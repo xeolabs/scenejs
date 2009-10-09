@@ -1,0 +1,137 @@
+<!--
+	Builds Guava3D
+
+	Guava3D home:	http://www.xeolabs.com/portal/projects/guava3d
+	Author: 	Lindsay S. Kay, 19/4/2009
+-->
+<project name="" basedir="." default="test">
+
+    <property name="BUILD_MAJOR" value="0"/>
+    <property name="BUILD_MINOR" value="2"/>
+    <property name="BUILD_ID" value="5"/>
+
+    <property name="DIST_DIR"
+              location="${basedir}/dist"
+              description="Folder for concatenated, min, lite and packed target"/>
+
+    <property name="GUAVA_DIST"
+              location="${DIST_DIR}/guava3d.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js"/>
+
+    <property name="GUAVA_LATEST_DIST"
+              location="${DIST_DIR}/guava3d.js"/>
+
+    <property name="RHINO_JAR" location="test/lib/rhino/js.jar" description="Rhino JS Engine"/>
+
+    <property name="LIB_DIR"
+              location="${basedir}/lib"
+              description="Libraries Folder"/>
+
+    <property name="SRC_DIR"
+              location="${basedir}/src"
+              description="Source Folder"/>
+
+    <property name="TEST_DIR"
+              location="${basedir}/test"
+              description="Folder for tests"/>
+
+    <macrodef name="git">
+        <attribute name="command"/>
+        <attribute name="dir" default=""/>
+        <element name="args" optional="true"/>
+        <sequential>
+            <echo message="git @{command}"/>
+            <exec executable="git" dir="@{dir}">
+                <args>
+                    <arg value="@{command}"/>
+                </args>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="git-clone-pull">
+        <attribute name="repository"/>
+        <attribute name="dest"/>
+        <sequential>
+            <git command="clone">
+                <args>
+                    <arg value="@{repository}"/>
+                    <arg value="@{dest}"/>
+                </args>
+            </git>
+            <git command="pull" dir="@{dest}"/>
+        </sequential>
+    </macrodef>
+
+    <target name="all" depends="package"/>
+
+    <target name="test" description="Test Guava3D">
+        <echo message="Creating test report in ${TEST_DIR}/target/index.html"/>
+        <java fork="true" jar="${TEST_DIR}/lib/rhino/js.jar" failonerror="true">
+            <arg value="${TEST_DIR}/src/test-guava3d.js"/>
+            <jvmarg value="-Dfile.encoding=utf-8"/>
+        </java>
+    </target>
+
+    <target name="package" depends="test" description="Main Guava build">
+        <mkdir dir="${DIST_DIR}"/>
+        <!-- CORE -->
+        <echo message="Building ${GUAVA_DIST}"/>
+        <concat destfile="${GUAVA_DIST}">
+
+            <!-- Core graph framework -->
+
+            <fileset dir="${SRC_DIR}" includes="graph/core.js"/>
+            <fileset dir="${SRC_DIR}" includes="graph/event.js"/>
+            <fileset dir="${SRC_DIR}" includes="graph/graphContext.js"/>
+            <fileset dir="${SRC_DIR}" includes="graph/nodeContext.js"/>
+            <fileset dir="${SRC_DIR}" includes="graph/node.js"/>
+            <fileset dir="${SRC_DIR}" includes="graph/graph.js"/>
+
+            <!-- Canvas manager framework -->
+
+            <fileset dir="${SRC_DIR}" includes="canvas/canvasManager.js"/>
+
+            <!-- Scene node types -->
+
+            <fileset dir="${SRC_DIR}" includes="scene/commons.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/alpha.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/appearance.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/boundingBox.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/geometry.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/box.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/camera.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/Canvas.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/layer.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/lighting.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/scalarInterpolator.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/loop.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/transformGroup.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/viewSpace.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/renderer.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/renderer/firefoxRenderer.js"/>
+            <fileset dir="${SRC_DIR}" includes="scene/selector.js"/>
+
+            <!-- Third-party libraries needed by plugins -->
+
+            <fileset dir="${LIB_DIR}" includes="sylvester.js"/>
+
+            <!-- Canvas support plugins -->
+
+            <fileset dir="${SRC_DIR}" includes="backend/mozglweb20/mozGlWeb20CanvasBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="backend/mozglweb20/mozGlWeb20NodeBackends.js"/>
+
+        </concat>
+        <echo message="${GUAVA_DIST} built."/>
+        <copy tofile="${GUAVA_LATEST_DIST}" file="${GUAVA_DIST}"/>
+    </target>
+
+    <target name="push" depends="test">
+        <sequential>
+            <echo message="git push origin"/>
+            <exec executable="git">
+                <arg value="push"/>
+                <arg value="origin"/>
+            </exec>
+        </sequential>
+    </target>
+</project>
