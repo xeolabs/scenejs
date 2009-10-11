@@ -11,45 +11,33 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
     ],
 
     vertexShaders: [
-        "attribute vec3 Vertex;\n" +
-        "attribute vec3 Normal;\n" +
-        "attribute vec4 InColor;\n" +
+        'attribute vec3 Vertex; ' +
+        'attribute vec3 Normal; ' +
+        'attribute vec4 InColor; ' +
 
-            /* Matrix locations - these will be mapped to scene reserved names
-             */
-        "uniform mat4 PMatrix;\n" +
-        "uniform mat4 MVMatrix;\n" +
-        "uniform mat3 NMatrix;\n" +
+        'uniform mat4 PMatrix; ' +
+        'uniform mat4 MVMatrix; ' +
 
-            /* Light position - a value for this is specified in the node's 'vars' config
-             */
-        "uniform vec4 LightPos;\n" +
+        'uniform vec4 LightPos; ' +
+        'varying vec4 FragColor; ' +
 
-        "varying vec4 FragColor;\n" +
+        'void main(void) { ' +
+        ' vec4 v = vec4(Vertex, 1.0); ' +
+        ' vec4 vmv = MVMatrix * v; ' +
+        ' gl_Position = PMatrix * vmv; ' +
 
-        "void main(void) {\n" +
-        "    vec4 v = vec4(Vertex, 1.0);\n" +
-        "    vec4 vmv = MVMatrix * v;\n" +
-        "    gl_Position = PMatrix * vmv;\n" +
+        ' vec3 lightDir = vec3(normalize(vmv - LightPos)); ' +
 
-        "    vec3 nn = normalize(NMatrix * Normal);\n" +
-        "    vec3 lightDir = vec3(normalize(vmv - LightPos));\n" +
+        ' float NdotL = max(dot(lightDir, Normal), 0.0); ' +
 
-        "    float intensity = dot(lightDir, nn);\n" +
+        ' const vec3 diffuseColor = vec3(0.4, 0.4, 0.2); ' +
+        ' const vec3 lightColor = vec3(0.1, 0.1, 0.6); ' +
+        ' const vec3 ambientColor = vec3(0.1, 0.1, 0.1); ' +
 
-        "    vec4 color;\n" +
+        ' vec3 diffuse = diffuseColor + lightColor; ' +
 
-        "    if (intensity > 0.95)\n" +
-        "      color = vec4(1.0,0.5,0.5,1.0);\n" +
-        "    else if (intensity > 0.5)\n" +
-        "      color = vec4(0.6,0.3,0.3,1.0);\n" +
-        "    else if (intensity > 0.25)\n" +
-        "      color = vec4(0.4,0.2,0.2,1.0);\n" +
-        "    else\n" +
-        "      color = vec4(0.2,0.1,0.1,1.0);\n" +
-
-        "    FragColor = color;\n" +
-        "}\n"
+        ' FragColor = vec4(NdotL * diffuse + ambientColor, 1.0); ' +
+        '}'
     ],
 
     /** Setter functions to inject data into the scripts via the GL context. Note that in some cases these also
@@ -64,10 +52,6 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
 
         scene_ModelViewProjectionMatrix: function(gl, findVar, mat) {
             gl.uniformMatrix4fv(findVar(gl, 'PMatrix'), mat.flatten());
-        },
-
-        scene_NormalMatrix: function(gl, findVar, mat) {
-            gl.uniformMatrix3fv(findVar(gl, 'NMatrix'), mat.flatten());
         },
 
         scene_Normal: function(gl, findVar, normals) {

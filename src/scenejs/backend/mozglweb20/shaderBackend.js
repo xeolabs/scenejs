@@ -79,7 +79,7 @@ SceneJs.ShaderBackend = function(program) {
                             fs.shader = undefined;
                         }
                         for (var i = 0; i < program.vertexShaders.length; i++) {
-                            var vs = program.vertexShaders[j];
+                            var vs = program.vertexShaders[i];
                             context.deleteProgram(vs.shader);
                             vs.shader = undefined;
                         }

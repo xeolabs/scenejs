@@ -49,9 +49,9 @@ var scene = new SceneJs.Graph({
                     vars: {
                         light: {
                             pos: {
-                                x: -100.0,
-                                y: -200.0,
-                                z: 200.0
+                                x: 60.0,
+                                y: 60.0,
+                                z: -100.0
                             }
                         }
                     },
@@ -64,7 +64,7 @@ var scene = new SceneJs.Graph({
 
                             x : 1,
                             y : 1,
-                            width: 500,
+                            width: 400,
                             height: 400,
 
                             children: [

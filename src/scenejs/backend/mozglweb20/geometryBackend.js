@@ -20,18 +20,18 @@ SceneJs.Backend.installNodeBackend(
                 context = _cfg.context;
             };
 
-            this.drawGeometry = function(g) {
+            this.drawGeometry = function(geo) {
                 if (ctx.programs && ctx.programs.getActiveProgramName()) {
-                    if (g.vertices) {
-                        ctx.programs.setVariable(context, 'scene_Vertex', g.vertices);
+                    if (geo.vertices) {
+                        ctx.programs.setVariable(context, 'scene_Vertex', geo.vertices);
                     }
-                    if (g.normals) {
-                        ctx.programs.setVariable(context, 'scene_Normal', g.normals);
+                    if (geo.normals) {
+                        ctx.programs.setVariable(context, 'scene_Normal', geo.normals);
                     }
-                    if (g.colors) {
-                        // ctx.programs.setVariable(context, 'scene_Color', g.colors);
+                    if (geo.colors) {
+                        // ctx.programs.setVariable(context, 'scene_Color', geo.colors);
                     }
-                    context.drawElements(context.TRIANGLES, g.indices.length, context.UNSIGNED_SHORT, g.indices);
+                    context.drawElements(context.TRIANGLES, geo.indices.length, context.UNSIGNED_SHORT, geo.indices);
                 } else {
                     // No program active.
                     // TODO: load geometry via GL fixed function pipeline

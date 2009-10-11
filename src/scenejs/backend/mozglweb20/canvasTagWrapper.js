@@ -27,20 +27,12 @@ SceneJs.Backend.installCanvasBackend(new (function() {
 
     this.aquire = function(cfg) {
         var context = cfg.context;
-        context.clearColor(0.8, 0.8, 0.9, 1.0);
-        context.clearDepth(1.0);
-        context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-        context.enable(context.DEPTH_TEST);
-        //      context.enable(context.CULL_FACE);
-        //    context.hint(context.PERSPECTIVE_CORRECTION_HINT, context.NICEST);
     };
 
     this.release = function(cfg) {
         cfg.context.swapBuffers();
     };
 
-    /** Called to release config resources when canvas element removed from DOM
-     */
     this.destroy = function(cfg) {
 
     };
