@@ -20,6 +20,6 @@ SceneJS is written by [Lindsay Kay][xeolabs-github]. Lindsay has a skunkworks at
 [scenejs-forum]: http://scenejs.bbster.net/
 [scenejs-docs]: http://scenejs.com/docs/introduction.html
 [scenejs-issues]: http://github.com/xeolabs/scenejs/issues
-[scenejs-downloads]: http://scenejs.com/downloads.html
+[scenejs-downloads]: http://scenejs.com/downloads/downloads.html
 [xeolabs-github]: http://github.com/xeolabs
 [xeolabs.com]: http://www.xeolabs.com
