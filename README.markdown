@@ -4,20 +4,12 @@ SceneJS is an object-oriented Javascript framework from [XeoLabs][xeolabs-home] 
 API on top of the powerful OpenGL-specification 3D Canvas element.
 
 ## More Information
-Project home:
-[http://www.scenejs.com][scenejs-home]
 
-Download:
-[SceneJS Downloads][scenejs-downloads]
-
-Learn more:
-[SceneJS Documentation][scenejs-docs]
-
-Discuss:
-[SceneJS Community Forums][scenejs-forum]
-
-Report a bug or request a feature:
-[SceneJS Bug Tracker][scenejs-issues]
+ - [Homepage][scenejs-home]
+ - [Downloads][scenejs-downloads]
+ - [Documentation][scenejs-docs]
+ - [Community Forums][scenejs-forum]
+ - [Issue Tracker][scenejs-issues]
 
 ## Author
 
