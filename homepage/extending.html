@@ -1,0 +1,442 @@
+<html>
+
+<head>
+    <title>SceneJS | OpenGL Scene Graph for Javascript</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Style-Type" content="text/css"/>
+
+    <script class="javascript" src="js/sh_main.min.js"></script>
+    <script class="javascript" src="js/sh_javascript.js"></script>
+
+    <link href="css/sh_style.css" rel="stylesheet" type="text/css"/>
+
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="css/layout.css" rel="stylesheet" type="text/css"/>
+
+
+</head>
+
+<body id="about" onload="sh_highlightDocument();">
+
+<div id="main">
+
+<div id="header">
+    <a href="index.html"><img src="images/scenejs_small.png" id="logo" alt=""/></a>
+    <ul id="menu">
+        <li><a href="http://github.com/xeolabs/scenejs/downloads"><span><span>Download</span></span></a></li>
+        <li id="menu-act"><a href="intro.html"><span><span>Documentation</span></span></a></li>
+        <li><a href="http://github.com/xeolabs/scenejs/issues"><span><span>Issues</span></span></a></li>
+        <li><a href=""><span><span>Forum</span></span></a></li>
+        <li><a href="http://github.com/xeolabs/scenejs"><span><span>Sourcecode</span></span></a></li>
+    </ul>
+    <div id="headerContent">
+        <div id="headerContentContainer">
+            <a href="intro.html">Introduction</a>&nbsp;|&nbsp;Core Graph API&nbsp;&nbsp;
+        </div>
+    </div>
+</div>
+
+<div id="content">
+<div class="row-1">
+<div class="wrapper">
+<h1>Core Graph API</h1>
+
+<p><span>The Graph API sits at the bottom of SceneJS's layered architecture to provide general graph connectivity,
+    statefulness and event flow. It defines the basic node class, which is extended by the <a
+            href="/portal/node/101">scene node classes</a> (transforms, geometry etc.) within the
+    <a href="/portal/node/91">Scene API</a>.</span></p>
+
+<p>In this section you'll learn how to apply the Graph API, including</p>
+<ul class="featurelist">
+    <li class="featurelist"><a href="#struct">Graph Structure and Traversal</a> - how to construct a graph and how
+        SceneJS will
+        traverse it,
+    </li>
+    <li class="featurelist"><a href="#instancing">Instancing</a> - how to save memory by re-using the same node objects
+        in
+        multiple
+        locations within a graph,
+    </li>
+    <li class="featurelist"><a href="#events">Event Flow between Nodes</a> - how nodes can communicate with each other,
+        and
+    </li>
+    <li class="featurelist"><a href="#state">Runtime State Management</a> - how a graph remembers state during and
+        between
+        traversals
+    </li>
+    <li class="featurelist"><a href="#caveats">Caveats</a> things you should avoid doing with the Graph API, unless you
+        enjoy
+        debugging!
+    </li>
+</ul>
+<br/><br/>
+<a class="name" name="struct"><h2>Graph Structure and Traversal</h2></a>
+<p><span>SceneJS traverses its graph in depth-first order each time it renders a frame, visiting each node twice in a variation
+on the Visitor pattern - once to "pre-visit" after arrival before visiting its children, then again to "post-visit" it on
+departure. From arrival until departure, SceneJS is said to be "visiting" the node, so with respect to visitation a
+SceneJS graph implements the Composite pattern. Example 1 shows basic node types assembled into a graph. One of the nodes has
+pre- and post-visit methods defined. The nodeContext passed to these methods is the node's <b>runtime context</b> and is
+also passed into event listeners, as will be shown below. The resources provided by these nodeContexts will be
+introduced in the sections below.</span></p>
+
+<br/><br/><b>Example 1.</b> A minimal graph, in which one of the nodes has <em>preVisit</em> and <em>postVisit</em>
+methods
+defined.
+<pre class="sh_javascript">
+var graph = new SceneJs.Graph({
+        children: [
+            new SceneJs.Node({
+
+                preVisit: function(nodeContext) {
+	             	// Your pre-visit functionality
+                },
+                postVisit: function(nodeContext) {
+			// Your post-visit functionality
+                },
+
+                children: [
+                    new SceneJs.Node(),
+                    new SceneJs.Node()
+                ]
+            }),
+            new SceneJs.Node()
+	]
+});
+
+graph.traverse();
+</pre>
+<br/>
+<a class="name" name="instancing"><h2>Node Instancing</h2></a>
+<p><span>A SceneJS node can have more than one parent. In the graphics world this is referred to as "instancing". Although the
+node is duplicated across many location, each "instance" may have other differentiating parameters set by higher nodes during
+graph traversal. By factoring out common data between instances to achieve lower memory usage, this technique is an
+example of the Flyweight design pattern. Example 2 shows a trivial example in which a node is attached twice to the same
+parent. Internally, SceneJS lazily back-links each node it its parent on arrival, then un-links it on departure, so in
+this example it's as if we had two different node objects on the parent.</span></p>
+
+<br/><br/><b>Example 2.</b> Same node instance connected into a Graph in two locations
+<pre class="sh_javascript">
+var node = new SceneJs.Node();
+
+var scene = new SceneJs.Graph({
+    children: [
+        new SceneJs.Node({
+            children: [
+                node,
+                node
+            ]
+        })
+    ]
+});
+</pre>
+<br/>
+<a class="name" name="events"><h2>Event Flow between Nodes</h2></a>
+<p><span>Nodes can send messages to each other through events. There are two kinds of event: "parent-events", which are fired
+down the hierarchy at sub-nodes, and "child-events", which are fired up the hierarchy. Each node may be configured with
+listeners to catch events: parent-listeners handle buffered incoming parent-events just before pre-visit, while
+child-listeners immediately handle child-events as they are fired from child nodes. Note that parent events are buffered
+because, as mentioned above, child nodes are lazy linked to their parents when traversed into - they don't actually
+exist as children at the point when the parent event is fired. </span></p>
+<br/><br/>
+
+<h3>Child Events - Events from Child Nodes to Parents</h3>
+<p><span>The graph in Example 3 contains a node which fires a couple of child events up the hierarchy. There's that node runtime
+context again - the nodeContext passed into the node's preRender method - which provides methods for firing child and
+parent events. Note the comments in this example, which indicate the sequence in which things happen. See how the 'beta'
+event is consumed so that it does not continue to bubble up the hierarchy. When a node fires a child event, SceneJS
+immediately fires the event at corresponding child-event listeners on each node on the path up to the root, stopping as
+soon as one of the listeners has marked the event as consumed.</span></p>
+
+<br/><br/><b>Example 3.</b> Graph containing a node that fires child events up the hierarchy.
+<pre class="sh_javascript">
+var graph = new SceneJs.Graph({
+        children: [
+            new SceneJs.Node({
+                childListeners: {
+                    'alpha': {
+			fn: function(nodeContext, event) {
+
+				// Event 'alpha' has bubbled up and is handled here again at step 3.
+
+				alert('Event name ' + event.name + ' handled with params ' + event.foo + " and " + event.bar);
+			}
+                    }
+                },
+                children: [
+                    new SceneJs.Node({
+                        childListeners: {
+                            'alpha': {
+				fn: function(nodeContext, event) {
+
+					// Event 'alpha' is handled here at step 2.
+				}
+                            }  ,
+                            'beta': {
+				fn: function(nodeContext, event) {
+
+					// Event 'beta' is handled here at step 4.
+					// Consume it so it doesnt bubble up to parent.
+
+					event.consumed = true;
+				}
+                            }
+                        },
+                        children: [
+                            new SceneJs.Node({
+                                preVisit : function(nodeContext) {
+
+                                        // Events alpha' and 'beta' are fired from here at step 1.
+
+					nodeContext.fireChildEvent('alpha', {
+					        foo: 'foo value',
+					        bar: 'bar value'
+					});
+
+					nodeContext.fireChildEvent('beta', {
+					        foo: 'foo value',
+					        bar: 'bar value'
+					});
+                                }
+                            })
+                        ]
+                    })
+                ]})
+        ]
+});
+
+graph.traverse();
+</pre>
+<br/>
+
+<h3>Parent Events - Events from Parent Nodes to Children</h3>
+<p><span>The graph in Example 4 contains a node that fires a couple of parent events down the hierarchy. See how the 'alpha'
+event is consumed so that it does not continue to radiate down the hierarchy. Actually, parent events don't really
+travel anywhere. When a node fires a parent event, it just buffers it locally. Then just before SceneJS pre-visits each
+lower node, for each parent-event listener it finds on the node it hunts up the hierarchy for the corresponding event,
+firing the listener if and when it finds the event. At that point, SceneJS stops hunting, so effectively a parent event
+overrides any of the same name that was fired higher up the tree. While there is negligible overhead in firing parent
+events, there is some overhead in handling parent events from far up the hierarchy. As soon as a parent-event listener
+consumes an event, the event effectively disappears, preventing any nodes subsequently visited during the traversal from
+ever seeing it.</span></p>
+
+<br/><br/><b>Example 4.</b> Graph containing a node that fires parent events down the hierarchy.
+<pre class="sh_javascript">
+var graph = new SceneJs.Graph({
+        children: [
+            new SceneJs.Node({
+                preVisit:function(nodeContext) {
+
+                        // Events 'alpha' and 'beta' are fired from here at Step 1.
+
+			nodeContext.fireParentEvent('alpha', {
+				foo: 'foo value',
+				bar: 'bar value'
+			});
+
+
+			nodeContext.fireParentEvent('beta', {
+				foo: 'foo value',
+				bar: 'bar value'
+			});
+                },
+                children: [
+                    new SceneJs.Node({
+                        parentListeners: {
+                            	'alpha': {
+					fn: function(nodeContext, event) {
+
+						// Event 'alpha' is handled here at step 2 and is consumed so that it stops here.
+						// Parent events are handled just prior to preVisit.
+
+                                                event.consumed = true;
+					}
+				},
+				'beta': {
+					fn: function(nodeContext, event) {
+
+						// Event 'beta' is handled here at step 3.
+					}
+				}
+                     	}
+                    }),
+                    new SceneJs.Node({
+                        parentListeners: {
+				'beta' : {
+					fn: function(nodeContext, event) {
+
+						// Event 'beta' is handled again here at step 4.
+					}
+				}
+                        } ,
+                        children: [
+                            new SceneJs.Node({
+                                children: [
+                                    new SceneJs.Node({
+                                        parentListeners: {
+                                            'beta': {
+						fn: function(nodeContext, event) {
+
+							// Event 'beta' is handled yet again here at step 5.
+						}
+                                            }
+                                        }
+                                    })
+                                ]
+                            })
+                        ]
+                    })
+                ]})
+        ]
+});
+
+graph.traverse();
+</pre>
+<br/>
+<a class="name" name="state"><h2>Runtime State Management</h2></a>
+<p><span>SceneJS holds a graph's runtime state in a <b>graph runtime context</b>. Some of that state can be persistent between
+traversals, such as the counter in Example 5 below. In that example, the graph runtime context is created with a counter
+property, then while the counter is less than ten the graph is traversed, during which the sole node increments the
+counter each time.</span></p>
+
+<br/><br/><b>Example 5.</b> Graph with a single node that increments a counter on the runtime context that persists
+between traversals
+<pre class="sh_javascript">
+var graph = new SceneJs.Graph({
+        children: [
+          	new SceneJs.Node({
+          	    	preVisit: function(nodeContext) {
+				var graphContext = nodeContext.getGraphContext();
+            			graphContext.counter++;
+                	}
+            	})
+      	]
+});
+
+
+var graphContext = { counter: 0 };
+while (graphContext.counter < 10) {
+   	graph.traverse(graphContext);
+}
+</pre>
+
+<p><span>Graph nodes may create properties on the graph runtime context on preVisit then destroy them on postVisit. Various
+Node-subtypes in the <a href="/portal/node/91">Scene API</a> manage some quite elaborate properties on the context. For
+example, <a href="/portal/node/91#transformgroup">TransformGroups</a> push and pop to a matrix stack on the context, a
+<a href="/portal/node/91#device">Device</a> sets and removes renderer objects, and so on. In Example 6 below we have a
+parent node that sets a message on the graph runtime context with it's preVisit method. The child reads the message,
+then the parent un-sets it again in its postVisit method. Also, note that Graph's traverse method internally creates a
+default empty graph runtime context since we didn't supply our own. In this example the context is therefore created
+afresh with each traversal.</span></p>
+
+<br/><br/><b>Example 6.</b> Graph with a parent node that manages a property on the runtime context for a child
+<pre class="sh_javascript">
+var graph = new SceneJs.Graph({
+     	children: [
+           	new SceneJs.Node({
+
+           	     preVisit: function(nodeContext) {
+
+           	 		// Parent node gets graph context from node context
+
+           	 		// and sets something on it for child
+
+           	          	var graphContext = nodeContext.getGraphContext();
+           	 		graphContext.foo = 'Hi, child nodes!';
+
+           	     },
+
+           	     postVisit: function(nodeContext) {
+
+           	 		// Ordinarily each node should restore the graph context
+           	 		// to its original state before it was modified on pre-visit
+
+           	             var graphContext = nodeContext.getGraphContext();
+           	 		graphContext.foo = null;
+           	     },
+
+           	     children: [
+           	         new SceneJs.Node({
+           	 		preVisit: function(nodeContext) {
+
+           		     		// Child node finds what parent set on graph context
+
+           	                 	var graphContext = nodeContext.getGraphContext();
+           		     		alert('Message from parent: ' + graphContext.foo);
+           	         	}
+                          })
+                     ]
+
+       		})
+      	]
+});
+
+// If not supplied, a default internal graph runtime context is
+
+// created that will not persist between traversals
+
+graph.traverse();
+</pre>
+
+<br/>
+<a class="name" name="caveats"><h2>Caveats</h2></a>
+<p><span>As with any framework, there are a few things you should never do with SceneJs. I'll add more here as people discover
+them.</span></p>
+    <br/>
+<h3>Don't retain and modify configuration objects</h3>
+<p><span>The configuration passed to a Node constructor should not be retained and modified by the caller. In other words, the
+following is a very bad thing to do: </span></p>
+<pre class="sh_javascript">
+var config = {
+     preVisit: function() {
+          // Do something
+     }
+};
+var myNode1 = new SceneJs.Node(config);
+
+config.preVisit = function() {
+     // Do something different
+}
+var myNode2 = new SceneJs.Node(config);
+</pre>
+<p><span>For efficiency, it's the contract of a Node to hold a reference to the config object, not a clone of it. So in the above
+example, node1's preVisit method will be redefined, giving unexpected results. It's best not to retain a config once
+you've created a Node with it.</span></p>
+
+    <br/>
+<h3>Avoid firing events in cycles</h3>
+<p><span>SceneJS is not clever enough to determine if super and sub-nodes are firing events back-and-forth at each other in an
+endless loop, which would cause your graph traversal to hang.</span></p>
+         <br/>
+<h3>Avoid attaching a node to one of its sub-nodes</h3>
+<p><span>Don't connect nodes into cycles. If you do that, SceneJS will blindly traverse them forever.</span></p>
+              <br/><br/>
+<a class="name" name="next"><h2>Next Step: The Scene API</h2></a>
+<p><span>That's it for the SceneJS Graph API. Now lets look at the <a href="/portal/node/91">Scene API</a>, which sub-classes the
+Graph API Node type to provide elements to build 3D scene graphs with.</span></p>
+
+</div>
+</div>
+<div id="footer">
+    <p>&copy; 2009, <a href="http://www.xeolabs.com">XeoLabs</a></p>
+
+</div>
+
+</div>
+
+</div>
+
+<!--
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-10689958-1");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+-->
+</body>
+
+</html>
