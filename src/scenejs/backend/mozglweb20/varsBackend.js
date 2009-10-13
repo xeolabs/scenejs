@@ -1,10 +1,12 @@
-/** WebGL support for the ShaderVars node
+/**
+ * WebGL backend for SceneJs.Vars node 
+ *
  */
 SceneJs.Backend.installNodeBackend(
         new (function() {
 
             this.canvasType = 'moz-glweb20';
-            this.nodeType = 'shader-vars';
+            this.nodeType = 'vars';
 
             var ctx;
             var cfg;
@@ -17,7 +19,11 @@ SceneJs.Backend.installNodeBackend(
                 cfg = _cfg;
             };
 
-            this.setVariable = function(name, value) {
-                ctx.programs.setVariable(cfg.context, name, value);
+            this.pushVarOverrides = function(vars) {
+                ctx.pushVarOverrides(cfg.context, vars);
+            };
+
+            this.popVarOverrides = function() {
+                ctx.popVarOverrides(cfg.context);
             };
         })());

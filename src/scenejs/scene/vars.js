@@ -1,9 +1,5 @@
-SceneJs.Shader = function(cfg) {
+SceneJs.Vars = function(cfg) {
     cfg = cfg || {};
-
-    if (!cfg.type) {
-        throw 'Mandatory Shader config missing: \'type\'';
-    }
 
     this.reset = function() {
         this.vars = cfg.vars || {};  // TODO: Clone these!!
@@ -12,7 +8,6 @@ SceneJs.Shader = function(cfg) {
     this.preVisit = function() {
         var backend = SceneJs.Backend.getNodeBackend(this.getType());
         if (backend) {
-            backend.activateProgram(this.getType());
             if (this.vars) {
                 backend.pushVars(this.vars);
             }
@@ -23,17 +18,18 @@ SceneJs.Shader = function(cfg) {
         var backend = SceneJs.Backend.getNodeBackend(this.getType());
         if (backend) {
             if (this.vars) {
-                backend.popVars({});
+                backend.popVars();
             }
-            backend.deactivateProgram();
         }
     };
 
-    SceneJs.Shader.superclass.constructor.call(this, SceneJs.apply(cfg, {
+    SceneJs.ShaderVars.superclass.constructor.call(this, SceneJs.apply(cfg, {
         getType: function() {
-            return cfg.type;
+            return 'vars';
         }
     }));
 };
 
-SceneJs.extend(SceneJs.Shader, SceneJs.Node, {});
+SceneJs.extend(SceneJs.ShaderVars, SceneJs.Node, {});
+
+

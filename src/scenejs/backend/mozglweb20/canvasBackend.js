@@ -1,5 +1,5 @@
 /**
- * WebGL support for Canvas node
+ * WebGL backend for Canvas node
  */
 SceneJs.Backend.installNodeBackend(
         new (function() {
@@ -10,21 +10,10 @@ SceneJs.Backend.installNodeBackend(
             var ctx;
             var cfg;
 
-            /**
-             * Installation-phase hook
-             *
-             * @param _ctx
-             */
             this.install = function(_ctx) {
                 ctx = _ctx;
             };
 
-            /** Configuration-phase hook;
-             *
-             *      - pushes identity matrix on model-view matrix stack
-             *
-             * @param _cfg
-             */
             this.configure = function(_cfg) {
                 cfg = _cfg;
                 cfg.context.clearDepth(1.0);               

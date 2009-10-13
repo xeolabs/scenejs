@@ -1,4 +1,4 @@
-/** Installs canvas tag wrapper for WebGL2.0 canvas
+/** WebGL canvas backend
  *
  */
 SceneJs.Backend.installCanvasBackend(new (function() {

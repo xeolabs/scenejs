@@ -1,4 +1,4 @@
-/** WebGL Support for Geometry node
+/** WebGL backend for Geometry node
  *
  */
 SceneJs.Backend.installNodeBackend(

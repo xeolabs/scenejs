@@ -1,4 +1,4 @@
-/** WebGL support for Viewport node
+/** WebGL backend for SceneJs.Viewport node
  *
  */
 SceneJs.Backend.installNodeBackend(

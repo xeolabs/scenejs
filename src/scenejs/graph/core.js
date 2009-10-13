@@ -106,6 +106,14 @@ SceneJs.apply = function(o, c, defaults) {
             }
         },
 
+        shallowClone : function(obj) {
+            var obj2 = {};
+            for (var key in obj) {
+                obj2[key] = obj[key];
+            }
+            return obj2;
+        },
+
         clone : function(obj) {
             return obj;
             //           var seenObjects = [];
@@ -170,7 +178,7 @@ SceneJs.apply(Function.prototype, {createCallback:function() {
                 }
             }
             return D.apply(C || window, F)
-        } ;
+        };
     }
 });
 

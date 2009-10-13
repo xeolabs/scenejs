@@ -1,7 +1,6 @@
-/** Base class for shader node support plugins.
+/**
+ * Base class for WebGL shader backends.
  *
- * This is subclassed to introduce a new GLSL shader into the scene backend, configuring your subclass with the
- * vertex and fragment shaders, along with setters to write values to their variables.
  */
 SceneJs.ShaderBackend = function(program) {
 
@@ -42,6 +41,8 @@ SceneJs.ShaderBackend = function(program) {
                 var programs = {};
                 var programStack = [];
                 var activeProgram = null;
+
+                var varStack = [];
 
                 /** Loads a program into the registry. Does nothing if program of same name already loaded.
                  *
@@ -130,23 +131,63 @@ SceneJs.ShaderBackend = function(program) {
                     return activeProgram ? activeProgram.nodeType : null;
                 };
 
-                /**
-                 * Sets value of a script variable on the currently active program. This employs the setter of the same name
-                 * on the active program to transfer the value into the GL context.
-                 *
-                 * @param context GL context
-                 * @name name Name of variable
-                 * @value value Value for variable
-                 */
-                this.setVariable = function(context, name, value) {
+                var _setVars = function(context, vars) {
                     if (!activeProgram) {
-                        throw 'No program active'; // Graph traversal probably not currently within a Program node
+                        throw 'No program active';
                     }
-                    var setter = activeProgram.setters[name];
-                    if (!setter) {
-                        throw 'No such setter on active program: \'' + name + '\'';
+                    for (var key in activeProgram.setters) {
+                        activeProgram.setters[key].call(this, context,
+                                activeProgram.varLocationMap.getVarLocation, vars[key]); // Defaults on null
                     }
-                    setter.call(this, context, activeProgram.varLocationMap.getVarLocation, value);
+                };
+
+                /** Writes vars to scripts of active program, falling back on setter's defaults where var not given
+                 */
+                this.setVars = function(context, vars) {
+                    _setVars(context, vars);
+                };
+
+                this.pushVars = function(context, vars) {
+                    if (!activeProgram) {
+                        throw 'No program active';
+                    }
+                    varStack.push(vars);
+                    _setVars(context, vars);
+                };
+
+                this.popVars = function(context) {
+                    if (!activeProgram) {
+                        throw 'No program active';
+                    }
+                    varStack.pop();
+                    if (varStack.length > 0) {
+                        _setVars(context, varStack[varStack.length - 1]);
+                    }
+                };
+
+                /* Pushes vars - new entry becomes clone of top with overrides and is written to script
+                 */
+                this.pushVarOverrides = function(context, vars) {
+                    if (!activeProgram) {
+                        throw 'No program active';
+                    }
+                    if (varStack.length > 0) {
+                        vars = SceneJs.applyIf(SceneJs.shallowClone(vars), varStack[varStack.length - 1]);
+                    }
+                    varStack.push(vars);
+                    _setVars(context, vars);
+                };
+
+                /* Pops vars - script is then reset to default vars and previous top is written to script
+                 */
+                this.popVarOverrides = function(context) {
+                    if (!activeProgram) {
+                        throw 'No program active';
+                    }
+                    varStack.pop();
+                    if (varStack.length > 0) {
+                        _setVars(context, varStack[varStack.length - 1]);
+                    }
                 };
 
                 /** Deactivates the current active program. Reactivates the program (if any) that was active prior to the
@@ -190,15 +231,12 @@ SceneJs.ShaderBackend = function(program) {
         ctx.programs.activateProgram(context, nodeType);
     };
 
-    /**
-     * Sets value of a script variable on the currently active program. This employs the setter of the same name
-     * on the active program to transfer the value into the GL context.
-     *
-     * @name name Name of variable
-     * @value value Value for variable
-     */
-    this.setVariable = function(name, value) {
-        ctx.programs.setVariable(context, name, value);
+    this.pushVars = function(vars) {
+        ctx.programs.pushVars(cfg.context, vars);
+    };
+
+    this.popVars = function() {
+        ctx.programs.popVars(cfg.context);
     };
 
     /** Deactivates the current active program. Reactivates the program (if any) that was active prior to the
