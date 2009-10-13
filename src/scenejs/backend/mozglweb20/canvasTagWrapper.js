@@ -8,25 +8,20 @@ SceneJs.Backend.installCanvasBackend(new (function() {
     /** Attempts to get a context on the given canvas it for this plugin. Returns context on success else null.
      * The actual context is wrapped in an object that could bundle resources alongside the context.
      */
-    this.getConfig = function(_canvas) {
+    this.getConfig = function(canvas) {
         var cfg = null;
         var context = null;
-        if (!_canvas) {
+        if (!canvas) {
             throw 'canvas is undefined';
         }
         try {
-            context = _canvas.getContext(this.canvasType);
+            context = canvas.getContext(this.canvasType);
         } catch(e) {
         }
-        cfg = {
-            canvas: _canvas,
-            context: context
-        };
-        return cfg;
+        return context ? {  canvas: canvas,  context: context } : null;
     };
 
     this.aquire = function(cfg) {
-        var context = cfg.context;
     };
 
     this.release = function(cfg) {
@@ -34,6 +29,5 @@ SceneJs.Backend.installCanvasBackend(new (function() {
     };
 
     this.destroy = function(cfg) {
-
     };
 })());

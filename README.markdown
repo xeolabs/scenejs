@@ -1,7 +1,7 @@
 # SceneJS
 
-SceneJS is an object-oriented Javascript framework from [XeoLabs][xeolabs-home] that provides an extensible scene graph
-API on top of the powerful OpenGL-specification 3D Canvas element.
+SceneJS is a extensible object-oriented Javascript framework that allows you to build scene graphs
+on top of the powerful OpenGL Canvas3D element.
 
 ## More Information
 
@@ -22,4 +22,4 @@ SceneJS is written by [Lindsay Kay][xeolabs-github]. Lindsay has a skunkworks at
 [scenejs-issues]: http://github.com/xeolabs/scenejs/issues
 [scenejs-downloads]: http://scenejs.com/downloads/downloads.html
 [xeolabs-github]: http://github.com/xeolabs
-[xeolabs.com]: http://www.xeolabs.com
+[xeolabs-home]: http://www.xeolabs.com
