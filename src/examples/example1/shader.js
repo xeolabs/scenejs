@@ -2,14 +2,6 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
 
     nodeType: 'example-shader-1',
 
-    fragmentShaders: [
-        'varying float intensity; ' +
-        'varying vec4 FragColor; ' +
-        'void main(void) { ' +
-        '      gl_FragColor = FragColor; ' +
-        '}'
-    ],
-
     vertexShaders: [
         'attribute vec3 Vertex; ' +
         'attribute vec3 Normal; ' +
@@ -37,6 +29,14 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
         ' vec3 diffuse = diffuseColor + lightColor; ' +
 
         ' FragColor = vec4(NdotL * diffuse + ambientColor, 1.0); ' +
+        '}'
+    ],
+
+    fragmentShaders: [
+        'varying float intensity; ' +
+        'varying vec4 FragColor; ' +
+        'void main(void) { ' +
+        '      gl_FragColor = FragColor; ' +
         '}'
     ],
 

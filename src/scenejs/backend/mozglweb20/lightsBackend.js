@@ -1,5 +1,5 @@
 /**
- * WebGL backend for SceneJs.Lights node 
+ * WebGL backend for SceneJs.Lights node
  */
 
 SceneJs.Backend.installNodeBackend(
@@ -17,14 +17,47 @@ SceneJs.Backend.installNodeBackend(
                     ctx.lightStack = new function() {
                         var stack = [];
 
+                        var clonePos = function(v) {
+                            return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
+                        };
+
+                        var cloneVec = function(v) {
+                            return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
+                        };
+
+                        var partialCloneLight = function(l) {
+                            return {
+                                pos : clonePos(l.pos),
+                                ambient : l.ambient,
+                                diffuse : l.diffuse,
+                                specular : l.specular,
+                                dir: cloneVec(l.dir),
+                                constantAttenuation: l.constantAttenuation,
+                                linearAttenuation: l.linearAttenuation,
+                                quadraticAttenuation: l.quadraticAttenuation
+                            };
+                        };
+
+                        var transform = function(mat, v) {
+                            var v2 = mat.x($V([v.x, v.y, v.z, 1.0]));
+                            return { x : v2.elements[0], y: v2.elements[1], z: v2.elements[2], w: 1 };
+                        };
+
                         this.pushLights = function(context, lights) {
                             if (!ctx.getActiveProgramName()) {
                                 throw 'No program active';
                             }
+                            var mat = ctx.mvMatrixStack.peek();
                             for (var i = 0; i < lights.length; i++) {
-                                stack.push(lights[i]);
+                                var light = lights[i];
+                                if (mat) {
+                                    light = partialCloneLight(light);   // Back-end never modifies parameters
+                                    light.pos = transform(mat, light.pos);
+                                    light.dir = transform(mat, light.dir);
+                                }
+                                stack.push(light);
                             }
-                            ctx.setVars(context, { lights: stack });
+                            ctx.setVars(context, { scene_Lights: stack });
                         };
 
                         this.popLights = function(context, numLights) {

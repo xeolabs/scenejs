@@ -2,7 +2,7 @@ SceneJs.Shader = function(cfg) {
     cfg = cfg || {};
 
     if (!cfg.type) {
-        throw 'Mandatory Shader config missing: \'type\'';
+        throw 'Mandatory Shader config missing: \'type\' (identifies required node backend)';
     }
 
     this.reset = function() {

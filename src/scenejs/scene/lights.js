@@ -1,4 +1,4 @@
-/** Variables for an enclosing Program node
+/** A list of lights to apply to sub-nodes. Each 
  *
  * @param cfg
  */
@@ -30,11 +30,16 @@ SceneJs.Lights = function(cfg) {
         };
     };
 
+    var cloneLights = function(lights) {
+        var lights2 = [];
+            for (var i = 0; i < lights.length; i++) {
+                lights2.push(cloneLight(lights[i]));
+            }
+        return lights2;
+    };
+
     var init = function() {
-        this.lights = [];
-        for (var i = 0; i < cfg.lights.length; i++) {
-            this.lights.push(cloneLight(cfg.lights[i]));
-        }
+        this.lights = cfg.lights ? cloneLights(cfg.lights) : [];
     };
 
     this.reset = function() {
@@ -44,7 +49,7 @@ SceneJs.Lights = function(cfg) {
     this.preVisit = function() {
         var backend = SceneJs.Backend.getNodeBackend(this.getType());
         if (backend) {
-            backend.pushLights(this.lights);
+            backend.pushLights(cloneLights(this.lights));
         }
     };
 

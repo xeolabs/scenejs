@@ -27,7 +27,7 @@
                     this.push = function(context, mat) {
                         stack.push(mat);
                         if (ctx.programs && ctx.programs.getActiveProgramName()) {
-                            ctx.programs.setVariable(context, 'scene_ModelViewMatrix', mat);
+                            ctx.programs.setVar(context, 'scene_ModelViewMatrix', mat);
                             //  ctx.programs.setVariable(context, 'scene_NormalMatrix', mat.inverse().transpose().make3x3());
                         } else {
                             // No program active.
@@ -41,7 +41,7 @@
                             stack.pop();
                             top = stack[stack.length - 1];
                             if (ctx.programs && ctx.programs.getActiveProgramName()) {
-                                ctx.programs.setVariable(context, 'scene_ModelViewMatrix', top);
+                                ctx.programs.setVars(context, 'scene_ModelViewMatrix', top);
                                 // ctx.programs.setVariable(context, 'scene_NormalMatrix', top.inverse().transpose().make3x3());
                             } else {
                                 // No program loaded.

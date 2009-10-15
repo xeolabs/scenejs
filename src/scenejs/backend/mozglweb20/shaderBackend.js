@@ -141,7 +141,18 @@ SceneJs.ShaderBackend = function(program) {
                     }
                 };
 
-                /** Writes vars to scripts of active program, falling back on setter's defaults where var not given
+                /** Calls the specified setter, if it exists, on the active program
+                 */
+                this.setVar = function(context, name, value) {
+                    if (activeProgram.setters[name]) {
+                        activeProgram.setters[name].call(this, context,
+                                activeProgram.varLocationMap.getVarLocation, value);
+                    }
+                };
+
+                /**
+                 * Sets vars on the active program; for each element in the vars, the setter of the
+                 * same name is called if it exists, passing the element's value into it.
                  */
                 this.setVars = function(context, vars) {
                     _setVars(context, vars);

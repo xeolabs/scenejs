@@ -3,18 +3,12 @@
  *
  * @param cfg
  */
-//SceneJs.BlinnPhongShader = SceneJs.extend(SceneJs.Shader, {
-//    getType: function() {
-//        return 'blinn-phong-shader';
-//    }
-//});
 
 SceneJs.BlinnPhongShader = function(cfg) {
     SceneJs.BlinnPhongShader.superclass.constructor.call(this, SceneJs.apply(cfg || {}, {
         type: 'blinn-phong-shader'
     }));
 };
-
 SceneJs.extend(SceneJs.BlinnPhongShader, SceneJs.Node, {});
 
 SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
@@ -24,12 +18,14 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
     fragmentShaders: [
         'varying float intensity; ' +
         'varying vec4 FragColor; ' +
+
         'void main(void) { ' +
         '      gl_FragColor = FragColor; ' +
         '}'
     ],
 
     vertexShaders: [
+
         'struct Material { ' +
         '   vec4 ambient; ' +
         '   vec4 diffuse; ' +
@@ -37,19 +33,18 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
         '   float shininess; ' +
         ' }; ' +
 
-        'vec2 dLight(' +
-        'in vec3 light_pos,' + // light position
-        'in vec3 half_light, ' + // half-way vector between light and view
-        'in vec3 frag_normal, ' + // geometry normal
-        'in float shininess ' +
+        'vec2 dLight(in vec3 light_pos,' + // light position
+        '   in vec3 half_light, ' + // half-way vector between light and view
+        '   in vec3 frag_normal, ' + // geometry normal
+        '   in float shininess ' +
         ') { ' +
             // returns vec2( ambientMult, diffuseMult )
-        '   float n_dot_pos = max( 0.0, dot(frag_normal, light_pos)); ' +
-        '   float n_dot_half = 0.0; ' +
-        '   if (n_dot_pos > -.05) { ' +
-        '       n_dot_half = pow(max(0.0,dot(half_light, frag_normal)), shininess); ' +
-        '   } ' +
-        '   return vec2( n_dot_pos, n_dot_half); ' +
+        '       float n_dot_pos = max( 0.0, dot(frag_normal, light_pos)); ' +
+        '       float n_dot_half = 0.0; ' +
+        '       if (n_dot_pos > -.05) { ' +
+        '           n_dot_half = pow(max(0.0,dot(half_light, frag_normal)), shininess); ' +
+        '       } ' +
+        '       return vec2( n_dot_pos, n_dot_half); ' +
         ' } ' +
 
         ' uniform Material material; ' +
@@ -58,28 +53,35 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
         ' varying vec3 baseNormal; ' +
 
         ' void main() { ' +
-        '     vec4 fragColor = Global_ambient * material.ambient; ' +
-        '     int AMBIENT = 0; ' +
-        '     int DIFFUSE = 1; ' +
-        '     int SPECULAR = 2; ' +
-        '     int POSITION = 3; ' +
-        '     int i; ' +
-        '     for (i=0;i<12;i=i+4) { ' +
-        '         vec3 EC_Light_location = normalize( ' + // normalized eye-coordinate Light location
-        '             gl_NormalMatrix * lights[i+POSITION].xyz ' +
-        '         ); ' +
-        '         vec3 Light_half = normalize( ' + // half-vector calculation
-        '             EC_Light_location - vec3( 0,0,-1 ) ' +
-        '         ); ' +
-        '         vec2 weights = dLight( EC_Light_location, Light_half,baseNormal, material.shininess ); ' +
-        '         fragColor = ( ' +
-        '             fragColor ' +
-        '             + (lights[i+AMBIENT] * material.ambient) ' +
-        '             + (lights[i+DIFFUSE] * material.diffuse * weights.x) ' +
-        '             + (lights[i+SPECULAR] * material.specular * weights.y) ' +
-        '         ); ' +
-        '     } ' +
-        '     gl_FragColor = fragColor; ' +
+        '       vec4 fragColor = Global_ambient * material.ambient; ' +
+
+        '       int AMBIENT = 0; ' +
+        '       int DIFFUSE = 1; ' +
+        '       int SPECULAR = 2; ' +
+        '       int POSITION = 3; ' +
+
+        '       int i; ' +
+
+        '       for (i=0; i<12; i=i+4) { ' +
+
+        '           vec3 EC_Light_location = normalize( ' + // normalized eye-coordinate Light location
+        '               gl_NormalMatrix * lights[i+POSITION].xyz ' +
+        '           ); ' +
+
+        '           vec3 Light_half = normalize( ' + // half-vector calculation
+        '               EC_Light_location - vec3( 0,0,-1 ) ' +
+        '           ); ' +
+
+        '           vec2 weights = dLight( EC_Light_location, Light_half,baseNormal, material.shininess ); ' +
+
+        '           fragColor = ( ' +
+        '               fragColor ' +
+        '               + (lights[i+AMBIENT] * material.ambient) ' +
+        '               + (lights[i+DIFFUSE] * material.diffuse * weights.x) ' +
+        '               + (lights[i+SPECULAR] * material.specular * weights.y) ' +
+        '           ); ' +
+        '       } ' +
+        '       gl_FragColor = fragColor; ' +
         ' } '
     ],
 
@@ -129,23 +131,42 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
             }
         },
 
-        scene_Color:  function(gl, findVar, colors) {
-
-            var loc = findVar(gl, 'InColor');
-            gl.vertexAttribPointer(loc, 4, gl.FLOAT, false, 0, colors);
-            gl.enableVertexAttribArray(loc);
+        scene_Material: function(gl, findVar, material) {
+            gl.uniform3fv(findVar(gl, 'Material'),
+                    [
+                        m.ambient.r, m.ambient.g, m.ambient.b, m.ambient.a,//
+                        m.diffuse.r, m.diffuse.g, m.diffuse.b, m.diffuse.a,//
+                        m.specular.r, m.specular.g, m.specular.b, m.specular.a,//
+                        m.shininess
+                    ]);
         },
 
-        lights: function(gl, findVar, lights) {
+        scene_Lights: function(gl, findVar, lights) {
             var la = [];
             for (var i = 0; i < lights.length; i++) {
                 var l = lights[i];
-                la.push([l.ambient.pos.x, l.ambient.pos.y, l.ambient.pos.z, 1.0]);
-                la.push([l.diffuse.pos.x, l.diffuse.pos.y, l.diffuse.pos.z, 1.0]);
-                la.push([l.specular.pos.x, l.specular.pos.y, l.specular.pos.z, 1.0]);
-                la.push([l.position.pos.x, l.position.pos.y, l.position.pos.z, 1.0]);
+
+                la.push([l.ambient.r]);
+                la.push([l.ambient.g]);
+                la.push([l.ambient.b]);
+                la.push([l.ambient.a]);
+
+                la.push([l.diffuse.r]);
+                la.push([l.diffuse.g]);
+                la.push([l.diffuse.b]);
+                la.push([l.diffuse.a]);
+
+                la.push([l.specular.r]);
+                la.push([l.specular.g]);
+                la.push([l.specular.b]);
+                la.push([l.specular.a]);
+
+                la.push([l.position.x]);
+                la.push([l.position.y]);
+                la.push([l.position.z]);
+                la.push([0]); // 0 to flag as direction
             }
-            gl.uniform4fv(findVar(gl, 'lights'), 12, lights);
+            gl.uniform4fv(findVar(gl, 'lights'), lights);
         }
     }
 }));
