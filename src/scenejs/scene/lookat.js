@@ -1,32 +1,11 @@
-SceneJs.LookAt = function(cfg) {
-    cfg = cfg || {};
+SceneJs.lookAt = function() {
+
+    var cfg = SceneJs.getConfig(arguments);
+
+    var type = 'lookat';
 
     var cloneVec = function(v) {
         return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
-    };
-
-
-    var init = function() {
-        this.eye = cfg.eye ? cloneVec(cfg.eye) : { x: 0.0, y: 0.0, z: -10.0 };
-        this.look = cfg.look ? cloneVec(cfg.look) : { x: 0.0, y: 0.0, z: 0.0 };
-        this.up = cfg.up ? cloneVec(cfg.up) : { x: 0.0, y: 1.0, z: 0.0 };
-
-    };
-
-    init.call(this);
-
-    // Validate params - prevents creation of a singular matrix, ie. one full of zeros
-
-    if (this.eye.x == this.look.x && this.eye.y == this.look.y && this.eye.z == this.look.z) {
-        throw 'Invald SceneJs.LookAt configuration: eye and look cannot be identical';
-    }
-    
-    if (this.up.x == 0 && this.up.y == 0 && this.up.z == 0) {
-        throw 'Invald SceneJs.LookAt configuration: up vector cannot be of zero length, ie. all elements zero';
-    }
-
-    this.reset = function() {
-        init();
     };
 
     var makeLookAt = function(_eye,
@@ -53,47 +32,38 @@ SceneJs.LookAt = function(cfg) {
         return m.x(t);
     };
 
-    this.preVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var mvMatrix = makeLookAt(this.eye, this.look, this.up);
-            var mvTopMatrix = backend.getModelViewMatrixTop();
-            if (mvTopMatrix) {
-                mvMatrix = mvTopMatrix.x(mvMatrix).ensure4x4();
-            }
-            backend.pushModelViewMatrix(mvMatrix);
-            var gc = nodeContext.getGraphContext();
-            if (!gc.modelViewTransforms) {
-                gc.modelViewTransforms = [];
-            }
-            gc.modelViewTransforms.push({
-                type: this.getType(),
-                matrix: mvMatrix,
-                eye: cloneVec(this.eye),
-                look: cloneVec(this.look),
-                up: cloneVec(this.up)
-            });
-        }
-    };
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
 
-    this.postVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.popModelViewMatrix();
-            var gc = nodeContext.getGraphContext();
-            gc.modelViewTransforms.pop();
-        }
-    };
+                reset: function() {
+                    this.eye = cfg.eye ? cloneVec(cfg.eye) : { x: 0.0, y: 0.0, z: -10.0 };
+                    this.look = cfg.look ? cloneVec(cfg.look) : { x: 0.0, y: 0.0, z: 0.0 };
+                    this.up = cfg.up ? cloneVec(cfg.up) : { x: 0.0, y: 1.0, z: 0.0 };
 
-    SceneJs.LookAt.superclass.constructor.call(this, SceneJs.apply(cfg, {
-        getType: function() {
-            return 'lookat';
-        }
-    }));
+                    // Prevent creation of singular matrix
+
+                    if (this.eye.x == this.look.x && this.eye.y == this.look.y && this.eye.z == this.look.z) {
+                        throw 'Invald SceneJs.lookAt configuration: eye and look cannot be identical';
+                    }
+
+                    if (this.up.x == 0 && this.up.y == 0 && this.up.z == 0) {
+                        throw 'Invald SceneJs.lookAt configuration: up vector cannot be of zero length, ie. all elements zero';
+                    }
+                },
+
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.pushModelViewMatrix(makeLookAt(this.eye, this.look, this.up));
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.popModelViewMatrix();
+                    }
+                }
+            }));
 };
-
-SceneJs.extend(SceneJs.LookAt, SceneJs.Node, {
-
-});
-
 

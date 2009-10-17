@@ -1,35 +1,36 @@
-SceneJs.Vars = function(cfg) {
-    cfg = cfg || {};
+SceneJs.vars = function() {
 
-    this.reset = function() {
-        this.vars = cfg.vars || {};  // TODO: Clone these!!
-    };
+    var cfg = SceneJs.getConfig(arguments);
 
-    this.preVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            if (this.vars) {
-                backend.pushVars(this.vars);
-            }
-        }
-    };
+    var type = 'vars';
 
-    this.postVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            if (this.vars) {
-                backend.popVars();
-            }
-        }
-    };
+    return SceneJs.node(
 
-    SceneJs.ShaderVars.superclass.constructor.call(this, SceneJs.apply(cfg, {
-        getType: function() {
-            return 'vars';
-        }
-    }));
+            SceneJs.apply(cfg, {
+
+                reset : function() {
+                    this.vars = cfg.vars || {};  // TODO: Clone these!!
+                },
+
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        if (this.vars) {
+                            backend.pushVars(this.vars);
+                        }
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        if (this.vars) {
+                            backend.popVars();
+                        }
+                    }
+                }
+            }));
 };
 
-SceneJs.extend(SceneJs.ShaderVars, SceneJs.Node, {});
 
 

@@ -1,51 +1,50 @@
 /**
- *
- * @param cfg
+ *  Activates a DOM canvas element for its subtree. You can have more than one canvas node in your scene if you want
+ * multiple views of the scene on multiple canvas tags throughout your page.
  */
-SceneJs.Canvas = function(cfg) {
-    cfg = cfg || {};
+SceneJs.canvas = function() {
+    var cfg = SceneJs.getConfig(arguments);
+
     if (!cfg.canvasId) {
-        throw 'SceneJs.Canvas config missing: canvasId';
+        throw 'SceneJs.canvas config missing: canvasId';
     }
 
-    this.preVisit = function() {
-        try {
-            SceneJs.Backend.acquireCanvas(cfg.canvasId);
-        } catch(e) {
-            throw 'Canvas node failed to acquire canvas: ' + e;
-        }
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            if (cfg.clearColor) {
-                backend.setClearColor(cfg.clearColor);
-            }
-            if (cfg.depthTest) {
-                backend.setDepthTest(cfg.depthTest);
-            }
-            if (cfg.clearDepth) {
-                backend.setClearDepth(cfg.clearDepth);
-            }
-        }
-    };
+    var type = 'canvas';
 
-    this.postVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.flush();
-            backend.swapBuffers();
-        }
-        SceneJs.Backend.releaseCanvas();
-    };
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
+                preVisit : function() {
+                    try {
+                        SceneJs.Backend.acquireCanvas(cfg.canvasId);
+                    } catch(e) {
+                        throw 'Canvas node failed to acquire canvas element: ' + e;
+                    }
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        if (cfg.clearColor) {
+                            backend.setClearColor(cfg.clearColor);
+                        }
+                        if (cfg.depthTest) {
+                            backend.setDepthTest(cfg.depthTest);
+                        }
+                        if (cfg.clearDepth) {
+                            backend.setClearDepth(cfg.clearDepth);
+                        }
+                    }
+                },
 
-    SceneJs.Canvas.superclass.constructor.call(this,
-            SceneJs.apply(cfg, {  getType : function() {
-                return 'canvas';
-            }}));
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.flush();
+                        backend.swapBuffers();
+                    }
+                    SceneJs.Backend.releaseCanvas();
+                }
+            }));
 };
 
-SceneJs.extend(SceneJs.Canvas, SceneJs.Node, {
 
-});
 
 
 

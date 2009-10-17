@@ -1,39 +1,37 @@
-SceneJs.Shader = function(cfg) {
-    cfg = cfg || {};
+SceneJs.shader = function() {
+
+    var cfg = SceneJs.getConfig(arguments);
 
     if (!cfg.type) {
         throw 'Mandatory Shader config missing: \'type\' (identifies required node backend)';
     }
+    var type = 'shader';
 
-    this.reset = function() {
-        this.vars = cfg.vars || {};  // TODO: Clone these!!
-    };
+    return SceneJs.node(
 
-    this.preVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.activateProgram(this.getType());
-            if (this.vars) {
-                backend.pushVars(this.vars);
-            }
-        }
-    };
+            SceneJs.apply(cfg, {
 
-    this.postVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            if (this.vars) {
-                backend.popVars({});
-            }
-            backend.deactivateProgram();
-        }
-    };
+                reset : function() {
+                    this.vars = cfg.vars || {};  // TODO: Clone these!!
+                },
 
-    SceneJs.Shader.superclass.constructor.call(this, SceneJs.apply(cfg, {
-        getType: function() {
-            return cfg.type;
-        }
-    }));
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.activateProgram(cfg.type);
+                        if (this.vars) {
+                            backend.pushVars(this.vars);
+                        }
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        if (this.vars) {
+                            backend.popVars();
+                        }
+                        backend.deactivateProgram();
+                    }
+                }}));
 };
-
-SceneJs.extend(SceneJs.Shader, SceneJs.Node, {});

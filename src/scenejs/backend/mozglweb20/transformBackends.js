@@ -25,10 +25,13 @@
                     var top = null;
 
                     this.push = function(context, mat) {
+                        if (top) {
+                            mat = top.x(mat).ensure4x4();
+                        }
                         stack.push(mat);
                         if (ctx.programs && ctx.programs.getActiveProgramName()) {
                             ctx.programs.setVar(context, 'scene_ModelViewMatrix', mat);
-                            //  ctx.programs.setVariable(context, 'scene_NormalMatrix', mat.inverse().transpose().make3x3());
+                            ctx.programs.setVar(context, 'scene_NormalMatrix', mat.inverse().transpose().make3x3());
                         } else {
                             // No program active.
                             // TODO: set matrix for GL fixed function pipeline
@@ -42,17 +45,18 @@
                             top = stack[stack.length - 1];
                             if (ctx.programs && ctx.programs.getActiveProgramName()) {
                                 ctx.programs.setVars(context, 'scene_ModelViewMatrix', top);
-                                // ctx.programs.setVariable(context, 'scene_NormalMatrix', top.inverse().transpose().make3x3());
+                                ctx.programs.setVar(context, 'scene_NormalMatrix', top.inverse().transpose().make3x3());
                             } else {
                                 // No program loaded.
                                 // TODO: set matrix for GL fixed function pipeline
                             }
+                        }  else {
+                            top = null;
                         }
                     };
 
                     this.peek = function() {
-                        var m = stack[stack.length - 1];
-                        return m ? m : null;
+                        return top;
                     };
                 };
             }

@@ -14,32 +14,30 @@
  * Lots of wicked scene features are not demonstrated here, such as animation, event flows, multiple canvases,
  * advanced shaders and so on. I'll show you those in more examples later.
  */
-var scene = new SceneJs.Graph({
-    children: [
+var scene = new SceneJs.graph(
 
         /* A Canvas node activates a DOM canvas element for its subtree. You can have more
          * than one Canvas node in your scene if you want multiple views of the scene on multiple
          * canvas tags throughout your page (alternatively, you could have multiple ViewPorts on the
          * same Canvas).
          */
-        new SceneJs.Canvas({
+        SceneJs.canvas({
 
             canvasId: 'mycanvas',
 
             clearColor: new SceneJs.Color(0.8, 0.8, 0.9, 1.0),
             depthTest: true,
-            clearDepth: 1.0,
+            clearDepth: 1.0
+        },
 
-            children: [
+
                 /*
                  * We've configured the backend with a ShaderBackend plugin of type "example-shader-1",
                  * which our Shader activates to provide OpenGL Shading Language scripts to the GL engine.
                  * You can have many Shader nodes in your scene, to activate different shading scripts for different
                  * subtrees.
                  */
-                new SceneJs.Shader({
-
-                    type: 'example-shader-1',
+                SceneJs.simpleShader( { type: 'example-shader-1',
 
                     /*
                      * One of our Shader scripts has a light source variable, which we can provide a

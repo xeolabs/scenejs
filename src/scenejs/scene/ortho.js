@@ -1,20 +1,8 @@
-SceneJs.Ortho = function(cfg) {
-    cfg = cfg || {};
+SceneJs.ortho = function() {
 
-    var init = function() {
-        this.left = cfg.left || -1.0;
-        this.right = cfg.right || 1.0;
-        this.top = cfg.top || 1.0;
-        this.bottom = cfg.bottom || -1.0;
-        this.near = cfg.near || 0.1;
-        this.far = cfg.far || 100.0;
-    };
+    var cfg = SceneJs.getConfig(arguments);
 
-    this.reset = function() {
-        init();
-    };
-
-    init.call(this);
+    var type = 'ortho';
 
     var makeOrtho = function(left, right,
                              bottom, top,
@@ -30,36 +18,6 @@ SceneJs.Ortho = function(cfg) {
         ]);
     };
 
-    this.preVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var pmMatrix = makeOrtho(
-                    this.left,
-                    this.right,
-                    this.bottom,
-                    this.top,
-                    this.near,
-                    this.far);
-            backend.setProjectionMatrix(pmMatrix);
-        }
-        var gc = nodeContext.getGraphContext();
-        if (!gc.projectionTransforms) {
-            gc.projectionTransforms = [];
-        }
-        gc.projectionTransforms.push({
-            type: this.getType(),
-            matrix: pmMatrix,
-            volume: {
-                left:  this.left,
-                right: this.right,
-                top :this.top,
-                bottom: this.bottom ,
-                near: this.near,
-                far: this.far
-            }
-        });
-    };
-
     var getIdentityMatrix = function() {
         return $M([
             [1, 0, 0, 0],
@@ -69,24 +27,40 @@ SceneJs.Ortho = function(cfg) {
         ]);
     };
 
-    this.postVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var pmMatrix = getIdentityMatrix();
-            backend.setProjectionMatrix(pmMatrix);
-            nodeContext.getGraphContext().projectionTransforms.pop();
-        }
-    };
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
 
-    SceneJs.Ortho.superclass.constructor.call(this,
-            SceneJs.apply(cfg, {  getType : function() {
-                return 'ortho';
-            }}));
+                reset : function() {
+                    this.left = cfg.left || -1.0;
+                    this.right = cfg.right || 1.0;
+                    this.top = cfg.top || 1.0;
+                    this.bottom = cfg.bottom || -1.0;
+                    this.near = cfg.near || 0.1;
+                    this.far = cfg.far || 100.0;
+                },
+
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.setProjectionMatrix(
+                                makeOrtho(
+                                        this.left,
+                                        this.right,
+                                        this.bottom,
+                                        this.top,
+                                        this.near,
+                                        this.far));
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.setProjectionMatrix(getIdentityMatrix());
+                    }
+                }
+            })
+            );
 };
-
-SceneJs.extend(SceneJs.Ortho, SceneJs.Node, {
-
-});
-
 
 

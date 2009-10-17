@@ -26,7 +26,7 @@
                 /* Not able to access built-in uniforms via glUniform
                  * so we'll fall back on our own names
                  */
-                ctx.programs.setVariable(cfg.context, 'scene_ModelViewProjectionMatrix', mat);
+                ctx.programs.setVariable(cfg.context, 'scene_ProjectionMatrix', mat);
             }
             else {
                 // No program activate - programs object is lazy-created

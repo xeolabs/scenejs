@@ -1,14 +1,7 @@
-SceneJs.ns("SceneJs.scene.ux");
+SceneJs.ns("SceneJs.objects");
 
-/** Extends SceneJs.Geometry to define the venerable OpenGL Teapot
- *
- * @param cfg
- */
-SceneJs.scene.ux.Teapot = function(cfg) {
-    cfg = cfg || {};
-    SceneJs.scene.ux.Teapot.superclass.constructor.call(this, {
-        primitiveType : 'triangles',
-
+SceneJs.objects.teapot = function() {
+    return SceneJs.inherit(SceneJs.geometry, arguments, {
         vertices: [
             [-3.000000, 1.650000, 0.000000],
             [-2.987110, 1.650000, -0.098438],
@@ -5743,8 +5736,6 @@ SceneJs.scene.ux.Teapot = function(cfg) {
         ]
     });
 };
-
-SceneJs.extend(SceneJs.scene.ux.Teapot, SceneJs.Geometry, {});
 
 
 

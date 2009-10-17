@@ -1,9 +1,8 @@
-/** A list of lights to apply to sub-nodes. Each 
- *
- * @param cfg
- */
-SceneJs.Lights = function(cfg) {
-    cfg = cfg || {};
+SceneJs.lights = function() {
+
+    var cfg = SceneJs.getConfig(arguments);
+
+    var type = 'lights';
 
     var clonePos = function(v) {
         return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
@@ -32,39 +31,31 @@ SceneJs.Lights = function(cfg) {
 
     var cloneLights = function(lights) {
         var lights2 = [];
-            for (var i = 0; i < lights.length; i++) {
-                lights2.push(cloneLight(lights[i]));
-            }
+        for (var i = 0; i < lights.length; i++) {
+            lights2.push(cloneLight(lights[i]));
+        }
         return lights2;
     };
 
-    var init = function() {
-        this.lights = cfg.lights ? cloneLights(cfg.lights) : [];
-    };
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
 
-    this.reset = function() {
-        init.call(this);
-    };
+                reset : function() {
+                    this.lights = cfg.lights ? cloneLights(cfg.lights) : [];
+                },
 
-    this.preVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.pushLights(cloneLights(this.lights));
-        }
-    };
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.pushLights(this.lights);
+                    }
+                },
 
-    this.preVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.popLights(this.lights.length);
-        }
-    };
-
-    SceneJs.Lights.superclass.constructor.call(this, SceneJs.apply(cfg, {
-        getType: function() {
-            return 'lights';
-        }
-    }));
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.popLights(this.lights.length);
+                    }
+                }
+            }));
 };
-
-SceneJs.extend(SceneJs.Lights, SceneJs.Node, {});

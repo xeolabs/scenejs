@@ -1,24 +1,11 @@
 /**
  *
- * @param cfg
  */
-SceneJs.Frustum = function(cfg) {
-    cfg = cfg || {};
+SceneJs.frustum = function() {
 
-    var init = function() {
-        this.left = cfg.left || -1.0;
-        this.right = cfg.right || 1.0;
-        this.top = cfg.top || 1.0;
-        this.bottom = cfg.bottom || -1.0;
-        this.near = cfg.near || 0.1;
-        this.far = cfg.far || 100.0;
-    };
+    var cfg = SceneJs.getConfig(arguments);
 
-    init.call(this);
-
-    this.reset = function() {
-        init();
-    };
+    var type = 'frustum';
 
     var makeFrustum = function(left, right,
                                bottom, top,
@@ -37,36 +24,6 @@ SceneJs.Frustum = function(cfg) {
         ]);
     };
 
-    this.preVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var pmMatrix = makeFrustum(
-                    this.left,
-                    this.right,
-                    this.bottom,
-                    this.top,
-                    this.near,
-                    this.far);
-            backend.setProjectionMatrix(pmMatrix);
-            var gc = nodeContext.getGraphContext();
-            if (!gc.projectionTransforms) {
-                gc.projectionTransforms = [];
-            }
-            gc.projectionTransforms.push({
-                type: this.getType(),
-                matrix: pmMatrix,
-                frustum : {
-                    left: this.left,
-                    right: this.right,
-                    bottom: this.bottom,
-                    top: this.top,
-                    near: this.near,
-                    far: this.far
-                }
-            });
-        }
-    };
-
     var getIdentityMatrix = function() {
         return $M([
             [1, 0, 0, 0],
@@ -76,24 +33,38 @@ SceneJs.Frustum = function(cfg) {
         ]);
     };
 
-    this.postVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var pmMatrix = getIdentityMatrix();
-            backend.setProjectionMatrix(pmMatrix);
-            nodeContext.getGraphContext().projectionTransforms.pop();
-        }
-    };
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
 
-    SceneJs.Frustum.superclass.constructor.call(this,
-            SceneJs.apply(cfg, {  getType : function() {
-                return 'frustum';
-            }}));
+                reset : function() {
+                    this.left = cfg.left || -1.0;
+                    this.right = cfg.right || 1.0;
+                    this.top = cfg.top || 1.0;
+                    this.bottom = cfg.bottom || -1.0;
+                    this.near = cfg.near || 0.1;
+                    this.far = cfg.far || 100.0;
+                },
+
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.setProjectionMatrix(makeFrustum(
+                                this.left,
+                                this.right,
+                                this.bottom,
+                                this.top,
+                                this.near,
+                                this.far));
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.setProjectionMatrix(getIdentityMatrix());
+                    }
+                }
+            }));
 };
-
-SceneJs.extend(SceneJs.Frustum, SceneJs.Node, {
-
-});
-
 
 

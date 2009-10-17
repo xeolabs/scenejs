@@ -148,6 +148,41 @@ SceneJs.apply = function(o, c, defaults) {
         }
     });
 
+    SceneJs.getConfig = function(args) {
+        if (args.length == 0) {
+            return {};
+        }
+        if (args[0] instanceof SceneJs.node) {
+            return {
+                children: args
+            };
+        } else {
+            var children = [];
+            for (var i = 1; i < args.length; i++) {
+                children.push(args[i]);
+            }
+            return SceneJs.apply(args[0], { children: children });
+        }
+    };
+
+    SceneJs.inherit = function(superClass, args, cfg) {
+        var args2 = [];
+        if (args.length > 0) {
+            if (args[0] instanceof SceneJs.node) {
+                args2.push(cfg);
+                for (var i = 0; i < args.length; i++) {
+                    args2.push(args[i]);
+                }
+            } else {
+                args2.push(SceneJs.applyIf(cfg, args[0]));
+                for (var i = 1; i < args.length; i++) {
+                    args2.push(args[i]);
+                }
+            }
+        }
+        return superClass.apply(this, args2);
+    };
+
     // in intellij using keyword "namespace" causes parsing errors
     SceneJs.ns = SceneJs.namespace;
 })();

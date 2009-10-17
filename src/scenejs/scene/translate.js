@@ -1,55 +1,31 @@
-SceneJs.Translate = function(cfg) {
-    cfg = cfg || {};
+SceneJs.translate = function() {
 
-    var init = function() {
-        this.x = cfg.x || 0.0;
-        this.y = cfg.y || 0.0;
-        this.z = cfg.z || 0.0;
-    };
+    var cfg = SceneJs.getConfig(arguments);
 
-    init.call(this);
+    var type = 'translate';
 
-    this.reset = function() {
-        init.call(this);
-    };
+    return SceneJs.node(
 
-    this.preVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var mvMatrix = Matrix.Translate(this.x, this.y, this.z).ensure4x4();
-            var mvTopMatrix = backend.getModelViewMatrixTop();
-            if (mvTopMatrix) {
-                mvMatrix = mvTopMatrix.x(mvMatrix).ensure4x4();
-            }
-            backend.pushModelViewMatrix(mvMatrix);
-            var gc = nodeContext.getGraphContext();
-            if (!gc.modelViewTransforms) {
-                gc.modelViewTransforms = [];
-            }
-            gc.modelViewTransforms.push({
-                type:this.getType(),
-                matrix: mvMatrix,
-                x : this.x,
-                y : this.y,
-                z : this.z
+            SceneJs.apply(cfg, {
 
-            });
-        }
-    };
+                reset : function() {
+                    this.x = cfg.x || 0.0;
+                    this.y = cfg.y || 0.0;
+                    this.z = cfg.z || 0.0;
+                },
 
-    this.postVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.popModelViewMatrix();
-            nodeContext.getGraphContext().modelViewTransforms.pop();
-        }
-    };
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.pushModelViewMatrix(Matrix.Translate(this.x, this.y, this.z).ensure4x4());
+                    }
+                },
 
-    SceneJs.Translate.superclass.constructor.call(this, SceneJs.apply(cfg, {
-        getType : function() {
-            return 'translate';
-        }
-    }));
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.popModelViewMatrix();
+                    }
+                }
+            }));
 };
-
-SceneJs.extend(SceneJs.Translate, SceneJs.Node, {});

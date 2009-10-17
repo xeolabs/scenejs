@@ -1,47 +1,40 @@
-SceneJs.Material = function(cfg) {
-    cfg = cfg || {};
+SceneJs.material = function() {
+
+    var cfg = SceneJs.getConfig(arguments);
+
+    var type = 'material';
 
     var cloneColor = function(v) {
         return v ? { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 } : { r: 0, g : 0, b: 0, a : 1 };
     };
 
-    var init = function() {
-        this.ambient = cloneColor(cfg.ambient);
-        this.diffuse = cloneColor(cfg.diffuse);
-        this.specular = cloneColor(cfg.specular);
-        this.shininess = cloneColor(cfg.shininess);
-    };
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
 
-    init.call(this);
+                reset : function() {
+                    this.ambient = cloneColor(cfg.ambient);
+                    this.diffuse = cloneColor(cfg.diffuse);
+                    this.specular = cloneColor(cfg.specular);
+                    this.shininess = cloneColor(cfg.shininess);
+                },
 
-    this.reset = function() {
-        init.call(this);
-    };
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.pushVars({
+                            ambient:  this.ambient,
+                            diffuse:  this.diffuse,
+                            specular: this.specular,
+                            shininess:this.shininess
+                        });
+                    }
+                },
 
-    this.preVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.pushVars({
-                ambient:  this.ambient,
-                diffuse:  this.diffuse,
-                specular: this.specular,
-                shininess:this.shininess
-            });
-        }
-    };
-
-    this.preVisit = function() {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.popVars();
-        }
-    };
-
-    SceneJs.Material.superclass.constructor.call(this, SceneJs.apply(cfg, {
-        getType: function() {
-            return 'material';
-        }
-    }));
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.popVars();
+                    }
+                }
+            }));
 };
-
-SceneJs.extend(SceneJs.Material, SceneJs.Node, {});

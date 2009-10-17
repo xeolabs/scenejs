@@ -51,13 +51,13 @@ SceneJs.Backend.installNodeBackend(
                             for (var i = 0; i < lights.length; i++) {
                                 var light = lights[i];
                                 if (mat) {
-                                    light = partialCloneLight(light);   // Back-end never modifies parameters
+                                    light = partialCloneLight(light);   // Dont modify the light
                                     light.pos = transform(mat, light.pos);
                                     light.dir = transform(mat, light.dir);
                                 }
                                 stack.push(light);
                             }
-                            ctx.setVars(context, { scene_Lights: stack });
+                            ctx.setVars(context, 'scene_Lights', stack);
                         };
 
                         this.popLights = function(context, numLights) {
@@ -67,7 +67,7 @@ SceneJs.Backend.installNodeBackend(
                             for (var i = 0; i < numLights; i++) {
                                 stack.pop();
                             }
-                            ctx.setVars(context, { lights: stack });
+                            ctx.setVars(context, 'scene_Lights', stack);
                         };
                     };
                 }
@@ -77,10 +77,18 @@ SceneJs.Backend.installNodeBackend(
                 cfg = _cfg;
             };
 
+            /**
+             * Transforms given world-space lights to view-space, pushes those onto the lights stack,
+             * then loads the stack into scripts of current shader program.
+             */
             this.pushLights = function(lights) {
                 ctx.pushLights(cfg.context, lights);
             };
 
+            /**
+             * Pops the given number of lights off the lights stack then loads the stack into
+             * scripts of current shaderprogram
+             */
             this.popLights = function(numLights) {
                 ctx.popLights(cfg.context, numLights);
             };

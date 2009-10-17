@@ -72,6 +72,7 @@ SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
             gl.enableVertexAttribArray(loc);
         },
 
+        
         light: function(gl, findVar, light) {
             gl.uniform4fv(findVar(gl, 'LightPos'), $V([light.pos.x, light.pos.y, light.pos.z, 1.0]).flatten());
         }

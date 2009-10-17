@@ -1,47 +1,36 @@
-/**
- *
- * @param cfg
- */
-SceneJs.Viewport = function(cfg) {
-    cfg = cfg || {};
+SceneJs.viewport = function() {
 
-    var init = function() {
-        this.x = cfg.x || 0;
-        this.y = cfg.x || 0;
-        this.width = cfg.width || 100;
-        this.height = cfg.height || 100;
-    };
+    var cfg = SceneJs.getConfig(arguments);
 
-    init.call(this);
-    
-    this.reset = function() {
-        init();
-    };  
+    var type = 'viewport';
 
-    this.preVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.setViewport(this.x, this.y, this.width, this.height);
-        }
-        nodeContext.getGraphContext().viewport = { x : this.x, y: this.y, width: this.width, height : this.height };
-    };
+    return SceneJs.node(
 
-    this.postVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            backend.destroyViewport();
-        }
-        nodeContext.getGraphContext().viewport = undefined;
-    };
+            SceneJs.apply(cfg, {
 
-    SceneJs.Viewport.superclass.constructor.call(this,
-            SceneJs.apply(cfg, {  getType : function() {
-                return 'viewport';
-            }}));
+                reset: function() {
+                    this.x = cfg.x || 0;
+                    this.y = cfg.x || 0;
+                    this.width = cfg.width || 100;
+                    this.height = cfg.height || 100;
+                },
+
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.setViewport(this.x, this.y, this.width, this.height);
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.destroyViewport();
+                    }
+                }
+            }));
 };
 
-SceneJs.extend(SceneJs.Viewport, SceneJs.Node, {
-});
 
 
 

@@ -1,22 +1,8 @@
-/**
- *
- * @param cfg
- */
-SceneJs.Perspective = function(cfg) {
-    cfg = cfg || {};
+SceneJs.perspective = function() {
 
-    var init = function() {
-        this.fovy = cfg.fovy || 60.0;
-        this.aspect = cfg.aspect || 1.0;
-        this.near = cfg.near || 0.1;
-        this.far = cfg.far || 400.0;
-    };
+    var cfg = SceneJs.getConfig(arguments);
 
-    init.call(this);
-
-    this.reset = function() {
-        init();
-    };
+    var type = 'perspective';
 
     var makeFrustum = function(left, right,
                                bottom, top,
@@ -35,41 +21,6 @@ SceneJs.Perspective = function(cfg) {
         ]);
     };
 
-    this.preVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var frustumH = Math.tan(this.fovy / 360.0 * Math.PI) * this.near;
-            var frustumW = frustumH * aspect;
-            var frustum = {
-                left: -frustumW,
-                right: frustumW,
-                bottom: -frustumH,
-                top: frustumH,
-                near: this.near,
-                far: this.far
-            };
-            var pmMatrix = makeFrustum(
-                    frustum.left,
-                    frustum.right,
-                    frustum.bottom,
-                    frustum.top,
-                    frustum.near,
-                    frustum.far);
-            backend.setProjectionMatrix(pmMatrix);
-            var gc = nodeContext.getGraphContext();
-            if (!gc.projectionTransforms) {
-                gc.projectionTransforms = [];
-            }
-            gc.projectionTransforms.push({
-                type: this.getType(),
-                matrix: pmMatrix,
-                frustum : frustum,
-                fovy : this.fovy,
-                aspect : this.aspect
-            });
-        }
-    };
-
     var getIdentityMatrix = function() {
         return $M([
             [1, 0, 0, 0],
@@ -79,21 +30,37 @@ SceneJs.Perspective = function(cfg) {
         ]);
     };
 
-    this.postVisit = function(nodeContext) {
-        var backend = SceneJs.Backend.getNodeBackend(this.getType());
-        if (backend) {
-            var pmMatrix = getIdentityMatrix();
-            backend.setProjectionMatrix(pmMatrix);
-            var gc = nodeContext.getGraphContext();
-            gc.projectionTransforms.pop();
-        }
-    };
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
 
+                reset : function() {
+                    this.fovy = cfg.fovy || 60.0;
+                    this.aspect = cfg.aspect || 1.0;
+                    this.near = cfg.near || 0.1;
+                    this.far = cfg.far || 400.0;
+                },
 
-    SceneJs.Perspective.superclass.constructor.call(this,
-            SceneJs.apply(cfg, {  getType : function() {
-                return 'perspective';
-            }}));
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        var frustumH = Math.tan(this.fovy / 360.0 * Math.PI) * this.near;
+                        var frustumW = frustumH * this.aspect;
+                        backend.setProjectionMatrix(makeFrustum(
+                                -frustumW,
+                                frustumW,
+                                -frustumH,
+                                frustumH,
+                                this.near,
+                                this.far
+                                ));
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.setProjectionMatrix(getIdentityMatrix());
+                    }
+                }
+            }));
 };
-
-SceneJs.extend(SceneJs.Perspective, SceneJs.Node, {});

@@ -1,45 +1,38 @@
-SceneJs.Selector = function(cfg) {
-    cfg = cfg || {};
-    var selection = [];
-    this.reset = function() {
-        selection = [];
-    };
-    this.reset();
+SceneJs.shader = function() {
 
-    this.selectChild = function(childIndex) {
-        selection['' + childIndex] = true;
-    };
+    var cfg = SceneJs.getConfig(arguments);
 
-    this.deselectChild = function(childIndex) {
-        return selection['' + childIndex] = false;
-    };
-
-    this.isChildSelected = function(childIndex) {
-        return selection['' + childIndex];
-    };
-
-    this.deselectAllChildren = function() {
-        selection = [];
-    };
-
-    this.selectAllChildren = function() {
-        this.deselectAllChildren();
-        var numChildren = this.getNumChildren();
-        for (var i = 0; i < numChildren; i++) {
-            this.selectChild(i);
-        }
-    };
-
-    SceneJs.Selector.superclass.constructor.call(this,
-            SceneJs.apply(cfg, {
-                filterChild : function(childIndex) {
-                    return selection['' + childIndex];
-                }
-            }));
-};
-
-SceneJs.extend(SceneJs.Selector, SceneJs.Node, {
-    getType: function() {
-        return 'selector';
+    if (!cfg.type) {
+        throw 'Mandatory Shader config missing: \'type\' (identifies required node backend)';
     }
-});
+
+    var type = 'shader';
+
+    return SceneJs.node(
+
+            SceneJs.apply(cfg, {
+
+                reset : function() {
+                    this.vars = cfg.vars || {};  // TODO: Clone these!!
+                },
+
+                preVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        backend.activateProgram(cfg.type);
+                        if (this.vars) {
+                            backend.pushVars(this.vars);
+                        }
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    if (backend) {
+                        if (this.vars) {
+                            backend.popVars();
+                        }
+                        backend.deactivateProgram();
+                    }
+                }}));
+};
