@@ -12,27 +12,27 @@ SceneJs.Backend.installNodeBackend(
 
             this.install = function(_ctx) {
                 ctx = _ctx;
-                if (!ctx.lightStack) {
-                    ctx.lightStack = new function() {
+                if (!ctx.materialStack) {
+                    ctx.materialStack = new function() {
                         var stack = [];
 
                         this.pushMaterial = function(context, material) {
-                            if (!ctx.getActiveProgramName()) {
+                            if (!ctx.programs.getActiveProgramName()) {
                                 throw 'No program active';
                             }
                             stack.push(material);
-                            ctx.setVars(context, { material: material });
+                            ctx.programs.setVar(context, 'scene_Material', material);
                         };
 
                         this.popMaterial = function(context) {
-                            if (!ctx.getActiveProgramName()) {
+                            if (!ctx.programs.getActiveProgramName()) {
                                 throw 'No program active';
                             }
                             stack.pop();
                             if (stack.length > 0) {
-                                ctx.setVars(context, { material:stack[stack.length - 1] });
+                                ctx.programs.setVar(context, 'scene_Material',  stack[stack.length - 1] );
                             } else {
-                                ctx.setVars(context, { material: null }); // Script will revert to default material
+                                ctx.programs.setVar(context, 'scene_Material',  null); // Script will revert to default material
                             }
                         };
                     };
@@ -44,10 +44,10 @@ SceneJs.Backend.installNodeBackend(
             };
 
             this.pushMaterial = function(material) {
-                ctx.pushMaterial(cfg.context, material);
+                ctx.materialStack.pushMaterial(cfg.context, material);
             };
 
             this.popMaterial = function() {
-                ctx.popMaterial(cfg.context);
+                ctx.materialStack.popMaterial(cfg.context);
             };
         })());

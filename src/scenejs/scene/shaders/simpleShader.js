@@ -97,9 +97,9 @@ SceneJs.Backend.installNodeBackend(SceneJs.shaderBackend({
 
         scene_Material: function(gl, findVar, m) {
             if (m) {
-                gl.uniform4fv(findVar(gl, 'MaterialAmbient'), $V([m.ambient.r, m.ambient.g, m.ambient.b, m.ambient.a]).flatten());
-                gl.uniform4fv(findVar(gl, 'MaterialDiffuse'), $V([m.diffuse.r, m.diffuse.g, m.diffuse.b, m.diffuse.a]).flatten());
-                gl.uniform4fv(findVar(gl, 'MaterialSpecular'), $V([m.specular.r, m.specular.g, m.specular.b, m.specular.a]).flatten());
+                gl.uniform3fv(findVar(gl, 'MaterialAmbient'), $V([m.ambient.r, m.ambient.g, m.ambient.b]).flatten());
+                gl.uniform3fv(findVar(gl, 'MaterialDiffuse'), $V([m.diffuse.r, m.diffuse.g, m.diffuse.b]).flatten());
+                gl.uniform3fv(findVar(gl, 'MaterialSpecular'), $V([m.specular.r, m.specular.g, m.specular.b]).flatten());
             }
         },
 

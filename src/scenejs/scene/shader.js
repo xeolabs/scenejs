@@ -5,7 +5,6 @@ SceneJs.shader = function() {
     if (!cfg.type) {
         throw 'Mandatory Shader config missing: \'type\' (identifies required node backend)';
     }
-    var type = 'shader';
 
     return SceneJs.node(
 
@@ -16,7 +15,7 @@ SceneJs.shader = function() {
                 },
 
                 preVisit : function() {
-                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    var backend = SceneJs.Backend.getNodeBackend(cfg.type);
                     if (backend) {
                         backend.activateProgram(cfg.type);
                         if (this.vars) {
@@ -26,7 +25,7 @@ SceneJs.shader = function() {
                 },
 
                 postVisit : function() {
-                    var backend = SceneJs.Backend.getNodeBackend(type);
+                    var backend = SceneJs.Backend.getNodeBackend(cfg.type);
                     if (backend) {
                         if (this.vars) {
                             backend.popVars();

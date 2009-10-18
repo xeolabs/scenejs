@@ -2,7 +2,8 @@ SceneJs.graph = function() {
 
     var cfg = SceneJs.getConfig(arguments);
 
-    return new SceneJs.apply(SceneJs.node(cfg), {
+    var node = SceneJs.node(cfg);
+   return SceneJs.apply(node, {
         traverse : function(graphContext) {
 
             if (!graphContext) {

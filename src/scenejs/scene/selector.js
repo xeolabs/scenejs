@@ -1,4 +1,4 @@
-SceneJs.shader = function() {
+SceneJs.selector = function() {
 
     var cfg = SceneJs.getConfig(arguments);
 

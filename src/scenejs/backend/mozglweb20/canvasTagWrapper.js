@@ -16,6 +16,7 @@ SceneJs.Backend.installCanvasBackend(new (function() {
         }
         try {
             context = canvas.getContext(this.canvasType);
+            context.enable(context.CULL_FACE);
         } catch(e) {
         }
         return context ? {  canvas: canvas,  context: context } : null;

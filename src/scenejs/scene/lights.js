@@ -5,15 +5,18 @@ SceneJs.lights = function() {
     var type = 'lights';
 
     var clonePos = function(v) {
+        v = v || {};
         return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
     };
 
     var cloneVec = function(v) {
+        v = v || {};
         return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
     };
 
     var cloneColor = function(v) {
-        return v ? { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 } : { r: 0, g : 0, b: 0, a : 1 };
+        v = v || {};
+        return { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 };
     };
 
     var cloneLight = function(l) {

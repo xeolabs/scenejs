@@ -5,7 +5,8 @@ SceneJs.material = function() {
     var type = 'material';
 
     var cloneColor = function(v) {
-        return v ? { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 } : { r: 0, g : 0, b: 0, a : 1 };
+        v = v || {};
+        return { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 };
     };
 
     return SceneJs.node(
@@ -21,7 +22,7 @@ SceneJs.material = function() {
                 preVisit : function() {
                     var backend = SceneJs.Backend.getNodeBackend(type);
                     if (backend) {
-                        backend.pushVars({
+                        backend.pushMaterial({
                             ambient:  this.ambient,
                             diffuse:  this.diffuse,
                             specular: this.specular,
@@ -33,7 +34,7 @@ SceneJs.material = function() {
                 postVisit : function() {
                     var backend = SceneJs.Backend.getNodeBackend(type);
                     if (backend) {
-                        backend.popVars();
+                        backend.popMaterial();
                     }
                 }
             }));

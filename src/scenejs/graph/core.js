@@ -15,6 +15,11 @@ SceneJs.apply = function(o, c, defaults) {
 
 
 (function() {
+    var instanceofNode = function(o) {
+        return (o.visit && o.visit instanceof Function
+                && o.getNumChildren && o.getNumChildren instanceof Function);
+    };
+
     SceneJs.apply(SceneJs, {
 
         MV_MATRIX_VAR : 'scene_ModelViewMatrix',
@@ -152,32 +157,36 @@ SceneJs.apply = function(o, c, defaults) {
         if (args.length == 0) {
             return {};
         }
-        if (args[0] instanceof SceneJs.node) {
+        if (instanceofNode(args[0])) {
             return {
                 children: args
             };
         } else {
-            var children = [];
-            for (var i = 1; i < args.length; i++) {
-                children.push(args[i]);
+            var cfg = args[0];
+            if (!cfg.children) {
+                cfg.children = [];
             }
-            return SceneJs.apply(args[0], { children: children });
+            for (var i = 1; i < args.length; i++) {
+                cfg.children.push(args[i]);
+            }
+            return cfg;
         }
     };
 
     SceneJs.inherit = function(superClass, args, cfg) {
+        if (args.length == 0) {
+            return superClass.call(this, cfg);
+        }
         var args2 = [];
-        if (args.length > 0) {
-            if (args[0] instanceof SceneJs.node) {
-                args2.push(cfg);
-                for (var i = 0; i < args.length; i++) {
-                    args2.push(args[i]);
-                }
-            } else {
-                args2.push(SceneJs.applyIf(cfg, args[0]));
-                for (var i = 1; i < args.length; i++) {
-                    args2.push(args[i]);
-                }
+        if (instanceofNode(args[0])) {
+            args2.push(cfg);
+            for (var i = 0; i < args.length; i++) {
+                args2.push(args[i]);
+            }
+        } else {
+            args2.push(SceneJs.apply(args[0], cfg));
+            for (var i = 1; i < args.length; i++) {
+                args2.push(args[i]);
             }
         }
         return superClass.apply(this, args2);

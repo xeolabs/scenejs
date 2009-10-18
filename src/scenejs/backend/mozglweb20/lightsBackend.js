@@ -44,7 +44,7 @@ SceneJs.Backend.installNodeBackend(
                         };
 
                         this.pushLights = function(context, lights) {
-                            if (!ctx.getActiveProgramName()) {
+                            if (!ctx.programs.getActiveProgramName()) {
                                 throw 'No program active';
                             }
                             var mat = ctx.mvMatrixStack.peek();
@@ -57,17 +57,17 @@ SceneJs.Backend.installNodeBackend(
                                 }
                                 stack.push(light);
                             }
-                            ctx.setVars(context, 'scene_Lights', stack);
+                            ctx.programs.setVars(context, 'scene_Lights', stack);
                         };
 
                         this.popLights = function(context, numLights) {
-                            if (!ctx.getActiveProgramName()) {
+                            if (!ctx.programs.getActiveProgramName()) {
                                 throw 'No program active';
                             }
                             for (var i = 0; i < numLights; i++) {
                                 stack.pop();
                             }
-                            ctx.setVars(context, 'scene_Lights', stack);
+                            ctx.programs.setVars(context, 'scene_Lights', stack);
                         };
                     };
                 }
@@ -82,7 +82,7 @@ SceneJs.Backend.installNodeBackend(
              * then loads the stack into scripts of current shader program.
              */
             this.pushLights = function(lights) {
-                ctx.pushLights(cfg.context, lights);
+                ctx.lightStack.pushLights(cfg.context, lights);
             };
 
             /**
@@ -90,6 +90,6 @@ SceneJs.Backend.installNodeBackend(
              * scripts of current shaderprogram
              */
             this.popLights = function(numLights) {
-                ctx.popLights(cfg.context, numLights);
+                ctx.lightStack.popLights(cfg.context, numLights);
             };
         })());

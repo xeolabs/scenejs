@@ -21,321 +21,60 @@
 
 <div id="main">
 
-<!-- header -->
-<div id="header">
-    <a href="../index.html"><img src="../images/scenejs_small.png" id="logo" alt=""/></a>
-    <ul id="menu">
-        <li><a href="../downloads/downloads.html"><span><span>Download</span></span></a></li>
-        <li id="menu-act"><a href="introduction.html"><span><span>Documentation</span></span></a></li>
-        <li><a href="http://github.com/xeolabs/scenejs/issues"><span><span>Issues</span></span></a></li>
-        <li><a href="http://scenejs.bbster.net/"><span><span>Forum</span></span></a></li>
-        <li><a href="http://github.com/xeolabs/scenejs"><span><span>Sourcecode</span></span></a></li>
-    </ul>
-    <div id="headerContent">
-        <div id="headerContentContainer">
-            Introduction&nbsp;|&nbsp;<a href="graphapi.html">Core Graph API</a>&nbsp;|&nbsp;<a href="extending.html">Extending
-            SceneJs</a>
+    <!-- header -->
+    <div id="header">
+        <a href="../index.html"><img src="../images/scenejs_small.png" id="logo" alt=""/></a>
+        <ul id="menu">
+            <li><a href="../downloads/downloads.html"><span><span>Download</span></span></a></li>
+            <li id="menu-act"><a href="introduction.html"><span><span>Documentation</span></span></a></li>
+            <li><a href="http://github.com/xeolabs/scenejs/issues"><span><span>Issues</span></span></a></li>
+            <li><a href="http://scenejs.bbster.net/"><span><span>Forum</span></span></a></li>
+            <li><a href="http://github.com/xeolabs/scenejs"><span><span>Sourcecode</span></span></a></li>
+        </ul>
+        <div id="headerContent">
+            <div id="headerContentContainer">
+                Introduction&nbsp;|&nbsp;<a href="graphapi.html">Core Graph API</a>&nbsp;|&nbsp;<a
+                    href="extending.html">Extending
+                SceneJs</a>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="content">
-<div class="row-1">
-<div class="wrapper">
-<h1>Introduction</h1>
+    <div id="content">
+        <div class="row-1">
+            <div class="wrapper">
+                <h1>Introduction</h1>
 
-<p><span><b>SceneJS</b> is an open source Javascript framework from <a href="http://www.xeolabs.com">XeoLabs</a>
-that provides an extensible scene graph API on top of the powerful new OpenGL-standard 3D Canvas element, which is
-    supported by browsers such as Firefox and Safari.</span></p>
+                <p><span><b>SceneJS</b> is an open source Javascript framework from <a href="http://www.xeolabs.com">XeoLabs</a>
+that provides an extensible scene graph framework on top of the powerful new OpenGL-standard Canvas3D element (and soon the WebGL canvas as well) .</span>
+                </p>
 
-<p><span>To give you an immediate feel for SceneJS, we're going to take a superficial look at a really <b>minimal</b>
-    example scene graph. Then in the rest of the documentation pages, we'll dig down to the core
-    <a href="graph.html">Graph API</a> to look at nitty gritty like scene composition, traversal, event flow, animation and how to extend the framework.</span>
-</p>
-<br>
+                <img src="../images/teapot-example1.jpg" style="margin-left:15px;" align="right"/>
 
-<h2>Our first scene graph</h2>
+                <p><span>SceneJS is designed so that your scene graphs have a clean declarative feel to them. Check out the
+                    minimal scene below, which renders the venerable OpenGL teapot shown to the right. If you're familiar with
+                    3D graphics and scene graphs, it should be faurly clear what's going on in there.</span></p>
+                <p><span>To render the teapot,
+                SceneJS will traverse the scene in depth-first order. Each node sets some OpenGL state when pre-visited, then
+                un-sets it again when post-visited. In this graph, a <i>canvas</i> activates a Canvas element, a <i>simpleShader</i>
+                    activates some GLSL scripts, and the rest of the nodes set various matrices, vectors and geometry variables
+                    within the scripts (except for <i>viewport</i> which calls a fixed OpenGL function).</span>
+                </p>
+                 <p><span>Note that node declarations generally have the form <b>node({<i>configs</i>}, <i>child</i>,<i>child</i>...)</b>.</span></p>
+                <p><span>There's a lot more to SceneJS than this of course - I'll show you animation, instancing, event flow, custom nodes
+                    and GLSL shaders etc. in the rest of the documentation (as I write it!).</span></p>
+                <br/><span><p><b>Our first scene graph:</b></p></span><br/>
+                <script src="http://gist.github.com/212277.js"></script>
 
-<img src="../images/teapot-example1.jpg" style="margin-left:15px;" align="right"/>
 
-<p><span>Our first example renders the
-    image shown to the right, the venerable OpenGL teapot. At the core of our scene graph is a set of vertex and fragment
-    shader scripts written in the OpenGL Shader Language (GLSL), while most of the rest of the scene is
-    essentially for loading things like matrices, geometry etc. into variables within
-    those scripts.</span></p>
+            </div>
+        </div>
+        <div id="footer">
+            <p><span>&copy; 2009, <a href="http://www.xeolabs.com">XeoLabs</a></span></p>
 
-<p><span>A key thing to remember when looking over this example is that a scene is traversed in
-    depth-first order, during which each node modifies some bit of scene state on pre-visit, then undoes
-    its modifications again it on post-visit. Each node therefore only affects those in the subtree beneath it.</span>
-</p>
+        </div>
 
-<p><span>At the root of our graph we have, behold, a <b class="class-name">Graph</b> node:</span></p><br/>
-
-<!--<script src="http://gist.github.com/205819.js"></script>-->
-            <pre class="sh_javascript">
-var scene = new SceneJs.Graph({
-    children: [</pre>
-<a name="canvas"></a>
-
-<p><span> Within that, a <b class="class-name">Canvas</b> node activates a DOM canvas element for its subtree. You can have
-    more
-    than one Canvas node in your scene if you want multiple views of the scene on multiple canvas tags
-    throughout your page
-    (alternatively, you could have multiple ViewPorts on the
-    same Canvas).
-</span></p>
-            <pre class="sh_javascript">
-        new SceneJs.Canvas({
-
-            canvasId: 'mycanvas',
-
-            clearColor: new SceneJs.Color(0.8, 0.8, 0.9, 1.0),
-            depthTest: true,
-            clearDepth: 1.0,
-
-            children: [</pre>
-<a name="shader-node"></a>
-
-<p><span>We've configured the backend with a ShaderBackend plugin of type "example-shader-1" (<a
-        href="intro.html#shader-plugin">shown
-    below</a>), which our
-    <b class="class-name">Shader</b> node activates to provide OpenGL Shading Language scripts to the GL engine.
-    You can have many Shader nodes in your scene, to activate different shading scripts for different
-    subtrees.
-</span></p>
-            <pre class="sh_javascript">
-                new SceneJs.Shader({
-
-                    type: 'example-shader-1',</pre>
-<p><span>One of our Shader scripts has a light source variable, which we can provide a
-    value for here. We could also provide values in ScriptVars nodes anywhere
-    within the Shader's subtree.
-</span></p>
-            <pre class="sh_javascript">
-                    vars: {
-                        light: {
-                            pos: {
-                                x: -100.0,
-                                y: -200.0,
-                                z: 200.0
-                            }
-                        }
-                    },
-
-                    children: [</pre>
-<p><span>A <b class="class-name">ViewPort</b> node selects the area of the Canvas that sub nodes will affect:</span></p>
-            <pre class="sh_javascript">
-                        new SceneJs.Viewport({
-
-                            x : 1,
-                            y : 1,
-                            width: 500,
-                            height: 400,
-
-                            children: [</pre>
-<p><span>Next, a <b class="class-name">Perspective</b> node sets up the perspective transform applied to sub nodes.
-    Internally, it generates a perspective matrix and loads it into a special
-    projection matrix variable in the Shader scripts.
-</span></p>
-            <pre class="sh_javascript">
-                                new SceneJs.Perspective({
-
-                                    fovy : 60.0,
-                                    aspect : 1.0,
-                                    near : 0.1,
-                                    far : 400.0,
-
-                                    children: [ </pre>
-<p><span>
-    A <b class="class-name">LookAt</b> node sets up the model-view transform to apply to sub nodes
-    before the perspective transform.
-    Internally, it generates a model-view matrix and loads it into
-    a special variable in the Shader scripts.
-</span></p>
-            <pre class="sh_javascript">
-                                        new SceneJs.LookAt({
-
-                                            eye : { z: -50.0 },
-                                            up : { y: 1.0 },
-
-                                            children: [
-                                                new SceneJs.Layer({
-                                                    renderMethods: {
-                                                        cullBackfaces: false
-                                                    },
-                                                    children: [</pre>
-<p><span> A <b class="class-name">Rotate</b> node concatenates a rotation transform onto
-    the model-view matrix and reloads the matrix into
-    the Shader scripts:
-</span></p>
-            <pre class="sh_javascript">
-                                                        new SceneJs.Rotate({
-
-                                                            x: 1.0,
-                                                            angle: -45.0,
-
-                                                            children: [
-
-                                                                new SceneJs.Rotate({
-
-                                                                    y: 1.0,
-                                                                    angle: 45.0,
-
-                                                                    children: [</pre>
-<p><span> A <b class="class-name">Scale</b> node concatenates a scaling
-    transformation onto the model-view
-    matrix and reloads the matrix into the
-    Shader scripts:
-</span></p>
-            <pre class="sh_javascript">
-                                                                        new SceneJs.Scale({
-
-                                                                            x: 5.0,
-                                                                            y: 5.0,
-                                                                            z: 5.0,
-
-                                                                            children: [</pre>
-<p><span> A <b class="class-name">Teapot</b> node is a specialised
-    <b class="class-name">Geometry</b> node, which loads
-    vertices, normals and faces
-    for the venerable OpenGL teapot
-    into special variables in
-    the Shader scripts:
-</span></p>
-            <pre class="sh_javascript">
-                                                                                new SceneJs.scene.ux.Teapot()
-                                                                            ]
-                                                                        }) // SceneJs.Scale
-                                                                    ]
-                                                                }) // SceneJs.Rotate
-                                                            ]
-                                                        }) // SceneJs.Rotate
-                                                    ]
-                                                }) // SceneJs.Layer
-                                            ]
-                                        }) // SceneJs.LookAt
-                                    ]
-                                }) // SceneJs.Perspective
-                            ]
-                        }) // SceneJs.ViewPort
-                    ]
-                }) // SceneJs.Shader
-            ]
-        }) // SceneJs.Canvas
-    ]
-}); // SceneJs.Graph</pre>
-<p><span>To render a single frame of the scene graph, you can now call:
-</span></p>
-            <pre class="sh_javascript">
-scene.traverse(); </pre>
-<br/><br/>
-<a name="shader-plugin"></a>
-
-<h2>Shader backend plugin</h2>
-
-<p><span>To support our scene graph's Shader node (<a href="intro.html#shader-node">described earlier</a>), we must prepare SceneJS by
-    plugging in the
-    <b class="class-name">ShaderBackend</b> shown below.</span></p>
-<pre class="sh_javascript">
-SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
-
-    nodeType: 'example-shader-1',
-    </pre>
-<p><span>Its got an GLSL <i>fragment shader</i> script:</span></p>
-         <pre class="sh_javascript">
-    fragmentShaders: [
-        'varying float intensity; ' +
-        'varying vec4 FragColor; ' +
-        'void main(void) { ' +
-        '      gl_FragColor = FragColor; ' +
-        '}'
-    ],</pre>
-<p><span>and an GLSL <i>vertex shader</i> script:</span></p>
-         <pre class="sh_javascript">
-    vertexShaders: [
-        'attribute vec3 Vertex; ' +
-        'attribute vec3 Normal; ' +
-        'attribute vec4 InColor; ' +
-
-        'uniform mat4 PMatrix; ' +
-        'uniform mat4 MVMatrix; ' +
-
-        'uniform vec4 LightPos; ' +
-        'varying vec4 FragColor; ' +
-
-        'void main(void) { ' +
-        '     vec4 v = vec4(Vertex, 1.0); ' +
-        '     vec4 vmv = MVMatrix * v; ' +
-        '     gl_Position = PMatrix * vmv; ' +
-
-        '     vec3 lightDir = vec3(normalize(vmv - LightPos)); ' +
-
-        '     float NdotL = max(dot(lightDir, Normal), 0.0); ' +
-
-        '     const vec3 diffuseColor = vec3(0.4, 0.4, 0.2); ' +
-        '     const vec3 lightColor = vec3(0.1, 0.1, 0.6); ' +
-        '     const vec3 ambientColor = vec3(0.1, 0.1, 0.1); ' +
-
-        '     vec3 diffuse = diffuseColor + lightColor; ' +
-
-        '     FragColor = vec4(NdotL * diffuse + ambientColor, 1.0); ' +
-        '}'
-    ],
-</pre>
-<p><span>The shader backend works a bit like a bean, in that it has a map of setter
-    methods that are used by SceneJS to load the matrices, geometry, colors and light source into the scripts,
-    via canvas OpenGL context. Each of these has a name recognised by the scene nodes, and is passed the context, a
-    callback that it uses to resolve the location of it's target variable(s), and the data to set:</span></p>
-         <pre class="sh_javascript">
-        setters : {
-
-            scenejs_ModelViewMatrix: function(gl, findVar, mat) {
-                gl.uniformMatrix4fv(findVar(gl, 'MVMatrix'), mat.flatten());
-            },
-
-            scenejs_ModelViewProjectionMatrix: function(gl, findVar, mat) {
-                gl.uniformMatrix4fv(findVar(gl, 'PMatrix'), mat.flatten());
-            },</pre>
-<p><span>The setters used by Teapot also encapsulate OpenGL calls to enable their respective
-    script arrays (an GLSL thing):</span></p><pre class="sh_javascript">
-            scenejs_Normal: function(gl, findVar, normals) {
-                var loc = findVar(gl, 'Normal');
-                gl.vertexAttribPointer(loc, 3, gl.FLOAT, false, 0, normals);
-                gl.enableVertexAttribArray(loc);
-            },
-
-            scenejs_Vertex: function(gl, findVar, vertices) {
-                var loc = findVar(gl, 'Vertex') ;
-                gl.vertexAttribPointer(loc, 3, gl.FLOAT, false, 0, vertices);
-                gl.enableVertexAttribArray(loc);
-            },
-
-            scenejs_Color:  function(gl, findVar, colors) {
-                var loc = findVar(gl, 'InColor');
-                gl.vertexAttribPointer(loc, 4, gl.FLOAT, false, 0, colors);
-                gl.enableVertexAttribArray(loc);
-            },
-
-    </pre>
-<p><span>So far, the setters have had reserved names that SceneJS knows how to find. Finally, here is the light source
-    setter method, with a name that maps to the Shader node variable <a href="intro.html#shader-node">described
-        earlier</a>. Note
-    how it translates the light source into a vector, which it loads into to appropriate variable:</span></p><pre
-        class="sh_javascript">
-            light: function(gl, findVar, light) {
-                 gl.uniform4fv(findVar(gl, 'LightPos'), [light.pos.x, light.pos.y, light.pos.z, 1.0]);
-            }
-        }
-}));
-      </pre>
-</div>
-</div>
-<div id="footer">
-    <p><span>&copy; 2009, <a href="http://www.xeolabs.com">XeoLabs</a></span></p>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 

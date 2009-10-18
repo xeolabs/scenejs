@@ -15,55 +15,58 @@
  * Lots of wicked scene features are not demonstrated here, such as animation, event flows, multiple canvases,
  * advanced shaders and so on. I'll show you those in more examples later.
  */
-var scene = SceneJs.graph(
+with (SceneJs) {
 
-        SceneJs.canvas({ canvasId: 'mycanvas' },
+    var scene = graph(
 
-                SceneJs.shaders.simpleShader(
+            canvas({ canvasId: 'mycanvas' },
 
-                        SceneJs.lights({
-                            lights: [
-                                {
-                                    pos: { x: 60.0, y: 60.0, z: -100.0 }
-                                }
-                            ]},
-                                SceneJs.viewport({
-                                    x : 1,
-                                    y : 1,
-                                    width: 400,
-                                    height: 400
-                                },
-                                        SceneJs.perspective({
-                                            fovy : 60.0,
-                                            aspect : 1.0,
-                                            near : 0.1,
-                                            far : 400.0
-                                        },
+                    shaders.simpleShader(
 
-                                                SceneJs.lookAt({
-                                                    eye : { z: -50.0 },
-                                                    up : { y: 1.0 }
-                                                },
+                            lights({
+                                lights: [
+                                    {
+                                        pos: { x: 60.0, y: 60.0, z: -100.0 }
+                                    }
+                                ]},
+                                    viewport({
+                                        x : 1,
+                                        y : 1,
+                                        width: 400,
+                                        height: 400
+                                    },
+                                            perspective({
+                                                fovy : 60.0,
+                                                aspect : 1.0,
+                                                near : 0.1,
+                                                far : 400.0
+                                            },
 
-                                                        SceneJs.material({
-                                                            diffuse: { r:0.8, g:0.8, b:0.9 },
-                                                            specular: { r:0.8,g:0.8, b:0.9 },
-                                                            shininess: { r:0.8,g:0.8, b:0.9 }
-                                                        },
-                                                                SceneJs.objects.teapot()
-                                                                ) // material
-                                                        ) // lookAt
-                                                ) // perspective
-                                        ) // viewport
-                                ) // lights
-                        ) // smoothShader
-                ) // canvas
-        ); // graph
+                                                    lookAt({
+                                                        eye : { y: 5.0, z: -7.0 },
+                                                        up : { y: 1.0 }
+                                                    },
 
-/* Lets do it - render one frame of the scene graph. To recap, the canvas tag with ID "example-canvas" will display
- * a perspective projection of a teapot, scaled, rotated a little bit, translated back into the Z-axis and shaded.
- *
- * Note that if your scene graph was interactive or animated, you would call this method in a loop.
- */
-scene.traverse();
+                                                            material({
+                                                                ambient: { r:0.2, g:0.2, b:0.2 },
+                                                              //  diffuse: { r:0.8, g:0.8, b:0.9 },
+                                                                specular: { r:0.8,g:0.8, b:0.9 }
+                                                            },
+                                                                    objects.teapot()
+                                                                    ) // material
+                                                            ) // lookAt
+                                                    ) // perspective
+                                            ) // viewport
+                                    ) // lights
+                            ) // smoothShader
+                    ) // canvas
+            ); // graph
+
+    /* Lets do it - render one frame of the scene graph. To recap, the canvas tag with ID "example-canvas" will display
+     * a perspective projection of a teapot, scaled, rotated a little bit, translated back into the Z-axis and shaded.
+     *
+     * Note that if your scene graph was interactive or animated, you would call this method in a loop.
+     */
+    scene.traverse();
+}
 

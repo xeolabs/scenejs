@@ -44,7 +44,7 @@
                             stack.pop();
                             top = stack[stack.length - 1];
                             if (ctx.programs && ctx.programs.getActiveProgramName()) {
-                                ctx.programs.setVars(context, 'scene_ModelViewMatrix', top);
+                                ctx.programs.setVar(context, 'scene_ModelViewMatrix', top);
                                 ctx.programs.setVar(context, 'scene_NormalMatrix', top.inverse().transpose().make3x3());
                             } else {
                                 // No program loaded.

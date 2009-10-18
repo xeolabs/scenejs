@@ -23,10 +23,10 @@ SceneJs.Backend.installNodeBackend(
             this.drawGeometry = function(geo) {
                 if (ctx.programs && ctx.programs.getActiveProgramName()) {
                     if (geo.vertices) {
-                        ctx.programs.setVariable(context, 'scene_Vertex', geo.vertices);
+                        ctx.programs.setVar(context, 'scene_Vertex', geo.vertices);
                     }
                     if (geo.normals) {
-                        ctx.programs.setVariable(context, 'scene_Normal', geo.normals);
+                        ctx.programs.setVar(context, 'scene_Normal', geo.normals);
                     }
                     if (geo.colors) {
                         // ctx.programs.setVariable(context, 'scene_Color', geo.colors);

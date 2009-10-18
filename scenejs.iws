@@ -16,10 +16,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/canvasTagWrapper.js" afterPath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/canvasTagWrapper.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/vars.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/vars.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/downloads.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/downloads.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/graph/node.js" afterPath="$PROJECT_DIR$/src/scenejs/graph/node.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/intro/scene.js" afterPath="$PROJECT_DIR$/src/examples/intro/scene.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/example1/index.html" afterPath="$PROJECT_DIR$/src/examples/example1/index.html" />
@@ -32,10 +32,10 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/shader.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/shader.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/material.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/material.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/example1/scene.js" afterPath="$PROJECT_DIR$/src/examples/example1/scene.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/scene/shaders/simpleShader.js" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/gists/scenejs-child-event-flow.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/example1/shader.js" afterPath="$PROJECT_DIR$/src/examples/example1/shader.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/lightsBackend.js" afterPath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/lightsBackend.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/docs/graphapi.html" afterPath="$PROJECT_DIR$/website/docs/graphapi.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.ipr" afterPath="$PROJECT_DIR$/scenejs.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/selector.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/selector.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/ortho.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/ortho.js" />
@@ -46,20 +46,22 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/graph.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/layer.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/layer.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/frustum.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/frustum.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/geometry.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/geometry.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/translate.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/translate.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/lookat.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/lookat.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/projectionBackends.js" afterPath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/projectionBackends.js" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/gists/scenejs-runtime-state.js" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/gists/scenejs-runtime-state2.js" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/gists/scenejs-dont-retain-configs.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/materialBackend.js" afterPath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/materialBackend.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/geometryBackend.js" afterPath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/geometryBackend.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/graph/core.js" afterPath="$PROJECT_DIR$/src/scenejs/graph/core.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/transformBackends.js" afterPath="$PROJECT_DIR$/src/scenejs/backend/mozglweb20/transformBackends.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/lights.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/lights.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/extending.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/shaders/simpleShader.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/shaders/simpleShader.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/shaders/blinn-phong-shader.js" afterPath="" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/gists/scenejs-parent-event-flow.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/canvas.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/canvas.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/docs/introduction.html" afterPath="$PROJECT_DIR$/website/docs/introduction.html" />
     </list>
     <ignored path="scenejs.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -121,34 +123,7 @@
       <file leaf-file-name="scene.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/examples/intro/scene.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="52" column="82" selection-start="2930" selection-end="2930" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/examples/intro/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="51" column="73" selection-start="3540" selection-end="3540" vertical-scroll-proportion="-20.227272">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ortho.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/scene/ortho.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="12" selection-start="2062" selection-end="2062" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="canvas.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/scene/canvas.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="50" column="96" selection-start="2668" selection-end="2668" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -157,43 +132,7 @@
       <file leaf-file-name="simpleShader.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/scenejs/scene/shaders/simpleShader.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="63" selection-start="828" selection-end="828" vertical-scroll-proportion="-0.23771791">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="geometry.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/scene/geometry.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="26" selection-start="59" selection-end="59" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="core.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/graph/core.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="169" column="82" selection-start="5505" selection-end="5505" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="graph.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/graph/graph.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="4" selection-start="4" selection-end="4" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="node.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/graph/node.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="8" selection-start="8" selection-end="8" vertical-scroll-proportion="0.0">
+            <state line="100" column="13" selection-start="3184" selection-end="3184" vertical-scroll-proportion="1.8225039">
               <folding />
             </state>
           </provider>
@@ -202,7 +141,70 @@
       <file leaf-file-name="material.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/scenejs/scene/material.js">
           <provider selected="true" editor-type-id="text-editor">
+            <state line="8" column="68" selection-start="230" selection-end="230" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/intro/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="39" column="124" selection-start="2455" selection-end="2455" vertical-scroll-proportion="-16.363636">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="materialBackend.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/materialBackend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="32" column="80" selection-start="1252" selection-end="1252" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="transformBackends.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/transformBackends.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="47" column="96" selection-start="1902" selection-end="1902" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="canvasTagWrapper.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/canvasTagWrapper.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="18" column="27" selection-start="612" selection-end="612" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="geometryBackend.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/geometryBackend.js">
+          <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="layerBackend.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/layerBackend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="23" column="30" selection-start="510" selection-end="552" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="shaderBackend.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/shaderBackend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="146" column="25" selection-start="6865" selection-end="6865" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -272,6 +274,50 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="images" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="docs" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -764,7 +810,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22341955" sideWeight="0.9260274" order="0" side_tool="false" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25215518" sideWeight="0.9260274" order="0" side_tool="false" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" />
@@ -858,93 +904,9 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/selector.js">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/lights.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="65" selection-start="891" selection-end="891" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/shader.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="65" selection-start="890" selection-end="890" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/translate.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="65" selection-start="756" selection-end="756" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/vars.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="65" selection-start="706" selection-end="706" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/viewport.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="24" selection-start="946" selection-end="946" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/objects/teapot.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="16" selection-start="48" selection-end="48" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/ortho.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="12" selection-start="2062" selection-end="2062" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/canvas.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/geometry.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="26" selection-start="59" selection-end="59" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/material.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/intro/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="73" selection-start="3540" selection-end="3540" vertical-scroll-proportion="-20.227272">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/intro/scene.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="52" column="82" selection-start="2930" selection-end="2930" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/graph/core.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="169" column="82" selection-start="5505" selection-end="5505" vertical-scroll-proportion="0.0">
+        <state line="42" column="20" selection-start="1167" selection-end="1167" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -956,16 +918,100 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/graph/graph.js">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/shader.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="4" selection-start="4" selection-end="4" vertical-scroll-proportion="0.0">
+        <state line="0" column="8" selection-start="8" selection-end="8" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/graph/core.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="173" column="62" selection-start="5608" selection-end="5608" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dist/scenejs.0.2.5.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="990" column="9" selection-start="32627" selection-end="32627" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/ortho.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/intro/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="39" column="124" selection-start="2455" selection-end="2455" vertical-scroll-proportion="-16.363636">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/scene/material.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="68" selection-start="230" selection-end="230" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/materialBackend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="80" selection-start="1252" selection-end="1252" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/intro/scene.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="96" selection-start="2668" selection-end="2668" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/geometryBackend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/layerBackend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="30" selection-start="510" selection-end="552" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/canvasTagWrapper.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="27" selection-start="612" selection-end="612" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/transformBackends.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="47" column="96" selection-start="1902" selection-end="1902" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/backend/mozglweb20/shaderBackend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="146" column="25" selection-start="6865" selection-end="6865" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/scenejs/scene/shaders/simpleShader.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="63" selection-start="828" selection-end="828" vertical-scroll-proportion="-0.23771791">
+        <state line="100" column="13" selection-start="3184" selection-end="3184" vertical-scroll-proportion="1.8225039">
           <folding />
         </state>
       </provider>
