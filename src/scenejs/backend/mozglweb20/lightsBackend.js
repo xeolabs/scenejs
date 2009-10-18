@@ -57,7 +57,7 @@ SceneJs.Backend.installNodeBackend(
                                 }
                                 stack.push(light);
                             }
-                            ctx.programs.setVars(context, 'scene_Lights', stack);
+                             ctx.programs.setVar(context, 'scene_Lights', stack);
                         };
 
                         this.popLights = function(context, numLights) {
@@ -67,7 +67,7 @@ SceneJs.Backend.installNodeBackend(
                             for (var i = 0; i < numLights; i++) {
                                 stack.pop();
                             }
-                            ctx.programs.setVars(context, 'scene_Lights', stack);
+                            ctx.programs.setVar(context, 'scene_Lights', stack);
                         };
                     };
                 }

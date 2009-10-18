@@ -16,7 +16,11 @@ SceneJs.Backend.installCanvasBackend(new (function() {
         }
         try {
             context = canvas.getContext(this.canvasType);
-            context.enable(context.CULL_FACE);
+            context.clearColor(0.8, 0.8, 0.9, 1.0); 
+        //    context.enable(context.CULL_FACE);
+            context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+            context.enable(context.DEPTH_TEST);
+            context.clearDepth(0.1); 
         } catch(e) {
         }
         return context ? {  canvas: canvas,  context: context } : null;

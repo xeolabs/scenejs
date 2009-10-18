@@ -26,7 +26,7 @@ with (SceneJs) {
                             lights({
                                 lights: [
                                     {
-                                        pos: { x: 60.0, y: 60.0, z: -100.0 }
+                                        pos: { x: 0.0, y: 50.0, z: -50.0 }
                                     }
                                 ]},
                                     viewport({
@@ -43,14 +43,14 @@ with (SceneJs) {
                                             },
 
                                                     lookAt({
-                                                        eye : { y: 5.0, z: -7.0 },
+                                                        eye : { x: 5.0, y: 5.0, z: -7.0 },
                                                         up : { y: 1.0 }
                                                     },
 
                                                             material({
-                                                                ambient: { r:0.2, g:0.2, b:0.2 },
-                                                              //  diffuse: { r:0.8, g:0.8, b:0.9 },
-                                                                specular: { r:0.8,g:0.8, b:0.9 }
+                                                                ambient: { r:0.0, g:0.2, b:0.2 },
+                                                                diffuse: { r:0.0, g:0.0, b:0.4 },
+                                                                specular: { r:0.6,g:0.6, b:0.6 }
                                                             },
                                                                     objects.teapot()
                                                                     ) // material
