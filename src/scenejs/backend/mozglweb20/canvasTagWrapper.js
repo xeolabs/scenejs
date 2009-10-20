@@ -9,7 +9,6 @@ SceneJs.Backend.installCanvasBackend(new (function() {
      * The actual context is wrapped in an object that could bundle resources alongside the context.
      */
     this.getConfig = function(canvas) {
-        var cfg = null;
         var context = null;
         if (!canvas) {
             throw 'canvas is undefined';

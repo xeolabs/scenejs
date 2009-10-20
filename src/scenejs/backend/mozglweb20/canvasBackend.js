@@ -16,7 +16,7 @@ SceneJs.Backend.installNodeBackend(
 
             this.configure = function(_cfg) {
                 cfg = _cfg;
-                cfg.context.clearDepth(1.0);               
+                cfg.context.clearDepth(1.0);
             };
 
             this.setDepthTest = function(enable) {

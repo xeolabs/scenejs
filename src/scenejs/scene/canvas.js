@@ -13,6 +13,7 @@ SceneJs.canvas = function() {
 
     return SceneJs.node(
             SceneJs.apply(cfg, {
+
                 preVisit : function() {
                     try {
                         SceneJs.Backend.acquireCanvas(cfg.canvasId);

@@ -11,6 +11,11 @@ SceneJs.node = function() {
         this.preVisit = cfg.preVisit;
         this.postVisit = cfg.postVisit;
 
+        this.addChild = function(child) {
+            this.children.push(child);
+            return this;
+        };
+
         this.getNumChildren = function() {
             return children.length;
         };

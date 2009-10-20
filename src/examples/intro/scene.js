@@ -19,7 +19,7 @@ with (SceneJs) {
 
     var scene = graph(
 
-            canvas({ canvasId: 'mycanvas' },
+            canvas({ canvasId: 'mycanvas'},
 
                     shaders.simpleShader(
 
@@ -60,7 +60,8 @@ with (SceneJs) {
                                     ) // lights
                             ) // smoothShader
                     ) // canvas
-            ); // graph
+            )
+            ; // graph
 
     /* Lets do it - render one frame of the scene graph. To recap, the canvas tag with ID "example-canvas" will display
      * a perspective projection of a teapot, scaled, rotated a little bit, translated back into the Z-axis and shaded.

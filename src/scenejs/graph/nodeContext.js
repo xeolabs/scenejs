@@ -1,8 +1,8 @@
-SceneJs.NodeContext = function(_graphContext, _parent, _node, _childListeners) {
+SceneJs.NodeContext = function(_graphContext, _parent, _node, _childListeners, _parentEvents) {
     var graphContext = _graphContext;
     var parent = _parent;
     var node = _node;
-    var parentEvents = {};
+    var parentEvents = _parentEvents || {};
     var childListeners = _childListeners;
 
     this.getGraphContext = function() {
