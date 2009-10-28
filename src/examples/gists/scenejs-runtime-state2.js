@@ -3,7 +3,7 @@ var graph = SceneJs.graph(
 
            	        preVisit: function(nodeContext) {
 
-           	 		    // Parent node gets graph context from node context
+           	 		    // Parent node gets frontend context from node context
 
            	 		    // and sets something on it for child
 
@@ -14,7 +14,7 @@ var graph = SceneJs.graph(
 
            	        postVisit: function(nodeContext) {
 
-           	 		    // Ordinarily each node should restore the graph context
+           	 		    // Ordinarily each node should restore the frontend context
            	 		    // to its original state before it was modified on pre-visit
 
            	             var graphContext = nodeContext.getGraphContext();
@@ -25,7 +25,7 @@ var graph = SceneJs.graph(
                 new SceneJs.node({
            	 		    preVisit: function(nodeContext) {
 
-           		     		// Child node finds what parent set on graph context
+           		     		// Child node finds what parent set on frontend context
 
            	                var graphContext = nodeContext.getGraphContext();
            		     		alert('Message from parent: ' + graphContext.foo);
@@ -34,8 +34,8 @@ var graph = SceneJs.graph(
                  )
         );
 
-// If not supplied, a default internal graph runtime context is
+// If not supplied, a default internal frontend runtime context is
 
 // created that will not persist between traversals
 
-graph.traverse();
+graph.render();

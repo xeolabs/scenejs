@@ -1,0 +1,3 @@
+ * 
+ * Memoization is used in nodes as higher-order-functions that create a memoizing function from a non-memoizing one.
+ * Backends are provided for nodes as modules

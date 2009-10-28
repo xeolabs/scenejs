@@ -37,17 +37,17 @@ with (SceneJs) {
                     ) // lights
             ); // smoothShader
 
+
+
     var scene = graph(
-            canvas({ canvasId: 'canvas1'}, content),
-            canvas({ canvasId: 'canvas2'}, content),
-            canvas({ canvasId: 'canvas3'}, content)
+            canvas({ canvasId: 'canvas1'}, content,content)
             );
 
-    /* Lets do it - render one frame of the scene graph. To recap, the canvas tag with ID "example-canvas" will display
+    /* Lets do it - render one frame of the scene frontend. To recap, the canvas tag with ID "example-canvas" will display
      * a perspective projection of a teapot, scaled, rotated a little bit, translated back into the Z-axis and shaded.
      *
-     * Note that if your scene graph was interactive or animated, you would call this method in a loop.
+     * Note that if your scene frontend was interactive or animated, you would call this method in a loop.
      */
-    scene.traverse();
+    scene.render();
 }
 

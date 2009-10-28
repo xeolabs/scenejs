@@ -60,6 +60,6 @@ var graph = SceneJs.graph(
                     ) // SceneJs.node
                 ) // SceneJs.node
             ) // SceneJs.node
-        ); // SceneJs.graph
+        ); // SceneJs.frontend
 
-graph.traverse();
+graph.render();

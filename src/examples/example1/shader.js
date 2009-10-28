@@ -1,6 +1,6 @@
-SceneJs.Backend.installNodeBackend(new SceneJs.ShaderBackend({
+SceneJs.private.backendModules.installBackend(new SceneJs.ShaderBackend({
 
-    nodeType: 'example-shader-1',
+    type: 'example-shader-1',
 
     vertexShaders: [
         'attribute vec3 Vertex; ' +

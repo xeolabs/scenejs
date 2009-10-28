@@ -59,7 +59,7 @@
                 <p><span>When a <a href="../intro.html#canvas">Canvas</a> scene node is pre-visited during <a
                         href="../graph.html#struct">graph traversal</a> , it calls SceneJS.Backend.acquireCanvas to
                     activate its canvas. Recall that a Canvas node is configured with
-                    a canvas ID. Then as sub-Nodes are visited, they can each call SceneJS.Backend.getNodeBackend to get an appropriate
+                    a canvas ID. Then as sub-Nodes are visited, they can each call SceneJS.Backend.getBackend to get an appropriate
                     NodeBackend through which they can interact with the active canvas. When the Canvas is post-visited,
                     it calls SceneJS.Backend.releaseCanvas to deactivate the canvas. Internally, SceneJS.Backend automatically
                     employs the appropriate plugins to support these methods. We'll look at this in more detail below. </span>

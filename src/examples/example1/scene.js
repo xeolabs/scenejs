@@ -1,7 +1,7 @@
 /**
- * This is a simple scene graph to demonstrate the general idea. A scene graph basically renders images to
- * one or more OpenGL canvas elements in the browser page. At the core of a scene graph is at least one set of vertex
- * and fragment shader scripts written in the OpenGL Shader Language (OGSL), while the rest of the scene graph is
+ * This is a simple scene frontend to demonstrate the general idea. A scene frontend basically renders images to
+ * one or more OpenGL canvas elements in the browser page. At the core of a scene frontend is at least one set of vertex
+ * and fragment shader scripts written in the OpenGL Shader Language (OGSL), while the rest of the scene frontend is
  * essentially for generating things like matrices, geometry etc. and loading them into variables within those scripts.
  *
  * A key thing to bear in mind when looking over this example is that a scene is traversed in depth-first order, during
@@ -158,10 +158,10 @@ var scene = new SceneJs.graph(
     ]
 }); // SceneJs.Graph
 
-/* Lets do it - render one frame of the scene graph. To recap, the canvas tag with ID "example-canvas" will display
+/* Lets do it - render one frame of the scene frontend. To recap, the canvas tag with ID "example-canvas" will display
  * a perspective projection of a teapot, scaled, rotated a little bit, translated back into the Z-axis and shaded.
  *
- * Note that if your scene graph was interactive or animated, you would call this method in a loop.
+ * Note that if your scene frontend was interactive or animated, you would call this method in a loop.
  */
-scene.traverse();
+scene.render();
 

@@ -11,5 +11,5 @@ var graph = SceneJs.graph(
 var graphContext = { counter: 0 };
 
 while (graphContext.counter < 10) {
-   	graph.traverse(graphContext);
+   	graph.render(graphContext);
 }

@@ -43,7 +43,7 @@
 
             <!-- Core -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/graph/core.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/core.js"/>
 
             <!-- Back end-->
 
@@ -61,11 +61,11 @@
 
             <!-- Graph API -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/graph/event.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/graph/graphContext.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/graph/nodeContext.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/graph/node.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/graph/graph.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/event.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/graphContext.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/nodeContext.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/node.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/frontend.js"/>
 
             <!-- Front end -->
 
