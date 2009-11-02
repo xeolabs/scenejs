@@ -1,16 +1,17 @@
 /**
- * Modelling rotation transformation node.
+ * Sets a rotation modelling transformation on the current shader. The transform will be cumulative with transforms at
+ * higher nodes.
  */
 SceneJs.rotate = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
 
-    var backend = SceneJs.private.backendModules.getBackend('viewtransform');
+    var backend = SceneJs.private.backendModules.getBackend('modeltransform');
     
     var localMat;
     var modelTransform;
 
     return function(scope) {
-        if (!localMat || !cfg.cachable) {
+        if (!localMat || !cfg.fixed) { // Memoize matrix if node config is constant
             var params = cfg.getParams(scope);
             params.x = params.x || 0;
             params.y = params.y || 0;
@@ -21,12 +22,12 @@ SceneJs.rotate = function() {
             localMat = SceneJs.utils.Matrix4.createRotate(params.angle || 0.0, params.x, params.y, params.z);
         }
 
-        var xform = backend.getModelTransform();
+        var xform = backend.getModelTransform(); // Retain current model matrix
 
-        if (!modelTransform || !xform.cacheSafe) {
+        if (!modelTransform || !xform.fixed) { // Multiply by current model matrix, memoize if current matrix is constant
             modelTransform = {
                 matrix: xform.matrix.multiply(localMat),
-                cached: xform.cacheSafe && cfg.cachable
+                fixed: xform.fixed && cfg.fixed
             };
         }
 

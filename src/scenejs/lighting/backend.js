@@ -1,5 +1,8 @@
 /**
- * WebGL backend for SceneJs.Lights node
+ * Backend for a lights node, provides ability to set lights on the current shader. The lights are held in a stack,
+ * which can be pushed to and popped from. Each time after it is pushed or popped, the stack is loaded into the
+ * shader. Note that the current shader may have a limit on how many lights it will recognise, in which case only
+ * that many lights from the top of the stack downwards will be effectively active within the shader.
  */
 
 SceneJs.private.backendModules.installBackend(
@@ -17,9 +20,11 @@ SceneJs.private.backendModules.installBackend(
             };
 
             var cloneVec = function(v) {
-                return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
+                return v ? { x : v.x || 0, y : v.y || 0, z : v.z || 0 } : { x : 0, y: 0, z: 0 };
             };
 
+            /** Transforms a light by the current view and modelling matrices
+             */
             var transform = function(l) {
                 return {
                     pos : ctx.viewTransform.matrix.transformVector3(
@@ -35,6 +40,11 @@ SceneJs.private.backendModules.installBackend(
                 };
             };
 
+            /**
+             * For client node to transform its lights from model to view-space before it pushes them onto the stack.
+             * This allows the node to memoize the lights after transformation in cases when the coordinate space is
+             * fixed; the client node should not memoize, however, if getSafeToCache() returns true;
+             */
             this.transformLights = function(lights) {
                 var lights2 = [];
                 for (var i = 0; i < lights.length; i++) {
@@ -44,6 +54,16 @@ SceneJs.private.backendModules.installBackend(
                 return lights2;
             };
 
+            /** Returns true if the coordinate space defined by the current view and model matrices is
+             * fixed, ie. not animated, at this level of scene traversal. If not, then it is not safe
+             * for the client node to memoize its lights once transformed.
+             */
+            this.getSafeToCache = function() {
+                return ctx.viewTransform.fixed && ctx.modelTransform.fixed;
+            };
+
+            /** Pushes view-space lights to stack, and then inserts stack into shader.
+             */
             this.pushLights = function(lights) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';
@@ -51,17 +71,16 @@ SceneJs.private.backendModules.installBackend(
                 for (var i = 0; i < lights.length; i++) {
                     ctx.lightStack.push(lights[i]);
                 }
-                ctx.programs.setVar(ctx.canvas.context, 'scene_Lights', ctx.lightStack);
+                ctx.programs.setVar('scene_Lights', ctx.lightStack);
             };
 
+            /** Pops view-space lights from stack, and then re-inserts stack into shader.
+             *
+             */
             this.popLights = function(numLights) {
                 for (var i = 0; i < numLights; i++) {
                     ctx.lightStack.pop();
                 }
-                ctx.programs.setVar(ctx.canvas.context, 'scene_Lights', ctx.lightStack);
-            };
-
-            this.getSafeToCache = function() {
-                return ctx.viewTransform.cachable && ctx.modelTransform.cacheSafe;
+                ctx.programs.setVar( 'scene_Lights', ctx.lightStack);
             };
         })());

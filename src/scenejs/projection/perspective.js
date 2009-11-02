@@ -1,3 +1,6 @@
+/**
+ * Scene node that constructs a perspective projection matrix and sets it on the current shader.
+ */
 SceneJs.perspective = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
 
@@ -7,7 +10,7 @@ SceneJs.perspective = function() {
 
     return function(scope) {
 
-        if (!mat || !cfg.cachable) {
+        if (!mat || !cfg.fixed) {
             var params = cfg.getParams(scope);
 
             params.fovy = params.fovy || 60.0;
@@ -27,8 +30,10 @@ SceneJs.perspective = function() {
                     );
         }
 
+       var previousMat = backend.getProjectionMatrix();
+
         backend.setProjectionMatrix(mat);
         SceneJs.private.visitChildren(cfg, scope);
-        backend.setProjectionMatrix();
+        backend.setProjectionMatrix(previousMat);
     };
 };

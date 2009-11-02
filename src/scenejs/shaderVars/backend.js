@@ -1,5 +1,5 @@
 /**
- * WebGL backend for SceneJs.Vars node
+ * Backend for scene vars node, sets variables on the active shader and retains them.
  *
  */
 SceneJs.private.backendModules.installBackend(

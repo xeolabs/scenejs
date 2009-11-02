@@ -1,7 +1,7 @@
 /**
  * Sawn-off smooth shader that uses only the position of the most recently defined light
- * source (last light defined in the the light list of the current Light node) and
- * the ambient, specular and diffuse components of a Material.
+ * source (the last light defined in the the light list of the current light node) and
+ * the ambient, specular and diffuse components of a material node.
  *
  * SceneJS shaders always have separate projection, view and modelling matrices for efficiency.
  *
@@ -16,7 +16,7 @@
 
 SceneJs.utils.ns("SceneJs.shaders");
 
-SceneJs.private.backendModules.install(SceneJs.shaderBackend({
+SceneJs.private.backendModules.installBackend(SceneJs.shaderBackend({
 
     type: 'simple-shader',
 
@@ -103,7 +103,7 @@ SceneJs.private.backendModules.install(SceneJs.shaderBackend({
 
         scene_Material: function(context, findVar, m) {
             if (m) {
-                context.uniform3fv(findVar(context, 'MaterialAmbient'), [m.ambient.r, m.ambient.g, m.ambient.b]);   // TODO: cache locations?
+                context.uniform3fv(findVar(context, 'MaterialAmbient'), [m.ambient.r, m.ambient.g, m.ambient.b]);  
                 context.uniform3fv(findVar(context, 'MaterialDiffuse'), [m.diffuse.r, m.diffuse.g, m.diffuse.b]);
                 context.uniform3fv(findVar(context, 'MaterialSpecular'), [m.specular.r, m.specular.g, m.specular.b]);
             }

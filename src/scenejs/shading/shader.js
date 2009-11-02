@@ -1,7 +1,9 @@
+/** Activates a shader program for sub-nodes.
+ *
+ */
 SceneJs.shader = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
     var programId;
-    var vars;
     var backend;
 
     return function(scope) {
@@ -11,7 +13,7 @@ SceneJs.shader = function() {
             if (!params.type) {
                 throw 'Mandatory shader parameter missing: \'type\'';
             }
-            backend = SceneJs.private.backendModules.getBackend(type);
+            backend = SceneJs.private.backendModules.getBackend(params.type);
         }
 
         /* Lazy-load shaders
@@ -22,27 +24,30 @@ SceneJs.shader = function() {
 
         /* Save previous shader and var state
          */
-        var activeProgramId = backend.getActiveProgramId(); // Save active shaders
-        var activeVars;
-        if (activeProgramId) {
-            activeVars = backend.getVars();
+        var previousProgramId = backend.getActiveProgramId(); // Save active shaders
+        var previousVars;
+        if (previousProgramId) {
+            previousVars = backend.getVars();
         }
 
         /* Activate new shaders and vars
          */
         backend.activateProgram(programId);
         if (params.vars) {
-            backend.setVars(params.vars);
+            backend.setVars({
+                vars: params.vars,
+                fixed : cfg.fixed // Sub-vars are cacheable if these are not dynamically-generated
+            });
         }
 
         SceneJs.private.visitChildren(cfg, scope);
 
         /* Restore previous shader and var state
          */
-        if (activeProgramId) {
-            backend.activateProgram(activeProgramId);
-            if (activeVars) {
-                backend.setVars(activeVars);
+        if (previousProgramId) {
+            backend.activateProgram(previousProgramId);
+            if (previousVars) {
+                backend.setVars(previousVars);
             }
         } else {
             backend.deactivateProgram();

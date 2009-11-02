@@ -1,5 +1,8 @@
 SceneJs.utils.ns("SceneJs.objects");
 
+/** Specialises (as a higher-order function) a geometry node to define the venerable OpenGL teapot.
+ *
+ */
 SceneJs.objects.teapot = function() {
     return SceneJs.geometry({
         vertices: [

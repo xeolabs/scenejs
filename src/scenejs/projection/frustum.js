@@ -1,3 +1,6 @@
+/**
+ * Scene node that constructs a projection matrix from a frustum and sets it on the current shader.
+ */
 SceneJs.frustum = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
 
@@ -7,7 +10,7 @@ SceneJs.frustum = function() {
 
     return function(scope) {
 
-        if (!mat || cfg.cachable) {
+        if (!mat || cfg.fixed) {    // Memoize matrix if node config is constant
             var params = cfg.getParams(scope);
             mat = SceneJs.utils.Matrix4.createFrustum(
                     params.left || -1.0,
@@ -19,9 +22,11 @@ SceneJs.frustum = function() {
                     );
         }
 
+        var previousMat = backend.getProjectionMatrix();
+
         backend.setProjectionMatrix(mat);
         SceneJs.private.visitChildren(cfg, scope);
-        backend.setProjectionMatrix();
+        backend.setProjectionMatrix(previousMat);
     };
 };
 

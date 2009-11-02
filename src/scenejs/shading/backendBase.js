@@ -1,5 +1,5 @@
 /**
- * Base class for WebGL shader backends.
+ * Backend for shader scene nodes.
  *
  */
 SceneJs.shaderBackend = function(cfg) {
@@ -34,17 +34,32 @@ SceneJs.shaderBackend = function(cfg) {
                 ctx.programs = new function() {
                     var programs = {};
                     var activeProgram = null;
-                    var vars = {};
+                    var vars = {
+                        vars: {},
+                        fixed: true
+                    };
 
-                    this.loadProgram = function(canvas) {
-                        var programId = ctx.canvas.canvasId + this.type;
+                    /** Creates a program on the context of the given canvas, loads the configured
+                     * shaders into it, links the shaders, then returns the ID of the program. If the
+                     * program (one of the configured type on the given canvas) already exists, will just
+                     * return the ID of the program.
+                     */
+                    this.loadProgram = function() {
+                        if (!ctx.canvas) {
+                            throw 'No canvas active';
+                        }
+                        var programId = ctx.canvas.canvasId + cfg.type;
 
                         var program = programs[programId];
                         if (program) {
                             return programId;
                         }
 
-                        program = {};
+                        var context = ctx.canvas.context;
+
+                        program = {
+                            programId : programId
+                        };
 
                         /* Create program on canvas
                          */
@@ -53,7 +68,7 @@ SceneJs.shaderBackend = function(cfg) {
                         /* Load fragment shaders
                          */
                         var fragmentShaders = [];
-                        for (var i = 0; i < program.fragmentShaders.length; i++) {
+                        for (var i = 0; i < cfg.fragmentShaders.length; i++) {
                             var shader = loadShader(context, cfg.fragmentShaders[i], context.FRAGMENT_SHADER);
                             context.attachShader(program.program, shader);
                             fragmentShaders.push(shader);
@@ -62,8 +77,8 @@ SceneJs.shaderBackend = function(cfg) {
                         /* Load vertex shaders
                          */
                         var vertexShaders = [];
-                        for (var i = 0; i < program.vertexShaders.length; i++) {
-                            var shader = loadShader(context, program.vertexShaders[i], context.VERTEX_SHADER);
+                        for (var i = 0; i < cfg.vertexShaders.length; i++) {
+                            var shader = loadShader(context, cfg.vertexShaders[i], context.VERTEX_SHADER);
                             context.attachShader(program.program, shader);
                             vertexShaders.push(shader);
                         }
@@ -85,108 +100,111 @@ SceneJs.shaderBackend = function(cfg) {
 
                         /* Create variable location map on program
                          */
-                        program.varLocationMap = new function() {
-                            var attribLocations = {};
-                            this.getVarLocation = function(context, name) {
-                                var loc = attribLocations[name];
-                                if (loc == undefined) {
+                        program.getVarLocation = function() {
+                            var locations = {};
+                            return function(context, name) {
+                                var loc = locations[name];
+                                if (!loc) {
                                     loc = context.getAttribLocation(activeProgram.program, name);
                                     if (loc == -1) {
                                         loc = context.getUniformLocation(activeProgram.program, name);
                                         if (loc == -1) {
-                                            throw 'Shader script attribute not found: \'' + name + '\'';
+                                            throw 'Variable not found in active shader: \'' + name + '\'';
                                         }
                                     }
-                                    attribLocations[name] = loc;
+                                    locations[name] = loc;
                                 }
                                 return loc;
                             };
                         };
 
                         programs[programId] = program;
-
                         return programId;
                     };
 
-                    this.activateProgram = function(context, programId) {
+                    /** Activates the loaded program of the given ID
+                     */
+                    this.activateProgram = function(programId) {
+                        if (!ctx.canvas) {
+                            throw 'No canvas active';
+                        }
                         activeProgram = programs[programId];
-                        context.useProgram(activeProgram.program);
-                        vars = {};
+                        ctx.canvas.context.useProgram(activeProgram.program);
+                        vars = {
+                            vars: {},
+                            fixed: true
+                        };
                     };
 
+                    /** Returns the ID of the currently active program 
+                     */
                     this.getActiveProgramId = function() {
-                        return activeProgram ? activeProgram.type : null;
-                    };                 
+                        return activeProgram ? activeProgram.programId : null;
+                    };
 
-                    this.setVar = function(context, name, value) {
+                    this.setVar = function(name, value) {
                         if (!activeProgram) {
-                            throw 'No program active';
+                            throw 'No shader active';
                         }
-                        if (activeProgram.setters[name]) {
-                            activeProgram.setters[name].call(this, context,
-                                    activeProgram.varLocationMap.getVarLocation, value);
+                        var setter = cfg.setters[name];
+                        if (setter) {
+                            setter.call(this, ctx.canvas.context, activeProgram.getVarLocation, value);
                         }
                     };
 
                     /**
                      * Sets vars on the active program; for each element in the vars, the setter of the
-                     * same name is called if it exists, passing the element's value into it.
+                     * same name is called if it exists, passing the element's value into it. The program will
+                     * set defaults on itself where vars are not supplied.
                      */
-                    this.setVars = function(context, v) {
+                    this.setVars = function(v) {
                         if (!activeProgram) {
-                            throw 'No program active';
+                            throw 'No shader active';
                         }
-                        for (var key in activeProgram.setters) {
-                            activeProgram.setters[key].call(this, context,
-                                    activeProgram.varLocationMap.getVarLocation, v[key]); // Defaults on null
+                        for (var key in cfg.setters) {
+                            cfg.setters[key].call(this, ctx.canvas.context,
+                                    activeProgram.getVarLocation, v.vars[key]); // Defaults on null
                         }
                         vars = v;
                     };
 
-                    this.getVars = function(context) {
+                    this.getVars = function() {
                         return vars;
                     };
 
-                    this.deactivateProgram = function(context) {
+                    /** Deactivates the currently active program
+                     */
+                    this.deactivateProgram = function() {
+                        if (!activeProgram) {
+                            throw 'No shader active';
+                        }
+                        ctx.canvas.context.flush();
+                        //  cfg.context.swapBuffers();
                         activeProgram = null;
-                        context.useProgram(0); // Switch GL to use fixed-function paths
+                        ctx.canvas.context.useProgram(0); // Switch GL to use fixed-function paths
                     };
                 };
             }
         };
 
         this.loadProgram = function() {
-            if (!ctx.canvas) {
-                throw 'No canvas active';
-            }
-            return ctx.programs.loadProgram(ctx.canvas);
+            return ctx.programs.loadProgram();
         };
 
         this.activateProgram = function(programId) {
-            if (!ctx.canvas) {
-                throw 'No canvas active';
-            }
-            ctx.programs.activateProgram(ctx.canvas.context, programId);
+            ctx.programs.activateProgram(programId);
         };
 
-        this.getActiveProgram = function() {
-            return ctx.programs.getActiveProgram();
+        this.getActiveProgramId = function() {
+            return ctx.programs.getActiveProgramId();
         };
 
         this.setVars = function(vars) {
-            if (!ctx.canvas) {
-                throw 'No canvas active';
-            }
-            ctx.programs.setVars(ctx.canvas.context, vars);
+            ctx.programs.setVars(vars);
         };
 
         this.deactivateProgram = function() {
-            if (!ctx.canvas) {
-                throw 'No canvas active';
-            }
-            ctx.canvas.context.flush();
-            //  cfg.context.swapBuffers();
-            ctx.programs.deactivateProgram(ctx.canvas.context);
+            ctx.programs.deactivateProgram();
         };
     })();
 };

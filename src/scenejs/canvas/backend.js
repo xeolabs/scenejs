@@ -1,5 +1,5 @@
 /**
- * WebGL backend for Canvas node
+ * Backend for a canvas node.
  */
 SceneJs.private.backendModules.installBackend(
         new (function() {
@@ -15,7 +15,7 @@ SceneJs.private.backendModules.installBackend(
             this.findCanvas = function(canvasId) {
                 var canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw 'Canvas element not found in DOM (element ID = \'' + canvasId + '\')';
+                    throw 'Canvas element not in DOM (id = \'' + canvasId + '\')';
                 }
                 var context = canvas.getContext('moz-glweb20');
                 context.clearColor(0.8, 0.8, 0.9, 1.0);

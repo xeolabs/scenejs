@@ -1,3 +1,6 @@
+/**
+ * Scene node that constructs an ortographic projection matrix and sets it on the current shader.
+ */
 SceneJs.ortho = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
 
@@ -7,7 +10,7 @@ SceneJs.ortho = function() {
 
     return function(scope) {
 
-        if (!mat || !cfg.cachable) {
+        if (!mat || !cfg.fixed) {
             var params = cfg.getParams(scope);
 
             mat = SceneJs.utils.Matrix4.createOrtho(
@@ -20,9 +23,11 @@ SceneJs.ortho = function() {
                     );
         }
 
+        var previousMat = backend.getProjectionMatrix();
+
         backend.setProjectionMatrix(mat);
         SceneJs.private.visitChildren(cfg, scope);
-        backend.setProjectionMatrix();
+        backend.setProjectionMatrix(previousMat);
     };
 };
 

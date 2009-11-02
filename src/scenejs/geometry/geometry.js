@@ -1,3 +1,7 @@
+/**
+ * Defines geometry on the currently-active canvas, to be shaded with the current shader.
+ *
+ */
 SceneJs.geometry = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
 
@@ -58,11 +62,11 @@ SceneJs.geometry = function() {
         return result;
     };
 
-    var geo;
+    var geo;  // memoized if params are fixed
 
     return function(scope) {
         var params = cfg.getParams(scope);
-        if (!geo || !cfg.cachable) {
+        if (!geo || !cfg.fixed) {
             geo = {
                 vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
                 normals: params.normals && params.normals.length > 0 ? params.normals

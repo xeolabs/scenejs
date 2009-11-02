@@ -1,18 +1,19 @@
+/** Sets material properties on the current shader for sub-nodes
+ *
+ */
 SceneJs.material = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
 
     var backend = SceneJs.private.backendModules.getBackend('material');
 
     var cloneColor = function(v) {
-        v = v || {};
-        return { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 };
+        return v ? { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 } : { r: 0, g : 0, b: 0};
     };
 
-    var material;
+    var material;   // memoized
 
     return function(scope) {
-
-        if (!material || !cfg.cachable) {
+        if (!material || !cfg.fixed) { // if not memoized or params are variable
             var params = cfg.getParams(scope);
             material = {
                 ambient:  cloneColor(params.ambient),
@@ -22,10 +23,10 @@ SceneJs.material = function() {
             };
         }
 
-        var currentMaterial = backend.getMaterial();
+        var saveMaterial = backend.getMaterial();
 
         backend.setMaterial(material);
         SceneJs.private.visitChildren(cfg, scope);
-        backend.setMaterial(currentMaterial);
+        backend.setMaterial(saveMaterial);
     };
 };

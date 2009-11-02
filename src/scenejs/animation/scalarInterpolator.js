@@ -151,7 +151,7 @@ SceneJs.scalarInterpolator = function() {
 
         var outputValue = function(v) {
             try {
-              params.output.call(this, scope, v);   
+              params.output.call(this, scope, v);    // TODO : scope should be subscope for child nodes!
             } catch (e) {
                 throw 'Error calling scalarInterpolator output function - is the function correct?';
             }
@@ -176,7 +176,7 @@ SceneJs.scalarInterpolator = function() {
 
         update();
 
-        SceneJs.private.visitChildren(cfg, scope);
+        SceneJs.private.visitChildren(cfg, scope, true); // Create new scopes for children
     };
 };
 

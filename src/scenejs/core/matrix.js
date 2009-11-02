@@ -1,3 +1,7 @@
+/** Optimised vector and matrix utilities
+ *
+ */
+
 /** A 3D vector
  *
  */
@@ -60,7 +64,7 @@ SceneJs.utils.Matrix4 = function(e) {
         0.0,0.0,1.0,0.0,
         0.0,0.0,0.0,1.0];
 
-   this.multiply = function (a) {
+    this.multiply = function (a) {
         var c = new SceneJs.utils.Matrix4();
         for (var i = 0; i < 16; i += 4) {
             c.elements[i + 0] = this.elements[i] * a.elements[0] +
@@ -81,6 +85,23 @@ SceneJs.utils.Matrix4 = function(e) {
                                 this.elements[i + 3] * a.elements[15];
         }
         return c;
+    };
+
+    this.transformPoint3 = function(p) {
+        return {
+            x : (this.elements[0] * p.x) + (this.elements[4] * p.y) + (this.elements[8] * p.z) + this.elements[12],
+            y : (this.elements[1] * p.x) + (this.elements[5] * p.y) + (this.elements[9] * p.z) + this.elements[13],
+            z : (this.elements[2] * p.x) + (this.elements[6] * p.y) + (this.elements[10] * p.z) + this.elements[14],
+            w : (this.elements[3] * p.x) + (this.elements[7] * p.y) + (this.elements[11] * p.z) + this.elements[15]
+        };
+    };
+
+    this.transformVector3 = function(v) {
+        return {
+            x:(this.elements[0] * v.x) + (this.elements[4] * v.y) + (this.elements[8] * v.z),
+            y:(this.elements[1] * v.x) + (this.elements[5] * v.y) + (this.elements[9] * v.z),
+            z:(this.elements[2] * v.x) + (this.elements[6] * v.y) + (this.elements[10] * v.z)
+        };
     };
 };
 
@@ -150,7 +171,7 @@ SceneJs.utils.Matrix4.createRotate = function (angle, x, y, z) {
         return new SceneJs.utils.Matrix4([
             (oneMinusCos * xx) + cosAngle, (oneMinusCos * xy) - zs, (oneMinusCos * zx) + ys, 0.0,
             (oneMinusCos * xy) + zs, (oneMinusCos * yy) + cosAngle, (oneMinusCos * yz) - xs,  0.0,
-            (oneMinusCos * zx) - ys, (oneMinusCos * yz) + xs, (oneMinusCos * zz) + cosAngle, rotMat.elements[11] = 0.0,
+            (oneMinusCos * zx) - ys, (oneMinusCos * yz) + xs, (oneMinusCos * zz) + cosAngle, 0.0,
             0.0, 0.0, 0.0, 1.0
         ]);
     } else {
@@ -172,12 +193,11 @@ SceneJs.utils.Matrix4.createLookAt = function(eye, look, up) {
     var upCrossn = SceneJs.utils.Vector3.cross(up, n);
     var u = SceneJs.utils.Vector3.divide(upCrossn, SceneJs.utils.Vector3.len(upCrossn));
     var v = SceneJs.utils.Vector3.cross(n, u);
-    return (new SceneJs.utils.Matrix4([
+    return SceneJs.utils.Matrix4.createTranslation(-eye.x, -eye.y, -eye.z).multiply(new SceneJs.utils.Matrix4([
         u.x, u.y, u.z, 0.0,
         v.x, v.y, v.z, 0.0,
         n.x, n.y, n.z, 0.0,
-        0.0, 0.0, 0.0, 1.0]))
-            .translate(-eye.x, -eye.y, -eye.z);
+        0.0, 0.0, 0.0, 1.0]));
 };
 
 SceneJs.utils.Matrix4.createFrustum = function(left, right,
@@ -210,19 +230,4 @@ SceneJs.utils.Matrix4.createOrtho = function(left, right,
         0, 0, 0, 1]);
 };
 
-SceneJs.utils.Matrix4.transformPoint3 = function(p) {
-    return {
-        x : (this.elements[0] * p.x) + (this.elements[4] * p.y) + (this.elements[8] * p.z) + this.elements[12],
-        y : (this.elements[1] * p.x) + (this.elements[5] * p.y) + (this.elements[9] * p.z) + this.elements[13],
-        z : (this.elements[2] * p.x) + (this.elements[6] * p.y) + (this.elements[10] * p.z) + this.elements[14],
-        w : (this.elements[3] * p.x) + (this.elements[7] * p.y) + (this.elements[11] * p.z) + this.elements[15]
-    };
-};
 
-SceneJs.utils.Matrix4.transformVector3 = function(v) {
-    return {
-        x:(this.elements[0] * v.x) + (this.elements[4] * v.y) + (this.elements[8] * v.z),
-        y:(this.elements[1] * v.x) + (this.elements[5] * v.y) + (this.elements[9] * v.z),
-        z:(this.elements[2] * v.x) + (this.elements[6] * v.y) + (this.elements[10] * v.z)
-    };
-};

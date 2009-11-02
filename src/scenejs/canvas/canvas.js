@@ -1,8 +1,12 @@
+/** Activates a OpenGL context on a specified HTML-5 canvas for sub-nodes. These can be nested; a previously-active
+ * canvas will be temporarily inactive while this one's canvas is active.
+ *
+ */
 SceneJs.canvas = function() {
     var cfg = SceneJs.private.getNodeConfig(arguments);
 
     var backend = SceneJs.private.backendModules.getBackend('canvas');
-    var canvas;
+    var canvas; // memoized
 
     return function(scope) {
         var params = cfg.getParams(scope);
@@ -10,9 +14,9 @@ SceneJs.canvas = function() {
             throw 'canvas node parameter missing: canvasId';
         }
 
-        var superCanvas = backend.getCanvas();
+        var superCanvas = backend.getCanvas(); // remember previous canvas if any
 
-        if (!canvas) {
+        if (!canvas || !cfg.fixed) {
             canvas = backend.findCanvas(params.canvasId);
         }
         backend.setCanvas(canvas);
@@ -32,7 +36,7 @@ SceneJs.canvas = function() {
         backend.flush();
         backend.swapBuffers();
         if (superCanvas) {
-            backend.setCanvas(superCanvas);
+            backend.setCanvas(superCanvas); // restore previous canvas
         }
     };
 };

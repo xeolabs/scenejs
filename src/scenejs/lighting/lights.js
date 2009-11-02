@@ -6,7 +6,11 @@ SceneJs.lights = function() {
     var lights;
 
     return function(scope) {
-        if (!lights || !cfg.cachable || !backend.getSafeToCache()) {
+
+        /* Memoize lights if they are given in a constant node config and if the
+         * current view and model coordinate system is also constant        
+         */
+        if (!lights || !cfg.fixed || !backend.getSafeToCache()) {
             lights = backend.transformLights(cfg.getParams(scope).lights);
         }
         backend.pushLights(lights);

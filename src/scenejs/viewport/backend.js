@@ -1,4 +1,4 @@
-/** WebGL backend for SceneJs.Viewport node
+/** Backend for viewport node
  *
  */
 SceneJs.private.backendModules.installBackend(
@@ -16,7 +16,8 @@ SceneJs.private.backendModules.installBackend(
                 if (!ctx.canvas) {
                     throw 'No canvas active';
                 }
-                ctx.canvas.context.viewport(x, y, width, height);
-                ctx.canvas.context.clear(context.COLOR_BUFFER_BIT);
+                var context = ctx.canvas.context;
+                context.viewport(x, y, width, height);
+                context.clear(context.COLOR_BUFFER_BIT);
             };
         })());

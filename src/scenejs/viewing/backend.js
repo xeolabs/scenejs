@@ -1,3 +1,6 @@
+/**
+ * Scene node that constructs an viewing transform matrix and sets it on the current shader.
+ */
 SceneJs.private.backendModules.installBackend(
         new (function() {
 
@@ -10,7 +13,7 @@ SceneJs.private.backendModules.installBackend(
                 if (!ctx.viewTransform) {
                     ctx.viewTransform = {
                         matrix :  new SceneJs.utils.Matrix4(),
-                        cacheSafe: true
+                        fixed: true
                     };
                 }
             };
@@ -20,7 +23,7 @@ SceneJs.private.backendModules.installBackend(
                     throw 'No shader active';
                 }
                 ctx.viewTransform = transform;
-                ctx.programs.setVar(cfg.context, 'scene_ViewMatrix', transform.matrix);
+                ctx.programs.setVar('scene_ViewMatrix', transform.matrix);
             };
 
             this.getViewTransform = function() {
