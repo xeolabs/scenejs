@@ -2,7 +2,7 @@
  * Backend for scene vars node, sets variables on the active shader and retains them.
  *
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'vars';

@@ -1,7 +1,7 @@
 SceneJs.lights = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.private.backendModules.getBackend('lights');
+    var backend = SceneJs.backends.getBackend('lights');
 
     var lights;
 
@@ -14,7 +14,7 @@ SceneJs.lights = function() {
             lights = backend.transformLights(cfg.getParams(scope).lights);
         }
         backend.pushLights(lights);
-        SceneJs.private.visitChildren(cfg, scope);
-        backend.popLights();
+        SceneJs.utils.visitChildren(cfg, scope);
+        backend.popLights(lights.length);
     };
 };

@@ -1,5 +1,5 @@
 SceneJs.scalarInterpolator = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
     var NOT_FOUND = 0;
     var BEFORE_FIRST = 1;
@@ -176,7 +176,7 @@ SceneJs.scalarInterpolator = function() {
 
         update();
 
-        SceneJs.private.visitChildren(cfg, scope, true); // Create new scopes for children
+        SceneJs.utils.visitChildren(cfg, scope, true); // Create new scopes for children
     };
 };
 

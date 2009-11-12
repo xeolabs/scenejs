@@ -1,7 +1,7 @@
 /**
  * Backend for a canvas node.
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'canvas';
@@ -19,9 +19,9 @@ SceneJs.private.backendModules.installBackend(
                 }
                 var context = canvas.getContext('moz-glweb20');
                 context.clearColor(0.8, 0.8, 0.9, 1.0);
+                context.clearDepth(1.0);
                 context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
                 context.enable(context.DEPTH_TEST);
-                context.clearDepth(0.1);
 
                 return {
                     canvas: canvas,
@@ -34,7 +34,7 @@ SceneJs.private.backendModules.installBackend(
                 ctx.canvas = canvas;
             };
 
-            this.getCanvas = function(canvas) {
+            this.getCanvas = function() {
                 return ctx.canvas;
             };
 

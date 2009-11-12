@@ -57,38 +57,7 @@ var SceneJs = {version: '1.0'};
                     o = o[d[j]];
                 }
             }
-        }
-    };
-
-    /**
-     * Private framework resources
-     */
-    SceneJs.private = {
-
-        /** Registry of modules that provide backend functionality for scene graph nodes
-         */
-        backendModules : new (function() {
-            var backends = {};
-            var ctx = {};
-
-            /** Installs a backend module - see examples for more info.
-             */
-            this.installBackend = function(backend) {
-                backends[backend.type] = backend;
-                backend.install(ctx);
-            };
-
-            /** Obtains the backend module of the given type
-             */
-            this.getBackend = function(type) {
-                var backend = backends[type];
-                if (!backend) {
-                    throw 'No backend installed of type \'' + type + '\'';
-                }
-                return backend;
-            };
-        })(),
-
+        },
         /** Creates a new data scope for a scene graph subtree, optionally as a child of a
          * parent scope. The scope can be flagged as being either fixed or unfixed. The former
          * type has data that will be constant for the life of the scene graph, while the latter
@@ -167,6 +136,30 @@ var SceneJs = {version: '1.0'};
             }
         }
     };
+
+    /** Registry of modules that provide backend functionality for scene graph nodes
+     */
+    SceneJs.backends = new (function() {
+        var backends = {};
+        var ctx = {};
+
+        /** Installs a backend module - see examples for more info.
+         */
+        this.installBackend = function(backend) {
+            backends[backend.type] = backend;
+            backend.install(ctx);
+        };
+
+        /** Obtains the backend module of the given type
+         */
+        this.getBackend = function(type) {
+            var backend = backends[type];
+            if (!backend) {
+                throw 'No backend installed of type \'' + type + '\'';
+            }
+            return backend;
+        };
+    })();
 })();
 
 SceneJs.utils.ns = SceneJs.utils.namespace; // in intellij using keyword "namespace" causes parsing errors

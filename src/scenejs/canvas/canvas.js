@@ -3,9 +3,9 @@
  *
  */
 SceneJs.canvas = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.private.backendModules.getBackend('canvas');
+    var backend = SceneJs.backends.getBackend('canvas');
     var canvas; // memoized
 
     return function(scope) {
@@ -21,19 +21,8 @@ SceneJs.canvas = function() {
         }
         backend.setCanvas(canvas);
 
-        if (params.clearColor) {
-            backend.setClearColor(params.clearColor);
-        }
-        if (params.depthTest) {
-            backend.setDepthTest(params.depthTest);
-        }
-        if (params.clearDepth) {
-            backend.setClearDepth(params.clearDepth);
-        }
+        SceneJs.utils.visitChildren(cfg, scope);
 
-        SceneJs.private.visitChildren(cfg, scope);
-
-        backend.flush();
         backend.swapBuffers();
         if (superCanvas) {
             backend.setCanvas(superCanvas); // restore previous canvas

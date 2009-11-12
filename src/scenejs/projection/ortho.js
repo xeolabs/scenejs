@@ -2,9 +2,9 @@
  * Scene node that constructs an ortographic projection matrix and sets it on the current shader.
  */
 SceneJs.ortho = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.private.backendModules.getBackend('projection');
+    var backend = SceneJs.backends.getBackend('projection');
 
     var mat;
 
@@ -26,7 +26,7 @@ SceneJs.ortho = function() {
         var previousMat = backend.getProjectionMatrix();
 
         backend.setProjectionMatrix(mat);
-        SceneJs.private.visitChildren(cfg, scope);
+        SceneJs.utils.visitChildren(cfg, scope);
         backend.setProjectionMatrix(previousMat);
     };
 };

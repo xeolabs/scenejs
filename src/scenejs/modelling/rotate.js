@@ -3,9 +3,9 @@
  * higher nodes.
  */
 SceneJs.rotate = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.private.backendModules.getBackend('modeltransform');
+    var backend = SceneJs.backends.getBackend('modeltransform');
     
     var localMat;
     var modelTransform;
@@ -32,7 +32,7 @@ SceneJs.rotate = function() {
         }
 
         backend.setModelTransform(modelTransform);
-        SceneJs.private.visitChildren(cfg, scope);
+        SceneJs.utils.visitChildren(cfg, scope);
         backend.setModelTransform(xform);
     };
 };

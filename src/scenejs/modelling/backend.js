@@ -1,7 +1,7 @@
 /** Backend for modelling transform nodes. Allows client node to set a modelling matrix on the shader. The matrix
  * is bundled with a flag which signifies if the matrix is constant, where it can be memoized by the client node.
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'modeltransform';

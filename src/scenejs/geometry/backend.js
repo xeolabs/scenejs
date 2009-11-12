@@ -2,7 +2,7 @@
  * Backend for a geometry node. Provides the means to insert gemetry into the currently active shader.
  *
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'geometry';
@@ -28,5 +28,7 @@ SceneJs.private.backendModules.installBackend(
                 }
                 var context = ctx.canvas.context;
                 context.drawElements(context.TRIANGLES, geo.indices.length, context.UNSIGNED_SHORT, geo.indices);
+                context.flush();
+
             };
         })());

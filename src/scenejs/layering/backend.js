@@ -2,7 +2,7 @@
  * WebGL support for Layer node
  *
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'layer';

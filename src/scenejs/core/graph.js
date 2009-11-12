@@ -3,7 +3,7 @@
  *
  */
 SceneJs.graph = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
     return {
 
         /**
@@ -11,7 +11,7 @@ SceneJs.graph = function() {
          * set on the root data scope
          */
         render : function(paramOverrides) {
-            var scope = SceneJs.private.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
+            var scope = SceneJs.utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
             var params = cfg.getParams();
             for (var key in params) {    // Push scene params into scope
                 scope.put(key, params[key]);
@@ -21,7 +21,7 @@ SceneJs.graph = function() {
                     scope.put(key, paramOverrides[key]);
                 }
             }
-            SceneJs.private.visitChildren(cfg, scope);
+            SceneJs.utils.visitChildren(cfg, scope);
         }
     };
 };

@@ -5,7 +5,7 @@
  * that many lights from the top of the stack downwards will be effectively active within the shader.
  */
 
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'lights';

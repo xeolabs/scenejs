@@ -1,20 +1,22 @@
 /**
- * Scene node that creates a data scope for sub-nodes.
+ * Scene node that creates a child scope containing the elements of its configuration. 
  */
 SceneJs.scope = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
     var childScope;
 
     return function(scope) {
-        if (!childScope || !cfg.fixed || !scope.isfixed()) { // memoize scope if config and scope are constant 
+        if (!childScope || !cfg.fixed || !scope.isfixed()) { // memoize scope if config and scope are constant
+            childScope = SceneJs.utils.newScope(scope, cfg.fixed);
             var params = cfg.getParams(scope);
-            childScope = SceneJs.private.newScope(scope, cfg.fixed);
-            for (var key in params) {
-                childScope.put(key, params[key]);
+            if (params) {
+                for (var key in params) {
+                    childScope.put(key, params[key]);
+                }
             }
         }
-        SceneJs.private.visitChildren(cfg, childScope);
+        SceneJs.utils.visitChildren(cfg, childScope);
     };
 };
 

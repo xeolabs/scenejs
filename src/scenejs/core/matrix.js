@@ -151,7 +151,6 @@ SceneJs.utils.Matrix4.createRotate = function (angle, x, y, z) {
     if (mag > 0) {
         var xx, yy, zz, xy, yz, zx, xs, ys, zs;
         var oneMinusCos;
-        var rotMat;
 
         x /= mag;
         y /= mag;
@@ -188,7 +187,6 @@ SceneJs.utils.Matrix4.createRotate = function (angle, x, y, z) {
  */
 SceneJs.utils.Matrix4.createLookAt = function(eye, look, up) {
     var eyeSubLook = { x : eye.x - look.x, y : eye.y - look.y, z : eye.z - look.z};
-
     var n = SceneJs.utils.Vector3.divide(eyeSubLook, SceneJs.utils.Vector3.len(eyeSubLook));
     var upCrossn = SceneJs.utils.Vector3.cross(up, n);
     var u = SceneJs.utils.Vector3.divide(upCrossn, SceneJs.utils.Vector3.len(upCrossn));
@@ -199,6 +197,31 @@ SceneJs.utils.Matrix4.createLookAt = function(eye, look, up) {
         n.x, n.y, n.z, 0.0,
         0.0, 0.0, 0.0, 1.0]));
 };
+//
+//var makeLookAt = function(_eye,
+//                            _look,
+//                            _up) {
+//      var eye = $V([_eye.x, _eye.y, _eye.z]);
+//      var center = $V([_look.x, _look.y, _look.z]);
+//      var up = $V([_up.x, _up.y, _up.z]);
+//      var z = eye.subtract(center).toUnitVector();
+//      var x = up.cross(z).toUnitVector();
+//      var y = z.cross(x).toUnitVector();
+//      var m = $M([
+//          [x.e(1), x.e(2), x.e(3), 0],
+//          [y.e(1), y.e(2), y.e(3), 0],
+//          [z.e(1), z.e(2), z.e(3), 0],
+//          [0, 0, 0, 1]
+//      ]);
+//      var t = $M([
+//          [1, 0, 0, -_eye.x],
+//          [0, 1, 0, -_eye.y],
+//          [0, 0, 1, -_eye.z],
+//          [0, 0, 0, 1]
+//      ]);
+//      return m.x(t);
+//  };
+
 
 SceneJs.utils.Matrix4.createFrustum = function(left, right,
                                                bottom, top,
@@ -216,6 +239,7 @@ SceneJs.utils.Matrix4.createFrustum = function(left, right,
         0, 0, -1, 0
     ]);
 };
+
 
 SceneJs.utils.Matrix4.createOrtho = function(left, right,
                                              bottom, top,

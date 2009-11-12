@@ -2,7 +2,7 @@
  *
  */
 SceneJs.shader = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
     var programId;
     var backend;
 
@@ -13,7 +13,7 @@ SceneJs.shader = function() {
             if (!params.type) {
                 throw 'Mandatory shader parameter missing: \'type\'';
             }
-            backend = SceneJs.private.backendModules.getBackend(params.type);
+            backend = SceneJs.backends.getBackend(params.type);
         }
 
         /* Lazy-load shaders
@@ -40,7 +40,7 @@ SceneJs.shader = function() {
             });
         }
 
-        SceneJs.private.visitChildren(cfg, scope);
+        SceneJs.utils.visitChildren(cfg, scope);
 
         /* Restore previous shader and var state
          */

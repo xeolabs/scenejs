@@ -3,9 +3,9 @@
  *
  */
 SceneJs.geometry = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.private.backendModules.getBackend('geometry');
+    var backend = SceneJs.backends.getBackend('geometry');
 
     var calculateNormals = function(vertices, faces) {
         var nvecs = new Array(vertices.length);
@@ -76,7 +76,7 @@ SceneJs.geometry = function() {
             };
         }
         backend.drawGeometry(geo);
-        SceneJs.private.visitChildren(cfg, scope);
+        SceneJs.utils.visitChildren(cfg, scope);
     };
 };
 

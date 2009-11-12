@@ -100,7 +100,7 @@ SceneJs.shaderBackend = function(cfg) {
 
                         /* Create variable location map on program
                          */
-                        program.getVarLocation = function() {
+                        program.getVarLocation = (function() {
                             var locations = {};
                             return function(context, name) {
                                 var loc = locations[name];
@@ -116,7 +116,7 @@ SceneJs.shaderBackend = function(cfg) {
                                 }
                                 return loc;
                             };
-                        };
+                        })();
 
                         programs[programId] = program;
                         return programId;
@@ -136,7 +136,7 @@ SceneJs.shaderBackend = function(cfg) {
                         };
                     };
 
-                    /** Returns the ID of the currently active program 
+                    /** Returns the ID of the currently active program
                      */
                     this.getActiveProgramId = function() {
                         return activeProgram ? activeProgram.programId : null;
@@ -179,7 +179,6 @@ SceneJs.shaderBackend = function(cfg) {
                             throw 'No shader active';
                         }
                         ctx.canvas.context.flush();
-                        //  cfg.context.swapBuffers();
                         activeProgram = null;
                         ctx.canvas.context.useProgram(0); // Switch GL to use fixed-function paths
                     };

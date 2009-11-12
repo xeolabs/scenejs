@@ -1,0 +1,108 @@
+<html>
+
+<head>
+    <title>SceneJS | OpenGL Scene Graph for Javascript</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Style-Type" content="text/css"/>
+
+    <script class="javascript" src="../js/sh/sh_main.min.js"></script>
+    <script class="javascript" src="../js/sh/sh_javascript.js"></script>
+
+    <link href="../css/sh_style.css" rel="stylesheet" type="text/css"/>
+
+    <link href="../css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/layout.css" rel="stylesheet" type="text/css"/>
+
+
+</head>
+
+<body id="about" onload="sh_highlightDocument();">
+
+<div id="main">
+
+    <div id="header">
+        <a href="../index.html"><img src="../images/scenejs_small.png" id="logo" alt=""/></a>
+        <ul id="menu">
+            <li><a href="../downloads/downloads.html"><span><span>Download</span></span></a></li>
+            <li id="menu-act"><a href="introduction.html"><span><span>Documentation</span></span></a></li>
+            <li><a href="http://github.com/xeolabs/scenejs/issues"><span><span>Issues</span></span></a></li>
+            <li><a href="http://scenejs.bbster.net/"><span><span>Forum</span></span></a></li>
+            <li><a href="http://github.com/xeolabs/scenejs"><span><span>Sourcecode</span></span></a></li>
+        </ul>
+        <div id="headerContent">
+            <div id="headerContentContainer">
+                <a href="introduction.html">Introduction</a>&nbsp;|&nbsp;How SceneJs Works&nbsp;|&nbsp;Extending SceneJs
+            </div>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="row-1">
+            <div class="wrapper">
+                <h1>How SceneJS Works</h1>
+
+                <p><span>The SceneJS architecture is split into two layers: the <b>front-end</b>, which contains scene graph node
+                types, and the <b>back-end</b>, a framework containing plugins that mediate between the nodes and canvases.</span>
+                </p>
+
+                <p><span>To see how it works, let's take a look at <b>viewport</b>, a really simple node which just sets a viewport
+                    on the currently active canvas.</span></p>
+
+                <p><span>Here's its backend:</span></p>
+                <br/>
+                <script src="http://gist.github.com/224920.js"></script>
+                <br/>
+
+                <p><span>As you can see, the backend is an anonymous object which is installed straight into the framework. The install
+                  method is called as soon as it's installed to provide it with a context, <b>ctx</b>, that is shared by all
+                  backend plugins. Many of the backends set up resources on the context at this point, such as lookup tables etc.
+                  </span></p>
+
+                <p><span>The <b>setViewport</b> method is specially for use by the client viewport node. The method expects to find a canvas
+                    on the backend context, set by the backend of a previously visited <b>canvas</b> node. Finding that, it will set the
+                    viewport on the canvas.</span></p>
+
+                <p><span>Now for the <b>viewport</b> node:</span></p>
+                <br/>
+                <script src="http://gist.github.com/224921.js"></script>
+                <br/>
+
+                <p><span>SceneJs.viewport is a higher-order function that creates the actual viewport node (ie. function). Recall from back in
+                    the <a href="introduction.html">introduction</a> that node declarations generally have the
+                    form <b>node({<i>configs</i>}, <i>child</i>,<i>child</i>...)</b></span>, where <i>configs</i> can either be an object,
+                    or a function that dynamically generates a configs object.</span></p>
+
+                <p><span>The call to <b>SceneJs.util.getNodeConfig(arguments)</b> translates those arguments into an object,
+                    <b><i>cfg</i></b>, which
+                    has an array of the child nodes and a function, <b><i>getConfigs(scope)</i></b>. Let's take a look at that function:</span></p><br/>
+                <script src="http://gist.github.com/226969.js"></script>
+                <p><span>So when <i>configs</i> was a function, then <i>cfg.getConfigs</i> will be that function. Otherwise, when
+                    <i>configs</i> was an object, then <i>cfg.getConfigs</i> will return that object.
+                        See how <i>cfg</i> also has a flag, <b><i>fixed</i></b> which will be false in the former case to indicate that
+                    getConfigs may return something different each time and that memoization
+                    should not be done on it (thats done in more sophisticated node types than <i>viewport</i>, which is our simplest node type).</span></p>
+
+            </div>
+        </div>
+        <div id="footer">
+            <p>&copy; 2009, <a href="http://www.xeolabs.com">XeoLabs</a></p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-8036359-2");
+        pageTracker._trackPageview();
+    } catch(err) {
+    }</script>
+</body>
+
+</html>

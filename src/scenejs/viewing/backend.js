@@ -1,7 +1,7 @@
 /**
  * Scene node that constructs an viewing transform matrix and sets it on the current shader.
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'viewtransform';

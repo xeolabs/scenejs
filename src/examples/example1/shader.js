@@ -1,4 +1,4 @@
-SceneJs.private.backendModules.installBackend(new SceneJs.ShaderBackend({
+SceneJs.backends.installBackend(new SceneJs.ShaderBackend({
 
     type: 'example-shader-1',
 

@@ -1,7 +1,7 @@
 /**
  * Backend for a material node, feeds given material properties into the active shader and retains them.
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'material';

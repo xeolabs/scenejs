@@ -1,6 +1,6 @@
 /** Backend for projection nodes.
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'projection';

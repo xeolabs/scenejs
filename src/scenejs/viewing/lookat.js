@@ -2,9 +2,9 @@
  * Scene node that constructs a 'lookat' view transformation matrix and sets it on the current shader.
  */
 SceneJs.lookAt = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.private.backendModules.getBackend('viewtransform');
+    var backend = SceneJs.backends.getBackend('viewtransform');
 
     var cloneVec = function(v) {
         return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
@@ -34,7 +34,7 @@ SceneJs.lookAt = function() {
         var xform = backend.getViewTransform();
 
         backend.setViewTransform({ matrix: mat, fixed: cfg.fixed });
-        SceneJs.private.visitChildren(cfg, scope);
+        SceneJs.utils.visitChildren(cfg, scope);
         backend.setViewTransform(xform);
     };
 };

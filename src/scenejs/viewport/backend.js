@@ -1,7 +1,7 @@
 /** Backend for viewport node
  *
  */
-SceneJs.private.backendModules.installBackend(
+SceneJs.backends.installBackend(
         new (function() {
 
             this.type = 'viewport';

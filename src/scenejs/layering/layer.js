@@ -6,14 +6,14 @@ SceneJs.layer = function() {
     return SceneJs.node(
             SceneJs.apply(cfg, {
                 preVisit : function() {
-                    var backend = SceneJs.private.backendModules.getBackend(type);
+                    var backend = SceneJs.backends.getBackend(type);
                     if (backend) {
                         (cfg.cullFace) ? backend.setCullFace(true) : backend.setCullFace(false);
                     }
                 },
 
                 postVisit : function() {
-                    var backend = SceneJs.private.backendModules.getBackend(type);
+                    var backend = SceneJs.backends.getBackend(type);
                     if (backend) {
                         backend.setCullFace(false);
                         backend.flush();

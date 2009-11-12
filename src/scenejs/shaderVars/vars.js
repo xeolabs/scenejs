@@ -1,8 +1,8 @@
 /** Sets vars on the current shader, temporarily overriding vars set by higher vars nodes.
  */
 SceneJs.shaderVars = function() {
-    var cfg = SceneJs.private.getNodeConfig(arguments);
-    var backend = SceneJs.private.backendModules.getBackend('vars');
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+    var backend = SceneJs.backends.getBackend('vars');
 
     var vars;
 
@@ -16,7 +16,7 @@ SceneJs.shaderVars = function() {
             };
         }
         backend.setVars(vars);
-        SceneJs.private.visitChildren(cfg, scope);
+        SceneJs.utils.visitChildren(cfg, scope);
         backend.setVars(superVars);
     };
 };
