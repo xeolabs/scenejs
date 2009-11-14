@@ -13,6 +13,10 @@ SceneJs.backends.installBackend(
                 ctx = _ctx;
             };
 
+            this.intersects = function(boundary) {
+                return true; // TODO
+            };
+
             this.drawGeometry = function(geo) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';

@@ -21,7 +21,7 @@ SceneJs.lookAt = function() {
             params.look = params.look ? cloneVec(params.look) : { x: 0.0, y: 0.0, z: 0.0 };
             params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
 
-            if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == this.look.z) {
+            if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
                 throw 'Invald lookAt parameters: eye and look cannot be identical';
             }
             if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {

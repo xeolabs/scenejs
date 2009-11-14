@@ -91,7 +91,7 @@ h2.extra {
 }
 
 #main {
-    width: 908px;
+    width: 1000px;
     margin: 0 auto;
     font-size: 0.8em;
     text-align: left;
@@ -141,7 +141,7 @@ h2.extra {
 #menu {
     position: absolute;
     top: 57px;
-    left: 400px;
+    left: 500px;
 }
 
 #menu li {
@@ -239,7 +239,7 @@ h2.extra {
 }
 
 #content #imageDiv img {
-    margin-left: 100px;
+    margin-left: 200px;
 }
 
 #content p em {
@@ -379,4 +379,64 @@ ul.featureList li {
 
 b.class-name {
     color: #555;
+}
+
+table.sandbox-main {
+    width: 100%;
+}
+
+table.sandbox-main td.heading-col1 {
+
+}
+
+table.sandbox-main td.heading-col2 {
+    padding-left: 10px;
+}
+
+table.sandbox-main td.col1 {
+    border: solid 1px lightgray;
+    vertical-align: top;
+    background: #EFEFFB;
+    text-align:right;
+}
+
+table.sandbox-main td.col2 {
+    vertical-align: top;
+    padding-left: 10px;
+}
+
+div.sandbox-error {
+    width: 360px;
+    height: 360px;
+    background: #550000;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    padding: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+div.sandbox-no-error {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    padding: 1px 0 11px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00aa00;
+}
+
+.what-is-this-heading {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: #FFFFFF url(/portal/sites/all/themes/foundation/icons/medium/shadow/nav_down_green.png) no-repeat scroll right center;
+    color: #444444;
+    font-family: Helvetica, Arial, Tahoma, Verdana, "Lucida Grande", sans-serif;
+    font-size: 1.4em;
+    font-weight: normal;
+    line-height: 1.2em;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-right: 34px;
+    padding-top: 2px;
+    vertical-align: middle;
 }

@@ -1,0 +1,173 @@
+<html>
+
+<head>
+    <title>SceneJS Playroom</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Style-Type" content="text/css"/>
+
+    <link href="../css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="../css/layout.css" rel="stylesheet" type="text/css"/>
+
+    <!--<link href="../lib/codemirror/css/sandbox.css" rel="stylesheet" type="text/css"/>-->
+
+    <script src="../lib/codemirror/js/codemirror.js" type="text/javascript"></script>
+    <script src="../lib/codemirror/js/mirrorframe.js" type="text/javascript"></script>
+    <script type="text/javascript" src="../js/ajax-object.js"></script>
+    <script type="text/javascript" src="../js/querystring.js"></script>
+    <script type="text/javascript" src="../js/sandbox.js"></script>
+</head>
+
+<body id="about">
+
+<div id="main">
+    <div id="header">
+        <a href="../index.html"><img src="../images/scenejs_small.png" id="logo" alt=""/></a>
+        <ul id="menu">
+            <li><a href="../downloads/downloads.html"><span><span>Download</span></span></a></li>
+            <li id="menu-act"><a href="introduction.html"><span><span>Documentation</span></span></a></li>
+            <li><a href="http://github.com/xeolabs/scenejs/issues"><span><span>Issues</span></span></a></li>
+            <li><a href="http://scenejs.bbster.net/"><span><span>Forum</span></span></a></li>
+            <li><a href="http://github.com/xeolabs/scenejs"><span><span>Sourcecode</span></span></a></li>
+        </ul>
+        <div id="headerContent">
+            <div id="headerContentContainer">
+                Introduction&nbsp;|&nbsp;<a
+                    href="howitworks.html">How SceneJs Works</a>&nbsp;|&nbsp;Extending SceneJs
+            </div>
+        </div>
+    </div>
+
+    <div id="content">
+        <div id="description">Loading description...</div>
+        <br/>
+
+        <p><span><b>This is editable</b> - if you're feeling brave, go ahead and tweak it, then <a href="re-run">run</a> it
+            and see what happens in the canvas!</span></p>
+        <br/>
+        <table class="sandbox-main">
+            <tr>
+                <td class="col1">
+                    <input type="button" value="Run"/><input type="button" value="Reformat"/><input type="button" value="Reset"/><b></b> 
+                    <div class="source">
+                        <textarea id="code" cols="160" rows="60">
+
+                        </textarea>
+                    </div>
+                </td>
+                <td class="col2">
+                    <div id="output">
+                    </div>
+                    <br/>
+
+                    <div class="what-is-this-heading">Help</div>
+                    <p>
+                        <span>This is a live demo of a SceneJS scene graph that you can tweak.</span>
+                    </p>
+                    <br/>
+
+                    <p><span>Go ahead - type some edits in the scene definition to the left, then
+                        <a href="evalScene()">execute</a> it to
+                          see what happens in the canvas above.</span></p>
+                    <br/>
+
+                    <p><span>There's just one catch: don't change the definition's SceneJS.canvas element, which
+                        locates the canvas by its 'myCanvas' ID.</span></p>
+                    <br/>
+
+                    <p><span>If the definition layout gets messy, you can <a
+                            href="Javascript:SandBox.reformat()">format</a> it.</span></p>
+                    <br/>
+
+                    <p><span>Start small - maybe just change a few numbers slightly to begin with. If you break the
+                        definition completely, you can always <a href="Javascript:SandBox.reset()">reset</a> it.</span>
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        <script type="text/javascript">
+            /* Load scene and description
+             */
+            String.prototype.trim = function () {
+                return this.replace(/^\s*/, '').replace(/\s*$/, '');
+            };
+            var qs = new Querystring();
+            var description = qs.params['description'];
+            if (!description) {
+                alert('Page query parameter missing: description');
+            }
+            var code = qs.params['source'];
+            if (!code) {
+                alert('Page query parameter missing: source');
+            }
+            (new ajaxObject(description,
+                    function(responseText, responseStatus) {
+                        document.getElementById('description').innerHTML = responseText;
+                    })).update();
+
+            var SandBox = new function() {
+                var scene;
+                var editor;
+
+                var evalScene = function(sceneJs) {
+                    var output = document.getElementById('output');
+                    output.innerHTML = '<canvas id="theCanvas" style="border: solid 1px; background:black" width="360px" height="360px"/>';
+                    try {
+                        eval(sceneJs);
+                    } catch (e) {
+                        output.innerHTML = '<div class="sandbox-error">Error in scene - ' + e + '</div>';
+                    }
+                };
+
+                this.load = function() {
+                    var textarea = document.getElementById('code');
+                    (new ajaxObject(code,
+                            function(responseText, responseStatus) {
+                                scene = responseText;
+                                textarea.value = responseText;
+                                editor = new MirrorFrame(CodeMirror.replace(textarea), {
+                                    height: "1000px",
+                                    width: "650px",
+                                    content: textarea.value,
+                                    parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+                                    stylesheet: "../lib/codemirror/css/jscolors.css",
+                                    path: "../lib/codemirror/js/",
+                                    autoMatchParens: true
+                                });
+                                evalScene(responseText);
+                            })).update();
+                };
+
+                this.reset = function() {
+
+                };
+
+                this.execute = function() {
+
+                };
+            };
+
+            SandBox.load();
+        </script>
+
+    </div>
+</div>
+<div id="footer">
+    <p><span>&copy; 2009, <a href="http://www.xeolabs.com">XeoLabs</a></span></p>
+
+</div>
+
+<script type="text/javascript">
+
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-8036359-2");
+        pageTracker._trackPageview();
+    } catch(err) {
+    }</script>
+</body>
+
+</html>

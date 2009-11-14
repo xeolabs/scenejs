@@ -62,6 +62,7 @@ SceneJs.geometry = function() {
         return result;
     };
 
+    var boundary;
     var geo;  // memoized if params are fixed
 
     return function(scope) {
@@ -74,8 +75,11 @@ SceneJs.geometry = function() {
                 colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
                 indices : params.faces && params.faces.length > 0 ? flatten(params.faces, 3) : []
             };
+            boundary = null; // TODO
         }
-        backend.drawGeometry(geo);
+        if (!boundary || backend.intersects(boundary)) {
+            backend.drawGeometry(geo);
+        }
         SceneJs.utils.visitChildren(cfg, scope);
     };
 };

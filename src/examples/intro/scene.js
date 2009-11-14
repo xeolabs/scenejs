@@ -26,11 +26,11 @@ with (SceneJs) {
                                     lights({
                                         lights: [
                                             {
-                                                pos: { x: 0.0, y: 50.0, z: -50.0 }
+                                                pos: { x: 0.0, y: 50.0, z: -60.0 }
                                             }
                                         ]},
 
-                                            frustum({ fovy : 60.0, aspect : 1.0, near : 0.1, far : 400.0},
+                                            frustum({ fovy : 30.0, aspect : 1.0, near : 0.1, far : 400.0},
 
                                                     lookAt({
                                                         eye : { x: 5.0, y: 5.0, z: -7.0},
@@ -44,8 +44,8 @@ with (SceneJs) {
                                                             },
 
                                                                     material({
-                                                                        ambient:  { r:0.5, g:0.5, b:0.9 },
-                                                                        diffuse:  { r:0.5, g:0.5, b:0.9 },
+                                                                        ambient:  { r:0.5, g:0.2, b:0.9 },
+                                                                        diffuse:  { r:0.5, g:0.2, b:0.9 },
                                                                         specular: { r:0.5, g:0.5, b:0.9 }},
 
                                                                             objects.teapot()

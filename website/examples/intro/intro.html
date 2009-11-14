@@ -1,0 +1,14 @@
+<h1>Introduction</h1>
+<p><span><b>SceneJS</b> is an open source Javascript framework from <a href="http://www.xeolabs.com">XeoLabs</a>
+that provides an extensible scene graph framework on top of the powerful new OpenGL-standard Canvas3D element (and soon the WebGL canvas as well) .</span>
+</p>
+
+<p><span>Check out the live example scene graph below, which renders the venerable OpenGL teapot. See how it is composed of functions; these
+    are called in depth-first
+    order, each setting some OpenGL state on entry, then un-setting it again on exit. In this scene, a <b>canvas</b> activates a Canvas element, a <b>shader</b>
+activates some <a href="http://en.wikipedia.org/wiki/GLSL">GLSL</a> scripts, and the rest of the nodes set various matrices, vectors and geometry variables
+within the scripts (except for <b>viewport</b> which calls a fixed OpenGL function).</span></p>
+
+<p><span>Note that the function calls generally take the form <b>node({<i>configs</i>}, <i>child</i>,<i>child</i>...)</b>.
+Node configurations only specify properties that override defaults, such as non-zero vector components.</span>
+</p>
