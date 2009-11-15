@@ -1,7 +1,7 @@
 with (SceneJs) {
     var scene = graph({}, // node always has a config object
 
-            canvas({ canvasId: 'mycanvas'},
+            canvas({ canvasId: 'myCanvas'},
 
                     viewport({ x : 1, y : 1, width: 400, height: 400},
 
@@ -23,26 +23,22 @@ with (SceneJs) {
 
                                                             generator(function() {
 
-                                                                var angle = 0;
+                                                                var x = 0;
 
                                                                 return function() {
-                                                                    angle += 5.0;
-                                                                    if (angle < 360) {
-                                                                        return {
-                                                                            angle: angle
-                                                                        };
+                                                                    x += 5.0;
+                                                                    if (x < 20) {
+                                                                        return { x: x };
                                                                     }
                                                                 };
                                                             },
-                                                                    rotate(function(scope) {
-                                                                        return {
-                                                                            angle: scope.get('angle'), x : 1.0
-                                                                        };
+
+                                                                    translate(function(scope) {
+                                                                        return { x: scope.get('x') };
                                                                     },
-                                                                            translate({ x: 100 },
-                                                                                    objects.teapot()
-                                                                                    ) // translate
-                                                                            ) // rotate
+
+                                                                            objects.teapot()
+                                                                            ) // translate
                                                                     ) // loop
                                                             ) // lookAt
                                                     ) // frustum

@@ -7,14 +7,13 @@
 
     <link href="../css/style.css" rel="stylesheet" type="text/css"/>
     <link href="../css/layout.css" rel="stylesheet" type="text/css"/>
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
 
-    <!--<link href="../lib/codemirror/css/sandbox.css" rel="stylesheet" type="text/css"/>-->
-
-    <script src="../lib/codemirror/js/codemirror.js" type="text/javascript"></script>
-    <script src="../lib/codemirror/js/mirrorframe.js" type="text/javascript"></script>
-    <script type="text/javascript" src="../js/ajax-object.js"></script>
-    <script type="text/javascript" src="../js/querystring.js"></script>
-    <script type="text/javascript" src="../js/sandbox.js"></script>
+    <script src="js/codemirror/codemirror.js" type="text/javascript"></script>
+    <script src="js/codemirror/mirrorframe.js" type="text/javascript"></script>
+    <script src="js/ajax-object.js" type="text/javascript"></script>
+    <script src="js/querystring.js" type="text/javascript"></script>
+    <script src="../downloads/scenejs.0.2.5.js" type="text/javascript"></script>
 </head>
 
 <body id="about">
@@ -24,141 +23,151 @@
         <a href="../index.html"><img src="../images/scenejs_small.png" id="logo" alt=""/></a>
         <ul id="menu">
             <li><a href="../downloads/downloads.html"><span><span>Download</span></span></a></li>
-            <li id="menu-act"><a href="introduction.html"><span><span>Documentation</span></span></a></li>
+            <li id="menu-act"><a href="examples.html"><span><span>Examples</span></span></a></li>
             <li><a href="http://github.com/xeolabs/scenejs/issues"><span><span>Issues</span></span></a></li>
             <li><a href="http://scenejs.bbster.net/"><span><span>Forum</span></span></a></li>
             <li><a href="http://github.com/xeolabs/scenejs"><span><span>Sourcecode</span></span></a></li>
         </ul>
         <div id="headerContent">
             <div id="headerContentContainer">
-                Introduction&nbsp;|&nbsp;<a
-                    href="howitworks.html">How SceneJs Works</a>&nbsp;|&nbsp;Extending SceneJs
+                <p><span>This is an editable live example from the <a
+                        href="examples.html">Examples</a> gallery.
+                    Go ahead, edit the source code and re-run it.<br/>Just make sure you don't mess up its <b>canvas</b> node -
+                    it needs that in order to render to the WebGL Canvas in this page.</span>
+                </p>
             </div>
         </div>
     </div>
 
     <div id="content">
-        <div id="description">Loading description...</div>
-        <br/>
+        <div class="row-1">
+            <div class="examples-index">
+                <div id="description" class="sandbox-description">Loading description...</div>
+                <br/>
+                <table class="sandbox-main">
+                    <tr>
+                        <td class="col1">
 
-        <p><span><b>This is editable</b> - if you're feeling brave, go ahead and tweak it, then <a href="re-run">run</a> it
-            and see what happens in the canvas!</span></p>
-        <br/>
-        <table class="sandbox-main">
-            <tr>
-                <td class="col1">
-                    <input type="button" value="Run"/><input type="button" value="Reformat"/><input type="button" value="Reset"/><b></b> 
-                    <div class="source">
-                        <textarea id="code" cols="160" rows="60">
+                            <input class="sandbox-button" type="button" value="Run"
+                                   onclick="javascript:SandBox.execute()"/>
+                            <input class="sandbox-button" type="button" value="Re-indent"
+                                   onclick="javascript:SandBox.reindent()"/>
+                            <input type="button" class="sandbox-button" value="Reset"
+                                   onclick="javascript:SandBox.reset()"/>
 
-                        </textarea>
-                    </div>
-                </td>
-                <td class="col2">
-                    <div id="output">
-                    </div>
-                    <br/>
+                            <div class="source">
+                                <textarea id="code">
 
-                    <div class="what-is-this-heading">Help</div>
-                    <p>
-                        <span>This is a live demo of a SceneJS scene graph that you can tweak.</span>
-                    </p>
-                    <br/>
+                                </textarea>
+                            </div>
+                        </td>
 
-                    <p><span>Go ahead - type some edits in the scene definition to the left, then
-                        <a href="evalScene()">execute</a> it to
+                        <td class="col2">
+                            <div id="output">
+                            </div>
+                            <div class="help">
+                                <br/>
+
+                                <div class="what-is-this-heading">Help</div>
+                                <p>
+                                    <span>This is a live demo of a SceneJS scene graph that you can tweak.</span>
+                                </p>
+                                <br/>
+
+                                <p><span>Go ahead - type some edits in the scene definition to the left, then
+                        <a href="Javascript:SandBox.execute()">run</a> it to
                           see what happens in the canvas above.</span></p>
-                    <br/>
+                                <br/>
 
-                    <p><span>There's just one catch: don't change the definition's SceneJS.canvas element, which
+                                <p><span>There's just one catch: don't change the definition's SceneJS.canvas element, which
                         locates the canvas by its 'myCanvas' ID.</span></p>
-                    <br/>
+                                <br/>
 
-                    <p><span>If the definition layout gets messy, you can <a
-                            href="Javascript:SandBox.reformat()">format</a> it.</span></p>
-                    <br/>
+                                <p><span>If the definition layout gets messy, you can <a
+                                        href="Javascript:SandBox.reindent()">re-indent</a> it.</span></p>
+                                <br/>
 
-                    <p><span>Start small - maybe just change a few numbers slightly to begin with. If you break the
+                                <p><span>Start small - maybe just change a few numbers slightly to begin with. If you break the
                         definition completely, you can always <a href="Javascript:SandBox.reset()">reset</a> it.</span>
-                    </p>
-                </td>
-            </tr>
-        </table>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
 
-        <script type="text/javascript">
-            /* Load scene and description
-             */
-            String.prototype.trim = function () {
-                return this.replace(/^\s*/, '').replace(/\s*$/, '');
-            };
-            var qs = new Querystring();
-            var description = qs.params['description'];
-            if (!description) {
-                alert('Page query parameter missing: description');
-            }
-            var code = qs.params['source'];
-            if (!code) {
-                alert('Page query parameter missing: source');
-            }
-            (new ajaxObject(description,
-                    function(responseText, responseStatus) {
-                        document.getElementById('description').innerHTML = responseText;
-                    })).update();
-
-            var SandBox = new function() {
-                var scene;
-                var editor;
-
-                var evalScene = function(sceneJs) {
-                    var output = document.getElementById('output');
-                    output.innerHTML = '<canvas id="theCanvas" style="border: solid 1px; background:black" width="360px" height="360px"/>';
-                    try {
-                        eval(sceneJs);
-                    } catch (e) {
-                        output.innerHTML = '<div class="sandbox-error">Error in scene - ' + e + '</div>';
+                <script type="text/javascript">
+                    /* Load scene and description
+                     */
+                    String.prototype.trim = function () {
+                        return this.replace(/^\s*/, '').replace(/\s*$/, '');
+                    };
+                    var qs = new Querystring();
+                    var exampleName = qs.params['example'];
+                    if (!exampleName) {
+                        alert('Page query parameter missing: exampleName');
                     }
-                };
-
-                this.load = function() {
-                    var textarea = document.getElementById('code');
-                    (new ajaxObject(code,
+                    (new ajaxObject(exampleName + '/description.html',
                             function(responseText, responseStatus) {
-                                scene = responseText;
-                                textarea.value = responseText;
-                                editor = new MirrorFrame(CodeMirror.replace(textarea), {
-                                    height: "1000px",
-                                    width: "650px",
-                                    content: textarea.value,
-                                    parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-                                    stylesheet: "../lib/codemirror/css/jscolors.css",
-                                    path: "../lib/codemirror/js/",
-                                    autoMatchParens: true
-                                });
-                                evalScene(responseText);
+                                document.getElementById('description').innerHTML = responseText;
                             })).update();
-                };
 
-                this.reset = function() {
+                    var SandBox = new function() {
+                        var scene;
+                        var editor;
 
-                };
+                        var evalScene = function(sceneJs) {
+                            var output = document.getElementById('output');
+                            output.innerHTML = '<canvas id="exampleCanvas" style="border: solid 1px; background:black" width="360px" height="360px"/>';
+                            try {
+                                eval(sceneJs);
+                            } catch (e) {
+                                output.innerHTML = '<div class="sandbox-error">Error in scene - ' + e + '</div>';
+                            }
+                        };
 
-                this.execute = function() {
+                        this.load = function() {
+                            var textarea = document.getElementById('code');
+                            (new ajaxObject(exampleName + '/scene.js',
+                                    function(responseText, responseStatus) {
+                                        scene = responseText;
+                                        textarea.value = responseText;
+                                        editor = new MirrorFrame(CodeMirror.replace(textarea), {
+                                            height: "1000px",
+                                            width: "590px",
+                                            content: textarea.value,
+                                            parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+                                            stylesheet: "css/codemirror/jscolors.css",
+                                            path: "js/codemirror/",
+                                            autoMatchParens: true
+                                        });
+                                        evalScene(responseText);
+                                    })).update();
+                        };
 
-                };
-            };
+                        this.reset = function() {
+                            editor.mirror.setCode(scene);
+                        };
 
-            SandBox.load();
-        </script>
+                        this.execute = function() {
+                            evalScene(editor.mirror.getCode());
+                        };
 
+                        this.reindent = function() {
+                            editor.mirror.reindent();
+                        };
+                    };
+
+                    SandBox.load();
+                </script>
+            </div>
+        </div>
+        <div id="footer">
+            <p><span>&copy; 2009, <a href="http://www.xeolabs.com">XeoLabs</a></span></p>
+        </div>
     </div>
-</div>
-<div id="footer">
-    <p><span>&copy; 2009, <a href="http://www.xeolabs.com">XeoLabs</a></span></p>
-
 </div>
 
 <script type="text/javascript">
-
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>

@@ -1,0 +1,257 @@
+#examples-index {
+    text-align: center;
+}
+
+table.examples-index {
+    width: 100%;
+    padding: 0;
+    background: #EFEFFB;
+}
+
+table.examples-index td.col1 {
+    vertical-align: top;
+    text-align: left;
+    width: 300px;
+    border: solid 1px lightgray;
+    padding: 5px;
+}
+
+table.examples-index td.col1 p {
+    color: #666666; /*line-height: 1.417em;*/
+    padding-top: 0 !important;
+    width: 90%;
+}
+
+table.examples-index td.col2 {
+    vertical-align: top;
+    border: solid 1px lightgray;
+    padding: 5px;
+}
+
+table.examples-index td.col2 p {
+    color: #666666; /*line-height: 1.417em;*/
+    padding-top: 0 !important;
+}
+
+table.sandbox-main {
+    width: 100%;
+    padding: 0;
+}
+
+table.sandbox-main td.heading-col1 {
+}
+
+table.sandbox-main td.heading-col2 {
+    padding-left: 10px;
+}
+
+table.sandbox-main td.col1 {
+    border: solid 1px lightgray;
+    vertical-align: top;
+    background: #EFEFFB;
+    text-align: right;
+    width:580px;
+}
+
+table.sandbox-main td.col2 {
+    vertical-align: top;
+    padding-left: 10px;
+}
+
+div.sandbox-description {
+    width: 100%;
+}
+
+div.source {
+    border: none;
+    padding: 3px;
+    width: 590px;
+    float: left;
+}
+
+div.canvas {
+    border: 1px solid black;
+    padding: 3px;
+    width: 360px;
+    height: 360px;
+    float: right;
+}
+
+div.sandbox-error {
+    width: 360px;
+    height: 360px;
+    background: #550000;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    padding: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.what-is-this-heading {
+    background: #FFFFFF url(/portal/sites/all/themes/foundation/icons/medium/shadow/nav_down_green.png) no-repeat scroll right center;
+    color: #444444;
+    font-family: Helvetica, Arial, Tahoma, Verdana, "Lucida Grande", sans-serif;
+    font-size: 1.4em;
+    font-weight: normal;
+    line-height: 1.2em;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-right: 34px;
+    padding-top: 2px;
+    vertical-align: middle;
+}
+
+.sandbox-button {
+    color: blue;
+}
+
+.help {
+
+}
+.help p {
+    line-height: 1.417em;
+    color: #666;
+    padding-top: 8px;
+}
+
+.help p span {
+    color: #333;
+}
+
+.help a {
+    border-bottom: 1px dotted;
+    text-decoration: none;
+}
+
+.highlight {
+        
+}
+
+.CodeMirror-line-numbers {
+    color: #aaaaaa;
+    float: left;
+    font-family: monospace;
+    margin-right: 0.5em;
+    text-align: right;
+    width: 2em;
+}
+
+.roundedcornr_box {
+    float: left;
+    margin: 0 4px;
+}
+
+.border_tl {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_tl.png) repeat scroll 0 0;
+    height: 9px;
+    width: 9px;
+}
+
+.border_t {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_t.png) repeat scroll 0 0;
+    height: 9px;
+}
+
+.border_tr {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_tr.png) repeat scroll 0 0;
+    height: 9px;
+    width: 9px;
+}
+
+.border_l {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_l.png) repeat scroll 0 0;
+    width: 9px;
+}
+
+.border_r {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_r.png) repeat scroll 0 0;
+    width: 9px;
+}
+
+.border_bl {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_bl.png) repeat scroll 0 0;
+    height: 9px;
+    width: 9px;
+}
+
+.border_b {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_b.png) repeat scroll 0 0;
+    height: 9px;
+}
+
+.border_br {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/border/border_br.png) repeat scroll 0 0;
+    height: 9px;
+    width: 9px;
+}
+
+.db_top div {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/db_tl.png) no-repeat scroll left top;
+}
+
+.db_top {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: #92C1F0 url(../images/db_tr.png) no-repeat scroll right top;
+}
+
+.lb_top div {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: transparent url(../images/lb_tl.png) no-repeat scroll left top;
+}
+
+.lb_top {
+    -moz-background-clip: border;
+    -moz-background-inline-policy: continuous;
+    -moz-background-origin: padding;
+    background: #D0E4F6 url(../images/lb_tr.png) no-repeat scroll right top;
+}
+
+.db_top div, .db_top, .lb_top div, .lb_top {
+    font-size: 1px;
+    height: 5px;
+}
+
+.lb_roundedcornr_content, .db_roundedcornr_content {
+    font-size: 80%;
+    padding: 0 10px;
+}
+
+.lb_roundedcornr_content {
+    background-color: #D0E4F6;
+}
+
+.db_roundedcornr_content {
+    background-color: #92C1F0;
+}

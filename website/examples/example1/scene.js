@@ -1,13 +1,13 @@
 with (SceneJs) {
 
   var scene = graph(
-    {}, // graph always has a config object
+    {},
 
     canvas(
-      { canvasId: 'mycanvas'},
+      { canvasId: 'exampleCanvas'}, // DONT EDIT - Locates demo canvas
 
       viewport(
-        { x : 1, y : 1, width: 400, height: 400},
+        { x : 1, y : 1, width: 350, height: 350},
 
         shader(
           { type: 'simple-shader' },

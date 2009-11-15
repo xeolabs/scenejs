@@ -12,82 +12,100 @@
 
     <property name="DIST_DIR"
               location="${basedir}/dist"
-              description="Folder for concatenated, min, lite and packed target"/>
+              description="Distribution directory"/>
 
-    <property name="SCENEJS_DIST"
-              location="${DIST_DIR}/scenejs.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js"/>
-
-    <property name="SCENEJS_LATEST_DIST"
-              location="${DIST_DIR}/scenejs.js"/>
-
-    <property name="LIB_DIR"
-              location="${basedir}/lib"
-              description="Libraries Folder"/>
+    <property name="SCENEJS_NAME"
+              value="scenejs.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js"/>
 
     <property name="SRC_DIR"
               location="${basedir}/src"
               description="Source Folder"/>
 
+    <property name="SCENEJS_DIST"
+              location="${DIST_DIR}/${SCENEJS_NAME}"
+              description="Website downloads directory"/>
+
+    <property name="DOWNLOADS_DIST"
+              location="${basedir}/website/downloads/${SCENEJS_NAME}"
+              description="Website downloads directory"/>
+
     <target name="all" depends="package"/>
 
-    <target name="package"  description="Main Guava build">
+    <target name="package" description="Main SceneJS build">
         <mkdir dir="${DIST_DIR}"/>
-        <!-- CORE -->
         <echo message="Building ${SCENEJS_DIST}"/>
         <concat destfile="${SCENEJS_DIST}">
 
-            <!-- 3rd party libs -->
+            <!-- core -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/graph.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/matrix.js"/>
 
-            <fileset dir="${LIB_DIR}" includes="lib/sylvester.js"/>
-            <fileset dir="${LIB_DIR}" includes="lib/sylvester.ux.js"/>
+            <!-- canvas -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/canvas.js"/>
 
-            <!-- Core -->
+            <!-- viewport -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/viewport.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/core.js"/>
+            <!-- appearance -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/material.js"/>
 
-            <!-- Back end-->
+            <!-- scope -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/scope/scope.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/backend.js"/>
+            <!-- generation -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/canvasTagWrapper.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/canvasBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/shaderBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/lightsBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/viewportBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/layerBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/projectionBackends.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/transformBackends.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/backend/mozglweb20/geometryBackend.js"/>
+            <!-- branching -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/branching/selector.js"/>
 
-            <!-- Graph API -->
+            <!-- geometry -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/event.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/graphContext.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/nodeContext.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/node.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/frontend/frontend.js"/>
+            <!-- viewing -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/viewing/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/viewing/lookat.js"/>
 
-            <!-- Front end -->
+            <!-- projection -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/projection/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/projection/perspective.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/projection/frustum.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/projection/ortho.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/canvas.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/viewport.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/geometry.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/lookat.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/perspective.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/ortho.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/frustum.js"/>
+            <!-- layer -->
             <fileset dir="${SRC_DIR}" includes="scenejs/scene/layer.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/rotate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/translate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/scale.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/shader.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/lights.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/shaders/blinn-phong-shader.js"/>
-            
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/ux/teapot.js"/>
+
+            <!-- modelling -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/modelling/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/modelling/rotate.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/modelling/translate.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/modelling/scale.js"/>
+
+            <!--  shading -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/backendBase.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/shader.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/simple/simpleBackend.js"/>
+
+            <!-- shaderVars -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/shaderVars/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/shaderVars/vars.js"/>
+
+            <!-- lighting -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
+
+            <!-- geometry -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
 
         </concat>
         <echo message="${SCENEJS_DIST} built."/>
-        <copy tofile="${SCENEJS_LATEST_DIST}" file="${SCENEJS_DIST}"/>
+        <copy tofile="${DOWNLOADS_DIST}" file="${SCENEJS_DIST}"/>
     </target>
 </project>
