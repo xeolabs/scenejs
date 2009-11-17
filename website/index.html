@@ -6,7 +6,8 @@
     <meta http-equiv="Content-Style-Type" content="text/css"/>
     <link href="css/style.css" rel="stylesheet" type="text/css"/>
     <link href="css/layout.css" rel="stylesheet" type="text/css"/>
-
+    <script type="application/x-javascript" src="js/google/jsapi.js"></script>
+    <script type="application/x-javascript" src="js/blogfeed.js"></script>
 </head>
 
 <body id="home">
@@ -27,66 +28,10 @@
         <div class="row-1">
             <div class="wrapper">
                 <div class="col-1">
-                    <h2>News</h2>
+                    <h2><a href="http://scenejs.blogspot.com">SceneJS Blog</a></h2>
 
                     <div id="freshPanel">
-                        <div id="newsPanel">
-                            <b>Live examples</b>
-
-                            <div id="newsDetails">
-                                <div id="itemContent">
-                                    <p>November 15, 2009 -
-                                        Get cracking with <a href="examples/examples.html">live examples</a>
-                                        which include source code that you can edit in the Web page and re-run.
-                                        Here's the simplest one: <a href="examples/sandbox.html?example=example1">
-                                            a basic scene graph</a> that renders a teapot.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="newsPanel">
-                            <b>Major scene API redesign</b>
-
-                            <div id="newsDetails">
-                                <div id="itemContent">
-                                    <p>October 25, 2009 - SceneJS now more
-                                        <a href="http://en.wikipedia.org/wiki/Functional_programming">functionally
-                                            designed</a> and therefore generally cooler.
-                                        Scenes are now composed of functions instead of
-                                        objects. This makes them more declarative and succinct. It also makes them
-                                        faster, as the
-                                        higher-order functions employ <a
-                                                href="http://en.wikipedia.org/wiki/Memoization">memoization</a> wherever
-                                        possible to avoid re-computation.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="newsPanel">
-                            <b>Source code pushed GitHub</b>
-
-                            <div id="newsDetails">
-                                <div id="itemContent">
-                                    <p>October 9, 2009 - First SceneJS sourcecode pushed to GitHub:
-                                        <a href="http://github.com/xeolabs/scenejs">http://github.com/xeolabs/scenejs</a>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div id="newsPanel">
-                            <b>Birth of SceneJS - forked from Guava3D</b>
-
-                            <div id="newsDetails">
-                                <div id="itemContent">
-                                    <p>October 8, 2009 - Since Google called one of it's core frameworks "Guava", the
-                                        XeoLabs project formally
-                                        known as Guava3D was forked to become SceneJS, and now has a new home right
-                                        here.</p>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="blogposts">Loading..</div>
                     </div>
                 </div>
                 <div class="col-2">
@@ -94,23 +39,25 @@
 
                     <p><span><b>SceneJS</b> is an open source Javascript framework from <a
                             href="http://www.xeolabs.com">XeoLabs</a>
-                        that provides an extensible scene graph API on top of the powerful OpenGL-specification 3D Canvas element.</span>
+                        that provides a scene graph API on top of the WebGL Canvas element.</span>
                     </p>
 
-                    <p><span>SceneJS is currently heading towards it's first release, but already it has a few nifty features, including:</span>
+                    <p><span>SceneJS has some nifty features so far, including:</span>
                     </p>
                     <br/>
                     <ul class="featurelist">
-                        <li class="featurelist">a highly extensible API</li>
-                        <li class="featurelist">keyframe interpolation animation</li>
-                        <li class="featurelist">support for custom OpenGL Shading Language scripts</li>
+                        <li class="featurelist">a simple scene definition style</li>
+                        <li class="featurelist">an easily extendable API</li>
+                        <li class="featurelist">procedural scene generation</li>
+                        <li class="featurelist">keyframe animation</li>
+                        <li class="featurelist">GLSL shading</li>
                     </ul>
                     <br/>
 
-                    <p><span>Read more about those in the ever-growing <a
-                            href="docs/introduction.html">documentation</a>.</span></p>
+                    <p><span>Take a look at the gallery of <a
+                            href="examples/examples.html">live examples</a>.</span></p>
 
-                    <p><span>The <a href="http://github.com/xeolabs/scenejs">source code</a> is publically available at GitHub.</span>
+                    <p><span>And of course - the <a href="http://github.com/xeolabs/scenejs">source code</a> is publically available at GitHub.</span>
                     </p>
 
                     <p><span>SceneJS is maintained by Lindsay Kay, who you can contact at </span><span id="contact"><a
@@ -127,6 +74,11 @@
 </div>
 
 <script type="text/javascript">
+
+    SceneJsWeb.getBlogPosts('blogposts');
+
+    /* Google analytics
+     */
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
@@ -135,7 +87,8 @@
         var pageTracker = _gat._getTracker("UA-8036359-2");
         pageTracker._trackPageview();
     } catch(err) {
-    }</script>
+    }
+</script>
 </body>
 
 </html>

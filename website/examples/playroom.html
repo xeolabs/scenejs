@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>SceneJS Playroom</title>
+    <title>SceneJS Live Example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="Content-Style-Type" content="text/css"/>
 
@@ -9,15 +9,60 @@
     <link href="../css/layout.css" rel="stylesheet" type="text/css"/>
     <link href="css/style.css" rel="stylesheet" type="text/css"/>
 
+    <script src="../js/jquery-1.3.2.min.js" type="text/javascript"></script>
     <script src="js/codemirror/codemirror.js" type="text/javascript"></script>
     <script src="js/codemirror/mirrorframe.js" type="text/javascript"></script>
     <script src="js/ajax-object.js" type="text/javascript"></script>
     <script src="js/querystring.js" type="text/javascript"></script>
+    <script src="js/sandbox.js" type="text/javascript"></script>
     <script src="../downloads/scenejs.0.2.5.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            /* Get example ID
+             */
+            String.prototype.trim = function () {
+                return this.replace(/^\s*/, '').replace(/\s*$/, '');
+            };
+            var qs = new Querystring();
+            var exampleName = qs.params['example'];
+            if (!exampleName) {
+                window.location = 'examples.html';
+            }
+
+            /* Start playroom controller
+             */
+            var playroom = new PlayRoomController({
+                infoPath: exampleName + '/info.js',
+                descriptionPath: exampleName + '/description.html',
+                definitionPath: exampleName + '/scene.js',
+                descriptionAreaId: 'sandbox-description',
+                definitionAreaId: 'definition-text',
+                outputAreaId: 'output-area',
+                onLoad: { fn  : function() {
+
+                    document.title = "SceneJS Playroom - " + playroom.getInfo().title;
+
+                    $("#toggle-description").click(function () {
+                        $("#sandbox-description").slideToggle("slow");
+                    });
+
+                    $("#execute-button").click(function() {
+                        playroom.execute();
+                    });
+                    $("#reindent-button").click(function() {
+                        playroom.reindent();
+                    });
+                    $("#reset-button").click(function() {
+                        playroom.reset();
+                    });
+                }, scope: this }
+            });
+        });
+    </script>
 </head>
 
 <body id="about">
-
 <div id="main">
     <div id="header">
         <a href="../index.html"><img src="../images/scenejs_small.png" id="logo" alt=""/></a>
@@ -42,28 +87,28 @@
     <div id="content">
         <div class="row-1">
             <div class="examples-index">
-                <div id="description" class="sandbox-description">Loading description...</div>
+                <a id="toggle-description">Hide</a>
+
+                <div id="sandbox-description" class="sandbox-description">Loading description...</div>
                 <br/>
                 <table class="sandbox-main">
                     <tr>
                         <td class="col1">
-
-                            <input class="sandbox-button" type="button" value="Run"
-                                   onclick="javascript:SandBox.execute()"/>
-                            <input class="sandbox-button" type="button" value="Re-indent"
-                                   onclick="javascript:SandBox.reindent()"/>
-                            <input type="button" class="sandbox-button" value="Reset"
-                                   onclick="javascript:SandBox.reset()"/>
+                            <input class="sandbox-button" id="execute-button" type="button" value="Run"/>
+                            <input class="sandbox-button" id="reindent-button" type="button" value="Re-indent"/>
+                            <input type="button" id="reset-button" class="sandbox-button" value="Reset"/>
 
                             <div class="source">
-                                <textarea id="code">
+                                <textarea id="definition-text">
 
                                 </textarea>
                             </div>
                         </td>
-
                         <td class="col2">
-                            <div id="output">
+                            <div id="output-area">
+                                <div class="sandbox-progress">
+                                    Loading scene definition...
+                                </div>
                             </div>
                             <div class="help">
                                 <br/>
@@ -75,7 +120,7 @@
                                 <br/>
 
                                 <p><span>Go ahead - type some edits in the scene definition to the left, then
-                        <a href="Javascript:SandBox.execute()">run</a> it to
+                        <a id="execute-link">run</a> it to
                           see what happens in the canvas above.</span></p>
                                 <br/>
 
@@ -84,81 +129,16 @@
                                 <br/>
 
                                 <p><span>If the definition layout gets messy, you can <a
-                                        href="Javascript:SandBox.reindent()">re-indent</a> it.</span></p>
+                                        id="reindent-link">re-indent</a> it.</span></p>
                                 <br/>
 
                                 <p><span>Start small - maybe just change a few numbers slightly to begin with. If you break the
-                        definition completely, you can always <a href="Javascript:SandBox.reset()">reset</a> it.</span>
+                        definition completely, you can always <a id="reset-link">reset</a> it.</span>
                                 </p>
                             </div>
                         </td>
                     </tr>
                 </table>
-
-                <script type="text/javascript">
-                    /* Load scene and description
-                     */
-                    String.prototype.trim = function () {
-                        return this.replace(/^\s*/, '').replace(/\s*$/, '');
-                    };
-                    var qs = new Querystring();
-                    var exampleName = qs.params['example'];
-                    if (!exampleName) {
-                        alert('Page query parameter missing: exampleName');
-                    }
-                    (new ajaxObject(exampleName + '/description.html',
-                            function(responseText, responseStatus) {
-                                document.getElementById('description').innerHTML = responseText;
-                            })).update();
-
-                    var SandBox = new function() {
-                        var scene;
-                        var editor;
-
-                        var evalScene = function(sceneJs) {
-                            var output = document.getElementById('output');
-                            output.innerHTML = '<canvas id="exampleCanvas" style="border: solid 1px; background:black" width="360px" height="360px"/>';
-                            try {
-                                eval(sceneJs);
-                            } catch (e) {
-                                output.innerHTML = '<div class="sandbox-error">Error in scene - ' + e + '</div>';
-                            }
-                        };
-
-                        this.load = function() {
-                            var textarea = document.getElementById('code');
-                            (new ajaxObject(exampleName + '/scene.js',
-                                    function(responseText, responseStatus) {
-                                        scene = responseText;
-                                        textarea.value = responseText;
-                                        editor = new MirrorFrame(CodeMirror.replace(textarea), {
-                                            height: "1000px",
-                                            width: "590px",
-                                            content: textarea.value,
-                                            parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-                                            stylesheet: "css/codemirror/jscolors.css",
-                                            path: "js/codemirror/",
-                                            autoMatchParens: true
-                                        });
-                                        evalScene(responseText);
-                                    })).update();
-                        };
-
-                        this.reset = function() {
-                            editor.mirror.setCode(scene);
-                        };
-
-                        this.execute = function() {
-                            evalScene(editor.mirror.getCode());
-                        };
-
-                        this.reindent = function() {
-                            editor.mirror.reindent();
-                        };
-                    };
-
-                    SandBox.load();
-                </script>
             </div>
         </div>
         <div id="footer">

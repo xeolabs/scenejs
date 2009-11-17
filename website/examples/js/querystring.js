@@ -32,9 +32,9 @@ function Querystring(qs) { // optionally pass a querystring to parse
 Querystring.prototype.get = function(key, default_) {
     var value = this.params[key];
     return (value != null) ? value : default_;
-}
+};
 
 Querystring.prototype.contains = function(key) {
     var value = this.params[key];
     return (value != null);
-}
+};
