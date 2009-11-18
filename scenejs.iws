@@ -19,16 +19,11 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/shading/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/downloads.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/css/style.css" afterPath="$PROJECT_DIR$/website/examples/css/style.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/example1/info.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/scale.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/translate.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/css/layout.css" afterPath="$PROJECT_DIR$/website/css/layout.css" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/lighting/lights.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsexml.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/shading/shader.js" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/jscolors.css" afterPath="$PROJECT_DIR$/website/examples/css/jscolors.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/js/sandbox.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/matrix4x4.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/appearance/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsesparql.js" afterPath="" />
@@ -42,58 +37,56 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewport/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/core/node.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/core/matrix.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/example2/info.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewing/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/canvas/backend.js" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/css/breadcrumb.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/playroomV2.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/extending.html" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/js/jquery.tabs.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/layering/layer.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsehtmlmixed.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewing/lookat.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/canvas/canvas.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/branching/selector.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsehtmlmixed.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsecss.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/perspective.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/css/codemirror/jscolors.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/downloads.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsedummy.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/lighting/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/shading/simple/simpleShader.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/stringstream.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/index.html" afterPath="$PROJECT_DIR$/website/index.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/frustum.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/tokenize.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsejavascript.js" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/sandbox.html" afterPath="$PROJECT_DIR$/website/examples/playroom.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/examples.html" afterPath="$PROJECT_DIR$/website/examples/examples.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/undo.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/select.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/rotate.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/geometry/backend.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/css/jscolors.css" afterPath="$PROJECT_DIR$/website/examples/css/jscolors.css" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/util.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/core/graph.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/vars/vars.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsesparql.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/vars/backend.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/example1/description.html" afterPath="$PROJECT_DIR$/website/examples/example1/html.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/sandbox.css" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/js/querystring.js" afterPath="$PROJECT_DIR$/website/examples/js/querystring.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/highlight.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/js/blogfeed.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsexml.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsecss.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/layering/layerBackend.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/jscolors.css" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/playroom.html" afterPath="$PROJECT_DIR$/website/examples/playroom.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/ortho.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/geometry/objects/teapot.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/example2/description.html" afterPath="$PROJECT_DIR$/website/examples/example2/html.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/editor.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/animation/scalarInterpolator.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/css/style.css" afterPath="$PROJECT_DIR$/website/css/style.css" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/backend.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/js/sandbox.js" afterPath="$PROJECT_DIR$/website/examples/js/playroom.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewport/viewport.js" afterPath="" />
     </list>
-    <ignored path="scenejs.iws" />
     <ignored path=".idea/workspace.xml" />
+    <ignored path="scenejs.iws" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="Commander">
@@ -149,91 +142,91 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="playroom.html" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="playroom.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/website/examples/playroom.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="0" selection-start="1363" selection-end="1363" vertical-scroll-proportion="0.0931677">
+            <state line="147" column="6" selection-start="6727" selection-end="6727" vertical-scroll-proportion="-72.22727">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="info.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/example1/info.js">
+      <file leaf-file-name="playroomV2.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/playroomV2.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="49" column="35" selection-start="1969" selection-end="1969" vertical-scroll-proportion="-15.636364">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="info.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/example2/info.js">
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="0" selection-start="49" selection-end="49" vertical-scroll-proportion="0.0">
+            <state line="70" column="17" selection-start="3072" selection-end="3183" vertical-scroll-proportion="-8.818182">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="description.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/example2/description.html">
+      <file leaf-file-name="html.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/example1/html.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+            <state line="18" column="0" selection-start="1335" selection-end="1335" vertical-scroll-proportion="-12.272727">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="description.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/example1/description.html">
+      <file leaf-file-name="jquery.tabs.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/js/jquery.tabs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+            <state line="650" column="0" selection-start="34727" selection-end="34727" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="querystring.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/js/querystring.js">
+      <file leaf-file-name="style.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/css/style.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="2" selection-start="1160" selection-end="1160" vertical-scroll-proportion="0.0">
+            <state line="107" column="34" selection-start="1568" selection-end="1568" vertical-scroll-proportion="-17.84">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ajax-object.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/js/ajax-object.js">
+      <file leaf-file-name="style.css" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/website/examples/css/style.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="77" selection-start="1782" selection-end="1782" vertical-scroll-proportion="0.0">
+            <state line="103" column="23" selection-start="1937" selection-end="1937" vertical-scroll-proportion="0.6112805">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="sandbox.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/js/sandbox.js">
+      <file leaf-file-name="jscolors.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/css/jscolors.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="4" selection-start="15" selection-end="15" vertical-scroll-proportion="1.8">
+            <state line="4" column="15" selection-start="88" selection-end="90" vertical-scroll-proportion="0.16">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="codemirror.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/codemirror.js">
+      <file leaf-file-name="playroom.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/js/playroom.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="147" column="8" selection-start="5615" selection-end="5615" vertical-scroll-proportion="0.0">
+            <state line="40" column="47" selection-start="1575" selection-end="1575" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="examples.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/examples.html">
+      <file leaf-file-name="mirrorframe.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/mirrorframe.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="58" column="51" selection-start="2686" selection-end="2686" vertical-scroll-proportion="-39.545456">
+            <state line="5" column="9" selection-start="199" selection-end="199" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -395,6 +388,92 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="js" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="examples" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="js" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="codemirror" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="examples" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="images" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="splitter" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="examples" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="images" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -709,13 +788,13 @@
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="MemberChooser.sorted" value="false" />
     <property name="options.lastSelected" value="preferences.sourceCode.Alignment and Braces" />
+    <property name="MemberChooser.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -857,13 +936,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1440" y="25" width="1440" height="850" extended-state="0" />
+    <frame x="0" y="25" width="1440" height="850" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297414" sideWeight="0.9315069" order="3" side_tool="false" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.08630137" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.00723589" sideWeight="0.661157" order="1" side_tool="false" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.0" sideWeight="0.661157" order="1" side_tool="false" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292011" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
@@ -875,7 +954,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26700434" sideWeight="0.661157" order="0" side_tool="false" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2684515" sideWeight="0.661157" order="0" side_tool="false" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292011" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" />
@@ -973,58 +1052,9 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/stringstream.js">
+    <entry file="file://$PROJECT_DIR$/website/examples/example2/html.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/tokenize.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/tokenizejavascript.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/undo.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/util.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/css/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="0" selection-start="44" selection-end="44" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/codemirror.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="147" column="8" selection-start="5615" selection-end="5615" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/ajax-object.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="77" selection-start="1782" selection-end="1782" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -1036,51 +1066,100 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/example1/description.html">
+    <entry file="file://$PROJECT_DIR$/website/examples/js/ajax-object.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="77" selection-start="1782" selection-end="1782" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/css/layout.css">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/example1/info.js">
+    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/codemirror.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/example2/description.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/example2/info.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="0" selection-start="49" selection-end="49" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/sandbox.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="4" selection-start="15" selection-end="15" vertical-scroll-proportion="1.8">
+        <state line="147" column="8" selection-start="5615" selection-end="5615" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/website/examples/examples.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="58" column="51" selection-start="2686" selection-end="2686" vertical-scroll-proportion="-39.545456">
+        <state line="58" column="51" selection-start="2686" selection-end="2686" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/mirrorframe.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="9" selection-start="199" selection-end="199" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/examples/js/jquery.tabs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="650" column="0" selection-start="34727" selection-end="34727" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/examples/example1/html.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="0" selection-start="1335" selection-end="1335" vertical-scroll-proportion="-12.272727">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/examples/js/playroom.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="47" selection-start="1575" selection-end="1575" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/examples/css/jscolors.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="15" selection-start="88" selection-end="90" vertical-scroll-proportion="0.16">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="70" column="17" selection-start="3072" selection-end="3183" vertical-scroll-proportion="-8.818182">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/website/examples/playroom.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="0" selection-start="1363" selection-end="1363" vertical-scroll-proportion="0.0931677">
+        <state line="147" column="6" selection-start="6727" selection-end="6727" vertical-scroll-proportion="-72.22727">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/examples/playroomV2.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="49" column="35" selection-start="1969" selection-end="1969" vertical-scroll-proportion="-15.636364">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/css/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="107" column="34" selection-start="1568" selection-end="1568" vertical-scroll-proportion="-17.84">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/examples/css/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="103" column="23" selection-start="1937" selection-end="1937" vertical-scroll-proportion="0.6112805">
           <folding />
         </state>
       </provider>
