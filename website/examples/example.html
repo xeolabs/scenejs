@@ -1,0 +1,167 @@
+<div id="page" class="buffered-page-invisible">
+    <div id="content">
+        <h1><a id="back-to-catalog-link">Examples</a> / Simple Shading</h1>
+
+        <div>
+            <div id="inner-splitter">
+                <div id="inner-leftPane">
+
+                    <div id="source-tabs" class="playroom-tabs">
+                        <ul class="playroom-tabs">
+                            <li><a href="#javascript-tab"><span>JavaScript</span></a></li>
+                            <li><a href="#html-tab"><span>HTML</span></a></li>
+                        </ul>
+                        <div id="javascript-tab" class="playroom-tabs-panel">
+                            <div id="playroom-javascript-toolbar">
+                                <input id="format-scene-button" class="format-button" type="button" value="Format"/>
+                                <input id="reset-scene-button" class="reset-button" type="button" value="Reset"/>
+                            </div>
+                            <div class="source">
+                                <textarea id="definition-text">
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <div id="html-tab">
+                            <div id="playroom-html-toolbar">
+                                <input id="format-html-button" class="reindent-button" type="button" value="Format"/>
+                                <input id="reset_html-button" class="reset-button" type="button" value="Reset"/>
+                            </div>
+                            <div class="source">
+                                <textarea id="html-text">
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="inner-rightPane">
+                    <div id="output-tabs" class="playroom-tabs">
+                        <ul class="playroom-tabs">
+                            <li><a href="#output-tab"><span>Output</span></a></li>
+                            <li><a href="#errors-tab"><span>Errors</span></a></li>
+                        </ul>
+                        <div id="output-tab">
+                            <div id="output-area">
+                                <div class="sandbox-progress">
+                                    Loading scene definition...
+                                </div>
+                            </div>
+                        </div>
+                        <div id="errors-tab">
+                            <div id="log-area"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var layedOut = false;
+
+    var sourceTabs;
+    var outputTabs;
+
+    var returnToCatalogue = function() {
+        $("#playroom-inner").load("./examples/catalogue.html");
+    };
+
+    var exampleId = $("#example_id").text();
+    if (!exampleId) {
+        returnToCatalogue();
+    }
+
+    var initToolbar = function() {
+        $("#reset-scene-button").click(function() {
+
+
+            //            playroom.reset();
+        });
+
+        $("#back-to-catalog-link").click(function() {
+            $("#playroom-inner").load("./examples/catalogue.html");
+        });
+    } ;
+
+    var makeLayout = function() {
+        if (!layedOut) {
+            initToolbar();
+            $().ready(function() {
+                $("#inner-splitter").splitter({
+                    type: "v",
+                    outline: true,
+                    minLeft: 100,  minRight: 100,
+                    resizeToWidth: true,
+                    //                    cookie: "vsplitter",
+                    anchorToWindow:true,
+                    accessKey: 'I'
+                });
+            });
+            sourceTabs = $("#source-tabs").tabs();
+            outputTabs = $("#output-tabs").tabs();
+        }
+
+        layedOut = true;
+    };
+
+    var errorTemplate = $.template('<div id="error">' +
+                                   '<div id="error-title">Error in scene definition</div>' +
+                                   '<div id="error-message">${message}</div>' +
+                                   '<div id="error-advice">${advice}</div>' +
+                                   '</div>');
+
+    var displayError = function(e) {
+        var advice = "";
+        if (e instanceof SceneJs.canvas.CanvasNotFoundException) {
+            advice = 'Does the HTML contain the canvas with that ID?';
+        } else if (e instanceof SceneJs.canvas.CanvasNotSupportedException) {
+            advice = 'Does this browser support WebGL?';
+        }
+        $('#log-area').append(errorTemplate, {
+            message: (e.message) ? e.message : e,
+            advice: advice
+        });
+    };
+
+    //    $(window).ajaxStart(function() {
+    //        $(this).show();
+    //    });
+
+    $(window).ajaxError(function(event, request, settings, e) {
+        jAlert("Never mind, let's go get another one from the Examples list.", "Scene example failed to load", function() {
+            returnToCatalogue();
+        });
+    });
+
+    $(window).ajaxStop(function() {
+
+    });
+
+    var playroom = new PlayRoomController({
+        htmlPath: './examples/repository/entries/' + exampleId + '/layout.html',
+        definitionPath: './examples/repository/entries/' + exampleId + '/scene.js',
+        definitionAreaId: 'definition-text',
+        htmlAreaId: 'html-text',
+
+        onSceneDefError:  function(e) {   // On scene parse error, create layout, show errors and reveal page
+            makeLayout();
+            outputTabs.tabs('select', 1); // Select error tab
+            displayError(e); // Populate error tab
+            $("#page").removeClass().addClass("buffered-page-visible");
+        },
+        onLoadException: function(e) {
+            jAlert("Never mind, let's go get another one from the Examples list.", "Scene example failed to load", function() {
+                returnToCatalogue();
+            });
+        },
+
+        onReady:  function() { // On load success, create layout and reveal page
+            makeLayout();
+            $("#page").removeClass().addClass("buffered-page-visible");
+        }
+    });
+
+
+</script>

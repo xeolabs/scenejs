@@ -29,3 +29,12 @@ SceneJs.canvas = function() {
         }
     };
 };
+
+// TODO: These are thrown by the backend. Not sure about this cyclic-dependency.
+SceneJs.canvas.CanvasNotSupportedException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.canvas.CanvasNotFoundException = function(msg) {
+    this.message = msg;
+};

@@ -1,0 +1,61 @@
+#catalog {
+    padding: 20 15 0 15;    
+}
+
+#breadcrumbs-dir-link {
+
+}
+
+#index {
+        text-align: left;
+}
+
+#index #index-dir {
+
+}
+
+#index #index-dir #index-dir-title {
+    color: #666666;
+    font-size: 1.1em;
+    padding: 0 0 10;
+    text-decoration: underline;
+}
+
+#index #index-dir #index-dir-abstract {
+    color: #666666;
+    font-size: 1.0em;
+    padding: 0 0 10;
+}
+
+#index #index-entry {
+
+}
+
+#index #index-entry #index-entry-title {
+    color: #6666ff;
+    font-size: 1.2em;
+    padding: 0 0 10;
+    text-decoration: underline;
+}
+
+#index #index-entry #index-entry-abstract {
+    color: #666666;
+    font-size: 1.0em;
+    padding: 0 0 10;
+}
+
+#index #index-entry #index-entry-author {
+    color: #666666;
+    font-size: 1.0em;
+    padding: 0 0 10;
+}
+
+#index #index-entry #index-entry-date {
+    color: #666666;
+    font-size: 1.0em;
+    padding: 0 0 10;
+}
+
+
+
+

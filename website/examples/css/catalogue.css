@@ -1,0 +1,37 @@
+.catalogue {
+    padding-top: 20px;
+    width: 800px;
+    margin: auto;
+}
+
+.catalogue-category {
+    border-top: 1px solid lightgray;
+    padding: 10px 0 20px;
+}
+
+.catalogue-category-title {
+    color: #666666;
+    font-size: 1.1em;
+    padding: 0 0 15px;
+}
+
+.catalogue-entry {
+
+}
+
+.catalogue-entry a {
+}
+
+.catalogue-entry a:hover {
+    background:#cecece;
+}
+
+.catalogue-entry-text {
+    color: #444444;
+    font-size: 0.8em;
+    padding: 0  0 10px;
+    width:100%;
+
+}
+
+

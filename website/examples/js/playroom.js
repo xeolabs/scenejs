@@ -2,103 +2,138 @@
  *
  */
 var PlayRoomController = function(cfg) {
-    var info = null;
     var scene;
-    var editor;
+    var html;
+    var sceneEditor;
+    var htmlEditor;
 
-    /** Load HTML that embeds canvases etc.
-     *
-     */
     var loadHtml = function() {
+        if (!cfg.htmlAreaId) {
+            throw "PlayRoom htmlAreaId not specified";
+        }
         var textarea = document.getElementById(cfg.htmlAreaId);
-        (new ajaxObject(cfg.htmlPath,
-                function(responseText, responseStatus) {
-                    scene = responseText;
-                    textarea.value = responseText + responseText + responseText + responseText + responseText;
-                    editor = new MirrorFrame(CodeMirror.replace(textarea), {
+        if (!textarea) {
+            throw "PlayRoom htmlAreaId not resolved";
+        }
+        try {
+            $.ajax({
+                url:cfg.htmlPath,
+                success: function(data) {
+                    textarea.value = data;
+                    html = data;
+                    htmlEditor = new MirrorFrame(CodeMirror.replace(textarea), {
                         height: "100%",
                         width: "100%",
                         content: textarea.value,
-                        parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-                        stylesheet: "css/jscolors.css",
-                        path: "js/codemirror/",
-                        autoMatchParens: true
+                        parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
+                        stylesheet: ["./examples/css/xmlcolors.css", "./playroom/css/jscolors.css", "./playroom/css/csscolors.css"],
+                        path: "./examples/js/codemirror/"
                     });
-                    if (cfg.onLoad) {
-                        cfg.onLoad.fn.call(cfg.onLoad.scope || this);
+                    if (cfg.onReady) {
+                        cfg.onReady();
                     }
-                })).update();
-    };
-
-    var evalScene = function(sceneJs) {
-        //        var output = document.getElementById(cfg.outputAreaId);
-        //        output.innerHTML = '<canvas id="exampleCanvas" class="sandbox-canvas"/>';
-        try {
-            eval(sceneJs);
+                }
+            });
         } catch (e) {
-            document.getElementById(cfg.logAreaId).innerHTML = 'Error in scene - ' + e;
-            if (cfg.onError) {
-                cfg.onError.fn.call(cfg.onError.scope || this);
+            if (cfg.onLoadException) {
+                cfg.onLoadException(e);
             }
         }
     };
 
-    /** Load scene definition
-     *
-     */
+    var evalScene = function(sceneDef) {
+        try {
+            eval(sceneDef);
+        } catch (e) {
+            if (cfg.onSceneDefError) {
+                cfg.onSceneDefError(e);
+            }
+        }
+    };
+
     var loadScene = function() {
+        if (!cfg.definitionAreaId) {
+            throw "PlayRoom definitionAreaId not specified";
+        }
         var textarea = document.getElementById(cfg.definitionAreaId);
-        (new ajaxObject(cfg.definitionPath,
-                function(responseText, responseStatus) {
-                    scene = responseText;
-                    textarea.value = responseText + responseText + responseText + responseText + responseText;
-                    editor = new MirrorFrame(CodeMirror.replace(textarea), {
+        if (!textarea) {
+            throw "PlayRoom definitionAreaId not resolved";
+        }
+        try {
+            $.ajax({
+                url: cfg.definitionPath,
+                success: function(data) {
+                    textarea.value = data;
+                    sceneEditor = new MirrorFrame(CodeMirror.replace(textarea), {
                         height: "100%",
                         width: "100%",
                         content: textarea.value,
                         parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-                        stylesheet: "css/jscolors.css",
-                        path: "js/codemirror/",
+                        stylesheet: "./examples/css/jscolors.css",
+                        path: "./examples/js/codemirror/",
                         autoMatchParens: true
                     });
-                    evalScene(responseText);
+                    scene = data;
+                    evalScene(scene);
                     loadHtml();
-                })).update();
+                }
+            });
+        } catch (e) {
+            if (cfg.onLoadException) {
+                cfg.onLoadException(e);
+            }
+        }
+
+        //
+        //        (new ajaxObject(cfg.definitionPath,
+        //                function(responseText, responseStatus) {
+        //                    if (responseStatus == 201) {
+        //                        scene = responseText;
+        //                        textarea.value = responseText + responseText + responseText + responseText + responseText;
+        //                        sceneEditor = new MirrorFrame(CodeMirror.replace(textarea), {
+        //                            height: "100%",
+        //                            width: "100%",
+        //                            content: textarea.value,
+        //                            parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+        //                            stylesheet: "./examples/css/jscolors.css",
+        //                            path: "./examples/js/codemirror/",
+        //                            autoMatchParens: true
+        //                        });
+        //                        evalScene(responseText);
+        //                        loadHtml();
+        //                    } else {
+        //                        if (cfg.onLoadError) {
+        //                            cfg.onLoadError(responseStatus);
+        //                        } else {
+        //                            throw "Failed to load example's scene description - status: " + responseStatus;
+        //                        }
+        //                    }
+        //                })).update();
     };
 
-    /**
-     * Load metadata
-     */
-    var loadInfo = function() {
-        (new ajaxObject(cfg.infoPath,
-                function(responseText, responseStatus) {
-                    eval('info = ' + responseText);
-                    loadScene();
-                })).update();
-    };
-
-    /**
-     * Load everything
-     */
     var load = function() {
-        loadInfo();
+        loadScene();
     };
 
     load();
 
-    this.getInfo = function() {
-        return info;
+    this.resetScene = function() {
+        sceneEditor.mirror.setCode(scene);
     };
 
-    this.reset = function() {
-        editor.mirror.setCode(scene);
+    this.resetHtml = function() {
+        htmlEditor.mirror.setCode(html);
     };
 
-    this.execute = function() {
-        evalScene(editor.mirror.getCode());
+    this.executeScene = function() {
+        evalScene(sceneEditor.mirror.getCode());
     };
 
-    this.reindent = function() {
-        editor.mirror.reindent();
+    this.reindentScene = function() {
+        sceneEditor.mirror.reindent();
+    };
+
+    this.reindentHtml = function() {
+        sceneEditor.mirror.reindent();
     };
 };

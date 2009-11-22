@@ -4,6 +4,8 @@
 SceneJs.backends.installBackend(
         new (function() {
 
+            var CONTEXT_TYPE = 'moz-glweb20';
+
             this.type = 'canvas';
 
             var ctx;
@@ -15,9 +17,16 @@ SceneJs.backends.installBackend(
             this.findCanvas = function(canvasId) {
                 var canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw 'Canvas element not in DOM (id = \'' + canvasId + '\')';
+                    throw new SceneJs.canvas.CanvasNotFoundException
+                            ('Could not find canvas document element with id \'' + canvasId + '\'');
                 }
                 var context = canvas.getContext('moz-glweb20');
+                if (!context) {
+                    throw new SceneJs.canvas.CanvasNotSupportedException
+                            ('Canvas document element with id \''
+                                    + canvasId
+                                    + '\' failed to provide a \'' + CONTEXT_TYPE + '\' context');
+                }
                 context.clearColor(0.8, 0.8, 0.9, 1.0);
                 context.clearDepth(1.0);
                 context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
@@ -62,3 +71,6 @@ SceneJs.backends.installBackend(
                 ctx.canvas.context.swapBuffers();
             };
         })());
+
+
+

@@ -44,12 +44,21 @@ table.examples-index td.col2 p {
     height: 150px; /*position: relative;*/
 }
 
+#playroom-index {
+    width: 200px;
+}
+
+#playroom-example {
+    width: 800px;
+    float:right;
+
+}
+
 div.source {
     border: none;
-    padding: 0;
- /*padding : 3 px;*/
+    padding: 0; /*padding : 3 px;*/
     width: 100%;
-    height: 100%;
+    height: 70%;
     float: left;
     overflow: auto;
 }
@@ -57,8 +66,7 @@ div.source {
 /* Canvas area displaying pre-load progress messages */
 div.sandbox-progress {
     width: 100%;
-    height: 100%;
-    /*background: #000000;*/
+    height: 100%; /*background: #000000;*/
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     padding: 10px;
     font-size: 1.2em;
@@ -80,8 +88,8 @@ div.sandbox-error {
 
 /* Canvas area displaying scene */
 div.sandbox-canvas {
-    /*border: solid 1px;*/
-    /*background: black;*/
+/*border: solid 1px;*/
+/*background: black;*/
     background: white;
     width: 100%;
     height: 100%;
@@ -91,39 +99,79 @@ div.sandbox-canvas {
     color: blue;
 }
 
-#toolbar {
-/*height: 70%;*/
+#playroom-project-name {
+    padding: 10px 0 10px 15px;
+    text-align:left;
+     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.2em;      
+}
 
-    margin: 0em 2em;
+#playroom-javascript-toolbar {
+    text-align: right;
+}
+
+#playroom-html-toolbar {
+    text-align: right;
 }
 
 #inner-splitter {
     min-width: 500px; /* Splitter can't be too thin ... */
     min-height: 300px; /* ... or too flat */
     height: 90%;
-    margin: 0.5em 2em 1em;
-    /*border: 3px solid #cccccc; *//* No padding allowed */
+    margin: 0.5em 2em em; /*border: 3px solid #cccccc; *//* No padding allowed */
 }
 
-#inner-leftPane {
-    border: 3px solid #cccccc;
+#inner-leftPane {  
     background: #ffffff;
     overflow: auto; /* No margin or border allowed */
     overflow: hidden;
 }
 
 #inner-rightPane {
-    /*border: 3px solid #cccccc;*/
+/*border: 3px solid #cccccc;*/
     background: #ffffff;
     overflow: hidden; /* No margin or border allowed */
 }
 
 #inner-splitter .vsplitbar {
     width: 15px;
-    background:  url(../images/splitter/vgrabber.gif) no-repeat center;
+    background: url(../images/splitter/vgrabber.gif) no-repeat center;
 }
 
 #inner-splitter .vsplitbar.active {
     background: #da8 url(../images/splitter/vgrabber.gif) no-repeat center;
     opacity: 0.7;
+}
+
+#error {
+
+}
+
+#error-title {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cc0000;
+    padding: 5px 0 20px;
+}
+
+#error-message {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.2em;
+    color: #666666;
+    padding: 0 0 15px;
+}
+
+#error-advice {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.1em;
+    color: #666666;
+}
+
+#error-title {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #cc0000;
+    padding: 5px 0 20px;
 }

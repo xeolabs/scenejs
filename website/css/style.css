@@ -52,7 +52,6 @@ a:hover {
 }
 
 body {
-    background: #fff url(../images/body-stripe.gif) repeat-x 0% 0%;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 100%;
     line-height: 1em; /*color: #393939;*/
@@ -62,11 +61,11 @@ body {
 
 h1 {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    padding: 5px 0 25px 0;
+    padding: 20px 0 10px;
     font-size: 2.2em;
     font-weight: normal;
-    color: #994444;
-    text-align: center;
+    color: #444444;
+    text-align: left;
 }
 
 h2 {
@@ -74,7 +73,7 @@ h2 {
     padding: 1px 0 11px 0;
     font-size: 1.583em;
     font-weight: normal;
-    color: #994444;
+    color: #444444;
 }
 
 h2.extra {
@@ -106,21 +105,9 @@ h2.extra {
     text-align: left;
 }
 
-#header {
-    height: 250px;
-    position: relative;
-}
-
-#home #header {
-    height: 410px;
-    background: url(../images/header_splash.jpg) no-repeat 0% 0%;
-}
-
-#header #headerContent {
-    position: absolute;
-    text-align: center;
-    top: 160px; /*left: 40px;*/
-    width: 100%;
+#home #banner {
+    height: 120px;
+    background: url(../images/scenejs_small.png) no-repeat 0% 0% #000099;
 }
 
 #header #headerContentContainer {
@@ -404,19 +391,25 @@ h2.extra {
     vertical-align: baseline;
 }
 
-ul.featureList {
-    margin: 0;
-    padding: 0 0 0 30px;
-    list-style: none;
-}
-
-ul.featureList li {
-    padding-left: 15px;
-    background-image: url(../images/icon_bullet.gif);
-    background-repeat: no-repeat;
-    background-position: 0 .35em;
-}
-
 b.class-name {
     color: #555;
+}
+
+#page {
+
+}
+
+/* For buffering pages that are displayed only when complete
+*/
+.buffered-page-visible {
+    padding-left:0px;
+}
+
+.buffered-page-invisible {
+    padding-left:10000px;
+}
+
+#content {
+    margin: 0 auto;
+    width: 1200px;
 }

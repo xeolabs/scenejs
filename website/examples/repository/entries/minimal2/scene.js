@@ -1,12 +1,13 @@
 with (SceneJs) {
+
   var scene = graph(
-     {},             
+    {},
 
     canvas(
       { canvasId: 'exampleCanvas'}, // DONT EDIT - Locates demo canvas
 
       viewport(
-        { x : 1, y : 1, width: 400, height: 400},
+        { x : 1, y : 1, width: 350, height: 350},
 
         shader(
           { type: 'simple-shader' },
@@ -28,28 +29,20 @@ with (SceneJs) {
                   up : { y: 1.0 }
                 },
 
-                generator(
-                  function() {
+                rotate(function(scope) {
+                  return {
+                    angle: scope.get('angle'), x : 1.0
+                  };
+                },
 
-                    var x = 0;
-                    
-                    return function() {
-                      x += 5.0;
-                      if (x < 20) {
-                        return { x: x };
-                      }
-                    };
-                  },
+                       material({
+                         ambient: { r:0.5, g:0.5, b:0.9 },
+                         diffuse: { r:0.5, g:0.5, b:0.9 },
+                         specular: { r:0.5, g:0.5, b:0.9 }},
 
-                  translate(
-                    function(scope) {
-                      return { x: scope.get('x') };
-                    },
-
-                    objects.teapot()
-
-                  ) // translate
-                ) // generator
+                                objects.teapot()
+                               )
+                      ) // rotate
               ) // lookAt
             ) // frustum
           ) // lights
@@ -58,5 +51,5 @@ with (SceneJs) {
     ) // canvas
   ); // scene
 
-  scene.render();
+  scene.render({angle: 45.0});
 }

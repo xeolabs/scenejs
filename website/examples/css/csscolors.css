@@ -14,42 +14,34 @@ pre.code, .editbox {
   margin: 0;
 }
 
-span.js-punctuation {
-  color: #666666;
-}
-
-span.js-operator {
-  color: #666666;
-}
-
-span.js-keyword {
+span.css-at {
   color: #770088;
 }
 
-span.js-atom {
+span.css-unit {
   color: #228811;
 }
 
-span.js-variable {
+span.css-value {
+  color: #770088;
+}
+
+span.css-identifier {
   color: black;
 }
 
-span.js-variabledef {
+span.css-important {
   color: #0000FF;
 }
 
-span.js-localvariable {
+span.css-colorcode {
   color: #004499;
 }
 
-span.js-property {
-  color: black;
-}
-
-span.js-comment {
+span.css-comment {
   color: #AA7700;
 }
 
-span.js-string {
+span.css-string {
   color: #AA2222;
 }
