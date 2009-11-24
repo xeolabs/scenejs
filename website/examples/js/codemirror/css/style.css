@@ -135,11 +135,11 @@ div.sandbox-canvas {
 
 #inner-splitter .vsplitbar {
     width: 15px;
-    background: url(../images/splitter/vgrabber.gif) no-repeat center;
+    background: url(../../../images/splitter/vgrabber.gif) no-repeat center;
 }
 
 #inner-splitter .vsplitbar.active {
-    background: #da8 url(../images/splitter/vgrabber.gif) no-repeat center;
+    background: #da8 url(../../../images/splitter/vgrabber.gif) no-repeat center;
     opacity: 0.7;
 }
 

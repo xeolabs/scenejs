@@ -16,108 +16,139 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/css/style.css" afterPath="$PROJECT_DIR$/website/examples/css/style.css" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/java.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/catalogue.html" afterPath="$PROJECT_DIR$/website/examples/catalogue.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-icons_888888_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_888888_256x240.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/scale.js" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/dev/dev.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/script.png" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_flat_0_aaaaaa_40x100.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_flat_0_aaaaaa_40x100.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/lighting/lights.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/shading/shader.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/file.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/matrix4x4.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/appearance/backend.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_diagonals-thick_90_eeeeee_40x40.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_diagonals-thick_90_eeeeee_40x40.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/appearance/material.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery.jBreadCrumb.1.1.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/geometry/geometry.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/canvas/canvas.js" afterPath="$PROJECT_DIR$/src/scenejs/canvas/canvas.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/css/catalogue.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/css/tabs.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/catalogue.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/html.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/application.png" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/css/xmlcolors.css" afterPath="$PROJECT_DIR$/website/examples/js/codemirror/css/xmlcolors.css" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/mirrorframe.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/css/style.css" afterPath="$PROJECT_DIR$/website/examples/js/codemirror/css/style.css" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/graph.html" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/js/jquery-1.3.2.min.js" afterPath="$PROJECT_DIR$/website/js/jquery/jquery-1.3.2.min.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_glass_75_e6e6e6_1x400.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_75_e6e6e6_1x400.png" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/php.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/core/core.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewport/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/core/node.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/jqueryFileTree.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-icons_cd0a0a_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_cd0a0a_256x240.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/canvas/backend.js" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/example1/html.html" afterPath="$PROJECT_DIR$/website/examples/repository/entries/minimal2/layout.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/css.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/extending.html" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/js/jquery.tabs.js" afterPath="$PROJECT_DIR$/website/js/jquery/jquery.tabs.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/ruby.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewing/lookat.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/example.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/example1/info.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/js/jquery/jquery.template.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/homepage/index.html" afterPath="$PROJECT_DIR$/website/home/home.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/repository/entries/minimal1/scene.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/directory.png" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/jquery-ui-1.7.2.custom.css" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/jquery-ui-1.7.2.custom.css" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_inset-soft_95_fef1ec_1x100.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_inset-soft_95_fef1ec_1x100.png" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_flat_75_ffffff_40x100.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_flat_75_ffffff_40x100.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/shading/simple/simpleShader.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/stringstream.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/index.html" afterPath="$PROJECT_DIR$/website/index.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/pdf.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsejavascript.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/select.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/js/jquery/jquery.url.min.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/picture.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/zip.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/util.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/core/graph.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/vars/backend.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/scenejs.png" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/dev/js/dev.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/backend.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/downloads/downloads.html" afterPath="$PROJECT_DIR$/website/downloads/downloads.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_glass_55_fbf9ee_1x400.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_55_fbf9ee_1x400.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsecss.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/layering/layerBackend.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/repository/catalogue.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/jquery-ui-1.7.2.custom.css" afterPath="$PROJECT_DIR$/website/css/themes/custom/jquery-ui-1.7.2.custom.css" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_glass_50_3baae3_1x400.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/ortho.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/geometry/objects/teapot.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-icons_222222_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_222222_256x240.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/editor.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/js/catalogue/catalog.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/psd.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/animation/scalarInterpolator.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.2.5.js" afterPath="$PROJECT_DIR$/website/downloads/scenejs.0.2.5.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/js/jquery.cookie.js" afterPath="$PROJECT_DIR$/website/js/jquery/jquery.cookie.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_glass_75_dadada_1x400.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_75_dadada_1x400.png" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-icons_2e83ff_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_2e83ff_256x240.png" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/code.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/shading/backend.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/downloads.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/jscolors.css" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/js/catalogue/css/catalog.css" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/js/splitter.js" afterPath="$PROJECT_DIR$/website/js/jquery/splitter.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/example1/scene.js" afterPath="$PROJECT_DIR$/website/examples/repository/entries/minimal2/scene.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/translate.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsesparql.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/playroomV2.html" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_highlight-soft_100_deedf7_1x100.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-soft_100_deedf7_1x100.png" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_highlight-hard_70_000000_1x100.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-hard_70_000000_1x100.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/tokenizejavascript.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/example2/info.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/codemirror.js" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/js/blogfeed.js" afterPath="$PROJECT_DIR$/website/js/blogfeed/blogfeed.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/scenejs.0.2.5.js" afterPath="$PROJECT_DIR$/dist/scenejs.0.2.5.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/doc.png" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-icons_454545_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_454545_256x240.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/example.html" afterPath="$PROJECT_DIR$/website/examples/example.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/linux.png" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_glass_65_ffffff_1x400.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_65_ffffff_1x400.png" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/music.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/folder_open.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/layout.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/core/matrix.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewing/backend.js" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/website/js/jquery-ui-1.7.2.custom.min.js" afterPath="$PROJECT_DIR$/website/js/jquery/jquery-ui-1.7.2.custom.min.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/css/jscolors.css" afterPath="$PROJECT_DIR$/website/examples/js/codemirror/css/jscolors.css" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/css/csscolors.css" afterPath="$PROJECT_DIR$/website/examples/js/codemirror/css/csscolors.css" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/layering/layer.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/indexV2.html" afterPath="$PROJECT_DIR$/website/indexV2.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/examples/css/sparqlcolors.css" afterPath="$PROJECT_DIR$/website/examples/js/codemirror/css/sparqlcolors.css" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/canvas/canvas.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/branching/selector.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/examples.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsehtmlmixed.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-icons_2e83ff_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_2e83ff_256x240.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/perspective.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/film.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/downloads.html" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/repository/entries/minimal1/layout.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsedummy.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/lighting/backend.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/db.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/xls.png" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/js/playroom.js" afterPath="$PROJECT_DIR$/website/examples/js/playroom.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/ajax-object.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/ppt.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/frustum.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/tokenize.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/undo.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_highlight-soft_25_ffef8f_1x100.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-soft_25_ffef8f_1x100.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/modelling/rotate.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/playroom.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/geometry/backend.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/spinner.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/vars/vars.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_glass_100_e4f1fb_1x400.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_100_e4f1fb_1x400.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/examples/css/catalogue.css" afterPath="$PROJECT_DIR$/website/examples/css/catalogue.css" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-icons_72a7cf_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_72a7cf_256x240.png" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_flat_15_cd0a0a_40x100.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_flat_15_cd0a0a_40x100.png" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-bg_highlight-hard_100_f2f5f7_1x100.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-hard_100_f2f5f7_1x100.png" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/flash.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/sandbox.css" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/indexV2.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-icons_3d80b3_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_3d80b3_256x240.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/highlight.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/canvas/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/canvas/backend.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsexml.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/jscolors.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/breadcrumb.css" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/website/examples/index.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/custom-theme/images/ui-bg_highlight-soft_75_cccccc_1x100.png" afterPath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_highlight-soft_75_cccccc_1x100.png" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/jqueryFileTree.css" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-icons_2694e8_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_2694e8_256x240.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/css/style.css" afterPath="$PROJECT_DIR$/website/css/style.css" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/jquery-filetree/images/txt.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/projection/backend.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/website/css/cupertino/images/ui-icons_ffffff_256x240.png" afterPath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_ffffff_256x240.png" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/scene/viewport/viewport.js" afterPath="" />
     </list>
-    <ignored path=".idea/workspace.xml" />
     <ignored path="scenejs.iws" />
+    <ignored path=".idea/workspace.xml" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="Commander">
@@ -173,73 +204,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="indexV2.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/indexV2.html">
+      <file leaf-file-name="dev.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/dev/dev.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="22" selection-start="1843" selection-end="1843" vertical-scroll-proportion="-21.136364">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="catalog.js" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/website/examples/js/catalogue/catalog.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="117" column="85" selection-start="4180" selection-end="4180" vertical-scroll-proportion="-1.1441442">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="example.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/example.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="30" selection-start="1781" selection-end="1781" vertical-scroll-proportion="15.319149">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="style.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/css/style.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="407" column="67" selection-start="6719" selection-end="6719" vertical-scroll-proportion="-19.04">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="playroom.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/js/playroom.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="20" selection-start="1366" selection-end="1366" vertical-scroll-proportion="-10.04">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="catalogue.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/catalogue.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="55" column="63" selection-start="1952" selection-end="1952" vertical-scroll-proportion="-25.227272">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="catalogue.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/css/catalogue.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="22" selection-start="448" selection-end="448" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="style.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/css/style.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="175" column="4" selection-start="3424" selection-end="3426" vertical-scroll-proportion="-22.44">
+            <state line="7" column="35" selection-start="344" selection-end="344" vertical-scroll-proportion="-4.7727275">
               <folding />
             </state>
           </provider>
@@ -257,10 +225,73 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="catalogue.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/website/examples/repository/catalogue.js">
+      <file leaf-file-name="catalogue.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/catalogue.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="68" selection-start="825" selection-end="825" vertical-scroll-proportion="0.0">
+            <state line="48" column="29" selection-start="1737" selection-end="1737" vertical-scroll-proportion="-26.545454">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="catalogue.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/css/catalogue.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="38" column="23" selection-start="491" selection-end="491" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tabs.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/css/tabs.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="20" column="49" selection-start="410" selection-end="410" vertical-scroll-proportion="-12.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dev.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/dev/js/dev.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="82" column="31" selection-start="3469" selection-end="3469" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dev.css" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/website/dev/css/dev.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="31" column="17" selection-start="403" selection-end="403" vertical-scroll-proportion="0.6112805">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="style.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/css/style.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="15" column="19" selection-start="252" selection-end="252" vertical-scroll-proportion="25.2">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="indexV2.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/indexV2.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="60" column="17" selection-start="2650" selection-end="2650" vertical-scroll-proportion="-22.5">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="playroom.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/examples/js/playroom.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="81" column="24" selection-start="2743" selection-end="2743" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -354,6 +385,54 @@
           <option name="myItemId" value="js" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="mashup" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="js" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="home" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
       </PATH>
       <PATH>
         <PATH_ELEMENT>
@@ -422,44 +501,6 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="examples" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="js" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="catalogue" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="website" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="examples" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="js" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="catalogue" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
@@ -485,7 +526,59 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="downloads" />
+          <option name="myItemId" value="dev" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="dev" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="js" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="dev" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="css" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -570,13 +663,13 @@
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="MemberChooser.sorted" value="false" />
     <property name="options.lastSelected" value="preferences.sourceCode.Alignment and Braces" />
+    <property name="MemberChooser.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -718,14 +811,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="25" width="1440" height="850" extended-state="2" />
+    <frame x="0" y="25" width="1440" height="850" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297414" sideWeight="0.9315069" order="3" side_tool="false" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.08630137" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.010853835" sideWeight="0.9793388" order="1" side_tool="false" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.011019284" sideWeight="0.5" order="1" side_tool="false" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.00723589" sideWeight="0.73966944" order="1" side_tool="false" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25066668" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
@@ -736,7 +829,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2583213" sideWeight="0.9793388" order="0" side_tool="false" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28798842" sideWeight="0.73966944" order="0" side_tool="false" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292011" sideWeight="0.5" order="8" side_tool="false" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" />
@@ -834,14 +927,28 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/website/examples/repository/entries/minimal1/scene.js">
+    <entry file="file://$PROJECT_DIR$/website/examples/example.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="56" selection-start="0" selection-end="70" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/home/home.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/repository/entries/minimal2/scene.js">
+    <entry file="file://$PROJECT_DIR$/website/js/mashup/mashup.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="92" column="95" selection-start="3405" selection-end="3405" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/js/jquery/jquery.cookie.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
@@ -850,49 +957,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/website/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="2.0454545">
+        <state line="76" column="31" selection-start="3244" selection-end="3244" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/js/jquery/jquery.url.min.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="442" selection-start="765" selection-end="765" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/catalogue/css/catalog.css">
+    <entry file="file://$PROJECT_DIR$/website/examples/js/codemirror/css/csscolors.css">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/repository/catalogue.js">
+    <entry file="file://$PROJECT_DIR$/website/examples/js/playroom.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="68" selection-start="825" selection-end="825" vertical-scroll-proportion="0.0">
+        <state line="81" column="24" selection-start="2743" selection-end="2743" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/css/style.css">
+    <entry file="file://$PROJECT_DIR$/website/css/tabs.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="175" column="4" selection-start="3424" selection-end="3426" vertical-scroll-proportion="-22.44">
+        <state line="20" column="49" selection-start="410" selection-end="410" vertical-scroll-proportion="-12.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/css/style.css">
+    <entry file="file://$PROJECT_DIR$/website/indexV2.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="407" column="67" selection-start="6719" selection-end="6719" vertical-scroll-proportion="-19.04">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/css/catalogue.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="22" selection-start="448" selection-end="448" vertical-scroll-proportion="0.0">
+        <state line="60" column="17" selection-start="2650" selection-end="2650" vertical-scroll-proportion="-22.5">
           <folding />
         </state>
       </provider>
@@ -907,37 +1000,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/website/dev/js/dev.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="31" selection-start="3469" selection-end="3469" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/css/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="19" selection-start="252" selection-end="252" vertical-scroll-proportion="25.2">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/dev/dev.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="35" selection-start="344" selection-end="344" vertical-scroll-proportion="-4.7727275">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/website/examples/catalogue.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="63" selection-start="1952" selection-end="1952" vertical-scroll-proportion="-25.227272">
+        <state line="48" column="29" selection-start="1737" selection-end="1737" vertical-scroll-proportion="-26.545454">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/playroom.js">
+    <entry file="file://$PROJECT_DIR$/website/examples/css/catalogue.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="20" selection-start="1366" selection-end="1366" vertical-scroll-proportion="-10.04">
+        <state line="38" column="23" selection-start="491" selection-end="491" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/example.html">
+    <entry file="file://$PROJECT_DIR$/website/dev/css/dev.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="30" selection-start="1781" selection-end="1781" vertical-scroll-proportion="15.319149">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/indexV2.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="22" selection-start="1843" selection-end="1843" vertical-scroll-proportion="-21.136364">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/website/examples/js/catalogue/catalog.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="117" column="85" selection-start="4180" selection-end="4180" vertical-scroll-proportion="-1.1441442">
+        <state line="31" column="17" selection-start="403" selection-end="403" vertical-scroll-proportion="0.6112805">
           <folding />
         </state>
       </provider>

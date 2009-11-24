@@ -1,0 +1,136 @@
+/* - - - - - - CSS Document - - - - - - - - -
+
+Title : Global style sheet for client-side web development
+Author : Cody Lindley 
+
+- - - - - - - - - - - - - - - - - - - - - */
+
+*{padding: 0; margin: 0;}
+
+/* ----- global default/initial styles ----- */
+body {background-color:#fff;}
+
+html, body {height:100%;}
+
+/* ----- base default font size, type, and line height ----- */
+html body{font: 62.5%/1.4em Arial, Helvetica, sans-serif;color:#333333}
+html>body{font: 62.5%/1.4em Arial, Helvetica, sans-serif;color:#333333}
+
+/* ----- add selectors here for font sizing ----- */
+#JT_close_left, #JT_close_right{font-size: 1.1em;}
+#JT_copy p, #JT_copy ul{font-size: 1.1em;}
+p, label{font-size: 1.2em;}
+
+
+/* ----- base links ----- */
+a:link {color: #CC6633;}
+a:visited {color: #CC6633;}
+a:hover {color: #999966;}
+a:active {color: #CC6633;}
+a:focus{color: #CC6633;}
+
+p {line-height:1.4em;margin:10px 0;}
+hr{margin:10px 0;color:#999999;}
+
+ul{
+	list-style: none;
+}
+
+ul li{
+padding-top:3px;
+}
+
+#contentPad{
+margin:20px;
+}
+
+.formInfo a, .formInfo a:active, formInfo a:visited{
+	background-color:#FF0000;
+	font-size: 1.3em;
+	font-weight:bold;
+	padding:1px 2px;
+	margin-left:5px;
+	color:#FFFFFF;
+	text-decoration: none;
+}
+
+.formInfo a:hover{
+	color:#660000;
+	text-decoration: none;
+}
+
+/* ---------->>> jtip <<<---------------------------------------------------------------*/
+
+#JT_arrow_left{
+	background-image: url(../images/arrow_left.gif);
+	background-repeat: no-repeat;
+	background-position: left top;
+	position: absolute;
+	z-index:101;
+	left:-12px;
+	height:23px;
+	width:10px;
+    top:-3px;
+}
+
+#JT_arrow_right{
+	background-image: url(../images/arrow_right.gif);
+	background-repeat: no-repeat;
+	background-position: left top;
+	position: absolute;
+	z-index:101;
+	height:23px;
+	width:11px;
+    top:-2px;
+}
+
+#JT {
+	position: absolute;
+	z-index:100;
+	border: 2px solid #CCCCCC;
+	background-color: #fff;
+}
+
+#JT_copy{
+	padding:10px 10px 10px 10px;
+	color:#333333;
+}
+
+.JT_loader{
+	background-image: url(../images/loader.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width:100%;
+	height:12px;
+}
+
+#JT_close_left{
+	background-color: #CCCCCC;
+	text-align: left;
+	padding-left: 8px;
+	padding-bottom: 5px;
+	padding-top: 2px;
+	font-weight:bold;
+}
+
+#JT_close_right{
+	background-color: #CCCCCC;
+	text-align: left;
+	padding-left: 8px;
+	padding-bottom: 5px;
+	padding-top: 2px;
+	font-weight:bold;
+}
+
+#JT_copy p{
+margin:3px 0;
+}
+
+#JT_copy img{
+	padding: 1px;
+	border: 1px solid #CCCCCC;
+}
+
+.jTip{
+cursor:help;
+}

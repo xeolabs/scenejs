@@ -25,8 +25,16 @@ var PlayRoomController = function(cfg) {
                         height: "100%",
                         width: "100%",
                         content: textarea.value,
-                        parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
-                        stylesheet: ["./examples/css/xmlcolors.css", "./playroom/css/jscolors.css", "./playroom/css/csscolors.css"],
+                        parserfile: [
+                            "parsexml.js",
+                            "parsecss.js",
+                            "tokenizejavascript.js",
+                            "parsejavascript.js",
+                            "parsehtmlmixed.js"],
+                        stylesheet: [
+                            "./examples/js/codemirror/css/xmlcolors.css",
+                            "./examples/js/codemirror/css/jscolors.css",
+                            "./examples/js/codemirror/css/csscolors.css"],
                         path: "./examples/js/codemirror/"
                     });
                     if (cfg.onReady) {
@@ -68,8 +76,11 @@ var PlayRoomController = function(cfg) {
                         height: "100%",
                         width: "100%",
                         content: textarea.value,
-                        parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-                        stylesheet: "./examples/css/jscolors.css",
+                        parserfile: [
+                            "tokenizejavascript.js",
+                            "parsejavascript.js"
+                        ],
+                        stylesheet: "./examples/js/codemirror/css/jscolors.css",
                         path: "./examples/js/codemirror/",
                         autoMatchParens: true
                     });
@@ -83,32 +94,6 @@ var PlayRoomController = function(cfg) {
                 cfg.onLoadException(e);
             }
         }
-
-        //
-        //        (new ajaxObject(cfg.definitionPath,
-        //                function(responseText, responseStatus) {
-        //                    if (responseStatus == 201) {
-        //                        scene = responseText;
-        //                        textarea.value = responseText + responseText + responseText + responseText + responseText;
-        //                        sceneEditor = new MirrorFrame(CodeMirror.replace(textarea), {
-        //                            height: "100%",
-        //                            width: "100%",
-        //                            content: textarea.value,
-        //                            parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-        //                            stylesheet: "./examples/css/jscolors.css",
-        //                            path: "./examples/js/codemirror/",
-        //                            autoMatchParens: true
-        //                        });
-        //                        evalScene(responseText);
-        //                        loadHtml();
-        //                    } else {
-        //                        if (cfg.onLoadError) {
-        //                            cfg.onLoadError(responseStatus);
-        //                        } else {
-        //                            throw "Failed to load example's scene description - status: " + responseStatus;
-        //                        }
-        //                    }
-        //                })).update();
     };
 
     var load = function() {

@@ -1,3 +1,11 @@
+#back-to-catalog-link {
+    color: blue;
+}
+
+#back-to-catalog-link:hover {
+    color: maroon;
+}
+
 .catalogue {
     padding-top: 20px;
     width: 800px;
@@ -5,7 +13,6 @@
 }
 
 .catalogue-category {
-    border-top: 1px solid lightgray;
     padding: 10px 0 20px;
 }
 
@@ -15,22 +22,23 @@
     padding: 0 0 15px;
 }
 
-.catalogue-entry {
+.catalogue-entry-list {
+    padding-top: 5px;
+}
 
+.catalogue-entry {
 }
 
 .catalogue-entry a {
 }
 
 .catalogue-entry a:hover {
-    background:#cecece;
+    background: #cecece;
 }
 
 .catalogue-entry-text {
-    color: #444444;
-    font-size: 0.8em;
-    padding: 0  0 10px;
-    width:100%;
+    padding: 0 0 10px;
+    width: 100%;
 
 }
 

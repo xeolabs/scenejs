@@ -1,0 +1,37 @@
+<div id="page">
+    <div id="content">
+        <h1>Development</h1>
+
+        <div id="intro">
+            <p>Source code is managed in a public <a href="http://git-scm.com/">Git</a> repository hosted by GitHub at
+                <a href="http://github.com/xeolabs/scenejs">github.com/xeolabs/scenejs</a>.</p>
+            <p>Clone it by typing:  <b>git clone git://github.com/xeolabs/scenejs.git</b></p>
+        </div>
+        <div id="main">
+            <div id="mashup">
+                <div id="github-issues">
+                    <h2>Issues</h2>
+
+                    <p class="github-url"><a href="http://github.com/xeolabs/scenejs/issues">http://github.com/xeolabs/scenejs/issues</a>
+                    </p>
+
+                    <div id="github-issues-list"></div>
+                </div>
+                <div id="github-commits">
+                    <h2>Commits</h2>
+
+                    <p class="github-url"><a
+                            href="http://github.com/xeolabs/scenejs/commits">http://github.com/xeolabs/scenejs/commits</a></p>
+
+                    <div id="github-commits-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var revealThisPage = function() {
+        $("#page").removeClass().addClass("buffered-page-visible");
+    };
+    initSceneJsHome();
+</script>
