@@ -22,7 +22,7 @@ SceneJs.shader = function() {
             programId = backend.loadProgram();
         }
 
-        /* Save previous shader and var state
+        /* Save any state set by higher shader node
          */
         var previousProgramId = backend.getActiveProgramId(); // Save active shaders
         var previousVars;
@@ -42,7 +42,7 @@ SceneJs.shader = function() {
 
         SceneJs.utils.visitChildren(cfg, scope);
 
-        /* Restore previous shader and var state
+        /* Restore any state saved for higher
          */
         if (previousProgramId) {
             backend.activateProgram(previousProgramId);
@@ -54,3 +54,5 @@ SceneJs.shader = function() {
         }
     };
 };
+
+

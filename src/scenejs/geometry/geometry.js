@@ -7,13 +7,13 @@ SceneJs.geometry = function() {
 
     var backend = SceneJs.backends.getBackend('geometry');
 
-    var calculateNormals = function(vertices, faces) {
+    var calculateNormals = function(vertices, indices) {
         var nvecs = new Array(vertices.length);
 
-        for (var i = 0; i < faces.length; i++) {
-            var j0 = faces[i][0];
-            var j1 = faces[i][1];
-            var j2 = faces[i][2];
+        for (var i = 0; i < indices.length; i++) {
+            var j0 = indices[i][0];
+            var j1 = indices[i][1];
+            var j2 = indices[i][2];
 
             var v1 = $V(vertices[j0]);
             var v2 = $V(vertices[j1]);
@@ -55,31 +55,27 @@ SceneJs.geometry = function() {
         var result = [];
         for (var i = 0; i < ar.length; i++) {
             if (numPerElement && ar[i].length != numPerElement)
-                throw "bad element inside array";
+                throw new SceneJs.exceptions.IllegalGeometryParameterException("Bad geometry array element");
             for (var j = 0; j < ar[i].length; j++)
                 result.push(ar[i][j]);
         }
         return result;
     };
 
-    var boundary;
-    var geo;  // memoized if params are fixed
+    var buf; // handle to backend geometry buffer
 
     return function(scope) {
         var params = cfg.getParams(scope);
-        if (!geo || !cfg.fixed) {
-            geo = {
+        if (!buf || !cfg.fixed) {
+            buf = backend.createGeoBuffer({
                 vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
                 normals: params.normals && params.normals.length > 0 ? params.normals
-                        : flatten(calculateNormals(params.vertices, params.faces), 3),
+                        : flatten(calculateNormals(params.vertices, params.indices), 3),
                 colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
-                indices : params.faces && params.faces.length > 0 ? flatten(params.faces, 3) : []
-            };
-            boundary = null; // TODO
+                indices : params.indices && params.indices.length > 0 ? flatten(params.indices, 3) : []
+            });
         }
-        if (!boundary || backend.intersects(boundary)) {
-            backend.drawGeometry(geo);
-        }
+        backend.drawGeoBuffer(buf);
         SceneJs.utils.visitChildren(cfg, scope);
     };
 };

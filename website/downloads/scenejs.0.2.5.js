@@ -485,12 +485,12 @@ SceneJs.backends.installBackend(
             this.findCanvas = function(canvasId) {
                 var canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw new SceneJs.canvas.CanvasNotFoundException
+                    throw new SceneJs.exceptions.CanvasNotFoundException
                             ('Could not find canvas document element with id \'' + canvasId + '\'');
                 }
                 var context = canvas.getContext('moz-glweb20');
                 if (!context) {
-                    throw new SceneJs.canvas.CanvasNotSupportedException
+                    throw new SceneJs.exceptions.CanvasNotSupportedException
                             ('Canvas document element with id \''
                                     + canvasId
                                     + '\' failed to provide a \'' + CONTEXT_TYPE + '\' context');
@@ -575,11 +575,11 @@ SceneJs.canvas = function() {
 };
 
 // TODO: These are thrown by the backend. Not sure about this cyclic-dependency.
-SceneJs.canvas.CanvasNotSupportedException = function(msg) {
+SceneJs.exceptions.CanvasNotSupportedException = function(msg) {
     this.message = msg;
 };
 
-SceneJs.canvas.CanvasNotFoundException = function(msg) {
+SceneJs.exceptions.CanvasNotFoundException = function(msg) {
     this.message = msg;
 };/** Backend for viewport node
  *
@@ -769,7 +769,7 @@ SceneJs.backends.installBackend(
                 return true; // TODO
             };
 
-            this.drawGeometry = function(geo) {
+            this.bufferGeometry = function(geo) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';
                 }
@@ -867,7 +867,7 @@ SceneJs.geometry = function() {
             boundary = null; // TODO
         }
         if (!boundary || backend.intersects(boundary)) {
-            backend.drawGeometry(geo);
+            backend.bufferGeometry(geo);
         }
         SceneJs.utils.visitChildren(cfg, scope);
     };
@@ -1810,7 +1810,7 @@ SceneJs.backends.installBackend(
                 return true; // TODO
             };
 
-            this.drawGeometry = function(geo) {
+            this.bufferGeometry = function(geo) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';
                 }
@@ -1908,7 +1908,7 @@ SceneJs.geometry = function() {
             boundary = null; // TODO
         }
         if (!boundary || backend.intersects(boundary)) {
-            backend.drawGeometry(geo);
+            backend.bufferGeometry(geo);
         }
         SceneJs.utils.visitChildren(cfg, scope);
     };

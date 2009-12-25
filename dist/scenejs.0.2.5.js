@@ -485,12 +485,12 @@ SceneJs.backends.installBackend(
             this.findCanvas = function(canvasId) {
                 var canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw new SceneJs.canvas.CanvasNotFoundException
+                    throw new SceneJs.exceptions.CanvasNotFoundException
                             ('Could not find canvas document element with id \'' + canvasId + '\'');
                 }
                 var context = canvas.getContext('moz-glweb20');
                 if (!context) {
-                    throw new SceneJs.canvas.CanvasNotSupportedException
+                    throw new SceneJs.exceptions.CanvasNotSupportedException
                             ('Canvas document element with id \''
                                     + canvasId
                                     + '\' failed to provide a \'' + CONTEXT_TYPE + '\' context');
@@ -541,7 +541,6 @@ SceneJs.backends.installBackend(
         })());
 
 
-
 /** Activates a OpenGL context on a specified HTML-5 canvas for sub-nodes. These can be nested; a previously-active
  * canvas will be temporarily inactive while this one's canvas is active.
  *
@@ -575,13 +574,14 @@ SceneJs.canvas = function() {
 };
 
 // TODO: These are thrown by the backend. Not sure about this cyclic-dependency.
-SceneJs.canvas.CanvasNotSupportedException = function(msg) {
+SceneJs.exceptions.CanvasNotSupportedException = function(msg) {
     this.message = msg;
 };
 
-SceneJs.canvas.CanvasNotFoundException = function(msg) {
+SceneJs.exceptions.CanvasNotFoundException = function(msg) {
     this.message = msg;
-};/** Backend for viewport node
+};
+/** Backend for viewport node
  *
  */
 SceneJs.backends.installBackend(
@@ -616,7 +616,8 @@ SceneJs.viewport = function() {
 
         SceneJs.utils.visitChildren(cfg, scope);
     };
-};/**
+};
+/**
  * Backend for a material node, feeds given material properties into the active shader and retains them.
  */
 SceneJs.backends.installBackend(
@@ -649,7 +650,8 @@ SceneJs.backends.installBackend(
             this.getMaterial = function() {
                 return ctx.material;
             };
-        })());/** Sets material properties on the current shader for sub-nodes
+        })());
+/** Sets material properties on the current shader for sub-nodes
  *
  */
 SceneJs.material = function() {
@@ -680,8 +682,9 @@ SceneJs.material = function() {
         SceneJs.utils.visitChildren(cfg, scope);
         backend.setMaterial(saveMaterial);
     };
-};/**
- * Scene node that creates a child scope containing the elements of its configuration. 
+};
+/**
+ * Scene node that creates a child scope containing the elements of its configuration.
  */
 SceneJs.scope = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
@@ -769,7 +772,7 @@ SceneJs.backends.installBackend(
                 return true; // TODO
             };
 
-            this.drawGeometry = function(geo) {
+            this.bufferGeometry = function(geo) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';
                 }
@@ -787,7 +790,8 @@ SceneJs.backends.installBackend(
                 context.flush();
 
             };
-        })());/**
+        })());
+/**
  * Defines geometry on the currently-active canvas, to be shaded with the current shader.
  *
  */
@@ -867,7 +871,7 @@ SceneJs.geometry = function() {
             boundary = null; // TODO
         }
         if (!boundary || backend.intersects(boundary)) {
-            backend.drawGeometry(geo);
+            backend.bufferGeometry(geo);
         }
         SceneJs.utils.visitChildren(cfg, scope);
     };
@@ -904,7 +908,8 @@ SceneJs.backends.installBackend(
             this.getViewTransform = function() {
                 return ctx.viewTransform;
             };
-        })());/**
+        })());
+/**
  * Scene node that constructs a 'lookat' view transformation matrix and sets it on the current shader.
  */
 SceneJs.lookAt = function() {
@@ -936,14 +941,15 @@ SceneJs.lookAt = function() {
 
             mat = SceneJs.utils.Matrix4.createLookAt(params.eye, params.look, params.up);
         }
-        
+
         var xform = backend.getViewTransform();
 
         backend.setViewTransform({ matrix: mat, fixed: cfg.fixed });
         SceneJs.utils.visitChildren(cfg, scope);
         backend.setViewTransform(xform);
     };
-};/** Backend for projection nodes.
+};
+/** Backend for projection nodes.
  */
 SceneJs.backends.installBackend(
         new (function() {
@@ -970,7 +976,8 @@ SceneJs.backends.installBackend(
             this.getProjectionMatrix = function() {
                 return ctx.projectionMatrix;
             }
-        })());/**
+        })());
+/**
  * Scene node that constructs a perspective projection matrix and sets it on the current shader.
  */
 SceneJs.perspective = function() {
@@ -1002,7 +1009,7 @@ SceneJs.perspective = function() {
                     );
         }
 
-       var previousMat = backend.getProjectionMatrix();
+        var previousMat = backend.getProjectionMatrix();
 
         backend.setProjectionMatrix(mat);
         SceneJs.utils.visitChildren(cfg, scope);
@@ -1111,7 +1118,8 @@ SceneJs.backends.installBackend(
             this.getModelTransform = function() {
                 return ctx.modelTransform;
             };
-        })());/**
+        })());
+/**
  * Sets a rotation modelling transformation on the current shader. The transform will be cumulative with transforms at
  * higher nodes.
  */
@@ -1119,7 +1127,7 @@ SceneJs.rotate = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
 
     var backend = SceneJs.backends.getBackend('modeltransform');
-    
+
     var localMat;
     var modelTransform;
 
@@ -1180,7 +1188,8 @@ SceneJs.translate = function() {
         SceneJs.utils.visitChildren(cfg, scope);
         backend.setModelTransform(xform);
     };
-};/**
+};
+/**
  * Sets a scaling modelling transformation on the current shader. The transform will be cumulative with transforms at
  * higher nodes.
  */
@@ -1420,7 +1429,8 @@ SceneJs.shaderBackend = function(cfg) {
             ctx.programs.deactivateProgram();
         };
     })();
-};/** Activates a shader program for sub-nodes.
+};
+/** Activates a shader program for sub-nodes.
  *
  */
 SceneJs.shader = function() {
@@ -1497,46 +1507,46 @@ SceneJs.backends.installBackend(SceneJs.shaderBackend({
     type: 'simple-shader',
 
     vertexShaders: [
-//        "attribute vec3 Vertex;\n" +
-//        "attribute vec3 Normal;\n" +
-//        "attribute vec4 InColor;\n" +
-//
-//            /* Matrix locations - these will be mapped to scene reserved names
-//             */
-//        "uniform mat4 PMatrix;\n" +
-//        "uniform mat4 VMatrix;\n" +
-//        "uniform mat4 MMatrix;\n" +
-//        "uniform mat3 NMatrix;\n" +
-//
-//            /* Light position - a value for this is specified in the node's 'vars' config
-//             */
-//        "uniform vec4 LightPos;\n" +
-//        "varying vec4 FragColor;\n" +
+        //        "attribute vec3 Vertex;\n" +
+        //        "attribute vec3 Normal;\n" +
+        //        "attribute vec4 InColor;\n" +
+        //
+        //            /* Matrix locations - these will be mapped to scene reserved names
+        //             */
+        //        "uniform mat4 PMatrix;\n" +
+        //        "uniform mat4 VMatrix;\n" +
+        //        "uniform mat4 MMatrix;\n" +
+        //        "uniform mat3 NMatrix;\n" +
+        //
+        //            /* Light position - a value for this is specified in the node's 'vars' config
+        //             */
+        //        "uniform vec4 LightPos;\n" +
+        //        "varying vec4 FragColor;\n" +
 
-       // "void main(void) {\n" +
-            //        "    vec4 v = vec4(Vertex, 1.0);\n" +
-            //        "    vec4 mv = MMatrix * v;\n" +
-            //        "    vec4 vv = VMatrix * mv;\n" +
-            //        "    gl_Position = PMatrix * vv;\n" +
-            //
-            //        "    vec3 nn = normalize(NMatrix * Normal);\n" +
-            //        "    vec3 lightDir = vec3(normalize(vv - LightPos));\n" +
-            //
-            //        "    float intensity = dot(lightDir, nn);\n" +
-            //
-            //        "    vec4 color;\n" +
-            //
-            //        "    if (intensity > 0.95)\n" +
-            //        "      color = vec4(1.0,0.5,0.5,1.0);\n" +
-            //        "    else if (intensity > 0.5)\n" +
-            //        "      color = vec4(0.6,0.3,0.3,1.0);\n" +
-            //        "    else if (intensity > 0.25)\n" +
-            //        "      color = vec4(0.4,0.2,0.2,1.0);\n" +
-            //        "    else\n" +
-            //        "      color = vec4(0.2,0.1,0.1,1.0);\n" +
-            //
-            //        "    FragColor = color;\n" +
-            //        "}\n"
+        // "void main(void) {\n" +
+        //        "    vec4 v = vec4(Vertex, 1.0);\n" +
+        //        "    vec4 mv = MMatrix * v;\n" +
+        //        "    vec4 vv = VMatrix * mv;\n" +
+        //        "    gl_Position = PMatrix * vv;\n" +
+        //
+        //        "    vec3 nn = normalize(NMatrix * Normal);\n" +
+        //        "    vec3 lightDir = vec3(normalize(vv - LightPos));\n" +
+        //
+        //        "    float intensity = dot(lightDir, nn);\n" +
+        //
+        //        "    vec4 color;\n" +
+        //
+        //        "    if (intensity > 0.95)\n" +
+        //        "      color = vec4(1.0,0.5,0.5,1.0);\n" +
+        //        "    else if (intensity > 0.5)\n" +
+        //        "      color = vec4(0.6,0.3,0.3,1.0);\n" +
+        //        "    else if (intensity > 0.25)\n" +
+        //        "      color = vec4(0.4,0.2,0.2,1.0);\n" +
+        //        "    else\n" +
+        //        "      color = vec4(0.2,0.1,0.1,1.0);\n" +
+        //
+        //        "    FragColor = color;\n" +
+        //        "}\n"
 
 
         'attribute vec3 Vertex; ' +
@@ -1582,13 +1592,13 @@ SceneJs.backends.installBackend(SceneJs.shaderBackend({
      */
     setters : {
 
-        scene_ViewMatrix: function(context, findVar, mat) {           
+        scene_ViewMatrix: function(context, findVar, mat) {
             if (mat) {
                 context.uniformMatrix4fv(findVar(context, 'VMatrix'), mat.elements);
             }
         },
 
-        scene_ModelMatrix: function(context, findVar, mat) {           
+        scene_ModelMatrix: function(context, findVar, mat) {
             if (mat) {
                 context.uniformMatrix4fv(findVar(context, 'MMatrix'), mat.elements);
             }
@@ -1661,7 +1671,8 @@ SceneJs.backends.installBackend(
             this.getVars = function() {
                 ctx.programs.getVars(ctx.canvas.context);
             };
-        })());/** Sets vars on the current shader, temporarily overriding vars set by higher vars nodes.
+        })());
+/** Sets vars on the current shader, temporarily overriding vars set by higher vars nodes.
  */
 SceneJs.shaderVars = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
@@ -1683,8 +1694,6 @@ SceneJs.shaderVars = function() {
         backend.setVars(superVars);
     };
 };
-
-
 
 
 /**
@@ -1770,9 +1779,10 @@ SceneJs.backends.installBackend(
                 for (var i = 0; i < numLights; i++) {
                     ctx.lightStack.pop();
                 }
-                ctx.programs.setVar( 'scene_Lights', ctx.lightStack);
+                ctx.programs.setVar('scene_Lights', ctx.lightStack);
             };
-        })());SceneJs.lights = function() {
+        })());
+SceneJs.lights = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
 
     var backend = SceneJs.backends.getBackend('lights');
@@ -1791,7 +1801,8 @@ SceneJs.backends.installBackend(
         SceneJs.utils.visitChildren(cfg, scope);
         backend.popLights(lights.length);
     };
-};/**
+};
+/**
  * Backend for a geometry node. Provides the means to insert gemetry into the currently active shader.
  *
  */
@@ -1810,7 +1821,7 @@ SceneJs.backends.installBackend(
                 return true; // TODO
             };
 
-            this.drawGeometry = function(geo) {
+            this.bufferGeometry = function(geo) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';
                 }
@@ -1828,7 +1839,8 @@ SceneJs.backends.installBackend(
                 context.flush();
 
             };
-        })());/**
+        })());
+/**
  * Defines geometry on the currently-active canvas, to be shaded with the current shader.
  *
  */
@@ -1908,7 +1920,7 @@ SceneJs.geometry = function() {
             boundary = null; // TODO
         }
         if (!boundary || backend.intersects(boundary)) {
-            backend.drawGeometry(geo);
+            backend.bufferGeometry(geo);
         }
         SceneJs.utils.visitChildren(cfg, scope);
     };

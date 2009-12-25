@@ -6,7 +6,7 @@ SceneJs.rotate = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
 
     var backend = SceneJs.backends.getBackend('modeltransform');
-    
+
     var localMat;
     var modelTransform;
 
@@ -19,14 +19,15 @@ SceneJs.rotate = function() {
             if (params.x + params.y + params.z == 0) {
                 throw 'rotate vector is zero - at least one of x,y and z must be non-zero';
             }
-            localMat = SceneJs.utils.Matrix4.createRotate(params.angle || 0.0, params.x, params.y, params.z);
+            localMat = new SceneJs.utils.Matrix4();
+            localMat.rotate(params.angle || 0.0, params.x, params.y, params.z);
         }
 
         var xform = backend.getModelTransform(); // Retain current model matrix
 
         if (!modelTransform || !xform.fixed) { // Multiply by current model matrix, memoize if current matrix is constant
             modelTransform = {
-                matrix: xform.matrix.multiply(localMat),
+                matrix: xform.matrix.multRight(localMat),       // TODO: verify correct order
                 fixed: xform.fixed && cfg.fixed
             };
         }

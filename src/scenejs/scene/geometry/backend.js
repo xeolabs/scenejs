@@ -12,7 +12,7 @@ SceneJs.private.backend.installBackend(
                 ctx = _ctx;
             };
 
-            this.drawGeometry = function(geo) {
+            this.bufferGeometry = function(geo) {
                 if (!ctx.programs.getActiveProgramName()) {
                     throw 'No shader active';
                 }

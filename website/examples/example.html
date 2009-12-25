@@ -118,9 +118,9 @@
 
     var displayError = function(e) {
         var advice = "";
-        if (e instanceof SceneJs.canvas.CanvasNotFoundException) {
+        if (e instanceof SceneJs.exceptions.CanvasNotFoundException) {
             advice = 'Does the HTML contain the canvas with that ID?';
-        } else if (e instanceof SceneJs.canvas.CanvasNotSupportedException) {
+        } else if (e instanceof SceneJs.exceptions.CanvasNotSupportedException) {
             advice = 'Does this browser support WebGL?';
         }
         $('#log-area').append(errorTemplate, {

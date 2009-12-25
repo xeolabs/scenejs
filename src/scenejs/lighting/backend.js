@@ -56,7 +56,8 @@ SceneJs.backends.installBackend(
 
             /** Returns true if the coordinate space defined by the current view and model matrices is
              * fixed, ie. not animated, at this level of scene traversal. If not, then it is not safe
-             * for the client node to memoize its lights once transformed.
+             * for the client node to memoize its lights once they are transformed, because the transformation
+             * is therefore likely to vary, causing the lights to move around.
              */
             this.getSafeToCache = function() {
                 return ctx.viewTransform.fixed && ctx.modelTransform.fixed;

@@ -13,24 +13,20 @@ SceneJs.perspective = function() {
         if (!mat || !cfg.fixed) {
             var params = cfg.getParams(scope);
 
-            params.fovy = params.fovy || 60.0;
+            params.fovy = params.fovy || 60.0;  // TODO: validate params
             params.aspect = params.aspect || 1.0;
             params.near = params.near || 0.1;
             params.far = params.far || 400.0;
-            var frustumH = Math.tan((params.fovy / 360.0 * Math.PI) * params.near);
-            var frustumW = frustumH * params.aspect;
 
-            mat = SceneJs.utils.Matrix4.createFrustum(
-                    -frustumW,
-                    frustumW,
-                    -frustumH,
-                    frustumH,
+            mat = new SceneJs.utils.Matrix4();
+            mat.perspective(
+                    params.fovy,
+                    params.aspect,
                     params.near,
-                    params.far
-                    );
+                    params.far);
         }
 
-       var previousMat = backend.getProjectionMatrix();
+        var previousMat = backend.getProjectionMatrix();
 
         backend.setProjectionMatrix(mat);
         SceneJs.utils.visitChildren(cfg, scope);

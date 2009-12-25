@@ -71,7 +71,7 @@ SceneJs.geometry = function() {
                 indices : params.faces && params.faces.length > 0 ? flatten(params.faces, 3) : []
             };
         }
-        backend.drawGeometry(geo);
+        backend.bufferGeometry(geo);
         SceneJs.private.visitChildren(cfg, scope);
     };
 };

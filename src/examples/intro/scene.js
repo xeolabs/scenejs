@@ -30,18 +30,14 @@ with (SceneJs) {
                                             }
                                         ]},
 
-                                            frustum({ fovy : 30.0, aspect : 1.0, near : 0.1, far : 400.0},
+                                            perspective({ fovy : 30.0, aspect : 1.0, near : 0.1, far : 400.0},
 
                                                     lookAt({
                                                         eye : { x: 5.0, y: 5.0, z: -7.0},
                                                         up : { y: 1.0 }
                                                     },
 
-                                                            rotate(function(scope) {
-                                                                return {
-                                                                    angle: scope.get('angle'), x : 1.0
-                                                                };
-                                                            },
+
 
                                                                     material({
                                                                         ambient:  { r:0.5, g:0.2, b:0.9 },
@@ -50,7 +46,7 @@ with (SceneJs) {
 
                                                                             objects.teapot()
                                                                             )
-                                                                    ) // rotate
+                                                                   
                                                             ) // lookAt
                                                     ) // frustum
                                             ) // lights

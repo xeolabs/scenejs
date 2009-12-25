@@ -20,7 +20,7 @@ SceneJs.backends.installBackend(
 
             this.setViewTransform = function(transform) {
                 if (!ctx.programs.getActiveProgramId()) {
-                    throw 'No shader active';
+                    throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
                 ctx.viewTransform = transform;
                 ctx.programs.setVar('scene_ViewMatrix', transform.matrix);

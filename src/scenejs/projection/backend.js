@@ -16,7 +16,7 @@ SceneJs.backends.installBackend(
              */
             this.setProjectionMatrix = function(mat) {
                 if (!ctx.programs.getActiveProgramId()) {
-                    throw 'No shader active';
+                    throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
                 ctx.programs.setVar('scene_ProjectionMatrix', mat || new SceneJs.utils.Matrix4());
                 ctx.projectionMatrix = mat;

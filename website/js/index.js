@@ -1,0 +1,3 @@
+SceneJs.website =  new function() {
+       
+};

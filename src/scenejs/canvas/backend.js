@@ -4,7 +4,7 @@
 SceneJs.backends.installBackend(
         new (function() {
 
-            var CONTEXT_TYPE = 'moz-glweb20';
+            var CONTEXT_TYPES = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
 
             this.type = 'canvas';
 
@@ -17,17 +17,21 @@ SceneJs.backends.installBackend(
             this.findCanvas = function(canvasId) {
                 var canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw new SceneJs.canvas.CanvasNotFoundException
+                    throw new SceneJs.exceptions.CanvasNotFoundException
                             ('Could not find canvas document element with id \'' + canvasId + '\'');
                 }
-                var context = canvas.getContext('moz-glweb20');
+                var context;
+
+                for (var i = 0; (!context) && i < CONTEXT_TYPES.length; i++) {
+                    context = canvas.getContext(CONTEXT_TYPES[i]);
+                }
                 if (!context) {
-                    throw new SceneJs.canvas.CanvasNotSupportedException
+                    throw new SceneJs.exceptions.CanvasNotSupportedException
                             ('Canvas document element with id \''
                                     + canvasId
-                                    + '\' failed to provide a \'' + CONTEXT_TYPE + '\' context');
+                                    + '\' failed to provide a supported context');
                 }
-                context.clearColor(0.8, 0.8, 0.9, 1.0);
+                context.clearColor(0.0, 0.0, 0.0, 1.0);
                 context.clearDepth(1.0);
                 context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
                 context.enable(context.DEPTH_TEST);
@@ -63,12 +67,12 @@ SceneJs.backends.installBackend(
                 ctx.canvas.context.clearDepth(depth);
             };
 
-            this.flush = function() {
-                ctx.canvas.context.flush();
+            this.clearCanvas = function() {
+                ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT); // Buffers are swapped automatically in WebGL
             };
 
-            this.swapBuffers = function() {
-                ctx.canvas.context.swapBuffers();
+            this.flush = function() {
+                ctx.canvas.context.flush();
             };
         })());
 

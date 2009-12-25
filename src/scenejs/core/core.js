@@ -5,6 +5,12 @@ var SceneJs = {version: '1.0'};
 
 (function() {
 
+    /** All exceptions thrown by SceneJS      
+     */
+    SceneJs.exceptions = {
+
+    };
+
     /** Public resources
      */
     SceneJs.utils = {

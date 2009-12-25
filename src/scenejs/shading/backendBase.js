@@ -5,7 +5,7 @@
 SceneJs.shaderBackend = function(cfg) {
 
     if (!cfg.type) {
-        throw 'SceneJs.ShaderBackendBase mandatory config missing: \'type\'';
+        throw new SceneJs.exceptions.NodeConfigExpectedException("SceneJs.ShaderBackendBase mandatory config missing: \'type\'");
     }
 
     return new (function() {
@@ -46,10 +46,12 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.loadProgram = function() {
                         if (!ctx.canvas) {
-                            throw 'No canvas active';
+                            throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
                         }
-                        var programId = ctx.canvas.canvasId + cfg.type;
+                        var programId = ctx.canvas.canvasId + ":" + cfg.type;
 
+                        /* Try to reuse cached program
+                         */
                         var program = programs[programId];
                         if (program) {
                             return programId;
@@ -57,15 +59,14 @@ SceneJs.shaderBackend = function(cfg) {
 
                         var context = ctx.canvas.context;
 
+                        /* Create program on context
+                         */
                         program = {
-                            programId : programId
+                            programId : programId,
+                            program : context.createProgram()
                         };
 
-                        /* Create program on canvas
-                         */
-                        program.program = context.createProgram();
-
-                        /* Load fragment shaders
+                        /* Load fragment shaders into context
                          */
                         var fragmentShaders = [];
                         for (var i = 0; i < cfg.fragmentShaders.length; i++) {
@@ -74,7 +75,7 @@ SceneJs.shaderBackend = function(cfg) {
                             fragmentShaders.push(shader);
                         }
 
-                        /* Load vertex shaders
+                        /* Load vertex shaders into context
                          */
                         var vertexShaders = [];
                         for (var i = 0; i < cfg.vertexShaders.length; i++) {
@@ -82,20 +83,22 @@ SceneJs.shaderBackend = function(cfg) {
                             context.attachShader(program.program, shader);
                             vertexShaders.push(shader);
                         }
-                        context.linkProgram(program.program); // Link
 
-                        /* Delete program and shaders on link failure
+                        /* Link program                        
+                         */
+                        context.linkProgram(program.program);
+
+                        /* On link failure, delete program and shaders then throw exception
                          */
                         if (context.getProgramParameter(program.program, 0x8B82 /*gl.LINK_STATUS*/) != 1) {
                             context.deleteProgram(program.program);
-
                             while (fragmentShaders.length > 0) {
                                 context.deleteProgram(fragmentShaders.pop());
                             }
                             while (vertexShaders.length > 0) {
                                 context.deleteProgram(vertexShaders.pop());
                             }
-                            throw 'Failed to load program: ' + context.getProgramInfoLog(program.program);
+                            throw new SceneJs.exceptions.ShaderLinkFailureException("Failed to link shader program: " + context.getProgramInfoLog(program.program));
                         }
 
                         /* Create variable location map on program
@@ -109,7 +112,7 @@ SceneJs.shaderBackend = function(cfg) {
                                     if (loc == -1) {
                                         loc = context.getUniformLocation(activeProgram.program, name);
                                         if (loc == -1) {
-                                            throw 'Variable not found in active shader: \'' + name + '\'';
+                                            throw new SceneJs.exceptions.ShaderVariableNotFoundException("Variable not found in active shader: \'" + name + "\'");
                                         }
                                     }
                                     locations[name] = loc;
@@ -118,6 +121,8 @@ SceneJs.shaderBackend = function(cfg) {
                             };
                         })();
 
+                        /* Register the newly-created program
+                         */
                         programs[programId] = program;
                         return programId;
                     };
@@ -126,13 +131,13 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.activateProgram = function(programId) {
                         if (!ctx.canvas) {
-                            throw 'No canvas active';
+                            throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
                         }
                         activeProgram = programs[programId];
                         ctx.canvas.context.useProgram(activeProgram.program);
                         vars = {
                             vars: {},
-                            fixed: true
+                            fixed: true // Cacheable vars by default 
                         };
                     };
 
@@ -144,7 +149,7 @@ SceneJs.shaderBackend = function(cfg) {
 
                     this.setVar = function(name, value) {
                         if (!activeProgram) {
-                            throw 'No shader active';
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
                         var setter = cfg.setters[name];
                         if (setter) {
@@ -159,7 +164,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.setVars = function(v) {
                         if (!activeProgram) {
-                            throw 'No shader active';
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
                         for (var key in cfg.setters) {
                             cfg.setters[key].call(this, ctx.canvas.context,
@@ -172,19 +177,39 @@ SceneJs.shaderBackend = function(cfg) {
                         return vars;
                     };
 
+                    /** Binds the given vertex buffer to be the vertex source for the active program
+                     */
+                    this.bindVertexBuffer = function(buffer) {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        cfg.binders.bindVertexBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                    };
+
+                    /** Binds the given normals buffer to be the normals source for the active program
+                     */
+                    this.bindNormalBuffer = function(buffer) {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        cfg.binders.bindNormalBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                    };
+
                     /** Deactivates the currently active program
                      */
                     this.deactivateProgram = function() {
                         if (!activeProgram) {
-                            throw 'No shader active';
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
                         ctx.canvas.context.flush();
                         activeProgram = null;
-                        ctx.canvas.context.useProgram(0); // Switch GL to use fixed-function paths
+                        ctx.canvas.context.useProgram(null); // Switch GL to use fixed-function paths
                     };
                 };
             }
         };
+
+        // Methods for client shader node
 
         this.loadProgram = function() {
             return ctx.programs.loadProgram();
