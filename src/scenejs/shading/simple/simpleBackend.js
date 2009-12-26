@@ -117,17 +117,15 @@ SceneJs.backends.installBackend(
                     //            }
                     //        },
                     //
-                    //        scene_Vertex: function(context, findVar, vertices) {
-                    //            if (vertices) {
-                    //                for (var i = 0; i < vertices.length; i++) {
-                    //                    vertices[i] *= 10.0;
-                    //                }
-                    //                var loc = findVar(context, 'Vertex') ;
-                    //                context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, vertices);
-                    //                context.enableVertexAttribArray(loc);
-                    //            }
-                    //
-                    //        }
+                    ,
+                    scene_Vertex: function(context, findVar, vertices) {
+                        if (vertices) { // No default                           
+                            var loc = findVar(context, 'Vertex') ;
+                            context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, vertices);
+                            context.enableVertexAttribArray(loc);
+                        }
+
+                    }
                 }
             });
         })()

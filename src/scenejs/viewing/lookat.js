@@ -17,7 +17,7 @@ SceneJs.lookAt = function() {
         if (!mat || !cfg.fixed) { // Memoize matrix if node config is constant
             var params = cfg.getParams(scope);
 
-            params.eye = params.eye ? cloneVec(params.eye) : { x: 0.0, y: 0.0, z: -10.0 };
+            params.eye = params.eye ? cloneVec(params.eye) : { x: 0.0, y: 0.0, z: 0.0 };
             params.look = params.look ? cloneVec(params.look) : { x: 0.0, y: 0.0, z: 0.0 };
             params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
 

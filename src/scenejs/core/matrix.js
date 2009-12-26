@@ -5,7 +5,7 @@ SceneJs.utils.Matrix4 = function(m)
             this.load(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
             return;
         }
-        else if (m instanceof CanvasMatrix4) {
+        else if (m instanceof SceneJs.utils.Matrix4) {
             this.load(m);
             return;
         }
@@ -502,9 +502,9 @@ SceneJs.utils.Matrix4.prototype.lookat = function(eyex, eyey, eyez, centerx, cen
     var yz = upz;
 
     // X vector = Y cross Z
-    xx = yy * zz - yz * zy;
-    xy = -yx * zz + yz * zx;
-    xz = yx * zy - yy * zx;
+    var xx = yy * zz - yz * zy;
+    var xy = -yx * zz + yz * zx;
+    var xz = yx * zy - yy * zx;
 
     // Recompute Y = Z cross X
     yx = zy * xz - zz * xy;
@@ -550,7 +550,7 @@ SceneJs.utils.Matrix4.prototype.lookat = function(eyex, eyey, eyez, centerx, cen
     matrix.translate(-eyex, -eyey, -eyez);
 
     this.multRight(matrix);
-}
+};
 
 // Support functions
 SceneJs.utils.Matrix4.prototype._determinant2x2 = function(a, b, c, d)

@@ -20,8 +20,10 @@ SceneJs.translate = function() {
         var xform = backend.getModelTransform();
 
         if (!modelTransform || !xform.fixed) { // Multiply by current model matrix, memoize if current matrix is constant
+            var mat = new SceneJs.utils.Matrix4(localMat);
+            mat.multRight(xform.matrix);
             modelTransform = {
-                matrix: xform.matrix.multRight(localMat), // TODO: verify correct order
+                matrix: mat, // TODO: verify correct order
                 fixed: xform.fixed && cfg.fixed
             };
         }

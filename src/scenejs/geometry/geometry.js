@@ -62,26 +62,25 @@ SceneJs.geometry = function() {
         return result;
     };
 
-    var buf; // handle to backend geometry buffer
+    var bufId; // handle to backend geometry buffer
 
     return function(scope) {
         var params = cfg.getParams(scope);
-        for (var i = 0; i < params.vertices.length;i++) {
-
-             params.vertices[i][0] *= 0.1;
-                params.vertices[i][1] *= 0.1;
-            params.vertices[i][2] *= 0.1;
+        if (!bufId || !cfg.fixed) {
+            if (params.type) {
+                bufId = backend.findGeoBuffer(params.type);
+            }
+            if (!bufId) {
+                bufId = backend.createGeoBuffer(params.type, {
+                    vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
+                    normals: params.normals && params.normals.length > 0 ? params.normals
+                            : flatten(calculateNormals(params.vertices, params.indices), 3),
+                    colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
+                    indices : params.indices && params.indices.length > 0 ? flatten(params.indices, 3) : []
+                });
+            }
         }
-        if (!buf || !cfg.fixed) {
-            buf = backend.createGeoBuffer({
-                vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
-                normals: params.normals && params.normals.length > 0 ? params.normals
-                        : flatten(calculateNormals(params.vertices, params.indices), 3),
-                colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
-                indices : params.indices && params.indices.length > 0 ? flatten(params.indices, 3) : []
-            });
-        }
-        backend.drawGeoBuffer(buf);
+        backend.drawGeoBuffer(bufId);
         SceneJs.utils.visitChildren(cfg, scope);
     };
 };

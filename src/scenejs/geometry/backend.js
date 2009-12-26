@@ -6,6 +6,8 @@
 SceneJs.backends.installBackend(
         new (function() {
 
+            var nextBufId = 0;
+
             this.type = 'geometry';
 
             var ctx;
@@ -30,35 +32,50 @@ SceneJs.backends.installBackend(
                 return handle;
             };
 
+            this.findGeoBuffer = function(bufId) {
+                return ctx.buffers[bufId];
+            };
+
             /** Buffers the given geometry and returns a handle to it. This is done once for each client geometry node,
              * which memoizes the handle
              */
-            this.createGeoBuffer = function(geo) {
+            this.createGeoBuffer = function(bufId, geo) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
+                if (!bufId) {
+                    bufId = "buf" + nextBufId++;
+                }
                 var context = ctx.canvas.context;
-                return {
+                ctx.buffers[bufId] = {
                     vertexBuf : createBuffer(context, geo.vertices, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.vertices)),
                     //normalBuf : createBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals)),
                     indexBuf :  createBuffer(context, geo.indices, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLUnsignedShortArray(geo.indices))
                 };
+                return bufId;
             };
 
             /** Draws the geometry in the given buffer
              */
-            this.drawGeoBuffer = function(buf) {
+            this.drawGeoBuffer = function(bufId) {
+                var buffer = ctx.buffers[bufId];
 
                 /* Bind vertex and normal buffers to active program
                  */
-                ctx.programs.bindVertexBuffer(buf.vertexBuf.bufferId);
-              //  ctx.programs.bindNormalBuffer(buf.normalBuf.bufferId);
+                ctx.programs.bindVertexBuffer(buffer.vertexBuf.bufferId);
+                //  ctx.programs.bindNormalBuffer(buf.normalBuf.bufferId);
 
                 /* Bind index buffer and draw geometry using the active program
                  */
                 var context = ctx.canvas.context;
-                context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buf.indexBuf.bufferId);
-                context.drawElements(context.TRIANGLES, buf.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-             //   context.flush();                
+                context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffer.indexBuf.bufferId);
+                context.drawElements(context.TRIANGLES, buffer.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
+                //   context.flush();
             };
+
+            this.freeGeoBuffer = function(bufId) { // TODO: freeGeoBuffer  - maybe use auto cache eviction?
+
+
+            };
+
         })());
