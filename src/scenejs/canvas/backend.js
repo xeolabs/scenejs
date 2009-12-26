@@ -32,10 +32,12 @@ SceneJs.backends.installBackend(
                                     + '\' failed to provide a supported context');
                 }
                 context.clearColor(0.0, 0.0, 0.0, 1.0);
-                context.clearDepth(1.0);
-                context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-                context.enable(context.DEPTH_TEST);
-
+                context.clearDepth(1.0);  // TODO: configurable cleardepth with warning for potentially bad values
+            //    context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+                context.disable(context.DEPTH_TEST);
+              //  context.depthFunc(context.ALWAYS);
+             //   context.depthRange(0.0, 0.01);
+                
                 return {
                     canvas: canvas,
                     context: context,
@@ -53,9 +55,9 @@ SceneJs.backends.installBackend(
 
             this.setDepthTest = function(enable) {
                 if (enable) {
-                    ctx.canvas.context.enable(cfg.context.DEPTH_TEST);
+                 //   ctx.canvas.context.enable(cfg.context.DEPTH_TEST);
                 } else {
-                    ctx.canvas.context.disable(cfg.context.DEPTH_TEST);
+                  //  ctx.canvas.context.disable(cfg.context.DEPTH_TEST);
                 }
             };
 
@@ -64,11 +66,11 @@ SceneJs.backends.installBackend(
             };
 
             this.setClearDepth = function(depth) {
-                ctx.canvas.context.clearDepth(depth);
+            //    ctx.canvas.context.clearDepth(depth);
             };
 
             this.clearCanvas = function() {
-                ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT); // Buffers are swapped automatically in WebGL
+               // ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT); // Buffers are swapped automatically in WebGL
             };
 
             this.flush = function() {

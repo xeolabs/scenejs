@@ -66,6 +66,12 @@ SceneJs.geometry = function() {
 
     return function(scope) {
         var params = cfg.getParams(scope);
+        for (var i = 0; i < params.vertices.length;i++) {
+
+             params.vertices[i][0] *= 0.1;
+                params.vertices[i][1] *= 0.1;
+            params.vertices[i][2] *= 0.1;
+        }
         if (!buf || !cfg.fixed) {
             buf = backend.createGeoBuffer({
                 vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],

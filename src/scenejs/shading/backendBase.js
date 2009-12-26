@@ -127,6 +127,16 @@ SceneJs.shaderBackend = function(cfg) {
                         return programId;
                     };
 
+                    /** Calls each setter on program, passing a null value to each. Each setter is responsible for
+                     * injecting a default value into the scripts when null is given, safeguarding against them never
+                     * being set a value.
+                     */
+                    var setVarDefaults = function() {
+                        for (var key in cfg.setters) {
+                            cfg.setters[key].call(this, ctx.canvas.context,
+                                    activeProgram.getVarLocation, null);
+                        }
+                    }
                     /** Activates the loaded program of the given ID
                      */
                     this.activateProgram = function(programId) {
@@ -135,6 +145,7 @@ SceneJs.shaderBackend = function(cfg) {
                         }
                         activeProgram = programs[programId];
                         ctx.canvas.context.useProgram(activeProgram.program);
+                        setVarDefaults();
                         vars = {
                             vars: {},
                             fixed: true // Cacheable vars by default 

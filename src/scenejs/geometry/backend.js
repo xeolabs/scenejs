@@ -39,8 +39,8 @@ SceneJs.backends.installBackend(
                 }
                 var context = ctx.canvas.context;
                 return {
-                    vertexBuf : createBuffer(context, geo.vertices, context.ARRAY_BUFFER, 4, new WebGLFloatArray(geo.vertices)),
-                    normalBuf : createBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals)),
+                    vertexBuf : createBuffer(context, geo.vertices, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.vertices)),
+                    //normalBuf : createBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals)),
                     indexBuf :  createBuffer(context, geo.indices, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLUnsignedShortArray(geo.indices))
                 };
             };
@@ -52,13 +52,13 @@ SceneJs.backends.installBackend(
                 /* Bind vertex and normal buffers to active program
                  */
                 ctx.programs.bindVertexBuffer(buf.vertexBuf.bufferId);
-                ctx.programs.bindNormalBuffer(buf.normalBuf.bufferId);
+              //  ctx.programs.bindNormalBuffer(buf.normalBuf.bufferId);
 
                 /* Bind index buffer and draw geometry using the active program
                  */
                 var context = ctx.canvas.context;
                 context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buf.indexBuf.bufferId);
                 context.drawElements(context.TRIANGLES, buf.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-                context.flush();                
+             //   context.flush();                
             };
         })());

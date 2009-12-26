@@ -30,23 +30,25 @@ with (SceneJs) {
                                             }
                                         ]},
 
-                                            perspective({ fovy : 30.0, aspect : 1.0, near : 0.1, far : 400.0},
+                                        // Map an area of view-space via perspective reduction to OpenGL's unit device view volume
+
+                                            perspective({ fovy : 35.0, aspect : 1.0, near : 0.1, far : 100.0},
 
                                                     lookAt({
-                                                        eye : { x: 5.0, y: 5.0, z: -7.0},
+                                                        eye : { x: 0.0, y: 0.0, z: 7.0},
+                                                        look : { x : 0, y : 0, z : 0 },
                                                         up : { y: 1.0 }
                                                     },
+                                                            material({
+                                                                ambient:  { r:0.5, g:0.2, b:0.9 },
+                                                                diffuse:  { r:0.5, g:0.2, b:0.9 },
+                                                                specular: { r:0.5, g:0.5, b:0.9 }},
 
-
-
-                                                                    material({
-                                                                        ambient:  { r:0.5, g:0.2, b:0.9 },
-                                                                        diffuse:  { r:0.5, g:0.2, b:0.9 },
-                                                                        specular: { r:0.5, g:0.5, b:0.9 }},
-
+                                                                    scale({x:5.0, y:5.0, z: 2.0},
                                                                             objects.teapot()
                                                                             )
-                                                                   
+                                                                    )
+
                                                             ) // lookAt
                                                     ) // frustum
                                             ) // lights

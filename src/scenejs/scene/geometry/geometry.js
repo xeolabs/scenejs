@@ -60,8 +60,7 @@ SceneJs.geometry = function() {
 
     var geo;
 
-    return function(scope) {
-        var params = cfg.getParams(scope);
+    return function(scope) {      
         if (!geo || !cfg.cachable) {
             geo = {
                 vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
