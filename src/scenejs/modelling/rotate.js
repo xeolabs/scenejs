@@ -17,23 +17,17 @@ SceneJs.rotate = function() {
             params.y = params.y || 0;
             params.z = params.z || 0;
             if (params.x + params.y + params.z == 0) {
-                throw 'rotate vector is zero - at least one of x,y and z must be non-zero';
+                throw new SceneJs.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
             }
-            localMat = new SceneJs.utils.Matrix4();
-            localMat.rotate(params.angle || 0.0, params.x, params.y, params.z);
+            localMat =  SceneJs.utils.Matrix4.createRotate(params.angle || 0.0, params.x, params.y, params.z);
         }
-
         var xform = backend.getModelTransform(); // Retain current model matrix
-
         if (!modelTransform || !xform.fixed) { // Multiply by current model matrix, memoize if current matrix is constant
-            var mat = new SceneJs.utils.Matrix4(localMat);
-            mat.multRight(xform.matrix);
             modelTransform = {
-                matrix: mat,       // TODO: verify correct order
+                matrix: localMat.multiply(xform.matrix),       // TODO: verify correct order
                 fixed: xform.fixed && cfg.fixed
             };
         }
-
         backend.setModelTransform(modelTransform);
         SceneJs.utils.visitChildren(cfg, scope);
         backend.setModelTransform(xform);

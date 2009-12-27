@@ -32,20 +32,24 @@ SceneJs.backends.installBackend(
                 return handle;
             };
 
-            this.findGeoBuffer = function(bufId) {
-                return ctx.buffers[bufId];
+            /** Tests if a buffer for the given geometry type exists on the current canvas
+             *
+             * @param geoType - IE. "teapot", "cube" etc.
+             */
+            this.findGeoBuffer = function(geoType) {
+                var bufId = ctx.canvas.canvasId + type;
+                return (ctx.buffers[bufId]) ? bufId : null;
             };
 
-            /** Buffers the given geometry and returns a handle to it. This is done once for each client geometry node,
-             * which memoizes the handle
+            /** Creates a buffer containing the given geometry, associated with the activate canvas and returns its ID.
+             * When the geoType is given, the buffer ID is the concatenation of the geoID with the canvas ID, otherwise
+             * an "anonymous" unique buffer ID is generated.
              */
-            this.createGeoBuffer = function(bufId, geo) {
+            this.createGeoBuffer = function(geoType, geo) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
-                if (!bufId) {
-                    bufId = "buf" + nextBufId++;
-                }
+                var bufId = ctx.canvas.canvasId + (geoType || nextBufId++);
                 var context = ctx.canvas.context;
                 ctx.buffers[bufId] = {
                     vertexBuf : createBuffer(context, geo.vertices, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.vertices)),

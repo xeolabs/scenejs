@@ -1,647 +1,273 @@
-SceneJs.utils.Matrix4 = function(m)
-{
-    if (m && typeof m == 'object') {
-        if ("length" in m && m.length >= 16) {
-            this.load(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
-            return;
+/** Optimised vector and matrix utilities
+ *
+ */
+
+/** A 3D vector
+ *
+ */
+SceneJs.utils.Vector3 = function(x, y, z) {
+    this.x = x ? x : 0;
+    this.y = y ? y : 0;
+    this.z = z ? z : 0;
+};
+
+/** Subtracts 3D vector b from a
+ *
+ */
+SceneJs.utils.Vector3.subtract = function(a, b) {
+    return new SceneJs.utils.Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+};
+
+/** Returns the cross-product of two 3D vectors
+ *
+ */
+SceneJs.utils.Vector3.cross = function(a, b) {
+    return new SceneJs.utils.Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+};
+
+/**
+ * Returns the length of a 3D vector
+ */
+SceneJs.utils.Vector3.len = function(a) {
+    return Math.sqrt((a.x * a.x) + (a.y * a.y) + (a.z * a.z));
+};
+
+/** Divides a 3D vector by a divisor
+ */
+SceneJs.utils.Vector3.divide = function(a, divisor) {
+    return new SceneJs.utils.Vector3(a.x / divisor, a.y / divisor, a.z / divisor);
+};
+
+/** Scales a 3D vector by a scalar
+ */
+SceneJs.utils.Vector3.scale = function(a, scalar) {
+    return new SceneJs.utils.Vector3(a.x * scalar, a.y * scalar, a.z * scalar);
+};
+
+/** Normalises a 3D vector
+ */
+SceneJs.utils.Vector3.normalize = function(a) {
+    return SceneJs.utils.Vector3.divide(a, this.len(a));
+};
+
+/** Returns the dot product of two 3D vectors
+ */
+SceneJs.utils.Vector3.dot = function(a, b) {
+    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+};
+
+SceneJs.utils.Matrix4 = function(e) {
+
+    this.elements = e || [
+        1.0,0.0,0.0,0.0,
+        0.0,1.0,0.0,0.0,
+        0.0,0.0,1.0,0.0,
+        0.0,0.0,0.0,1.0];
+
+    this.multiply = function (a) {
+        var c = new SceneJs.utils.Matrix4();
+        for (var i = 0; i < 16; i += 4) {
+            c.elements[i + 0] = this.elements[i] * a.elements[0] +
+                                this.elements[i + 1] * a.elements[4] +
+                                this.elements[i + 2] * a.elements[8] +
+                                this.elements[i + 3] * a.elements[12];
+            c.elements[i + 1] = this.elements[i] * a.elements[1] +
+                                this.elements[i + 1] * a.elements[5] +
+                                this.elements[i + 2] * a.elements[9] +
+                                this.elements[i + 3] * a.elements[13];
+            c.elements[i + 2] = this.elements[i] * a.elements[2] +
+                                this.elements[i + 1] * a.elements[6] +
+                                this.elements[i + 2] * a.elements[10] +
+                                this.elements[i + 3] * a.elements[14];
+            c.elements[i + 3] = this.elements[i] * a.elements[3] +
+                                this.elements[i + 1] * a.elements[7] +
+                                this.elements[i + 2] * a.elements[11] +
+                                this.elements[i + 3] * a.elements[15];
         }
-        else if (m instanceof SceneJs.utils.Matrix4) {
-            this.load(m);
-            return;
-        }
-    }
-    this.makeIdentity();
-}
+        return c;
+    };
 
-SceneJs.utils.Matrix4.prototype.load = function()
-{
-    if (arguments.length == 1 && typeof arguments[0] == 'object') {
-        var matrix = arguments[0];
+    this.transformPoint3 = function(p) {
+        return {
+            x : (this.elements[0] * p.x) + (this.elements[4] * p.y) + (this.elements[8] * p.z) + this.elements[12],
+            y : (this.elements[1] * p.x) + (this.elements[5] * p.y) + (this.elements[9] * p.z) + this.elements[13],
+            z : (this.elements[2] * p.x) + (this.elements[6] * p.y) + (this.elements[10] * p.z) + this.elements[14],
+            w : (this.elements[3] * p.x) + (this.elements[7] * p.y) + (this.elements[11] * p.z) + this.elements[15]
+        };
+    };
 
-        if ("length" in matrix && matrix.length == 16) {
-            this.e11 = matrix[0];
-            this.e12 = matrix[1];
-            this.e13 = matrix[2];
-            this.e14 = matrix[3];
+    this.transformVector3 = function(v) {
+        return {
+            x:(this.elements[0] * v.x) + (this.elements[4] * v.y) + (this.elements[8] * v.z),
+            y:(this.elements[1] * v.x) + (this.elements[5] * v.y) + (this.elements[9] * v.z),
+            z:(this.elements[2] * v.x) + (this.elements[6] * v.y) + (this.elements[10] * v.z)
+        };
+    };
 
-            this.e21 = matrix[4];
-            this.e22 = matrix[5];
-            this.e23 = matrix[6];
-            this.e24 = matrix[7];
+    this.getAsArray = function() {
+        return this.elements;
+    };
 
-            this.e31 = matrix[8];
-            this.e32 = matrix[9];
-            this.e33 = matrix[10];
-            this.e34 = matrix[11];
+    this.getAsWebGLFloatArray = function() {
+        return new WebGLFloatArray(this.getAsArray());
+    };
+};
 
-            this.e41 = matrix[12];
-            this.e42 = matrix[13];
-            this.e43 = matrix[14];
-            this.e44 = matrix[15];
-            return;
-        }
+/** Returns a fresh scaling matrix
+ *
+ * @param sx X-axis scaling amount
+ * @param sy Y-axis scaling amount
+ * @param sz Z-axis scaling amount
+ */
+SceneJs.utils.Matrix4.createScale = function(sx, sy, sz) {
+    return new SceneJs.utils.Matrix4([
+        sx, 0, 0, 0,
+        0, sy, 0, 0,
+        0, 0, sz, 0,
+        0, 0, 0, 1
+    ]);
+};
 
-        if (arguments[0] instanceof SceneJs.utils.Matrix4) {
+/** Returns a fresh translation matrix
+ *
+ * @param tx X-axis translation amount
+ * @param ty Y-axis translation amount
+ * @param tz Z-axis translation amount
+ */
+SceneJs.utils.Matrix4.createTranslation = function(tx, ty, tz) {
+    return new SceneJs.utils.Matrix4([
+        1, 0, 0, tx,
+        0, 1, 0, ty,
+        0, 0, 1, tz,
+        0, 0, 0, 1
+    ]);
+};
 
-            this.e11 = matrix.e11;
-            this.e12 = matrix.e12;
-            this.e13 = matrix.e13;
-            this.e14 = matrix.e14;
+/** Returns a fresh rotation matrix
+ *
+ * @param angle Angle of rotation in degrees
+ * @param x
+ * @param y
+ * @param z
+ */
+SceneJs.utils.Matrix4.createRotate = function (angle, x, y, z) {
+    angle *= 0.0174532925; // Convert to radians
+    var mag = Math.sqrt(x * x + y * y + z * z);
+    var sinAngle = Math.sin(angle);
+    var cosAngle = Math.cos(angle);
 
-            this.e21 = matrix.e21;
-            this.e22 = matrix.e22;
-            this.e23 = matrix.e23;
-            this.e24 = matrix.e24;
+    if (mag > 0) {
+        var xx, yy, zz, xy, yz, zx, xs, ys, zs;
+        var oneMinusCos;
 
-            this.e31 = matrix.e31;
-            this.e32 = matrix.e32;
-            this.e33 = matrix.e33;
-            this.e34 = matrix.e34;
+        x /= mag;
+        y /= mag;
+        z /= mag;
 
-            this.e41 = matrix.e41;
-            this.e42 = matrix.e42;
-            this.e43 = matrix.e43;
-            this.e44 = matrix.e44;
-            return;
-        }
-    }
+        xx = x * x;
+        yy = y * y;
+        zz = z * z;
+        xy = x * y;
+        yz = y * z;
+        zx = z * x;
+        xs = x * sinAngle;
+        ys = y * sinAngle;
+        zs = z * sinAngle;
+        oneMinusCos = 1.0 - cosAngle;
 
-    this.makeIdentity();
-}
-
-SceneJs.utils.Matrix4.prototype.getAsArray = function()
-{
-    return [
-        this.e11, this.e12, this.e13, this.e14,
-        this.e21, this.e22, this.e23, this.e24,
-        this.e31, this.e32, this.e33, this.e34,
-        this.e41, this.e42, this.e43, this.e44
-    ];
-}
-
-SceneJs.utils.Matrix4.prototype.getAsWebGLFloatArray = function()
-{
-    return new WebGLFloatArray(this.getAsArray());
-}
-
-SceneJs.utils.Matrix4.prototype.makeIdentity = function()
-{
-    this.e11 = 1;
-    this.e12 = 0;
-    this.e13 = 0;
-    this.e14 = 0;
-
-    this.e21 = 0;
-    this.e22 = 1;
-    this.e23 = 0;
-    this.e24 = 0;
-
-    this.e31 = 0;
-    this.e32 = 0;
-    this.e33 = 1;
-    this.e34 = 0;
-
-    this.e41 = 0;
-    this.e42 = 0;
-    this.e43 = 0;
-    this.e44 = 1;
-}
-
-SceneJs.utils.Matrix4.prototype.transpose = function()
-{
-    var tmp = this.e12;
-    this.e12 = this.e21;
-    this.e21 = tmp;
-
-    tmp = this.e13;
-    this.e13 = this.e31;
-    this.e31 = tmp;
-
-    tmp = this.e14;
-    this.e14 = this.e41;
-    this.e41 = tmp;
-
-    tmp = this.e23;
-    this.e23 = this.e32;
-    this.e32 = tmp;
-
-    tmp = this.e24;
-    this.e24 = this.e42;
-    this.e42 = tmp;
-
-    tmp = this.e34;
-    this.e34 = this.e43;
-    this.e43 = tmp;
-}
-
-SceneJs.utils.Matrix4.prototype.invert = function()
-{
-    // Calculate the 4x4 determinant
-    // If the determinant is zero,
-    // then the inverse matrix is not unique.
-    var det = this._determinant4x4();
-
-    if (Math.abs(det) < 1e-8)
-        return null;
-
-    this._makeAdjoint();
-
-    // Scale the adjoint matrix to get the inverse
-    this.e11 /= det;
-    this.e12 /= det;
-    this.e13 /= det;
-    this.e14 /= det;
-
-    this.e21 /= det;
-    this.e22 /= det;
-    this.e23 /= det;
-    this.e24 /= det;
-
-    this.e31 /= det;
-    this.e32 /= det;
-    this.e33 /= det;
-    this.e34 /= det;
-
-    this.e41 /= det;
-    this.e42 /= det;
-    this.e43 /= det;
-    this.e44 /= det;
-}
-
-SceneJs.utils.Matrix4.prototype.translate = function(x, y, z)
-{
-    if (x == undefined)
-        x = 0;
-    if (y == undefined)
-        y = 0;
-    if (z == undefined)
-        z = 0;
-
-    var matrix = new SceneJs.utils.Matrix4();
-    matrix.e41 = x;
-    matrix.e42 = y;
-    matrix.e43 = z;
-
-    this.multRight(matrix);
-}
-
-SceneJs.utils.Matrix4.prototype.scale = function(x, y, z)
-{
-    if (x == undefined)
-        x = 1;
-    if (z == undefined) {
-        if (y == undefined) {
-            y = x;
-            z = x;
-        }
-        else
-            z = 1;
-    }
-    else if (y == undefined)
-        y = x;
-
-    var matrix = new SceneJs.utils.Matrix4();
-    matrix.e11 = x;
-    matrix.e22 = y;
-    matrix.e33 = z;
-
-    this.multRight(matrix);
-}
-
-SceneJs.utils.Matrix4.prototype.rotate = function(angle, x, y, z)
-{
-    // angles are in degrees. Switch to radians
-    angle = angle / 180 * Math.PI;
-
-    angle /= 2;
-    var sinA = Math.sin(angle);
-    var cosA = Math.cos(angle);
-    var sinA2 = sinA * sinA;
-
-    // normalize
-    var length = Math.sqrt(x * x + y * y + z * z);
-    if (length == 0) {
-        // bad vector, just use something reasonable
-        x = 0;
-        y = 0;
-        z = 1;
-    } else if (length != 1) {
-        x /= length;
-        y /= length;
-        z /= length;
-    }
-
-    var mat = new SceneJs.utils.Matrix4();
-
-    // optimize case where axis is along major axis
-    if (x == 1 && y == 0 && z == 0) {
-        mat.e11 = 1;
-        mat.e12 = 0;
-        mat.e13 = 0;
-        mat.e21 = 0;
-        mat.e22 = 1 - 2 * sinA2;
-        mat.e23 = 2 * sinA * cosA;
-        mat.e31 = 0;
-        mat.e32 = -2 * sinA * cosA;
-        mat.e33 = 1 - 2 * sinA2;
-        mat.e14 = mat.e24 = mat.e34 = 0;
-        mat.e41 = mat.e42 = mat.e43 = 0;
-        mat.e44 = 1;
-    } else if (x == 0 && y == 1 && z == 0) {
-        mat.e11 = 1 - 2 * sinA2;
-        mat.e12 = 0;
-        mat.e13 = -2 * sinA * cosA;
-        mat.e21 = 0;
-        mat.e22 = 1;
-        mat.e23 = 0;
-        mat.e31 = 2 * sinA * cosA;
-        mat.e32 = 0;
-        mat.e33 = 1 - 2 * sinA2;
-        mat.e14 = mat.e24 = mat.e34 = 0;
-        mat.e41 = mat.e42 = mat.e43 = 0;
-        mat.e44 = 1;
-    } else if (x == 0 && y == 0 && z == 1) {
-        mat.e11 = 1 - 2 * sinA2;
-        mat.e12 = 2 * sinA * cosA;
-        mat.e13 = 0;
-        mat.e21 = -2 * sinA * cosA;
-        mat.e22 = 1 - 2 * sinA2;
-        mat.e23 = 0;
-        mat.e31 = 0;
-        mat.e32 = 0;
-        mat.e33 = 1;
-        mat.e14 = mat.e24 = mat.e34 = 0;
-        mat.e41 = mat.e42 = mat.e43 = 0;
-        mat.e44 = 1;
+        return new SceneJs.utils.Matrix4([
+            (oneMinusCos * xx) + cosAngle, (oneMinusCos * xy) - zs, (oneMinusCos * zx) + ys, 0.0,
+            (oneMinusCos * xy) + zs, (oneMinusCos * yy) + cosAngle, (oneMinusCos * yz) - xs,  0.0,
+            (oneMinusCos * zx) - ys, (oneMinusCos * yz) + xs, (oneMinusCos * zz) + cosAngle, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        ]);
     } else {
-        var x2 = x * x;
-        var y2 = y * y;
-        var z2 = z * z;
-
-        mat.e11 = 1 - 2 * (y2 + z2) * sinA2;
-        mat.e12 = 2 * (x * y * sinA2 + z * sinA * cosA);
-        mat.e13 = 2 * (x * z * sinA2 - y * sinA * cosA);
-        mat.e21 = 2 * (y * x * sinA2 - z * sinA * cosA);
-        mat.e22 = 1 - 2 * (z2 + x2) * sinA2;
-        mat.e23 = 2 * (y * z * sinA2 + x * sinA * cosA);
-        mat.e31 = 2 * (z * x * sinA2 + y * sinA * cosA);
-        mat.e32 = 2 * (z * y * sinA2 - x * sinA * cosA);
-        mat.e33 = 1 - 2 * (x2 + y2) * sinA2;
-        mat.e14 = mat.e24 = mat.e34 = 0;
-        mat.e41 = mat.e42 = mat.e43 = 0;
-        mat.e44 = 1;
+        return new SceneJs.utils.Matrix4();
     }
-    this.multRight(mat);
-}
+};
 
-SceneJs.utils.Matrix4.prototype.multRight = function(mat)
-{
-    var e11 = (this.e11 * mat.e11 + this.e12 * mat.e21
-            + this.e13 * mat.e31 + this.e14 * mat.e41);
-    var e12 = (this.e11 * mat.e12 + this.e12 * mat.e22
-            + this.e13 * mat.e32 + this.e14 * mat.e42);
-    var e13 = (this.e11 * mat.e13 + this.e12 * mat.e23
-            + this.e13 * mat.e33 + this.e14 * mat.e43);
-    var e14 = (this.e11 * mat.e14 + this.e12 * mat.e24
-            + this.e13 * mat.e34 + this.e14 * mat.e44);
+/** Encodes a view transformation to the matrix. This wipes out anything already encoded/concatenated into the
+ * matrix.
+ *
+ * @param eye Position of the viewer's eye
+ * @param look Vector along which the viewer is looking.
+ * @param up Vector pointing upwards. Typically this starts off at {0.0, 1.0, 0.0}.
+ */
+SceneJs.utils.Matrix4.createLookAt = function(eye, look, up) {
+    var eyeSubLook = { x : eye.x - look.x, y : eye.y - look.y, z : eye.z - look.z};
+    var n = SceneJs.utils.Vector3.divide(eyeSubLook, SceneJs.utils.Vector3.len(eyeSubLook));
+    var upCrossn = SceneJs.utils.Vector3.cross(up, n);
+    var u = SceneJs.utils.Vector3.divide(upCrossn, SceneJs.utils.Vector3.len(upCrossn));
+    var v = SceneJs.utils.Vector3.cross(n, u);
+    return SceneJs.utils.Matrix4
+            .createTranslation(-eye.x, -eye.y, -eye.z)
+            .multiply(new SceneJs.utils.Matrix4([
+        u.x, u.y, u.z, 0.0,
+        v.x, v.y, v.z, 0.0,
+        n.x, n.y, n.z, 0.0,
+        0.0, 0.0, 0.0, 1.0]));
+};
+//
+//var makeLookAt = function(_eye,
+//                            _look,
+//                            _up) {
+//      var eye = $V([_eye.x, _eye.y, _eye.z]);
+//      var center = $V([_look.x, _look.y, _look.z]);
+//      var up = $V([_up.x, _up.y, _up.z]);
+//      var z = eye.subtract(center).toUnitVector();
+//      var x = up.cross(z).toUnitVector();
+//      var y = z.cross(x).toUnitVector();
+//      var m = $M([
+//          [x.e(1), x.e(2), x.e(3), 0],
+//          [y.e(1), y.e(2), y.e(3), 0],
+//          [z.e(1), z.e(2), z.e(3), 0],
+//          [0, 0, 0, 1]
+//      ]);
+//      var t = $M([
+//          [1, 0, 0, -_eye.x],
+//          [0, 1, 0, -_eye.y],
+//          [0, 0, 1, -_eye.z],
+//          [0, 0, 0, 1]
+//      ]);
+//      return m.x(t);
+//  };
 
-    var e21 = (this.e21 * mat.e11 + this.e22 * mat.e21
-            + this.e23 * mat.e31 + this.e24 * mat.e41);
-    var e22 = (this.e21 * mat.e12 + this.e22 * mat.e22
-            + this.e23 * mat.e32 + this.e24 * mat.e42);
-    var e23 = (this.e21 * mat.e13 + this.e22 * mat.e23
-            + this.e23 * mat.e33 + this.e24 * mat.e43);
-    var e24 = (this.e21 * mat.e14 + this.e22 * mat.e24
-            + this.e23 * mat.e34 + this.e24 * mat.e44);
 
-    var e31 = (this.e31 * mat.e11 + this.e32 * mat.e21
-            + this.e33 * mat.e31 + this.e34 * mat.e41);
-    var e32 = (this.e31 * mat.e12 + this.e32 * mat.e22
-            + this.e33 * mat.e32 + this.e34 * mat.e42);
-    var e33 = (this.e31 * mat.e13 + this.e32 * mat.e23
-            + this.e33 * mat.e33 + this.e34 * mat.e43);
-    var e34 = (this.e31 * mat.e14 + this.e32 * mat.e24
-            + this.e33 * mat.e34 + this.e34 * mat.e44);
-
-    var e41 = (this.e41 * mat.e11 + this.e42 * mat.e21
-            + this.e43 * mat.e31 + this.e44 * mat.e41);
-    var e42 = (this.e41 * mat.e12 + this.e42 * mat.e22
-            + this.e43 * mat.e32 + this.e44 * mat.e42);
-    var e43 = (this.e41 * mat.e13 + this.e42 * mat.e23
-            + this.e43 * mat.e33 + this.e44 * mat.e43);
-    var e44 = (this.e41 * mat.e14 + this.e42 * mat.e24
-            + this.e43 * mat.e34 + this.e44 * mat.e44);
-
-    this.e11 = e11;
-    this.e12 = e12;
-    this.e13 = e13;
-    this.e14 = e14;
-
-    this.e21 = e21;
-    this.e22 = e22;
-    this.e23 = e23;
-    this.e24 = e24;
-
-    this.e31 = e31;
-    this.e32 = e32;
-    this.e33 = e33;
-    this.e34 = e34;
-
-    this.e41 = e41;
-    this.e42 = e42;
-    this.e43 = e43;
-    this.e44 = e44;
-}
-
-SceneJs.utils.Matrix4.prototype.multLeft = function(mat)
-{
-    var e11 = (mat.e11 * this.e11 + mat.e12 * this.e21
-            + mat.e13 * this.e31 + mat.e14 * this.e41);
-    var e12 = (mat.e11 * this.e12 + mat.e12 * this.e22
-            + mat.e13 * this.e32 + mat.e14 * this.e42);
-    var e13 = (mat.e11 * this.e13 + mat.e12 * this.e23
-            + mat.e13 * this.e33 + mat.e14 * this.e43);
-    var e14 = (mat.e11 * this.e14 + mat.e12 * this.e24
-            + mat.e13 * this.e34 + mat.e14 * this.e44);
-
-    var e21 = (mat.e21 * this.e11 + mat.e22 * this.e21
-            + mat.e23 * this.e31 + mat.e24 * this.e41);
-    var e22 = (mat.e21 * this.e12 + mat.e22 * this.e22
-            + mat.e23 * this.e32 + mat.e24 * this.e42);
-    var e23 = (mat.e21 * this.e13 + mat.e22 * this.e23
-            + mat.e23 * this.e33 + mat.e24 * this.e43);
-    var e24 = (mat.e21 * this.e14 + mat.e22 * this.e24
-            + mat.e23 * this.e34 + mat.e24 * this.e44);
-
-    var e31 = (mat.e31 * this.e11 + mat.e32 * this.e21
-            + mat.e33 * this.e31 + mat.e34 * this.e41);
-    var e32 = (mat.e31 * this.e12 + mat.e32 * this.e22
-            + mat.e33 * this.e32 + mat.e34 * this.e42);
-    var e33 = (mat.e31 * this.e13 + mat.e32 * this.e23
-            + mat.e33 * this.e33 + mat.e34 * this.e43);
-    var e34 = (mat.e31 * this.e14 + mat.e32 * this.e24
-            + mat.e33 * this.e34 + mat.e34 * this.e44);
-
-    var e41 = (mat.e41 * this.e11 + mat.e42 * this.e21
-            + mat.e43 * this.e31 + mat.e44 * this.e41);
-    var e42 = (mat.e41 * this.e12 + mat.e42 * this.e22
-            + mat.e43 * this.e32 + mat.e44 * this.e42);
-    var e43 = (mat.e41 * this.e13 + mat.e42 * this.e23
-            + mat.e43 * this.e33 + mat.e44 * this.e43);
-    var e44 = (mat.e41 * this.e14 + mat.e42 * this.e24
-            + mat.e43 * this.e34 + mat.e44 * this.e44);
-
-    this.e11 = e11;
-    this.e12 = e12;
-    this.e13 = e13;
-    this.e14 = e14;
-
-    this.e21 = e21;
-    this.e22 = e22;
-    this.e23 = e23;
-    this.e24 = e24;
-
-    this.e31 = e31;
-    this.e32 = e32;
-    this.e33 = e33;
-    this.e34 = e34;
-
-    this.e41 = e41;
-    this.e42 = e42;
-    this.e43 = e43;
-    this.e44 = e44;
-}
-
-SceneJs.utils.Matrix4.prototype.ortho = function(left, right, bottom, top, near, far)
-{
-    var tx = (left + right) / (left - right);
-    var ty = (top + bottom) / (top - bottom);
-    var tz = (far + near) / (far - near);
-
-    var matrix = new SceneJs.utils.Matrix4();
-    matrix.e11 = 2 / (left - right);
-    matrix.e12 = 0;
-    matrix.e13 = 0;
-    matrix.e14 = 0;
-    matrix.e21 = 0;
-    matrix.e22 = 2 / (top - bottom);
-    matrix.e23 = 0;
-    matrix.e24 = 0;
-    matrix.e31 = 0;
-    matrix.e32 = 0;
-    matrix.e33 = -2 / (far - near);
-    matrix.e34 = 0;
-    matrix.e41 = tx;
-    matrix.e42 = ty;
-    matrix.e43 = tz;
-    matrix.e44 = 1;
-
-    this.multRight(matrix);
-}
-
-SceneJs.utils.Matrix4.prototype.frustum = function(left, right, bottom, top, near, far)
-{
-    var matrix = new SceneJs.utils.Matrix4();
+SceneJs.utils.Matrix4.createFrustum = function(left, right,
+                                               bottom, top,
+                                               znear, zfar) {
+    var X = 2 * znear / (right - left);
+    var Y = 2 * znear / (top - bottom);
     var A = (right + left) / (right - left);
     var B = (top + bottom) / (top - bottom);
-    var C = -(far + near) / (far - near);
-    var D = -(2 * far * near) / (far - near);
+    var C = -(zfar + znear) / (zfar - znear);
+    var D = -2 * zfar * znear / (zfar - znear);
+    return new SceneJs.utils.Matrix4([
+        X, 0, A, 0,
+        0, Y, B, 0,
+        0, 0, C, D,
+        0, 0, -1, 0
+    ]);
+};
 
-    matrix.e11 = (2 * near) / (right - left);
-    matrix.e12 = 0;
-    matrix.e13 = 0;
-    matrix.e14 = 0;
+SceneJs.utils.Matrix4.createOrtho = function(left, right,
+                                             bottom, top,
+                                             znear, zfar) {
+    var tx = -(right + left) / (right - left);
+    var ty = -(top + bottom) / (top - bottom);
+    var tz = -(zfar + znear) / (zfar - znear);
+    return new SceneJs.utils.Matrix4([
+        2 / (right - left), 0, 0, tx,
+        0, 2 / (top - bottom), 0, ty,
+        0, 0, -2 / (zfar - znear), tz,
+        0, 0, 0, 1]);
+};
 
-    matrix.e21 = 0;
-    matrix.e22 = 2 * near / (top - bottom);
-    matrix.e23 = 0;
-    matrix.e24 = 0;
-
-    matrix.e31 = A;
-    matrix.e32 = B;
-    matrix.e33 = C;
-    matrix.e34 = -1;
-
-    matrix.e41 = 0;
-    matrix.e42 = 0;
-    matrix.e43 = D;
-    matrix.e44 = 0;
-
-    this.multRight(matrix);
-}
-
-SceneJs.utils.Matrix4.prototype.perspective = function(fovy, aspect, zNear, zFar)
-{
+SceneJs.utils.Matrix4.createPerspective = function(fovy, aspect, zNear, zFar) {
     var top = Math.tan(fovy * Math.PI / 360) * zNear;
     var bottom = -top;
     var left = aspect * bottom;
     var right = aspect * top;
-    this.frustum(left, right, bottom, top, zNear, zFar);
+    return SceneJs.utils.Matrix4.createFrustum(left, right, bottom, top, zNear, zFar);
 }
 
-SceneJs.utils.Matrix4.prototype.lookat = function(eyex, eyey, eyez, centerx, centery, centerz, upx, upy, upz)
-{
-    var matrix = new SceneJs.utils.Matrix4();
-
-    // Make rotation matrix
-
-    // Z vector
-    var zx = eyex - centerx;
-    var zy = eyey - centery;
-    var zz = eyez - centerz;
-    var mag = Math.sqrt(zx * zx + zy * zy + zz * zz);
-    if (mag) {
-        zx /= mag;
-        zy /= mag;
-        zz /= mag;
-    }
-
-    // Y vector
-    var yx = upx;
-    var yy = upy;
-    var yz = upz;
-
-    // X vector = Y cross Z
-    var xx = yy * zz - yz * zy;
-    var xy = -yx * zz + yz * zx;
-    var xz = yx * zy - yy * zx;
-
-    // Recompute Y = Z cross X
-    yx = zy * xz - zz * xy;
-    yy = -zx * xz + zz * xx;
-    yx = zx * xy - zy * xx;
-
-    // cross product gives area of parallelogram, which is < 1.0 for
-    // non-perpendicular unit-length vectors; so normalize x, y here
-
-    mag = Math.sqrt(xx * xx + xy * xy + xz * xz);
-    if (mag) {
-        xx /= mag;
-        xy /= mag;
-        xz /= mag;
-    }
-
-    mag = Math.sqrt(yx * yx + yy * yy + yz * yz);
-    if (mag) {
-        yx /= mag;
-        yy /= mag;
-        yz /= mag;
-    }
-
-    matrix.e11 = xx;
-    matrix.e12 = xy;
-    matrix.e13 = xz;
-    matrix.e14 = 0;
-
-    matrix.e21 = yx;
-    matrix.e22 = yy;
-    matrix.e23 = yz;
-    matrix.e24 = 0;
-
-    matrix.e31 = zx;
-    matrix.e32 = zy;
-    matrix.e33 = zz;
-    matrix.e34 = 0;
-
-    matrix.e41 = 0;
-    matrix.e42 = 0;
-    matrix.e43 = 0;
-    matrix.e44 = 1;
-    matrix.translate(-eyex, -eyey, -eyez);
-
-    this.multRight(matrix);
-};
-
-// Support functions
-SceneJs.utils.Matrix4.prototype._determinant2x2 = function(a, b, c, d)
-{
-    return a * d - b * c;
-}
-
-SceneJs.utils.Matrix4.prototype._determinant3x3 = function(a1, a2, a3, b1, b2, b3, c1, c2, c3)
-{
-    return a1 * this._determinant2x2(b2, b3, c2, c3)
-            - b1 * this._determinant2x2(a2, a3, c2, c3)
-            + c1 * this._determinant2x2(a2, a3, b2, b3);
-}
-
-SceneJs.utils.Matrix4.prototype._determinant4x4 = function()
-{
-    var a1 = this.e11;
-    var b1 = this.e12;
-    var c1 = this.e13;
-    var d1 = this.e14;
-
-    var a2 = this.e21;
-    var b2 = this.e22;
-    var c2 = this.e23;
-    var d2 = this.e24;
-
-    var a3 = this.e31;
-    var b3 = this.e32;
-    var c3 = this.e33;
-    var d3 = this.e34;
-
-    var a4 = this.e41;
-    var b4 = this.e42;
-    var c4 = this.e43;
-    var d4 = this.e44;
-
-    return a1 * this._determinant3x3(b2, b3, b4, c2, c3, c4, d2, d3, d4)
-            - b1 * this._determinant3x3(a2, a3, a4, c2, c3, c4, d2, d3, d4)
-            + c1 * this._determinant3x3(a2, a3, a4, b2, b3, b4, d2, d3, d4)
-            - d1 * this._determinant3x3(a2, a3, a4, b2, b3, b4, c2, c3, c4);
-}
-
-SceneJs.utils.Matrix4.prototype._makeAdjoint = function()
-{
-    var a1 = this.e11;
-    var b1 = this.e12;
-    var c1 = this.e13;
-    var d1 = this.e14;
-
-    var a2 = this.e21;
-    var b2 = this.e22;
-    var c2 = this.e23;
-    var d2 = this.e24;
-
-    var a3 = this.e31;
-    var b3 = this.e32;
-    var c3 = this.e33;
-    var d3 = this.e34;
-
-    var a4 = this.e41;
-    var b4 = this.e42;
-    var c4 = this.e43;
-    var d4 = this.e44;
-
-    // Row column labeling reversed since we transpose rows & columns
-    this.e11 = this._determinant3x3(b2, b3, b4, c2, c3, c4, d2, d3, d4);
-    this.e21 = - this._determinant3x3(a2, a3, a4, c2, c3, c4, d2, d3, d4);
-    this.e31 = this._determinant3x3(a2, a3, a4, b2, b3, b4, d2, d3, d4);
-    this.e41 = - this._determinant3x3(a2, a3, a4, b2, b3, b4, c2, c3, c4);
-
-    this.e12 = - this._determinant3x3(b1, b3, b4, c1, c3, c4, d1, d3, d4);
-    this.e22 = this._determinant3x3(a1, a3, a4, c1, c3, c4, d1, d3, d4);
-    this.e32 = - this._determinant3x3(a1, a3, a4, b1, b3, b4, d1, d3, d4);
-    this.e42 = this._determinant3x3(a1, a3, a4, b1, b3, b4, c1, c3, c4);
-
-    this.e13 = this._determinant3x3(b1, b2, b4, c1, c2, c4, d1, d2, d4);
-    this.e23 = - this._determinant3x3(a1, a2, a4, c1, c2, c4, d1, d2, d4);
-    this.e33 = this._determinant3x3(a1, a2, a4, b1, b2, b4, d1, d2, d4);
-    this.e43 = - this._determinant3x3(a1, a2, a4, b1, b2, b4, c1, c2, c4);
-
-    this.e14 = - this._determinant3x3(b1, b2, b3, c1, c2, c3, d1, d2, d3);
-    this.e24 = this._determinant3x3(a1, a2, a3, c1, c2, c3, d1, d2, d3);
-    this.e34 = - this._determinant3x3(a1, a2, a3, b1, b2, b3, d1, d2, d3);
-    this.e44 = this._determinant3x3(a1, a2, a3, b1, b2, b3, c1, c2, c3);
-}
-
-
-SceneJs.utils.Matrix4.prototype.transformVector3 = function(v) {
-    return {
-        x:(this.e11 * v.x) + (this.e12 * v.y) + (this.e13 * v.z),
-        y:(this.e21 * v.x) + (this.e22 * v.y) + (this.e23 * v.z),
-        z:(this.e31 * v.x) + (this.e32 * v.y) + (this.e33 * v.z)
-    };
-};

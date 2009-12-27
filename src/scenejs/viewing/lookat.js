@@ -27,11 +27,7 @@ SceneJs.lookAt = function() {
             if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
                 throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
             }
-            mat = new SceneJs.utils.Matrix4();
-            mat.lookat(
-                    params.eye.x, params.eye.y, params.eye.z,
-                    params.look.x, params.look.y, params.look.z,
-                    params.up.x, params.up.y, params.up.z);
+            mat = SceneJs.utils.Matrix4.createLookAt(params.eye, params.look, params.up);
         }
 
         var xform = backend.getViewTransform();

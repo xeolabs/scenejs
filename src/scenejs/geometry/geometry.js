@@ -66,7 +66,13 @@ SceneJs.geometry = function() {
 
     return function(scope) {
         var params = cfg.getParams(scope);
-        if (!bufId || !cfg.fixed) {
+        if (!cfg.fixed) {
+            /* Since I'm always using VBOs, we cant buffer geometry if it's going to keep changing.
+             * In future versions I'll allow dynamic geometry config and just not buffer it in that case.
+             */
+            throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
+        }
+        if (!bufId) {
             if (params.type) {
                 bufId = backend.findGeoBuffer(params.type);
             }

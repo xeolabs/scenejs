@@ -34,3 +34,12 @@ SceneJs.exceptions.IllegalGeometryParameterException = function(msg) {
     this.message = msg;
 };
 
+/** Thrown on attempt to do something that's not yet supported in SceneJS
+ */
+SceneJs.exceptions.UnsupportedOperationException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.IllegalRotateConfigException = function(msg) {
+    this.message = msg;
+};

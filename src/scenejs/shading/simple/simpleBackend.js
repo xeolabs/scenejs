@@ -45,6 +45,7 @@ SceneJs.backends.installBackend(
                     "void main(void) {" +
                     "    vec4 v = vec4(Vertex, 1.0);" +
                     "    vec4 vp = PMatrix * VMatrix * MMatrix * v;" +
+                    "    vp.z = 0.0; vp.x /= 10.0; vp.y /= 10.0;" +
                     "    gl_Position = vp;" +
                     "}"
                 ],

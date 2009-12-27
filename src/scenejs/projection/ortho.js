@@ -12,9 +12,7 @@ SceneJs.ortho = function() {
 
         if (!mat || !cfg.fixed) {
             var params = cfg.getParams(scope);
-
-            mat = new SceneJs.utils.Matrix4();
-            mat.ortho(
+            mat = SceneJs.utils.Matrix4.createOrtho(
                     params.left || -1.0,
                     params.right || 1.0,
                     params.bottom || -1.0,

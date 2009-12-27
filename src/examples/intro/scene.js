@@ -32,25 +32,28 @@ with (SceneJs) {
 
                                         // Map an area of view-space via perspective reduction to OpenGL's unit device view volume
 
-                                            perspective({ fovy : 35.0, aspect : 1.0, near : 0.1, far : 100.0},
+                                                                                    perspective({ fovy : 35.0, aspect : 1.0, near : 0.1, far : 400.0},
 
-                                                    lookAt({
-                                                        eye : { x: 2.0, y: 2.0, z: 20.0},
-                                                        look : { x : 0.0, y : 0.0, z : 0 },
-                                                        up : { x: 0.0, y: 1.0, z: 0.0 }
-                                                    },
-                                                            material({
-                                                                ambient:  { r:0.5, g:0.2, b:0.9 },
-                                                                diffuse:  { r:0.5, g:0.2, b:0.9 },
-                                                                specular: { r:0.5, g:0.5, b:0.9 }},
+                                        //   ortho({ left: -100, right:100, bottom:0, top:100, near : 1.0, far : 2.0},
+                                                                                            lookAt({
+                                                                                                eye : { x: 0.0, y: 0.0, z: 200.0},
+                                                                                                look : { x : 0.0, y : 0.0, z : 0 },
+                                                                                                up : { x: 0.0, y: 1.0, z: 0.0 }
+                                                                                            },
+                                            material({
+                                                ambient:  { r:0.5, g:0.2, b:0.9 },
+                                                diffuse:  { r:0.5, g:0.2, b:0.9 },
+                                                specular: { r:0.5, g:0.5, b:0.9 }},
 
-                                                                    scale({x:5.0, y:1.0, z: 1.0},
-                                                                            objects.teapot()
-                                                                            )
+                                                    rotate({x:0.0, y:0.0, z: 1.0, angle:45.0},
+                                                            scale({x:2.0, y:1.0, z: 1.0},
+                                                                    objects.teapot()
                                                                     )
+                                                            )
+                                                    )
 
-                                                            ) // lookAt
-                                                    ) // frustum
+                                                       ) // lookAt
+                                        ) // frustum
                                             ) // lights
                                     ) // shader
                             ) // viewport

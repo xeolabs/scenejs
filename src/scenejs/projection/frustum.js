@@ -12,8 +12,7 @@ SceneJs.frustum = function() {
 
         if (!mat || cfg.fixed) {    // Memoize matrix if node config is constant
             var params = cfg.getParams(scope);
-            mat = new SceneJs.utils.Matrix4();
-            mat.frustum(
+            mat = SceneJs.utils.Matrix4.createFrustum(
                     params.left || -1.0,
                     params.right || 1.0,
                     params.bottom || -1.0,

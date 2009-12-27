@@ -18,8 +18,7 @@ SceneJs.perspective = function() {
             params.near = params.near || 0.1;
             params.far = params.far || 400.0;
 
-            mat = new SceneJs.utils.Matrix4();
-            mat.perspective(
+            mat = SceneJs.utils.Matrix4.createPerspective(
                     params.fovy,
                     params.aspect,
                     params.near,

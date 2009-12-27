@@ -206,6 +206,7 @@ SceneJs.shaderBackend = function(cfg) {
                         cfg.binders.bindNormalBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
                     };
 
+                    
                     /** Deactivates the currently active program
                      */
                     this.deactivateProgram = function() {
