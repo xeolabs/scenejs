@@ -92,11 +92,13 @@ SceneJs.utils.Matrix4 = function(e) {
             x : (this.elements[0] * p.x) + (this.elements[4] * p.y) + (this.elements[8] * p.z) + this.elements[12],
             y : (this.elements[1] * p.x) + (this.elements[5] * p.y) + (this.elements[9] * p.z) + this.elements[13],
             z : (this.elements[2] * p.x) + (this.elements[6] * p.y) + (this.elements[10] * p.z) + this.elements[14],
-            w : (this.elements[3] * p.x) + (this.elements[7] * p.y) + (this.elements[11] * p.z) + this.elements[15]
+            w : (this.elements[3] * p.x) + (this.elements[7] * p.y) + (this.elements[11] * p.z) + this.elements[3][3]
         };
     };
 
     this.transformVector3 = function(v) {
+
+        
         return {
             x:(this.elements[0] * v.x) + (this.elements[4] * v.y) + (this.elements[8] * v.z),
             y:(this.elements[1] * v.x) + (this.elements[5] * v.y) + (this.elements[9] * v.z),

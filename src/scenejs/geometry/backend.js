@@ -53,7 +53,7 @@ SceneJs.backends.installBackend(
                 var context = ctx.canvas.context;
                 ctx.buffers[bufId] = {
                     vertexBuf : createBuffer(context, geo.vertices, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.vertices)),
-                    //normalBuf : createBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals)),
+                    normalBuf : createBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals)),
                     indexBuf :  createBuffer(context, geo.indices, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLUnsignedShortArray(geo.indices))
                 };
                 return bufId;
@@ -67,7 +67,7 @@ SceneJs.backends.installBackend(
                 /* Bind vertex and normal buffers to active program
                  */
                 ctx.programs.bindVertexBuffer(buffer.vertexBuf.bufferId);
-                //  ctx.programs.bindNormalBuffer(buf.normalBuf.bufferId);
+                ctx.programs.bindNormalBuffer(buffer.normalBuf.bufferId);
 
                 /* Bind index buffer and draw geometry using the active program
                  */

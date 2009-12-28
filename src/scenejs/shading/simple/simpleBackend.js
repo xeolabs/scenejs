@@ -23,7 +23,12 @@ SceneJs.backends.installBackend(
 
             /** Default value for script matrices, injected on activation
              */
-            var defaultMat = Matrix.I(4);
+            var defaultMat4 = Matrix.I(4).flatten();
+            var defaultNormalMat = Matrix.I(4).inverse().transpose().make3x3().flatten();
+            var defaultMaterial = {
+                diffuse: { r: 1.0, g: 1.0, b: 1.0 },
+                ambient: { r: 1.0, g: 1.0, b: 1.0 }
+            };
 
             return SceneJs.shaderBackend({
 
@@ -31,21 +36,42 @@ SceneJs.backends.installBackend(
 
                 fragmentShaders: [
 
-                    'void main(void) { ' +
-                    '      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); ' +
-                    '} '
+                    "varying vec4 FragColor;" +
+
+                    "void main(void) { " +
+                    "      gl_FragColor = FragColor;  " +
+                    "} "
                 ],
 
                 vertexShaders: [
+
                     "attribute vec3 Vertex;" +
-                    'uniform mat4 MVPMatrix; ' +
+                    "attribute vec3 Normal;" +
+
+                    "uniform vec4 LightPos;" +
+
+                    'uniform mat4 PMatrix; ' +
+                    'uniform mat4 MVMatrix; ' +
+                    'uniform mat3 NMatrix; ' +
+
+                    "uniform vec3 MaterialAmbient;" +
+                    "uniform vec3 MaterialDiffuse;" +
+                        //"uniform vec3 MaterialSpecular;" +
+
+                    "varying vec4 FragColor;" +
 
 
                     "void main(void) {" +
-                    "    vec4 v = vec4(Vertex, 1.0);" +
-                    "    vec4 vp = MVPMatrix * v;" +
-                  //  "    vp.z = 1.0;" +
-                    "    gl_Position = vp;" +
+                    "   vec4 v = vec4(Vertex, 1.0);" +
+                    "   vec4 vmv = MVMatrix * v;" +
+                    "   gl_Position = PMatrix * vmv;" +
+
+                    "   vec3 nn = normalize(NMatrix * Normal);" +
+                    "   vec3 lightDir = vec3(normalize(vmv - LightPos));" +
+
+                    "   float NdotL = max(dot(lightDir, nn), 0.0);" +
+
+                    "   FragColor = vec4(NdotL * MaterialDiffuse + MaterialAmbient, 1.0);" +
                     "}"
                 ],
 
@@ -66,8 +92,10 @@ SceneJs.backends.installBackend(
                     /** Binds the given buffer to the Normal attribute
                      */
                     bindNormalBuffer : function(context, findVar, buffer) {
-                        //            context.bindBuffer(context.ARRAY_BUFFER, buffer);
-                        //            context.vertexAttribPointer(findVar(context, 'Normal'), 3, context.FLOAT, false, 0, 0);
+                        var normalAttribute = findVar(context, 'Normal');
+                        context.enableVertexAttribArray(normalAttribute);
+                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
+                        context.vertexAttribPointer(normalAttribute, 3, context.FLOAT, false, 0, 0);
                     }
                 },
 
@@ -78,38 +106,45 @@ SceneJs.backends.installBackend(
                  */
                 setters : {
 
-                    scene_MVPMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'MVPMatrix'), false, new WebGLFloatArray((mat || defaultMat).flatten()));
-                    }
+                    scene_ProjectionMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false,
+                                new WebGLFloatArray(mat ? mat.flatten() : defaultMat4));
+                    },
 
-                    //,
-                    //        scene_Material: function(context, findVar, m) {
-                    //            if (m) {
-                    //                context.uniform3fv(findVar(context, 'MaterialAmbient'), [m.ambient.r, m.ambient.g, m.ambient.b]);
-                    //                context.uniform3fv(findVar(context, 'MaterialDiffuse'), [m.diffuse.r, m.diffuse.g, m.diffuse.b]);
-                    //                context.uniform3fv(findVar(context, 'MaterialSpecular'), [m.specular.r, m.specular.g, m.specular.b]);
-                    //            }
-                    //        },
-                    //
-                    //        scene_Lights: function(context, findVar, lights) {
-                    //            if (lights && lights.length > 0) {
-                    //                var l = lights[0];
-                    //                context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
-                    //            }
-                    //        }
+                    scene_ModelViewMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix4fv(findVar(context, 'MVMatrix'), false,
+                                new WebGLFloatArray(mat ? mat.flatten() : defaultMat4));
+                    },
 
+                    scene_NormalMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false,
+                                new WebGLFloatArray(mat ? mat.flatten() : defaultNormalMat));
+                    },
 
-                    //        ,
-                    //
-                    //         scene_Normal: function(context, findVar, normals) {
-                    //            if (normals) {
-                    //                var loc = findVar(context, 'Normal');
-                    //                context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, normals);
-                    //                context.enableVertexAttribArray(loc);
-                    //            }
-                    //        },
-                    //
-                    ,
+                    scene_Material: function(context, findVar, m) {
+                        m = m || defaultMaterial;
+                        context.uniform3fv(findVar(context, 'MaterialAmbient'), [m.ambient.r, m.ambient.g, m.ambient.b]);
+                        context.uniform3fv(findVar(context, 'MaterialDiffuse'), [m.diffuse.r, m.diffuse.g, m.diffuse.b]);
+                        //                            context.uniform3fv(findVar(context, 'MaterialSpecular'), [m.specular.r, m.specular.g, m.specular.b]);
+                    },
+
+                    scene_Lights: function(context, findVar, lights) {
+                        if (lights && lights.length > 0) {
+                            var l = lights[0];
+                            context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
+                        } else {
+                            context.uniform4fv(findVar(context, 'LightPos'), [10.0, 0.0, -10.0, 1.0]);
+                        }
+                    },
+
+                    scene_Normal: function(context, findVar, normals) {
+                        if (normals) {
+                            var loc = findVar(context, 'Normal');
+                            context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, normals);
+                            context.enableVertexAttribArray(loc);
+                        }
+                    },
+
                     scene_Vertex: function(context, findVar, vertices) {
                         if (vertices) { // No default                           
                             var loc = findVar(context, 'Vertex') ;

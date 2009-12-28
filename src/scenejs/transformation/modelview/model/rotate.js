@@ -5,7 +5,7 @@
 SceneJs.rotate = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.backends.getBackend('mvp-transform');
+    var backend = SceneJs.backends.getBackend('model-view-transform');
 
     var mat;
     var xform;
@@ -19,12 +19,15 @@ SceneJs.rotate = function() {
             if (params.x + params.y + params.z == 0) {
                 throw new SceneJs.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
             }
-            mat = SceneJs.utils.Matrix4.createRotate(params.angle || 0.0, params.x, params.y, params.z);
+            mat = Matrix.Rotation(params.angle ? params.angle / 180 * Math.PI : 0.0,
+                    $V([params.x || 0, params.y || 0, params.z || 0])).ensure4x4()
         }
-       var superXform = backend.getTransform();
+        var superXform = backend.getTransform();
         if (!xform || !superXform.fixed || !cfg.fixed) {
+            var tempMat = superXform.matrix.x(mat);
             xform = {
-                matrix: superXform.matrix.x(mat),
+                matrix: tempMat,
+                normalMatrix:tempMat.inverse().transpose().make3x3(),
                 fixed: superXform.fixed && cfg.fixed
             };
         }

@@ -8,16 +8,17 @@
 SceneJs.generator = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
     return function(scope) {
+        if (cfg.fixed) {
+            throw 'generator node must be configured with a function';
+        }
         var params = cfg.getParams(scope);
         while (params) {
-            if (params.isfixed()) {
-                throw 'generator node must be configured with a function';
-            }
             var childScope = SceneJs.utils.newScope(scope);
             for (var key in params) {
                 childScope.put(key, params[key]);
             }
             SceneJs.utils.visitChildren(cfg, childScope);
+            params = cfg.getParams(scope);
         }
     };
 };

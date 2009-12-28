@@ -20,20 +20,18 @@ SceneJs.backends.installBackend(
             };
 
             var cloneVec = function(v) {
-                return v ? { x : v.x || 0, y : v.y || 0, z : v.z || 0 } : { x : 0, y: 0, z: 0 };
+                return v ? {x:v.x || 0, y:v.y || 0, z:v.z || 0} : { x:0, y:0, z:0 };
             };
 
             /** Transforms a light by the current view and modelling matrices
              */
             var transform = function(l) {
                 return {
-                    pos : ctx.viewTransform.matrix.transformVector3(
-                            ctx.modelTransform.matrix.transformVector3(cloneVec(l.pos))),
+                    pos : ctx.mvpTransform.matrix.transformVector3(cloneVec(l.pos)),
                     ambient : l.ambient,
                     diffuse : l.diffuse,
                     specular : l.specular,
-                    dir: ctx.viewTransform.matrix.transformVector3(
-                            ctx.modelTransform.matrix.transformVector3(cloneVec(l.dir))),
+                    dir: ctx.mvpTransform.matrix.transformVector3(cloneVec(l.dir)),
                     constantAttenuation: l.constantAttenuation,
                     linearAttenuation: l.linearAttenuation,
                     quadraticAttenuation: l.quadraticAttenuation
@@ -49,7 +47,7 @@ SceneJs.backends.installBackend(
                 var lights2 = [];
                 for (var i = 0; i < lights.length; i++) {
                     var light = lights[i];
-                 //   lights2.push(transform(light));
+                    lights2.push(transform(light));
                 }
                 return lights2;
             };

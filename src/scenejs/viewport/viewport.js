@@ -6,8 +6,11 @@ SceneJs.viewport = function() {
     return function(scope) {
         var params = cfg.getParams(scope);
 
-        backend.setViewport(params.x || 0, params.y || 0, params.width || 100, params.height || 100);
-
+        var prevViewport = backend.getViewport();
+        backend.setViewport({ x: params.x || 0, y: params.y || 0, width: params.width || 100, height: params.height || 100});
         SceneJs.utils.visitChildren(cfg, scope);
+        if (prevViewport) {
+            backend.setViewport(prevViewport);
+        }
     };
 };

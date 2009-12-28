@@ -4,15 +4,17 @@
 SceneJs.backends.installBackend(
         new (function() {
 
-            this.type = 'mvp-transform';
+            this.type = 'model-view-transform';
 
             var ctx;
 
             this.install = function(_ctx) {
                 ctx = _ctx;
                 if (!ctx.mvpTransform) {
+                    var t = Matrix.I(4);
                     ctx.mvpTransform = {
-                        matrix : Matrix.I(4),
+                        matrix : t,
+                        normalMatrix : t.inverse().transpose().make3x3(),
                         fixed: true
                     };
                 }
@@ -23,7 +25,8 @@ SceneJs.backends.installBackend(
                     throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
                 ctx.mvpTransform = transform;
-                ctx.programs.setVar('scene_MVPMatrix', transform.matrix);
+                ctx.programs.setVar('scene_ModelViewMatrix', transform.matrix);
+                ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrix);
             };
 
             this.getTransform = function() {

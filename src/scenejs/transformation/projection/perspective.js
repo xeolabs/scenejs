@@ -2,37 +2,59 @@
  * Scene node that constructs a perspective projection matrix and sets it on the current shader.
  */
 
-SceneJs.perspective = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
-    var backend = SceneJs.backends.getBackend('mvp-transform');
-    var mat;
-    var xform;
+(function() {
 
-    return function(scope) {
+    function makeFrustum(left, right,
+                         bottom, top,
+                         znear, zfar) {
+        var X = 2 * znear / (right - left);
+        var Y = 2 * znear / (top - bottom);
+        var A = (right + left) / (right - left);
+        var B = (top + bottom) / (top - bottom);
+        var C = -(zfar + znear) / (zfar - znear);
+        var D = -2 * zfar * znear / (zfar - znear);
 
-        if (!mat || !cfg.fixed) {
-            var params = cfg.getParams(scope);
+        return $M([
+            [X, 0, A, 0],
+            [0, Y, B, 0],
+            [0, 0, C, D],
+            [0, 0, -1, 0]
+        ]);
+    }
 
-            params.fovy = params.fovy || 60.0;  // TODO: validate params
-            params.aspect = params.aspect || 1.0;
-            params.near = params.near || 0.1;
-            params.far = params.far || 400.0;
+    function makePerspective(fovy, aspect, znear, zfar) {
+        var ymax = znear * Math.tan(fovy * Math.PI / 360.0);
+        var ymin = -ymax;
+        var xmin = ymin * aspect;
+        var xmax = ymax * aspect;
 
-            mat = makePerspective(
-                    params.fovy,
-                    params.aspect,
-                    params.near,
-                    params.far);
-        }
-        var superXform = backend.getTransform();
-        if (!xform || !superXform.fixed || !cfg.fixed) {
-            xform = {
-                matrix: superXform.matrix.x(mat),
-                fixed: superXform.fixed && cfg.fixed
-            };
-        }
-        backend.setTransform(xform);
-        SceneJs.utils.visitChildren(cfg, scope);
-        backend.setTransform(superXform);
+        return makeFrustum(xmin, xmax, ymin, ymax, znear, zfar);
+    }
+
+    SceneJs.perspective = function() {
+        var cfg = SceneJs.utils.getNodeConfig(arguments);
+        var backend = SceneJs.backends.getBackend('projection-transform');
+        var mat;
+
+        return function(scope) {
+            if (!mat || !cfg.fixed) {
+                var params = cfg.getParams(scope);
+
+                params.fovy = params.fovy || 60.0;  // TODO: validate params
+                params.aspect = params.aspect || 1.0;
+                params.near = params.near || 0.1;
+                params.far = params.far || 400.0;
+
+                mat = makePerspective(
+                        params.fovy,
+                        params.aspect,
+                        params.near,
+                        params.far);
+            }
+            var prevMat = backend.getMatrix();
+            backend.setMatrix(mat);
+            SceneJs.utils.visitChildren(cfg, scope);
+            backend.setMatrix(prevMat);
+        };
     };
-};
+})();
