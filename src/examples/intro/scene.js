@@ -26,34 +26,32 @@ with (SceneJs) {
                                     lights({
                                         lights: [
                                             {
-                                                pos: { x: 0.0, y: 50.0, z: -60.0 }
+                                                pos: { x: 0.0, y: 50.0, z: -30.0 }
                                             }
                                         ]},
+                                            perspective({ fovy : 35.0, aspect : 1.0, near : 0.10, far : 600.0
+                                            },
 
-                                        // Map an area of view-space via perspective reduction to OpenGL's unit device view volume
+                                                    lookAt({
+                                                        eye : { x: 50.0, y: 0.0, z: -60.0},
+                                                        look : { x : 0.0, y : 0.0, z : 0 },
+                                                        up : { x: 0.0, y: 1.0, z: 0.0 }
+                                                    },
 
-                                                                                    perspective({ fovy : 35.0, aspect : 1.0, near : 0.1, far : 400.0},
+                                                            material({
+                                                                ambient:  { r:0.5, g:0.2, b:0.9 },
+                                                                diffuse:  { r:0.5, g:0.2, b:0.9 },
+                                                                specular: { r:0.5, g:0.5, b:0.9 }},
 
-                                        //   ortho({ left: -100, right:100, bottom:0, top:100, near : 1.0, far : 2.0},
-                                                                                            lookAt({
-                                                                                                eye : { x: 0.0, y: 0.0, z: 200.0},
-                                                                                                look : { x : 0.0, y : 0.0, z : 0 },
-                                                                                                up : { x: 0.0, y: 1.0, z: 0.0 }
-                                                                                            },
-                                            material({
-                                                ambient:  { r:0.5, g:0.2, b:0.9 },
-                                                diffuse:  { r:0.5, g:0.2, b:0.9 },
-                                                specular: { r:0.5, g:0.5, b:0.9 }},
-
-                                                    rotate({x:0.0, y:0.0, z: 1.0, angle:45.0},
-                                                            scale({x:2.0, y:1.0, z: 1.0},
-                                                                    objects.teapot()
+                                                                    //translate({x:0.0, y:0.0, z: .0},
+                                                                               // scale({x:0.01, y:0.01, z: 1},
+                                                                            objects.teapot()
+                                                                            )
+                                                                    //   )
                                                                     )
-                                                            )
-                                                    )
 
-                                                       ) // lookAt
-                                        ) // frustum
+//                                                            ) // lookAt
+                                                    ) // frustum
                                             ) // lights
                                     ) // shader
                             ) // viewport
@@ -64,6 +62,15 @@ with (SceneJs) {
      * be passed to the rotate node in the 'scope' as used in the rotate node config. Note that if your scene frontend 
      * was interactive or animated, you would call this method in a loop.
      */
-    scene.render({angle: 45.0});
+    try {
+        scene.render({angle: 45.0});
+    } catch (e) {
+        if (e.message) {
+            alert(e.message);
+        } else {
+            alert(e);
+        }
+        throw e;
+    }
 }
 

@@ -1,16 +1,19 @@
 /**
  * Scene node that constructs a 'lookat' view transformation matrix and sets it on the current shader.
  */
+
+
 SceneJs.lookAt = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.backends.getBackend('viewtransform');
+    var backend = SceneJs.backends.getBackend('mvp-transform');
 
     var cloneVec = function(v) {
         return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
     };
 
     var mat;
+    var xform;
 
     return function(scope) {
 
@@ -27,13 +30,21 @@ SceneJs.lookAt = function() {
             if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
                 throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
             }
-            mat = SceneJs.utils.Matrix4.createLookAt(params.eye, params.look, params.up);
+            mat = makeLookAt(
+                    params.eye.x, params.eye.y, params.eye.z,
+                    params.look.x, params.look.y, params.look.z,
+                    params.up.x, params.up.y, params.up.z);
         }
 
-        var xform = backend.getViewTransform();
-
-        backend.setViewTransform({ matrix: mat, fixed: cfg.fixed });
+       var superXform = backend.getTransform();
+        if (!xform || !superXform.fixed || !cfg.fixed) {
+            xform = {
+                matrix: superXform.matrix.x(mat),
+                fixed: superXform.fixed && cfg.fixed
+            };
+        }
+        backend.setTransform(xform);
         SceneJs.utils.visitChildren(cfg, scope);
-        backend.setViewTransform(xform);
+        backend.setTransform(superXform);
     };
 };

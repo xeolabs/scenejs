@@ -7,11 +7,11 @@ SceneJs.objects.cube = function() {
 
     //    var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-    var min = -0.10;
-    var max = .10;
+    var min = -1.0;
+    var max = 1.0;
 
-    var zmax = 0.50;
-    var zmin = 0.50;
+    var zmax = 1.0;
+    var zmin = -1.0;
 
     return SceneJs.geometry({
         //        vertices:    [

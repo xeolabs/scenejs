@@ -878,7 +878,7 @@ SceneJs.geometry = function() {
 };
 
 /**
- * Scene node that constructs an viewing transform matrix and sets it on the current shader.
+ * Scene node that constructs an transformation transform matrix and sets it on the current shader.
  */
 SceneJs.backends.installBackend(
         new (function() {

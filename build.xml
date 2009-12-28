@@ -67,9 +67,9 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/backend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
 
-            <!-- viewing -->
-            <fileset dir="${SRC_DIR}" includes="scenejs/viewing/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/viewing/lookat.js"/>
+            <!-- transformation -->
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/lookat.js"/>
 
             <!-- projection -->
             <fileset dir="${SRC_DIR}" includes="scenejs/projection/backend.js"/>

@@ -207,30 +207,7 @@ SceneJs.utils.Matrix4.createLookAt = function(eye, look, up) {
         n.x, n.y, n.z, 0.0,
         0.0, 0.0, 0.0, 1.0]));
 };
-//
-//var makeLookAt = function(_eye,
-//                            _look,
-//                            _up) {
-//      var eye = $V([_eye.x, _eye.y, _eye.z]);
-//      var center = $V([_look.x, _look.y, _look.z]);
-//      var up = $V([_up.x, _up.y, _up.z]);
-//      var z = eye.subtract(center).toUnitVector();
-//      var x = up.cross(z).toUnitVector();
-//      var y = z.cross(x).toUnitVector();
-//      var m = $M([
-//          [x.e(1), x.e(2), x.e(3), 0],
-//          [y.e(1), y.e(2), y.e(3), 0],
-//          [z.e(1), z.e(2), z.e(3), 0],
-//          [0, 0, 0, 1]
-//      ]);
-//      var t = $M([
-//          [1, 0, 0, -_eye.x],
-//          [0, 1, 0, -_eye.y],
-//          [0, 0, 1, -_eye.z],
-//          [0, 0, 0, 1]
-//      ]);
-//      return m.x(t);
-//  };
+
 
 
 SceneJs.utils.Matrix4.createFrustum = function(left, right,
@@ -241,7 +218,7 @@ SceneJs.utils.Matrix4.createFrustum = function(left, right,
     var A = (right + left) / (right - left);
     var B = (top + bottom) / (top - bottom);
     var C = -(zfar + znear) / (zfar - znear);
-    var D = -2 * zfar * znear / (zfar - znear);
+    var D = (-2 * zfar * znear) / (zfar - znear);
     return new SceneJs.utils.Matrix4([
         X, 0, A, 0,
         0, Y, B, 0,
@@ -253,9 +230,9 @@ SceneJs.utils.Matrix4.createFrustum = function(left, right,
 SceneJs.utils.Matrix4.createOrtho = function(left, right,
                                              bottom, top,
                                              znear, zfar) {
-    var tx = -(right + left) / (right - left);
-    var ty = -(top + bottom) / (top - bottom);
-    var tz = -(zfar + znear) / (zfar - znear);
+      var tx = (left + right) / (left - right);
+    var ty = (top + bottom) / (top - bottom);
+    var tz = (zfar + znear) / (zfar - znear);
     return new SceneJs.utils.Matrix4([
         2 / (right - left), 0, 0, tx,
         0, 2 / (top - bottom), 0, ty,

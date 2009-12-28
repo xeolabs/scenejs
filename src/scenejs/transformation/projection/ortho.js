@@ -3,16 +3,13 @@
  */
 SceneJs.ortho = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
-
-    var backend = SceneJs.backends.getBackend('projection');
-
+    var backend = SceneJs.backends.getBackend('mvp-transform');
     var mat;
-
+    var xform;
     return function(scope) {
-
         if (!mat || !cfg.fixed) {
             var params = cfg.getParams(scope);
-            mat = SceneJs.utils.Matrix4.createOrtho(
+            mat = makeOrtho(
                     params.left || -1.0,
                     params.right || 1.0,
                     params.bottom || -1.0,
@@ -21,12 +18,17 @@ SceneJs.ortho = function() {
                     params.far || 100.0
                     );
         }
-
-        var previousMat = backend.getProjectionMatrix();
-
-        backend.setProjectionMatrix(mat);
+       var superXform = backend.getTransform();
+        if (!xform || !superXform.fixed || !cfg.fixed) {
+            xform = {
+                matrix: superXform.matrix.x(mat),
+                fixed: superXform.fixed && cfg.fixed
+            };
+        }
+        backend.setTransform(xform);
         SceneJs.utils.visitChildren(cfg, scope);
-        backend.setProjectionMatrix(previousMat);
+        backend.setTransform(superXform);
     };
 };
+
 

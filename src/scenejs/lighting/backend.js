@@ -49,7 +49,7 @@ SceneJs.backends.installBackend(
                 var lights2 = [];
                 for (var i = 0; i < lights.length; i++) {
                     var light = lights[i];
-                    lights2.push(transform(light));
+                 //   lights2.push(transform(light));
                 }
                 return lights2;
             };
@@ -82,6 +82,6 @@ SceneJs.backends.installBackend(
                 for (var i = 0; i < numLights; i++) {
                     ctx.lightStack.pop();
                 }
-                ctx.programs.setVar( 'scene_Lights', ctx.lightStack);
+                ctx.programs.setVar('scene_Lights', ctx.lightStack);
             };
         })());

@@ -23,7 +23,7 @@ SceneJs.backends.installBackend(
 
             /** Default value for script matrices, injected on activation
              */
-            var defaultMat = new SceneJs.utils.Matrix4();
+            var defaultMat = Matrix.I(4);
 
             return SceneJs.shaderBackend({
 
@@ -38,14 +38,13 @@ SceneJs.backends.installBackend(
 
                 vertexShaders: [
                     "attribute vec3 Vertex;" +
-                    'uniform mat4 PMatrix; ' +
-                    'uniform mat4 VMatrix; ' +
-                    'uniform mat4 MMatrix; ' +
+                    'uniform mat4 MVPMatrix; ' +
+
 
                     "void main(void) {" +
                     "    vec4 v = vec4(Vertex, 1.0);" +
-                    "    vec4 vp = PMatrix * VMatrix * MMatrix * v;" +
-                    "    vp.z = 0.0; vp.x /= 10.0; vp.y /= 10.0;" +
+                    "    vec4 vp = MVPMatrix * v;" +
+                  //  "    vp.z = 1.0;" +
                     "    gl_Position = vp;" +
                     "}"
                 ],
@@ -79,16 +78,8 @@ SceneJs.backends.installBackend(
                  */
                 setters : {
 
-                    scene_ModelMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'MMatrix'), false, (mat || defaultMat).getAsWebGLFloatArray());
-                    },
-
-                    scene_ViewMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'VMatrix'), false, (mat || defaultMat).getAsWebGLFloatArray());
-                    },
-
-                    scene_ProjectionMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false, (mat || defaultMat).getAsWebGLFloatArray());
+                    scene_MVPMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix4fv(findVar(context, 'MVPMatrix'), false, new WebGLFloatArray((mat || defaultMat).flatten()));
                     }
 
                     //,

@@ -1,12 +1,12 @@
 /**
  * Scene node that constructs a perspective projection matrix and sets it on the current shader.
  */
+
 SceneJs.perspective = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
-
-    var backend = SceneJs.backends.getBackend('projection');
-
+    var backend = SceneJs.backends.getBackend('mvp-transform');
     var mat;
+    var xform;
 
     return function(scope) {
 
@@ -18,17 +18,21 @@ SceneJs.perspective = function() {
             params.near = params.near || 0.1;
             params.far = params.far || 400.0;
 
-            mat = SceneJs.utils.Matrix4.createPerspective(
+            mat = makePerspective(
                     params.fovy,
                     params.aspect,
                     params.near,
                     params.far);
         }
-
-        var previousMat = backend.getProjectionMatrix();
-
-        backend.setProjectionMatrix(mat);
+        var superXform = backend.getTransform();
+        if (!xform || !superXform.fixed || !cfg.fixed) {
+            xform = {
+                matrix: superXform.matrix.x(mat),
+                fixed: superXform.fixed && cfg.fixed
+            };
+        }
+        backend.setTransform(xform);
         SceneJs.utils.visitChildren(cfg, scope);
-        backend.setProjectionMatrix(previousMat);
+        backend.setTransform(superXform);
     };
 };
