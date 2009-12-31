@@ -8,16 +8,18 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
+            var init = function() {
+                ctx.material = {  // Default to some colour so we'll see at least something while debugging a scene
+                    ambient:  { r: 0, g : 0, b : 1 },
+                    diffuse:  { r: 0, g : 0, b : 1 },
+                    specular: { r: 0, g : 0, b : 1 },
+                    shininess:{ r: 0, g : 0, b : 1 }
+                };
+            };
+
             this.install = function(_ctx) {
                 ctx = _ctx;
-                if (!ctx.material) {
-                    ctx.material = {  // Default to some colour so we'll see at least something while debugging a scene 
-                        ambient:  { r: 0, g : 0, b : 1 },
-                        diffuse:  { r: 0, g : 0, b : 1 },
-                        specular: { r: 0, g : 0, b : 1 },
-                        shininess:{ r: 0, g : 0, b : 1 }
-                    };
-                }
+                init();
             };
 
             this.setMaterial = function(material) {
@@ -30,5 +32,9 @@ SceneJs.backends.installBackend(
 
             this.getMaterial = function() {
                 return ctx.material;
+            };
+
+            this.reset = function() {
+                init();
             };
         })());

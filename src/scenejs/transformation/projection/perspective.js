@@ -34,10 +34,10 @@
     SceneJs.perspective = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
         var backend = SceneJs.backends.getBackend('projection-transform');
-        var mat;
+        var xform;
 
         return function(scope) {
-            if (!mat || !cfg.fixed) {
+            if (!xform || !cfg.fixed) {
                 var params = cfg.getParams(scope);
 
                 params.fovy = params.fovy || 60.0;  // TODO: validate params
@@ -45,16 +45,21 @@
                 params.near = params.near || 0.1;
                 params.far = params.far || 400.0;
 
-                mat = makePerspective(
+                var tempMat = makePerspective(
                         params.fovy,
                         params.aspect,
                         params.near,
                         params.far);
+
+                xform = {
+                    matrix:tempMat,
+                    matrixAsArray: new WebGLFloatArray(tempMat.flatten())
+                };
             }
-            var prevMat = backend.getMatrix();
-            backend.setMatrix(mat);
+            var prevXform = backend.getTransform();
+            backend.setTransform(xform);
             SceneJs.utils.visitChildren(cfg, scope);
-            backend.setMatrix(prevMat);
+            backend.setTransform(prevXform);
         };
     };
 })();

@@ -69,7 +69,8 @@
                 var tempMat = superXform.matrix.x(mat);
                 xform = {
                     matrix: tempMat,
-                    normalMatrix: tempMat.inverse().transpose().make3x3(),
+                    normalMatrixAsArray : new WebGLFloatArray(tempMat.inverse().transpose().make3x3().flatten()),
+                    matrixAsArray : new WebGLFloatArray(tempMat.flatten()),
                     fixed: superXform.fixed && cfg.fixed
                 };
             }

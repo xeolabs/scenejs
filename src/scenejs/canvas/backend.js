@@ -10,8 +10,13 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
+            var init = function() {
+                ctx.canvas = null;
+            }
+
             this.install = function(_ctx) {
                 ctx = _ctx;
+                init();
             };
 
             this.findCanvas = function(canvasId) {
@@ -32,9 +37,9 @@ SceneJs.backends.installBackend(
                                     + '\' failed to provide a supported context');
                 }
                 context.clearColor(0.0, 0.0, 0.0, 1.0);
-                context.clearDepth(1.0);  // TODO: configurable cleardepth with warning for potentially bad values
+                //context.clearDepth(1.0);  // TODO: configurable cleardepth with warning for potentially bad values
                 context.enable(context.DEPTH_TEST);
-                context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+                //   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
                 //  context.depthFunc(context.ALWAYS);
                 //   context.depthRange(0.0, 0.01);
 
@@ -70,11 +75,16 @@ SceneJs.backends.installBackend(
             };
 
             this.clearCanvas = function() {
-                // ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT); // Buffers are swapped automatically in WebGL
+                ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT | ctx.canvas.context.DEPTH_BUFFER_BIT); // Buffers are swapped automatically in WebGL
             };
 
             this.flush = function() {
+                ctx.canvas.context.finish();
                 ctx.canvas.context.flush();
+            };
+
+            this.reset = function() {
+                init();
             };
         })());
 

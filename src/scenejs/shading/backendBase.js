@@ -32,11 +32,26 @@ SceneJs.shaderBackend = function(cfg) {
                 };
 
                 ctx.programs = new function() {
+
                     var programs = {};
                     var activeProgram = null;
                     var vars = {
                         vars: {},
                         fixed: true
+                    };
+
+                    /** Deletes a program and its shaders
+                     */
+                    var deleteProgram = function(program) {
+                        if (document.getElementById(program.canvas.canvasId)) {  // Context can't exist if canvas not in DOM
+                            while (program.fragmentShaders.length > 0) {
+                                program.context.deleteShader(program.fragmentShaders.pop());
+                            }
+                            while (program.vertexShaders.length > 0) {
+                                program.context.deleteShader(program.vertexShaders.pop());
+                            }
+                            program.context.deleteProgram(program.program);
+                        }
                     };
 
                     /** Creates a program on the context of the given canvas, loads the configured
@@ -62,26 +77,28 @@ SceneJs.shaderBackend = function(cfg) {
                         /* Create program on context
                          */
                         program = {
+                            canvas : ctx.canvas,
+                            context : context,
                             programId : programId,
-                            program : context.createProgram()
+                            program : context.createProgram(),
+                            fragmentShaders: [],
+                            vertexShaders: []
                         };
 
                         /* Load fragment shaders into context
                          */
-                        var fragmentShaders = [];
                         for (var i = 0; i < cfg.fragmentShaders.length; i++) {
                             var shader = loadShader(context, cfg.fragmentShaders[i], context.FRAGMENT_SHADER);
                             context.attachShader(program.program, shader);
-                            fragmentShaders.push(shader);
+                            program.fragmentShaders.push(shader);
                         }
 
                         /* Load vertex shaders into context
                          */
-                        var vertexShaders = [];
                         for (var i = 0; i < cfg.vertexShaders.length; i++) {
                             var shader = loadShader(context, cfg.vertexShaders[i], context.VERTEX_SHADER);
                             context.attachShader(program.program, shader);
-                            vertexShaders.push(shader);
+                            program.vertexShaders.push(shader);
                         }
 
                         /* Link program                        
@@ -91,13 +108,7 @@ SceneJs.shaderBackend = function(cfg) {
                         /* On link failure, delete program and shaders then throw exception
                          */
                         if (context.getProgramParameter(program.program, 0x8B82 /*gl.LINK_STATUS*/) != 1) {
-                            context.deleteProgram(program.program);
-                            while (fragmentShaders.length > 0) {
-                                context.deleteProgram(fragmentShaders.pop());
-                            }
-                            while (vertexShaders.length > 0) {
-                                context.deleteProgram(vertexShaders.pop());
-                            }
+                            deleteProgram(program);
                             throw new SceneJs.exceptions.ShaderLinkFailureException("Failed to link shader program: " + context.getProgramInfoLog(program.program));
                         }
 
@@ -133,10 +144,10 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     var setVarDefaults = function() {
                         for (var key in cfg.setters) {
-                            cfg.setters[key].call(this, ctx.canvas.context,
-                                    activeProgram.getVarLocation, null);
+                            cfg.setters[key].call(this, ctx.canvas.context, activeProgram.getVarLocation, null);
                         }
-                    }
+                    };
+
                     /** Activates the loaded program of the given ID
                      */
                     this.activateProgram = function(programId) {
@@ -206,7 +217,7 @@ SceneJs.shaderBackend = function(cfg) {
                         cfg.binders.bindNormalBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
                     };
 
-                    
+
                     /** Deactivates the currently active program
                      */
                     this.deactivateProgram = function() {
@@ -216,6 +227,17 @@ SceneJs.shaderBackend = function(cfg) {
                         ctx.canvas.context.flush();
                         activeProgram = null;
                         ctx.canvas.context.useProgram(null); // Switch GL to use fixed-function paths
+                    };
+
+                    /** Deletes all programs
+                     */
+                    this.deletePrograms = function() {
+                        for (var programId in programs) {
+                            deleteProgram(programs[programId]);
+                        }
+                        programs = {};
+                        activeProgram = null;
+                        vars = {};
                     };
                 };
             }
@@ -241,6 +263,12 @@ SceneJs.shaderBackend = function(cfg) {
 
         this.deactivateProgram = function() {
             ctx.programs.deactivateProgram();
+        };
+
+        /** Frees resources (programs and their shaders) held by this backend
+         */
+        this.reset = function() {
+            ctx.programs.deletePrograms();
         };
     })();
 };

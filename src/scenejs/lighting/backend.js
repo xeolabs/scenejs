@@ -12,11 +12,13 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
+            var init = function() {
+                ctx.lightStack = [];
+            };
+
             this.install = function(_ctx) {
                 ctx = _ctx;
-                if (!ctx.lightStack) {
-                    ctx.lightStack = [];
-                }
+                init();
             };
 
             var cloneVec = function(v) {
@@ -27,11 +29,11 @@ SceneJs.backends.installBackend(
              */
             var transform = function(l) {
                 return {
-                    pos : ctx.mvpTransform.matrix.transformVector3(cloneVec(l.pos)),
+                    pos : ctx.mvTransform.matrix.transformVector3(cloneVec(l.pos)),
                     ambient : l.ambient,
                     diffuse : l.diffuse,
                     specular : l.specular,
-                    dir: ctx.mvpTransform.matrix.transformVector3(cloneVec(l.dir)),
+                    dir: ctx.mvTransform.matrix.transformVector3(cloneVec(l.dir)),
                     constantAttenuation: l.constantAttenuation,
                     linearAttenuation: l.linearAttenuation,
                     quadraticAttenuation: l.quadraticAttenuation
@@ -52,13 +54,13 @@ SceneJs.backends.installBackend(
                 return lights2;
             };
 
-            /** Returns true if the coordinate space defined by the current view and model matrices is
+            /** Returns true if the coordinate space defined by the current view matrices is
              * fixed, ie. not animated, at this level of scene traversal. If not, then it is not safe
              * for the client node to memoize its lights once they are transformed, because the transformation
              * is therefore likely to vary, causing the lights to move around.
              */
             this.getSafeToCache = function() {
-                return ctx.viewTransform.fixed && ctx.modelTransform.fixed;
+                return ctx.mvTransform.fixed;
             };
 
             /** Pushes view-space lights to stack, and then inserts stack into shader.
@@ -81,5 +83,9 @@ SceneJs.backends.installBackend(
                     ctx.lightStack.pop();
                 }
                 ctx.programs.setVar('scene_Lights', ctx.lightStack);
+            };
+
+            this.reset = function() {
+                init();
             };
         })());

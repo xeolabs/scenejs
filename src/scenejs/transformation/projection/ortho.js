@@ -21,11 +21,11 @@
     SceneJs.ortho = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
         var backend = SceneJs.backends.getBackend('projection-transform');
-        var mat;
+        var xform;
         return function(scope) {
-            if (!mat || !cfg.fixed) {
+            if (!xform || !cfg.fixed) {
                 var params = cfg.getParams(scope);
-                mat = makeOrtho(
+                var tempMat = makeOrtho(
                         params.left || -1.0,
                         params.right || 1.0,
                         params.bottom || -1.0,
@@ -33,11 +33,15 @@
                         params.near || 0.1,
                         params.far || 100.0
                         );
+                xform = {
+                    matrix: tempMat,
+                    matrixAsArray: new WebGLFloatArray(tempMat.flatten())
+                };
             }
-            var prevMat = backend.getMatrix();
-            backend.setMatrix(mat);
+            var prevXform = backend.getTransform();
+            backend.setTransform(xform);
             SceneJs.utils.visitChildren(cfg, scope);
-            backend.setMatrix(prevMat);
+            backend.setTransform(prevXform);
         };
     };
 })();

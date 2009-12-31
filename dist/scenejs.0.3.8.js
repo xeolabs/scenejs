@@ -1,7 +1,2917 @@
+// === Sylvester ===
+// Vector and Matrix mathematics modules for JavaScript
+// Copyright (c) 2007 James Coglan
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+var Sylvester = {
+  version: '0.1.3',
+  precision: 1e-6
+};
+
+function Vector() {}
+Vector.prototype = {
+
+  // Returns element i of the vector
+  e: function(i) {
+    return (i < 1 || i > this.elements.length) ? null : this.elements[i-1];
+  },
+
+  // Returns the number of elements the vector has
+  dimensions: function() {
+    return this.elements.length;
+  },
+
+  // Returns the modulus ('length') of the vector
+  modulus: function() {
+    return Math.sqrt(this.dot(this));
+  },
+
+  // Returns true iff the vector is equal to the argument
+  eql: function(vector) {
+    var n = this.elements.length;
+    var V = vector.elements || vector;
+    if (n != V.length) { return false; }
+    do {
+      if (Math.abs(this.elements[n-1] - V[n-1]) > Sylvester.precision) { return false; }
+    } while (--n);
+    return true;
+  },
+
+  // Returns a copy of the vector
+  dup: function() {
+    return Vector.create(this.elements);
+  },
+
+  // Maps the vector to another vector according to the given function
+  map: function(fn) {
+    var elements = [];
+    this.each(function(x, i) {
+      elements.push(fn(x, i));
+    });
+    return Vector.create(elements);
+  },
+
+  // Calls the iterator for each element of the vector in turn
+  each: function(fn) {
+    var n = this.elements.length, k = n, i;
+    do { i = k - n;
+      fn(this.elements[i], i+1);
+    } while (--n);
+  },
+
+  // Returns a new vector created by normalizing the receiver
+  toUnitVector: function() {
+    var r = this.modulus();
+    if (r === 0) { return this.dup(); }
+    return this.map(function(x) { return x/r; });
+  },
+
+  // Returns the angle between the vector and the argument (also a vector)
+  angleFrom: function(vector) {
+    var V = vector.elements || vector;
+    var n = this.elements.length, k = n, i;
+    if (n != V.length) { return null; }
+    var dot = 0, mod1 = 0, mod2 = 0;
+    // Work things out in parallel to save time
+    this.each(function(x, i) {
+      dot += x * V[i-1];
+      mod1 += x * x;
+      mod2 += V[i-1] * V[i-1];
+    });
+    mod1 = Math.sqrt(mod1); mod2 = Math.sqrt(mod2);
+    if (mod1*mod2 === 0) { return null; }
+    var theta = dot / (mod1*mod2);
+    if (theta < -1) { theta = -1; }
+    if (theta > 1) { theta = 1; }
+    return Math.acos(theta);
+  },
+
+  // Returns true iff the vector is parallel to the argument
+  isParallelTo: function(vector) {
+    var angle = this.angleFrom(vector);
+    return (angle === null) ? null : (angle <= Sylvester.precision);
+  },
+
+  // Returns true iff the vector is antiparallel to the argument
+  isAntiparallelTo: function(vector) {
+    var angle = this.angleFrom(vector);
+    return (angle === null) ? null : (Math.abs(angle - Math.PI) <= Sylvester.precision);
+  },
+
+  // Returns true iff the vector is perpendicular to the argument
+  isPerpendicularTo: function(vector) {
+    var dot = this.dot(vector);
+    return (dot === null) ? null : (Math.abs(dot) <= Sylvester.precision);
+  },
+
+  // Returns the result of adding the argument to the vector
+  add: function(vector) {
+    var V = vector.elements || vector;
+    if (this.elements.length != V.length) { return null; }
+    return this.map(function(x, i) { return x + V[i-1]; });
+  },
+
+  // Returns the result of subtracting the argument from the vector
+  subtract: function(vector) {
+    var V = vector.elements || vector;
+    if (this.elements.length != V.length) { return null; }
+    return this.map(function(x, i) { return x - V[i-1]; });
+  },
+
+  // Returns the result of multiplying the elements of the vector by the argument
+  multiply: function(k) {
+    return this.map(function(x) { return x*k; });
+  },
+
+  x: function(k) { return this.multiply(k); },
+
+  // Returns the scalar product of the vector with the argument
+  // Both vectors must have equal dimensionality
+  dot: function(vector) {
+    var V = vector.elements || vector;
+    var i, product = 0, n = this.elements.length;
+    if (n != V.length) { return null; }
+    do { product += this.elements[n-1] * V[n-1]; } while (--n);
+    return product;
+  },
+
+  // Returns the vector product of the vector with the argument
+  // Both vectors must have dimensionality 3
+  cross: function(vector) {
+    var B = vector.elements || vector;
+    if (this.elements.length != 3 || B.length != 3) { return null; }
+    var A = this.elements;
+    return Vector.create([
+      (A[1] * B[2]) - (A[2] * B[1]),
+      (A[2] * B[0]) - (A[0] * B[2]),
+      (A[0] * B[1]) - (A[1] * B[0])
+    ]);
+  },
+
+  // Returns the (absolute) largest element of the vector
+  max: function() {
+    var m = 0, n = this.elements.length, k = n, i;
+    do { i = k - n;
+      if (Math.abs(this.elements[i]) > Math.abs(m)) { m = this.elements[i]; }
+    } while (--n);
+    return m;
+  },
+
+  // Returns the index of the first match found
+  indexOf: function(x) {
+    var index = null, n = this.elements.length, k = n, i;
+    do { i = k - n;
+      if (index === null && this.elements[i] == x) {
+        index = i + 1;
+      }
+    } while (--n);
+    return index;
+  },
+
+  // Returns a diagonal matrix with the vector's elements as its diagonal elements
+  toDiagonalMatrix: function() {
+    return Matrix.Diagonal(this.elements);
+  },
+
+  // Returns the result of rounding the elements of the vector
+  round: function() {
+    return this.map(function(x) { return Math.round(x); });
+  },
+
+  // Returns a copy of the vector with elements set to the given value if they
+  // differ from it by less than Sylvester.precision
+  snapTo: function(x) {
+    return this.map(function(y) {
+      return (Math.abs(y - x) <= Sylvester.precision) ? x : y;
+    });
+  },
+
+  // Returns the vector's distance from the argument, when considered as a point in space
+  distanceFrom: function(obj) {
+    if (obj.anchor) { return obj.distanceFrom(this); }
+    var V = obj.elements || obj;
+    if (V.length != this.elements.length) { return null; }
+    var sum = 0, part;
+    this.each(function(x, i) {
+      part = x - V[i-1];
+      sum += part * part;
+    });
+    return Math.sqrt(sum);
+  },
+
+  // Returns true if the vector is point on the given line
+  liesOn: function(line) {
+    return line.contains(this);
+  },
+
+  // Return true iff the vector is a point in the given plane
+  liesIn: function(plane) {
+    return plane.contains(this);
+  },
+
+  // Rotates the vector about the given object. The object should be a
+  // point if the vector is 2D, and a line if it is 3D. Be careful with line directions!
+  rotate: function(t, obj) {
+    var V, R, x, y, z;
+    switch (this.elements.length) {
+      case 2:
+        V = obj.elements || obj;
+        if (V.length != 2) { return null; }
+        R = Matrix.Rotation(t).elements;
+        x = this.elements[0] - V[0];
+        y = this.elements[1] - V[1];
+        return Vector.create([
+          V[0] + R[0][0] * x + R[0][1] * y,
+          V[1] + R[1][0] * x + R[1][1] * y
+        ]);
+        break;
+      case 3:
+        if (!obj.direction) { return null; }
+        var C = obj.pointClosestTo(this).elements;
+        R = Matrix.Rotation(t, obj.direction).elements;
+        x = this.elements[0] - C[0];
+        y = this.elements[1] - C[1];
+        z = this.elements[2] - C[2];
+        return Vector.create([
+          C[0] + R[0][0] * x + R[0][1] * y + R[0][2] * z,
+          C[1] + R[1][0] * x + R[1][1] * y + R[1][2] * z,
+          C[2] + R[2][0] * x + R[2][1] * y + R[2][2] * z
+        ]);
+        break;
+      default:
+        return null;
+    }
+  },
+
+  // Returns the result of reflecting the point in the given point, line or plane
+  reflectionIn: function(obj) {
+    if (obj.anchor) {
+      // obj is a plane or line
+      var P = this.elements.slice();
+      var C = obj.pointClosestTo(P).elements;
+      return Vector.create([C[0] + (C[0] - P[0]), C[1] + (C[1] - P[1]), C[2] + (C[2] - (P[2] || 0))]);
+    } else {
+      // obj is a point
+      var Q = obj.elements || obj;
+      if (this.elements.length != Q.length) { return null; }
+      return this.map(function(x, i) { return Q[i-1] + (Q[i-1] - x); });
+    }
+  },
+
+  // Utility to make sure vectors are 3D. If they are 2D, a zero z-component is added
+  to3D: function() {
+    var V = this.dup();
+    switch (V.elements.length) {
+      case 3: break;
+      case 2: V.elements.push(0); break;
+      default: return null;
+    }
+    return V;
+  },
+
+  // Returns a string representation of the vector
+  inspect: function() {
+    return '[' + this.elements.join(', ') + ']';
+  },
+
+  // Set vector's elements from an array
+  setElements: function(els) {
+    this.elements = (els.elements || els).slice();
+    return this;
+  }
+};
+
+// Constructor function
+Vector.create = function(elements) {
+  var V = new Vector();
+  return V.setElements(elements);
+};
+
+// i, j, k unit vectors
+Vector.i = Vector.create([1,0,0]);
+Vector.j = Vector.create([0,1,0]);
+Vector.k = Vector.create([0,0,1]);
+
+// Random vector of size n
+Vector.Random = function(n) {
+  var elements = [];
+  do { elements.push(Math.random());
+  } while (--n);
+  return Vector.create(elements);
+};
+
+// Vector filled with zeros
+Vector.Zero = function(n) {
+  var elements = [];
+  do { elements.push(0);
+  } while (--n);
+  return Vector.create(elements);
+};
+
+
+
+function Matrix() {}
+Matrix.prototype = {
+
+  // Returns element (i,j) of the matrix
+  e: function(i,j) {
+    if (i < 1 || i > this.elements.length || j < 1 || j > this.elements[0].length) { return null; }
+    return this.elements[i-1][j-1];
+  },
+
+  // Returns row k of the matrix as a vector
+  row: function(i) {
+    if (i > this.elements.length) { return null; }
+    return Vector.create(this.elements[i-1]);
+  },
+
+  // Returns column k of the matrix as a vector
+  col: function(j) {
+    if (j > this.elements[0].length) { return null; }
+    var col = [], n = this.elements.length, k = n, i;
+    do { i = k - n;
+      col.push(this.elements[i][j-1]);
+    } while (--n);
+    return Vector.create(col);
+  },
+
+  // Returns the number of rows/columns the matrix has
+  dimensions: function() {
+    return {rows: this.elements.length, cols: this.elements[0].length};
+  },
+
+  // Returns the number of rows in the matrix
+  rows: function() {
+    return this.elements.length;
+  },
+
+  // Returns the number of columns in the matrix
+  cols: function() {
+    return this.elements[0].length;
+  },
+
+  // Returns true iff the matrix is equal to the argument. You can supply
+  // a vector as the argument, in which case the receiver must be a
+  // one-column matrix equal to the vector.
+  eql: function(matrix) {
+    var M = matrix.elements || matrix;
+    if (typeof(M[0][0]) == 'undefined') { M = Matrix.create(M).elements; }
+    if (this.elements.length != M.length ||
+        this.elements[0].length != M[0].length) { return false; }
+    var ni = this.elements.length, ki = ni, i, nj, kj = this.elements[0].length, j;
+    do { i = ki - ni;
+      nj = kj;
+      do { j = kj - nj;
+        if (Math.abs(this.elements[i][j] - M[i][j]) > Sylvester.precision) { return false; }
+      } while (--nj);
+    } while (--ni);
+    return true;
+  },
+
+  // Returns a copy of the matrix
+  dup: function() {
+    return Matrix.create(this.elements);
+  },
+
+  // Maps the matrix to another matrix (of the same dimensions) according to the given function
+  map: function(fn) {
+    var els = [], ni = this.elements.length, ki = ni, i, nj, kj = this.elements[0].length, j;
+    do { i = ki - ni;
+      nj = kj;
+      els[i] = [];
+      do { j = kj - nj;
+        els[i][j] = fn(this.elements[i][j], i + 1, j + 1);
+      } while (--nj);
+    } while (--ni);
+    return Matrix.create(els);
+  },
+
+  // Returns true iff the argument has the same dimensions as the matrix
+  isSameSizeAs: function(matrix) {
+    var M = matrix.elements || matrix;
+    if (typeof(M[0][0]) == 'undefined') { M = Matrix.create(M).elements; }
+    return (this.elements.length == M.length &&
+        this.elements[0].length == M[0].length);
+  },
+
+  // Returns the result of adding the argument to the matrix
+  add: function(matrix) {
+    var M = matrix.elements || matrix;
+    if (typeof(M[0][0]) == 'undefined') { M = Matrix.create(M).elements; }
+    if (!this.isSameSizeAs(M)) { return null; }
+    return this.map(function(x, i, j) { return x + M[i-1][j-1]; });
+  },
+
+  // Returns the result of subtracting the argument from the matrix
+  subtract: function(matrix) {
+    var M = matrix.elements || matrix;
+    if (typeof(M[0][0]) == 'undefined') { M = Matrix.create(M).elements; }
+    if (!this.isSameSizeAs(M)) { return null; }
+    return this.map(function(x, i, j) { return x - M[i-1][j-1]; });
+  },
+
+  // Returns true iff the matrix can multiply the argument from the left
+  canMultiplyFromLeft: function(matrix) {
+    var M = matrix.elements || matrix;
+    if (typeof(M[0][0]) == 'undefined') { M = Matrix.create(M).elements; }
+    // this.columns should equal matrix.rows
+    return (this.elements[0].length == M.length);
+  },
+
+  // Returns the result of multiplying the matrix from the right by the argument.
+  // If the argument is a scalar then just multiply all the elements. If the argument is
+  // a vector, a vector is returned, which saves you having to remember calling
+  // col(1) on the result.
+  multiply: function(matrix) {
+    if (!matrix.elements) {
+      return this.map(function(x) { return x * matrix; });
+    }
+    var returnVector = matrix.modulus ? true : false;
+    var M = matrix.elements || matrix;
+    if (typeof(M[0][0]) == 'undefined') { M = Matrix.create(M).elements; }
+    if (!this.canMultiplyFromLeft(M)) { return null; }
+    var ni = this.elements.length, ki = ni, i, nj, kj = M[0].length, j;
+    var cols = this.elements[0].length, elements = [], sum, nc, c;
+    do { i = ki - ni;
+      elements[i] = [];
+      nj = kj;
+      do { j = kj - nj;
+        sum = 0;
+        nc = cols;
+        do { c = cols - nc;
+          sum += this.elements[i][c] * M[c][j];
+        } while (--nc);
+        elements[i][j] = sum;
+      } while (--nj);
+    } while (--ni);
+    var M = Matrix.create(elements);
+    return returnVector ? M.col(1) : M;
+  },
+
+  x: function(matrix) { return this.multiply(matrix); },
+
+  // Returns a submatrix taken from the matrix
+  // Argument order is: start row, start col, nrows, ncols
+  // Element selection wraps if the required index is outside the matrix's bounds, so you could
+  // use this to perform row/column cycling or copy-augmenting.
+  minor: function(a, b, c, d) {
+    var elements = [], ni = c, i, nj, j;
+    var rows = this.elements.length, cols = this.elements[0].length;
+    do { i = c - ni;
+      elements[i] = [];
+      nj = d;
+      do { j = d - nj;
+        elements[i][j] = this.elements[(a+i-1)%rows][(b+j-1)%cols];
+      } while (--nj);
+    } while (--ni);
+    return Matrix.create(elements);
+  },
+
+  // Returns the transpose of the matrix
+  transpose: function() {
+    var rows = this.elements.length, cols = this.elements[0].length;
+    var elements = [], ni = cols, i, nj, j;
+    do { i = cols - ni;
+      elements[i] = [];
+      nj = rows;
+      do { j = rows - nj;
+        elements[i][j] = this.elements[j][i];
+      } while (--nj);
+    } while (--ni);
+    return Matrix.create(elements);
+  },
+
+  // Returns true iff the matrix is square
+  isSquare: function() {
+    return (this.elements.length == this.elements[0].length);
+  },
+
+  // Returns the (absolute) largest element of the matrix
+  max: function() {
+    var m = 0, ni = this.elements.length, ki = ni, i, nj, kj = this.elements[0].length, j;
+    do { i = ki - ni;
+      nj = kj;
+      do { j = kj - nj;
+        if (Math.abs(this.elements[i][j]) > Math.abs(m)) { m = this.elements[i][j]; }
+      } while (--nj);
+    } while (--ni);
+    return m;
+  },
+
+  // Returns the indeces of the first match found by reading row-by-row from left to right
+  indexOf: function(x) {
+    var index = null, ni = this.elements.length, ki = ni, i, nj, kj = this.elements[0].length, j;
+    do { i = ki - ni;
+      nj = kj;
+      do { j = kj - nj;
+        if (this.elements[i][j] == x) { return {i: i+1, j: j+1}; }
+      } while (--nj);
+    } while (--ni);
+    return null;
+  },
+
+  // If the matrix is square, returns the diagonal elements as a vector.
+  // Otherwise, returns null.
+  diagonal: function() {
+    if (!this.isSquare) { return null; }
+    var els = [], n = this.elements.length, k = n, i;
+    do { i = k - n;
+      els.push(this.elements[i][i]);
+    } while (--n);
+    return Vector.create(els);
+  },
+
+  // Make the matrix upper (right) triangular by Gaussian elimination.
+  // This method only adds multiples of rows to other rows. No rows are
+  // scaled up or switched, and the determinant is preserved.
+  toRightTriangular: function() {
+    var M = this.dup(), els;
+    var n = this.elements.length, k = n, i, np, kp = this.elements[0].length, p;
+    do { i = k - n;
+      if (M.elements[i][i] == 0) {
+        for (j = i + 1; j < k; j++) {
+          if (M.elements[j][i] != 0) {
+            els = []; np = kp;
+            do { p = kp - np;
+              els.push(M.elements[i][p] + M.elements[j][p]);
+            } while (--np);
+            M.elements[i] = els;
+            break;
+          }
+        }
+      }
+      if (M.elements[i][i] != 0) {
+        for (j = i + 1; j < k; j++) {
+          var multiplier = M.elements[j][i] / M.elements[i][i];
+          els = []; np = kp;
+          do { p = kp - np;
+            // Elements with column numbers up to an including the number
+            // of the row that we're subtracting can safely be set straight to
+            // zero, since that's the point of this routine and it avoids having
+            // to loop over and correct rounding errors later
+            els.push(p <= i ? 0 : M.elements[j][p] - M.elements[i][p] * multiplier);
+          } while (--np);
+          M.elements[j] = els;
+        }
+      }
+    } while (--n);
+    return M;
+  },
+
+  toUpperTriangular: function() { return this.toRightTriangular(); },
+
+  // Returns the determinant for square matrices
+  determinant: function() {
+    if (!this.isSquare()) { return null; }
+    var M = this.toRightTriangular();
+    var det = M.elements[0][0], n = M.elements.length - 1, k = n, i;
+    do { i = k - n + 1;
+      det = det * M.elements[i][i];
+    } while (--n);
+    return det;
+  },
+
+  det: function() { return this.determinant(); },
+
+  // Returns true iff the matrix is singular
+  isSingular: function() {
+    return (this.isSquare() && this.determinant() === 0);
+  },
+
+  // Returns the trace for square matrices
+  trace: function() {
+    if (!this.isSquare()) { return null; }
+    var tr = this.elements[0][0], n = this.elements.length - 1, k = n, i;
+    do { i = k - n + 1;
+      tr += this.elements[i][i];
+    } while (--n);
+    return tr;
+  },
+
+  tr: function() { return this.trace(); },
+
+  // Returns the rank of the matrix
+  rank: function() {
+    var M = this.toRightTriangular(), rank = 0;
+    var ni = this.elements.length, ki = ni, i, nj, kj = this.elements[0].length, j;
+    do { i = ki - ni;
+      nj = kj;
+      do { j = kj - nj;
+        if (Math.abs(M.elements[i][j]) > Sylvester.precision) { rank++; break; }
+      } while (--nj);
+    } while (--ni);
+    return rank;
+  },
+
+  rk: function() { return this.rank(); },
+
+  // Returns the result of attaching the given argument to the right-hand side of the matrix
+  augment: function(matrix) {
+    var M = matrix.elements || matrix;
+    if (typeof(M[0][0]) == 'undefined') { M = Matrix.create(M).elements; }
+    var T = this.dup(), cols = T.elements[0].length;
+    var ni = T.elements.length, ki = ni, i, nj, kj = M[0].length, j;
+    if (ni != M.length) { return null; }
+    do { i = ki - ni;
+      nj = kj;
+      do { j = kj - nj;
+        T.elements[i][cols + j] = M[i][j];
+      } while (--nj);
+    } while (--ni);
+    return T;
+  },
+
+  // Returns the inverse (if one exists) using Gauss-Jordan
+  inverse: function() {
+    if (!this.isSquare() || this.isSingular()) { return null; }
+    var ni = this.elements.length, ki = ni, i, j;
+    var M = this.augment(Matrix.I(ni)).toRightTriangular();
+    var np, kp = M.elements[0].length, p, els, divisor;
+    var inverse_elements = [], new_element;
+    // Matrix is non-singular so there will be no zeros on the diagonal
+    // Cycle through rows from last to first
+    do { i = ni - 1;
+      // First, normalise diagonal elements to 1
+      els = []; np = kp;
+      inverse_elements[i] = [];
+      divisor = M.elements[i][i];
+      do { p = kp - np;
+        new_element = M.elements[i][p] / divisor;
+        els.push(new_element);
+        // Shuffle of the current row of the right hand side into the results
+        // array as it will not be modified by later runs through this loop
+        if (p >= ki) { inverse_elements[i].push(new_element); }
+      } while (--np);
+      M.elements[i] = els;
+      // Then, subtract this row from those above it to
+      // give the identity matrix on the left hand side
+      for (j = 0; j < i; j++) {
+        els = []; np = kp;
+        do { p = kp - np;
+          els.push(M.elements[j][p] - M.elements[i][p] * M.elements[j][i]);
+        } while (--np);
+        M.elements[j] = els;
+      }
+    } while (--ni);
+    return Matrix.create(inverse_elements);
+  },
+
+  inv: function() { return this.inverse(); },
+
+  // Returns the result of rounding all the elements
+  round: function() {
+    return this.map(function(x) { return Math.round(x); });
+  },
+
+  // Returns a copy of the matrix with elements set to the given value if they
+  // differ from it by less than Sylvester.precision
+  snapTo: function(x) {
+    return this.map(function(p) {
+      return (Math.abs(p - x) <= Sylvester.precision) ? x : p;
+    });
+  },
+
+  // Returns a string representation of the matrix
+  inspect: function() {
+    var matrix_rows = [];
+    var n = this.elements.length, k = n, i;
+    do { i = k - n;
+      matrix_rows.push(Vector.create(this.elements[i]).inspect());
+    } while (--n);
+    return matrix_rows.join('\n');
+  },
+
+  // Set the matrix's elements from an array. If the argument passed
+  // is a vector, the resulting matrix will be a single column.
+  setElements: function(els) {
+    var i, elements = els.elements || els;
+    if (typeof(elements[0][0]) != 'undefined') {
+      var ni = elements.length, ki = ni, nj, kj, j;
+      this.elements = [];
+      do { i = ki - ni;
+        nj = elements[i].length; kj = nj;
+        this.elements[i] = [];
+        do { j = kj - nj;
+          this.elements[i][j] = elements[i][j];
+        } while (--nj);
+      } while(--ni);
+      return this;
+    }
+    var n = elements.length, k = n;
+    this.elements = [];
+    do { i = k - n;
+      this.elements.push([elements[i]]);
+    } while (--n);
+    return this;
+  }
+};
+
+// Constructor function
+Matrix.create = function(elements) {
+  var M = new Matrix();
+  return M.setElements(elements);
+};
+
+// Identity matrix of size n
+Matrix.I = function(n) {
+  var els = [], k = n, i, nj, j;
+  do { i = k - n;
+    els[i] = []; nj = k;
+    do { j = k - nj;
+      els[i][j] = (i == j) ? 1 : 0;
+    } while (--nj);
+  } while (--n);
+  return Matrix.create(els);
+};
+
+// Diagonal matrix - all off-diagonal elements are zero
+Matrix.Diagonal = function(elements) {
+  var n = elements.length, k = n, i;
+  var M = Matrix.I(n);
+  do { i = k - n;
+    M.elements[i][i] = elements[i];
+  } while (--n);
+  return M;
+};
+
+// Rotation matrix about some axis. If no axis is
+// supplied, assume we're after a 2D transform
+Matrix.Rotation = function(theta, a) {
+  if (!a) {
+    return Matrix.create([
+      [Math.cos(theta),  -Math.sin(theta)],
+      [Math.sin(theta),   Math.cos(theta)]
+    ]);
+  }
+  var axis = a.dup();
+  if (axis.elements.length != 3) { return null; }
+  var mod = axis.modulus();
+  var x = axis.elements[0]/mod, y = axis.elements[1]/mod, z = axis.elements[2]/mod;
+  var s = Math.sin(theta), c = Math.cos(theta), t = 1 - c;
+  // Formula derived here: http://www.gamedev.net/reference/articles/article1199.asp
+  // That proof rotates the co-ordinate system so theta
+  // becomes -theta and sin becomes -sin here.
+  return Matrix.create([
+    [ t*x*x + c, t*x*y - s*z, t*x*z + s*y ],
+    [ t*x*y + s*z, t*y*y + c, t*y*z - s*x ],
+    [ t*x*z - s*y, t*y*z + s*x, t*z*z + c ]
+  ]);
+};
+
+// Special case rotations
+Matrix.RotationX = function(t) {
+  var c = Math.cos(t), s = Math.sin(t);
+  return Matrix.create([
+    [  1,  0,  0 ],
+    [  0,  c, -s ],
+    [  0,  s,  c ]
+  ]);
+};
+Matrix.RotationY = function(t) {
+  var c = Math.cos(t), s = Math.sin(t);
+  return Matrix.create([
+    [  c,  0,  s ],
+    [  0,  1,  0 ],
+    [ -s,  0,  c ]
+  ]);
+};
+Matrix.RotationZ = function(t) {
+  var c = Math.cos(t), s = Math.sin(t);
+  return Matrix.create([
+    [  c, -s,  0 ],
+    [  s,  c,  0 ],
+    [  0,  0,  1 ]
+  ]);
+};
+
+// Random matrix of n rows, m columns
+Matrix.Random = function(n, m) {
+  return Matrix.Zero(n, m).map(
+    function() { return Math.random(); }
+  );
+};
+
+// Matrix filled with zeros
+Matrix.Zero = function(n, m) {
+  var els = [], ni = n, i, nj, j;
+  do { i = n - ni;
+    els[i] = [];
+    nj = m;
+    do { j = m - nj;
+      els[i][j] = 0;
+    } while (--nj);
+  } while (--ni);
+  return Matrix.create(els);
+};
+
+
+
+function Line() {}
+Line.prototype = {
+
+  // Returns true if the argument occupies the same space as the line
+  eql: function(line) {
+    return (this.isParallelTo(line) && this.contains(line.anchor));
+  },
+
+  // Returns a copy of the line
+  dup: function() {
+    return Line.create(this.anchor, this.direction);
+  },
+
+  // Returns the result of translating the line by the given vector/array
+  translate: function(vector) {
+    var V = vector.elements || vector;
+    return Line.create([
+      this.anchor.elements[0] + V[0],
+      this.anchor.elements[1] + V[1],
+      this.anchor.elements[2] + (V[2] || 0)
+    ], this.direction);
+  },
+
+  // Returns true if the line is parallel to the argument. Here, 'parallel to'
+  // means that the argument's direction is either parallel or antiparallel to
+  // the line's own direction. A line is parallel to a plane if the two do not
+  // have a unique intersection.
+  isParallelTo: function(obj) {
+    if (obj.normal) { return obj.isParallelTo(this); }
+    var theta = this.direction.angleFrom(obj.direction);
+    return (Math.abs(theta) <= Sylvester.precision || Math.abs(theta - Math.PI) <= Sylvester.precision);
+  },
+
+  // Returns the line's perpendicular distance from the argument,
+  // which can be a point, a line or a plane
+  distanceFrom: function(obj) {
+    if (obj.normal) { return obj.distanceFrom(this); }
+    if (obj.direction) {
+      // obj is a line
+      if (this.isParallelTo(obj)) { return this.distanceFrom(obj.anchor); }
+      var N = this.direction.cross(obj.direction).toUnitVector().elements;
+      var A = this.anchor.elements, B = obj.anchor.elements;
+      return Math.abs((A[0] - B[0]) * N[0] + (A[1] - B[1]) * N[1] + (A[2] - B[2]) * N[2]);
+    } else {
+      // obj is a point
+      var P = obj.elements || obj;
+      var A = this.anchor.elements, D = this.direction.elements;
+      var PA1 = P[0] - A[0], PA2 = P[1] - A[1], PA3 = (P[2] || 0) - A[2];
+      var modPA = Math.sqrt(PA1*PA1 + PA2*PA2 + PA3*PA3);
+      if (modPA === 0) return 0;
+      // Assumes direction vector is normalized
+      var cosTheta = (PA1 * D[0] + PA2 * D[1] + PA3 * D[2]) / modPA;
+      var sin2 = 1 - cosTheta*cosTheta;
+      return Math.abs(modPA * Math.sqrt(sin2 < 0 ? 0 : sin2));
+    }
+  },
+
+  // Returns true iff the argument is a point on the line
+  contains: function(point) {
+    var dist = this.distanceFrom(point);
+    return (dist !== null && dist <= Sylvester.precision);
+  },
+
+  // Returns true iff the line lies in the given plane
+  liesIn: function(plane) {
+    return plane.contains(this);
+  },
+
+  // Returns true iff the line has a unique point of intersection with the argument
+  intersects: function(obj) {
+    if (obj.normal) { return obj.intersects(this); }
+    return (!this.isParallelTo(obj) && this.distanceFrom(obj) <= Sylvester.precision);
+  },
+
+  // Returns the unique intersection point with the argument, if one exists
+  intersectionWith: function(obj) {
+    if (obj.normal) { return obj.intersectionWith(this); }
+    if (!this.intersects(obj)) { return null; }
+    var P = this.anchor.elements, X = this.direction.elements,
+        Q = obj.anchor.elements, Y = obj.direction.elements;
+    var X1 = X[0], X2 = X[1], X3 = X[2], Y1 = Y[0], Y2 = Y[1], Y3 = Y[2];
+    var PsubQ1 = P[0] - Q[0], PsubQ2 = P[1] - Q[1], PsubQ3 = P[2] - Q[2];
+    var XdotQsubP = - X1*PsubQ1 - X2*PsubQ2 - X3*PsubQ3;
+    var YdotPsubQ = Y1*PsubQ1 + Y2*PsubQ2 + Y3*PsubQ3;
+    var XdotX = X1*X1 + X2*X2 + X3*X3;
+    var YdotY = Y1*Y1 + Y2*Y2 + Y3*Y3;
+    var XdotY = X1*Y1 + X2*Y2 + X3*Y3;
+    var k = (XdotQsubP * YdotY / XdotX + XdotY * YdotPsubQ) / (YdotY - XdotY * XdotY);
+    return Vector.create([P[0] + k*X1, P[1] + k*X2, P[2] + k*X3]);
+  },
+
+  // Returns the point on the line that is closest to the given point or line
+  pointClosestTo: function(obj) {
+    if (obj.direction) {
+      // obj is a line
+      if (this.intersects(obj)) { return this.intersectionWith(obj); }
+      if (this.isParallelTo(obj)) { return null; }
+      var D = this.direction.elements, E = obj.direction.elements;
+      var D1 = D[0], D2 = D[1], D3 = D[2], E1 = E[0], E2 = E[1], E3 = E[2];
+      // Create plane containing obj and the shared normal and intersect this with it
+      // Thank you: http://www.cgafaq.info/wiki/Line-line_distance
+      var x = (D3 * E1 - D1 * E3), y = (D1 * E2 - D2 * E1), z = (D2 * E3 - D3 * E2);
+      var N = Vector.create([x * E3 - y * E2, y * E1 - z * E3, z * E2 - x * E1]);
+      var P = Plane.create(obj.anchor, N);
+      return P.intersectionWith(this);
+    } else {
+      // obj is a point
+      var P = obj.elements || obj;
+      if (this.contains(P)) { return Vector.create(P); }
+      var A = this.anchor.elements, D = this.direction.elements;
+      var D1 = D[0], D2 = D[1], D3 = D[2], A1 = A[0], A2 = A[1], A3 = A[2];
+      var x = D1 * (P[1]-A2) - D2 * (P[0]-A1), y = D2 * ((P[2] || 0) - A3) - D3 * (P[1]-A2),
+          z = D3 * (P[0]-A1) - D1 * ((P[2] || 0) - A3);
+      var V = Vector.create([D2 * x - D3 * z, D3 * y - D1 * x, D1 * z - D2 * y]);
+      var k = this.distanceFrom(P) / V.modulus();
+      return Vector.create([
+        P[0] + V.elements[0] * k,
+        P[1] + V.elements[1] * k,
+        (P[2] || 0) + V.elements[2] * k
+      ]);
+    }
+  },
+
+  // Returns a copy of the line rotated by t radians about the given line. Works by
+  // finding the argument's closest point to this line's anchor point (call this C) and
+  // rotating the anchor about C. Also rotates the line's direction about the argument's.
+  // Be careful with this - the rotation axis' direction affects the outcome!
+  rotate: function(t, line) {
+    // If we're working in 2D
+    if (typeof(line.direction) == 'undefined') { line = Line.create(line.to3D(), Vector.k); }
+    var R = Matrix.Rotation(t, line.direction).elements;
+    var C = line.pointClosestTo(this.anchor).elements;
+    var A = this.anchor.elements, D = this.direction.elements;
+    var C1 = C[0], C2 = C[1], C3 = C[2], A1 = A[0], A2 = A[1], A3 = A[2];
+    var x = A1 - C1, y = A2 - C2, z = A3 - C3;
+    return Line.create([
+      C1 + R[0][0] * x + R[0][1] * y + R[0][2] * z,
+      C2 + R[1][0] * x + R[1][1] * y + R[1][2] * z,
+      C3 + R[2][0] * x + R[2][1] * y + R[2][2] * z
+    ], [
+      R[0][0] * D[0] + R[0][1] * D[1] + R[0][2] * D[2],
+      R[1][0] * D[0] + R[1][1] * D[1] + R[1][2] * D[2],
+      R[2][0] * D[0] + R[2][1] * D[1] + R[2][2] * D[2]
+    ]);
+  },
+
+  // Returns the line's reflection in the given point or line
+  reflectionIn: function(obj) {
+    if (obj.normal) {
+      // obj is a plane
+      var A = this.anchor.elements, D = this.direction.elements;
+      var A1 = A[0], A2 = A[1], A3 = A[2], D1 = D[0], D2 = D[1], D3 = D[2];
+      var newA = this.anchor.reflectionIn(obj).elements;
+      // Add the line's direction vector to its anchor, then mirror that in the plane
+      var AD1 = A1 + D1, AD2 = A2 + D2, AD3 = A3 + D3;
+      var Q = obj.pointClosestTo([AD1, AD2, AD3]).elements;
+      var newD = [Q[0] + (Q[0] - AD1) - newA[0], Q[1] + (Q[1] - AD2) - newA[1], Q[2] + (Q[2] - AD3) - newA[2]];
+      return Line.create(newA, newD);
+    } else if (obj.direction) {
+      // obj is a line - reflection obtained by rotating PI radians about obj
+      return this.rotate(Math.PI, obj);
+    } else {
+      // obj is a point - just reflect the line's anchor in it
+      var P = obj.elements || obj;
+      return Line.create(this.anchor.reflectionIn([P[0], P[1], (P[2] || 0)]), this.direction);
+    }
+  },
+
+  // Set the line's anchor point and direction.
+  setVectors: function(anchor, direction) {
+    // Need to do this so that line's properties are not
+    // references to the arguments passed in
+    anchor = Vector.create(anchor);
+    direction = Vector.create(direction);
+    if (anchor.elements.length == 2) {anchor.elements.push(0); }
+    if (direction.elements.length == 2) { direction.elements.push(0); }
+    if (anchor.elements.length > 3 || direction.elements.length > 3) { return null; }
+    var mod = direction.modulus();
+    if (mod === 0) { return null; }
+    this.anchor = anchor;
+    this.direction = Vector.create([
+      direction.elements[0] / mod,
+      direction.elements[1] / mod,
+      direction.elements[2] / mod
+    ]);
+    return this;
+  }
+};
+
+
+// Constructor function
+Line.create = function(anchor, direction) {
+  var L = new Line();
+  return L.setVectors(anchor, direction);
+};
+
+// Axes
+Line.X = Line.create(Vector.Zero(3), Vector.i);
+Line.Y = Line.create(Vector.Zero(3), Vector.j);
+Line.Z = Line.create(Vector.Zero(3), Vector.k);
+
+
+
+function Plane() {}
+Plane.prototype = {
+
+  // Returns true iff the plane occupies the same space as the argument
+  eql: function(plane) {
+    return (this.contains(plane.anchor) && this.isParallelTo(plane));
+  },
+
+  // Returns a copy of the plane
+  dup: function() {
+    return Plane.create(this.anchor, this.normal);
+  },
+
+  // Returns the result of translating the plane by the given vector
+  translate: function(vector) {
+    var V = vector.elements || vector;
+    return Plane.create([
+      this.anchor.elements[0] + V[0],
+      this.anchor.elements[1] + V[1],
+      this.anchor.elements[2] + (V[2] || 0)
+    ], this.normal);
+  },
+
+  // Returns true iff the plane is parallel to the argument. Will return true
+  // if the planes are equal, or if you give a line and it lies in the plane.
+  isParallelTo: function(obj) {
+    var theta;
+    if (obj.normal) {
+      // obj is a plane
+      theta = this.normal.angleFrom(obj.normal);
+      return (Math.abs(theta) <= Sylvester.precision || Math.abs(Math.PI - theta) <= Sylvester.precision);
+    } else if (obj.direction) {
+      // obj is a line
+      return this.normal.isPerpendicularTo(obj.direction);
+    }
+    return null;
+  },
+
+  // Returns true iff the receiver is perpendicular to the argument
+  isPerpendicularTo: function(plane) {
+    var theta = this.normal.angleFrom(plane.normal);
+    return (Math.abs(Math.PI/2 - theta) <= Sylvester.precision);
+  },
+
+  // Returns the plane's distance from the given object (point, line or plane)
+  distanceFrom: function(obj) {
+    if (this.intersects(obj) || this.contains(obj)) { return 0; }
+    if (obj.anchor) {
+      // obj is a plane or line
+      var A = this.anchor.elements, B = obj.anchor.elements, N = this.normal.elements;
+      return Math.abs((A[0] - B[0]) * N[0] + (A[1] - B[1]) * N[1] + (A[2] - B[2]) * N[2]);
+    } else {
+      // obj is a point
+      var P = obj.elements || obj;
+      var A = this.anchor.elements, N = this.normal.elements;
+      return Math.abs((A[0] - P[0]) * N[0] + (A[1] - P[1]) * N[1] + (A[2] - (P[2] || 0)) * N[2]);
+    }
+  },
+
+  // Returns true iff the plane contains the given point or line
+  contains: function(obj) {
+    if (obj.normal) { return null; }
+    if (obj.direction) {
+      return (this.contains(obj.anchor) && this.contains(obj.anchor.add(obj.direction)));
+    } else {
+      var P = obj.elements || obj;
+      var A = this.anchor.elements, N = this.normal.elements;
+      var diff = Math.abs(N[0]*(A[0] - P[0]) + N[1]*(A[1] - P[1]) + N[2]*(A[2] - (P[2] || 0)));
+      return (diff <= Sylvester.precision);
+    }
+  },
+
+  // Returns true iff the plane has a unique point/line of intersection with the argument
+  intersects: function(obj) {
+    if (typeof(obj.direction) == 'undefined' && typeof(obj.normal) == 'undefined') { return null; }
+    return !this.isParallelTo(obj);
+  },
+
+  // Returns the unique intersection with the argument, if one exists. The result
+  // will be a vector if a line is supplied, and a line if a plane is supplied.
+  intersectionWith: function(obj) {
+    if (!this.intersects(obj)) { return null; }
+    if (obj.direction) {
+      // obj is a line
+      var A = obj.anchor.elements, D = obj.direction.elements,
+          P = this.anchor.elements, N = this.normal.elements;
+      var multiplier = (N[0]*(P[0]-A[0]) + N[1]*(P[1]-A[1]) + N[2]*(P[2]-A[2])) / (N[0]*D[0] + N[1]*D[1] + N[2]*D[2]);
+      return Vector.create([A[0] + D[0]*multiplier, A[1] + D[1]*multiplier, A[2] + D[2]*multiplier]);
+    } else if (obj.normal) {
+      // obj is a plane
+      var direction = this.normal.cross(obj.normal).toUnitVector();
+      // To find an anchor point, we find one co-ordinate that has a value
+      // of zero somewhere on the intersection, and remember which one we picked
+      var N = this.normal.elements, A = this.anchor.elements,
+          O = obj.normal.elements, B = obj.anchor.elements;
+      var solver = Matrix.Zero(2,2), i = 0;
+      while (solver.isSingular()) {
+        i++;
+        solver = Matrix.create([
+          [ N[i%3], N[(i+1)%3] ],
+          [ O[i%3], O[(i+1)%3]  ]
+        ]);
+      }
+      // Then we solve the simultaneous equations in the remaining dimensions
+      var inverse = solver.inverse().elements;
+      var x = N[0]*A[0] + N[1]*A[1] + N[2]*A[2];
+      var y = O[0]*B[0] + O[1]*B[1] + O[2]*B[2];
+      var intersection = [
+        inverse[0][0] * x + inverse[0][1] * y,
+        inverse[1][0] * x + inverse[1][1] * y
+      ];
+      var anchor = [];
+      for (var j = 1; j <= 3; j++) {
+        // This formula picks the right element from intersection by
+        // cycling depending on which element we set to zero above
+        anchor.push((i == j) ? 0 : intersection[(j + (5 - i)%3)%3]);
+      }
+      return Line.create(anchor, direction);
+    }
+  },
+
+  // Returns the point in the plane closest to the given point
+  pointClosestTo: function(point) {
+    var P = point.elements || point;
+    var A = this.anchor.elements, N = this.normal.elements;
+    var dot = (A[0] - P[0]) * N[0] + (A[1] - P[1]) * N[1] + (A[2] - (P[2] || 0)) * N[2];
+    return Vector.create([P[0] + N[0] * dot, P[1] + N[1] * dot, (P[2] || 0) + N[2] * dot]);
+  },
+
+  // Returns a copy of the plane, rotated by t radians about the given line
+  // See notes on Line#rotate.
+  rotate: function(t, line) {
+    var R = Matrix.Rotation(t, line.direction).elements;
+    var C = line.pointClosestTo(this.anchor).elements;
+    var A = this.anchor.elements, N = this.normal.elements;
+    var C1 = C[0], C2 = C[1], C3 = C[2], A1 = A[0], A2 = A[1], A3 = A[2];
+    var x = A1 - C1, y = A2 - C2, z = A3 - C3;
+    return Plane.create([
+      C1 + R[0][0] * x + R[0][1] * y + R[0][2] * z,
+      C2 + R[1][0] * x + R[1][1] * y + R[1][2] * z,
+      C3 + R[2][0] * x + R[2][1] * y + R[2][2] * z
+    ], [
+      R[0][0] * N[0] + R[0][1] * N[1] + R[0][2] * N[2],
+      R[1][0] * N[0] + R[1][1] * N[1] + R[1][2] * N[2],
+      R[2][0] * N[0] + R[2][1] * N[1] + R[2][2] * N[2]
+    ]);
+  },
+
+  // Returns the reflection of the plane in the given point, line or plane.
+  reflectionIn: function(obj) {
+    if (obj.normal) {
+      // obj is a plane
+      var A = this.anchor.elements, N = this.normal.elements;
+      var A1 = A[0], A2 = A[1], A3 = A[2], N1 = N[0], N2 = N[1], N3 = N[2];
+      var newA = this.anchor.reflectionIn(obj).elements;
+      // Add the plane's normal to its anchor, then mirror that in the other plane
+      var AN1 = A1 + N1, AN2 = A2 + N2, AN3 = A3 + N3;
+      var Q = obj.pointClosestTo([AN1, AN2, AN3]).elements;
+      var newN = [Q[0] + (Q[0] - AN1) - newA[0], Q[1] + (Q[1] - AN2) - newA[1], Q[2] + (Q[2] - AN3) - newA[2]];
+      return Plane.create(newA, newN);
+    } else if (obj.direction) {
+      // obj is a line
+      return this.rotate(Math.PI, obj);
+    } else {
+      // obj is a point
+      var P = obj.elements || obj;
+      return Plane.create(this.anchor.reflectionIn([P[0], P[1], (P[2] || 0)]), this.normal);
+    }
+  },
+
+  // Sets the anchor point and normal to the plane. If three arguments are specified,
+  // the normal is calculated by assuming the three points should lie in the same plane.
+  // If only two are sepcified, the second is taken to be the normal. Normal vector is
+  // normalised before storage.
+  setVectors: function(anchor, v1, v2) {
+    anchor = Vector.create(anchor);
+    anchor = anchor.to3D(); if (anchor === null) { return null; }
+    v1 = Vector.create(v1);
+    v1 = v1.to3D(); if (v1 === null) { return null; }
+    if (typeof(v2) == 'undefined') {
+      v2 = null;
+    } else {
+      v2 = Vector.create(v2);
+      v2 = v2.to3D(); if (v2 === null) { return null; }
+    }
+    var A1 = anchor.elements[0], A2 = anchor.elements[1], A3 = anchor.elements[2];
+    var v11 = v1.elements[0], v12 = v1.elements[1], v13 = v1.elements[2];
+    var normal, mod;
+    if (v2 !== null) {
+      var v21 = v2.elements[0], v22 = v2.elements[1], v23 = v2.elements[2];
+      normal = Vector.create([
+        (v12 - A2) * (v23 - A3) - (v13 - A3) * (v22 - A2),
+        (v13 - A3) * (v21 - A1) - (v11 - A1) * (v23 - A3),
+        (v11 - A1) * (v22 - A2) - (v12 - A2) * (v21 - A1)
+      ]);
+      mod = normal.modulus();
+      if (mod === 0) { return null; }
+      normal = Vector.create([normal.elements[0] / mod, normal.elements[1] / mod, normal.elements[2] / mod]);
+    } else {
+      mod = Math.sqrt(v11*v11 + v12*v12 + v13*v13);
+      if (mod === 0) { return null; }
+      normal = Vector.create([v1.elements[0] / mod, v1.elements[1] / mod, v1.elements[2] / mod]);
+    }
+    this.anchor = anchor;
+    this.normal = normal;
+    return this;
+  }
+};
+
+// Constructor function
+Plane.create = function(anchor, v1, v2) {
+  var P = new Plane();
+  return P.setVectors(anchor, v1, v2);
+};
+
+// X-Y-Z planes
+Plane.XY = Plane.create(Vector.Zero(3), Vector.k);
+Plane.YZ = Plane.create(Vector.Zero(3), Vector.i);
+Plane.ZX = Plane.create(Vector.Zero(3), Vector.j);
+Plane.YX = Plane.XY; Plane.ZY = Plane.YZ; Plane.XZ = Plane.ZX;
+
+// Utility functions
+var $V = Vector.create;
+var $M = Matrix.create;
+var $L = Line.create;
+var $P = Plane.create;
+//// augment Sylvester some
+//Matrix.Translation = function (v)
+//{
+//    if (v.elements.length == 2) {
+//        var r = Matrix.I(3);
+//        r.elements[2][0] = v.elements[0];
+//        r.elements[2][1] = v.elements[1];
+//        return r;
+//    }
+//
+//    if (v.elements.length == 3) {
+//        var r = Matrix.I(4);
+//        r.elements[0][3] = v.elements[0];
+//        r.elements[1][3] = v.elements[1];
+//        r.elements[2][3] = v.elements[2];
+//        return r;
+//    }
+//
+//    throw "Invalid length for Translation";
+//}
+
+Matrix.prototype.flatten = function () {
+    var result = [];
+    if (this.elements.length == 0)
+        return [];
+
+
+    for (var j = 0; j < this.elements[0].length; j++)
+        for (var i = 0; i < this.elements.length; i++)
+            result.push(this.elements[i][j]);
+    return result;
+}
+
+Matrix.prototype.ensure4x4 = function()
+{
+    if (this.elements.length == 4 &&
+        this.elements[0].length == 4)
+        return this;
+
+    if (this.elements.length > 4 ||
+        this.elements[0].length > 4)
+        return null;
+
+    for (var i = 0; i < this.elements.length; i++) {
+        for (var j = this.elements[i].length; j < 4; j++) {
+            if (i == j)
+                this.elements[i].push(1);
+            else
+                this.elements[i].push(0);
+        }
+    }
+
+    for (var i = this.elements.length; i < 4; i++) {
+        if (i == 0)
+            this.elements.push([1, 0, 0, 0]);
+        else if (i == 1)
+            this.elements.push([0, 1, 0, 0]);
+        else if (i == 2)
+                this.elements.push([0, 0, 1, 0]);
+            else if (i == 3)
+                    this.elements.push([0, 0, 0, 1]);
+    }
+
+    return this;
+};
+
+Matrix.prototype.make3x3 = function()
+{
+    if (this.elements.length != 4 ||
+        this.elements[0].length != 4)
+        return null;
+
+    return Matrix.create([
+        [this.elements[0][0], this.elements[0][1], this.elements[0][2]],
+        [this.elements[1][0], this.elements[1][1], this.elements[1][2]],
+        [this.elements[2][0], this.elements[2][1], this.elements[2][2]]
+    ]);
+};
+
+Vector.prototype.flatten = function () {
+    return this.elements;
+};
+
+
+Matrix.prototype.transformPoint3 = function(p) {
+    var p = {
+        x : (this.elements[0] * p.x) + (this.elements[4] * p.y) + (this.elements[8] * p.z) + this.elements[12],
+        y : (this.elements[1] * p.x) + (this.elements[5] * p.y) + (this.elements[9] * p.z) + this.elements[13],
+        z : (this.elements[2] * p.x) + (this.elements[6] * p.y) + (this.elements[10] * p.z) + this.elements[14],
+        w : (this.elements[3] * p.x) + (this.elements[7] * p.y) + (this.elements[11] * p.z) + this.elements[15]
+    };
+    return p;
+};
+
+Matrix.prototype.transformVector3 = function(v) {
+    var p = {
+        x: (this.elements[0][0] * v.x) + (this.elements[1][0] * v.y) + (this.elements[2][0] * v.z),
+        y: (this.elements[0][1] * v.x) + (this.elements[1][1] * v.y) + (this.elements[2][1] * v.z),
+        z: (this.elements[0][2] * v.x) + (this.elements[1][2] * v.y) + (this.elements[2][2] * v.z)
+    };
+    return p;
+};
+
+//
+////
+//// glOrtho
+////
+//function makeOrtho(left, right,
+//                   bottom, top,
+//                   znear, zfar)
+//{
+//    var tx = -(right + left) / (right - left);
+//    var ty = -(top + bottom) / (top - bottom);
+//    var tz = -(zfar + znear) / (zfar - znear);
+//
+//    return $M([
+//        [2 / (right - left), 0, 0, tx],
+//        [0, 2 / (top - bottom), 0, ty],
+//        [0, 0, -2 / (zfar - znear), tz],
+//        [0, 0, 0, 1]
+//    ]);
+//}
+//
+//function makeFrustum(left, right,
+//                     bottom, top,
+//                     znear, zfar)
+//{
+//    var X = 2 * znear / (right - left);
+//    var Y = 2 * znear / (top - bottom);
+//    var A = (right + left) / (right - left);
+//    var B = (top + bottom) / (top - bottom);
+//    var C = -(zfar + znear) / (zfar - znear);
+//    var D = -2 * zfar * znear / (zfar - znear);
+//
+//    return $M([
+//        [X, 0, A, 0],
+//        [0, Y, B, 0],
+//        [0, 0, C, D],
+//        [0, 0, -1, 0]
+//    ]);
+//}
+//
+////
+//// gluPerspective
+////
+//function makePerspective(fovy, aspect, znear, zfar)
+//{
+//    var ymax = znear * Math.tan(fovy * Math.PI / 360.0);
+//    var ymin = -ymax;
+//    var xmin = ymin * aspect;
+//    var xmax = ymax * aspect;
+//
+//    return makeFrustum(xmin, xmax, ymin, ymax, znear, zfar);
+//}
+//
+//
+//
+//
+//function makeLookAt(ex, ey, ez,
+//                    cx, cy, cz,
+//                    ux, uy, uz)
+//{
+//    var eye = $V([ex, ey, ez]);
+//    var center = $V([cx, cy, cz]);
+//    var up = $V([ux, uy, uz]);
+//
+//    var z = eye.subtract(center).toUnitVector();
+//    var x = up.cross(z).toUnitVector();
+//    var y = z.cross(x).toUnitVector();
+//
+//    var m = $M([
+//        [x.e(1), x.e(2), x.e(3), 0],
+//        [y.e(1), y.e(2), y.e(3), 0],
+//        [z.e(1), z.e(2), z.e(3), 0],
+//        [0, 0, 0, 1]
+//    ]);
+//
+//    var t = $M([
+//        [1, 0, 0, -ex],
+//        [0, 1, 0, -ey],
+//        [0, 0, 1, -ez],
+//        [0, 0, 0, 1]
+//    ]);
+//    return m.x(t);
+//}
+//
+//function makeTranslate(x, y, z) {
+//    return Matrix.create([
+//        [ 1, 0, 0, x ],
+//        [ 0, 1, 0, y ],
+//        [ 0, 0, 1, z ],
+//        [ 0, 0, 0, 1 ]
+//    ]);
+//};
+//
+//function makeScale(x, y, z) {
+//    return Matrix.create([
+//        [ x, 0, 0, 0 ],
+//        [ 0, y, 0, 0 ],
+//        [ 0, 0, z, 0 ],
+//        [ 0, 0, 0, 1 ]
+//    ]);
+//};/** The SceneJS namespace, with public and private resources.
+ *
+ */
+var SceneJs = {version: '1.0'};
+
+(function() {
+
+    /** All exceptions thrown by SceneJS
+     */
+    SceneJs.exceptions = {
+
+    };
+
+    function isArray(obj) {
+        return toString.call(obj) === "[object Array]";
+    }
+
+    /** Public resources
+     */
+    SceneJs.utils = {
+
+        /** Converts degrees to radiians
+         */
+        degToRad : function(degrees) {
+            return degrees * Math.PI / 180.0;
+        },
+
+        /** Applies properties on c to o, applying properties on defaults to o where they are not on c
+         *
+         */
+        apply : function(o, c, defaults) {
+            if (defaults) {
+                SceneJs.apply(o, defaults);
+            }
+            if (o && c && typeof c == 'object') {
+                for (var p in c) {
+                    o[p] = c[p];
+                }
+            }
+            return o;
+        },
+
+        /** Applies properties on c to o wherever o does not already have properties of same name
+         *
+         */
+        applyIf : function(o, c) {
+            if (o && c) {
+                for (var p in c) {
+                    if (typeof o[p] == "undefined") {
+                        o[p] = c[p];
+                    }
+                }
+            }
+            return o;
+        },
+
+        /** Creates a namespace
+         */
+        namespace : function() {
+            var a = arguments, o = null, i, j, d, rt;
+            for (i = 0; i < a.length; ++i) {
+                d = a[i].split(".");
+                rt = d[0];
+                eval('if (typeof ' + rt + ' == "undefined"){' + rt + ' = {};} o = ' + rt + ';');
+                for (j = 1; j < d.length; ++j) {
+                    o[d[j]] = o[d[j]] || {};
+                    o = o[d[j]];
+                }
+            }
+        },
+        /** Creates a new data scope for a scene graph subtree, optionally as a child of a
+         * parent scope. The scope can be flagged as being either fixed or unfixed. The former
+         * type has data that will be constant for the life of the scene graph, while the latter
+         * has data that will vary. So, data derived from the former type may be cached (or 'memoized')
+         * in scene nodes, while the latter type must not be cached.
+         *
+         * @param _parent
+         * @param _constant
+         */
+        newScope : function(_parent, _fixed) {
+            var parent = _parent;
+            var data = {};
+            var fixed = _fixed || (_parent ? _parent.isfixed() : false);
+
+            return {
+                put : function(key, value) {
+                    data[key] = value;
+                },
+
+                /** Gets an element of data from this scope or the first one on the parent path that has it
+                 */
+                get : function(key) {
+                    var value = data[key];
+                    if (value) {
+                        return value;
+                    }
+                    if (!parent) {
+                        return null;
+                    }
+                    return parent.get(key);
+                },
+
+                isfixed : function() {
+                    return fixed;
+                }
+            };
+        },
+
+        /**
+         * Extracts scene node configuration from the given scene node parameter arguments. The mandatory first argument
+         * must either be a config object or a function that returns one, while the zero or more subsequent arguments
+         * are child nodes. When the first arg is an object the result will be an object containing a function that
+         * returns that object, a flag set true to indicate that the function always returns that exact object (which may be cached),
+         * and the child nodes. When the first arg is a function, the result will contain that function, a flag set false
+         * to indicate that the function's result may be variable, and the children.
+         */
+        getNodeConfig : function(args) {
+            if (args.length == 0) {
+                throw 'Invalid node parameters: should be a configuration followed by zero or more child nodes';
+            }
+            var result = { };
+            var a0 = args[0];
+            if (a0 instanceof Function) {
+                result.getParams = a0;
+                result.fixed = false; // Configs generated by function - probably variable
+            } else {
+                result.getParams = function() {
+                    return a0;
+                };
+                result.fixed = true;  // Config object - may be constant - node may override if config has function
+            }
+            result.children = [];
+            for (var i = 1; i < args.length; i++) {
+                var arg = args[i];
+                if (isArray(arg)) {
+                    for (var j = 0; j < arg.length; j++) {
+                        result.children.push(arg[j]);
+                    }
+                } else {
+                    result.children.push(arg);
+                }
+            }
+            return result;
+        },
+
+        /** Visits child nodes in the given node configuration
+         */
+        visitChildren : function(config, scope) {
+            if (config.children) {
+                for (var i = 0; i < config.children.length; i++) {
+                    config.children[i].call(this, scope);
+                }
+            }
+        }
+    };
+
+    /** Registry of modules that provide backend functionality for scene graph nodes
+     */
+    SceneJs.backends = new (function() {
+        var backends = {};
+        var ctx = {};
+
+        /** Installs a backend module - see examples for more info.
+         */
+        this.installBackend = function(backend) {
+            backends[backend.type] = backend;
+            backend.install(ctx);
+        };
+
+        /** Obtains the backend module of the given type
+         */
+        this.getBackend = function(type) {
+            var backend = backends[type];
+            if (!backend) {
+                throw 'No backend installed of type \'' + type + '\'';
+            }
+            return backend;
+        };
+    })();
+})();
+
+SceneJs.utils.ns = SceneJs.utils.namespace; // in intellij using keyword "namespace" causes parsing errors
+SceneJs.utils.ns("SceneJs");
+
+
+SceneJs.exceptions.NodeConfigExpectedException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.ShaderLinkFailureException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.ShaderVariableNotFoundException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.NoCanvasActiveException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.NoShaderActiveException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.CanvasNotSupportedException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.CanvasNotFoundException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.InvalidLookAtParametersException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.IllegalGeometryParameterException = function(msg) {
+    this.message = msg;
+};
+
+/** Thrown on attempt to do something that's not yet supported in SceneJS
+ */
+SceneJs.exceptions.UnsupportedOperationException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.IllegalRotateConfigException = function(msg) {
+    this.message = msg;
+};
+/**
+ * Backend for a canvas node.
+ */
+SceneJs.backends.installBackend(
+        new (function() {
+
+            var CONTEXT_TYPES = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
+
+            this.type = 'canvas';
+
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+            };
+
+            this.findCanvas = function(canvasId) {
+                var canvas = document.getElementById(canvasId);
+                if (!canvas) {
+                    throw new SceneJs.exceptions.CanvasNotFoundException
+                            ('Could not find canvas document element with id \'' + canvasId + '\'');
+                }
+                var context;
+
+                for (var i = 0; (!context) && i < CONTEXT_TYPES.length; i++) {
+                    context = canvas.getContext(CONTEXT_TYPES[i]);
+                }
+                if (!context) {
+                    throw new SceneJs.exceptions.CanvasNotSupportedException
+                            ('Canvas document element with id \''
+                                    + canvasId
+                                    + '\' failed to provide a supported context');
+                }
+                context.clearColor(0.0, 0.0, 0.0, 1.0);
+                //context.clearDepth(1.0);  // TODO: configurable cleardepth with warning for potentially bad values
+                context.enable(context.DEPTH_TEST);
+             //   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+                //  context.depthFunc(context.ALWAYS);
+                //   context.depthRange(0.0, 0.01);
+
+                return {
+                    canvas: canvas,
+                    context: context,
+                    canvasId : canvasId
+                };
+            };
+
+            this.setCanvas = function(canvas) {
+                ctx.canvas = canvas;
+            };
+
+            this.getCanvas = function() {
+                return ctx.canvas;
+            };
+
+            this.setDepthTest = function(enable) {
+                if (enable) {
+                    //   ctx.canvas.context.enable(cfg.context.DEPTH_TEST);
+                } else {
+                    //  ctx.canvas.context.disable(cfg.context.DEPTH_TEST);
+                }
+            };
+
+            this.setClearColor = function(c) {
+                ctx.canvas.context.clearColor(c.r, c.g, c.b, c.a);
+            };
+
+            this.setClearDepth = function(depth) {
+                //    ctx.canvas.context.clearDepth(depth);
+            };
+
+            this.clearCanvas = function() {
+                 ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT | ctx.canvas.context.DEPTH_BUFFER_BIT); // Buffers are swapped automatically in WebGL
+            };
+
+            this.flush = function() {
+                ctx.canvas.context.finish();
+                ctx.canvas.context.flush();
+            };
+        })());
+
+
+
+/**
+ * Backend for shader scene nodes.
+ *
+ */
+SceneJs.shaderBackend = function(cfg) {
+
+    if (!cfg.type) {
+        throw new SceneJs.exceptions.NodeConfigExpectedException("SceneJs.ShaderBackendBase mandatory config missing: \'type\'");
+    }
+
+    return new (function() {
+        this.type = cfg.type;
+
+        var ctx;
+
+        this.install = function(_ctx) {
+            ctx = _ctx;
+
+            if (!ctx.programs) {  // Lazy-create program registry
+
+                /** Utility function, loads a shader script into GL context
+                 */
+                var loadShader = function(context, script, shaderType) {
+                    var shader = context.createShader(shaderType);
+                    context.shaderSource(shader, script);
+                    context.compileShader(shader);
+                    if (context.getShaderParameter(shader, 0x8B81 /*gl.COMPILE_STATUS*/) != 1) {
+                        alert(context.getShaderInfoLog(shader));
+                        return null;
+                    }
+                    return shader;
+                };
+
+                ctx.programs = new function() {
+                    var programs = {};
+                    var activeProgram = null;
+                    var vars = {
+                        vars: {},
+                        fixed: true
+                    };
+
+                    /** Creates a program on the context of the given canvas, loads the configured
+                     * shaders into it, links the shaders, then returns the ID of the program. If the
+                     * program (one of the configured type on the given canvas) already exists, will just
+                     * return the ID of the program.
+                     */
+                    this.loadProgram = function() {
+                        if (!ctx.canvas) {
+                            throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
+                        }
+                        var programId = ctx.canvas.canvasId + ":" + cfg.type;
+
+                        /* Try to reuse cached program
+                         */
+                        var program = programs[programId];
+                        if (program) {
+                            return programId;
+                        }
+
+                        var context = ctx.canvas.context;
+
+                        /* Create program on context
+                         */
+                        program = {
+                            programId : programId,
+                            program : context.createProgram()
+                        };
+
+                        /* Load fragment shaders into context
+                         */
+                        var fragmentShaders = [];
+                        for (var i = 0; i < cfg.fragmentShaders.length; i++) {
+                            var shader = loadShader(context, cfg.fragmentShaders[i], context.FRAGMENT_SHADER);
+                            context.attachShader(program.program, shader);
+                            fragmentShaders.push(shader);
+                        }
+
+                        /* Load vertex shaders into context
+                         */
+                        var vertexShaders = [];
+                        for (var i = 0; i < cfg.vertexShaders.length; i++) {
+                            var shader = loadShader(context, cfg.vertexShaders[i], context.VERTEX_SHADER);
+                            context.attachShader(program.program, shader);
+                            vertexShaders.push(shader);
+                        }
+
+                        /* Link program                        
+                         */
+                        context.linkProgram(program.program);
+
+                        /* On link failure, delete program and shaders then throw exception
+                         */
+                        if (context.getProgramParameter(program.program, 0x8B82 /*gl.LINK_STATUS*/) != 1) {
+                            context.deleteProgram(program.program);
+                            while (fragmentShaders.length > 0) {
+                                context.deleteProgram(fragmentShaders.pop());
+                            }
+                            while (vertexShaders.length > 0) {
+                                context.deleteProgram(vertexShaders.pop());
+                            }
+                            throw new SceneJs.exceptions.ShaderLinkFailureException("Failed to link shader program: " + context.getProgramInfoLog(program.program));
+                        }
+
+                        /* Create variable location map on program
+                         */
+                        program.getVarLocation = (function() {
+                            var locations = {};
+                            return function(context, name) {
+                                var loc = locations[name];
+                                if (!loc) {
+                                    loc = context.getAttribLocation(activeProgram.program, name);
+                                    if (loc == -1) {
+                                        loc = context.getUniformLocation(activeProgram.program, name);
+                                        if (loc == -1) {
+                                            throw new SceneJs.exceptions.ShaderVariableNotFoundException("Variable not found in active shader: \'" + name + "\'");
+                                        }
+                                    }
+                                    locations[name] = loc;
+                                }
+                                return loc;
+                            };
+                        })();
+
+                        /* Register the newly-created program
+                         */
+                        programs[programId] = program;
+                        return programId;
+                    };
+
+                    /** Calls each setter on program, passing a null value to each. Each setter is responsible for
+                     * injecting a default value into the scripts when null is given, safeguarding against them never
+                     * being set a value.
+                     */
+                    var setVarDefaults = function() {
+                        for (var key in cfg.setters) {
+                            cfg.setters[key].call(this, ctx.canvas.context,
+                                    activeProgram.getVarLocation, null);
+                        }
+                    }
+                    /** Activates the loaded program of the given ID
+                     */
+                    this.activateProgram = function(programId) {
+                        if (!ctx.canvas) {
+                            throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
+                        }
+                        activeProgram = programs[programId];
+                        ctx.canvas.context.useProgram(activeProgram.program);
+                        setVarDefaults();
+                        vars = {
+                            vars: {},
+                            fixed: true // Cacheable vars by default 
+                        };
+                    };
+
+                    /** Returns the ID of the currently active program
+                     */
+                    this.getActiveProgramId = function() {
+                        return activeProgram ? activeProgram.programId : null;
+                    };
+
+                    this.setVar = function(name, value) {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        var setter = cfg.setters[name];
+                        if (setter) {
+                            setter.call(this, ctx.canvas.context, activeProgram.getVarLocation, value);
+                        }
+                    };
+
+                    /**
+                     * Sets vars on the active program; for each element in the vars, the setter of the
+                     * same name is called if it exists, passing the element's value into it. The program will
+                     * set defaults on itself where vars are not supplied.
+                     */
+                    this.setVars = function(v) {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        for (var key in cfg.setters) {
+                            cfg.setters[key].call(this, ctx.canvas.context,
+                                    activeProgram.getVarLocation, v.vars[key]); // Defaults on null
+                        }
+                        vars = v;
+                    };
+
+                    this.getVars = function() {
+                        return vars;
+                    };
+
+                    /** Binds the given vertex buffer to be the vertex source for the active program
+                     */
+                    this.bindVertexBuffer = function(buffer) {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        cfg.binders.bindVertexBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                    };
+
+                    /** Binds the given normals buffer to be the normals source for the active program
+                     */
+                    this.bindNormalBuffer = function(buffer) {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        cfg.binders.bindNormalBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                    };
+
+                    
+                    /** Deactivates the currently active program
+                     */
+                    this.deactivateProgram = function() {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        ctx.canvas.context.flush();
+                        activeProgram = null;
+                        ctx.canvas.context.useProgram(null); // Switch GL to use fixed-function paths
+                    };
+                };
+            }
+        };
+
+        // Methods for client shader node
+
+        this.loadProgram = function() {
+            return ctx.programs.loadProgram();
+        };
+
+        this.activateProgram = function(programId) {
+            ctx.programs.activateProgram(programId);
+        };
+
+        this.getActiveProgramId = function() {
+            return ctx.programs.getActiveProgramId();
+        };
+
+        this.setVars = function(vars) {
+            ctx.programs.setVars(vars);
+        };
+
+        this.deactivateProgram = function() {
+            ctx.programs.deactivateProgram();
+        };
+    })();
+};/**
+ * Backend for a lights node, provides ability to set lights on the current shader. The lights are held in a stack,
+ * which can be pushed to and popped from. Each time after it is pushed or popped, the stack is loaded into the
+ * shader. Note that the current shader may have a limit on how many lights it will recognise, in which case only
+ * that many lights from the top of the stack downwards will be effectively active within the shader.
+ */
+
+SceneJs.backends.installBackend(
+        new (function() {
+
+            this.type = 'lights';
+
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+                if (!ctx.lightStack) {
+                    ctx.lightStack = [];
+                }
+            };
+
+            var cloneVec = function(v) {
+                return v ? {x:v.x || 0, y:v.y || 0, z:v.z || 0} : { x:0, y:0, z:0 };
+            };
+
+            /** Transforms a light by the current view and modelling matrices
+             */
+            var transform = function(l) {
+                return {
+                    pos : ctx.mvTransform.matrix.transformVector3(cloneVec(l.pos)),
+                    ambient : l.ambient,
+                    diffuse : l.diffuse,
+                    specular : l.specular,
+                    dir: ctx.mvTransform.matrix.transformVector3(cloneVec(l.dir)),
+                    constantAttenuation: l.constantAttenuation,
+                    linearAttenuation: l.linearAttenuation,
+                    quadraticAttenuation: l.quadraticAttenuation
+                };
+            };
+
+            /**
+             * For client node to transform its lights from model to view-space before it pushes them onto the stack.
+             * This allows the node to memoize the lights after transformation in cases when the coordinate space is
+             * fixed; the client node should not memoize, however, if getSafeToCache() returns true;
+             */
+            this.transformLights = function(lights) {
+                var lights2 = [];
+                for (var i = 0; i < lights.length; i++) {
+                    var light = lights[i];
+                    lights2.push(transform(light));
+                }
+                return lights2;
+            };
+
+            /** Returns true if the coordinate space defined by the current view matrices is
+             * fixed, ie. not animated, at this level of scene traversal. If not, then it is not safe
+             * for the client node to memoize its lights once they are transformed, because the transformation
+             * is therefore likely to vary, causing the lights to move around.
+             */
+            this.getSafeToCache = function() {
+                return ctx.mvTransform.fixed;
+            };
+
+            /** Pushes view-space lights to stack, and then inserts stack into shader.
+             */
+            this.pushLights = function(lights) {
+                if (!ctx.programs.getActiveProgramId()) {
+                    throw 'No shader active';
+                }
+                for (var i = 0; i < lights.length; i++) {
+                    ctx.lightStack.push(lights[i]);
+                }
+                ctx.programs.setVar('scene_Lights', ctx.lightStack);
+            };
+
+            /** Pops view-space lights from stack, and then re-inserts stack into shader.
+             *
+             */
+            this.popLights = function(numLights) {
+                for (var i = 0; i < numLights; i++) {
+                    ctx.lightStack.pop();
+                }
+                ctx.programs.setVar('scene_Lights', ctx.lightStack);
+            };
+        })());/** Backend for viewport node
+ *
+ */
+SceneJs.backends.installBackend(
+        new (function() {
+
+            this.type = 'viewport';
+
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+            };
+
+            this.setViewport = function(viewport) {
+                if (!ctx.canvas) {
+                    throw 'No canvas active';
+                }
+                var context = ctx.canvas.context;
+                context.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+                ctx.viewport = viewport;
+            };
+
+            this.getViewport = function() {
+                if (!ctx.canvas) {
+                    throw 'No canvas active';
+                }
+
+                /* Lazy-create default viewport - assumes that client node always calls getViewport before setViewport
+                 */
+                if (!ctx.viewport) {
+                    ctx.viewport = { x : 1, y: 1, width: ctx.canvas.width, height: ctx.canvas.height };
+                }
+                return ctx.viewport;
+            };
+
+            this.clear = function() {
+               // ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT);
+            };
+        })());
+/**
+ * WebGL support for Layer node
+ *
+ */
+SceneJs.backends.installBackend(
+        new (function() {
+
+            this.type = 'layer';
+            
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+            };
+
+            this.setCullFace = function(enable) {
+                if (enable) {
+                    cfg.canvas.context.enable(cfg.context.CULL_FACE);
+                } else {
+                    cfg.canvas.context.disable(cfg.context.CULL_FACE);
+                }
+            };
+
+            this.flush = function() {
+                cfg.context.flush();
+            };
+        })());
+/**
+ * Manages the current model-view transformation
+ */
+SceneJs.backends.installBackend(
+        new (function() {
+
+            this.type = 'model-view-transform';
+
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+                if (!ctx.mvTransform) {
+                    var t = Matrix.I(4);
+                    ctx.mvTransform = {
+                        matrix : t,
+                        normalMatrix : new WebGLFloatArray(t.inverse().transpose().make3x3().flatten()),
+                        fixed: true
+                    };
+                }
+            };
+
+            this.setTransform = function(transform) {
+                if (!ctx.programs.getActiveProgramId()) {
+                    throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                }
+                ctx.mvTransform = transform;
+                ctx.programs.setVar('scene_ModelViewMatrix', transform.matrixAsArray);
+                ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
+            };
+
+            this.getTransform = function() {
+                return ctx.mvTransform;
+            };
+        })());/**
+ * Sets a rotation modelling transformation on the current shader. The transform will be cumulative with transforms at
+ * higher nodes.
+ */
+SceneJs.rotate = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var backend = SceneJs.backends.getBackend('model-view-transform');
+
+    var mat;
+    var xform;
+
+    return function(scope) {
+        if (!mat || !cfg.fixed) { // Memoize matrix if node config is constant
+            var params = cfg.getParams(scope);
+            params.x = params.x || 0;
+            params.y = params.y || 0;
+            params.z = params.z || 0;
+            if (params.x + params.y + params.z == 0) {
+                throw new SceneJs.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
+            }
+            mat = Matrix.Rotation(params.angle ? params.angle / 180 * Math.PI : 0.0,
+                    $V([params.x || 0, params.y || 0, params.z || 0])).ensure4x4()
+        }
+        var superXform = backend.getTransform();
+        if (!xform || !superXform.fixed || !cfg.fixed) {
+            var tempMat = superXform.matrix.x(mat);
+            xform = {
+                matrix: tempMat,
+                normalMatrixAsArray : new WebGLFloatArray(tempMat.inverse().transpose().make3x3().flatten()),
+                matrixAsArray : new WebGLFloatArray(tempMat.flatten()),
+                fixed: superXform.fixed && cfg.fixed
+            };
+        }
+        backend.setTransform(xform);
+        SceneJs.utils.visitChildren(cfg, scope);
+        backend.setTransform(superXform);
+    };
+};
+/**
+ * Sets a translation modelling transformation on the current shader. The transform will be cumulative with transforms at
+ * higher nodes.
+ */
+(function() {
+
+    function makeTranslate(x, y, z) {
+        return Matrix.create([
+            [ 1, 0, 0, x ],
+            [ 0, 1, 0, y ],
+            [ 0, 0, 1, z ],
+            [ 0, 0, 0, 1 ]
+        ]);
+    }
+
+    SceneJs.translate = function() {
+        var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+        var backend = SceneJs.backends.getBackend('model-view-transform');
+
+        var mat;
+        var xform;
+
+        return function(scope) {
+            if (!mat || !cfg.fixed) {  // Memoize matrix if node config is constant
+                var params = cfg.getParams(scope);
+                mat = makeTranslate(params.x || 0, params.y || 0, params.z || 0);
+            }
+            var superXform = backend.getTransform();
+            if (!xform || !superXform.fixed || !cfg.fixed) {
+                var tempMat = superXform.matrix.x(mat);
+                xform = {
+                    matrix: tempMat,
+                   normalMatrixAsArray : new WebGLFloatArray(tempMat.inverse().transpose().make3x3().flatten()),
+                matrixAsArray : new WebGLFloatArray(tempMat.flatten()),
+                    fixed: superXform.fixed && cfg.fixed
+                };
+            }
+            backend.setTransform(xform);
+            SceneJs.utils.visitChildren(cfg, scope);
+            backend.setTransform(superXform);
+        };
+    };
+})();/**
+ * Sets a scaling modelling transformation on the current shader. The transform will be cumulative with transforms at
+ * higher nodes.
+ */
+
+(function() {
+
+    function makeScale(x, y, z) {
+        return Matrix.create([
+            [ x, 0, 0, 0 ],
+            [ 0, y, 0, 0 ],
+            [ 0, 0, z, 0 ],
+            [ 0, 0, 0, 1 ]
+        ]);
+    }
+
+    SceneJs.scale = function() {
+        var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+        var backend = SceneJs.backends.getBackend('model-view-transform');
+
+        var mat;
+        var xform;
+
+        return function(scope) {
+            if (!mat || !cfg.fixed) {   // Memoize matrix if node config is constant
+                var params = cfg.getParams(scope);
+                mat = makeScale(params.x || 0, params.y || 0, params.z || 0);
+            }
+            var superXform = backend.getTransform();
+            if (!xform || !superXform.fixed || !cfg.fixed) {
+                var tempMat = superXform.matrix.x(mat);
+                xform = {
+                    matrix: tempMat,
+                    normalMatrixAsArray : new WebGLFloatArray(tempMat.inverse().transpose().make3x3().flatten()),
+                matrixAsArray : new WebGLFloatArray(tempMat.flatten()),
+                    fixed: superXform.fixed && cfg.fixed
+                };
+            }
+            backend.setTransform(xform);
+            SceneJs.utils.visitChildren(cfg, scope);
+            backend.setTransform(superXform);
+        };
+    };
+})();
+
+/**
+ * Scene node that constructs a 'lookat' view transformation matrix and sets it on the current shader.
+ */
+
+(function() {
+
+    function makeLookAt(ex, ey, ez,
+                        cx, cy, cz,
+                        ux, uy, uz) {
+        var eye = $V([ex, ey, ez]);
+        var center = $V([cx, cy, cz]);
+        var up = $V([ux, uy, uz]);
+
+        var z = eye.subtract(center).toUnitVector();
+        var x = up.cross(z).toUnitVector();
+        var y = z.cross(x).toUnitVector();
+
+        var m = $M([
+            [x.e(1), x.e(2), x.e(3), 0],
+            [y.e(1), y.e(2), y.e(3), 0],
+            [z.e(1), z.e(2), z.e(3), 0],
+            [0, 0, 0, 1]
+        ]);
+
+        var t = $M([
+            [1, 0, 0, -ex],
+            [0, 1, 0, -ey],
+            [0, 0, 1, -ez],
+            [0, 0, 0, 1]
+        ]);
+        return m.x(t);
+    }
+
+    SceneJs.lookAt = function() {
+        var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+        var backend = SceneJs.backends.getBackend('model-view-transform');
+
+        var cloneVec = function(v) {
+            return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
+        };
+
+        var mat;
+        var xform;
+
+        return function(scope) {
+
+            if (!mat || !cfg.fixed) { // Memoize matrix if node config is constant
+                var params = cfg.getParams(scope);
+
+                params.eye = params.eye ? cloneVec(params.eye) : { x: 0.0, y: 0.0, z: 0.0 };
+                params.look = params.look ? cloneVec(params.look) : { x: 0.0, y: 0.0, z: 0.0 };
+                params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
+
+                if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
+                    throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: eye and look cannot be identical");
+                }
+                if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
+                    throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
+                }
+                mat = makeLookAt(
+                        params.eye.x, params.eye.y, params.eye.z,
+                        params.look.x, params.look.y, params.look.z,
+                        params.up.x, params.up.y, params.up.z);
+            }
+
+            var superXform = backend.getTransform();
+            if (!xform || !superXform.fixed || !cfg.fixed) {
+                var tempMat = superXform.matrix.x(mat);
+                xform = {
+                    matrix: tempMat,
+                    normalMatrixAsArray : new WebGLFloatArray(tempMat.inverse().transpose().make3x3().flatten()),
+                    matrixAsArray : new WebGLFloatArray(tempMat.flatten()),
+                    fixed: superXform.fixed && cfg.fixed
+                };
+            }
+            backend.setTransform(xform);
+            SceneJs.utils.visitChildren(cfg, scope);
+            backend.setTransform(superXform);
+        };
+    };
+})();/**
+ * Manages the current model-view transformation
+ */
+SceneJs.backends.installBackend(
+        new (function() {
+
+            this.type = 'projection-transform';
+
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+                if (!ctx.projTransform) {
+                    ctx.projTransform = {
+                        matrix: Matrix.I(4),
+                        matrixAsArray : new WebGLFloatArray(Matrix.I(4).flatten())
+                    };
+                }
+            };
+
+            this.setTransform = function(transform) {
+                if (!ctx.programs.getActiveProgramId()) {
+                    throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                }                      
+                ctx.projTransform = transform;
+                ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
+            };
+
+            this.getTransform = function() {
+                return ctx.projTransform;
+            };
+        })());/**
+ * Scene node that constructs a perspective projection matrix and sets it on the current shader.
+ */
+
+(function() {
+
+    function makeFrustum(left, right,
+                         bottom, top,
+                         znear, zfar) {
+        var X = 2 * znear / (right - left);
+        var Y = 2 * znear / (top - bottom);
+        var A = (right + left) / (right - left);
+        var B = (top + bottom) / (top - bottom);
+        var C = -(zfar + znear) / (zfar - znear);
+        var D = -2 * zfar * znear / (zfar - znear);
+
+        return $M([
+            [X, 0, A, 0],
+            [0, Y, B, 0],
+            [0, 0, C, D],
+            [0, 0, -1, 0]
+        ]);
+    }
+
+    function makePerspective(fovy, aspect, znear, zfar) {
+        var ymax = znear * Math.tan(fovy * Math.PI / 360.0);
+        var ymin = -ymax;
+        var xmin = ymin * aspect;
+        var xmax = ymax * aspect;
+
+        return makeFrustum(xmin, xmax, ymin, ymax, znear, zfar);
+    }
+
+    SceneJs.perspective = function() {
+        var cfg = SceneJs.utils.getNodeConfig(arguments);
+        var backend = SceneJs.backends.getBackend('projection-transform');
+        var xform;
+
+        return function(scope) {
+            if (!xform || !cfg.fixed) {
+                var params = cfg.getParams(scope);
+
+                params.fovy = params.fovy || 60.0;  // TODO: validate params
+                params.aspect = params.aspect || 1.0;
+                params.near = params.near || 0.1;
+                params.far = params.far || 400.0;
+
+                var tempMat = makePerspective(
+                        params.fovy,
+                        params.aspect,
+                        params.near,
+                        params.far);
+
+                xform = {
+                    matrix:tempMat,
+                    matrixAsArray: new WebGLFloatArray(tempMat.flatten())
+                };
+            }
+            var prevXform = backend.getTransform();
+            backend.setTransform(xform);
+            SceneJs.utils.visitChildren(cfg, scope);
+            backend.setTransform(prevXform);
+        };
+    };
+})();
+/**
+ * Scene node that constructs an ortographic projection matrix and sets it on the current shader.
+ */
+(function() {
+
+    function makeOrtho(left, right,
+                       bottom, top,
+                       znear, zfar) {
+        var tx = -(right + left) / (right - left);
+        var ty = -(top + bottom) / (top - bottom);
+        var tz = -(zfar + znear) / (zfar - znear);
+
+        return $M([
+            [2 / (right - left), 0, 0, tx],
+            [0, 2 / (top - bottom), 0, ty],
+            [0, 0, -2 / (zfar - znear), tz],
+            [0, 0, 0, 1]
+        ]);
+    }
+
+    SceneJs.ortho = function() {
+        var cfg = SceneJs.utils.getNodeConfig(arguments);
+        var backend = SceneJs.backends.getBackend('projection-transform');
+        var xform;
+        return function(scope) {
+            if (!xform || !cfg.fixed) {
+                var params = cfg.getParams(scope);
+                var tempMat = makeOrtho(
+                        params.left || -1.0,
+                        params.right || 1.0,
+                        params.bottom || -1.0,
+                        params.top || 1.0,
+                        params.near || 0.1,
+                        params.far || 100.0
+                        );
+                xform = {
+                    matrix: tempMat,
+                    matrixAsArray: new WebGLFloatArray(tempMat.flatten())
+                };
+            }
+            var prevXform = backend.getTransform();
+            backend.setTransform(xform);
+            SceneJs.utils.visitChildren(cfg, scope);
+            backend.setTransform(prevXform);
+        };
+    };
+})();/**
+ * Scene node that constructs a projection matrix from a frustum and sets it on the current shader.
+ */
+
+(function() {
+
+    function makeFrustum(left, right,
+                         bottom, top,
+                         znear, zfar) {
+        var X = 2 * znear / (right - left);
+        var Y = 2 * znear / (top - bottom);
+        var A = (right + left) / (right - left);
+        var B = (top + bottom) / (top - bottom);
+        var C = -(zfar + znear) / (zfar - znear);
+        var D = -2 * zfar * znear / (zfar - znear);
+
+        return $M([
+            [X, 0, A, 0],
+            [0, Y, B, 0],
+            [0, 0, C, D],
+            [0, 0, -1, 0]
+        ]);
+    }
+
+    SceneJs.frustum = function() {
+        var cfg = SceneJs.utils.getNodeConfig(arguments);
+        var backend = SceneJs.backends.getBackend('projection-transform');
+        var xform;
+        return function(scope) {
+            if (!xform || cfg.fixed) {    // Memoize matrix if node config is constant
+                var params = cfg.getParams(scope);
+                var tempMat = makeFrustum(
+                        params.left || -1.0,
+                        params.right || 1.0,
+                        params.bottom || -1.0,
+                        params.top || 1.0,
+                        params.near || 0.1,
+                        params.far || 100.0
+                        );
+                xform = {
+                    matrix: tempMat,
+                    matrixAsArray: new WebGLFloatArray(tempMat.flatten())
+                };
+            }
+            var prevXform = backend.getTransform();
+            backend.setTransform(xform);
+            SceneJs.utils.visitChildren(cfg, scope);
+            backend.setTransform(prevXform);
+        };
+    };
+
+})();/*
+ * Backend for a geometry node. Manages geometry buffers (VBOs), allowing their creation, loading and activation.
+ * More on VBOs: http://www.opengl.org/wiki/Vertex_Buffer_Objects
+ */
+
+SceneJs.backends.installBackend(
+        new (function() {
+
+            var nextBufId = 0;
+
+            this.type = 'geometry';
+
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+                ctx.buffers = {};
+            };
+
+            this.intersects = function(boundary) {
+                return true; // TODO
+            };
+
+            var createBuffer = function(context, items, bufType, itemSize, glArray) {
+                var handle = {
+                    bufferId : context.createBuffer(),
+                    itemSize: itemSize,
+                    numItems : items.length
+                };
+                context.bindBuffer(bufType, handle.bufferId);
+                context.bufferData(bufType, glArray, context.STATIC_DRAW);
+                return handle;
+            };
+
+            /** Tests if a buffer for the given geometry type exists on the current canvas
+             *
+             * @param geoType - IE. "teapot", "cube" etc.
+             */
+            this.findGeoBuffer = function(geoType) {
+                var bufId = ctx.canvas.canvasId + type;
+                return (ctx.buffers[bufId]) ? bufId : null;
+            };
+
+            /** Creates a buffer containing the given geometry, associated with the activate canvas and returns its ID.
+             * When the geoType is given, the buffer ID is the concatenation of the geoID with the canvas ID, otherwise
+             * an "anonymous" unique buffer ID is generated.
+             */
+            this.createGeoBuffer = function(geoType, geo) {
+                if (!ctx.programs.getActiveProgramId()) {
+                    throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                }
+                var bufId = ctx.canvas.canvasId + (geoType || nextBufId++);
+                var context = ctx.canvas.context;
+                ctx.buffers[bufId] = {
+                    vertexBuf : createBuffer(context, geo.vertices, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.vertices)),
+                    normalBuf : createBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals)),
+                    indexBuf :  createBuffer(context, geo.indices, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLUnsignedShortArray(geo.indices))
+                };
+                return bufId;
+            };
+
+            /** Draws the geometry in the given buffer
+             */
+            this.drawGeoBuffer = function(bufId) {
+                var buffer = ctx.buffers[bufId];
+
+                /* Bind vertex and normal buffers to active program
+                 */
+                ctx.programs.bindVertexBuffer(buffer.vertexBuf.bufferId);
+                ctx.programs.bindNormalBuffer(buffer.normalBuf.bufferId);
+
+                /* Bind index buffer and draw geometry using the active program
+                 */
+                var context = ctx.canvas.context;
+
+                context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffer.indexBuf.bufferId);
+                context.drawElements(context.TRIANGLES, buffer.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
+                   context.flush();
+            };
+
+            this.freeGeoBuffer = function(bufId) { // TODO: freeGeoBuffer  - maybe use auto cache eviction?
+
+
+            };
+
+        })());/**
+ * Backend for a material node, feeds given material properties into the active shader and retains them.
+ */
+SceneJs.backends.installBackend(
+        new (function() {
+
+            this.type = 'material';
+
+            var ctx;
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+                if (!ctx.material) {
+                    ctx.material = {  // Default to some colour so we'll see at least something while debugging a scene 
+                        ambient:  { r: 0, g : 0, b : 1 },
+                        diffuse:  { r: 0, g : 0, b : 1 },
+                        specular: { r: 0, g : 0, b : 1 },
+                        shininess:{ r: 0, g : 0, b : 1 }
+                    };
+                }
+            };
+
+            this.setMaterial = function(material) {
+                if (!ctx.programs.getActiveProgramId()) {
+                    throw 'No shader active';
+                }
+                ctx.programs.setVar('scene_Material', material);
+                ctx.material = material;
+            };
+
+            this.getMaterial = function() {
+                return ctx.material;
+            };
+        })());/** Basic scene graph node. If the config contains any members, then they will be within scope for
+ * child nodes.
+ */
+SceneJs.node = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+    return function(scope) {
+        var params = cfg.getParams();
+        var childScope = SceneJs.utils.newScope(scope, false);
+        if (params) {
+            for (var key in params) {
+                childScope.put(key, params[key]);
+            }
+        }
+        SceneJs.utils.visitChildren(cfg, childScope || scope);
+    };
+};
+/** Root node of a scene graph. Like all nodes, its arguments are a config object followed by
+ * zero or more child nodes. The members of the config object are set on the root data scope when rendered.
+ *
+ */
+SceneJs.graph = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+    return {
+
+        /**
+         * Renders the scene graph, passing in the given parameters to override node parameters
+         * set on the root data scope
+         */
+        render : function(paramOverrides) {
+            var scope = SceneJs.utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
+            var params = cfg.getParams();
+            for (var key in params) {    // Push scene params into scope
+                scope.put(key, params[key]);
+            }
+            if (paramOverrides) {        // Override with traversal params
+                for (var key in paramOverrides) {
+                    scope.put(key, paramOverrides[key]);
+                }
+            }
+            SceneJs.utils.visitChildren(cfg, scope);
+        }
+    };
+};
+/** Activates a OpenGL context on a specified HTML-5 canvas for sub-nodes. These can be nested; a previously-active
+ * canvas will be temporarily inactive while this one's canvas is active.
+ *
+ */
+SceneJs.canvas = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var backend = SceneJs.backends.getBackend('canvas');
+    var canvas; // memoized
+
+    return function(scope) {
+        var params = cfg.getParams(scope);
+        if (!params.canvasId) {
+            throw 'canvas node parameter missing: canvasId';
+        }
+
+        var superCanvas = backend.getCanvas(); // remember previous canvas if any
+
+        if (!canvas || !cfg.fixed) {
+            canvas = backend.findCanvas(params.canvasId);
+        }
+        backend.setCanvas(canvas);
+
+        // TODO: configure canvas from node configs?
+
+       backend.clearCanvas(); // TODO: canvas should really be cleared globally at scene root instead of each time it's used!
+
+        SceneJs.utils.visitChildren(cfg, scope);
+    backend.flush();
+            backend.setCanvas(superCanvas); // restore previous canvas
+
+    };
+};
+
+SceneJs.viewport = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var backend = SceneJs.backends.getBackend('viewport');
+
+    return function(scope) {
+        var params = cfg.getParams(scope);
+
+        var prevViewport = backend.getViewport();
+        backend.setViewport({ x: params.x || 0, y: params.y || 0, width: params.width || 100, height: params.height || 100});
+        SceneJs.utils.visitChildren(cfg, scope);
+        if (prevViewport) {
+            backend.setViewport(prevViewport);
+        }
+    };
+};/**
+ * Defines geometry on the currently-active canvas, to be shaded with the current shader.
+ *
+ */
+SceneJs.geometry = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var backend = SceneJs.backends.getBackend('geometry');
+
+    var calculateNormals = function(vertices, indices) {
+        var nvecs = new Array(vertices.length);
+
+        for (var i = 0; i < indices.length; i++) {
+            var j0 = indices[i][0];
+            var j1 = indices[i][1];
+            var j2 = indices[i][2];
+
+            var v1 = $V(vertices[j0]);
+            var v2 = $V(vertices[j1]);
+            var v3 = $V(vertices[j2]);
+
+            var va = v2.subtract(v1);
+            var vb = v3.subtract(v1);
+
+            var n = va.cross(vb).toUnitVector();
+
+            if (!nvecs[j0]) nvecs[j0] = [];
+            if (!nvecs[j1]) nvecs[j1] = [];
+            if (!nvecs[j2]) nvecs[j2] = [];
+
+            nvecs[j0].push(n);
+            nvecs[j1].push(n);
+            nvecs[j2].push(n);
+        }
+
+        var normals = new Array(vertices.length);
+
+        // now go through and average out everything
+        for (var i = 0; i < nvecs.length; i++) {
+            var count = nvecs[i].length;
+            var x = 0;
+            var y = 0;
+            var z = 0;
+            for (var j = 0; j < count; j++) {
+                x += nvecs[i][j].elements[0];
+                y += nvecs[i][j].elements[1];
+                z += nvecs[i][j].elements[2];
+            }
+            normals[i] = [x / count, y / count, z / count];
+        }
+        return normals;
+    };
+
+    var flatten = function (ar, numPerElement) {
+        var result = [];
+        for (var i = 0; i < ar.length; i++) {
+            if (numPerElement && ar[i].length != numPerElement)
+                throw new SceneJs.exceptions.IllegalGeometryParameterException("Bad geometry array element");
+            for (var j = 0; j < ar[i].length; j++)
+                result.push(ar[i][j]);
+        }
+        return result;
+    };
+
+    var bufId; // handle to backend geometry buffer
+
+    return function(scope) {
+        var params = cfg.getParams(scope);
+        if (!cfg.fixed) {
+            /* Since I'm always using VBOs, we cant buffer geometry if it's going to keep changing.
+             * In future versions I'll allow dynamic geometry config and just not buffer it in that case.
+             */
+            throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
+        }
+        if (!bufId) {
+            if (params.type) {
+                bufId = backend.findGeoBuffer(params.type);
+            }
+            if (!bufId) {
+                bufId = backend.createGeoBuffer(params.type, {
+                    vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
+                    normals: params.normals && params.normals.length > 0 ? params.normals
+                            : flatten(calculateNormals(params.vertices, params.indices), 3),
+                    colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
+                    indices : params.indices && params.indices.length > 0 ? flatten(params.indices, 3) : []
+                });
+            }
+        }
+        backend.drawGeoBuffer(bufId);
+        SceneJs.utils.visitChildren(cfg, scope);
+    };
+};
+
 SceneJs.utils.ns("SceneJs.objects");
 
+/** Specialises (as a higher-order function) a geometry node to define the venerable OpenGL teapot.
+ *
+ */
 SceneJs.objects.teapot = function() {
     return SceneJs.geometry({
+
+    //    type:"teapot",
+        
         vertices: [
             [-3.000000, 1.650000, 0.000000],
             [-2.987110, 1.650000, -0.098438],
@@ -1980,7 +4890,7 @@ SceneJs.objects.teapot = function() {
             [3.408380, 2.315430, 0.000000],
             [3.428120, 2.327340, 0.000000]
         ],
-        faces: [
+        indices: [
             [1454,1468,1458],
             [1448,1454,1458],
             [1461,1448,1458],
@@ -5737,5 +8647,595 @@ SceneJs.objects.teapot = function() {
     });
 };
 
+
+
+SceneJs.utils.ns("SceneJs.objects");
+
+/** Cube geometry
+ *
+ */
+SceneJs.objects.cube = function() {
+
+    //    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var min = -1.0;
+    var max = 1.0;
+
+    var zmax = 1.0;
+    var zmin = -1.0;
+
+    return SceneJs.geometry({
+        //        vertices:    [
+        //            [0.0, 0.5, 0.0],
+        //            [-0.5, -0.5, 0.0],
+        //            [0.5, -0.5, 0.0 ]
+        //        ],
+
+        vertices: [
+
+            [min, min, zmin],
+            [max, min, zmin],
+            [max, max, zmin],
+            [min, max, zmin],
+
+            [min, min, zmax],
+            [max, min, zmax],
+            [max, max, zmax],
+            [min, max, zmax]
+        ],
+
+        //        indices:[[0,1,2]]
+
+        indices: [
+            // top
+            [0, 1, 2],
+            [2, 3, 0],
+
+            // left
+            [0, 3, 7],
+            [7, 4, 0],
+
+            // right
+            [2, 1, 5],
+            [5, 6, 2],
+
+            // front
+            [3, 2, 6],
+            [6, 7, 3],
+
+            // back
+            [1, 0, 4],
+            [4, 5, 1],
+
+            // back
+            [4, 7, 6],
+            [6, 5, 4]
+        ]
+    });
+};
+
+
+
+SceneJs.layer = function() {
+    var cfg = SceneJs.getConfig(arguments);
+
+    var type = 'layer';
+
+    return SceneJs.node(
+            SceneJs.apply(cfg, {
+                preVisit : function() {
+                    var backend = SceneJs.backends.getBackend(type);
+                    if (backend) {
+                        (cfg.cullFace) ? backend.setCullFace(true) : backend.setCullFace(false);
+                    }
+                },
+
+                postVisit : function() {
+                    var backend = SceneJs.backends.getBackend(type);
+                    if (backend) {
+                        backend.setCullFace(false);
+                        backend.flush();
+                    }
+                }}));
+};
+/** Activates a shader program for sub-nodes.
+ *
+ */
+SceneJs.shader = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+    var programId;
+    var backend;
+
+    return function(scope) {
+        var params = cfg.getParams(scope);
+
+        if (!backend) {
+            if (!params.type) {
+                throw 'Mandatory shader parameter missing: \'type\'';
+            }
+            backend = SceneJs.backends.getBackend(params.type);
+        }
+
+        /* Lazy-load shaders
+         */
+        if (!programId) {
+            programId = backend.loadProgram();
+        }
+
+        /* Save any state set by higher shader node
+         */
+        var previousProgramId = backend.getActiveProgramId(); // Save active shaders
+        var previousVars;
+        if (previousProgramId) {
+            previousVars = backend.getVars();
+        }
+
+        /* Activate new shaders and vars
+         */
+        backend.activateProgram(programId);
+        if (params.vars) {
+            backend.setVars({
+                vars: params.vars,
+                fixed : cfg.fixed // Sub-vars are cacheable if these are not dynamically-generated
+            });
+        }
+
+        SceneJs.utils.visitChildren(cfg, scope);
+
+        /* Restore any state saved for higher
+         */
+        if (previousProgramId) {
+            backend.activateProgram(previousProgramId);
+            if (previousVars) {
+                backend.setVars(previousVars);
+            }
+        } else {
+            backend.deactivateProgram();
+        }
+    };
+};
+
+
+/**
+ * Sawn-off smooth shader that uses only the position of the most recently defined light
+ * source (the last light defined in the the light list of the current light node) and
+ * the ambient, specular and diffuse components of a material node.
+ *
+ * SceneJS shaders always have separate projection, view and modelling matrices for efficiency.
+ *
+ * They provide two sets of functions to SceneJS: binders and setters. A binder function dynamically sets a GL buffer as
+ * the source of some script attribute, such as a vertex or normal, while a setter sets the value of some attribute
+ * within a script, such as a matrix.
+ *
+ * This is just to get you started!
+ *
+ * In practise, your shaders would want to use all of the lights, perhaps using something
+ * like the virtualised lightsources technique described at:
+ * http://gpwiki.org/index.php/OpenGL:Tutorials:Virtualized_Lights_with_OpenGL_and_GLSL
+ *
+ * @param cfg
+ */
+
+SceneJs.backends.installBackend(
+        (function() {
+
+            /** Default value for script matrices, injected on activation
+             */
+            var defaultMat4 = new WebGLFloatArray(Matrix.I(4).flatten());
+            var defaultNormalMat = new WebGLFloatArray(Matrix.I(4).inverse().transpose().make3x3().flatten());
+            var defaultMaterial = {
+                diffuse: { r: 1.0, g: 1.0, b: 1.0 },
+                ambient: { r: 1.0, g: 1.0, b: 1.0 }
+            };
+
+            return SceneJs.shaderBackend({
+
+                type: 'simple-shader',
+
+                fragmentShaders: [
+
+                    "varying vec4 FragColor;" +
+
+                    "void main(void) { " +
+                    "      gl_FragColor = FragColor;  " +
+                    "} "
+                ],
+
+                vertexShaders: [
+
+                    "attribute vec3 Vertex;" +
+                    "attribute vec3 Normal;" +
+
+                    "uniform vec4 LightPos;" +
+
+                    'uniform mat4 PMatrix; ' +
+                    'uniform mat4 MVMatrix; ' +
+                    'uniform mat3 NMatrix; ' +
+
+                    "uniform vec3 MaterialAmbient;" +
+                    "uniform vec3 MaterialDiffuse;" +
+                        //"uniform vec3 MaterialSpecular;" +
+
+                    "varying vec4 FragColor;" +
+
+
+                    "void main(void) {" +
+                    "   vec4 v = vec4(Vertex, 1.0);" +
+                    "   vec4 vmv = MVMatrix * v;" +
+                    "   gl_Position = PMatrix * vmv;" +
+
+                    "   vec3 nn = normalize(NMatrix * Normal);" +
+                    "   vec3 lightDir = vec3(normalize(vmv - LightPos));" +
+
+                    "   float NdotL = max(dot(lightDir, nn), 0.0);" +
+
+                    "   FragColor = vec4(NdotL * MaterialDiffuse + MaterialAmbient, 1.0);" +
+                    "}"
+                ],
+
+                /**
+                 * Binder functions - each of these dynamically sets a GL buffer as the value source for some script attribute.
+                 */
+                binders : {
+
+                    /** Binds the given buffer to the Vertex attribute
+                     */
+                    bindVertexBuffer : function(context, findVar, buffer) {
+                        var vertexAttribute = findVar(context, 'Vertex');
+                        context.enableVertexAttribArray(vertexAttribute);
+                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
+                        context.vertexAttribPointer(vertexAttribute, 3, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
+                    },
+
+                    /** Binds the given buffer to the Normal attribute
+                     */
+                    bindNormalBuffer : function(context, findVar, buffer) {
+                        var normalAttribute = findVar(context, 'Normal');
+                        context.enableVertexAttribArray(normalAttribute);
+                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
+                        context.vertexAttribPointer(normalAttribute, 3, context.FLOAT, false, 0, 0);
+                    }
+                },
+
+                /** Setter functions - each of these sets the value of some attribute within a script, such as a matrix.
+                 * When the shader is activated, these are all called in a batch, each with a null value, to prime their respective
+                 *  script attributes with default values in case values are never supplied for them. So as you can see,
+                 * they are responsible for setting a default value when none is given.
+                 */
+                setters : {
+
+                    scene_ProjectionMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false, mat|| defaultMat4);
+                    },
+
+                    scene_ModelViewMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix4fv(findVar(context, 'MVMatrix'), false, mat|| defaultMat4);
+                    },
+
+                    scene_NormalMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat|| defaultNormalMat);
+                    },
+
+                    scene_Material: function(context, findVar, m) {
+                        m = m || defaultMaterial;
+                        context.uniform3fv(findVar(context, 'MaterialAmbient'), [m.ambient.r, m.ambient.g, m.ambient.b]);
+                        context.uniform3fv(findVar(context, 'MaterialDiffuse'), [m.diffuse.r, m.diffuse.g, m.diffuse.b]);
+                        //                            context.uniform3fv(findVar(context, 'MaterialSpecular'), [m.specular.r, m.specular.g, m.specular.b]);
+                    },
+
+                    scene_Lights: function(context, findVar, lights) {
+                        if (lights && lights.length > 0) {
+                            var l = lights[0];
+                            context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
+                        } else {
+                            context.uniform4fv(findVar(context, 'LightPos'), [10.0, 0.0, -10.0, 1.0]);
+                        }
+                    },
+
+                    scene_Normal: function(context, findVar, normals) {
+                        if (normals) {
+                            var loc = findVar(context, 'Normal');
+                            context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, normals);
+                            context.enableVertexAttribArray(loc);
+                        }
+                    },
+
+                    scene_Vertex: function(context, findVar, vertices) {
+                        if (vertices) { // No default
+                            var loc = findVar(context, 'Vertex') ;
+                            context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, vertices);
+                            context.enableVertexAttribArray(loc);
+                        }
+
+                    }
+                }
+            });
+        })()
+        )
+        ;
+
+
+SceneJs.lights = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var backend = SceneJs.backends.getBackend('lights');
+
+    var lights;
+
+    return function(scope) {
+
+        /* Memoize lights if they are given in a constant node config and if the
+         * current view and model coordinate system is also constant        
+         */
+        if (!lights || !cfg.fixed || !backend.getSafeToCache()) {
+            lights = backend.transformLights(cfg.getParams(scope).lights);
+        }
+        backend.pushLights(lights);
+        SceneJs.utils.visitChildren(cfg, scope);
+        backend.popLights(lights.length);
+    };
+};/** Sets material properties on the current shader for sub-nodes
+ *
+ */
+SceneJs.material = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var backend = SceneJs.backends.getBackend('material');
+
+    var cloneColor = function(v) {
+        return v ? { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 } : { r: 0, g : 0, b: 0};
+    };
+
+    var material;   // memoized
+
+    return function(scope) {
+        if (!material || !cfg.fixed) { // if not memoized or params are variable
+            var params = cfg.getParams(scope);
+            material = {
+                ambient:  cloneColor(params.ambient),
+                diffuse:  cloneColor(params.diffuse),
+                specular: cloneColor(params.specular),
+                shininess:cloneColor(params.shininess)
+            };
+        }
+
+        var saveMaterial = backend.getMaterial();
+
+        backend.setMaterial(material);
+        SceneJs.utils.visitChildren(cfg, scope);
+        backend.setMaterial(saveMaterial);
+    };
+};SceneJs.scalarInterpolator = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var NOT_FOUND = 0;
+    var BEFORE_FIRST = 1;
+    var AFTER_LAST = 2;
+    var FOUND = 3;
+
+    return function(scope) {
+        var params = cfg.getParams(scope);
+
+        // Validate
+
+        if (!params.input) {
+            throw 'scalarInterpolator input parameter missing';
+        }
+        if (typeof(params.input) != 'function') {
+            throw 'scalarInterpolator input parameter should be a function';
+        }
+
+        if (!params.output) {
+            throw 'scalarInterpolator output parameter missing';
+        }
+        if (typeof(params.output) != 'function') {
+            throw 'scalarInterpolator apply parameter should be a function';
+        }
+        if (params.keys) {
+            if (!params.values) {
+                throw 'scalarInterpolator keys supplied but no values - must supply a value for each key';
+            }
+        } else if (params.values) {
+            throw 'scalarInterpolator values supplied but no keys - must supply a key for each value';
+        }
+        for (var i = 1; i < params.keys.length; i++) {
+            if (params.keys[i - 1] >= params.keys[i]) {
+                throw 'two invalid scalarInterpolator keys found (' + i - 1 + ' and ' + i + ') - key list should contain distinct values in ascending order';
+            }
+        }
+
+        params.type = params.type || 'linear';
+
+        switch (params.type) {
+            case 'linear':
+                break;
+            case 'constant':
+                break;
+            case 'cosine':
+                break;
+            case 'cubic':
+                if (params.keys.length < 4) {
+                    throw 'Minimum of four keyframes required for cubic scalarInterpolation - only '
+                            + params.keys.length
+                            + ' are specified';
+                }
+                break;
+            default:
+                throw 'scalarInterpolator type not supported - only "linear", "cosine", "cubic" and "constant" are supported';
+            /*
+
+
+             case 'hermite':
+             break;
+             */
+
+        }
+
+        var key;
+        try {
+            key = params.input.call(this, scope);
+        } catch (e) {
+            throw 'Error calling scalarInterpolator input function - is the fuction correct?';
+        }
+
+        var key1 = params.keys[0];
+        var key2 = params.keys[1];
+
+        var linearInterpolate = function(k) {
+            var u = params.keys[key2] - params.keys[key1];
+            var v = k - params.keys[key1];
+            var w = params.values[key2] - params.values[key1];
+            return params.values[key1] + ((v / u) * w);
+        } ;
+
+        var constantInterpolate = function(k) {
+            if (Math.abs((k - params.keys[key1])) < Math.abs((k - params.keys[key2]))) {
+                return params.keys[key1];
+            } else
+            {
+                return params.keys[key2];
+            }
+        };
+
+        var cosineInterpolate = function(k) {
+            var mu2 = (1 - Math.cos(k * Math.PI()) / 2.0);
+            return (params.keys[key1] * (1 - mu2) + params.keys[key2] * mu2);
+        };
+
+        var cubicInterpolate = function(k) {
+            if (key1 == 0 || key2 == (params.keys.length - 1)) {
+                /* Between first or last pair of keyframes - need four keyframes for cubic, so fall back on cosine
+                 */
+                return cosineInterpolate(k);
+            }
+            var y0 = params.keys[key1 - 1];
+            var y1 = params.keys[key1];
+            var y2 = params.keys[key2];
+            var y3 = params.keys[key2 + 1];
+            var mu2 = k * k;
+            var a0 = y3 - y2 - y0 + y1;
+            var a1 = y0 - y1 - a0;
+            var a2 = y2 - y0;
+            var a3 = y1;
+            return (a0 * k * mu2 + a1 * mu2 + a2 * k + a3);
+        };
+
+        var findEnclosingFrame = function(key) {
+            if (params.keys.length == 0) {
+                return NOT_FOUND;
+            }
+            if (key < params.keys[0]) {
+                return BEFORE_FIRST;
+            }
+            if (key > params.keys[params.keys.length - 1]) {
+                return AFTER_LAST;
+            }
+            while (params.keys[key1] > key) {
+                key1--;
+                key2--;
+            }
+            while (params.keys[key2] < key) {
+                key1++;
+                key2++;
+            }
+            return FOUND;
+        } ;
+
+        var interpolate = function(k) {
+            switch (params.type) {
+                case 'linear':
+                    return linearInterpolate(k);
+                case 'cosine':
+                    return cosineInterpolate(k);
+                case 'cubic':
+                    return cubicInterpolate(k);
+                case 'constant':
+                    return constantInterpolate(k);
+                default:
+                    throw 'internal error - interpolation type not switched: "' + params.type + "'";
+            }
+        };
+
+        var outputValue = function(v) {
+            try {
+              params.output.call(this, scope, v);    // TODO : scope should be subscope for child nodes!
+            } catch (e) {
+                throw 'Error calling scalarInterpolator output function - is the function correct?';
+            }
+        };
+
+        var update = function() {
+            switch (findEnclosingFrame(key)) {
+                case NOT_FOUND:
+                    break;
+                case BEFORE_FIRST:
+                    break; // time delay before interpolation begins
+                case AFTER_LAST:
+                    outputValue(params.values[params.values.length - 1]);
+                    break;
+                case FOUND:
+                    outputValue(interpolate((key)));
+                    break;
+                default:
+                    break;
+            }
+        };
+
+        update();
+
+        SceneJs.utils.visitChildren(cfg, scope, true); // Create new scopes for children
+    };
+};
+
+
+
+
+/**
+ * Scene node that creates a child scope containing the elements of its configuration. 
+ */
+SceneJs.scope = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var childScope;
+
+    return function(scope) {
+        if (!childScope || !cfg.fixed || !scope.isfixed()) { // memoize scope if config and scope are constant
+            childScope = SceneJs.utils.newScope(scope, cfg.fixed);
+            var params = cfg.getParams(scope);
+            if (params) {
+                for (var key in params) {
+                    childScope.put(key, params[key]);
+                }
+            }
+        }
+        SceneJs.utils.visitChildren(cfg, childScope);
+    };
+};
+
+
+/**
+ * A looping node that creates a child scope from the result of its configuration function then invokes child nodes,
+ * repeating this process until the config function returns nothing. This node type cannot be configured with an object.
+ *
+ * This node type is useful for procedurally generating subtrees within a scene. Its most common application would be
+ * to dynamically instance elements of primitive geometry to build complex objects.
+ */
+SceneJs.generator = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+    return function(scope) {
+        if (cfg.fixed) {
+            throw 'generator node must be configured with a function';
+        }
+        var params = cfg.getParams(scope);
+        while (params) {
+            var childScope = SceneJs.utils.newScope(scope);
+            for (var key in params) {
+                childScope.put(key, params[key]);
+            }
+            SceneJs.utils.visitChildren(cfg, childScope);
+            params = cfg.getParams(scope);
+        }
+    };
+};
 
 

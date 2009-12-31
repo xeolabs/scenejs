@@ -8,28 +8,34 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
+            var init = function() {
+                var t = Matrix.I(4);
+                ctx.mvTransform = {
+                    matrix : t,
+                    normalMatrix : new WebGLFloatArray(t.inverse().transpose().make3x3().flatten()),
+                    fixed: true
+                };
+            };
+
             this.install = function(_ctx) {
                 ctx = _ctx;
-                if (!ctx.mvpTransform) {
-                    var t = Matrix.I(4);
-                    ctx.mvpTransform = {
-                        matrix : t,
-                        normalMatrix : t.inverse().transpose().make3x3(),
-                        fixed: true
-                    };
-                }
+                init();
             };
 
             this.setTransform = function(transform) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
-                ctx.mvpTransform = transform;
-                ctx.programs.setVar('scene_ModelViewMatrix', transform.matrix);
-                ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrix);
+                ctx.mvTransform = transform;
+                ctx.programs.setVar('scene_ModelViewMatrix', transform.matrixAsArray);
+                ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
             };
 
             this.getTransform = function() {
-                return ctx.mvpTransform;
+                return ctx.mvTransform;
+            };
+
+            this.reset = function() {
+                init();
             };
         })());

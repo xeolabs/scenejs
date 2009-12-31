@@ -23,8 +23,8 @@ SceneJs.backends.installBackend(
 
             /** Default value for script matrices, injected on activation
              */
-            var defaultMat4 = Matrix.I(4).flatten();
-            var defaultNormalMat = Matrix.I(4).inverse().transpose().make3x3().flatten();
+            var defaultMat4 = new WebGLFloatArray(Matrix.I(4).flatten());
+            var defaultNormalMat = new WebGLFloatArray(Matrix.I(4).inverse().transpose().make3x3().flatten());
             var defaultMaterial = {
                 diffuse: { r: 1.0, g: 1.0, b: 1.0 },
                 ambient: { r: 1.0, g: 1.0, b: 1.0 }
@@ -107,18 +107,15 @@ SceneJs.backends.installBackend(
                 setters : {
 
                     scene_ProjectionMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false,
-                                new WebGLFloatArray(mat ? mat.flatten() : defaultMat4));
+                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false, mat|| defaultMat4);
                     },
 
                     scene_ModelViewMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'MVMatrix'), false,
-                                new WebGLFloatArray(mat ? mat.flatten() : defaultMat4));
+                        context.uniformMatrix4fv(findVar(context, 'MVMatrix'), false, mat|| defaultMat4);
                     },
 
                     scene_NormalMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false,
-                                new WebGLFloatArray(mat ? mat.flatten() : defaultNormalMat));
+                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat|| defaultNormalMat);
                     },
 
                     scene_Material: function(context, findVar, m) {
@@ -146,7 +143,7 @@ SceneJs.backends.installBackend(
                     },
 
                     scene_Vertex: function(context, findVar, vertices) {
-                        if (vertices) { // No default                           
+                        if (vertices) { // No default
                             var loc = findVar(context, 'Vertex') ;
                             context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, vertices);
                             context.enableVertexAttribArray(loc);

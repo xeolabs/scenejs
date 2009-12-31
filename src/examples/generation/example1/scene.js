@@ -6,7 +6,7 @@ with (SceneJs) {
 
             canvas({ canvasId: 'mycanvas'},
 
-                    viewport({ x : 1, y : 1, width: 500, height: 500},
+                    viewport({ x : 1, y : 1, width: 1000, height: 1000},
 
                             shader({ type: 'simple-shader' },
 
@@ -16,11 +16,11 @@ with (SceneJs) {
                                                 pos: { x: 50.0, y: 0.0, z: 30.0 }
                                             }
                                         ]},
-                                            perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 300.0
+                                            perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 30000.0
                                             },
 
                                                     lookAt({
-                                                        eye : { x: 0.0, y: 15.0, z: -25.0},
+                                                        eye : { x: 0.0, y: 18100, z: -50.0},
                                                         look : { x : 0.0, y : 0.0, z : 0 },
                                                         up : { x: 0.0, y: 1.0, z: 0.0 }
                                                     },
@@ -34,17 +34,21 @@ with (SceneJs) {
                                                                  */
                                                                     generator((function() {
                                                                         var angle = 0;
+                                                                        var height = -100;
                                                                         return function() {
-                                                                            angle += 45.0;
-                                                                            if (angle <= 360.0) {
-                                                                                return { angle: angle };
+                                                                            angle += 1.0;
+                                                                            height += 5;
+                                                                            if (angle <= 3600.0) {
+                                                                                return { angle: angle, height: height };
                                                                             }
                                                                         };
                                                                     })(),
                                                                             rotate(function(scope) {
                                                                                 return { angle : scope.get("angle"), y: 1.0 };
                                                                             },
-                                                                                    translate({x:7.0, y:.0, z: 0.0},
+                                                                                    translate(function(scope) {
+                                                                                        return {x:105.0 /** Math.random() */, y:scope.get('height'), z: 105.0 /* * Math.random()*/}
+                                                                                    },
                                                                                             objects.teapot()
                                                                                             ) // rotate
                                                                                     ) // translate

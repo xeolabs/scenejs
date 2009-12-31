@@ -6,7 +6,7 @@ with (SceneJs) {
 
             canvas({ canvasId: 'mycanvas'},
 
-                    viewport({ x : 1, y : 1, width: 500, height: 500},
+                    viewport({ x : 1, y : 1, width: 1000, height: 1000},
 
                             shader({ type: 'simple-shader' },
 

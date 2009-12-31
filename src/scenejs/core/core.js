@@ -5,11 +5,15 @@ var SceneJs = {version: '1.0'};
 
 (function() {
 
-    /** All exceptions thrown by SceneJS      
+    /** All exceptions thrown by SceneJS
      */
     SceneJs.exceptions = {
 
     };
+
+    function isArray(obj) {
+        return toString.call(obj) === "[object Array]";
+    }
 
     /** Public resources
      */
@@ -127,7 +131,14 @@ var SceneJs = {version: '1.0'};
             }
             result.children = [];
             for (var i = 1; i < args.length; i++) {
-                result.children.push(args[i]);
+                var arg = args[i];
+                if (isArray(arg)) {
+                    for (var j = 0; j < arg.length; j++) {
+                        result.children.push(arg[j]);
+                    }
+                } else {
+                    result.children.push(arg);
+                }
             }
             return result;
         },
@@ -165,7 +176,22 @@ var SceneJs = {version: '1.0'};
             }
             return backend;
         };
+
+        /** Cleans up all resources currently held by backend modules
+         */
+        this.reset = function() {
+            for (var type in backends) {
+                var backend = backends[type];
+                if (backend.reset) {
+                    backend.reset();
+                }
+            }
+        };
     })();
+
+    SceneJs.reset = function() {
+        SceneJs.backends.reset();
+    };
 })();
 
 SceneJs.utils.ns = SceneJs.utils.namespace; // in intellij using keyword "namespace" causes parsing errors

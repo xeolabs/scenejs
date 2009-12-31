@@ -32,9 +32,10 @@ with (SceneJs) {
                                             perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
                                                     lookAt({
-                                                        eye : { x: 0.0, y: 20.0, z: -20.0},
+                                                        eye : { x: 0.0, y: 15.0, z: -15},
                                                         look : { x : 0.0, y : 0.0, z : 0 },
                                                         up : { x: 0.0, y: 1.0, z: 0.0 }
+
                                                     },
                                                             material({
                                                                 ambient:  { r:0.2, g:0.2, b:0.5 },
@@ -55,9 +56,13 @@ with (SceneJs) {
             ); // scene
 
     /* Lets do it - render one frame of the scene frontend. The teapot's X-rotation angle is fed into the scene here, to
-     * be passed to the rotate node in the 'scope' as used in the rotate node config. Note that if your scene frontend 
+     * be passed to the rotate node in the 'scope' as used in the rotate node config. Note that if your scene frontend
      * was interactive or animated, you would call this method in a loop.
      */
-    scene.render({angle: 45.0});
+    scene.render({angle: 45});
 }
 
+/** Just to demonstrate freeing resources
+ * that SceneJS allocated for the scene
+ */
+SceneJs.reset();

@@ -8,22 +8,32 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
-                if (!ctx.projMatrix) {
-                    ctx.projMatrix = Matrix.I(4);
-                }
+            var init = function() {
+                var t = Matrix.I(4);
+                ctx.projTransform = {
+                    matrix: t,
+                    matrixAsArray : new WebGLFloatArray(t.flatten())
+                };
             };
 
-            this.setMatrix = function(matrix) {
+            this.install = function(_ctx) {
+                ctx = _ctx;
+                init();
+            };
+
+            this.setTransform = function(transform) {
                 if (!ctx.programs.getActiveProgramId()) {
                     throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
-                ctx.projMatrix = matrix;
-                ctx.programs.setVar('scene_ProjectionMatrix', matrix);
+                ctx.projTransform = transform;
+                ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
             };
 
-            this.getMatrix = function() {
-                return ctx.projMatrix;
+            this.getTransform = function() {
+                return ctx.projTransform;
+            };
+
+            this.reset = function() {
+                init();
             };
         })());

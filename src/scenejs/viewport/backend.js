@@ -8,8 +8,13 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
+            var init = function() {
+                ctx.viewport = null;
+            };
+
             this.install = function(_ctx) {
                 ctx = _ctx;
+                init();
             };
 
             this.setViewport = function(viewport) {
@@ -35,6 +40,10 @@ SceneJs.backends.installBackend(
             };
 
             this.clear = function() {
-                ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT);
+                // ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT);
+            };
+
+            this.reset = function() {
+                init();
             };
         })());
