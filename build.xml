@@ -8,7 +8,7 @@
 
     <property name="BUILD_MAJOR" value="0"/>
     <property name="BUILD_MINOR" value="3"/>
-    <property name="BUILD_ID" value="8"/>
+    <property name="BUILD_ID" value="9"/>
 
     <property name="DIST_DIR"
               location="${basedir}/dist"
@@ -17,7 +17,8 @@
     <property name="SCENEJS_NAME"
               value="scenejs.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js"/>
 
-     <property name="LIB_DIR"
+
+    <property name="LIB_DIR"
               location="${basedir}/lib"
               description="Lib Folder"/>
 
@@ -38,7 +39,10 @@
     <target name="package" description="Main SceneJS build">
         <mkdir dir="${DIST_DIR}"/>
         <echo message="Building ${SCENEJS_DIST}"/>
-        <concat destfile="${SCENEJS_DIST}">
+        <concat fixlastline="yes" destfile="${SCENEJS_DIST}">
+            
+            <fileset dir="${basedir}" includes="license.txt"/>
+
             <fileset dir="${LIB_DIR}" includes="sylvester.js"/>
             <fileset dir="${LIB_DIR}" includes="glUtils.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
@@ -66,7 +70,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/appearance/backend.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/graph.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/scene.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/canvas/canvas.js"/>
 

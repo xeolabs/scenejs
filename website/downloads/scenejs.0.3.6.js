@@ -211,11 +211,11 @@ SceneJs.exceptions.CanvasNotFoundException = function(msg) {
     this.message = msg;
 };
 
-SceneJs.exceptions.InvalidLookAtParametersException = function(msg) {
+SceneJs.exceptions.InvalidLookAtConfigException = function(msg) {
     this.message = msg;
 };
 
-SceneJs.exceptions.IllegalGeometryParameterException = function(msg) {
+SceneJs.exceptions.InvalidGeometryConfigException = function(msg) {
     this.message = msg;
 };
 
@@ -924,10 +924,10 @@ SceneJs.rotate = function() {
                 params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
 
                 if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
-                    throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: eye and look cannot be identical");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: eye and look cannot be identical");
                 }
                 if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
-                    throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                 }
                 mat = makeLookAt(
                         params.eye.x, params.eye.y, params.eye.z,
@@ -1410,7 +1410,7 @@ SceneJs.geometry = function() {
         var result = [];
         for (var i = 0; i < ar.length; i++) {
             if (numPerElement && ar[i].length != numPerElement)
-                throw new SceneJs.exceptions.IllegalGeometryParameterException("Bad geometry array element");
+                throw new SceneJs.exceptions.InvalidGeometryConfigException("Bad geometry array element");
             for (var j = 0; j < ar[i].length; j++)
                 result.push(ar[i][j]);
         }

@@ -24,7 +24,7 @@ SceneJs.backends.installBackend(
 
             this.setMaterial = function(material) {
                 if (!ctx.programs.getActiveProgramId()) {
-                    throw 'No shader active';
+                    throw new SceneJs.exceptions.NoShaderActiveException('No shader active');
                 }
                 ctx.programs.setVar('scene_Material', material);
                 ctx.material = material;

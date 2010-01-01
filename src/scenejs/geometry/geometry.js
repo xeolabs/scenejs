@@ -55,7 +55,7 @@ SceneJs.geometry = function() {
         var result = [];
         for (var i = 0; i < ar.length; i++) {
             if (numPerElement && ar[i].length != numPerElement)
-                throw new SceneJs.exceptions.IllegalGeometryParameterException("Bad geometry array element");
+                throw new SceneJs.exceptions.InvalidGeometryConfigException("Bad geometry array element");
             for (var j = 0; j < ar[i].length; j++)
                 result.push(ar[i][j]);
         }

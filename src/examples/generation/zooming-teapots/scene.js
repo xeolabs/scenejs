@@ -2,7 +2,7 @@
  *
  */
 with (SceneJs) {
-    var scene = graph({}, // node always has a config object
+    var exampleScene = scene({}, // node always has a config object
 
             canvas({ canvasId: 'mycanvas'},
 
@@ -71,27 +71,31 @@ with (SceneJs) {
                             ) // viewport
                     ) // canvas
             ); // scene
-    try {
-        var i = -450;
-        var p;
 
-        function doit() {
-            if (i > 500) {
-                clearInterval(p);
+    var i = -450;
+    var p;
+
+    function doit() {
+        if (i > 500) {
+            exampleScene.destroy();
+            clearInterval(p);
+        }
+
+        i += 2.0;
+        try {
+            exampleScene.render({z:(i == 0 ? 0.1 : i)}); // Don't allow lookat's 'look' to equal 'at'  
+        } catch (e) {
+            if (e.message) {
+                alert(e.message);
+            } else {
+                alert(e);
             }
-
-            i += 2.0;
-            scene.render({z:i});
+            throw e;
         }
-        p = setInterval("doit()", 10);
-
-    } catch (e) {
-        if (e.message) {
-            alert(e.message);
-        } else {
-            alert(e);
-        }
-        throw e;
     }
+
+    p = setInterval("doit()", 10);
+
+
 }
 

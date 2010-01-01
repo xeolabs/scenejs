@@ -67,7 +67,7 @@ SceneJs.backends.installBackend(
              */
             this.pushLights = function(lights) {
                 if (!ctx.programs.getActiveProgramId()) {
-                    throw 'No shader active';
+                     throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                 }
                 for (var i = 0; i < lights.length; i++) {
                     ctx.lightStack.push(lights[i]);

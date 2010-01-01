@@ -15,7 +15,7 @@
  * advanced shaders and so on. I'll show you those in other examples.
  */
 with (SceneJs) {
-    var scene = graph({}, // node always has a config object
+    var introScene = scene({}, // node always has a config object
 
             canvas({ canvasId: 'mycanvas'},
 
@@ -59,10 +59,6 @@ with (SceneJs) {
      * be passed to the rotate node in the 'scope' as used in the rotate node config. Note that if your scene frontend
      * was interactive or animated, you would call this method in a loop.
      */
-    scene.render({angle: 45});
+    introScene.render({angle: 45});
+    introScene.destroy();
 }
-
-/** Just to demonstrate freeing resources
- * that SceneJS allocated for the scene
- */
-SceneJs.reset();

@@ -261,6 +261,11 @@ SceneJs.shaderBackend = function(cfg) {
             ctx.programs.setVars(vars);
         };
 
+        this.getVars = function() {
+            return ctx.programs.getVars();
+        };
+
+
         this.deactivateProgram = function() {
             ctx.programs.deactivateProgram();
         };

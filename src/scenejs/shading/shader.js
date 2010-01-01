@@ -11,7 +11,7 @@ SceneJs.shader = function() {
 
         if (!backend) {
             if (!params.type) {
-                throw 'Mandatory shader parameter missing: \'type\'';
+                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory shader parameter missing: \'type\'");
             }
             backend = SceneJs.backends.getBackend(params.type);
         }

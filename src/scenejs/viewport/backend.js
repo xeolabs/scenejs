@@ -19,7 +19,7 @@ SceneJs.backends.installBackend(
 
             this.setViewport = function(viewport) {
                 if (!ctx.canvas) {
-                    throw 'No canvas active';
+                    throw new SceneJs.exceptions.NoCanvasActiveException('No canvas active');
                 }
                 var context = ctx.canvas.context;
                 context.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
@@ -28,7 +28,7 @@ SceneJs.backends.installBackend(
 
             this.getViewport = function() {
                 if (!ctx.canvas) {
-                    throw 'No canvas active';
+                    throw new SceneJs.exceptions.NoCanvasActiveException('No canvas active');
                 }
 
                 /* Lazy-create default viewport - assumes that client node always calls getViewport before setViewport

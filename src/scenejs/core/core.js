@@ -1,6 +1,4 @@
-/** The SceneJS namespace, with public and private resources.
- *
- */
+
 var SceneJs = {version: '1.0'};
 
 (function() {
@@ -116,7 +114,7 @@ var SceneJs = {version: '1.0'};
          */
         getNodeConfig : function(args) {
             if (args.length == 0) {
-                throw 'Invalid node parameters: should be a configuration followed by zero or more child nodes';
+                throw new SceneJs.exceptions.InvalidNodeConfigException('Invalid node parameters: should be a configuration followed by zero or more child nodes');
             }
             var result = { };
             var a0 = args[0];
@@ -172,7 +170,7 @@ var SceneJs = {version: '1.0'};
         this.getBackend = function(type) {
             var backend = backends[type];
             if (!backend) {
-                throw 'No backend installed of type \'' + type + '\'';
+                throw new SceneJs.exceptions.NodeBackendNotFoundException("No backend installed of type \'' + type + '\'");
             }
             return backend;
         };
@@ -188,10 +186,6 @@ var SceneJs = {version: '1.0'};
             }
         };
     })();
-
-    SceneJs.reset = function() {
-        SceneJs.backends.reset();
-    };
 })();
 
 SceneJs.utils.ns = SceneJs.utils.namespace; // in intellij using keyword "namespace" causes parsing errors

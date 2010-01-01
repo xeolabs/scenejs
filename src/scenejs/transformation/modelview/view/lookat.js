@@ -53,10 +53,10 @@
                 params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
 
                 if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
-                    throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: eye and look cannot be identical");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: eye and look cannot be identical");
                 }
                 if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
-                    throw new SceneJs.exceptions.InvalidLookAtParametersException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                 }
                 mat = makeLookAt(
                         params.eye.x, params.eye.y, params.eye.z,

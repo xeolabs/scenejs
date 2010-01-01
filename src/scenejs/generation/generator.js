@@ -9,7 +9,7 @@ SceneJs.generator = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
     return function(scope) {
         if (cfg.fixed) {
-            throw 'generator node must be configured with a function';
+            throw new SceneJs.exceptions.InvalidNodeConfigException('generator node must be configured with a function');
         }
         var params = cfg.getParams(scope);
         while (params) {

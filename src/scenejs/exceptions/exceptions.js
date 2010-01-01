@@ -26,11 +26,11 @@ SceneJs.exceptions.CanvasNotFoundException = function(msg) {
     this.message = msg;
 };
 
-SceneJs.exceptions.InvalidLookAtParametersException = function(msg) {
+SceneJs.exceptions.InvalidLookAtConfigException = function(msg) {
     this.message = msg;
 };
 
-SceneJs.exceptions.IllegalGeometryParameterException = function(msg) {
+SceneJs.exceptions.InvalidGeometryConfigException = function(msg) {
     this.message = msg;
 };
 
@@ -43,3 +43,12 @@ SceneJs.exceptions.UnsupportedOperationException = function(msg) {
 SceneJs.exceptions.IllegalRotateConfigException = function(msg) {
     this.message = msg;
 };
+
+SceneJs.exceptions.InvalidNodeConfigException = function(msg) {
+    this.message = msg;
+};
+
+SceneJs.exceptions.NodeBackendNotFoundException = function(msg) {
+    this.message = msg;
+};
+
