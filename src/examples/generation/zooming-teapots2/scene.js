@@ -2,7 +2,7 @@
  *
  */
 with (SceneJs) {
-    var scene = graph({}, // node always has a config object
+    var exampleScene = scene({}, // node always has a config object
 
             canvas({ canvasId: 'mycanvas'},
 
@@ -81,7 +81,7 @@ with (SceneJs) {
             }
 
             i += 2.0;
-            scene.render({z:i});
+            exampleScene.render({z:i});
         }
         p = setInterval("doit()", 10);
 

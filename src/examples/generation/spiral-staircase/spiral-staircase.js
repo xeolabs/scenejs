@@ -2,11 +2,11 @@
  *
  */
 with (SceneJs) {
-    var scene = graph({}, // node always has a config object
+    var exampleScene = scene({}, // node always has a config object
 
             canvas({ canvasId: 'mycanvas'},
 
-                    viewport({ x : 1, y : 1, width: 1000, height: 1000},
+                    viewport({ x : 1, y : 1, width: 600, height: 600},
 
                             shader({ type: 'simple-shader' },
 
@@ -68,7 +68,7 @@ with (SceneJs) {
                     ) // canvas
             ); // scene
     try {
-        scene.render();
+        exampleScene.render();
     } catch (e) {
         if (e.message) {
             alert(e.message);

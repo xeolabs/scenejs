@@ -2,7 +2,7 @@
  * Demonstrates how to use a generator node to render a scene in two viewports
  */
 with (SceneJs) {
-    var scene = graph({},
+    var exampleScene = scene({},
 
             canvas({
                 canvasId: 'mycanvas'
@@ -25,10 +25,10 @@ with (SceneJs) {
                                                         return function() {
                                                             i++;
                                                             switch (i) {
-                                                                case 1: return { viewport: {  x : 1, y : 1,  width: 200, height: 200  } };
-                                                                case 2: return { viewport: { x : 250, y : 1,  width: 200, height: 200  } };
-                                                                case 3: return { viewport: { x : 250, y : 250,  width: 200, height: 200  } };
-                                                                case 4: return { viewport: { x : 1, y : 250,  width: 200, height: 200  } };
+                                                                case 1: return { viewport: {  x : 1, y : 1,  width: 250, height: 250  } };
+                                                                case 2: return { viewport: { x : 250, y : 1,  width: 250, height: 250  } };
+                                                                case 3: return { viewport: { x : 250, y : 250,  width: 250, height: 250  } };
+                                                                case 4: return { viewport: { x : 1, y : 250,  width: 250, height: 250  } };
                                                                 case 5: i = 0;
                                                             }
                                                         };
@@ -51,6 +51,6 @@ with (SceneJs) {
                             )
                     )
             ); // scene
-    scene.render();
+    exampleScene.render();
 }
 

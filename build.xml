@@ -2,49 +2,82 @@
 	Builds SceneJS
 
 	Guava3D home:	http://www.scenejs.com
-	Author: 	Lindsay S. Kay, 12/10/2009
+	Author: 	Lindsay S. Kay, Jan 2, 2010
 -->
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="3"/>
-    <property name="BUILD_ID" value="9"/>
+    <property name="BUILD_MINOR" value="4"/>
+    <property name="BUILD_ID" value="0"/>
 
-    <property name="DIST_DIR"
-              location="${basedir}/dist"
-              description="Distribution directory"/>
+    <property name="LIB_DIR" location="${basedir}/lib"/>
 
-    <property name="SCENEJS_NAME"
-              value="scenejs.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.js"/>
+    <property name="SRC_DIR" location="${basedir}/src"/>
+
+    <property name="SCENEJS_JS_NAME" value="scenejs.js"/>
+
+    <property name="SCENEJS_MIN_JS_NAME" value="scenejs.min.js"/>
+
+    <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
+
+    <property name="SCENEJS_NAME" value="scenejs.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
+
+    <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SCENEJS_NAME}"/>
 
 
-    <property name="LIB_DIR"
-              location="${basedir}/lib"
-              description="Lib Folder"/>
+    <path id="yuicompressor.classpath">
+        <fileset dir="${LIB_DIR}">
+            <include name="**/yuicompressor-2.4.2.jar"/>
+            <include name="**/YUIAnt.jar"/>
 
-    <property name="SRC_DIR"
-              location="${basedir}/src"
-              description="Source Folder"/>
+        </fileset>
+    </path>
 
-    <property name="SCENEJS_DIST"
-              location="${DIST_DIR}/${SCENEJS_NAME}"
-              description="Website downloads directory"/>
-
-    <property name="DOWNLOADS_DIST"
-              location="${basedir}/website/downloads/${SCENEJS_NAME}"
-              description="Website downloads directory"/>
 
     <target name="all" depends="package"/>
 
-    <target name="package" description="Main SceneJS build">
-        <mkdir dir="${DIST_DIR}"/>
-        <echo message="Building ${SCENEJS_DIST}"/>
-        <concat fixlastline="yes" destfile="${SCENEJS_DIST}">
-            
+    <target name="archive" depends="package" description="Create archives of downloads">
+
+        <tar destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.tar.gz"
+             basedir="${EXTRACTED_DIST_DIR}"
+             compression="gzip"/>
+
+        <zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${EXTRACTED_DIST_DIR}"/>
+    </target>
+
+    <!-- Create compressed javascript lib -->
+
+    <target name="package" depends="assemble-lib" description="Create compressed SceneJS lib">
+        <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
+            <classpath>
+                <path refid="yuicompressor.classpath"/>
+            </classpath>
+        </taskdef>
+        <yuicompress linebreak="300" warn="false" munge="no" preserveallsemicolons="true"
+                     outputfolder="${EXTRACTED_DIST_DIR}">
+            <fileset dir="${EXTRACTED_DIST_DIR}/lib/">
+                <include name="**/*.js"/>
+            </fileset>
+        </yuicompress>
+        <move file="${EXTRACTED_DIST_DIR}/${SCENEJS_JS_NAME}"
+              tofile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_MIN_JS_NAME}"/>
+    </target>
+
+
+    <!-- Assemble javascript lib -->
+
+    <target name="assemble-lib" depends="create-dist-directories" description="Create uncompressed SceneJS lib">
+
+        <echo message="Building ${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}"/>
+
+        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}">
             <fileset dir="${basedir}" includes="license.txt"/>
+
+            <!-- Sylvester libs -->
 
             <fileset dir="${LIB_DIR}" includes="sylvester.js"/>
             <fileset dir="${LIB_DIR}" includes="glUtils.js"/>
+
             <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
@@ -81,7 +114,6 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/layering/layer.js"/>
 
-
             <fileset dir="${SRC_DIR}" includes="scenejs/shading/shader.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/shading/simple/simpleBackend.js"/>
 
@@ -93,7 +125,78 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/scope/scope.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
         </concat>
-        <echo message="${SCENEJS_DIST} built."/>
-        <copy tofile="${DOWNLOADS_DIST}" file="${SCENEJS_DIST}"/>
+        <echo message="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME} built."/>
     </target>
+
+
+    <!-- Build distribution directories -->
+
+    <target name="create-dist-directories" description="Create dist directories">
+
+        <delete includeemptydirs="true">
+            <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
+        </delete>
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}"/>
+        <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
+
+        <!-- Examples -->
+
+        <!-- Basic -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/basic"/>
+
+        <!-- Teapot -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/basic/teapot"/>
+        <copy file="${SRC_DIR}/examples/basic/teapot/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/basic/teapot/index.html"/>
+        <copy file="src/examples/basic/teapot/teapot.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/basic/teapot/teapot.js"/>
+
+        <!-- Animation -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation"/>
+
+        <!-- Teapots flythrough -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough"/>
+        <copy file="${SRC_DIR}/examples/animation/teapot-cluster-flythrough/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/index.html"/>
+        <copy file="src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"/>
+
+        <!-- Generation -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation"/>
+
+        <!-- Multiple teapots -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots"/>
+        <copy file="${SRC_DIR}/examples/generation/multiple-teapots/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/index.html"/>
+        <copy file="src/examples/generation/multiple-teapots/multiple-teapots.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/multiple-teapots.js"/>
+
+        <!-- Multiple viewports -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports"/>
+        <copy file="${SRC_DIR}/examples/generation/multiple-viewports/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/index.html"/>
+        <copy file="src/examples/generation/multiple-viewports/multiple-viewports.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/multiple-viewports.js"/>
+
+        <!-- Spiral staircase -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase"/>
+        <copy file="${SRC_DIR}/examples/generation/spiral-staircase/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/index.html"/>
+        <copy file="src/examples/generation/spiral-staircase/spiral-staircase.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/spiral-staircase.js"/>
+
+        <copy file="${basedir}/license.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
+        <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
+    </target>
+
 </project>

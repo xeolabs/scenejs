@@ -6,7 +6,7 @@ with (SceneJs) {
 
             canvas({ canvasId: 'mycanvas'},
 
-                    viewport({ x : 1, y : 1, width: 700, height: 700},
+                    viewport({ x : 1, y : 1, width: 600, height: 600},
 
                             shader({ type: 'simple-shader' },
 
@@ -83,7 +83,7 @@ with (SceneJs) {
 
         i += 2.0;
         try {
-            exampleScene.render({z:(i == 0 ? 0.1 : i)}); // Don't allow lookat's 'look' to equal 'at'  
+            exampleScene.render({z:(i == 0 ? 0.1 : i)}); // Don't allow lookat node's 'look' to equal its 'at'  
         } catch (e) {
             if (e.message) {
                 alert(e.message);
