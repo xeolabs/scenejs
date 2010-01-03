@@ -23,11 +23,11 @@ SceneJs.canvas = function() {
 
         // TODO: configure canvas from node configs?
 
-       backend.clearCanvas(); // TODO: canvas should really be cleared globally at scene root instead of each time it's used!
+        backend.clearCanvas(); // TODO: canvas should really be cleared globally at scene root instead of each time it's used!
 
         SceneJs.utils.visitChildren(cfg, scope);
-    backend.flush();
-            backend.setCanvas(superCanvas); // restore previous canvas
+        backend.flush();
+        backend.setCanvas(superCanvas); // restore previous canvas
 
     };
 };

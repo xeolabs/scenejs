@@ -3,6 +3,7 @@
  */
 SceneJs.shader = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
+    var canvasId;
     var programId;
     var backend;
 
@@ -16,9 +17,11 @@ SceneJs.shader = function() {
             backend = SceneJs.backends.getBackend(params.type);
         }
 
-        /* Lazy-load shaders
+        /* Load shader if not yet loaded, or the containing canvas
+         * node has dynamically switched to some other canvas
          */
-        if (!programId) {
+        if (!programId || (canvasId != backend.getActiveCanvasId())) {
+            canvasId = backend.getActiveCanvasId();
             programId = backend.loadProgram();
         }
 

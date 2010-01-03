@@ -62,16 +62,29 @@ SceneJs.geometry = function() {
         return result;
     };
 
+    var canvasId;
     var bufId; // handle to backend geometry buffer
 
     return function(scope) {
         var params = cfg.getParams(scope);
         if (!cfg.fixed) {
+
             /* Since I'm always using VBOs, we cant buffer geometry if it's going to keep changing.
              * In future versions I'll allow dynamic geometry config and just not buffer it in that case.
              */
             throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
         }
+
+        /* Drop handle to VBOs if containing canvas node
+         * has dynamically switched to some other canvas
+         * TODO: find way to copy VBOs between canvases
+         */
+        if (canvasId != backend.getActiveCanvasId()) {
+            bufId = null;
+        }
+
+        /* Obtain VBOs if not held
+         */
         if (!bufId) {
             if (params.type) {
                 bufId = backend.findGeoBuffer(params.type);
@@ -85,6 +98,7 @@ SceneJs.geometry = function() {
                     indices : params.indices && params.indices.length > 0 ? flatten(params.indices, 3) : []
                 });
             }
+            canvasId = backend.getActiveCanvasId();
         }
         backend.drawGeoBuffer(bufId);
         SceneJs.utils.visitChildren(cfg, scope);

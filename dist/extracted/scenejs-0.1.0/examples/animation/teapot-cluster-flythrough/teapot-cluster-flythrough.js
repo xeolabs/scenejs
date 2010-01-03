@@ -1,12 +1,25 @@
 /**
+ * SceneJS Example - Teapot cluster flythrough
  *
+ * Lindsay Kay
+ * lindsay.stanley.kay AT gmail.com
+ * January 2010
+ *
+ * In this scene, the viewpoint moves through a randomly-generated
+ * cluster of OpenGL teapots. A generator node dynamically instances
+ * the cluster - note how the elems array, containing the teapot
+ * positions, is memoised in a closure. More info on generators
+ * is available in the generator examples. Then we repeatedly render
+ * the scene, each time feeding in a scope containing an increasing
+ * value for the eye's location on the Z-axis, which is read by the
+ * lookat node.
  */
 with (SceneJs) {
     var exampleScene = scene({}, // node always has a config object
 
             canvas({ canvasId: 'mycanvas'},
 
-                    viewport({ x : 1, y : 1, width: 700, height: 700},
+                    viewport({ x : 1, y : 1, width: 600, height: 600},
 
                             shader({ type: 'simple-shader' },
 
@@ -33,7 +46,7 @@ with (SceneJs) {
                                                                     generator(
                                                                             (function() {
                                                                                 var elems = [];
-                                                                                for (var i = 0; i < 250; i++) {
+                                                                                for (var i = 0; i < 25; i++) {
                                                                                     elems.push({
                                                                                         x: (50 * Math.random()) - 25.0,
                                                                                         y: (50 * Math.random()) - 25.0,
@@ -71,27 +84,36 @@ with (SceneJs) {
                             ) // viewport
                     ) // canvas
             ); // scene
-    try {
-        var i = -450;
-        var p;
 
-        function doit() {
-            if (i > 500) {
-                clearInterval(p);
+    var zpos = -450;
+    var p;
+
+    function doit() {
+        if (zpos > 500) {
+            exampleScene.destroy();
+            clearInterval(p);
+        }
+
+        zpos += 2.0;
+        try {
+            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookat node's 'look' to equal its 'at'
+        } catch (e) {            
+            if (e.message) {
+                alert(e.message);
+            } else {
+                alert(e);
             }
-
-            i += 2.0;
-            exampleScene.render({z:i});
+            throw e;
         }
-        p = setInterval("doit()", 10);
-
-    } catch (e) {
-        if (e.message) {
-            alert(e.message);
-        } else {
-            alert(e);
-        }
-        throw e;
     }
+
+    /* Hack to get any scene definition exceptions up front.
+     * Chrome seemed to absorb them in setInterval!
+     */
+    exampleScene.render({z:zpos});
+
+    /* Continue animation
+     */
+    pInterval = setInterval("doit()", 10);
 }
 

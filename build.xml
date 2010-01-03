@@ -7,7 +7,7 @@
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="4"/>
+    <property name="BUILD_MINOR" value="1"/>
     <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
@@ -20,7 +20,7 @@
 
     <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
 
-    <property name="SCENEJS_NAME" value="scenejs.${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
+    <property name="SCENEJS_NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
 
     <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SCENEJS_NAME}"/>
 
@@ -34,15 +34,15 @@
     </path>
 
 
-    <target name="all" depends="package"/>
+    <target name="all" depends="archive"/>
 
     <target name="archive" depends="package" description="Create archives of downloads">
 
         <tar destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.tar.gz"
-             basedir="${EXTRACTED_DIST_DIR}"
+             basedir="${DIST_CONTAINER_DIR}/extracted"
              compression="gzip"/>
 
-        <zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${EXTRACTED_DIST_DIR}"/>
+        <zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
     </target>
 
     <!-- Create compressed javascript lib -->
@@ -195,6 +195,19 @@
         <copy file="src/examples/generation/spiral-staircase/spiral-staircase.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/spiral-staircase.js"/>
 
+        <copy file="${basedir}/license.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
+        <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
+
+          <!-- Multiple canvases -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases"/>
+        <copy file="${SRC_DIR}/examples/generation/multiple-canvases/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/index.html"/>
+        <copy file="src/examples/generation/multiple-canvases/multiple-canvases.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/multiple-canvases.js"/>
+
+        <!-- License and readme -->
+        
         <copy file="${basedir}/license.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
         <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
     </target>

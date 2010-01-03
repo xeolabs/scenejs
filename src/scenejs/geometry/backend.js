@@ -22,6 +22,13 @@ SceneJs.backends.installBackend(
                 return true; // TODO
             };
 
+            /* Geometry node needs to know to obtain new VBOs if the super canvas node
+             * has dynamically switched to some other canvas.
+             */
+            this.getActiveCanvasId = function() {
+                return ctx.canvas.canvasId;
+            };
+
             /** Tests if a buffer for the given geometry type exists on the current canvas
              *
              * @param geoType - IE. "teapot", "cube" etc.

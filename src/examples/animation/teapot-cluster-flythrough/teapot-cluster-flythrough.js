@@ -1,5 +1,18 @@
 /**
+ * SceneJS Example - Teapot cluster flythrough
  *
+ * Lindsay Kay
+ * lindsay.stanley.kay AT gmail.com
+ * January 2010
+ *
+ * In this scene, the viewpoint moves through a randomly-generated
+ * cluster of OpenGL teapots. A generator node dynamically instances
+ * the cluster - note how the elems array, containing the teapot
+ * positions, is memoised in a closure. More info on generators
+ * is available in the generator examples. Then we repeatedly render
+ * the scene, each time feeding in a scope containing an increasing
+ * value for the eye's location on the Z-axis, which is read by the
+ * lookat node.
  */
 with (SceneJs) {
     var exampleScene = scene({}, // node always has a config object
@@ -72,19 +85,19 @@ with (SceneJs) {
                     ) // canvas
             ); // scene
 
-    var i = -450;
+    var zpos = -450;
     var p;
 
     function doit() {
-        if (i > 500) {
+        if (zpos > 500) {
             exampleScene.destroy();
             clearInterval(p);
         }
 
-        i += 2.0;
+        zpos += 2.0;
         try {
-            exampleScene.render({z:(i == 0 ? 0.1 : i)}); // Don't allow lookat node's 'look' to equal its 'at'  
-        } catch (e) {
+            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookat node's 'look' to equal its 'at'
+        } catch (e) {            
             if (e.message) {
                 alert(e.message);
             } else {
@@ -94,8 +107,13 @@ with (SceneJs) {
         }
     }
 
-    p = setInterval("doit()", 10);
+    /* Hack to get any scene definition exceptions up front.
+     * Chrome seemed to absorb them in setInterval!
+     */
+    exampleScene.render({z:zpos});
 
-
+    /* Continue animation
+     */
+    pInterval = setInterval("doit()", 10);
 }
 

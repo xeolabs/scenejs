@@ -253,6 +253,13 @@ SceneJs.shaderBackend = function(cfg) {
             ctx.programs.activateProgram(programId);
         };
 
+        /* Shader node needs to know to release its program if the super canvas node
+         * has dynamically switched to some other canvas.
+         */
+        this.getActiveCanvasId = function() {
+            return ctx.canvas.canvasId;
+        };
+
         this.getActiveProgramId = function() {
             return ctx.programs.getActiveProgramId();
         };
