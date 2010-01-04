@@ -195,7 +195,7 @@
         <copy file="src/examples/generation/spiral-staircase/spiral-staircase.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/spiral-staircase.js"/>
 
-        <copy file="${basedir}/license.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
+        <copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
         <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
 
           <!-- Multiple canvases -->
@@ -208,7 +208,7 @@
 
         <!-- License and readme -->
         
-        <copy file="${basedir}/license.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
+        <copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
         <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
     </target>
 
