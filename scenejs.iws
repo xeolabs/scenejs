@@ -266,7 +266,7 @@
       <file leaf-file-name="core.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/scenejs/core/core.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="148" column="54" selection-start="5364" selection-end="5381" vertical-scroll-proportion="0.0">
+            <state line="145" column="8" selection-start="5181" selection-end="5181" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -290,10 +290,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="collada-cube.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="collada-cube.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/examples/assets/collada-cube/collada-cube.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="63" selection-start="682" selection-end="846" vertical-scroll-proportion="0.32041883">
+            <state line="35" column="24" selection-start="1409" selection-end="1409" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="canvas.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/canvas/canvas.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="27" column="11" selection-start="957" selection-end="998" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -326,20 +335,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="shader.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/shading/shader.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="62" selection-start="1171" selection-end="1171" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="asset.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="asset.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/scenejs/asset/asset.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="49" selection-start="675" selection-end="675" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="33" column="31" selection-start="1474" selection-end="1474" vertical-scroll-proportion="0.58743453">
+              <folding>
+                <marker date="1262847486000" expanded="true" signature="1354:1442" placeholder="/*...*/" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1256,13 +1258,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/scenejs/scope/scope.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="0" selection-start="685" selection-end="685" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/scenejs/branching/selector.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
@@ -1305,13 +1300,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/core/core.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="148" column="54" selection-start="5364" selection-end="5381" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/examples/basic/teapot/index.debug.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
@@ -1340,13 +1328,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/asset/asset.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="49" selection-start="675" selection-end="675" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/scenejs/asset/backendBase.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="13" column="28" selection-start="427" selection-end="427" vertical-scroll-proportion="1.36">
@@ -1363,8 +1344,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/examples/assets/collada-cube/collada-cube.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="63" selection-start="682" selection-end="846" vertical-scroll-proportion="0.32041883">
+        <state line="35" column="24" selection-start="1409" selection-end="1409" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/canvas/canvas.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="11" selection-start="957" selection-end="998" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/core/core.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="145" column="8" selection-start="5181" selection-end="5181" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/asset/asset.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="31" selection-start="1474" selection-end="1474" vertical-scroll-proportion="0.58743453">
+          <folding>
+            <marker date="1262847486000" expanded="true" signature="1354:1442" placeholder="/*...*/" />
+          </folding>
         </state>
       </provider>
     </entry>

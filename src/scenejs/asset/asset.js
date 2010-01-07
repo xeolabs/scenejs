@@ -11,10 +11,10 @@ SceneJs.asset = function() {
 
         var getFileExtension = function(fileName) {
             var i = fileName.lastIndexOf(".");
-            if (i == -1 || i == fileName.length-1) {
+            if (i == -1 || i == fileName.length - 1) {
                 throw "Invalid location config for asset node - extension missing";
             }
-            return fileName.substr(i+1);
+            return fileName.substr(i + 1);
         };
 
         if (!backend) {
@@ -28,6 +28,10 @@ SceneJs.asset = function() {
          * of evicting it when it has not been used recently
          */
         var assetNode = backend.getAsset(params.location);
+
+        /* Render the kids first - but we're unlikely to have those on an asset node
+         */
+        SceneJs.utils.visitChildren(cfg, scope);
 
         /* Render the asset
          */
