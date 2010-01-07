@@ -7,7 +7,7 @@
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="1"/>
+    <property name="BUILD_MINOR" value="2"/>
     <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
@@ -121,9 +121,10 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/appearance/material.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/animation/scalarInterpolator.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/scope/scope.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/animation/scalarInterpolator.js"/>
         </concat>
         <echo message="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME} built."/>
     </target>
@@ -198,7 +199,7 @@
         <copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
         <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
 
-          <!-- Multiple canvases -->
+        <!-- Multiple canvases -->
 
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases"/>
         <copy file="${SRC_DIR}/examples/generation/multiple-canvases/index.html"
@@ -206,8 +207,17 @@
         <copy file="src/examples/generation/multiple-canvases/multiple-canvases.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/multiple-canvases.js"/>
 
+        <!-- Scalar inpterpolator -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation"/>
+        <copy file="${SRC_DIR}/examples/animation/interpolated-rotation/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/index.html"/>
+        <copy file="src/examples/animation/interpolated-rotation/interpolated-rotation.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/interpolated-rotation.js"/>
+
+
         <!-- License and readme -->
-        
+
         <copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
         <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
     </target>

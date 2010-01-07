@@ -58,12 +58,14 @@ SceneJs.shaderBackend = function(cfg) {
                      * shaders into it, links the shaders, then returns the ID of the program. If the
                      * program (one of the configured type on the given canvas) already exists, will just
                      * return the ID of the program.
+                     *
+                     * @param _cfg Config from backend extention, provides program for lazy-load 
                      */
-                    this.loadProgram = function() {
+                    this.loadProgram = function(_cfg) {
                         if (!ctx.canvas) {
                             throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
                         }
-                        var programId = ctx.canvas.canvasId + ":" + cfg.type;
+                        var programId = ctx.canvas.canvasId + ":" + _cfg.type;
 
                         /* Try to reuse cached program
                          */
@@ -82,21 +84,23 @@ SceneJs.shaderBackend = function(cfg) {
                             programId : programId,
                             program : context.createProgram(),
                             fragmentShaders: [],
-                            vertexShaders: []
+                            vertexShaders: [],
+                            setters: _cfg.setters,
+                            binders: _cfg.binders
                         };
 
                         /* Load fragment shaders into context
                          */
-                        for (var i = 0; i < cfg.fragmentShaders.length; i++) {
-                            var shader = loadShader(context, cfg.fragmentShaders[i], context.FRAGMENT_SHADER);
+                        for (var i = 0; i < _cfg.fragmentShaders.length; i++) {
+                            var shader = loadShader(context, _cfg.fragmentShaders[i], context.FRAGMENT_SHADER);
                             context.attachShader(program.program, shader);
                             program.fragmentShaders.push(shader);
                         }
 
                         /* Load vertex shaders into context
                          */
-                        for (var i = 0; i < cfg.vertexShaders.length; i++) {
-                            var shader = loadShader(context, cfg.vertexShaders[i], context.VERTEX_SHADER);
+                        for (var i = 0; i < _cfg.vertexShaders.length; i++) {
+                            var shader = loadShader(context, _cfg.vertexShaders[i], context.VERTEX_SHADER);
                             context.attachShader(program.program, shader);
                             program.vertexShaders.push(shader);
                         }
@@ -138,13 +142,13 @@ SceneJs.shaderBackend = function(cfg) {
                         return programId;
                     };
 
-                    /** Calls each setter on program, passing a null value to each. Each setter is responsible for
+                    /** Calls each setter on the active program, passing a null value to each. Each setter is responsible for
                      * injecting a default value into the scripts when null is given, safeguarding against them never
                      * being set a value.
                      */
                     var setVarDefaults = function() {
-                        for (var key in cfg.setters) {
-                            cfg.setters[key].call(this, ctx.canvas.context, activeProgram.getVarLocation, null);
+                        for (var key in activeProgram.setters) {
+                            activeProgram.setters[key].call(this, ctx.canvas.context, activeProgram.getVarLocation, null);
                         }
                     };
 
@@ -173,7 +177,7 @@ SceneJs.shaderBackend = function(cfg) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        var setter = cfg.setters[name];
+                        var setter = activeProgram.setters[name];
                         if (setter) {
                             setter.call(this, ctx.canvas.context, activeProgram.getVarLocation, value);
                         }
@@ -188,8 +192,8 @@ SceneJs.shaderBackend = function(cfg) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        for (var key in cfg.setters) {
-                            cfg.setters[key].call(this, ctx.canvas.context,
+                        for (var key in activeProgram.setters) {
+                            activeProgram.setters[key].call(this, ctx.canvas.context,
                                     activeProgram.getVarLocation, v.vars[key]); // Defaults on null
                         }
                         vars = v;
@@ -205,7 +209,7 @@ SceneJs.shaderBackend = function(cfg) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        cfg.binders.bindVertexBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                        activeProgram.binders.bindVertexBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
                     };
 
                     /** Binds the given normals buffer to be the normals source for the active program
@@ -214,7 +218,7 @@ SceneJs.shaderBackend = function(cfg) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        cfg.binders.bindNormalBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                        activeProgram.binders.bindNormalBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
                     };
 
 
@@ -241,12 +245,18 @@ SceneJs.shaderBackend = function(cfg) {
                     };
                 };
             }
+
+            /**
+             * Set up this backend extension
+             */
+
         };
 
-        // Methods for client shader node
+        /* Methods for client shader node.
+         */
 
         this.loadProgram = function() {
-            return ctx.programs.loadProgram();
+            return ctx.programs.loadProgram(cfg); // Backend extension config is used when lazy-creating program
         };
 
         this.activateProgram = function(programId) {
@@ -271,7 +281,6 @@ SceneJs.shaderBackend = function(cfg) {
         this.getVars = function() {
             return ctx.programs.getVars();
         };
-
 
         this.deactivateProgram = function() {
             ctx.programs.deactivateProgram();

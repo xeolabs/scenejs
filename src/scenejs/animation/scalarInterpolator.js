@@ -1,3 +1,7 @@
+/**
+ * Takes a key value from the current scope and creates a child scope containing an output value that is
+ * interpolated within the configured keyframe sequence.
+ */
 SceneJs.scalarInterpolator = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
 
@@ -6,73 +10,80 @@ SceneJs.scalarInterpolator = function() {
     var AFTER_LAST = 2;
     var FOUND = 3;
 
+    var params;
+    var outputName;
+    var outputValue;
+
     return function(scope) {
-        var params = cfg.getParams(scope);
+        if (!params) {
+            params = cfg.getParams(scope);
 
-        // Validate
+            if (!cfg.fixed) {
 
-        if (!params.input) {
-            throw 'scalarInterpolator input parameter missing';
-        }
-        if (typeof(params.input) != 'function') {
-            throw 'scalarInterpolator input parameter should be a function';
-        }
-
-        if (!params.output) {
-            throw 'scalarInterpolator output parameter missing';
-        }
-        if (typeof(params.output) != 'function') {
-            throw 'scalarInterpolator apply parameter should be a function';
-        }
-        if (params.keys) {
-            if (!params.values) {
-                throw 'scalarInterpolator keys supplied but no values - must supply a value for each key';
+                /* Can't dynamically configure an interpolator - TODO: would that be useful?            
+                 */
+                throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of interpolators is not supported");
             }
-        } else if (params.values) {
-            throw 'scalarInterpolator values supplied but no keys - must supply a key for each value';
-        }
-        for (var i = 1; i < params.keys.length; i++) {
-            if (params.keys[i - 1] >= params.keys[i]) {
-                throw 'two invalid scalarInterpolator keys found (' + i - 1 + ' and ' + i + ') - key list should contain distinct values in ascending order';
+
+            // Validate
+
+            if (!params.input) {
+                throw 'scalarInterpolator input parameter missing';
             }
-        }
 
-        params.type = params.type || 'linear';
+            if (!params.output) {
+                throw 'scalarInterpolator output parameter missing';
+            }
 
-        switch (params.type) {
-            case 'linear':
-                break;
-            case 'constant':
-                break;
-            case 'cosine':
-                break;
-            case 'cubic':
-                if (params.keys.length < 4) {
-                    throw 'Minimum of four keyframes required for cubic scalarInterpolation - only '
-                            + params.keys.length
-                            + ' are specified';
+            if (params.keys) {
+                if (!params.values) {
+                    throw 'scalarInterpolator keys supplied but no values - must supply a value for each key';
                 }
-                break;
-            default:
-                throw 'scalarInterpolator type not supported - only "linear", "cosine", "cubic" and "constant" are supported';
-            /*
+            } else if (params.values) {
+                throw 'scalarInterpolator values supplied but no keys - must supply a key for each value';
+            }
+
+            for (var i = 1; i < params.keys.length; i++) {
+                if (params.keys[i - 1] >= params.keys[i]) {
+                    throw 'two invalid scalarInterpolator keys found (' + i - 1 + ' and ' + i + ') - key list should contain distinct values in ascending order';
+                }
+            }
+
+            params.type = params.type || 'linear';
+
+            switch (params.type) {
+                case 'linear':
+                    break;
+                case 'constant':
+                    break;
+                case 'cosine':
+                    break;
+                case 'cubic':
+                    if (params.keys.length < 4) {
+                        throw 'Minimum of four keyframes required for cubic scalarInterpolation - only '
+                                + params.keys.length
+                                + ' are specified';
+                    }
+                    break;
+                default:
+                    throw 'scalarInterpolator type not supported - only "linear", "cosine", "cubic" and "constant" are supported';
+                /*
 
 
-             case 'hermite':
-             break;
-             */
-
+                 case 'hermite':
+                 break;
+                 */
+            }
         }
 
-        var key;
-        try {
-            key = params.input.call(this, scope);
-        } catch (e) {
-            throw 'Error calling scalarInterpolator input function - is the fuction correct?';
+        var key = scope.get(params.input);
+
+        if (!key && key != 0) {
+            throw "scalarInterpolator failed to find input on scope";
         }
 
-        var key1 = params.keys[0];
-        var key2 = params.keys[1];
+        var key1 = 0;
+        var key2 = 1;
 
         var linearInterpolate = function(k) {
             var u = params.keys[key2] - params.keys[key1];
@@ -149,14 +160,6 @@ SceneJs.scalarInterpolator = function() {
             }
         };
 
-        var outputValue = function(v) {
-            try {
-              params.output.call(this, scope, v);    // TODO : scope should be subscope for child nodes!
-            } catch (e) {
-                throw 'Error calling scalarInterpolator output function - is the function correct?';
-            }
-        };
-
         var update = function() {
             switch (findEnclosingFrame(key)) {
                 case NOT_FOUND:
@@ -164,10 +167,10 @@ SceneJs.scalarInterpolator = function() {
                 case BEFORE_FIRST:
                     break; // time delay before interpolation begins
                 case AFTER_LAST:
-                    outputValue(params.values[params.values.length - 1]);
+                    outputValue = params.values[params.values.length - 1];
                     break;
                 case FOUND:
-                    outputValue(interpolate((key)));
+                    outputValue = interpolate((key));
                     break;
                 default:
                     break;
@@ -176,7 +179,10 @@ SceneJs.scalarInterpolator = function() {
 
         update();
 
-        SceneJs.utils.visitChildren(cfg, scope, true); // Create new scopes for children
+        var childScope = SceneJs.utils.newScope(scope, cfg.fixed);
+        childScope.put(params.output, outputValue);
+
+        SceneJs.utils.visitChildren(cfg, childScope);
     };
 };
 

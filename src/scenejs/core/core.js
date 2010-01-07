@@ -89,7 +89,7 @@ var SceneJs = {version: '1.0'};
                  */
                 get : function(key) {
                     var value = data[key];
-                    if (value) {
+                    if ((value == 0) || value) {
                         return value;
                     }
                     if (!parent) {
