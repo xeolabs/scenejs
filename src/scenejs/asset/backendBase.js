@@ -23,8 +23,22 @@ SceneJs.assetBackend = function(cfg) {
 
                 ctx.assets = new function() {
 
+                    var date = new Date(); // Used for generating unique JSONP callbacks
                     var importers = {}; // Backend extensions each create one of these
-                    var nodes = {}; // Nodes created by parsers, cached against file name
+                    var entries = {}; // Nodes created by parsers, cached against file name
+                    var evictionCountdown = 1000;
+
+                    var evict = function() {
+                        if (--evictionCountdown == 0) {
+                            //                            for (var src in entries) {
+                            //                                var entry = entries[src];
+                            //                                if (--entry.timeToLive < 0) {
+                            //                                    entries[src] = undefined;
+                            //                                }
+                            //                            }
+                            evictionCountdown = 1000;
+                        }
+                    };
 
                     /** Installs parser function provided in extension's configs
                      */
@@ -35,24 +49,65 @@ SceneJs.assetBackend = function(cfg) {
                         };
                     };
 
+                    var jsonp = function(fullUri, callback, callbackName) {
+                        var head = document.getElementsByTagName("head")[0];
+                        var script = document.createElement("script");
+                        script.type = "text/javascript";
+                        script.src = fullUri;
+                        window[callbackName] = function(data) {
+                            callback(data);
+                            window[callbackName] = undefined;
+                            try {
+                                delete window[callbackName];
+                            } catch(e) {
+                            }
+                            head.removeChild(script);
+                            ctx.scenejs.processes.processStopped();   // Notify load is finished
+                        };
+                        ctx.scenejs.processes.processStarted(); // Notify load started
+                        head.appendChild(script);
+                    };
+
+                    this.getAsset = function(uri) {
+                        var entry = entries[uri];
+                        if (entry) {
+                            entry.timeToLive--;
+                            //    evict();
+                            return entry.node;
+                        }
+                        return null;
+                    };
+
                     /** Imports file and returns node result. caches node against given file name.
                      */
-                    this.getAsset = function(location, type) {
-                        var node = nodes[location];
-                        if (!node) {                            
-                            var importer = importers[type];
-                            if (!importer) {
-                                throw "No asset node backend registered for file type: \"" + type + "\"";
-                            }
-                            node = importer.parse(); // TODO: parse what?
+                    this.loadAsset = function(proxy, uri, type, callback) {
+                        var importer = importers[type];
+                        if (!importer) {
+                            throw "No asset node backend registered for file type: \"" + type + "\"";
                         }
-                        return node;
+                        var callbackName = "callback" + date.getTime();
+                        jsonp(proxy + "?callback=" + callbackName + "&uri=" + uri,
+                                function(data) {
+                                    if (!data) { // TODO: be way more specific about asset load failures, but what can we determine here since it's asynch?
+                                        throw new SceneJs.exceptions.AssetLoadFailureException("Asset load failed", uri, proxy);
+                                    }
+                                    var assetNode = importer.parse(data);
+                                    if (!assetNode || (typeof assetNode != 'function')) {
+                                        throw new SceneJs.exceptions.AssetLoadFailureException("Asset load failed - parser failure? ", uri, proxy);
+                                    }
+                                    entries[uri] = {
+                                        node: assetNode,
+                                        timeToLive : 1000
+                                    };
+                                    callback(assetNode);
+                                },
+                                callbackName);
                     };
 
                     /** Clears nodes cached from previous imports.
                      */
                     this.clearAssets = function() {
-                        nodes = {};
+                        entries = {};
                     };
                 };
             }
@@ -64,10 +119,16 @@ SceneJs.assetBackend = function(cfg) {
 
         // Methods for client asset node
 
+        /** Looks for currently loaded asset, which may have been evicted after lack of recent use
+         */
+        this.getAsset = function(uri) {
+            return ctx.assets.getAsset(uri);
+        };
+
         /** Imports the given file and returns a new child for the client asset node
          */
-        this.getAsset = function(location) {
-            return ctx.assets.getAsset(location, cfg.type);
+        this.loadAsset = function(proxy, uri, callback) {
+            return ctx.assets.loadAsset(proxy, uri, cfg.type, callback);
         };
 
         /** Frees resources held by this backend (ie. parsers and cached scene graph fragments)
@@ -75,5 +136,7 @@ SceneJs.assetBackend = function(cfg) {
         this.reset = function() {
             ctx.assets.clearAssets();
         };
-    })();
+    }
+            )
+            ();
 };

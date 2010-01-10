@@ -1,11 +1,12 @@
-/** Imports an asset from a file into a scene graph. This node is configured with the location of a file that describes
- * a (portion of) a 3D scene. When first visited, it will cause that file to be imported into the scene graph
- * to become its subtree, providing that a backend has been installed to help SceneJS asset that particular file type.
+/** Asynchronously imports an asset from a file into a scene graph. This node is configured with the location of a file
+ * that describes a (portion of) a 3D scene. When first visited, it will cause that file to be imported into the scene
+ * graph to become its subtree, providing that a backend has been installed to help SceneJS asset that particular file
+ * type.
  */
 SceneJs.asset = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
     var backend;
-
+    var loading = false;
     return function(scope) {
         var params = cfg.getParams(scope);
 
@@ -18,24 +19,27 @@ SceneJs.asset = function() {
         };
 
         if (!backend) {
-            if (!params.location) {
-                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: location");
+            if (!params.proxy) {
+                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: proxy");
             }
-            backend = SceneJs.backends.getBackend("asset." + getFileExtension(params.location));
+            if (!params.uri) {
+                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: uri");
+            }
+            backend = SceneJs.backends.getBackend("asset." + getFileExtension(params.uri));
         }
 
-        /* We dont hold onto the asset in order to allow SceneJS the option
-         * of evicting it when it has not been used recently
-         */
-        var assetNode = backend.getAsset(params.location);
+        var assetNode = backend.getAsset(params.uri); // Backend may have evicted asset after lack of recent use
 
-        /* Render the kids first - but we're unlikely to have those on an asset node
-         */
-        SceneJs.utils.visitChildren(cfg, scope);
-
-        /* Render the asset
-         */
-        assetNode.call(this, scope);
+        if (!assetNode && !loading) { // Load asset if we dont have one and we're not busy loading one
+            loading = true;
+            backend.loadAsset(params.proxy, params.uri, function(_assetNode) {
+                assetNode = _assetNode;
+            });
+        } else if (assetNode) { // Otherwise render asset if we do have one
+            loading = false;
+            assetNode.call(this, scope);
+        }
+        SceneJs.utils.visitChildren(cfg, scope); // For completeness - probably wont have children on an asset node        
     };
 };
 

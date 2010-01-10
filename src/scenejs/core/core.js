@@ -1,4 +1,3 @@
-
 var SceneJs = {version: '1.0'};
 
 (function() {
@@ -23,34 +22,34 @@ var SceneJs = {version: '1.0'};
             return degrees * Math.PI / 180.0;
         },
 
-        /** Applies properties on c to o, applying properties on defaults to o where they are not on c
-         *
-         */
-        apply : function(o, c, defaults) {
-            if (defaults) {
-                SceneJs.apply(o, defaults);
-            }
-            if (o && c && typeof c == 'object') {
-                for (var p in c) {
-                    o[p] = c[p];
-                }
-            }
-            return o;
-        },
-
-        /** Applies properties on c to o wherever o does not already have properties of same name
-         *
-         */
-        applyIf : function(o, c) {
-            if (o && c) {
-                for (var p in c) {
-                    if (typeof o[p] == "undefined") {
-                        o[p] = c[p];
-                    }
-                }
-            }
-            return o;
-        },
+//        /** Applies properties on c to o, applying properties on defaults to o where they are not on c
+//         *
+//         */
+//        apply : function(o, c, defaults) {
+//            if (defaults) {
+//                SceneJs.apply(o, defaults);
+//            }
+//            if (o && c && typeof c == 'object') {
+//                for (var p in c) {
+//                    o[p] = c[p];
+//                }
+//            }
+//            return o;
+//        },
+//
+//        /** Applies properties on c to o wherever o does not already have properties of same name
+//         *
+//         */
+//        applyIf : function(o, c) {
+//            if (o && c) {
+//                for (var p in c) {
+//                    if (typeof o[p] == "undefined") {
+//                        o[p] = c[p];
+//                    }
+//                }
+//            }
+//            return o;
+//        },
 
         /** Creates a namespace
          */
@@ -152,11 +151,61 @@ var SceneJs = {version: '1.0'};
         }
     };
 
+    /**
+     * Current count of active scene processes. These processes are asynchronous
+     * with respect to rendering, where scene traversal soes not wait for them
+     * to complete.
+     */
+    var processCount = 0;
+
     /** Registry of modules that provide backend functionality for scene graph nodes
      */
     SceneJs.backends = new (function() {
         var backends = {};
-        var ctx = {};
+
+        /** Context that is shared by all backend plugins, for them to define what they
+         * on, as long as they don't clobber the core scenejs object.
+         */
+        var ctx = {
+
+            /**
+             * Special core object for SceneJS - provides core context for backend plugins
+             */
+            scenejs : {
+
+                /** Asynchronous process book-keeping
+                 */
+                processes : (function() {
+
+                    return {
+
+                        /** Called by backend when it has started a new process
+                         */
+                        processStarted: function() {
+                            processCount++;
+                        },
+
+                        /** Called by backend when a process has stopped
+                         */
+                        processStopped: function() {
+                            processCount--;
+                        },
+
+                        /** Returns count of active processes
+                         */
+                        getNumProcesses : function() {
+                            return processCount;
+                        },
+
+                        /** Resets all processes
+                         */
+                        reset : function() {
+                            processCount = 0;
+                        }
+                    };
+                })()
+            }
+        };
 
         /** Installs a backend module - see examples for more info.
          */
@@ -183,6 +232,22 @@ var SceneJs = {version: '1.0'};
                 if (backend.reset) {
                     backend.reset();
                 }
+            }
+            ctx.scenejs.processes.reset();
+        };
+
+        this.getStatus = function() {
+
+        };
+    })();
+
+    /** Facade through which external SceneJS clients (ie. scripts in the rest of the Webpage)
+     * can monitor the status of the whole of SceneJs.
+     */
+    SceneJs.status = (function() {
+        return {
+            getNumProcesses : function() {
+                return processCount;
             }
         };
     })();

@@ -62,6 +62,19 @@
                         SceneJs.backends.reset();
                     }
                 }
+            },
+
+            play : function(cfg, idleFunc) {
+                var p = setInterval(function() {
+                    this.render(cfg.params);
+                    if (idleFunc) {
+                        cfg = idleFunc(cfg);
+                        if (!cfg) {
+                            clearInterval(p);
+                            this.destroy();
+                        }
+                    }
+                }, cfg.fps || 5);
             }
         };
         _scene.id = registerScene(_scene);

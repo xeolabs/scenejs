@@ -1,5 +1,5 @@
 /**
- * Backend for asset nodes which extends the basic type to provide support for the COLLADA XML format
+ * Backend for asset nodes which extends the basic type to provide support for the Collada ".dae" file format.
  *
  * @param cfg
  */
@@ -14,9 +14,9 @@ SceneJs.backends.installBackend(
                  */
                 type: 'asset.dae',
 
-                /** Parses COLLADA XML into a scene node
+                /** Parser that converts a Collada file into a scene graph node
                  */
-                parse: function(data) {
+                parse: function() { // TODO: what form is this argument? String, stream or URL?
                     return SceneJs.objects.teapot({}); // Stub
                 }
             });

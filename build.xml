@@ -7,7 +7,7 @@
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="2"/>
+    <property name="BUILD_MINOR" value="3"/>
     <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
@@ -125,6 +125,13 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/animation/scalarInterpolator.js"/>
+
+            <!-- Assets -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/asset/asset.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/asset/backendBase.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/asset/collada/colladaBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/asset/js/jsBackend.js"/>
         </concat>
         <echo message="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME} built."/>
     </target>
@@ -214,6 +221,14 @@
               tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/index.html"/>
         <copy file="src/examples/animation/interpolated-rotation/interpolated-rotation.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/interpolated-rotation.js"/>
+
+            <!-- Assets -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset"/>
+        <copy file="${SRC_DIR}/examples/assets/js-teapot-asset/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/index.html"/>
+        <copy file="src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"/>
 
 
         <!-- License and readme -->
