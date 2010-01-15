@@ -1,40 +1,28 @@
-/** Root node of a scene graph. Like all nodes, its arguments are a config object followed by
+/**
+ * Root node of a scene graph. Like all nodes, its arguments are a config object followed by
  * zero or more child nodes. The members of the config object are set on the root data scope when rendered.
  *
  */
 
 (function() {
 
-    var nScenes = 0;
-    var scenes = [];
-
-    /** Registers scene with SceneJS and returns it's ID.
-     */
-    var registerScene = function(scene) {
-        var i = 0;
-        while (true) {
-            var id = "scene" + i++;
-            if (!scenes[id]) {
-                scenes[id] = scene;
-                nScenes++;
-                return id;
-            }
-        }
-    };
+    var backend = SceneJs.backends.getBackend('scene');
 
     /** Creates a new scene
      */
     SceneJs.scene = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
-        var destroyed = false;
+        var sceneId = null;
+
         var _scene = {
 
             /**
              * Renders the scene scene, passing in the given parameters to override node parameters
-             * set on the root data scope
+             * set on the root data scope, then returns an object that indicates the new scene status.
              */
             render : function(paramOverrides) {
-                if (!destroyed) {
+                if (sceneId) {
+                    backend.setActiveScene(sceneId);
                     var scope = SceneJs.utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
                     var params = cfg.getParams();
                     for (var key in params) {    // Push scene params into scope
@@ -46,7 +34,16 @@
                         }
                     }
                     SceneJs.utils.visitChildren(cfg, scope);
+                    backend.setActiveScene(null);
                 }
+            },
+
+            /** Returns count of active processes. A non-zero count indicates that the scene should be rendered
+             * at least one more time to show the "final" image because asynchronous tasks are still being
+             * performed within the scene
+             */
+            getNumProcesses : function() {
+                return (sceneId) ? backend.getNumProcesses(sceneId) : 0;
             },
 
             /** Destroys this scene, after which it cannot be rendered any more. You should destroy
@@ -54,42 +51,27 @@
              * resources for it (eg. shaders, VBOs etc) that are no longer in use.
              */
             destroy : function() {
-                if (!destroyed) {
-                    destroyed = true;
-                    scenes[this.id] = null;
-                    nScenes--;
-                    if (nScenes == 0) {
-                        SceneJs.backends.reset();
-                    }
+                if (sceneId) {
+                    sceneId = backend.deregisterScene(sceneId);
                 }
             },
 
-            play : function(cfg, idleFunc) {
-                var p = setInterval(function() {
-                    this.render(cfg.params);
-                    if (idleFunc) {
-                        cfg = idleFunc(cfg);
-                        if (!cfg) {
-                            clearInterval(p);
-                            this.destroy();
-                        }
-                    }
-                }, cfg.fps || 5);
+            /** Returns true if scene active, ie. not destroyed
+             */
+            isActive: function() {
+                return (sceneId != null);
             }
         };
-        _scene.id = registerScene(_scene);
+        sceneId = backend.registerScene(_scene);
         return _scene;
     };
 
     /** Destroys all scenes and causes SceneJS to release all resources it is currently holding for them.
      */
     SceneJs.reset = function() {
-        for (var id in scenes) {
-            var scene = scenes[id];
-            if (scene) {
-                scene.destroy();
-            }
+        var scenes = backend.getAllScenes();
+        for (var i = 0; i < scenes.length; i++) {
+            scenes[i].destroy();
         }
-        scenes = {};
     };
 })();

@@ -157,6 +157,7 @@ var SceneJs = {version: '1.0'};
      * to complete.
      */
     var processCount = 0;
+    var processes = {};
 
     /** Registry of modules that provide backend functionality for scene graph nodes
      */
@@ -167,44 +168,6 @@ var SceneJs = {version: '1.0'};
          * on, as long as they don't clobber the core scenejs object.
          */
         var ctx = {
-
-            /**
-             * Special core object for SceneJS - provides core context for backend plugins
-             */
-            scenejs : {
-
-                /** Asynchronous process book-keeping
-                 */
-                processes : (function() {
-
-                    return {
-
-                        /** Called by backend when it has started a new process
-                         */
-                        processStarted: function() {
-                            processCount++;
-                        },
-
-                        /** Called by backend when a process has stopped
-                         */
-                        processStopped: function() {
-                            processCount--;
-                        },
-
-                        /** Returns count of active processes
-                         */
-                        getNumProcesses : function() {
-                            return processCount;
-                        },
-
-                        /** Resets all processes
-                         */
-                        reset : function() {
-                            processCount = 0;
-                        }
-                    };
-                })()
-            }
         };
 
         /** Installs a backend module - see examples for more info.

@@ -45,7 +45,8 @@ SceneJs.assetBackend = function(cfg) {
                     this.installImporter = function(cfg) {
                         importers[cfg.type] = {
                             type: cfg.type,
-                            parse: cfg.parse
+                            parse: cfg.parse ,
+                            serverParams:cfg.serverParams
                         };
                     };
 
@@ -62,9 +63,8 @@ SceneJs.assetBackend = function(cfg) {
                             } catch(e) {
                             }
                             head.removeChild(script);
-                            ctx.scenejs.processes.processStopped();   // Notify load is finished
                         };
-                        ctx.scenejs.processes.processStarted(); // Notify load started
+                        ctx.scenes.processStarted(); // Notify load started
                         head.appendChild(script);
                     };
 
@@ -86,7 +86,11 @@ SceneJs.assetBackend = function(cfg) {
                             throw "No asset node backend registered for file type: \"" + type + "\"";
                         }
                         var callbackName = "callback" + date.getTime();
-                        jsonp(proxy + "?callback=" + callbackName + "&uri=" + uri,
+                        var url = [proxy, "?callback=" , callbackName , "&uri=" + uri];
+                        for (var param in importer.serverParams) { // TODO: memoize string portion that contains params
+                            url.push("&", param, "=", importer.serverParams[param]);
+                        }
+                        jsonp(url.join(""),
                                 function(data) {
                                     if (!data) { // TODO: be way more specific about asset load failures, but what can we determine here since it's asynch?
                                         throw new SceneJs.exceptions.AssetLoadFailureException("Asset load failed", uri, proxy);
@@ -125,10 +129,19 @@ SceneJs.assetBackend = function(cfg) {
             return ctx.assets.getAsset(uri);
         };
 
-        /** Imports the given file and returns a new child for the client asset node
+        /** Triggers asynchronous load of asset and begins new process; callback will fire with new child for the
+         * client asset node. The asset node will have to then call assetLoaded to totify the backend that the
+         * asset has loaded and allow backend to kill the process.
          */
         this.loadAsset = function(proxy, uri, callback) {
+            ctx.scenes.processStarted();
             return ctx.assets.loadAsset(proxy, uri, cfg.type, callback);
+        };
+
+        /** Notifies backend that load has completed; backend then kills the process.
+         */
+        this.assetLoaded = function() {
+            ctx.scenes.processStopped();
         };
 
         /** Frees resources held by this backend (ie. parsers and cached scene graph fragments)

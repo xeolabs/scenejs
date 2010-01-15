@@ -70,7 +70,7 @@ with (SceneJs) {
                                                          */
                                                             asset({
                                                                 uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
-                                                                proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"
+                                                                proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
                                                             })
                                                             ) // lookAt
                                                     ) // perspective
@@ -80,17 +80,15 @@ with (SceneJs) {
                     ) // canvas
             ); // scene
 
-    var nFrames = 0;
+
 
     var pInterval;
 
     function doit() {
-        if (nFrames > 500) {
+        if (exampleScene.getNumProcesses() == 0) {  // No processes running, so asset load finished
             exampleScene.destroy();
             clearInterval(pInterval);
         }
-
-        nFrames++;
         try {
             exampleScene.render();
         } catch (e) {
@@ -103,12 +101,11 @@ with (SceneJs) {
         }
     }
 
-    /* Hack to get any scene definition exceptions up front.
-     * Chrome seemed to absorb them in setInterval!
+    /* This tracersal will trigger asset load, starting one scene process
      */
     exampleScene.render();
 
-    /* Continue animation
+    /* Keep rendering until asset loaded, ie. no scene processes running
      */
     pInterval = setInterval("doit()", 10);
 }

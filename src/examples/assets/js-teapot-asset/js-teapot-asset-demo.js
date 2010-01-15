@@ -9,9 +9,9 @@
  * dynamically imported into your scene using asset nodes.
  *
  * They can potentially be stored in any format, such as COLLADA,
- * JSON, XML etc., and you can extend SceneJS with plugins to
- * parse various formats. Asset nodes are also able to make
- * cross-domain requests to get them.
+ * JSON etc., and you can extend SceneJS with plugins to parse
+ * various formats. Asset nodes are able to make cross-domain 
+ * requests to get them.
  *
  * This example imports an orange teapot from the asset repository
  * at SceneJS.com.
@@ -29,6 +29,10 @@
  * image. But if you keep rendering the scene for a few frames like
  * in this example, as you would when animating, the asset will
  * magically appear once loaded.
+ *
+ * SceneJS tracks these loads and tracks each one as a process that
+ * is currently within on the scene. So you can tell if all assets
+ * have loaded when the number of scene processes is zero.
  *
  * The ultimate plan with assets is to somehow use them to pre-load
  * bits of scene just before they fall into view, then rely on
@@ -70,7 +74,7 @@ with (SceneJs) {
                                                          */
                                                             asset({
                                                                 uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
-                                                                proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"
+                                                                proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
                                                             })
                                                             ) // lookAt
                                                     ) // perspective
@@ -80,48 +84,46 @@ with (SceneJs) {
                     ) // canvas
             ); // scene
 
-    var nFrames = 0;
 
     var pInterval;
 
-
-//    exampleScene.play({}, function(cfg) {
-//        return (SceneJs.status.getNumProcesses() == 0) ? null : cfg;
-//    });
-
+    /* Our periodic render function. This will stop the render interval when the count of
+     * scene processes is zero.
+     */
     function doit() {
-        var done = (SceneJs.status.getNumProcesses() == 0);
-        try {
-            exampleScene.render();
-        } catch (e) {
-            if (e.message) {
-                alert(e.message);
-            } else {
-                alert(e);
-            }
-            throw e;
-        }
-        if (done) {
-            clearInterval(pInterval);
+        if (exampleScene.getNumProcesses() == 0) {
+
+            /* No processes running in scene, so asset is loaded and we'll stop. The previous
+             * render will have drawn the asset.
+             */
             exampleScene.destroy();
+            clearInterval(pInterval);
+        } else {
+
+            /* Otherwise, a process is still running on the scene, so the asset
+             * must still be loading. Note that just as scene processes are created
+             * during a scene render, they are also destroyed during another
+             * subsequent render. Scene processes don't magically stop between renders,
+             * you have to do a render to given them the opportunity to stop.
+             */
+            try {
+                exampleScene.render();
+            } catch (e) {
+                if (e.message) {
+                    alert(e.message);
+                } else {
+                    alert(e);
+                }
+                throw e;
+            }
         }
     }
 
-    /* Hack to get any scene definition exceptions up front.
-     * Chrome seemed to absorb them in setInterval!
-     */
-    //exampleScene.render();
-
-    /* Continue animation
-     */
-    pInterval = setInterval("doit()", 10);
-
-    /* Hack to get any scene definition exceptions up front.
-     * Chrome seemed to absorb them in setInterval!
+    /* This initial render will trigger the asset load, starting one scene process
      */
     exampleScene.render();
 
-    /* Continue animation
+    /* Keep rendering until asset loaded, ie. no scene processes running
      */
     pInterval = setInterval("doit()", 10);
 }

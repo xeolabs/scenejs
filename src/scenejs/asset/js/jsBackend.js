@@ -15,6 +15,12 @@ SceneJs.backends.installBackend(
                  */
                 type: 'asset.js',
 
+               /** Special params for asset server
+                 */
+                serverParams: {
+                    mode: 'js'
+                },
+
                 /** Does no parsing, just returns data which is already a scene node
                  */
                 parse: function(data) {
