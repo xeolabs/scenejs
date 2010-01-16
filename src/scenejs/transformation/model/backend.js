@@ -1,15 +1,16 @@
 /**
- * Manages the current model-view transformation
+ * Manages the current modelling transformation
  */
 SceneJs.backends.installBackend(
         new (function() {
 
-            this.type = 'projection_transform';
+            this.type = 'model-transform';
 
             var ctx;
 
             var init = function() {
-                ctx.projectionTransform = (function() {
+
+                ctx.modelTransform = (function() {
                     var transform = {
                         matrix : SceneJs.math.identityMat4(),
                         fixed: true
@@ -29,13 +30,20 @@ SceneJs.backends.installBackend(
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
 
-                            /* Lazy-compute WebGL array
+                            /* Lazy-compute WebGL arrays
                              */
                             if (!transform.matrixAsArray) {
                                 transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                             }
 
-                            ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
+                            /* Lazy compute normal matrix
+                             */
+                            if (!transform.normalMatrixAsArray) {
+                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.matrix4to3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
+                            }
+
+                            ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);
+                            ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
 
                             loaded = true;
                         }
@@ -49,6 +57,14 @@ SceneJs.backends.installBackend(
 
                         getTransform: function() {
                             return transform;
+                        },
+
+                        transformVector: function(v) {
+                            return SceneJs.math.transformVector3(transform.matrix, v);
+                        } ,
+
+                        isFixed: function() {
+                            return transform.fixed;
                         }
                     };
                 })();
@@ -60,11 +76,11 @@ SceneJs.backends.installBackend(
             };
 
             this.setTransform = function(transform) {
-                ctx.projectionTransform.setTransform(transform);
+                ctx.modelTransform.setTransform(transform);
             };
 
             this.getTransform = function() {
-                return ctx.projectionTransform.getTransform();
+                return ctx.modelTransform.getTransform();
             };
 
             this.reset = function() {

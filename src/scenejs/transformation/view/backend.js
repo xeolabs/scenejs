@@ -1,15 +1,16 @@
 /**
- * Manages the current model-view transformation
+ * Manages the current view transformation
  */
 SceneJs.backends.installBackend(
         new (function() {
 
-            this.type = 'projection_transform';
+            this.type = 'view-transform';
 
             var ctx;
 
             var init = function() {
-                ctx.projectionTransform = (function() {
+
+                ctx.viewTransform = (function() {
                     var transform = {
                         matrix : SceneJs.math.identityMat4(),
                         fixed: true
@@ -17,7 +18,7 @@ SceneJs.backends.installBackend(
 
                     var loaded = false;
 
-                    /** When a new program is activated we will need to lazy-load our current matrix
+                 /** When a new program is activated we will need to lazy-load our current matrix
                      */
                     ctx.programs.onProgramActivate(function() {
                         loaded = false;
@@ -35,7 +36,7 @@ SceneJs.backends.installBackend(
                                 transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                             }
 
-                            ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
+                            ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
 
                             loaded = true;
                         }
@@ -60,11 +61,11 @@ SceneJs.backends.installBackend(
             };
 
             this.setTransform = function(transform) {
-                ctx.projectionTransform.setTransform(transform);
+                ctx.viewTransform.setTransform(transform);
             };
 
             this.getTransform = function() {
-                return ctx.projectionTransform.getTransform();
+                return ctx.viewTransform.getTransform();
             };
 
             this.reset = function() {

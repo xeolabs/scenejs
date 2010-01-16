@@ -23,8 +23,8 @@ SceneJs.backends.installBackend(
 
             /** Default value for script matrices, injected on activation
              */
-            var defaultMat4 = new WebGLFloatArray(Matrix.I(4).flatten());
-            var defaultNormalMat = new WebGLFloatArray(Matrix.I(4).inverse().transpose().make3x3().flatten());
+            var defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
+            var defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
             var defaultMaterial = {
                 diffuse: { r: 1.0, g: 1.0, b: 1.0 },
                 ambient: { r: 1.0, g: 1.0, b: 1.0 }
@@ -51,7 +51,8 @@ SceneJs.backends.installBackend(
                     "uniform vec4 LightPos;" +
 
                     'uniform mat4 PMatrix; ' +
-                    'uniform mat4 MVMatrix; ' +
+                    'uniform mat4 VMatrix; ' +
+                    'uniform mat4 MMatrix; ' +
                     'uniform mat3 NMatrix; ' +
 
                     "uniform vec3 MaterialAmbient;" +
@@ -63,11 +64,13 @@ SceneJs.backends.installBackend(
 
                     "void main(void) {" +
                     "   vec4 v = vec4(Vertex, 1.0);" +
-                    "   vec4 vmv = MVMatrix * v;" +
-                    "   gl_Position = PMatrix * vmv;" +
+
+                    "   vec4 mv =     MMatrix * v;" + // Modelling transformation
+                    "   vec4 vv =     VMatrix * mv;" + // Viewing transformation
+                    "   gl_Position = PMatrix * vv;" + // Perspective transformation
 
                     "   vec3 nn = normalize(NMatrix * Normal);" +
-                    "   vec3 lightDir = vec3(normalize(vmv - LightPos));" +
+                    "   vec3 lightDir = vec3(normalize(mv - LightPos));" +    // Lighting is done in model-space
 
                     "   float NdotL = max(dot(lightDir, nn), 0.0);" +
 
@@ -107,15 +110,19 @@ SceneJs.backends.installBackend(
                 setters : {
 
                     scene_ProjectionMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false, mat|| defaultMat4);
+                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false, mat || defaultMat4);
                     },
 
-                    scene_ModelViewMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'MVMatrix'), false, mat|| defaultMat4);
+                    scene_ModelMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix4fv(findVar(context, 'MMatrix'), false, mat || defaultMat4);
+                    },
+
+                    scene_ViewMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix4fv(findVar(context, 'VMatrix'), false, mat || defaultMat4);
                     },
 
                     scene_NormalMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat|| defaultNormalMat);
+                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat || defaultNormalMat);
                     },
 
                     scene_Material: function(context, findVar, m) {

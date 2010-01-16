@@ -64,8 +64,8 @@ with (SceneJs) {
                                                                                             (function() {
                                                                                                 var elems = [];
 
-                                                                                                for (var i = -20; i < 20; i += 5) {
-                                                                                                    for (var i2 = -20; i2 < 20; i2 += 5) {
+                                                                                                for (var i = -50; i < 50; i += 5) {
+                                                                                                    for (var i2 = -50; i2 < 50; i2 += 5) {
                                                                                                         elems.push({
                                                                                                             x: i,
 

@@ -12,14 +12,58 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
-            var init = function() {
-                ctx.lightStack = [];
-            };
-
             this.install = function(_ctx) {
                 ctx = _ctx;
-                init();
+
+                ctx.lights = (function() {
+                    var lightStack = [];
+
+                    var loaded = false;
+
+                    /** When a new program is activated we will need to lazy-load our lights
+                     */
+                    ctx.programs.onProgramActivate(function() {
+                        loaded = false;
+                    });
+
+                    /**
+                     * When geometry is about to draw we load our lights if not loaded already
+                     */
+                    ctx.geometry.onDraw(function() {
+                        if (!loaded) {
+                            ctx.programs.setVar('scene_Lights', lightStack);
+                            loaded = true;
+                        }
+                    });
+
+                    return {
+
+                        /** Pushes view-space lights to stack
+                         */
+                        pushLights : function(lights) {
+                            for (var i = 0; i < lights.length; i++) {
+                                lightStack.push(lights[i]);
+                            }
+                            loaded = false;
+                        },
+
+                        /** Pops view-space lights from stack
+                         */
+                        popLights : function(numLights) {
+                            for (var i = 0; i < numLights; i++) {
+                                lightStack.pop();
+                            }
+                            loaded = false;
+                        },
+
+                        reset: function() {
+                            lightStack = [];
+                            loaded = false;
+                        }
+                    };
+                })();
             };
+
 
             var cloneVec = function(v) {
                 return v ? {x:v.x || 0, y:v.y || 0, z:v.z || 0} : { x:0, y:0, z:0 };
@@ -29,11 +73,11 @@ SceneJs.backends.installBackend(
              */
             var transform = function(l) {
                 return {
-                    pos : ctx.mvTransform.matrix.transformVector3(cloneVec(l.pos)),
+                    pos : ctx.modelTransform.transformVector(cloneVec(l.pos)),
                     ambient : l.ambient,
                     diffuse : l.diffuse,
                     specular : l.specular,
-                    dir: ctx.mvTransform.matrix.transformVector3(cloneVec(l.dir)),
+                    dir: ctx.modelTransform.transformVector(cloneVec(l.dir)),
                     constantAttenuation: l.constantAttenuation,
                     linearAttenuation: l.linearAttenuation,
                     quadraticAttenuation: l.quadraticAttenuation
@@ -60,32 +104,18 @@ SceneJs.backends.installBackend(
              * is therefore likely to vary, causing the lights to move around.
              */
             this.getSafeToCache = function() {
-                return ctx.mvTransform.fixed;
+                return ctx.modelTransform.isFixed();
             };
 
-            /** Pushes view-space lights to stack, and then inserts stack into shader.
-             */
             this.pushLights = function(lights) {
-                if (!ctx.programs.getActiveProgramId()) {
-                     throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
-                }
-                for (var i = 0; i < lights.length; i++) {
-                    ctx.lightStack.push(lights[i]);
-                }
-                ctx.programs.setVar('scene_Lights', ctx.lightStack);
+                ctx.lights.pushLights(lights);
             };
 
-            /** Pops view-space lights from stack, and then re-inserts stack into shader.
-             *
-             */
             this.popLights = function(numLights) {
-                for (var i = 0; i < numLights; i++) {
-                    ctx.lightStack.pop();
-                }
-                ctx.programs.setVar('scene_Lights', ctx.lightStack);
+                ctx.lights.pushLights(numLights);
             };
 
             this.reset = function() {
-                init();
+                ctx.lights.reset();
             };
         })());

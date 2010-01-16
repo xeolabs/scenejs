@@ -26,7 +26,7 @@ with (SceneJs) {
                                     lights({
                                         lights: [
                                             {
-                                                pos: { x: 50.0, y: 0.0, z: 30.0 }
+                                                pos: { x: 50.0, y: 20.0, z: -30.0 }
                                             }
                                         ]},
                                             perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 30000.0

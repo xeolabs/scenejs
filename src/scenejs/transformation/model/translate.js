@@ -4,19 +4,10 @@
  */
 (function() {
 
-    function makeTranslate(x, y, z) {
-        return Matrix.create([
-            [ 1, 0, 0, x ],
-            [ 0, 1, 0, y ],
-            [ 0, 0, 1, z ],
-            [ 0, 0, 0, 1 ]
-        ]);
-    }
-
     SceneJs.translate = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
 
-        var backend = SceneJs.backends.getBackend('model-view-transform');
+        var backend = SceneJs.backends.getBackend('model-transform');
 
         var mat;
         var xform;
@@ -24,15 +15,13 @@
         return function(scope) {
             if (!mat || !cfg.fixed) {  // Memoize matrix if node config is constant
                 var params = cfg.getParams(scope);
-                mat = makeTranslate(params.x || 0, params.y || 0, params.z || 0);
+                mat = SceneJs.math.translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
             }
             var superXform = backend.getTransform();
             if (!xform || !superXform.fixed || !cfg.fixed) {
-                var tempMat = superXform.matrix.x(mat);
+                var tempMat = SceneJs.math.mulMat4(superXform.matrix, mat);
                 xform = {
-                    matrix: tempMat,
-                   normalMatrixAsArray : new WebGLFloatArray(tempMat.inverse().transpose().make3x3().flatten()),
-                matrixAsArray : new WebGLFloatArray(tempMat.flatten()),
+                    matrix: tempMat,                  
                     fixed: superXform.fixed && cfg.fixed
                 };
             }

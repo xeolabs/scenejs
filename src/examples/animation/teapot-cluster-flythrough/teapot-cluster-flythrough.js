@@ -26,7 +26,7 @@ with (SceneJs) {
                                     lights({
                                         lights: [
                                             {
-                                                pos: { x: 50.0, y: 0.0, z: 30.0 }
+                                                pos: { x: 1000.0, y: 1000.0, z: 0.0 }
                                             }
                                         ]},
                                             perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 30000.0
@@ -46,7 +46,7 @@ with (SceneJs) {
                                                                     generator(
                                                                             (function() {
                                                                                 var elems = [];
-                                                                                for (var i = 0; i < 25; i++) {
+                                                                                for (var i = 0; i < 35; i++) {
                                                                                     elems.push({
                                                                                         x: (50 * Math.random()) - 25.0,
                                                                                         y: (50 * Math.random()) - 25.0,
@@ -97,7 +97,7 @@ with (SceneJs) {
         zpos += 2.0;
         try {
             exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookat node's 'look' to equal its 'at'
-        } catch (e) {            
+        } catch (e) {
             if (e.message) {
                 alert(e.message);
             } else {

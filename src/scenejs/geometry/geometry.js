@@ -15,14 +15,14 @@ SceneJs.geometry = function() {
             var j1 = indices[i][1];
             var j2 = indices[i][2];
 
-            var v1 = $V(vertices[j0]);
-            var v2 = $V(vertices[j1]);
-            var v3 = $V(vertices[j2]);
+            var v1 = vertices[j0];
+            var v2 = vertices[j1];
+            var v3 = vertices[j2];
 
-            var va = v2.subtract(v1);
-            var vb = v3.subtract(v1);
+            var va = SceneJs.math.subVec4(v2, v1);
+            var vb = SceneJs.math.subVec4(v3, v1);
 
-            var n = va.cross(vb).toUnitVector();
+            var n = SceneJs.math.normalizeVec4(SceneJs.math.cross3Vec4(va, vb));
 
             if (!nvecs[j0]) nvecs[j0] = [];
             if (!nvecs[j1]) nvecs[j1] = [];
@@ -42,9 +42,9 @@ SceneJs.geometry = function() {
             var y = 0;
             var z = 0;
             for (var j = 0; j < count; j++) {
-                x += nvecs[i][j].elements[0];
-                y += nvecs[i][j].elements[1];
-                z += nvecs[i][j].elements[2];
+                x += nvecs[i][j][0];
+                y += nvecs[i][j][1];
+                z += nvecs[i][j][2];
             }
             normals[i] = [x / count, y / count, z / count];
         }

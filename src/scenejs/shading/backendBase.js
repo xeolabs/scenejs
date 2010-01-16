@@ -40,6 +40,17 @@ SceneJs.shaderBackend = function(cfg) {
                         fixed: true
                     };
 
+                    /** Other backends who want to know when a different program is activated; Eg. transform backends
+                     * who need to reload their matrices into it.
+                     */
+                    var programActivationObservers = [];
+
+                    var notifyProgramActivation = function() {
+                        for (var i = 0; i < programActivationObservers.length; i++) {
+                            programActivationObservers[i]();
+                        }
+                    };
+
                     /** Deletes a program and its shaders
                      */
                     var deleteProgram = function(program) {
@@ -59,7 +70,7 @@ SceneJs.shaderBackend = function(cfg) {
                      * program (one of the configured type on the given canvas) already exists, will just
                      * return the ID of the program.
                      *
-                     * @param _cfg Config from backend extention, provides program for lazy-load 
+                     * @param _cfg Config from backend extention, provides program for lazy-load
                      */
                     this.loadProgram = function(_cfg) {
                         if (!ctx.canvas) {
@@ -165,6 +176,7 @@ SceneJs.shaderBackend = function(cfg) {
                             vars: {},
                             fixed: true // Cacheable vars by default 
                         };
+                        notifyProgramActivation();
                     };
 
                     /** Returns the ID of the currently active program
@@ -197,6 +209,17 @@ SceneJs.shaderBackend = function(cfg) {
                                     activeProgram.getVarLocation, v.vars[key]); // Defaults on null
                         }
                         vars = v;
+                    };
+
+                    /** Loads all set vars into the currently active program if they arent loaded already. This is
+                     * called just before geometry is rendered to save inserting vars that might just get replaced
+                     * before they are used.
+                     */
+                    this.loadVars = function() {
+                        for (var key in activeProgram.setters) {
+                            var v = vars.vars[key];
+                                activeProgram.setters[key].call(this, ctx.canvas.context, activeProgram.getVarLocation, v); // Defaults on null                           
+                        }
                     };
 
                     this.getVars = function() {
@@ -243,13 +266,14 @@ SceneJs.shaderBackend = function(cfg) {
                         activeProgram = null;
                         vars = {};
                     };
+
+                    /** Register an observer to notify when a new program is activated
+                     */
+                    this.onProgramActivate = function(f) {
+                        programActivationObservers.push(f);
+                    };
                 };
             }
-
-            /**
-             * Set up this backend extension
-             */
-
         };
 
         /* Methods for client shader node.

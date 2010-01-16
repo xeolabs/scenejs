@@ -12,7 +12,7 @@ SceneJs.backends.installBackend(
 
             var init = function() {
                 ctx.canvas = null;
-            }
+            };
 
             this.install = function(_ctx) {
                 ctx = _ctx;

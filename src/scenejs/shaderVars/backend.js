@@ -11,6 +11,39 @@ SceneJs.backends.installBackend(
 
             this.install = function(_ctx) {
                 ctx = _ctx;
+
+                ctx.shaderVars = (function() {
+                    var vars = {
+                        vars : {
+                        },
+                        fixed: true
+                    };
+
+                    var loaded = false;
+
+                    return {
+                        setVars: function(v) {
+                            vars = v;
+                            loaded = false;
+                        },
+
+                        getVars: function() {
+                            return vars;
+                        },
+
+                        load: function() {
+                            if (!loaded) {
+
+                                
+                                loaded = true;
+                            }
+                        },
+
+                        needLoad: function() {
+                            loaded = false;
+                        }
+                    };
+                })();
             };
 
             this.setVars = function(v) {

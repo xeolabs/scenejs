@@ -28,9 +28,9 @@ with (SceneJs) {
                 return function() {
                     i++;
                     switch (i) {
-                        case 1: return { canvasId : "canvas1", eye: { z : 20, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
-                        case 2: return { canvasId : "canvas2", eye: { x : 20, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
-                        case 3: return { canvasId : "canvas3", eye: { y : 20 }, up: { z : 1 } };
+                        case 1: return { canvasId : "canvas1", eye: { z : 60, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
+                        case 2: return { canvasId : "canvas2", eye: { x : 60, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
+                        case 3: return { canvasId : "canvas3", eye: { y : 60 }, up: { z : 1 } };
                         case 4: i = 0;
                     }
                 };
