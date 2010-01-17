@@ -22,35 +22,6 @@ var SceneJs = {version: '1.0'};
             return degrees * Math.PI / 180.0;
         },
 
-//        /** Applies properties on c to o, applying properties on defaults to o where they are not on c
-//         *
-//         */
-//        apply : function(o, c, defaults) {
-//            if (defaults) {
-//                SceneJs.apply(o, defaults);
-//            }
-//            if (o && c && typeof c == 'object') {
-//                for (var p in c) {
-//                    o[p] = c[p];
-//                }
-//            }
-//            return o;
-//        },
-//
-//        /** Applies properties on c to o wherever o does not already have properties of same name
-//         *
-//         */
-//        applyIf : function(o, c) {
-//            if (o && c) {
-//                for (var p in c) {
-//                    if (typeof o[p] == "undefined") {
-//                        o[p] = c[p];
-//                    }
-//                }
-//            }
-//            return o;
-//        },
-
         /** Creates a namespace
          */
         namespace : function() {
@@ -151,13 +122,7 @@ var SceneJs = {version: '1.0'};
         }
     };
 
-    /**
-     * Current count of active scene processes. These processes are asynchronous
-     * with respect to rendering, where scene traversal soes not wait for them
-     * to complete.
-     */
-    var processCount = 0;
-    var processes = {};
+
 
     /** Registry of modules that provide backend functionality for scene graph nodes
      */
@@ -195,21 +160,6 @@ var SceneJs = {version: '1.0'};
                 if (backend.reset) {
                     backend.reset();
                 }
-            }
-        };
-
-        this.getStatus = function() {
-
-        };
-    })();
-
-    /** Facade through which external SceneJS clients (ie. scripts in the rest of the Webpage)
-     * can monitor the status of the whole of SceneJs.
-     */
-    SceneJs.status = (function() {
-        return {
-            getNumProcesses : function() {
-                return processCount;
             }
         };
     })();

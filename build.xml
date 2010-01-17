@@ -7,7 +7,7 @@
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="3"/>
+    <property name="BUILD_MINOR" value="4"/>
     <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
@@ -73,65 +73,98 @@
         <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}">
             <fileset dir="${basedir}" includes="license.txt"/>
 
-            <!-- Sylvester libs -->
 
-            <fileset dir="${LIB_DIR}" includes="sylvester.js"/>
-            <fileset dir="${LIB_DIR}" includes="glUtils.js"/>
+            <!-- Core -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
+
+            <!-- Exceptions -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/backendBase.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/layering/backend.js"/>
+            <!-- Scene -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelview/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelview/model/rotate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelview/model/translate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelview/model/scale.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelview/view/lookat.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/scene/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
+
+            <!-- Canvas -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/canvas.js"/>
+
+            <!-- Viewport -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/viewport.js"/>
+
+
+            <!-- Shading -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/backendBase.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/shader.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/simple/simpleBackend.js"/>
+
+            <!-- Geometry -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
+
+            <!-- Modelling transforms -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/rotate.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/translate.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/scale.js"/>
+
+            <!-- Projection transforms -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/backend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/perspective.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/ortho.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/frustum.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/backend.js"/>
+            <!-- Viewing transforms -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/scene.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/lookat.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/canvas.js"/>
+            <!-- Lighting -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/viewport.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/layering/layer.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/shader.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/simple/simpleBackend.js"/>
-
+            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/backend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/material.js"/>
+            <!-- Material -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/scope/scope.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/material.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/backend.js"/>
+
+            <!-- Layers -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/layering/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/layering/layer.js"/>
+
+            <!-- Interpolation -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/animation/scalarInterpolator.js"/>
+
+            <!-- Scope -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/scope/scope.js"/>
+
+            <!-- Generation -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
 
             <!-- Assets -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/asset/asset.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/asset/backendBase.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/asset/collada/colladaBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/asset/js/jsBackend.js"/>
+
         </concat>
         <echo message="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME} built."/>
     </target>
@@ -222,14 +255,13 @@
         <copy file="src/examples/animation/interpolated-rotation/interpolated-rotation.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/interpolated-rotation.js"/>
 
-            <!-- Assets -->
+        <!-- Assets -->
 
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset"/>
         <copy file="${SRC_DIR}/examples/assets/js-teapot-asset/index.html"
               tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/index.html"/>
         <copy file="src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"/>
-
 
         <!-- License and readme -->
 

@@ -70,8 +70,12 @@
      */
     SceneJs.reset = function() {
         var scenes = backend.getAllScenes();
+        var temp = [];
         for (var i = 0; i < scenes.length; i++) {
-            scenes[i].destroy();
+            temp.push(scenes[i]);
+        }
+        while (temp.length > 0) {
+            temp.pop().destroy();
         }
     };
 })();

@@ -39,14 +39,14 @@ with (SceneJs) {
                                                         input:"alpha",
                                                         output:"eyez",
                                                         keys: [0.0, 0.3, 1.0],
-                                                        values: [-100, -20, 100]
+                                                        values: [-50, -20, 60]
                                                     },
                                                             scalarInterpolator({
                                                                 type:"linear",
                                                                 input:"alpha",
                                                                 output:"eyex",
                                                                 keys: [0.0,  0.3, 1.0],
-                                                                values: [-100, 100, 0]
+                                                                values: [-50, 60, 0]
                                                             },
                                                                     lookAt(function(scope) {
                                                                         return {
@@ -54,7 +54,7 @@ with (SceneJs) {
                                                                             eye : { x: scope.get("eyex"), y: 5.0, z: scope.get("eyez")},
                                                                             look : { x : 0.0, y : .0, z : 0 },
                                                                             up : { x: 0.0, y: 1.0, z: 0.0 }
-                                                                        }
+                                                                        };
                                                                     },
                                                                             material({
                                                                                 ambient:  { r:0.4, g:0.2, b:0.2 },
@@ -64,8 +64,8 @@ with (SceneJs) {
                                                                                             (function() {
                                                                                                 var elems = [];
 
-                                                                                                for (var i = -50; i < 50; i += 5) {
-                                                                                                    for (var i2 = -50; i2 < 50; i2 += 5) {
+                                                                                                for (var i = -24; i < 24; i += 5) {
+                                                                                                    for (var i2 = -25; i2 < 25; i2 += 5) {
                                                                                                         elems.push({
                                                                                                             x: i,
 

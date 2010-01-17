@@ -39,7 +39,7 @@ SceneJs.backends.installBackend(
                             /* Lazy compute normal matrix
                              */
                             if (!transform.normalMatrixAsArray) {
-                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.matrix4to3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
+                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.mat4To3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
                             }
 
                             ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);

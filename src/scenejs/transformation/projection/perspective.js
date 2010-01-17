@@ -20,7 +20,7 @@
                 params.far = params.far || 400.0;
 
                 var tempMat = SceneJs.math.perspectiveMatrix4(
-                        params.fovy,
+                        params.fovy* Math.PI / 180.0,
                         params.aspect,
                         params.near,
                         params.far);

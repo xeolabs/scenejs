@@ -17,7 +17,6 @@ SceneJs.backends.installBackend(
                  * is the one that is currently active, ie. being rendered.
                  */
                 ctx.scenes = (function() {
-
                     var scenes = {};
                     var nScenes = 0;
                     var activeSceneId = null;
@@ -65,11 +64,14 @@ SceneJs.backends.installBackend(
                         /** Returns all registered scenes
                          */
                         getAllScenes:function() {
-                            var s = [];
+                            var list = [];
                             for (var id in scenes) {
-                                s.push(scenes[id].scene);
+                                var s = scenes[id];
+                                if (s) {           // sparse array
+                                    list.push(s.scene);
+                                }
                             }
-                            return s;
+                            return list;
                         },
 
                         /** Notifies backend that the currently active scene has started an asynchronous process
@@ -97,6 +99,10 @@ SceneJs.backends.installBackend(
                         }
                     };
                 })();
+            };
+
+            this.getAllScenes = function() {
+                return ctx.scenes.getAllScenes();
             };
 
             this.registerScene = function(scene) {
