@@ -29,7 +29,7 @@ with (SceneJs) {
                                     lights({
                                         lights: [
                                             {
-                                                pos: { x: 100.0, y: 40.0, z: 0.0 }
+                                                pos: { x: -300.0, y: -90.0, z: 100.0 }
                                             }
                                         ]},
                                             perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 300.0

@@ -196,7 +196,6 @@ var SceneJs = {version: '1.0'};
                     backend.reset();
                 }
             }
-            ctx.scenejs.processes.reset();
         };
 
         this.getStatus = function() {

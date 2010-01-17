@@ -39,6 +39,7 @@ SceneJs.backends.installBackend(
                 context.clearColor(0.0, 0.0, 0.0, 1.0);
                 //context.clearDepth(1.0);  // TODO: configurable cleardepth with warning for potentially bad values
                 context.enable(context.DEPTH_TEST);
+                context.enable(context.TEXTURE_2D); // TODO: enable only when we know that scene contains textures  
                 //   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
                 //  context.depthFunc(context.ALWAYS);
                 //   context.depthRange(0.0, 0.01);

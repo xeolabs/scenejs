@@ -135,7 +135,7 @@ SceneJs.assetBackend = function(cfg) {
          */
         this.loadAsset = function(proxy, uri, callback) {
             ctx.scenes.processStarted();
-            return ctx.assets.loadAsset(proxy, uri, cfg.type, callback);
+            ctx.assets.loadAsset(proxy, uri, cfg.type, callback);
         };
 
         /** Notifies backend that load has completed; backend then kills the process.

@@ -91,11 +91,12 @@ SceneJs.geometry = function() {
             }
             if (!bufId) {
                 bufId = backend.createGeoBuffer(params.type, {
-                    vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
+                    vertices : (params.vertices && params.vertices.length > 0) ? flatten(params.vertices, 3) : [],
                     normals: params.normals && params.normals.length > 0 ? params.normals
                             : flatten(calculateNormals(params.vertices, params.indices), 3),
                     colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
-                    indices : params.indices && params.indices.length > 0 ? flatten(params.indices, 3) : []
+                    indices : params.indices && params.indices.length > 0 ? flatten(params.indices, 3) : [],
+                    texCoords : params.texCoords && params.texCoords.length > 0 ? flatten(params.texCoords, 2) : []
                 });
             }
             canvasId = backend.getActiveCanvasId();

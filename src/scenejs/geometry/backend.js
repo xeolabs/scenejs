@@ -65,18 +65,23 @@ SceneJs.backends.installBackend(
                             var vertexBuf;
                             var normalBuf;
                             var indexBuf;
+                            var textureBuf;
 
                             try {
                                 vertexBuf = createArrayBuffer(context, geo.vertices, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.vertices));
                                 normalBuf = createArrayBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals));
                                 indexBuf = createArrayBuffer(context, geo.indices, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLUnsignedShortArray(geo.indices));
+                                if (geo.texCoords) {
+                                    textureBuf = createArrayBuffer(context, geo.texCoords, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLFloatArray(geo.texCoords));
+                                }
 
-                                buffers[bufId] = { // TODO: catch out-of-memory exception
+                                buffers[bufId] = {
                                     canvas : ctx.canvas,
                                     context : context,
                                     vertexBuf : vertexBuf,
                                     normalBuf : normalBuf,
-                                    indexBuf : indexBuf
+                                    indexBuf : indexBuf,
+                                    textureBuf: textureBuf
                                 };
 
                                 return bufId;
@@ -92,6 +97,9 @@ SceneJs.backends.installBackend(
                                 }
                                 if (normalBuf) {
                                     context.deleteBuffer(indexBuf.bufferId);
+                                }
+                                if (textureBuf) {
+                                    context.deleteBuffer(textureBuf.bufferId);
                                 }
                                 throw e;
                             }
@@ -110,6 +118,12 @@ SceneJs.backends.installBackend(
                              */
                             ctx.programs.bindVertexBuffer(buffer.vertexBuf.bufferId);
                             ctx.programs.bindNormalBuffer(buffer.normalBuf.bufferId);
+
+                            /* Textures optional in geometry
+                             */
+                            if (buffer.textureBuf) {
+                                ctx.programs.bindTextureBuffer(buffer.textureBuf.bufferId);
+                            }
 
                             /* Bind index buffer and draw geometry using the active program
                              */
@@ -131,6 +145,9 @@ SceneJs.backends.installBackend(
                                 if (buffer.indexBuf) {
                                     buffer.context.deleteBuffer(buffer.indexBuf.bufferId);
                                 }
+                                if (buffer.textureBuf) {
+                                    buffer.context.deleteBuffer(buffer.textureBuf.bufferId);
+                                }
                             }
                         },
 
@@ -140,7 +157,7 @@ SceneJs.backends.installBackend(
                             drawObservers.push(f);
                         },
 
-                        reset : function() {                           
+                        reset : function() {
                             for (var bufId in buffers) {
                                 deleteGeoBuffer(buffers[bufId]);
                             }
