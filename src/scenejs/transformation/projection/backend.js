@@ -29,17 +29,17 @@ SceneJs.backends.installBackend(
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
 
-                            /* Lazy-compute WebGL array
-                             */
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
+                                    /* Lazy-compute WebGL array
+                                     */
+                                    if (!transform.matrixAsArray) {
+                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                                    }
 
-                            ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
+                                    ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
 
-                            loaded = true;
-                        }
-                    });
+                                    loaded = true;
+                                }
+                            });
 
                     return {
                         setTransform: function(t) {

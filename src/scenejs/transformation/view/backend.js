@@ -18,7 +18,7 @@ SceneJs.backends.installBackend(
 
                     var loaded = false;
 
-                 /** When a new program is activated we will need to lazy-load our current matrix
+                    /** When a new program is activated we will need to lazy-load our current matrix
                      */
                     ctx.programs.onProgramActivate(function() {
                         loaded = false;
@@ -30,17 +30,17 @@ SceneJs.backends.installBackend(
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
 
-                            /* Lazy-compute WebGL array
-                             */
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
+                                    /* Lazy-compute WebGL array
+                                     */
+                                    if (!transform.matrixAsArray) {
+                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                                    }
 
-                            ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
+                                    ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
 
-                            loaded = true;
-                        }
-                    });
+                                    loaded = true;
+                                }
+                            });
 
                     return {
                         setTransform: function(t) {

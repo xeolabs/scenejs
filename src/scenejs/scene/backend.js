@@ -20,6 +20,7 @@ SceneJs.backends.installBackend(
                     var scenes = {};
                     var nScenes = 0;
                     var activeSceneId = null;
+                    var commands = {};
 
                     return {
 
@@ -97,6 +98,25 @@ SceneJs.backends.installBackend(
                         getScene : function(sceneId) {
                             return scenes[sceneId].scene;
                         }
+//                        ,
+//
+//                        onEvent: function(name, command) {
+//                            var list = commands[name];
+//                            if (!list) {
+//                                list = [];
+//                                commands[name] = list;
+//                            }
+//                            list.push(command);
+//                        },
+//
+//                        fireEvent: function(name, params) {
+//                            var list = commands[name];
+//                            if (list) {
+//                                for (var i = 0; i < list.length; i++) {
+//                                    list[i](params);
+//                                }
+//                            }
+//                        }
                     };
                 })();
             };

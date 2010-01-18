@@ -25,7 +25,7 @@ SceneJs.backends.installBackend(
                     });
 
                     /**
-                     * When geometry is about to draw we load our matrix if not loaded already
+                     * When geometry is about to drawn we load our matrix if not loaded already
                      */
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
@@ -58,6 +58,10 @@ SceneJs.backends.installBackend(
                         getTransform: function() {
                             return transform;
                         },
+
+                        transformPoint3: function(v) {
+                            return SceneJs.math.transformPoint3(transform.matrix, v);
+                        } ,
 
                         transformVector: function(v) {
                             return SceneJs.math.transformVector3(transform.matrix, v);

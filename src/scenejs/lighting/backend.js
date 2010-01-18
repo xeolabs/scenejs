@@ -73,7 +73,7 @@ SceneJs.backends.installBackend(
              */
             var transform = function(l) {
                 return {
-                    pos : ctx.modelTransform.transformVector(cloneVec(l.pos)),
+                    pos : ctx.modelTransform.transformPoint3(cloneVec(l.pos)),
                     ambient : l.ambient,
                     diffuse : l.diffuse,
                     specular : l.specular,
@@ -112,7 +112,7 @@ SceneJs.backends.installBackend(
             };
 
             this.popLights = function(numLights) {
-                ctx.lights.pushLights(numLights);
+                ctx.lights.popLights(numLights);
             };
 
             this.reset = function() {

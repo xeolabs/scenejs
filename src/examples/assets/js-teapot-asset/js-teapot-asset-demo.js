@@ -59,9 +59,9 @@ with (SceneJs) {
                                             perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
                                                     lookAt({
-                                                        eye : { x: 0.0, y: 30.0, z: -80},
+                                                        eye : { x: 0.0, y: 20.0, z: -20},
                                                         look : { x : 0.0, y : 0.0, z : 0 },
-                                                        up : { x: 0.0, y: -1.0, z: 0.0 }
+                                                        up : { x: 0.0, y: 1.0, z: 0.0 }
 
                                                     },
 

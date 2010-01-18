@@ -129,10 +129,13 @@ var SceneJs = {version: '1.0'};
     SceneJs.backends = new (function() {
         var backends = {};
 
+
+
         /** Context that is shared by all backend plugins, for them to define what they
          * on, as long as they don't clobber the core scenejs object.
          */
         var ctx = {
+            
         };
 
         /** Installs a backend module - see examples for more info.
@@ -864,6 +867,7 @@ SceneJs.backends.installBackend(
                     var scenes = {};
                     var nScenes = 0;
                     var activeSceneId = null;
+                    var commands = {};
 
                     return {
 
@@ -941,6 +945,25 @@ SceneJs.backends.installBackend(
                         getScene : function(sceneId) {
                             return scenes[sceneId].scene;
                         }
+//                        ,
+//
+//                        onEvent: function(name, command) {
+//                            var list = commands[name];
+//                            if (!list) {
+//                                list = [];
+//                                commands[name] = list;
+//                            }
+//                            list.push(command);
+//                        },
+//
+//                        fireEvent: function(name, params) {
+//                            var list = commands[name];
+//                            if (list) {
+//                                for (var i = 0; i < list.length; i++) {
+//                                    list[i](params);
+//                                }
+//                            }
+//                        }
                     };
                 })();
             };
@@ -980,7 +1003,7 @@ SceneJs.backends.installBackend(
     SceneJs.scene = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
         var sceneId = null;
-
+     
         var _scene = {
 
             /**
@@ -8016,29 +8039,29 @@ SceneJs.backends.installBackend(
                     });
 
                     /**
-                     * When geometry is about to draw we load our matrix if not loaded already
+                     * When geometry is about to drawn we load our matrix if not loaded already
                      */
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
 
-                            /* Lazy-compute WebGL arrays
-                             */
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
+                                    /* Lazy-compute WebGL arrays
+                                     */
+                                    if (!transform.matrixAsArray) {
+                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                                    }
 
-                            /* Lazy compute normal matrix
-                             */
-                            if (!transform.normalMatrixAsArray) {
-                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.mat4To3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
-                            }
+                                    /* Lazy compute normal matrix
+                                     */
+                                    if (!transform.normalMatrixAsArray) {
+                                        transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.mat4To3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
+                                    }
 
-                            ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);
-                            ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
+                                    ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);
+                                    ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
 
-                            loaded = true;
-                        }
-                    });
+                                    loaded = true;
+                                }
+                            });
 
                     return {
                         setTransform: function(t) {
@@ -8214,17 +8237,17 @@ SceneJs.backends.installBackend(
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
 
-                            /* Lazy-compute WebGL array
-                             */
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
+                                    /* Lazy-compute WebGL array
+                                     */
+                                    if (!transform.matrixAsArray) {
+                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                                    }
 
-                            ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
+                                    ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
 
-                            loaded = true;
-                        }
-                    });
+                                    loaded = true;
+                                }
+                            });
 
                     return {
                         setTransform: function(t) {
@@ -8377,7 +8400,7 @@ SceneJs.backends.installBackend(
 
                     var loaded = false;
 
-                 /** When a new program is activated we will need to lazy-load our current matrix
+                    /** When a new program is activated we will need to lazy-load our current matrix
                      */
                     ctx.programs.onProgramActivate(function() {
                         loaded = false;
@@ -8389,17 +8412,17 @@ SceneJs.backends.installBackend(
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
 
-                            /* Lazy-compute WebGL array
-                             */
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
+                                    /* Lazy-compute WebGL array
+                                     */
+                                    if (!transform.matrixAsArray) {
+                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                                    }
 
-                            ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
+                                    ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
 
-                            loaded = true;
-                        }
-                    });
+                                    loaded = true;
+                                }
+                            });
 
                     return {
                         setTransform: function(t) {
@@ -8689,14 +8712,14 @@ SceneJs.backends.installBackend(
 
                     _init();
 
-                    /** When a new program is activated we will need to lazy-load our material
+                    /** When a new program is activated we will need to lazy-load our current matrix
                      */
                     ctx.programs.onProgramActivate(function() {
                         loaded = false;
                     });
 
                     /**
-                     * When geometry is about to draw we load our material if not loaded already
+                     * When geometry is about to render we load our matrix if not loaded already
                      */
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {

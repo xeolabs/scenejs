@@ -28,14 +28,14 @@ SceneJs.backends.installBackend(
 
                     _init();
 
-                    /** When a new program is activated we will need to lazy-load our material
+                    /** When a new program is activated we will need to lazy-load our current matrix
                      */
                     ctx.programs.onProgramActivate(function() {
                         loaded = false;
                     });
 
                     /**
-                     * When geometry is about to draw we load our material if not loaded already
+                     * When geometry is about to render we load our matrix if not loaded already
                      */
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {

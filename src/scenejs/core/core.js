@@ -129,10 +129,13 @@ var SceneJs = {version: '1.0'};
     SceneJs.backends = new (function() {
         var backends = {};
 
+
+
         /** Context that is shared by all backend plugins, for them to define what they
          * on, as long as they don't clobber the core scenejs object.
          */
         var ctx = {
+            
         };
 
         /** Installs a backend module - see examples for more info.
