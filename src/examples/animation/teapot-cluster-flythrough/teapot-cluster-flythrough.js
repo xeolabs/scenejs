@@ -17,10 +17,14 @@
 with (SceneJs) {
     var exampleScene = scene({}, // node always has a config object
 
-            canvas({ canvasId: 'mycanvas'},
+            canvas({
+                canvasId: 'mycanvas',
+                clearColor : { r:0, g:0, b:0.3, a: 1 },
+                clearDepth : 1.0,
+                depthTest : true
+            },
 
                     viewport({ x : 1, y : 1, width: 600, height: 600},
-
                             shader({ type: 'simple-shader' },
 
                                     lights({

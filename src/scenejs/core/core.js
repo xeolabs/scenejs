@@ -116,7 +116,7 @@ var SceneJs = {version: '1.0'};
         visitChildren : function(config, scope) {
             if (config.children) {
                 for (var i = 0; i < config.children.length; i++) {
-                    config.children[i].call(this, scope);
+                    config.children[i]( scope);
                 }
             }
         }

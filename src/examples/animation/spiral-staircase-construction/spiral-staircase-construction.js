@@ -57,8 +57,8 @@ with (SceneJs) {
                                                                         };
                                                                     },
                                                                             material({
-                                                                                ambient:  { r:0.4, g:0.2, b:0.2 },
-                                                                                diffuse:  { r:0.9, g:0.5, b:0.4 }
+                                                                                ambient:  { r:0.6, g:0.6, b:0.6 },
+                                                                                diffuse:  { r:0.7, g:0.7, b:0.9 }
                                                                             },
                                                                                     generator(
                                                                                             (function() {
@@ -66,11 +66,14 @@ with (SceneJs) {
 
                                                                                                 for (var i = -24; i < 24; i += 5) {
                                                                                                     for (var i2 = -25; i2 < 25; i2 += 5) {
+                                                                                                        var height = (Math.random() * 50.0)-25;
                                                                                                         elems.push({
                                                                                                             x: i,
 
-                                                                                                            y: 0, //(10 * Math.random()) - 5.0  ,
-                                                                                                            z: i2
+                                                                                                            y: -(height ),
+                                                                                                            z: i2,
+                                                                                                            
+                                                                                                            height:height
                                                                                                         });
                                                                                                     }
                                                                                                 }
@@ -86,10 +89,13 @@ with (SceneJs) {
                                                                                             translate(function(scope) {
                                                                                                 return scope.get("param");
                                                                                             },
+                                                                                                    scale(function(scope) {
+                                                                                                        return  {y: scope.get("param.height")}
+                                                                                                    },
 
-                                                                                                    objects.cube()
+                                                                                                            objects.cube()
+                                                                                                            )
                                                                                                     )
-
                                                                                             )
                                                                                     )
                                                                             )
@@ -106,12 +112,12 @@ with (SceneJs) {
     var p;
 
     function doit() {
-        if (alpha > 1) {
+        if (alpha > 10) {
             exampleScene.destroy();
             clearInterval(p);
         }
 
-        alpha += 0.01;
+        alpha += 0.003;
         try {
             exampleScene.render({"alpha":alpha});
         } catch (e) {

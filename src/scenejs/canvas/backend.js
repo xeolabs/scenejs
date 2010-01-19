@@ -19,8 +19,8 @@ SceneJs.backends.installBackend(
                 init();
             };
 
-            this.findCanvas = function(canvasId) {
-                var canvas = document.getElementById(canvasId);
+            this.findCanvas = function(cfg) {
+                var canvas = document.getElementById(cfg.canvasId);
                 if (!canvas) {
                     throw new SceneJs.exceptions.CanvasNotFoundException
                             ('Could not find canvas document element with id \'' + canvasId + '\'');
@@ -36,18 +36,57 @@ SceneJs.backends.installBackend(
                                     + canvasId
                                     + '\' failed to provide a supported context');
                 }
-                context.clearColor(0.0, 0.0, 0.0, 1.0);
-                //context.clearDepth(1.0);  // TODO: configurable cleardepth with warning for potentially bad values
-                context.enable(context.DEPTH_TEST);
-                context.enable(context.TEXTURE_2D); // TODO: enable only when we know that scene contains textures  
-                //   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-                //  context.depthFunc(context.ALWAYS);
-                //   context.depthRange(0.0, 0.01);
+
+                cfg = cfg || {};
+
+                if (cfg.clearColor) {
+                    context.clearColor(cfg.clearColor.r, cfg.clearColor.g, cfg.clearColor.b, cfg.clearColor.a);
+                } else {
+                    context.clearColor(0.0, 0.0, 0.0, 1.0);
+                }
+
+                if (cfg.clearDepth) {
+                    context.clearDepth(cfg.clearDepth);
+                } else {
+                    //context.clearDepth(1.0);
+                }
+
+                if (cfg.depthTest) {
+                    context.enable(context.DEPTH_TEST);
+                } else {
+                    context.disable(context.DEPTH_TEST);
+                }
+
+                if (cfg.cullFace) {
+                    context.enable(context.CULL_FACE);
+                } else {
+                    context.disable(context.CULL_FACE);
+                }
+
+                if (cfg.texture2D) {
+                    context.enable(context.TEXTURE_2D);
+                } else {
+                    context.disable(context.TEXTURE_2D);
+                }
+
+                if (cfg.depthFunc) {
+
+                } else {
+
+                }
+
+                if (cfg.depthRange) {
+                    context.depthRange(cfg.depthRange.zmin, cfg.depthRange.zmin);
+                } else {
+              //      context.depthRange(0.0, 0.01);
+                }
+                
+                context.disable(context.SCISSOR_TEST);
 
                 return {
                     canvas: canvas,
                     context: context,
-                    canvasId : canvasId
+                    canvasId : cfg.canvasId
                 };
             };
 

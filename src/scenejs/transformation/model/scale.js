@@ -16,7 +16,7 @@
         return function(scope) {
             if (!mat || !cfg.fixed) {   // Memoize matrix if node config is constant
                 var params = cfg.getParams(scope);
-                mat = SceneJs.math.scalingMat4v([params.x || 0, params.y || 0, params.z || 0]);
+                mat = SceneJs.math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
             }
             var superXform = backend.getTransform();
             if (!xform || !superXform.fixed || !cfg.fixed) {

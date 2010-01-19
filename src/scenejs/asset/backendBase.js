@@ -30,13 +30,14 @@ SceneJs.assetBackend = function(cfg) {
 
                     var evict = function() {
                         if (--evictionCountdown == 0) {
-                            //                            for (var src in entries) {
-                            //                                var entry = entries[src];
-                            //                                if (--entry.timeToLive < 0) {
-                            //                                    entries[src] = undefined;
-                            //                                }
-                            //                            }
-                            evictionCountdown = 1000;
+//                            var oldest = -1;
+//                            for (var src in entries) {
+//                                var entry = entries[src];
+//                                if (entry.age > oldest) {
+//                                    oldest = entries[src].age;
+//                                }
+//                            }
+//                            evictionCountdown = 1000;
                         }
                     };
 
@@ -71,7 +72,7 @@ SceneJs.assetBackend = function(cfg) {
                     this.getAsset = function(uri) {
                         var entry = entries[uri];
                         if (entry) {
-                            entry.timeToLive--;
+                            entry.age = 0;
                             //    evict();
                             return entry.node;
                         }
@@ -101,7 +102,7 @@ SceneJs.assetBackend = function(cfg) {
                                     }
                                     entries[uri] = {
                                         node: assetNode,
-                                        timeToLive : 1000
+                                        age: 0
                                     };
                                     callback(assetNode);
                                 },

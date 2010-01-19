@@ -23,12 +23,14 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/basic/teapot/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/codemirror.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/canvas/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/canvas/backend.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/scenejs_small.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsexml.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/extending.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_75_dadada_1x400.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_viewports/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/canvas/canvas.js" afterPath="$PROJECT_DIR$/src/scenejs/canvas/canvas.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/entries/minimal1/scene.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_viewports/multiple-viewports.js" afterPath="" />
@@ -38,6 +40,7 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/examples/generation/spiral-staircase/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_viewports/index.debug.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/graph.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/backend.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/jscolors.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/playroom.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/experiments/exp1/index.html" afterPath="" />
@@ -55,6 +58,7 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/codemirror.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/generation/multiple-teapots/multiple-teapots.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_b.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" afterPath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/undo.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/generation/multiple-viewports/multiple-viewports.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/animation/interpolated-rotation/interpolated-rotation.js" afterPath="" />
@@ -75,7 +79,7 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/util.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/generation/multiple-canvases/index.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/scene.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/scene.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/index.debug.html" afterPath="$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/index.debug.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsesparql.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/spiral_staircase/index.debug.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_222222_256x240.png" afterPath="" />
@@ -94,6 +98,7 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/stringstream.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/jquery.alerts.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/examples/generation/multiple-viewports/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_2694e8_256x240.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/examples/generation/spiral-staircase/spiral-staircase.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/animation/teapot-cluster-flythrough/index.html" afterPath="" />
@@ -102,13 +107,14 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/lib/scenejs.min.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/teapot-example1.jpg" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/catalogue.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/backend.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_highlight-soft_75_cccccc_1x100.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_diagonals-thick_90_eeeeee_40x40.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/downloads.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_2e83ff_256x240.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/header_splash.jpg" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/generation/multiple-viewports/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/objects/cube.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/objects/cube.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/animation/teapot-cluster-flythrough/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/assets/collada-cube/collada-cube.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_tr.png" afterPath="" />
@@ -129,7 +135,6 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/csscolors.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/js/jquery.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/README.txt" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/projection/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/projection/backend.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/clipart/lindsayk.jpg" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/images/Thumbs.db" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_2e83ff_256x240.png" afterPath="" />
@@ -139,11 +144,11 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/arrow.jpg" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/dev/dev.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/images/help.gif" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/scenejs-0.4.0.tar.gz" afterPath="$PROJECT_DIR$/dist/scenejs-0.4.0.tar.gz" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery-ui-1.7.2.custom.min.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/images/arrow_right.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/license.txt" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_teapots/index.debug.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/viewport/viewport.js" afterPath="$PROJECT_DIR$/src/scenejs/viewport/viewport.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/core.js" afterPath="$PROJECT_DIR$/src/scenejs/core/core.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/catalogue.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/tokenizejavascript.js" afterPath="" />
@@ -156,12 +161,12 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/images/title.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery.easing.1.3.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/generation/multiple-canvases/multiple-canvases.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/menu-left.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/generation/spiral-staircase/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/button_src_hv.jpg" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/examples/generation/multiple-teapots/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/select.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/backend.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/generation/spiral-staircase/spiral-staircase.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/menu-right.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/xmlcolors.css" afterPath="" />
@@ -173,34 +178,29 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_flat_0_aaaaaa_40x100.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/button_demo_hv.jpg" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/jquery-ui-1.7.2.custom.css" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.4.0/lib/scenejs.min.js" afterPath="$PROJECT_DIR$/dist/extracted/scenejs-0.4.0/lib/scenejs.min.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery.tabs.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/asset/scenejs/nativeBackend.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/appearance/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/appearance/backend.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_ffffff_256x240.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js" afterPath="$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_888888_256x240.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/examples/generation/multiple-teapots/multiple-teapots.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_flat_75_ffffff_40x100.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/generation/multiple-canvases/multiple-canvases.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsedummy.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/scenejs-0.4.0.zip" afterPath="$PROJECT_DIR$/dist/scenejs-0.4.0.zip" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/editor.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/basic/teapot/teapot.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.4.0/lib/scenejs.js" afterPath="$PROJECT_DIR$/dist/extracted/scenejs-0.4.0/lib/scenejs.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsehtmlmixed.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/icon_bullet.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_teapots/multiple-teapots.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/highlight.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/basic/teapot/teapot.js" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/examples/assets/collada-cube/index.debug.html" afterPath="$PROJECT_DIR$/src/examples/animation/sunrise/index.debug.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_72a7cf_256x240.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/menu-tail.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/style.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_3d80b3_256x240.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/canvases/index.debug.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.3.7.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js" afterPath="$PROJECT_DIR$/src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/generation/multiple-teapots/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-hard_70_000000_1x100.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_flat_15_cd0a0a_40x100.png" afterPath="" />
@@ -218,8 +218,6 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/examples/animation/teapot-cluster-flythrough/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsehtmlmixed.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/js/jtip.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.4.0/examples/assets/js-teapot-asset/js-teapot-asset-demo.js" afterPath="$PROJECT_DIR$/dist/extracted/scenejs-0.4.0/examples/assets/js-teapot-asset/js-teapot-asset-demo.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/backend.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/sparqlcolors.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/lib/scenejs.min.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.3.6.js" afterPath="" />
@@ -237,20 +235,21 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/util.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/example.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/scenejs-0.3.0.tar.gz" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/examples/generation/multiple-teapots/index.html" afterPath="$PROJECT_DIR$/src/examples/animation/sunrise/index.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/editor.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/scenejs-0.1.0.tar.gz" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.2.0/lib/scenejs.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/backend.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/backend.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/asset/backendBase.js" afterPath="$PROJECT_DIR$/src/scenejs/asset/backendBase.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/entries/minimal2/layout.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/lib/scenejs.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/animation/interpolated-rotation/interpolated-rotation.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/basic/teapot/index.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/introduction.html" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsesparql.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/style.css" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_bl.png" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/images/info.gif" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/animation/spiral-staircase-construction/spiral-staircase-construction.js" afterPath="$PROJECT_DIR$/src/examples/animation/spiral-staircase-construction/spiral-staircase-construction.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/splitter/vdockbar.gif" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.3.0/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/dist/extracted/scenejs-0.1.0/examples/basic/teapot/teapot.js" afterPath="" />
@@ -313,124 +312,98 @@
     <favorites_list name="scenejs" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.65259516">
-      <split-first>
-        <leaf>
-          <file leaf-file-name="geometry.js" pinned="true" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/geometry/geometry.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="98" column="109" selection-start="3692" selection-end="3692" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="utils3d.js" pinned="true" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/lib/utils3d.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="176" column="37" selection-start="6022" selection-end="6022" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="backend.js" pinned="true" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/geometry/backend.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="114" column="0" selection-start="5322" selection-end="5322" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="backend.js" pinned="true" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/texture/backend.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="117" column="37" selection-start="4816" selection-end="4816" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="sunrise.js" pinned="false" current="true" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/examples/animation/sunrise/sunrise.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="109" column="20" selection-start="5526" selection-end="5526" vertical-scroll-proportion="0.7206068">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="backend.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/lighting/backend.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="114" column="30" selection-start="4610" selection-end="4610" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="backend.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/transformation/model/backend.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="62" column="57" selection-start="2330" selection-end="2330" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="math.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/core/math.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="581" column="4" selection-start="18466" selection-end="18466" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="lights.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/lighting/lights.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="19" column="0" selection-start="645" selection-end="645" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="interpolated-rotation.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/examples/animation/interpolated-rotation/interpolated-rotation.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="107" column="59" selection-start="5113" selection-end="5780" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="backend.js" pinned="true" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/geometry/backend.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="121" column="15" selection-start="5665" selection-end="5665" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="backendBase.js" pinned="false" current="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/scenejs/shading/backendBase.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="178" column="0" selection-start="8451" selection-end="8451" vertical-scroll-proportion="-2.3869731">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf>
+      <file leaf-file-name="geometry.js" pinned="true" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/geometry/geometry.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="105" column="26" selection-start="4029" selection-end="4029" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="utils3d.js" pinned="true" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/utils3d.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="176" column="37" selection-start="6022" selection-end="6022" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="backend.js" pinned="true" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/geometry/backend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="209" column="78" selection-start="9555" selection-end="9555" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="scissor.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/scissor/scissor.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="15" selection-start="15" selection-end="15" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.debug.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/index.debug.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="42" column="77" selection-start="1670" selection-end="1670" vertical-scroll-proportion="-29.041666">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="teapot-cluster-flythrough.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="26" column="70" selection-start="968" selection-end="968" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="backend.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/scissor/backend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="127" selection-start="816" selection-end="816" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/build.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="102" column="0" selection-start="3564" selection-end="3564" vertical-scroll-proportion="0.7358491">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="backend.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/canvas/backend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="82" column="0" selection-start="2658" selection-end="2658" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="backend.js" pinned="true" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/texture/backend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="117" column="37" selection-start="4816" selection-end="4816" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -499,6 +472,10 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="viewport" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -695,6 +672,54 @@
           <option name="myItemId" value="scenejs" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scissor" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="scene" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
@@ -830,6 +855,32 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
+          <option name="myItemId" value="exceptions" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
           <option name="myItemId" value="core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
@@ -857,6 +908,32 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="canvas" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="asset" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1469,13 +1546,13 @@
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="MemberChooser.sorted" value="false" />
     <property name="options.lastSelected" value="reference.settings.ide.settings.web.browsers" />
+    <property name="MemberChooser.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -1601,7 +1678,7 @@
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.099894844" sideWeight="0.5" order="1" side_tool="false" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.099691674" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
@@ -1648,114 +1725,114 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/dist/extracted/scenejs-0.4.0/lib/scenejs.min.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="61" column="18" selection-start="0" selection-end="166147" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="48" selection-start="915" selection-end="1354" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/generation/multiple-teapots/multiple-teapots.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="55" selection-start="1142" selection-end="1965" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/generation/multiple-viewports/multiple-viewports.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="108" selection-start="3209" selection-end="3458" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="128" column="96" selection-start="5764" selection-end="5764" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/index.debug.html">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/transformation/view/backend.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/index.html">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/shading/shader.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animation/sunrise/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="0" selection-start="492" selection-end="558" vertical-scroll-proportion="-9.208333">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animation/sunrise/index.debug.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="106" column="66" selection-start="4689" selection-end="4689" vertical-scroll-proportion="-75.083336">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animation/interpolated-rotation/interpolated-rotation.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="107" column="59" selection-start="5113" selection-end="5780" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/geometry/backend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="114" column="0" selection-start="5322" selection-end="5322" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/transformation/model/backend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="57" selection-start="2330" selection-end="2330" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/core/math.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="581" column="4" selection-start="18466" selection-end="18466" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/lighting/lights.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="0" selection-start="645" selection-end="645" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/scenejs/lighting/backend.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="114" column="30" selection-start="4610" selection-end="4610" vertical-scroll-proportion="0.0">
+        <state line="25" column="32" selection-start="787" selection-end="1014" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animation/sunrise/sunrise.js">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/transformation/model/rotate.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="109" column="20" selection-start="5526" selection-end="5526" vertical-scroll-proportion="0.7206068">
+        <state line="31" column="49" selection-start="1298" selection-end="1298" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/texture/backend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="117" column="37" selection-start="4816" selection-end="4816" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/viewport/viewport.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="148" selection-start="418" selection-end="418" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/viewport/backend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="49" column="0" selection-start="1525" selection-end="1525" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/lighting/lights.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="58" column="44" selection-start="1534" selection-end="1559" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/canvas/canvas.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="112" selection-start="483" selection-end="584" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/canvas/backend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="0" selection-start="2658" selection-end="2658" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/index.debug.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="42" column="77" selection-start="1670" selection-end="1670" vertical-scroll-proportion="-29.041666">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="70" selection-start="968" selection-end="968" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/scissor/scissor.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="15" selection-start="15" selection-end="15" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/scissor/backend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="127" selection-start="816" selection-end="816" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="102" column="0" selection-start="3564" selection-end="3564" vertical-scroll-proportion="0.7358491">
           <folding />
         </state>
       </provider>

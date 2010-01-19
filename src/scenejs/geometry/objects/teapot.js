@@ -6,7 +6,7 @@ SceneJs.utils.ns("SceneJs.objects");
 SceneJs.objects.teapot = function() {
     return SceneJs.geometry({
 
-    //    type:"teapot",
+        type:"teapot",
         
         vertices: [
             [-3.000000, 1.650000, 0.000000],

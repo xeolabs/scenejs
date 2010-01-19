@@ -56,4 +56,7 @@ SceneJs.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      
     this.message = msg + " (uri=\"" + (uri || "null") + "\", proxy=\"" + (proxy || "null") + "\")";
 };
 
+SceneJs.exceptions.NoViewportActiveException = function(msg) {
+    this.message = msg;
+};
 

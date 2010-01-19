@@ -74,21 +74,21 @@ SceneJs.geometry = function() {
              */
             throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
         }
-
-        /* Drop handle to VBOs if containing canvas node
-         * has dynamically switched to some other canvas
-         * TODO: find way to copy VBOs between canvases
-         */
-        if (canvasId != backend.getActiveCanvasId()) {
-            bufId = null;
+        if (!params.type) {
+            throw new SceneJs.exceptions.NodeConfigExpectedException("Geometry type parameter expected");
         }
 
-        /* Obtain VBOs if not held
-         */
-        if (!bufId) {
-            if (params.type) {
-                bufId = backend.findGeoBuffer(params.type);
+        if (params.type) {
+
+            /* Buffer geometry that is identified with a type
+             */
+            if (canvasId != backend.getActiveCanvasId()) { // TODO: backend should listen for canvas switch and throw out buffer
+                bufId = null;
             }
+
+            /* Backend may have evicted geometry buffer, so we may have to reallocate it
+             */
+            bufId = backend.findGeoBuffer(params.type);
             if (!bufId) {
                 bufId = backend.createGeoBuffer(params.type, {
                     vertices : (params.vertices && params.vertices.length > 0) ? flatten(params.vertices, 3) : [],
@@ -100,6 +100,8 @@ SceneJs.geometry = function() {
                 });
             }
             canvasId = backend.getActiveCanvasId();
+        } else {
+            // TODO: render eometry without using VBO
         }
         backend.drawGeoBuffer(bufId);
         SceneJs.utils.visitChildren(cfg, scope);

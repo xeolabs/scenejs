@@ -11,13 +11,13 @@ SceneJs.canvas = function() {
     return function(scope) {
         var params = cfg.getParams(scope);
         if (!params.canvasId) {
-            throw 'canvas node parameter missing: canvasId';
+            throw new SceneJs.exceptions.NodeConfigExpectedException('canvas node parameter missing: canvasId');
         }
 
         var superCanvas = backend.getCanvas(); // remember previous canvas if any
 
         if (!canvas || !cfg.fixed) {
-            canvas = backend.findCanvas(params.canvasId);
+            canvas = backend.findCanvas(params);
         }
         backend.setCanvas(canvas);
 

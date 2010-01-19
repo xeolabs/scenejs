@@ -7,7 +7,7 @@ SceneJs.objects.cube = function() {
 
     return SceneJs.geometry({
 
-
+        type: "cube",
 
         vertices :
                 [
