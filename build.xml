@@ -89,21 +89,10 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/scene/backend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
 
-            <!-- Canvas -->
+            <!-- Renderer -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/canvas/canvas.js"/>
-
-            <!-- Viewport -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/viewport/viewport.js"/>
-
-            <!-- Scissor -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/scissor/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scissor/scissor.js"/>
-
+            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 
             <!-- Shading -->
 

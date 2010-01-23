@@ -57,7 +57,7 @@ SceneJs.backends.installBackend(
                          * @param geoType - IE. "teapot", "cube" etc.
                          */
                         findGeoBuffer : function(geoType) {
-                            var bufId = ctx.canvas.canvasId + geoType;
+                            var bufId = ctx.renderer.canvas.canvasId + geoType;
                             return (buffers[bufId]) ? bufId : null;
                         },
 
@@ -69,8 +69,8 @@ SceneJs.backends.installBackend(
                             if (!ctx.programs.getActiveProgramId()) {
                                 throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                             }
-                            var bufId = ctx.canvas.canvasId + (geoType || nextBufId++);
-                            var context = ctx.canvas.context;
+                            var bufId = ctx.renderer.canvas.canvasId + (geoType || nextBufId++);
+                            var context = ctx.renderer.canvas.context;
 
                             var vertexBuf;
                             var normalBuf;
@@ -88,7 +88,7 @@ SceneJs.backends.installBackend(
                                 buffers[bufId] = {
                                     bufId: bufId,
                                     age: 0,
-                                    canvas : ctx.canvas,
+                                    canvas : ctx.renderer.canvas,
                                     context : context,
                                     vertexBuf : vertexBuf,
                                     normalBuf : normalBuf,
@@ -121,7 +121,7 @@ SceneJs.backends.installBackend(
                          */
                         drawGeoBuffer : function(bufId) {
                             var buffer = buffers[bufId];
-                            var context = ctx.canvas.context;
+                            var context = ctx.renderer.canvas.context;
 
                             /** Tell observers that we're about to draw
                              */
@@ -198,7 +198,7 @@ SceneJs.backends.installBackend(
              * has dynamically switched to some other canvas.
              */
             this.getActiveCanvasId = function() {
-                return ctx.canvas.canvasId;
+                return ctx.renderer.canvas.canvasId;
             };
 
             this.findGeoBuffer = function(geoType) {

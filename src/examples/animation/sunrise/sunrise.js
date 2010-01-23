@@ -6,7 +6,7 @@
 
  To render the teapot, SceneJS will traverse the scene in depth-first
  order. Each node is a function that will set some WebGL state on entry,
- then un-set it again before exit. In this graph, a canvas activates a
+ then un-set it again before exit. In this graph, a renderer activates a
  Canvas element, a shader activates some GLSL scripts, and the rest of
  the nodes set various matrices, vectors and geometry variables within
  the scripts. Note that node declarations generally have the form
@@ -19,48 +19,45 @@ with (SceneJs) {
     var exampleScene = scene(
     {},
 
-        /* A canvas node binds this scene to a WebGL canvas element
+        /* A renderer node binds this scene to a WebGL canvas element
          defined in the HTML tab
          */
-            canvas(
-            { canvasId: 'mycanvas'},
-
-                /* Specify a viewport on the canvas
+            renderer({
+                canvasId: 'mycanvas',
+                clearColor : { r:0, g:0, b:0.0, a: 1 },
+                viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                clear : { depth : true, color : true}
+            },
+                /* A simple phong GLSL shader to render sub-nodes, with
+                 a single light source. This shader type only supports
+                 a one light source.
                  */
-                    viewport(
-                    { x : 1, y : 1, width: 400, height: 400},
+                    shader(
+                    { type: 'simple-shader' },
 
-                        /* A simple phong GLSL shader to render sub-nodes, with
-                         a single light source. This shader type only supports
-                         a one light source.
+
+                        /* Perspective transformation
                          */
-                            shader(
-                            { type: 'simple-shader' },
+                            perspective(
+                            {  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
 
-
-
-                                /* Perspective transformation
+                                /* Viewing transform specifies eye position, looking
+                                 at the origin by default
                                  */
-                                    perspective(
-                                    {  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
-
-                                        /* Viewing transform specifies eye position, looking
-                                         at the origin by default
-                                         */
-                                            lookAt(
-                                            {
-                                                eye : { x: 0.0, y: 10.0, z: -15 },
-                                                up : { y: 1.0 }
-                                            },
-
-                                                     lights(function(scope) {
-                                        return {
-                                            lights: [
-                                                {
-                                                    pos: { x: 0, y: scope.get("lightY"), z: 0 }
-                                                }
-                                            ]};
+                                    lookAt(
+                                    {
+                                        eye : { x: 0.0, y: 10.0, z: -15 },
+                                        up : { y: 1.0 }
                                     },
+
+                                            lights(function(scope) {
+                                                return {
+                                                    lights: [
+                                                        {
+                                                            pos: { x: 0, y: scope.get("lightY"), z: 0 }
+                                                        }
+                                                    ]};
+                                            },
                                                 /* Next, a modelling transform to orient our teapot
                                                  by a given angle.  See how this node takes a function
                                                  which creates its configuration object?  You can do
@@ -92,10 +89,9 @@ with (SceneJs) {
                                                             ) // rotate
                                                     ) // lookAt
                                             ) // frustum
-                                     )
-                                    ) // shader
-                            ) // viewport
-                    ) // canvas
+                                    )
+                            ) // shader                            
+                    ) // renderer
             ); // scene
 
     var alpha = 0;

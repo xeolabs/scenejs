@@ -47,10 +47,10 @@ SceneJs.backends.installBackend(
             };
 
             this.setVars = function(v) {
-                ctx.programs.setVars(ctx.canvas.context, v);
+                ctx.programs.setVars(ctx.renderer.canvas.context, v);
             };
 
             this.getVars = function() {
-                ctx.programs.getVars(ctx.canvas.context);
+                ctx.programs.getVars(ctx.renderer.canvas.context);
             };
         })());

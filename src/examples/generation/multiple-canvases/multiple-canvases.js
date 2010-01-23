@@ -8,7 +8,7 @@
  * Here's one way to create multiple views of the same scene, each in a
  * seperate canvas, using a generator node.
  *
- * A generator node's job is to generate a dynamic scope obect containing 
+ * A generator node's job is to generate a dynamic scope obect containing
  * data for sub-nodes. See how its first parameter is a function to
  * generate that scope object. During a scene traversal, SceneJS will loop at
  * that node. In each loop, SceneJS calls the function, sets the scope and
@@ -35,41 +35,43 @@ with (SceneJs) {
                     }
                 };
             })(),
-                    canvas(function(scope) {
-                        return { canvasId : scope.get("canvasId") };
+                    renderer(function(scope) {
+                        return {
+                            canvasId : scope.get("canvasId"),
+                            clearColor : { r:0, g:0, b:0.0, a: 1 },
+                            viewport:{ x : 1, y : 1, width: 400, height: 400}  ,
+                            clear : { depth : true, color : true}
+                        };
                     },
 
-                            viewport({ x : 1, y : 1, width: 400, height: 400},
+                            shader({ type: 'simple-shader' },
 
-                                    shader({ type: 'simple-shader' },
-
-                                            lights({
-                                                lights: [
-                                                    {
-                                                        pos: { x: 30.0, y: 30.0, z: 30.0 }
-                                                    }
-                                                ]},
-                                                    perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
+                                    lights({
+                                        lights: [
+                                            {
+                                                pos: { x: 30.0, y: 30.0, z: 30.0 }
+                                            }
+                                        ]},
+                                            perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
+                                            },
+                                                    lookAt(function(scope) {
+                                                        return {
+                                                            eye : scope.get("eye"),
+                                                            look : scope.get("look"),
+                                                            up : scope.get("up")
+                                                        };
                                                     },
-                                                            lookAt(function(scope) {
-                                                                return {
-                                                                    eye : scope.get("eye"),
-                                                                    look : scope.get("look"),
-                                                                    up : scope.get("up")
-                                                                };
+                                                            material({
+                                                                ambient:  { r:0.2, g:0.2, b:0.5 },
+                                                                diffuse:  { r:0.6, g:0.6, b:0.9 }
                                                             },
-                                                                    material({
-                                                                        ambient:  { r:0.2, g:0.2, b:0.5 },
-                                                                        diffuse:  { r:0.6, g:0.6, b:0.9 }
-                                                                    },
-                                                                            objects.teapot()
-                                                                            )
-                                                                    ) // lookAt
-                                                            ) // perspective
-                                                    ) // lights
-                                            ) // shader
-                                    ) // viewport
-                            ) // canvas
+                                                                    objects.teapot()
+                                                                    )
+                                                            ) // lookAt
+                                                    ) // perspective
+                                            ) // lights
+                                    ) // shader
+                            ) // renderer
                     ) // generator
             ) ; // scene
 

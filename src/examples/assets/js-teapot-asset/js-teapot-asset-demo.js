@@ -10,7 +10,7 @@
  *
  * They can potentially be stored in any format, such as COLLADA,
  * JSON etc., and you can extend SceneJS with plugins to parse
- * various formats. Asset nodes are able to make cross-domain 
+ * various formats. Asset nodes are able to make cross-domain
  * requests to get them.
  *
  * This example imports an orange teapot from the asset repository
@@ -44,44 +44,46 @@
 with (SceneJs) {
     var exampleScene = scene({}, // node always has a config object
 
-            canvas({ canvasId: 'mycanvas'},
+            renderer({
+                canvasId: 'mycanvas',
+                clearColor : { r:0, g:0, b:0.0, a: 1 },
+                viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                clear : { depth : true, color : true}
+            },
 
-                    viewport({ x : 1, y : 1, width: 400, height: 400},
+                    shader({ type: 'simple-shader' },
 
-                            shader({ type: 'simple-shader' },
+                            lights({
+                                lights: [
+                                    {
+                                        pos: { x: -400.0, y: 40.0, z: 50.0 }
+                                    }
+                                ]},
+                                    perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
+                                    },
+                                            lookAt({
+                                                eye : { x: 0.0, y: 20.0, z: -20},
+                                                look : { x : 0.0, y : 0.0, z : 0 },
+                                                up : { x: 0.0, y: 1.0, z: 0.0 }
 
-                                    lights({
-                                        lights: [
-                                            {
-                                                pos: { x: -400.0, y: 40.0, z: 50.0 }
-                                            }
-                                        ]},
-                                            perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
-                                                    lookAt({
-                                                        eye : { x: 0.0, y: 20.0, z: -20},
-                                                        look : { x : 0.0, y : 0.0, z : 0 },
-                                                        up : { x: 0.0, y: 1.0, z: 0.0 }
 
-                                                    },
-
-                                                        /** Asset is configured with the URI at which its
-                                                         * definition is stored, and a proxy that will mediate
-                                                         * the cross-domain request and wrap the response in JSONP.
-                                                         *
-                                                         * This asset is in native SceneJS JavaScript, and the proxy
-                                                         * is at SceneJS.com.
-                                                         */
-                                                            asset({
-                                                                uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
-                                                                proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
-                                                            })
-                                                            ) // lookAt
-                                                    ) // perspective
-                                            ) // lights
-                                    ) // shader
-                            ) // viewport
-                    ) // canvas
+                                                /** Asset is configured with the URI at which its
+                                                 * definition is stored, and a proxy that will mediate
+                                                 * the cross-domain request and wrap the response in JSONP.
+                                                 *
+                                                 * This asset is in native SceneJS JavaScript, and the proxy
+                                                 * is at SceneJS.com.
+                                                 */
+                                                    asset({
+                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
+                                                        proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
+                                                    })
+                                                    ) // lookAt
+                                            ) // perspective
+                                    ) // lights
+                            ) // shader                             
+                    ) // renderer
             ); // scene
 
 

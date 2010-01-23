@@ -11,14 +11,17 @@
  * object. During a scene traversal, SceneJS will loop at that node. In each loop,
  * SceneJS calls the function, sets the scope and traverses the subtree, stopping
  * its loop as soon as the function result is undefined. Our generator causes four
- * loops, where in each one it sets a scope containing different extents for its
- * child viewport node. It stops the loop by not returning anything.
+ * loops, where in each one it sets a scope containing different extents for the
+ * viewport of its child renderer node. It stops the loop by not returning anything.
  */
 with (SceneJs) {
     var exampleScene = scene({},
 
-            canvas({
-                canvasId: 'mycanvas'
+            renderer({
+                canvasId: 'mycanvas',
+                clearColor : { r:0, g:0, b:0.0, a: 1 },
+                viewport:{ x : 1, y : 1, width: 600, height: 600},
+                clear : { depth : true, color : true}
             },
                     shader({ type: 'simple-shader' },
                             lights({
@@ -46,8 +49,10 @@ with (SceneJs) {
                                                             }
                                                         };
                                                     })(),
-                                                            viewport(function(scope) {
-                                                                return scope.get('viewport');
+                                                            renderer(function(scope) {
+                                                                return {
+                                                                    viewport: scope.get('viewport')
+                                                                };
                                                             },
                                                                     lookAt({
                                                                         eye : { x: 0.0, y: 10.0, z: 15.0},

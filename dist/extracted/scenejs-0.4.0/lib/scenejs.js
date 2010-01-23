@@ -116,7 +116,7 @@ var SceneJs = {version: '1.0'};
         visitChildren : function(config, scope) {
             if (config.children) {
                 for (var i = 0; i < config.children.length; i++) {
-                    config.children[i].call(this, scope);
+                    config.children[i]( scope);
                 }
             }
         }
@@ -844,6 +844,9 @@ SceneJs.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      
     this.message = msg + " (uri=\"" + (uri || "null") + "\", proxy=\"" + (proxy || "null") + "\")";
 };
 
+SceneJs.exceptions.NoViewportActiveException = function(msg) {
+    this.message = msg;
+};
 
 /**
  * Backend for a scene node.
@@ -1082,7 +1085,7 @@ SceneJs.backends.installBackend(
             var ctx;
 
             var init = function() {
-                ctx.canvas = null;
+                ctx.renderer.canvas = null;
             };
 
             this.install = function(_ctx) {
@@ -1090,8 +1093,8 @@ SceneJs.backends.installBackend(
                 init();
             };
 
-            this.findCanvas = function(canvasId) {
-                var canvas = document.getElementById(canvasId);
+            this.findCanvas = function(cfg) {
+                var canvas = document.getElementById(cfg.canvasId);
                 if (!canvas) {
                     throw new SceneJs.exceptions.CanvasNotFoundException
                             ('Could not find canvas document element with id \'' + canvasId + '\'');
@@ -1107,52 +1110,75 @@ SceneJs.backends.installBackend(
                                     + canvasId
                                     + '\' failed to provide a supported context');
                 }
-                context.clearColor(0.0, 0.0, 0.0, 1.0);
-                //context.clearDepth(1.0);  // TODO: configurable cleardepth with warning for potentially bad values
-                context.enable(context.DEPTH_TEST);
-                context.enable(context.TEXTURE_2D); // TODO: enable only when we know that scene contains textures  
-                //   context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-                //  context.depthFunc(context.ALWAYS);
-                //   context.depthRange(0.0, 0.01);
+
+                cfg = cfg || {};
+
+                if (cfg.clearColor) {
+                    context.clearColor(cfg.clearColor.r, cfg.clearColor.g, cfg.clearColor.b, cfg.clearColor.a);
+                } else {
+                    context.clearColor(0.0, 0.0, 0.0, 1.0);
+                }
+
+                if (cfg.clearDepth) {
+                    context.clearDepth(cfg.clearDepth);
+                } else {
+                    context.clearDepth(1.0);
+                }
+
+                if (cfg.depthTest) {
+                    context.enable(context.DEPTH_TEST);
+                } else {
+                    context.disable(context.DEPTH_TEST);
+                }
+
+                if (cfg.cullFace) {
+                    context.enable(context.CULL_FACE);
+                } else {
+                    context.disable(context.CULL_FACE);
+                }
+
+                if (cfg.texture2D) {
+                    context.enable(context.TEXTURE_2D);
+                } else {
+                    context.disable(context.TEXTURE_2D);
+                }
+
+                if (cfg.depthFunc) {
+
+                } else {
+
+                }
+
+                if (cfg.depthRange) {
+                    context.depthRange(cfg.depthRange.zmin, cfg.depthRange.zmin);
+                } else {
+              //      context.depthRange(0.0, 0.01);
+                }
+                
+                context.disable(context.SCISSOR_TEST);
 
                 return {
                     canvas: canvas,
                     context: context,
-                    canvasId : canvasId
+                    canvasId : cfg.canvasId
                 };
             };
 
             this.setCanvas = function(canvas) {
-                ctx.canvas = canvas;
+                ctx.renderer.canvas = canvas;
             };
 
             this.getCanvas = function() {
-                return ctx.canvas;
-            };
-
-            this.setDepthTest = function(enable) {
-                if (enable) {
-                    //   ctx.canvas.context.enable(cfg.context.DEPTH_TEST);
-                } else {
-                    //  ctx.canvas.context.disable(cfg.context.DEPTH_TEST);
-                }
-            };
-
-            this.setClearColor = function(c) {
-                ctx.canvas.context.clearColor(c.r, c.g, c.b, c.a);
-            };
-
-            this.setClearDepth = function(depth) {
-                //    ctx.canvas.context.clearDepth(depth);
+                return ctx.renderer.canvas;
             };
 
             this.clearCanvas = function() {
-                ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT | ctx.canvas.context.DEPTH_BUFFER_BIT); // Buffers are swapped automatically in WebGL
+                ctx.renderer.canvas.context.clear(ctx.renderer.canvas.context.COLOR_BUFFER_BIT | ctx.renderer.canvas.context.DEPTH_BUFFER_BIT); // Buffers are swapped automatically in WebGL
             };
 
             this.flush = function() {
-                ctx.canvas.context.finish();
-                ctx.canvas.context.flush();
+                ctx.renderer.canvas.context.finish();
+                ctx.renderer.canvas.context.flush();
             };
 
             this.reset = function() {
@@ -1175,13 +1201,13 @@ SceneJs.canvas = function() {
     return function(scope) {
         var params = cfg.getParams(scope);
         if (!params.canvasId) {
-            throw 'canvas node parameter missing: canvasId';
+            throw new SceneJs.exceptions.NodeConfigExpectedException('canvas node parameter missing: canvasId');
         }
 
         var superCanvas = backend.getCanvas(); // remember previous canvas if any
 
         if (!canvas || !cfg.fixed) {
-            canvas = backend.findCanvas(params.canvasId);
+            canvas = backend.findCanvas(params);
         }
         backend.setCanvas(canvas);
 
@@ -1216,29 +1242,29 @@ SceneJs.backends.installBackend(
             };
 
             this.setViewport = function(viewport) {
-                if (!ctx.canvas) {
+                if (!ctx.renderer.canvas) {
                     throw new SceneJs.exceptions.NoCanvasActiveException('No canvas active');
                 }
-                var context = ctx.canvas.context;
+                var context = ctx.renderer.canvas.context;
                 context.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
                 ctx.viewport = viewport;
             };
 
             this.getViewport = function() {
-                if (!ctx.canvas) {
+                if (!ctx.renderer.canvas) {
                     throw new SceneJs.exceptions.NoCanvasActiveException('No canvas active');
                 }
 
                 /* Lazy-create default viewport - assumes that client node always calls getViewport before setViewport
                  */
                 if (!ctx.viewport) {
-                    ctx.viewport = { x : 1, y: 1, width: ctx.canvas.width, height: ctx.canvas.height };
+                    ctx.viewport = { x : 1, y: 1, width: ctx.renderer.canvas.width, height: ctx.renderer.canvas.height };
                 }
                 return ctx.viewport;
             };
 
             this.clear = function() {
-                // ctx.canvas.context.clear(ctx.canvas.context.COLOR_BUFFER_BIT);
+                // ctx.renderer.canvas.context.clear(ctx.renderer.canvas.context.COLOR_BUFFER_BIT);
             };
 
             this.reset = function() {
@@ -1254,11 +1280,76 @@ SceneJs.viewport = function() {
         var params = cfg.getParams(scope);
 
         var prevViewport = backend.getViewport();
-        backend.setViewport({ x: params.x || 0, y: params.y || 0, width: params.width || 100, height: params.height || 100});
+        backend.setViewport({ x: params.x || 0, y: params.y || 0, width: params.width || 100, height: params.height || 100, scissor: params.scissor });
         SceneJs.utils.visitChildren(cfg, scope);
         if (prevViewport) {
             backend.setViewport(prevViewport);
         }
+    };
+};
+/** Backend for scissor node
+ *
+ */
+SceneJs.backends.installBackend(
+        new (function() {
+
+            this.type = 'scissor';
+
+            var ctx;
+
+            var init = function() {
+                ctx.scissor = null;
+            };
+
+            this.install = function(_ctx) {
+                ctx = _ctx;
+                init();
+            };
+
+            this.getScissor = function() {
+                if (!ctx.renderer.canvas) {
+                    throw new SceneJs.exceptions.NoCanvasActiveException('No canvas active for scissor');
+                }
+                return ctx.scissor;
+            };
+
+            this.setScissor = function(scissor) {
+                if (!ctx.renderer.canvas) {
+                    throw new SceneJs.exceptions.NoCanvasActiveException('No canvas active for scissor');
+                }
+                var context = ctx.renderer.canvas.context;
+                if (scissor) { // Set null when no scissor
+                    var viewport = ctx.viewport;
+                    if (!viewport) {
+                        throw new SceneJs.exceptions.NoViewportActiveException('No viewport active for scissor');
+                    }
+                    context.enable(context.SCISSOR_TEST);
+                    context.scissor(
+                            scissor.x || viewport.x,
+                            scissor.y || viewport.y,
+                            scissor.width || viewport.width,
+                            scissor.height || viewport.height);
+                } else {
+                    context.disable(context.SCISSOR_TEST);
+                }
+                ctx.scissor = scissor;
+            };
+
+            this.reset = function() {
+                init();
+            };
+        })());
+SceneJs.scissor = function() {
+    var cfg = SceneJs.utils.getNodeConfig(arguments);
+
+    var backend = SceneJs.backends.getBackend('scissor');
+
+    return function(scope) {
+        var params = cfg.getParams(scope);
+        var prevScissor = backend.getScissor();
+        backend.setScissor({ x: params.x, y: params.y, width: params.width, height: params.height });
+        SceneJs.utils.visitChildren(cfg, scope);
+        backend.setScissor(prevScissor); // Disables scissor when null
     };
 };
 /**
@@ -1336,10 +1427,10 @@ SceneJs.shaderBackend = function(cfg) {
                      * @param _cfg Config from backend extention, provides program for lazy-load
                      */
                     this.loadProgram = function(_cfg) {
-                        if (!ctx.canvas) {
+                        if (!ctx.renderer.canvas) {
                             throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
                         }
-                        var programId = ctx.canvas.canvasId + ":" + _cfg.type;
+                        var programId = ctx.renderer.canvas.canvasId + ":" + _cfg.type;
 
                         /* Try to reuse cached program
                          */
@@ -1348,12 +1439,12 @@ SceneJs.shaderBackend = function(cfg) {
                             return programId;
                         }
 
-                        var context = ctx.canvas.context;
+                        var context = ctx.renderer.canvas.context;
 
                         /* Create program on context
                          */
                         program = {
-                            canvas : ctx.canvas,
+                            canvas : ctx.renderer.canvas,
                             context : context,
                             programId : programId,
                             program : context.createProgram(),
@@ -1422,18 +1513,18 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     var setVarDefaults = function() {
                         for (var key in activeProgram.setters) {
-                            activeProgram.setters[key].call(this, ctx.canvas.context, activeProgram.getVarLocation, null);
+                            activeProgram.setters[key].call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, null);
                         }
                     };
 
                     /** Activates the loaded program of the given ID
                      */
                     this.activateProgram = function(programId) {
-                        if (!ctx.canvas) {
+                        if (!ctx.renderer.canvas) {
                             throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
                         }
                         activeProgram = programs[programId];
-                        ctx.canvas.context.useProgram(activeProgram.program);
+                        ctx.renderer.canvas.context.useProgram(activeProgram.program);
                         setVarDefaults();
                         vars = {
                             vars: {},
@@ -1454,7 +1545,7 @@ SceneJs.shaderBackend = function(cfg) {
                         }
                         var setter = activeProgram.setters[name];
                         if (setter) {
-                            setter.call(this, ctx.canvas.context, activeProgram.getVarLocation, value);
+                            setter.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, value);
                         }
                     };
 
@@ -1468,7 +1559,7 @@ SceneJs.shaderBackend = function(cfg) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
                         for (var key in activeProgram.setters) {
-                            activeProgram.setters[key].call(this, ctx.canvas.context,
+                            activeProgram.setters[key].call(this, ctx.renderer.canvas.context,
                                     activeProgram.getVarLocation, v.vars[key]); // Defaults on null
                         }
                         vars = v;
@@ -1481,7 +1572,7 @@ SceneJs.shaderBackend = function(cfg) {
                     this.loadVars = function() {
                         for (var key in activeProgram.setters) {
                             var v = vars.vars[key];
-                            activeProgram.setters[key].call(this, ctx.canvas.context, activeProgram.getVarLocation, v); // Defaults on null
+                            activeProgram.setters[key].call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, v); // Defaults on null
                         }
                     };
 
@@ -1495,7 +1586,7 @@ SceneJs.shaderBackend = function(cfg) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        activeProgram.binders.bindVertexBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                        activeProgram.binders.bindVertexBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
                     };
 
                     /** Binds the given normals buffer to be the normals source for the active program
@@ -1504,7 +1595,7 @@ SceneJs.shaderBackend = function(cfg) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        activeProgram.binders.bindNormalBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                        activeProgram.binders.bindNormalBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
                     };
 
                     /** Binds the given texture buffer to be the texture source for the active program
@@ -1514,7 +1605,7 @@ SceneJs.shaderBackend = function(cfg) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
                         if (activeProgram.binders.bindTextureBuffer) { // Texture support optional in shader
-                            activeProgram.binders.bindTextureBuffer.call(this, ctx.canvas.context, activeProgram.getVarLocation, buffer);
+                            activeProgram.binders.bindTextureBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
                         }
                     };
 
@@ -1524,9 +1615,9 @@ SceneJs.shaderBackend = function(cfg) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        ctx.canvas.context.flush();
+                        ctx.renderer.canvas.context.flush();
                         activeProgram = null;
-                        ctx.canvas.context.useProgram(null); // Switch GL to use fixed-function paths
+                        ctx.renderer.canvas.context.useProgram(null); // Switch GL to use fixed-function paths
                     };
 
                     /** Deletes all programs
@@ -1564,7 +1655,7 @@ SceneJs.shaderBackend = function(cfg) {
          * has dynamically switched to some other canvas.
          */
         this.getActiveCanvasId = function() {
-            return ctx.canvas.canvasId;
+            return ctx.renderer.canvas.canvasId;
         };
 
         this.getActiveProgramId = function() {
@@ -1838,6 +1929,16 @@ SceneJs.backends.installBackend(
                 ctx.geometry = (function() {
                     var buffers = {};
 
+                    /* Currently bound buffer - prevents continuous rebind of same buffer
+                     */
+                    var currentBoundBufId;
+
+                    /** Program activation unbinds buffer
+                     */
+                    ctx.programs.onProgramActivate(function() {
+                        currentBoundBufId = null;
+                    });
+
                     var createArrayBuffer = function(context, items, bufType, itemSize, glArray) {
                         var handle = {
                             bufferId : context.createBuffer(),
@@ -1866,7 +1967,7 @@ SceneJs.backends.installBackend(
                          * @param geoType - IE. "teapot", "cube" etc.
                          */
                         findGeoBuffer : function(geoType) {
-                            var bufId = ctx.canvas.canvasId + type;
+                            var bufId = ctx.renderer.canvas.canvasId + geoType;
                             return (buffers[bufId]) ? bufId : null;
                         },
 
@@ -1878,8 +1979,8 @@ SceneJs.backends.installBackend(
                             if (!ctx.programs.getActiveProgramId()) {
                                 throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                             }
-                            var bufId = ctx.canvas.canvasId + (geoType || nextBufId++);
-                            var context = ctx.canvas.context;
+                            var bufId = ctx.renderer.canvas.canvasId + (geoType || nextBufId++);
+                            var context = ctx.renderer.canvas.context;
 
                             var vertexBuf;
                             var normalBuf;
@@ -1895,7 +1996,9 @@ SceneJs.backends.installBackend(
                                 }
 
                                 buffers[bufId] = {
-                                    canvas : ctx.canvas,
+                                    bufId: bufId,
+                                    age: 0,
+                                    canvas : ctx.renderer.canvas,
                                     context : context,
                                     vertexBuf : vertexBuf,
                                     normalBuf : normalBuf,
@@ -1928,32 +2031,41 @@ SceneJs.backends.installBackend(
                          */
                         drawGeoBuffer : function(bufId) {
                             var buffer = buffers[bufId];
+                            var context = ctx.renderer.canvas.context;
 
                             /** Tell observers that we're about to draw
                              */
                             notifyDraw();
 
-                            /* Bind vertex and normal buffers to active program
+                            /* Dont rebind buffer if already bound
                              */
-                            ctx.programs.bindVertexBuffer(buffer.vertexBuf.bufferId);
-                            ctx.programs.bindNormalBuffer(buffer.normalBuf.bufferId);
+                            if (currentBoundBufId != bufId) {
 
-                            /* Textures optional in geometry
-                             */
-                            if (buffer.textureBuf) {
-                                ctx.programs.bindTextureBuffer(buffer.textureBuf.bufferId);
+                                /* Bind vertex and normal buffers to active program
+                                 */
+                                ctx.programs.bindVertexBuffer(buffer.vertexBuf.bufferId);
+                                ctx.programs.bindNormalBuffer(buffer.normalBuf.bufferId);
+
+                                /* Textures optional in geometry
+                                 */
+                                if (buffer.textureBuf) {
+                                    ctx.programs.bindTextureBuffer(buffer.textureBuf.bufferId);
+                                }
+
+                                /* Bind index buffer and draw geometry using the active program
+                                 */
+                                context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffer.indexBuf.bufferId);
+
+                                currentBoundBufId = bufId;
                             }
-
-                            /* Bind index buffer and draw geometry using the active program
-                             */
-                            var context = ctx.canvas.context;
-
-                            context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffer.indexBuf.bufferId);
                             context.drawElements(context.TRIANGLES, buffer.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                             context.flush();
                         },
 
                         deleteGeoBuffer : function(buffer) { // TODO: freeGeoBuffer  - maybe use auto cache eviction?
+
+                            // TODO: delete individual buffer
+
                             if (document.getElementById(buffer.canvas.canvasId)) { // Context won't exist if canvas has disappeared
                                 if (buffer.vertexBuf) {
                                     buffer.context.deleteBuffer(buffer.vertexBuf.bufferId);
@@ -1981,6 +2093,7 @@ SceneJs.backends.installBackend(
                                 deleteGeoBuffer(buffers[bufId]);
                             }
                             buffers = {};
+                            currentBoundBufId = null;
                         }
                     };
                 })();
@@ -1995,7 +2108,7 @@ SceneJs.backends.installBackend(
              * has dynamically switched to some other canvas.
              */
             this.getActiveCanvasId = function() {
-                return ctx.canvas.canvasId;
+                return ctx.renderer.canvas.canvasId;
             };
 
             this.findGeoBuffer = function(geoType) {
@@ -2097,21 +2210,21 @@ SceneJs.geometry = function() {
              */
             throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
         }
-
-        /* Drop handle to VBOs if containing canvas node
-         * has dynamically switched to some other canvas
-         * TODO: find way to copy VBOs between canvases
-         */
-        if (canvasId != backend.getActiveCanvasId()) {
-            bufId = null;
+        if (!params.type) {
+            throw new SceneJs.exceptions.NodeConfigExpectedException("Geometry type parameter expected");
         }
 
-        /* Obtain VBOs if not held
-         */
-        if (!bufId) {
-            if (params.type) {
-                bufId = backend.findGeoBuffer(params.type);
+        if (params.type) {
+
+            /* Buffer geometry that is identified with a type
+             */
+            if (canvasId != backend.getActiveCanvasId()) { // TODO: backend should listen for canvas switch and throw out buffer
+                bufId = null;
             }
+
+            /* Backend may have evicted geometry buffer, so we may have to reallocate it
+             */
+            bufId = backend.findGeoBuffer(params.type);
             if (!bufId) {
                 bufId = backend.createGeoBuffer(params.type, {
                     vertices : (params.vertices && params.vertices.length > 0) ? flatten(params.vertices, 3) : [],
@@ -2123,6 +2236,8 @@ SceneJs.geometry = function() {
                 });
             }
             canvasId = backend.getActiveCanvasId();
+        } else {
+            // TODO: render eometry without using VBO
         }
         backend.drawGeoBuffer(bufId);
         SceneJs.utils.visitChildren(cfg, scope);
@@ -2137,7 +2252,7 @@ SceneJs.utils.ns("SceneJs.objects");
 SceneJs.objects.teapot = function() {
     return SceneJs.geometry({
 
-    //    type:"teapot",
+        type:"teapot",
         
         vertices: [
             [-3.000000, 1.650000, 0.000000],
@@ -7885,7 +8000,7 @@ SceneJs.objects.cube = function() {
 
     return SceneJs.geometry({
 
-
+        type: "cube",
 
         vertices :
                 [
@@ -8044,24 +8159,24 @@ SceneJs.backends.installBackend(
                     ctx.geometry.onDraw(function() {
                         if (!loaded) {
 
-                                    /* Lazy-compute WebGL arrays
-                                     */
-                                    if (!transform.matrixAsArray) {
-                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                                    }
+                            /* Lazy-compute WebGL arrays
+                             */
+                            if (!transform.matrixAsArray) {
+                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                            }
 
-                                    /* Lazy compute normal matrix
-                                     */
-                                    if (!transform.normalMatrixAsArray) {
-                                        transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.mat4To3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
-                                    }
+                            /* Lazy compute normal matrix
+                             */
+                            if (!transform.normalMatrixAsArray) {
+                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.mat4To3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
+                            }
 
-                                    ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);
-                                    ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
+                            ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);
+                            ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
 
-                                    loaded = true;
-                                }
-                            });
+                            loaded = true;
+                        }
+                    });
 
                     return {
                         setTransform: function(t) {
@@ -8072,6 +8187,10 @@ SceneJs.backends.installBackend(
                         getTransform: function() {
                             return transform;
                         },
+
+                        transformPoint3: function(v) {
+                            return SceneJs.math.transformPoint3(transform.matrix, v);
+                        } ,
 
                         transformVector: function(v) {
                             return SceneJs.math.transformVector3(transform.matrix, v);
@@ -8189,7 +8308,7 @@ SceneJs.rotate = function() {
         return function(scope) {
             if (!mat || !cfg.fixed) {   // Memoize matrix if node config is constant
                 var params = cfg.getParams(scope);
-                mat = SceneJs.math.scalingMat4v([params.x || 0, params.y || 0, params.z || 0]);
+                mat = SceneJs.math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
             }
             var superXform = backend.getTransform();
             if (!xform || !superXform.fixed || !cfg.fixed) {
@@ -8582,7 +8701,7 @@ SceneJs.backends.installBackend(
              */
             var transform = function(l) {
                 return {
-                    pos : ctx.modelTransform.transformVector(cloneVec(l.pos)),
+                    pos : ctx.modelTransform.transformPoint3(cloneVec(l.pos)),
                     ambient : l.ambient,
                     diffuse : l.diffuse,
                     specular : l.specular,
@@ -8621,7 +8740,7 @@ SceneJs.backends.installBackend(
             };
 
             this.popLights = function(numLights) {
-                ctx.lights.pushLights(numLights);
+                ctx.lights.popLights(numLights);
             };
 
             this.reset = function() {
@@ -9132,13 +9251,14 @@ SceneJs.assetBackend = function(cfg) {
 
                     var evict = function() {
                         if (--evictionCountdown == 0) {
-                            //                            for (var src in entries) {
-                            //                                var entry = entries[src];
-                            //                                if (--entry.timeToLive < 0) {
-                            //                                    entries[src] = undefined;
-                            //                                }
-                            //                            }
-                            evictionCountdown = 1000;
+//                            var oldest = -1;
+//                            for (var src in entries) {
+//                                var entry = entries[src];
+//                                if (entry.age > oldest) {
+//                                    oldest = entries[src].age;
+//                                }
+//                            }
+//                            evictionCountdown = 1000;
                         }
                     };
 
@@ -9173,7 +9293,7 @@ SceneJs.assetBackend = function(cfg) {
                     this.getAsset = function(uri) {
                         var entry = entries[uri];
                         if (entry) {
-                            entry.timeToLive--;
+                            entry.age = 0;
                             //    evict();
                             return entry.node;
                         }
@@ -9203,7 +9323,7 @@ SceneJs.assetBackend = function(cfg) {
                                     }
                                     entries[uri] = {
                                         node: assetNode,
-                                        timeToLive : 1000
+                                        age: 0
                                     };
                                     callback(assetNode);
                                 },

@@ -13,7 +13,9 @@
     SceneJs.scene = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
         var sceneId = null;
-     
+
+        var eventHandlers = {};
+
         var _scene = {
 
             /**

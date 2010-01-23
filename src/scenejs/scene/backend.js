@@ -97,26 +97,25 @@ SceneJs.backends.installBackend(
                          */
                         getScene : function(sceneId) {
                             return scenes[sceneId].scene;
+                        },
+
+                        onEvent: function(name, command) {
+                            var list = commands[name];
+                            if (!list) {
+                                list = [];
+                                commands[name] = list;
+                            }
+                            list.push(command);
+                        },
+
+                        fireEvent: function(name, params) {
+                            var list = commands[name];
+                            if (list) {
+                                for (var i = 0; i < list.length; i++) {
+                                    list[i](params);
+                                }
+                            }
                         }
-//                        ,
-//
-//                        onEvent: function(name, command) {
-//                            var list = commands[name];
-//                            if (!list) {
-//                                list = [];
-//                                commands[name] = list;
-//                            }
-//                            list.push(command);
-//                        },
-//
-//                        fireEvent: function(name, params) {
-//                            var list = commands[name];
-//                            if (list) {
-//                                for (var i = 0; i < list.length; i++) {
-//                                    list[i](params);
-//                                }
-//                            }
-//                        }
                     };
                 })();
             };
@@ -135,6 +134,12 @@ SceneJs.backends.installBackend(
 
             this.setActiveScene = function(sceneId) {
                 return ctx.scenes.setActiveScene(sceneId);
+                ctx.scenes.fireEvent("scene-activated");
+            };
+
+            this.flush = function() {
+                ctx.scenes.fireEvent("scene-flushed");
+                return ctx.scenes.setActiveScene(null);
             };
 
             this.getNumProcesses = function(sceneId) {

@@ -30,7 +30,7 @@ SceneJs.backends.installBackend(
                     ctx.geometry.onDraw(function() {
                         if (!loaded && activeTexture) {
 
-                            var context = ctx.canvas.context;
+                            var context = ctx.renderer.canvas.context;
 
                             // TODO
 
@@ -68,7 +68,7 @@ SceneJs.backends.installBackend(
 
                         bindTexture: function(textureId) {
                             var texture = textures[textureId];
-                            var context = ctx.canvas.context;
+                            var context = ctx.renderer.canvas.context;
                             texture.ptexture = context.createTexture();
                             context.bindTexture(context.TEXTURE_2D, texture.ptexture);
                             context.texImage2D(context.TEXTURE_2D, 0, texture.image, true);
