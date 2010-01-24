@@ -8,7 +8,6 @@ SceneJs.backends.installBackend(
             /** IDs of supported WebGL canvas contexts
              */
             var CONTEXT_TYPES = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
-
             var ctx;
             var stateStack;   // Stack of renderer properties
             var glEnumMap;    // Maps renderer props to WebGL enums - lazy created when first GL context available
@@ -26,10 +25,14 @@ SceneJs.backends.installBackend(
                 }
                 var context;
                 for (var i = 0; (!context) && i < CONTEXT_TYPES.length; i++) {
-                    context = canvas.getContext(CONTEXT_TYPES[i]);
+                    try {
+                        context = canvas.getContext(CONTEXT_TYPES[i]);
+                    } catch (e) {
+
+                    }
                 }
                 if (!context) {
-                    throw new SceneJs.exceptions.CanvasNotSupportedException
+                    throw new SceneJs.exceptions.WebGLNotSupportedException
                             ('Canvas document element with id \''
                                     + canvasId
                                     + '\' failed to provide a supported context');

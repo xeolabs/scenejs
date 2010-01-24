@@ -1,9 +1,9 @@
 with (SceneJs) {
     var scene = graph({}, // node always has a config object
 
-            canvas({ canvasId: 'mycanvas'},
+            canvas({ canvasId: 'theCanvas'},
 
-                    viewport({ x : 1, y : 1, width: 400, height: 400},
+                    viewport({ x : 1, y : 1, width: 600, height: 600},
 
                             shader({ type: 'simple-shader' },
 
@@ -14,7 +14,7 @@ with (SceneJs) {
                                             }
                                         ]},
 
-                                            perspective({ fovy : 60.0, aspect : 1.0, near : 0.1, far : 400.0},
+                                            perspective({ fovy : 60.0, aspect : 1.0, near : 0.1, far : 600.0},
 
                                                     lookAt({
                                                         eye : { x: 5.0, y: 5.0, z: -50.0},

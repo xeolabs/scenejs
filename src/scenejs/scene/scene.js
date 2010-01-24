@@ -11,10 +11,15 @@
     /** Creates a new scene
      */
     SceneJs.scene = function() {
+
+        /* Check that backends installed OK
+         */
+        if (SceneJs.backends.getStatus().error) {
+            throw SceneJs.backends.getStatus().error;
+        }
+
         var cfg = SceneJs.utils.getNodeConfig(arguments);
         var sceneId = null;
-
-        var eventHandlers = {};
 
         var _scene = {
 

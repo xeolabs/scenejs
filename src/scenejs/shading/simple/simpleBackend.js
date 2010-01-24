@@ -23,11 +23,36 @@ SceneJs.backends.installBackend(
 
             /** Default value for script matrices, injected on activation
              */
-            var defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
-            var defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+            var defaultMat4;
+            var defaultNormalMat;
             var defaultMaterial = {
                 diffuse: { r: 1.0, g: 1.0, b: 1.0 },
                 ambient: { r: 1.0, g: 1.0, b: 1.0 }
+            };
+
+            /* Lazy compute default matrixes so that if WebGLFloatArray is missing the exception
+             * will be thrown during scene rendering.
+             */
+            var getDefaultMat4 = function() {
+                if (!defaultMat4) {
+                    try {
+                        defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
+                    } catch (e) {
+                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                    }
+                }
+                return defaultMat4;
+            };
+
+            var getDefaultNormalMat4 = function() {
+                if (!defaultNormalMat) {
+                    try {
+                        defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+                    } catch (e) {
+                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                    }
+                }
+                return defaultNormalMat;
             };
 
             return SceneJs.shaderBackend({
@@ -70,7 +95,7 @@ SceneJs.backends.installBackend(
                     "   gl_Position = PMatrix * vv;" + // Perspective transformation
 
                     "   vec3 nn = normalize(NMatrix * Normal);" +
-                    "   vec3 lightDir = vec3(normalize(mv - LightPos));" +    // Lighting is done in model-space
+                    "   vec3 lightDir = vec3(normalize(mv - LightPos));" + // Lighting is done in model-space
 
                     "   float NdotL = max(dot(lightDir, nn), 0.0);" +
 
@@ -110,19 +135,19 @@ SceneJs.backends.installBackend(
                 setters : {
 
                     scene_ProjectionMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false, mat || defaultMat4);
+                        context.uniformMatrix4fv(findVar(context, 'PMatrix'), false, mat || getDefaultMat4());
                     },
 
                     scene_ModelMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'MMatrix'), false, mat || defaultMat4);
+                        context.uniformMatrix4fv(findVar(context, 'MMatrix'), false, mat || getDefaultMat4());
                     },
 
                     scene_ViewMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix4fv(findVar(context, 'VMatrix'), false, mat || defaultMat4);
+                        context.uniformMatrix4fv(findVar(context, 'VMatrix'), false, mat || getDefaultMat4());
                     },
 
                     scene_NormalMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat || defaultNormalMat);
+                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat || getDefaultNormalMat4());
                     },
 
                     scene_Material: function(context, findVar, m) {

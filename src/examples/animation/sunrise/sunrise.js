@@ -23,7 +23,7 @@ with (SceneJs) {
          defined in the HTML tab
          */
             renderer({
-                canvasId: 'mycanvas',
+                canvasId: 'theCanvas',
                 clearColor : { r:0, g:0, b:0.0, a: 1 },
                 viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
                 clear : { depth : true, color : true}

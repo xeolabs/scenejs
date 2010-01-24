@@ -116,33 +116,40 @@ var SceneJs = {version: '1.0'};
         visitChildren : function(config, scope) {
             if (config.children) {
                 for (var i = 0; i < config.children.length; i++) {
-                    config.children[i]( scope);
+                    config.children[i](scope);
                 }
             }
         }
     };
 
 
-
     /** Registry of modules that provide backend functionality for scene graph nodes
      */
     SceneJs.backends = new (function() {
+        var status = {
+            error: null
+        };
         var backends = {};
-
-
 
         /** Context that is shared by all backend plugins, for them to define what they
          * on, as long as they don't clobber the core scenejs object.
          */
         var ctx = {
-            
+
         };
 
         /** Installs a backend module - see examples for more info.
          */
         this.installBackend = function(backend) {
-            backends[backend.type] = backend;
-            backend.install(ctx);
+            if (!status.error) {
+                try {
+                    backend.install(ctx);
+                    backends[backend.type] = backend;
+                } catch (e) {
+                    status.error = new SceneJs.exceptions.NodeBackendInstallFailedException
+                            ("Failed to install backend module for node type \"" + backend.type + "\": " + (e.message || e), e);
+                }
+            }
         };
 
         /** Obtains the backend module of the given type
@@ -153,6 +160,18 @@ var SceneJs = {version: '1.0'};
                 throw new SceneJs.exceptions.NodeBackendNotFoundException("No backend installed of type \'' + type + '\'");
             }
             return backend;
+        };
+
+        /** Returns current SceneJS backend error status
+         */
+        this.getStatus = function() {
+            return status;
+        };
+
+         /** Clears current SceneJS backend error status
+         */
+        this.clearStatus = function() {
+            status = {};
         };
 
         /** Cleans up all resources currently held by backend modules

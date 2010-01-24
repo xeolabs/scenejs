@@ -7,7 +7,7 @@
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="4"/>
+    <property name="BUILD_MINOR" value="5"/>
     <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
@@ -135,12 +135,7 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/appearance/material.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/appearance/backend.js"/>
-
-            <!-- Layers -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/layering/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/layering/layer.js"/>
-
+         
             <!-- Interpolation -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/animation/scalarInterpolator.js"/>

@@ -10,9 +10,9 @@
 with (SceneJs) {
     var exampleScene = scene({}, // node always has a config object
 
-            canvas({ canvasId: 'mycanvas'},
+            canvas({ canvasId: 'theCanvas'},
 
-                    viewport({ x : 1, y : 1, width: 400, height: 400},
+                    viewport({ x : 1, y : 1, width: 600, height: 600},
 
                             shader({ type: 'simple-shader' },
 
