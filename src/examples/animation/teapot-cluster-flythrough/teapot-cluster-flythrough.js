@@ -20,7 +20,7 @@ with (SceneJs) {
             renderer({
                 canvasId: 'theCanvas',
                 clearColor : { r:0, g:0, b:0.3, a: 1 },
-                viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+            
                 clear : { depth : true, color : true}
             },
                     shader({ type: 'simple-shader' },
@@ -50,11 +50,11 @@ with (SceneJs) {
                                                             generator(
                                                                     (function() {
                                                                         var elems = [];
-                                                                        for (var i = 0; i < 35; i++) {
+                                                                        for (var i = 0; i < 500; i++) {
                                                                             elems.push({
-                                                                                x: (50 * Math.random()) - 25.0,
+                                                                                x: (250 * Math.random()) - 125.0,
                                                                                 y: (50 * Math.random()) - 25.0,
-                                                                                z: (500 * Math.random()) - 250.0
+                                                                                z: (1800 * Math.random()) - 250.0
                                                                             });
                                                                         }
                                                                         var j = 0;

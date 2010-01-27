@@ -29,11 +29,7 @@ SceneJs.backends.installBackend(
                      */
                     ctx.geometry.onDraw(function() {
                         if (!loaded && activeTexture) {
-
-                            var context = ctx.renderer.canvas.context;
-
-                            // TODO
-
+                            ctx.programs.bindTexture(activeTexture.ptexture);
                             loaded = true;
                         }
                     });
@@ -59,7 +55,6 @@ SceneJs.backends.installBackend(
                                 timeToLive : 1000
                             };
                             texture.image.onload = function() {
-                                // alert("sdsdsdfasdf")
                                 textures[textureId] = texture;
                                 callback(texture.textureId);
                             };
@@ -71,7 +66,7 @@ SceneJs.backends.installBackend(
                             var context = ctx.renderer.canvas.context;
                             texture.ptexture = context.createTexture();
                             context.bindTexture(context.TEXTURE_2D, texture.ptexture);
-                            context.texImage2D(context.TEXTURE_2D, 0, texture.image, true);
+                            context.texImage2D(context.TEXTURE_2D, 0, texture.image);
                             context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
                             context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR_MIPMAP_NEAREST);
                             context.generateMipmap(context.TEXTURE_2D);

@@ -82,7 +82,7 @@ SceneJs.backends.installBackend(
                                 normalBuf = createArrayBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals));
                                 indexBuf = createArrayBuffer(context, geo.indices, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLUnsignedShortArray(geo.indices));
                                 if (geo.texCoords) {
-                                    textureBuf = createArrayBuffer(context, geo.texCoords, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLFloatArray(geo.texCoords));
+                                    textureBuf = createArrayBuffer(context, geo.texCoords, context.ARRAY_BUFFER, 2, new WebGLFloatArray(geo.texCoords));
                                 }
 
                                 buffers[bufId] = {
@@ -139,7 +139,7 @@ SceneJs.backends.installBackend(
                                 /* Textures optional in geometry
                                  */
                                 if (buffer.textureBuf) {
-                                    ctx.programs.bindTextureBuffer(buffer.textureBuf.bufferId);
+                                    ctx.programs.bindTextureCoordBuffer(buffer.textureBuf.bufferId);
                                 }
 
                                 /* Bind index buffer and draw geometry using the active program

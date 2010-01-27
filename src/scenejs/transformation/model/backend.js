@@ -15,7 +15,7 @@ SceneJs.backends.installBackend(
                         matrix : SceneJs.math.identityMat4(),
                         fixed: true
                     };
-
+                    var transformStack = [];
                     var loaded = false;
 
                     /** When a new program is activated we will need to lazy-load our current matrix

@@ -1810,12 +1810,12 @@ SceneJs.shaderBackend = function(cfg) {
 
                     /** Binds the given texture buffer to be the texture source for the active program
                      */
-                    this.bindTextureBuffer = function(buffer) {
+                    this.bindTextureCoordBuffer = function(buffer) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        if (activeProgram.binders.bindTextureBuffer) { // Texture support optional in shader
-                            activeProgram.binders.bindTextureBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
+                        if (activeProgram.binders.bindTextureCoordBuffer) { // Texture support optional in shader
+                            activeProgram.binders.bindTextureCoordBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
                         }
                     };
 
@@ -2284,7 +2284,7 @@ SceneJs.backends.installBackend(
                                 /* Textures optional in geometry
                                  */
                                 if (buffer.textureBuf) {
-                                    ctx.programs.bindTextureBuffer(buffer.textureBuf.bufferId);
+                                    ctx.programs.bindTextureCoordBuffer(buffer.textureBuf.bufferId);
                                 }
 
                                 /* Bind index buffer and draw geometry using the active program

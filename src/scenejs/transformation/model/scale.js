@@ -22,6 +22,7 @@
             if (!xform || !superXform.fixed || !cfg.fixed) {
                 var tempMat = SceneJs.math.mulMat4(superXform.matrix, mat);
                 xform = {
+                    localMatrix: mat,
                     matrix: tempMat,                   
                     fixed: superXform.fixed && cfg.fixed
                 };

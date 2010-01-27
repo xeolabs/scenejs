@@ -5,41 +5,22 @@ SceneJs.backends.installBackend(
         (function() {
 
             /** Default value for script matrices, injected on activation
-                       */
-                      var defaultMat4;
-                      var defaultNormalMat;
-                      var defaultMaterial = {
-                          diffuse: { r: 1.0, g: 1.0, b: 1.0 },
-                          ambient: { r: 1.0, g: 1.0, b: 1.0 }
-                      };
+             */
+            var defaultMat4;
 
-                      /* Lazy compute default matrixes so that when WebGLFloatArray missing the exception
-                       * will be thrown during scene rendering.
-                       */
-                      var getDefaultMat4 = function() {
-                          if (!defaultMat4) {
-                              try {
-                                  defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
-                              } catch (e) {
-                                  throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
-                              }
-                          }
-                          return defaultMat4;
-                      };
-
-                      var getDefaultNormalMat4 = function() {
-                          if (typeof WebGLFloatArdray == 'undefined') {
-                              throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)");
-                          }
-                          if (!defaultNormalMat) {
-                              try {
-                                  defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
-                              } catch (e) {
-                                  throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
-                              }
-                          }
-                          return defaultNormalMat;
-                      };
+            /* Lazy compute default matrixes so that when WebGLFloatArray missing the exception
+             * will be thrown during scene rendering.
+             */
+            var getDefaultMat4 = function() {
+                if (!defaultMat4) {
+                    try {
+                        defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
+                    } catch (e) {
+                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                    }
+                }
+                return defaultMat4;
+            };
 
 
             return SceneJs.shaderBackend({
@@ -65,7 +46,9 @@ SceneJs.backends.installBackend(
                     "varying vec2 vTextureCoord;" +
 
                     "void main(void) {" +
-                    "   gl_Position = PMatrix * MMatrix * VMatrix * vec4(Vertex, 1.0);" +
+                    "   vec4 mv =     MMatrix * vec4(Vertex, 1.0);" + // Modelling transformation
+                    "   vec4 vv =     VMatrix * mv;" + // Viewing transformation
+                    "   gl_Position = PMatrix * vv;" + // Perspective transformation
                     "   vTextureCoord = aTextureCoord;" +
                     "}"
                 ],
@@ -86,20 +69,29 @@ SceneJs.backends.installBackend(
 
                     /** Binds the given buffer to the Sampler attribute
                      */
-                    bindTextureBuffer : function(context, findVar, buffer) {
-                        var samplerAttribute = findVar(context, 'Sampler');
-                        context.activeTexture(gl.TEXTURE0);
-                        context.bindTexture(context.TEXTURE_2D, buffer);
-                        context.uniform1i(samplerAttribute, 0);
+                    bindTextureCoordBuffer : function(context, findVar, buffer) {
+                        var texCoordAttribute = findVar(context, 'aTextureCoord');
+                        context.enableVertexAttribArray(texCoordAttribute);
+                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
+                        context.vertexAttribPointer(texCoordAttribute, 2, context.FLOAT, false, 0, 0);
                     },
+
+                    /** Binds the given buffer to the Sampler attribute
+                     */
+                    bindTextureSampler : function(context, findVar, texture) {
+                        var sampler = findVar(context, "Sampler");
+                        context.activeTexture(context.TEXTURE0);
+                        context.bindTexture(context.TEXTURE_2D, texture);
+                        context.uniform1i(sampler, 0);
+                    } ,
 
                     /** Binds the given buffer to the Normal attribute
                      */
                     bindNormalBuffer : function(context, findVar, buffer) {
-                        var normalAttribute = findVar(context, 'Normal');
-                        context.enableVertexAttribArray(normalAttribute);
-                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
-                        context.vertexAttribPointer(normalAttribute, 3, context.FLOAT, false, 0, 0);
+                        //                        var normalAttribute = findVar(context, 'Normal');
+                        //                        context.enableVertexAttribArray(normalAttribute);
+                        //                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
+                        //                        context.vertexAttribPointer(normalAttribute, 3, context.FLOAT, false, 0, 0);
                     }
                 },
 
@@ -120,10 +112,6 @@ SceneJs.backends.installBackend(
 
                     scene_ViewMatrix: function(context, findVar, mat) {
                         context.uniformMatrix4fv(findVar(context, 'VMatrix'), false, mat || getDefaultMat4());
-                    },
-
-                    scene_NormalMatrix: function(context, findVar, mat) {
-                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat || getDefaultNormalMat4());
                     }
                 }
             });

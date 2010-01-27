@@ -246,14 +246,26 @@ SceneJs.shaderBackend = function(cfg) {
 
                     /** Binds the given texture buffer to be the texture source for the active program
                      */
-                    this.bindTextureBuffer = function(buffer) {
+                    this.bindTextureCoordBuffer = function(buffer) {
                         if (!activeProgram) {
                             throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
                         }
-                        if (activeProgram.binders.bindTextureBuffer) { // Texture support optional in shader
-                            activeProgram.binders.bindTextureBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
+                        if (activeProgram.binders.bindTextureCoordBuffer) { // Texture support optional in shader
+                            activeProgram.binders.bindTextureCoordBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
                         }
                     };
+
+                     /** Binds the given texture to be the sampler for the active program
+                     */
+                    this.bindTexture = function(texture) {
+                        if (!activeProgram) {
+                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        }
+                        if (activeProgram.binders.bindTextureSampler) { // Texture support optional in shader
+                            activeProgram.binders.bindTextureSampler.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, texture);
+                        }
+                    };
+
 
                     /** Deactivates the currently active program
                      */
