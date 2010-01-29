@@ -11,6 +11,7 @@ SceneJs.shaderBackend = function(cfg) {
     return new (function() {
         this.type = cfg.type;
 
+
         var ctx;
 
         this.install = function(_ctx) {
@@ -255,7 +256,7 @@ SceneJs.shaderBackend = function(cfg) {
                         }
                     };
 
-                     /** Binds the given texture to be the sampler for the active program
+                    /** Binds the given texture to be the sampler for the active program
                      */
                     this.bindTexture = function(texture) {
                         if (!activeProgram) {
@@ -267,15 +268,14 @@ SceneJs.shaderBackend = function(cfg) {
                     };
 
 
-                    /** Deactivates the currently active program
+                    /** Deactivates the currently active program - does nothing of no program active
                      */
                     this.deactivateProgram = function() {
-                        if (!activeProgram) {
-                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                        if (activeProgram) {
+                            ctx.renderer.canvas.context.flush();
+                            activeProgram = null;
+                            ctx.renderer.canvas.context.useProgram(null);
                         }
-                        ctx.renderer.canvas.context.flush();
-                        activeProgram = null;
-                        ctx.renderer.canvas.context.useProgram(null); // Switch GL to use fixed-function paths
                     };
 
                     /** Deletes all programs

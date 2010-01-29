@@ -123,6 +123,13 @@ SceneJs.backends.installBackend(
                             var buffer = buffers[bufId];
                             var context = ctx.renderer.canvas.context;
 
+                            /* If no shader active, then activate the appropriate one depending on whether
+                             * a texture is active or not
+                             */
+                            var tempShader = false;
+                            var shaderBackend = null;
+//                         
+
                             /** Tell observers that we're about to draw
                              */
                             notifyDraw();
@@ -150,6 +157,12 @@ SceneJs.backends.installBackend(
                             }
                             context.drawElements(context.TRIANGLES, buffer.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                             context.flush();
+
+                            /* Deactivate any shader that was temporarily activated
+                             */
+                            if (tempShader) {
+                                shaderBackend.deactivateProgram();
+                            }
                         },
 
                         deleteGeoBuffer : function(buffer) { // TODO: freeGeoBuffer  - maybe use auto cache eviction?

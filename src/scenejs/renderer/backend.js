@@ -1,4 +1,5 @@
-/** Backend for renderer nodes
+/** Backend for renderer nodes. When it activates a canvas for its renderer node, this backend gets the
+ * "simple-shader" backend to activate its program on the canvas context as the default shader.
  */
 SceneJs.backends.installBackend(
         new (function() {
@@ -368,11 +369,16 @@ SceneJs.backends.installBackend(
                 /* Select a canvas
                  */
                 var canvas;
-                if (props.canvasId) {
-                    canvas = findCanvas(props.canvasId);   // Activating a canvas
+                if (props.canvasId) {                      // Canvas specified to activate
+                    if (ctx.renderer.canvas) {
+                        throw new SceneJs.exceptions.CanvasAlreadyActiveException("A canvas is already activated by a higher renderer node");
+                    }
+                    canvas = findCanvas(props.canvasId);
+
                 } else if (ctx.renderer.canvas) {
                     canvas = ctx.renderer.canvas;          // Using current canvas
-                } else {
+
+                } else {                                   // No canvas specified, but none already active
                     throw new SceneJs.exceptions.NoCanvasActiveException(
                             'Outermost renderer node must have a canvasId');
                 }
@@ -390,26 +396,41 @@ SceneJs.backends.installBackend(
                     canvas: canvas,
                     props : props,
                     restore : restore,
-                    prevCanvas: ctx.renderer.canvas // Canvas to restore as active
+                    prevCanvas: ctx.renderer.canvas // To restore null when no higher state
                 };
                 return state;
             };
 
-            /** Activates the given renderer state
+            //var simpleShaderBackend = SceneJs.backends.getBackend('simple-shader');
+
+            /** Activates the given renderer state. If no state is active, then it must specify a canvas to activate,
+             * in which case the default simple shader will be activated as well
              */
             this.setRendererState = function(state) {
                 ctx.renderer.canvas = state.canvas;
                 stateStack.push(state);
                 setProperties(state.props);
+
+//                /* Ensure that at least the default simple shader is active
+//                 */
+//                if (!ctx.programs.getActiveProgramId()) {
+//                    var programId = simpleShaderBackend.loadProgram();
+//                    simpleShaderBackend.activateProgram(programId);
+//                }
             };
 
-            /** Restores previous renderer state
+            /** Restores previous renderer state, if any.
              */
             this.restoreRendererState = function(state) {
-                ctx.renderer.canvas = state.prevCanvas;
                 stateStack.pop();
-                if (ctx.renderer.canvas) {
+                if (state.prevCanvas) {
                     setProperties(state.restore);
+                } else {
+
+//                    /* Canvas deactivating - don't leave default simple shader active
+//                     */
+//                    simpleShaderBackend.deactivateProgram();
+                    ctx.renderer.canvas = null;
                 }
             };
 

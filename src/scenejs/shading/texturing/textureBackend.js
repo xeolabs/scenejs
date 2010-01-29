@@ -7,6 +7,11 @@ SceneJs.backends.installBackend(
             /** Default value for script matrices, injected on activation
              */
             var defaultMat4;
+            var defaultNormalMat;
+            var defaultMaterial = {
+                diffuse: { r: 1.0, g: 1.0, b: 1.0 },
+                ambient: { r: 1.0, g: 1.0, b: 1.0 }
+            };
 
             /* Lazy compute default matrixes so that when WebGLFloatArray missing the exception
              * will be thrown during scene rendering.
@@ -22,35 +27,61 @@ SceneJs.backends.installBackend(
                 return defaultMat4;
             };
 
+            var getDefaultNormalMat4 = function() {
+                if (!defaultNormalMat) {
+                    try {
+                        defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+                    } catch (e) {
+                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                    }
+                }
+                return defaultNormalMat;
+            };
 
             return SceneJs.shaderBackend({
 
                 type: 'texture-shader',
 
-                fragmentShaders: [
-                    "varying vec2 vTextureCoord;" +
-                    "uniform sampler2D Sampler;" +
-                    "void main(void) {" +
-                    "gl_FragColor = texture2D(Sampler, vec2(vTextureCoord.s, vTextureCoord.t));" +
-                    "}"
-                ],
-
                 vertexShaders: [
                     "attribute vec3 Vertex;" +
+                    "attribute vec3 Normal;" +
                     "attribute vec2 aTextureCoord;" +
+
+                    "uniform vec4 LightPos;" +
 
                     'uniform mat4 PMatrix; ' +
                     'uniform mat4 VMatrix; ' +
                     'uniform mat4 MMatrix; ' +
+                    'uniform mat3 NMatrix; ' +
+
+                    "uniform vec3 MaterialAmbient;" +
+                    "uniform vec3 MaterialDiffuse;" +
 
                     "varying vec2 vTextureCoord;" +
+                    "varying vec3 vLightWeighting; " +
 
                     "void main(void) {" +
                     "   vec4 mv =     MMatrix * vec4(Vertex, 1.0);" + // Modelling transformation
                     "   vec4 vv =     VMatrix * mv;" + // Viewing transformation
                     "   gl_Position = PMatrix * vv;" + // Perspective transformation
+                    "   vec3 nn = normalize(NMatrix * Normal);" +
+                    "   vec3 lightDir = vec3(normalize(mv - LightPos));" + // Lighting is done in model-space
+                    "   float directionalLightWeighting = max(dot(lightDir, nn), 0.0);" +
+                    "   vLightWeighting = MaterialAmbient + MaterialDiffuse * directionalLightWeighting;" +
                     "   vTextureCoord = aTextureCoord;" +
                     "}"
+                ],
+
+                fragmentShaders: [
+                    "varying vec2 vTextureCoord;" +
+                    "uniform sampler2D Sampler;" +
+                    "varying vec3 vLightWeighting; " +
+                    "void main(void) {" +
+                    "   vec4 textureColor = texture2D(Sampler, vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)); " +
+                    "   gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a); " +
+                    "}"
+
+
                 ],
 
                 /**
@@ -88,10 +119,10 @@ SceneJs.backends.installBackend(
                     /** Binds the given buffer to the Normal attribute
                      */
                     bindNormalBuffer : function(context, findVar, buffer) {
-                        //                        var normalAttribute = findVar(context, 'Normal');
-                        //                        context.enableVertexAttribArray(normalAttribute);
-                        //                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
-                        //                        context.vertexAttribPointer(normalAttribute, 3, context.FLOAT, false, 0, 0);
+                        var normalAttribute = findVar(context, 'Normal');
+                        context.enableVertexAttribArray(normalAttribute);
+                        context.bindBuffer(context.ARRAY_BUFFER, buffer);
+                        context.vertexAttribPointer(normalAttribute, 3, context.FLOAT, false, 0, 0);
                     }
                 },
 
@@ -112,6 +143,27 @@ SceneJs.backends.installBackend(
 
                     scene_ViewMatrix: function(context, findVar, mat) {
                         context.uniformMatrix4fv(findVar(context, 'VMatrix'), false, mat || getDefaultMat4());
+                    },
+
+                    scene_NormalMatrix: function(context, findVar, mat) {
+                        context.uniformMatrix3fv(findVar(context, 'NMatrix'), false, mat || getDefaultNormalMat4());
+                    },
+
+
+                    scene_Material: function(context, findVar, m) {
+                        m = m || defaultMaterial;
+                        context.uniform3fv(findVar(context, 'MaterialAmbient'), [m.ambient.r, m.ambient.g, m.ambient.b]);
+                        context.uniform3fv(findVar(context, 'MaterialDiffuse'), [m.diffuse.r, m.diffuse.g, m.diffuse.b]);
+                        //                            context.uniform3fv(findVar(context, 'MaterialSpecular'), [m.specular.r, m.specular.g, m.specular.b]);
+                    },
+
+                    scene_Lights: function(context, findVar, lights) {
+                        if (lights && lights.length > 0) {
+                            var l = lights[0];
+                            context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
+                        } else {
+                            context.uniform4fv(findVar(context, 'LightPos'), [10.0, 0.0, -10.0, 1.0]);
+                        }
                     }
                 }
             });

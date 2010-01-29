@@ -7,7 +7,7 @@
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="5"/>
+    <property name="BUILD_MINOR" value="6"/>
     <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
@@ -135,7 +135,7 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/appearance/material.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/appearance/backend.js"/>
-         
+
             <!-- Interpolation -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/animation/scalarInterpolator.js"/>
@@ -153,6 +153,12 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/asset/asset.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/asset/backendBase.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/asset/js/jsBackend.js"/>
+
+            <!-- Textures -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/texture/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/texturing/textureBackend.js"/>
 
         </concat>
         <echo message="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME} built."/>
@@ -251,6 +257,16 @@
               tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/index.html"/>
         <copy file="src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"/>
+
+           <!-- Texturing -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/textures/general-zod"/>
+        <copy file="${SRC_DIR}/examples/textures/general-zod/index.html"
+              tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/index.html"/>
+        <copy file="src/examples/textures/general-zod/general-zod.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.js"/>
+         <copy file="src/examples/textures/general-zod/general-zod.jpg"
+              tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.jpg"/>
 
         <!-- License and readme -->
 

@@ -38,6 +38,11 @@ SceneJs.exceptions.CanvasNotFoundException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJs.exceptions.CanvasAlreadyActiveException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 SceneJs.exceptions.InvalidLookAtConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;

@@ -34,6 +34,7 @@ SceneJs.backends.installBackend(
                         }
                     });
 
+
                     return {
 
                         getTexture : function(textureId) {
@@ -80,6 +81,10 @@ SceneJs.backends.installBackend(
                             }
                             activeTexture = texture;
                             loaded = false;
+                        },
+
+                        getActiveTextureId: function() {
+                            return activeTexture ? activeTexture.textureId : null;
                         }
                     };
                 })();
@@ -107,13 +112,15 @@ SceneJs.backends.installBackend(
                 ctx.textures.bindTexture(textureId);
             };
 
+
             /** Activates currently loaded texture of given ID
              */
             this.activateTexture = function(textureId) {
                 ctx.textures.activateTexture(textureId);
             };
 
-            this.reset = function() {
 
+            this.reset = function() {
+                   // TODO:  Delete textures!
             };
         })());
