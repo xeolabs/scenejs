@@ -95,7 +95,7 @@ with (SceneJs) {
                                                                                                 return  {y: scope.get("param.height")}
                                                                                             },
 
-                                                                                                    objects.cube()
+                                                                                                    objects.sphere()
                                                                                                     )
                                                                                             )
                                                                                     )

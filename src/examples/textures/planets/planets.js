@@ -5,18 +5,7 @@
  * lindsay.stanley.kay AT gmail.com
  * January 2010
  *
- * Prior to the destruction of Krypton, the criminal General Zod was banished into
- * the Phantom Zone by the Kryptonian Council of Elders. Here is Zod, floating through
- * space, trapped within the dimensional constraints of the Phantom Zone.
  *
- * Actually, he is a JPEG file named general-zod.jpg, mapped onto a cube
- * by a texture node about half-way down this source code.
- *
- * The texture has been configured to not wait for the texture to load before
- * rendering its subtree, so the cube will appear naked and untextured while the JPEG file
- * loads.
- *
- * Now, kneel before Zod.
  */
 try {
     with (SceneJs) {
@@ -45,32 +34,8 @@ try {
                                                     up : { x: 0.0, y: 1.0, z: 0.0 }
 
                                                 },
-
-
-                                                        material({
-                                                            ambient:  { r:0.3, g:0.3, b:0.3 },
-                                                            diffuse:  { r:1.0, g:1.0, b:1.0 }
-                                                        },
-
-                                                            /** Texture is configured with the URI at which its
-                                                             * image is stored. Textures are loaded asynchronously;
-                                                             * by default they will cause scene traversal to bypass their
-                                                             * child nodes until the texture image has loaded. However,
-                                                             * you can configure them with wait: false if you want
-                                                             * thier child geometries to appear all naked and shivering
-                                                             * while the texture image loads.
-                                                             */
-                                                                texture({                                                               
-                                                                    uri:"./general-zod.jpg",
-                                                                    wait: false
-                                                                },
-                                                                        rotate(function(scope) {
-                                                                            return { angle: scope.get("angle"), x : 1.0, y : 1.0}
-                                                                        },
-                                                                                SceneJs.objects.cube()
-                                                                                )
-                                                                        )
-                                                                )
+                                                        asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/jupiter.js",
+                                                            proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                         )
                                             // ) // lookAt
                                                 ) // perspective

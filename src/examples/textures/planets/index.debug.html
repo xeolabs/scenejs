@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>SceneJS Example - Generation of a Spiral Staircase</title>
+    <title>SceneJS Example - Textured Cube</title>
 </head>
 <body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
 <canvas id="theCanvas" width="600" height="600">
@@ -10,6 +10,7 @@
         <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
         &lt;canvas&gt; feature.</p>
 </canvas>
+
 
 <!-- Core -->
 
@@ -26,17 +27,19 @@
 <script type="application/x-javascript" src="../../../scenejs/scene/backend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/scene/scene.js"></script>
 
-<!-- Renderer -->
-
-<script type="application/x-javascript" src="../../../scenejs/renderer/backend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/renderer/renderer.js"></script>
-
 
 <!-- Shading -->
 
 <script type="application/x-javascript" src="../../../scenejs/shading/backendBase.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/shader.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/simple/simpleBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/texturing/textureBackend.js"></script>
+
+<!-- Renderer -->
+<!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
+
+<script type="application/x-javascript" src="../../../scenejs/renderer/backend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/renderer/renderer.js"></script>
 
 <!-- Geometry -->
 
@@ -75,6 +78,7 @@
 <script type="application/x-javascript" src="../../../scenejs/appearance/material.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/appearance/backend.js"></script>
 
+
 <!-- Interpolation -->
 
 <script type="application/x-javascript" src="../../../scenejs/animation/scalarInterpolator.js"></script>
@@ -94,7 +98,9 @@
 <script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackend.js"></script>
 
 
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/backend.js"></script>
 
-<script type="application/x-javascript" src="spiral-staircase-construction.js"></script>
+<script type="application/x-javascript" src="planets.js"></script>
 </body>
 </html>

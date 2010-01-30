@@ -66,6 +66,7 @@ SceneJs.backends.installBackend(
                             var texture = textures[textureId];
                             var context = ctx.renderer.canvas.context;
                             texture.ptexture = context.createTexture();
+                            texture.context = context;
                             context.bindTexture(context.TEXTURE_2D, texture.ptexture);
                             context.texImage2D(context.TEXTURE_2D, 0, texture.image);
                             context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
@@ -85,7 +86,18 @@ SceneJs.backends.installBackend(
 
                         getActiveTextureId: function() {
                             return activeTexture ? activeTexture.textureId : null;
+                        },
+
+                        deleteTextures : function() {
+                            for (var textureId in textures) {
+                                var texture = textures[textureId];
+                                texture.context.deleteTexture(texture.ptexture);
+                            }
+                            textures = {};
+                            activeTexture = null;
+                            loaded = false;
                         }
+
                     };
                 })();
             };
@@ -121,6 +133,6 @@ SceneJs.backends.installBackend(
 
 
             this.reset = function() {
-                   // TODO:  Delete textures!
+                ctx.textures.deleteTextures();
             };
         })());

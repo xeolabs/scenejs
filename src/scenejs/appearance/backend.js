@@ -18,9 +18,9 @@ SceneJs.backends.installBackend(
 
                     var _init = function() {
                         material = {  // Default to some colour so we'll see at least something while debugging a scene
-                            ambient:  { r: 0, g : 0, b : 1 },
-                            diffuse:  { r: 0, g : 0, b : 1 },
-                            specular: { r: 0, g : 0, b : 1 },
+                            ambient:  { r: .3, g : .3, b : .3 },
+                            diffuse:  { r: 1, g : 1, b : 1 },
+                            specular: { r: 1, g : 1, b : 1 },
                             shininess:{ r: 0, g : 0, b : 1 }
                         };
                         loaded = false;

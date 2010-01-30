@@ -8,7 +8,7 @@
 
     <property name="BUILD_MAJOR" value="0"/>
     <property name="BUILD_MINOR" value="6"/>
-    <property name="BUILD_ID" value="0"/>
+    <property name="BUILD_ID" value="1"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
 
@@ -106,6 +106,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
 
             <!-- Modelling transforms -->
 
@@ -258,14 +259,14 @@
         <copy file="src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"/>
 
-           <!-- Texturing -->
+        <!-- Texturing -->
 
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/textures/general-zod"/>
         <copy file="${SRC_DIR}/examples/textures/general-zod/index.html"
               tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/index.html"/>
         <copy file="src/examples/textures/general-zod/general-zod.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.js"/>
-         <copy file="src/examples/textures/general-zod/general-zod.jpg"
+        <copy file="src/examples/textures/general-zod/general-zod.jpg"
               tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.jpg"/>
 
         <!-- License and readme -->
