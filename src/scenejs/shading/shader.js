@@ -35,7 +35,9 @@ SceneJs.shader = function() {
 
         /* Activate new shaders and vars
          */
-        backend.activateProgram(programId);
+        if (previousProgramId != programId) {
+            backend.activateProgram(programId);
+        }
         if (params.vars) {
             backend.setVars({
                 vars: params.vars,
@@ -48,7 +50,9 @@ SceneJs.shader = function() {
         /* Restore any state saved for higher
          */
         if (previousProgramId) {
-            backend.activateProgram(previousProgramId);
+            if (previousProgramId != programId) {
+                backend.activateProgram(previousProgramId);
+            }
             if (previousVars) {
                 backend.setVars(previousVars);
             }

@@ -8,7 +8,7 @@
 
     <property name="BUILD_MAJOR" value="0"/>
     <property name="BUILD_MINOR" value="6"/>
-    <property name="BUILD_ID" value="1"/>
+    <property name="BUILD_ID" value="2"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
 

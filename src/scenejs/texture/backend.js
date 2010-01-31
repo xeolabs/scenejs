@@ -66,6 +66,7 @@ SceneJs.backends.installBackend(
                             var texture = textures[textureId];
                             var context = ctx.renderer.canvas.context;
                             texture.ptexture = context.createTexture();
+                            texture.canvas = ctx.renderer.canvas;
                             texture.context = context;
                             context.bindTexture(context.TEXTURE_2D, texture.ptexture);
                             context.texImage2D(context.TEXTURE_2D, 0, texture.image);
@@ -91,7 +92,11 @@ SceneJs.backends.installBackend(
                         deleteTextures : function() {
                             for (var textureId in textures) {
                                 var texture = textures[textureId];
-                                texture.context.deleteTexture(texture.ptexture);
+                                if (document.getElementById(texture.canvas.canvasId)) {  // Context can't exist if canvas not in DOM
+                                    if (texture.context) {
+                                        texture.context.deleteTexture(texture.ptexture);
+                                    }
+                                }
                             }
                             textures = {};
                             activeTexture = null;

@@ -43,7 +43,16 @@ SceneJs.asset = function() {
                 backend.assetLoaded();    // And notify backend so it can kill the load process
                 loading = false;
             }
-            assetNode.call(this, scope);
+            if (params.params) {
+                var childScope = SceneJs.utils.newScope(scope, cfg.fixed);
+                for (var key in params.params) {
+                    childScope.put(key, params.params[key]);
+                }
+                assetNode.call(this, childScope);
+            } else {
+                assetNode.call(this, scope);
+            }
+
         }
         SceneJs.utils.visitChildren(cfg, scope); // For completeness - probably wont have children on an asset node        
     };

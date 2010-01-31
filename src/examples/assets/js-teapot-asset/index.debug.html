@@ -28,18 +28,18 @@
 <script type="application/x-javascript" src="../../../scenejs/scene/scene.js"></script>
 
 
-<!-- Renderer -->
-
-<script type="application/x-javascript" src="../../../scenejs/renderer/backend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/renderer/renderer.js"></script>
-
-
-
 <!-- Shading -->
 
 <script type="application/x-javascript" src="../../../scenejs/shading/backendBase.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/shader.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/simple/simpleBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/texturing/textureBackend.js"></script>
+
+<!-- Renderer -->
+<!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
+
+<script type="application/x-javascript" src="../../../scenejs/renderer/backend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/renderer/renderer.js"></script>
 
 <!-- Geometry -->
 
@@ -77,10 +77,6 @@
 <script type="application/x-javascript" src="../../../scenejs/appearance/material.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/appearance/backend.js"></script>
 
-<!-- Layers -->
-
-<script type="application/x-javascript" src="../../../scenejs/layering/backend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/layering/layer.js"></script>
 
 <!-- Interpolation -->
 
@@ -101,7 +97,8 @@
 <script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackend.js"></script>
 
 
-
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/backend.js"></script>
 
 <script type="application/x-javascript" src="js-teapot-asset-demo.js"></script>
 </body>
