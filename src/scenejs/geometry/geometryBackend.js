@@ -23,9 +23,15 @@ SceneJs.backends.installBackend(
                      */
                     var currentBoundBufId;
 
-                    /** Program activation unbinds buffer
+                    /** When a new program is activated we will need to lazy-bind our current buffers
                      */
-                    ctx.programs.onProgramActivate(function() {
+                    ctx.scenes.onEvent("program-activated", function() {
+                        currentBoundBufId = null;
+                    });
+
+                    /** When a program is deactivated we may need to re-bind buffers to the previously active program
+                     */
+                    ctx.scenes.onEvent("program-deactivated", function() {
                         currentBoundBufId = null;
                     });
 
@@ -38,16 +44,6 @@ SceneJs.backends.installBackend(
                         context.bindBuffer(bufType, handle.bufferId);
                         context.bufferData(bufType, glArray, context.STATIC_DRAW);
                         return handle;
-                    };
-
-                    /** Other backends who want to know when geometry is about to be rendered
-                     */
-                    var drawObservers = [];
-
-                    var notifyDraw = function() {
-                        for (var i = 0; i < drawObservers.length; i++) {
-                            drawObservers[i]();
-                        }
                     };
 
                     return {
@@ -123,18 +119,12 @@ SceneJs.backends.installBackend(
                             var buffer = buffers[bufId];
                             var context = ctx.renderer.canvas.context;
 
-                            /* If no shader active, then activate the appropriate one depending on whether
-                             * a texture is active or not
-                             */
-                            var tempShader = false;
-                            var shaderBackend = null;
-//                         
-
                             /** Tell observers that we're about to draw
                              */
-                            notifyDraw();
+                            ctx.scenes.fireEvent("geo-drawing", {});
 
-                            /* Dont rebind buffer if already bound
+                            /* Dont rebind buffer if already bound - this is the case when
+                             * we're drawing a batch of the same object, like a bunch of cubes
                              */
                             if (currentBoundBufId != bufId) {
 
@@ -158,11 +148,7 @@ SceneJs.backends.installBackend(
                             context.drawElements(context.TRIANGLES, buffer.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                             context.flush();
 
-                            /* Deactivate any shader that was temporarily activated
-                             */
-                            if (tempShader) {
-                                shaderBackend.deactivateProgram();
-                            }
+
                         },
 
                         deleteGeoBuffer : function(buffer) { // TODO: freeGeoBuffer  - maybe use auto cache eviction?
@@ -183,12 +169,9 @@ SceneJs.backends.installBackend(
                                     buffer.context.deleteBuffer(buffer.textureBuf.bufferId);
                                 }
                             }
-                        },
-
-                        /** Register an observer to notify when a new program is activated
-                         */
-                        onDraw : function(f) {
-                            drawObservers.push(f);
+                            if (buffer.bufId == currentBoundBufId) {
+                                currentBoundBufId = null;
+                            }
                         },
 
                         reset : function() {

@@ -20,27 +20,33 @@ SceneJs.backends.installBackend(
 
                     /** When a new program is activated we will need to lazy-load our current matrix
                      */
-                    ctx.programs.onProgramActivate(function() {
+                    ctx.scenes.onEvent("program-activated", function() {
+                        loaded = false;
+                    });
+
+                    /** When a program is deactivated we may need to re-load into the previously active program
+                     */
+                    ctx.scenes.onEvent("program-deactivated", function() {
                         loaded = false;
                     });
 
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                    ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
-                                    /* Lazy-compute WebGL array
-                                     */
-                                    if (!transform.matrixAsArray) {
-                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                                    }
+                            /* Lazy-compute WebGL array
+                             */
+                            if (!transform.matrixAsArray) {
+                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                            }
 
-                                    ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
+                            ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
 
-                                    loaded = true;
-                                }
-                            });
+                            loaded = true;
+                        }
+                    });
 
                     return {
                         setTransform: function(t) {
@@ -50,6 +56,10 @@ SceneJs.backends.installBackend(
 
                         getTransform: function() {
                             return transform;
+                        },
+
+                        transformPoint3: function(v) {
+                            return SceneJs.math.transformPoint3(transform.matrix, v);
                         }
                     };
                 })();

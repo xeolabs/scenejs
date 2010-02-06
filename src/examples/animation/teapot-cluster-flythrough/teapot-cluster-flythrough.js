@@ -20,8 +20,9 @@ with (SceneJs) {
             renderer({
                 canvasId: 'theCanvas',
                 clearColor : { r:0, g:0, b:0.3, a: 1 },
-            
-                clear : { depth : true, color : true}
+                viewport: { x:0, y:0, width:1900, height:950 },
+                clear : { depth : true, color : true} ,
+                depthRange : { near: .5, far: 1500 }
             },
                     shader({ type: 'simple-shader' },
 
@@ -31,12 +32,13 @@ with (SceneJs) {
                                         pos: { x: 1000.0, y: 1000.0, z: 0.0 }
                                     }
                                 ]},
-                                    perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 1500.0
+                                    perspective({ fovy : 63.0, aspect : 2.0, near : .5, far : 1500.0
                                     },
+                                            
 
                                         /* Viewing transform
                                          */
-                                            lookAt(function(scope) {
+                                            lookat(function(scope) {
                                                 return{
                                                     eye : { x: 0.0, y: 0, z: scope.get("z")},
                                                     look : { x : 0.0, y : 0.0, z : 0 },
@@ -50,7 +52,7 @@ with (SceneJs) {
                                                             generator(
                                                                     (function() {
                                                                         var elems = [];
-                                                                        for (var i = 0; i < 500; i++) {
+                                                                        for (var i = 0; i < 200; i++) {
                                                                             elems.push({
                                                                                 x: (250 * Math.random()) - 125.0,
                                                                                 y: (50 * Math.random()) - 25.0,
@@ -69,13 +71,16 @@ with (SceneJs) {
                                                                     translate(function(scope) {
                                                                         return scope.get("param");
                                                                     },
-                                                                            scale(function(scope) {
-                                                                                return {
-                                                                                    x:2 ,
-                                                                                    y:2,
-                                                                                    z:2};
-                                                                            },
-                                                                                    objects.teapot()
+                                                                            scale({ x:2, y:2, z:2 },
+//                                                                                    axisBoundary({
+//                                                                                        xmin: -3.4,
+//                                                                                        ymin: -3.4,
+//                                                                                        zmin: -3.4,
+//                                                                                        xmax: 3.4,
+//                                                                                        ymax: 3.4,
+//                                                                                        zmax: 3.4 },
+                                                                                            objects.teapot()
+                                                                                          //  )
                                                                                     )
                                                                             )
                                                                     )
@@ -122,7 +127,7 @@ with (SceneJs) {
      */
     try {
         exampleScene.render({z:zpos});
-        
+
         /* Continue animation
          */
         pInterval = setInterval("doit()", 10);

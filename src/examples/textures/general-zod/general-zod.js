@@ -39,7 +39,7 @@ try {
                                     ]},
                                         perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                         },
-                                                lookAt({
+                                                lookat({
                                                     eye : { x: 0.0, y: 0.0, z: -10},
                                                     look : { x : 0.0, y : 0.0, z : 0 },
                                                     up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -65,14 +65,15 @@ try {
                                                                     wait: false
                                                                 },
                                                                         rotate(function(scope) {
-                                                                            return { angle: scope.get("angle"), x : 1.0, y : 1.0}
+                                                                            return { angle: scope.get("angle"), x : 1.0, y : 1.0};
                                                                         },
+                                                                                
                                                                                 SceneJs.objects.cube()
                                                                                 )
                                                                         )
                                                                 )
                                                         )
-                                            // ) // lookAt
+                                            // ) // lookat
                                                 ) // perspective
                                         ) // lights
                                 ) // shader

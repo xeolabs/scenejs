@@ -50,7 +50,7 @@ with (SceneJs) {
                                                         keys: [0.0,  0.3, 1.0],
                                                         values: [-50, 60, 0]
                                                     },
-                                                            lookAt(function(scope) {
+                                                            lookat(function(scope) {
                                                                 return {
 
                                                                     eye : { x: scope.get("eyex"), y: 5.0, z: scope.get("eyez")},

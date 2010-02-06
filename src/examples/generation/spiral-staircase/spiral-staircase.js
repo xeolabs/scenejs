@@ -38,7 +38,7 @@ with (SceneJs) {
                                     perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
 
-                                            lookAt({
+                                            lookat({
                                                 eye : { x: 0.0, y: 30.0, z: -20.0},
                                                 look : { x : 0.0, y : 15.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -77,7 +77,7 @@ with (SceneJs) {
                                                                             ) // translate
                                                                     ) // generator
                                                             ) // material
-                                                    ) // lookAt
+                                                    ) // lookat
 
 
                                             ) // frustum

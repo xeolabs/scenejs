@@ -36,7 +36,7 @@ with (SceneJs) {
                                 ]},
                                     perspective({ fovy : 55.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
-                                            lookAt({
+                                            lookat({
                                                 eye : { x: 0.0, y: 5.0, z: -8},
                                                 look : { x : 0.0, y : 1.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -71,7 +71,7 @@ with (SceneJs) {
                                                                                     )
                                                                             )
                                                                     )
-                                                            ) // lookAt
+                                                            ) // lookat
                                                     ) // perspective
                                             ) // lights
                                     ) // shader

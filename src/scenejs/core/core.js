@@ -83,7 +83,7 @@ var SceneJs = {version: '1.0'};
          * to indicate that the function's result may be variable, and the children.
          */
         getNodeConfig : function(args) {
-            if (args.length == 0) {
+            if (!args || args.length == 0) {
                 throw new SceneJs.exceptions.InvalidNodeConfigException('Invalid node parameters: should be a configuration followed by zero or more child nodes');
             }
             var result = { };
@@ -152,12 +152,20 @@ var SceneJs = {version: '1.0'};
             }
         };
 
+        /** Returns true if a backend of the given type is installed
+         */
+        this.hasBackend = function(type) {
+            var backend = backends[type] ;
+            return (backend != undefined && backend != null);
+        };
+
+
         /** Obtains the backend module of the given type
          */
         this.getBackend = function(type) {
             var backend = backends[type];
             if (!backend) {
-                throw new SceneJs.exceptions.NodeBackendNotFoundException("No backend installed of type \'' + type + '\'");
+                throw new SceneJs.exceptions.NodeBackendNotFoundException("No backend installed of type \"" + type + "\"");
             }
             return backend;
         };
@@ -168,7 +176,7 @@ var SceneJs = {version: '1.0'};
             return status;
         };
 
-         /** Clears current SceneJS backend error status
+        /** Clears current SceneJS backend error status
          */
         this.clearStatus = function() {
             status = {};

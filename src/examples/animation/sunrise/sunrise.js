@@ -44,7 +44,7 @@ with (SceneJs) {
                                 /* Viewing transform specifies eye position, looking
                                  at the origin by default
                                  */
-                                    lookAt(
+                                    lookat(
                                     {
                                         eye : { x: 0.0, y: 10.0, z: -15 },
                                         up : { y: 1.0 }
@@ -87,7 +87,7 @@ with (SceneJs) {
                                                                     objects.teapot()
                                                                     )
                                                             ) // rotate
-                                                    ) // lookAt
+                                                    ) // lookat
                                             ) // frustum
                                     )
                             ) // shader                            

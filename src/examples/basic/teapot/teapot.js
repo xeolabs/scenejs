@@ -37,7 +37,7 @@ with (SceneJs) {
                                 ]},
                                     perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
-                                            lookAt({
+                                            lookat({
                                                 eye : { x: 0.0, y: 7.0, z: -15},
                                                 look : { x : 0.0, y : 1.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -49,12 +49,24 @@ with (SceneJs) {
                                                     },
 
                                                             rotate(function(scope) {
-                                                                return { angle : scope.get("angle"), y: 1.0 }
+                                                                return { angle : scope.get("angle"), y: 1.0 };
                                                             },
-                                                                    objects.teapot()
+
+                                                                /* Bounding box around teapot
+                                                                 */
+                                                                    axisBoundary({
+                                                                        xmin: -4,
+                                                                        ymin: -4,
+                                                                        zmin: -4,
+                                                                        xmax: 4,
+                                                                        ymax: 4,
+                                                                        zmax: 4 },
+
+                                                                            objects.teapot()
+                                                                            )
                                                                     )
                                                             )
-                                                    ) // lookAt
+                                                    ) // lookat
                                             ) // perspective
                                     ) // lights
                             ) // shader                      

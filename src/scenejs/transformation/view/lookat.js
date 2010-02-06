@@ -4,7 +4,7 @@
 
 (function() {
 
-    SceneJs.lookAt = function() {
+    SceneJs.lookat = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
 
         var backend = SceneJs.backends.getBackend('view-transform');
@@ -26,10 +26,12 @@
                 params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
 
                 if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
-                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: eye and look cannot be identical");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException
+                            ("Invald lookat parameters: eye and look cannot be identical");
                 }
                 if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
-                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException
+                            ("Invald lookat parameters: up vector cannot be of zero length, ie. all elements zero");
                 }
                 mat = SceneJs.math.lookatMat4c(
                         params.eye.x, params.eye.y, params.eye.z,
@@ -42,6 +44,11 @@
                 var tempMat = SceneJs.math.mulMat4(superXform.matrix, mat);
                 xform = {
                     matrix: tempMat,
+                    lookat: {
+                        eye: params.eye,
+                        look: params.look,
+                        up: params.up
+                    },
                     fixed: superXform.fixed && cfg.fixed
                 };
             }

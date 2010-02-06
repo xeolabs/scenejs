@@ -966,13 +966,13 @@ SceneJs.backends.installBackend(
 
                         /** Notifies backend that the currently active scene has started an asynchronous process
                          */
-                        processStarted: function() {
+                        createProcess: function() {
                             scenes[activeSceneId].numProcesses++;
                         },
 
                         /**  Notifies backend that the currently active scene has completed an asynchronous process
                          */
-                        processStopped: function() {
+                        destroyProcess: function() {
                             scenes[activeSceneId].numProcesses--;
                         },
 
@@ -8586,7 +8586,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to drawn we load our matrix if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                    ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL arrays
@@ -8769,7 +8769,7 @@ SceneJs.backends.installBackend(
             var ctx;
 
             var init = function() {
-                ctx.projectionTransform = (function() {
+                ctx.projection = (function() {
                     var transform = {
                         matrix : SceneJs.math.identityMat4(),
                         fixed: true
@@ -8786,7 +8786,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                     ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                                     /* Lazy-compute WebGL array
@@ -8820,11 +8820,11 @@ SceneJs.backends.installBackend(
             };
 
             this.setTransform = function(transform) {
-                ctx.projectionTransform.setTransform(transform);
+                ctx.projection.setTransform(transform);
             };
 
             this.getTransform = function() {
-                return ctx.projectionTransform.getTransform();
+                return ctx.projection.getTransform();
             };
 
             this.reset = function() {
@@ -8961,7 +8961,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                     ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                                     /* Lazy-compute WebGL array
@@ -9012,7 +9012,7 @@ SceneJs.backends.installBackend(
 
 (function() {
 
-    SceneJs.lookAt = function() {
+    SceneJs.lookat = function() {
         var cfg = SceneJs.utils.getNodeConfig(arguments);
 
         var backend = SceneJs.backends.getBackend('view-transform');
@@ -9034,10 +9034,10 @@ SceneJs.backends.installBackend(
                 params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
 
                 if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
-                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: eye and look cannot be identical");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookat parameters: eye and look cannot be identical");
                 }
                 if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
-                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
+                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookat parameters: up vector cannot be of zero length, ie. all elements zero");
                 }
                 mat = SceneJs.math.lookatMat4c(
                         params.eye.x, params.eye.y, params.eye.z,
@@ -9090,7 +9090,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our lights if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                     ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Lights', lightStack);
                             loaded = true;
@@ -9273,7 +9273,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to render we load our material if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                    ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Material', material);
                             loaded = true;
@@ -9670,7 +9670,7 @@ SceneJs.assetBackend = function(cfg) {
                             }
                             head.removeChild(script);
                         };
-                        ctx.scenes.processStarted(); // Notify load started
+                        ctx.scenes.createProcess(); // Notify load started
                         head.appendChild(script);
                     };
 
@@ -9740,14 +9740,14 @@ SceneJs.assetBackend = function(cfg) {
          * asset has loaded and allow backend to kill the process.
          */
         this.loadAsset = function(proxy, uri, callback) {
-            ctx.scenes.processStarted();
+            ctx.scenes.createProcess();
             ctx.assets.loadAsset(proxy, uri, cfg.type, callback);
         };
 
         /** Notifies backend that load has completed; backend then kills the process.
          */
         this.assetLoaded = function() {
-            ctx.scenes.processStopped();
+            ctx.scenes.destroyProcess();
         };
 
         /** Frees resources held by this backend (ie. parsers and cached scene graph fragments)
@@ -9865,7 +9865,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our texture if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                    ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded && activeTexture) {
                             ctx.programs.bindTexture(activeTexture.ptexture);
                             loaded = true;
@@ -9956,14 +9956,14 @@ SceneJs.backends.installBackend(
              * the texture has loaded and allow backend to kill the process.
              */
             this.loadTexture = function(uri, callback) {
-                ctx.scenes.processStarted();
+                ctx.scenes.createProcess();
                 ctx.textures.loadTexture(uri, callback);
             };
 
             /** Notifies backend that load has completed; backend then kills the process.
              */
             this.textureLoaded = function(textureId) {
-                ctx.scenes.processStopped();
+                ctx.scenes.destroyProcess();
                 ctx.textures.bindTexture(textureId);
             };
 

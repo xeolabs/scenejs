@@ -20,16 +20,21 @@ SceneJs.backends.installBackend(
 
                     var loaded = false;
 
-                    /** When a new program is activated we will need to lazy-load our lights
+                    /** When a new program is activated we will need to lazy-load our current lights
                      */
-                    ctx.programs.onProgramActivate(function() {
+                    ctx.scenes.onEvent("program-activated", function() {
                         loaded = false;
                     });
 
+                    /** When a program is deactivated we may need to re-load into the previously active program
+                     */
+                    ctx.scenes.onEvent("program-deactivated", function() {
+                        loaded = false;
+                    });
                     /**
                      * When geometry is about to draw we load our lights if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                    ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Lights', lightStack);
                             loaded = true;
@@ -69,7 +74,8 @@ SceneJs.backends.installBackend(
                 return v ? {x:v.x || 0, y:v.y || 0, z:v.z || 0} : { x:0, y:0, z:0 };
             };
 
-            /** Transforms a light by the current view and modelling matrices
+            /** Transforms a light by the current modelling matrix. Lighting calculations
+             * are done within model-space.
              */
             var transform = function(l) {
                 return {

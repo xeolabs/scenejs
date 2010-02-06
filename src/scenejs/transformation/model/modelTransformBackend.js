@@ -15,19 +15,24 @@ SceneJs.backends.installBackend(
                         matrix : SceneJs.math.identityMat4(),
                         fixed: true
                     };
-                    var transformStack = [];
                     var loaded = false;
 
-                    /** When a new program is activated we will need to lazy-load our current matrix
+                   /** When a new program is activated we will need to lazy-load our current matrix
                      */
-                    ctx.programs.onProgramActivate(function() {
+                    ctx.scenes.onEvent("program-activated", function() {
+                        loaded = false;
+                    });
+
+                      /** When a program is deactivated we may need to re-load into the previously active program
+                     */
+                    ctx.scenes.onEvent("program-deactivated", function() {
                         loaded = false;
                     });
 
                     /**
                      * When geometry is about to drawn we load our matrix if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                   ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL arrays

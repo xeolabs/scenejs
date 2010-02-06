@@ -5,7 +5,7 @@ SceneJs.utils.ns("SceneJs.objects");
  */
 SceneJs.objects.sphere = function() {
 
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+    var cfg = SceneJs.utils.getNodeConfig(arguments || [{}]);
 
     if (!cfg.fixed) {
 

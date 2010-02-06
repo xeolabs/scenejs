@@ -54,7 +54,7 @@ with (SceneJs) {
                                         ]},
                                             perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
-                                                    lookAt(function(scope) {
+                                                    lookat(function(scope) {
                                                         return {
                                                             eye : scope.get("eye"),
                                                             look : scope.get("look"),
@@ -67,7 +67,7 @@ with (SceneJs) {
                                                             },
                                                                     objects.teapot()
                                                                     )
-                                                            ) // lookAt
+                                                            ) // lookat
                                                     ) // perspective
                                             ) // lights
                                     ) // shader

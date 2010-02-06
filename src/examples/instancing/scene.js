@@ -17,7 +17,7 @@ with (SceneJs) {
                         }
                     },
                             utils.arrayOf(
-                                    lookAt(function (scope) {
+                                    lookat(function (scope) {
                                         return {
                                             eye : { x: 6.0, y: 6.0, z: -8.0 },
                                             up : { y: scope.get('doodah') }};

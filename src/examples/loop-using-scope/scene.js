@@ -16,7 +16,7 @@ with (SceneJs) {
 
                                             frustum({ fovy : 60.0, aspect : 1.0, near : 0.1, far : 600.0},
 
-                                                    lookAt({
+                                                    lookat({
                                                         eye : { x: 5.0, y: 5.0, z: -7.0},
                                                         up : { y: 1.0 }
                                                     },
@@ -44,7 +44,7 @@ with (SceneJs) {
                                                                                     )
                                                                             ) // rotate
                                                                     ) // loop
-                                                            ) // lookAt
+                                                            ) // lookat
                                                     ) // frustum
                                             ) // lights
                                     ) // shader

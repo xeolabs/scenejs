@@ -41,17 +41,6 @@ SceneJs.shaderBackend = function(cfg) {
                         fixed: true
                     };
 
-                    /** Other backends who want to know when a different program is activated; Eg. transform backends
-                     * who need to reload their matrices into it.
-                     */
-                    var programActivationObservers = [];
-
-                    var notifyProgramActivation = function() {
-                        for (var i = 0; i < programActivationObservers.length; i++) {
-                            programActivationObservers[i]();
-                        }
-                    };
-
                     /** Deletes a program and its shaders
                      */
                     var deleteProgram = function(program) {
@@ -177,7 +166,7 @@ SceneJs.shaderBackend = function(cfg) {
                             vars: {},
                             fixed: true // Cacheable vars by default 
                         };
-                        notifyProgramActivation();
+                        ctx.scenes.fireEvent("program-activated", {});
                     };
 
                     /** Returns the ID of the currently active program
@@ -275,7 +264,9 @@ SceneJs.shaderBackend = function(cfg) {
                             ctx.renderer.canvas.context.flush();
                             activeProgram = null;
                             ctx.renderer.canvas.context.useProgram(null);
+
                         }
+                        ctx.scenes.fireEvent("program-deactivated", {});
                     };
 
                     /** Deletes all programs
@@ -287,12 +278,6 @@ SceneJs.shaderBackend = function(cfg) {
                         programs = {};
                         activeProgram = null;
                         vars = {};
-                    };
-
-                    /** Register an observer to notify when a new program is activated
-                     */
-                    this.onProgramActivate = function(f) {
-                        programActivationObservers.push(f);
                     };
                 };
             }

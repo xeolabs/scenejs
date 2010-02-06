@@ -73,9 +73,13 @@ SceneJs.exceptions.NodeBackendNotFoundException = function(msg, cause) {
     this.cause = cause;
 };
 
-
 SceneJs.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      // TODO: handle more cases for asset failure?
     this.message = msg + " (uri=\"" + (uri || "null") + "\", proxy=\"" + (proxy || "null") + "\")";
+};
+
+SceneJs.exceptions.AssetTypeUnsupportedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
 };
 
 

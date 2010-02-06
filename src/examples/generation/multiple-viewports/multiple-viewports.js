@@ -54,7 +54,7 @@ with (SceneJs) {
                                                                     viewport: scope.get('viewport')
                                                                 };
                                                             },
-                                                                    lookAt({
+                                                                    lookat({
                                                                         eye : { x: 0.0, y: 10.0, z: 15.0},
                                                                         look : { x : 0.0, y : 0.0, z : 0 },
                                                                         up : { x: 0.0, y: 1.0, z: 0.0 }

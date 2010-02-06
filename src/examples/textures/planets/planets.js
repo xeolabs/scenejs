@@ -28,7 +28,7 @@ try {
                                     ]},
                                         perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                         },
-                                                lookAt({
+                                                lookat({
                                                     eye : { x: 0.0, y: 0.0, z: -10},
                                                     look : { x : 0.0, y : 0.0, z : 0 },
                                                     up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -37,7 +37,7 @@ try {
                                                         asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/jupiter.js",
                                                             proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                         )
-                                            // ) // lookAt
+                                            // ) // lookat
                                                 ) // perspective
                                         ) // lights
                                 ) // shader

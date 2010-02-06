@@ -22,22 +22,20 @@ SceneJs.assetBackend = function(cfg) {
             if (!ctx.assets) {  // Lazy-create parser registry
 
                 ctx.assets = new function() {
-
-                    var date = new Date(); // Used for generating unique JSONP callbacks
                     var importers = {}; // Backend extensions each create one of these
                     var entries = {}; // Nodes created by parsers, cached against file name
                     var evictionCountdown = 1000;
 
                     var evict = function() {
                         if (--evictionCountdown == 0) {
-//                            var oldest = -1;
-//                            for (var src in entries) {
-//                                var entry = entries[src];
-//                                if (entry.age > oldest) {
-//                                    oldest = entries[src].age;
-//                                }
-//                            }
-//                            evictionCountdown = 1000;
+                            //                            var oldest = -1;
+                            //                            for (var src in entries) {
+                            //                                var entry = entries[src];
+                            //                                if (entry.age > oldest) {
+                            //                                    oldest = entries[src].age;
+                            //                                }
+                            //                            }
+                            //                            evictionCountdown = 1000;
                         }
                     };
 
@@ -65,7 +63,6 @@ SceneJs.assetBackend = function(cfg) {
                             }
                             head.removeChild(script);
                         };
-                        ctx.scenes.processStarted(); // Notify load started
                         head.appendChild(script);
                     };
 
@@ -81,30 +78,32 @@ SceneJs.assetBackend = function(cfg) {
 
                     /** Imports file and returns node result. caches node against given file name.
                      */
-                    this.loadAsset = function(proxy, uri, type, callback) {
+                    this.loadAsset = function(proxy, uri, type, callback, onError) {
                         var importer = importers[type];
                         if (!importer) {
-                            throw "No asset node backend registered for file type: \"" + type + "\"";
+                            throw "Asset file type not supported: \"" + type + "\"";
                         }
-                        var callbackName = "callback" + date.getTime();
+                        var callbackName = "callback" + (new Date()).getTime();
                         var url = [proxy, "?callback=" , callbackName , "&uri=" + uri];
                         for (var param in importer.serverParams) { // TODO: memoize string portion that contains params
                             url.push("&", param, "=", importer.serverParams[param]);
                         }
                         jsonp(url.join(""),
                                 function(data) {
-                                    if (!data) { // TODO: be way more specific about asset load failures, but what can we determine here since it's asynch?
-                                        throw new SceneJs.exceptions.AssetLoadFailureException("Asset load failed", uri, proxy);
+                                    if (!data) {
+                                        onError("server response is empty");
+                                    } else {
+                                        var assetNode = importer.parse(data, function(msg) {
+                                            onError(msg);
+                                        });
+                                        if (assetNode) {
+                                            entries[uri] = {
+                                                node: assetNode,
+                                                age: 0
+                                            };
+                                            callback(assetNode);
+                                        }
                                     }
-                                    var assetNode = importer.parse(data);
-                                    if (!assetNode || (typeof assetNode != 'function')) {
-                                        throw new SceneJs.exceptions.AssetLoadFailureException("Asset load failed - parser failure? ", uri, proxy);
-                                    }
-                                    entries[uri] = {
-                                        node: assetNode,
-                                        age: 0
-                                    };
-                                    callback(assetNode);
                                 },
                                 callbackName);
                     };
@@ -130,19 +129,34 @@ SceneJs.assetBackend = function(cfg) {
             return ctx.assets.getAsset(uri);
         };
 
-        /** Triggers asynchronous load of asset and begins new process; callback will fire with new child for the
+        /** Triggers asynchronous JSONP load of asset and creates new process; callback will fire with new child for the
          * client asset node. The asset node will have to then call assetLoaded to totify the backend that the
          * asset has loaded and allow backend to kill the process.
+         *
+         * JSON does nto handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
          */
-        this.loadAsset = function(proxy, uri, callback) {
-            ctx.scenes.processStarted();
-            ctx.assets.loadAsset(proxy, uri, cfg.type, callback);
+        this.loadAsset = function(proxy, uri, onSuccess, onError) {
+            var process = ctx.scenes.createProcess({
+                onTimeout: function() {
+                    ctx.logger.logError("Asset load failed - timed out waiting for a reply - proxy: " + proxy + ", uri: " + uri);
+                    onError();
+                },
+                description:"Asset load: " + uri
+            });
+            ctx.assets.loadAsset(proxy, uri, cfg.type,
+                    onSuccess,
+                    function(msg) {  // onError
+                        ctx.logger.logError("Asset load failed - " + msg + " - proxy: " + proxy + ", uri: " + uri);
+                        ctx.scenes.destroyProcess(process);
+                        onError();
+                    });
+            return process;
         };
 
         /** Notifies backend that load has completed; backend then kills the process.
          */
-        this.assetLoaded = function() {
-            ctx.scenes.processStopped();
+        this.assetLoaded = function(process) {
+            ctx.scenes.destroyProcess(process);
         };
 
         /** Frees resources held by this backend (ie. parsers and cached scene graph fragments)

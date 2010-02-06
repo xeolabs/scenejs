@@ -38,12 +38,12 @@ SceneJs.shader = function() {
         if (previousProgramId != programId) {
             backend.activateProgram(programId);
         }
-        if (params.vars) {
-            backend.setVars({
-                vars: params.vars,
-                fixed : cfg.fixed // Sub-vars are cacheable if these are not dynamically-generated
-            });
-        }
+//        if (params.vars) {
+//            backend.setVars({
+//                vars: params.vars,
+//                fixed : cfg.fixed // Sub-vars are cacheable if these are not dynamically-generated
+//            });
+//        }
 
         SceneJs.utils.visitChildren(cfg, scope);
 
@@ -53,9 +53,9 @@ SceneJs.shader = function() {
             if (previousProgramId != programId) {
                 backend.activateProgram(previousProgramId);
             }
-            if (previousVars) {
-                backend.setVars(previousVars);
-            }
+//            if (previousVars) {
+//                backend.setVars(previousVars);
+//            }
         } else {
             backend.deactivateProgram();
         }

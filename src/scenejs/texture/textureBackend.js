@@ -20,14 +20,19 @@ SceneJs.backends.installBackend(
 
                     /** When a new program is activated we will need to lazy-load our current texture
                      */
-                    ctx.programs.onProgramActivate(function() {
+                    ctx.scenes.onEvent("program-activated", function() {
                         loaded = false;
                     });
 
+                    /** When a program is deactivated we may need to re-load into the previously active program
+                     */
+                    ctx.scenes.onEvent("program-deactivated", function() {
+                        loaded = false;
+                    });
                     /**
                      * When geometry is about to draw we load our texture if not loaded already
                      */
-                    ctx.geometry.onDraw(function() {
+                    ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded && activeTexture) {
                             ctx.programs.bindTexture(activeTexture.ptexture);
                             loaded = true;
@@ -47,7 +52,7 @@ SceneJs.backends.installBackend(
                             return null;
                         },
 
-                        loadTexture: function(uri, callback) {
+                        loadTexture: function(uri, onSuccess, onError, onAbort) {
                             var textureId = uri;
                             var image = new Image();
                             var texture = {
@@ -57,8 +62,10 @@ SceneJs.backends.installBackend(
                             };
                             texture.image.onload = function() {
                                 textures[textureId] = texture;
-                                callback(texture.textureId);
+                                onSuccess(texture.textureId);
                             };
+                            texture.image.onerror = onError;
+                            texture.image.onabort = onAbort;
                             texture.image.src = uri;
                         },
 
@@ -102,7 +109,6 @@ SceneJs.backends.installBackend(
                             activeTexture = null;
                             loaded = false;
                         }
-
                     };
                 })();
             };
@@ -113,29 +119,43 @@ SceneJs.backends.installBackend(
                 return ctx.textures.getTexture(textureId);
             };
 
-            /** Triggers asynchronous load of texture image and begins new process; callback will fire with new texture ID
-             *  for the client texture node. The texture node will have to then call textureLoaded to notify the backend that
-             * the texture has loaded and allow backend to kill the process.
+            /** Starts load of texture image in a new process and returns the ID of the process. When the
+             * process later completes, either the given onSuccess or the onError will be called
+             * depending on whether the load was successful ot not. On failure, the process will have been
+             * be killed.  On success, the client texture node will have to then call textureLoaded to notify
+             * the backend that the texture has loaded and allow backend to kill the process.
              */
-            this.loadTexture = function(uri, callback) {
-                ctx.scenes.processStarted();
-                ctx.textures.loadTexture(uri, callback);
+            this.loadTexture = function(uri, onSuccess, onError, onAbort) {
+                var process = ctx.scenes.createProcess({
+                    description:"Texture load: " + uri
+                });
+                ctx.textures.loadTexture(uri,
+                        onSuccess,
+                        function() {
+                            ctx.logger.logError("Texture load failed: " + uri);
+                            ctx.scenes.destroyProcess(process);
+                            onError();
+                        },
+                        function() {
+                            ctx.logger.logWarning("Texture load aborted: " + uri);
+                            ctx.scenes.destroyProcess(process);
+                            onAbort();
+                        });
+                return process;
             };
 
-            /** Notifies backend that load has completed; backend then kills the process.
+            /** Notifies backend that load has completed; backend then binds the texture and kills the process.
              */
-            this.textureLoaded = function(textureId) {
-                ctx.scenes.processStopped();
+            this.textureLoaded = function(process, textureId) {
                 ctx.textures.bindTexture(textureId);
+                ctx.scenes.destroyProcess(process);
             };
-
 
             /** Activates currently loaded texture of given ID
              */
             this.activateTexture = function(textureId) {
                 ctx.textures.activateTexture(textureId);
             };
-
 
             this.reset = function() {
                 ctx.textures.deleteTextures();

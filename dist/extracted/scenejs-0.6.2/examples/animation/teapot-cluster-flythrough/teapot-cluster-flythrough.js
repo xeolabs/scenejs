@@ -36,7 +36,7 @@ with (SceneJs) {
 
                                         /* Viewing transform
                                          */
-                                            lookAt(function(scope) {
+                                            lookat(function(scope) {
                                                 return{
                                                     eye : { x: 0.0, y: 0, z: scope.get("z")},
                                                     look : { x : 0.0, y : 0.0, z : 0 },

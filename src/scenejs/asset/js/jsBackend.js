@@ -15,7 +15,7 @@ SceneJs.backends.installBackend(
                  */
                 type: 'asset.js',
 
-               /** Special params for asset server
+                /** Special params for asset server
                  */
                 serverParams: {
                     mode: 'js'
@@ -23,8 +23,13 @@ SceneJs.backends.installBackend(
 
                 /** Does no parsing, just returns data which is already a scene node
                  */
-                parse: function(data) {
-                    return data
+                parse: function(data, onError) {
+                    if (typeof data != 'function') {
+                        onError(data.error || "unkown server error");
+                        return null;
+                    } else {
+                        return data;
+                    }
                 }
             });
         })()

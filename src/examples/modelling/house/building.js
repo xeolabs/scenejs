@@ -30,7 +30,7 @@ with (SceneJs) {
                                 ]},
                                     perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 30000.0
                                     },
-                                            lookAt({
+                                            lookat({
                                                 eye : { x: 0.0, y: 20, z: -200.0},
                                                 look : { x : 0.0, y : 0.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -44,7 +44,7 @@ with (SceneJs) {
 //                                                    box({ xpos: 10.0, ypos: 10.0 }),
 //                                                    box({ xpos: -10.0, ypos: 10.0 })
 
-                                                    ) // lookAt
+                                                    ) // lookat
 
 
                                             ) // frustum

@@ -32,9 +32,9 @@ with (SceneJs) {
                                         pos: { x: 50.0, y: 20.0, z: -30.0 }
                                     }
                                 ]},
-                                    perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 30000.0
+                                    perspective({ fovy : 45.0, aspect : 1.0, near : 1, far : 300.0
                                     },
-                                            lookAt({
+                                            lookat({
                                                 eye : { x: 0.0, y: 20, z: -30.0},
                                                 look : { x : 0.0, y : 0.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -60,12 +60,14 @@ with (SceneJs) {
                                                                         return { angle : scope.get("angle"), y: 1.0 };
                                                                     },
                                                                             translate({ x: 8.0},
-                                                                                    objects.teapot()
+
+                                                                                            objects.teapot()
+                                                                                           
                                                                                     ) // translate
                                                                             ) // rotate
                                                                     ) // generator
                                                             ) // material
-                                                    ) // lookAt
+                                                    ) // lookat
 
 
                                             ) // frustum
