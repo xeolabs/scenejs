@@ -6,9 +6,10 @@
 SceneJs.asset = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
     var backend;
+    var logger = SceneJs.backends.getBackend("logger");
     var process = null;
-    var loading = false;
-    var error = false;
+    var loading = false; // Node is trying to load asset when this is true
+    var error = false;  // Node has given up trying to load when this is true
 
     var getFileExtension = function(fileName) {
         var i = fileName.lastIndexOf(".");
@@ -43,7 +44,7 @@ SceneJs.asset = function() {
         if (!error) {
             var assetNode = backend.getAsset(params.uri); // Backend may have evicted asset after lack of recent use
 
-            if (!assetNode && !loading) { // Load asset if we dont have one and we're not busy loading one
+            if (!assetNode && !loading) {
                 loading = true;
                 process = backend.loadAsset(
                         params.proxy,
@@ -51,16 +52,21 @@ SceneJs.asset = function() {
                         function(_assetNode) { // Success
                             assetNode = _assetNode;
                         },
-                        function() { // onError
+                        function() { // onTimeout
                             error = true;
+                            logger.getLogger().error("Asset load failed - timed out waiting for a reply (incorrect proxy URI?) - proxy: " + params.proxy + ", uri: " + params.uri);
+                        },
+                        function(msg) { // onError - backend has killed process
+                            error = true;
+                            logger.getLogger().error("Asset load failed - " + msg + " - proxy: " + params.proxy + ", uri: " + params.uri);
                         });
-            } else if (assetNode) { // Otherwise render asset if we do have one
+            } else if (assetNode) {
                 if (loading) {
-                    backend.assetLoaded(process);    // And notify backend so it can kill the load process
+                    backend.assetLoaded(process);  // Finish loading - kill process
                     process = null;
                     loading = false;
                 }
-                if (params.params) {
+                if (params.params) { // Parameters for asset - supply in a new child scope
                     var childScope = SceneJs.utils.newScope(scope, cfg.fixed);
                     for (var key in params.params) {
                         childScope.put(key, params.params[key]);

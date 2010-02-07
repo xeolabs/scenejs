@@ -8,22 +8,28 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
-            var init = function() {
+            this.install = function(_ctx) {
+                ctx = _ctx;
 
                 ctx.modelTransform = (function() {
-                    var transform = {
-                        matrix : SceneJs.math.identityMat4(),
-                        fixed: true
-                    };
-                    var loaded = false;
+                    var transform;
+                    var loaded;
 
-                   /** When a new program is activated we will need to lazy-load our current matrix
+                    ctx.scenes.onEvent("scene-activated", function() {
+                        transform = {
+                            matrix : SceneJs.math.identityMat4(),
+                            fixed: true
+                        };
+                        loaded = false;
+                    });
+
+                    /** When a new program is activated we will need to lazy-load our current matrix
                      */
                     ctx.scenes.onEvent("program-activated", function() {
                         loaded = false;
                     });
 
-                      /** When a program is deactivated we may need to re-load into the previously active program
+                    /** When a program is deactivated we may need to re-load into the previously active program
                      */
                     ctx.scenes.onEvent("program-deactivated", function() {
                         loaded = false;
@@ -32,7 +38,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to drawn we load our matrix if not loaded already
                      */
-                   ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.scenes.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL arrays
@@ -79,20 +85,11 @@ SceneJs.backends.installBackend(
                 })();
             };
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
-                init();
-            };
-
             this.setTransform = function(transform) {
                 ctx.modelTransform.setTransform(transform);
             };
 
             this.getTransform = function() {
                 return ctx.modelTransform.getTransform();
-            };
-
-            this.reset = function() {
-                init();
             };
         })());

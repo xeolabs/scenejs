@@ -24,6 +24,15 @@ SceneJs.backends.installBackend(
 
                     var time = (new Date()).getTime();
 
+                    var _fireEvent = function(name, params) {
+                        var list = commands[name];
+                        if (list) {
+                            for (var i = 0; i < list.length; i++) {
+                                list[i](params);
+                            }
+                        }
+                    };
+
                     return {
 
                         /** Registers listener for a backend-generated event. These are set by backends
@@ -44,12 +53,7 @@ SceneJs.backends.installBackend(
                         /** Fires backend event
                          */
                         fireEvent: function(name, params) {
-                            var list = commands[name];
-                            if (list) {
-                                for (var i = 0; i < list.length; i++) {
-                                    list[i](params);
-                                }
-                            }
+                            _fireEvent(name, params);
                         },
 
                         /** Registers a scene and returns the ID under which it is registered
@@ -90,6 +94,7 @@ SceneJs.backends.installBackend(
                         activateScene : function(sceneId) {
                             activeSceneId = sceneId;
                             time = (new Date()).getTime();
+                            _fireEvent("scene-activated");
                         },
 
                         /** Returns all registered scenes
@@ -132,7 +137,9 @@ SceneJs.backends.installBackend(
                         /**  Notifies backend that the currently active scene has completed an asynchronous process
                          */
                         destroyProcess: function(process) {
-                            process.destroyed = true;
+                            if (process) {
+                                process.destroyed = true;
+                            }
                         },
 
                         /** Returns the number of currently active processes in a scene, which is the currently active one by default
@@ -153,10 +160,13 @@ SceneJs.backends.installBackend(
                             return scenes[sceneId].scene;
                         },
 
+                        getActiveSceneID : function() {
+                            return activeSceneId;
+                        },
+
                         /** Deactivates the currently active scene and reaps destroyed and timed out processes
                          */
                         deactivateScene : function() {
-
                             /* Reap destroyed and timed-out processes
                              */
                             var scene = scenes[activeSceneId];
@@ -183,6 +193,10 @@ SceneJs.backends.installBackend(
                                 }
                             }
                             activeSceneId = null;
+                        },
+
+                        reset: function() {
+                            
                         }
                     };
                 })();
@@ -215,5 +229,13 @@ SceneJs.backends.installBackend(
 
             this.getNumProcesses = function(sceneId) {
                 return ctx.scenes.getNumProcesses(sceneId);
+            };
+
+            this.getProcesses = function(sceneId) {
+                return ctx.scenes.getProcesses(sceneId);
+            };
+
+            this.reset = function() {
+
             };
         })());

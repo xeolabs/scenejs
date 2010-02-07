@@ -320,34 +320,36 @@ SceneJs.backends.installBackend(
                 }
             };
 
-            /** Initialises backend - sets up a renderer state stack with an
-             *  initial set of essential default properties. The first renderer
-             *  state created by a client renderer node will fall back on these
-             *  where it fails to provide them. Also prepares a map of current
-             *  properties that will internally keep track of state.
-             */
-            var init = function() {
-                stateStack = [
-                    {
-                        props: {
-                            clearColor: {r: 0, g : 0, b : 0, a: 1.0},
-                            clearDepth: 1.0,
-                            enableDepthTest:true,
-                            enableCullFace: false,
-                            enableTexture2D: false,
-                            depthRange: { zNear: 0, zFar: 1},
-                            enableScissorTest: false,
-                            viewport: {} // will default to canvas extents
-                        }
-                    }
-                ];
-                currentProps = {};
-                ctx.renderer = {};
+            var defaultProps = {
+                clearColor: {r: 0, g : 0, b : 0, a: 1.0},
+                clearDepth: 1.0,
+                enableDepthTest:true,
+                enableCullFace: false,
+                enableTexture2D: false,
+                depthRange: { zNear: 0, zFar: 1},
+                enableScissorTest: false,
+                viewport: {} // will default to canvas extents
             };
 
             this.install = function(_ctx) {
                 ctx = _ctx;
-                init();
+
+                /** Initialises backend - sets up a renderer state stack with an
+                 *  initial set of essential default properties. The first renderer
+                 *  state created by a client renderer node will fall back on these
+                 *  where it fails to provide them. Also prepares a map of current
+                 *  properties that will internally keep track of state.
+                 */
+                ctx.scenes.onEvent("scene-activated",
+                        function() {
+                            stateStack = [
+                                {
+                                    props: defaultProps
+                                }
+                            ];
+                            currentProps = {};
+                            ctx.renderer = {};
+                        });
             };
 
             /** Gets value of the given property on the first higher renderer state that has it
@@ -411,12 +413,12 @@ SceneJs.backends.installBackend(
                 stateStack.push(state);
                 setProperties(state.props);
 
-//                /* Ensure that at least the default simple shader is active
-//                 */
-//                if (!ctx.programs.getActiveProgramId()) {
-//                    var programId = simpleShaderBackend.loadProgram();
-//                    simpleShaderBackend.activateProgram(programId);
-//                }
+                //                /* Ensure that at least the default simple shader is active
+                //                 */
+                //                if (!ctx.programs.getActiveProgramId()) {
+                //                    var programId = simpleShaderBackend.loadProgram();
+                //                    simpleShaderBackend.activateProgram(programId);
+                //                }
             };
 
             /** Restores previous renderer state, if any.
@@ -427,15 +429,11 @@ SceneJs.backends.installBackend(
                     setProperties(state.restore);
                 } else {
 
-//                    /* Canvas deactivating - don't leave default simple shader active
-//                     */
-//                    simpleShaderBackend.deactivateProgram();
+                    //                    /* Canvas deactivating - don't leave default simple shader active
+                    //                     */
+                    //                    simpleShaderBackend.deactivateProgram();
                     ctx.renderer.canvas = null;
                 }
-            };
-
-            this.reset = function() {
-                init();
             };
         })());
 

@@ -49,13 +49,13 @@ SceneJs.assetBackend = function(cfg) {
                         };
                     };
 
-                    var jsonp = function(fullUri, callback, callbackName) {
+                    var jsonp = function(fullUri, callbackName, onLoad) {
                         var head = document.getElementsByTagName("head")[0];
                         var script = document.createElement("script");
                         script.type = "text/javascript";
                         script.src = fullUri;
                         window[callbackName] = function(data) {
-                            callback(data);
+                            onLoad(data);
                             window[callbackName] = undefined;
                             try {
                                 delete window[callbackName];
@@ -76,20 +76,20 @@ SceneJs.assetBackend = function(cfg) {
                         return null;
                     };
 
-                    /** Imports file and returns node result. caches node against given file name.
+                    /** Loads asset and caches it against uri
                      */
-                    this.loadAsset = function(proxy, uri, type, callback, onError) {
+                    this.loadAsset = function(proxy, uri, type, callbackName, onSuccess, onError) {
                         var importer = importers[type];
                         if (!importer) {
                             throw "Asset file type not supported: \"" + type + "\"";
                         }
-                        var callbackName = "callback" + (new Date()).getTime();
                         var url = [proxy, "?callback=" , callbackName , "&uri=" + uri];
                         for (var param in importer.serverParams) { // TODO: memoize string portion that contains params
                             url.push("&", param, "=", importer.serverParams[param]);
                         }
                         jsonp(url.join(""),
-                                function(data) {
+                                callbackName,
+                                function(data) {    // onLoad
                                     if (!data) {
                                         onError("server response is empty");
                                     } else {
@@ -101,11 +101,10 @@ SceneJs.assetBackend = function(cfg) {
                                                 node: assetNode,
                                                 age: 0
                                             };
-                                            callback(assetNode);
+                                            onSuccess(assetNode);
                                         }
                                     }
-                                },
-                                callbackName);
+                                });
                     };
 
                     /** Clears nodes cached from previous imports.
@@ -130,25 +129,24 @@ SceneJs.assetBackend = function(cfg) {
         };
 
         /** Triggers asynchronous JSONP load of asset and creates new process; callback will fire with new child for the
-         * client asset node. The asset node will have to then call assetLoaded to totify the backend that the
+         * client asset node. The asset node will have to then call assetLoaded to notify the backend that the
          * asset has loaded and allow backend to kill the process.
          *
          * JSON does nto handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
          */
-        this.loadAsset = function(proxy, uri, onSuccess, onError) {
+        this.loadAsset = function(proxy, uri, onSuccess, onTimeout, onError) {
             var process = ctx.scenes.createProcess({
-                onTimeout: function() {
-                    ctx.logger.logError("Asset load failed - timed out waiting for a reply - proxy: " + proxy + ", uri: " + uri);
-                    onError();
+                onTimeout: function() {  // process killed automatically on timeout
+                    onTimeout();
                 },
                 description:"Asset load: " + uri
             });
-            ctx.assets.loadAsset(proxy, uri, cfg.type,
+            var callbackName = "callback" + ctx.scenes.getActiveSceneID() + process.id;
+            ctx.assets.loadAsset(proxy, uri, cfg.type, callbackName,
                     onSuccess,
                     function(msg) {  // onError
-                        ctx.logger.logError("Asset load failed - " + msg + " - proxy: " + proxy + ", uri: " + uri);
                         ctx.scenes.destroyProcess(process);
-                        onError();
+                        onError(msg);
                     });
             return process;
         };

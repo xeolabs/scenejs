@@ -67,7 +67,7 @@ with (SceneJs) {
                                                                 // TODO: catch error when texture shader specified, geometry rendered, but no texture specified
                                                                     shader({ type: 'texture-shader' },
                                                                             texture({
-                                                                                uri:"./skysphere-black.png",
+                                                                                uri:"./fields.png",
                                                                                 wait: false
                                                                             },
                                                                                     scale({ x:1000, y:1000, z:1000 },

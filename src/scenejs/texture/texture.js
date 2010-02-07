@@ -1,79 +1,59 @@
 SceneJs.texture = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
     var backend = SceneJs.backends.getBackend("texture");
+    var logger = SceneJs.backends.getBackend("logger");
     var params;
     var process = null;
-    var loading = false;
-    var error = false;
+    var loading = false;  // True while node is trying to load texture image
+    var error = false;  // Node has given up trying to load when this true
 
     return function(scope) {
         if (!params) {
             params = cfg.getParams(scope);
-            if (!cfg.fixed) {
-                throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of textures is not supported");
-            }
             if (!params.uri) {
                 throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory texture parameter missing: uri");
             }
-
-            /* By default, texture will block rendering of its child nodes until it is loaded
-             */
             if (params.wait == undefined) {
-                params.wait = true;
+                params.wait = true;   // By default, dont render children until texture loaded
             }
         }
         if (error) {
             if (!params.wait) {
-                SceneJs.utils.visitChildren(cfg, scope);
+                SceneJs.utils.visitChildren(cfg, scope); // Render children without texture
             }
         } else {
             var textureId = backend.getTexture(params.uri); // Backend may have evicted texture after lack of recent use
-
             if (!textureId && !loading) {
-
-                /* Don't have texture, and no load process currently running
-                 */
                 process = backend.loadTexture(
-
                         params.uri,
-
-                    /** Success handler - stores the texture handle and stops loading.
-                     * We'll kill the process when this node is visited on the next traversal, see below.
-                     */
-                        function(_textureId) {
+                        function(_textureId) {      // onSuccess
                             textureId = _textureId;
                             loading = true;
                         },
-
-                    /** Error handler - texture load timed out or 404'd. Backend will kill the process
-                     * for us and log an error.
-                     */
-                        function() {
+                        function() {  // onError - backend kills process for us
                             error = true;
+                            logger.getLogger().error("Texture load failed: " + params.uri);
                         },
-
-                    /** Abort handler - user has hit browser's Stop button. Backend will kill the process
-                     * for us and log a warning.
-                     */
-                        function() {
+                        function() {  // onAbort - user hits browser Stop button - backend kills process
                             error = true;
+                            logger.getLogger().warn("Texture load aborted: " + params.uri);
                         });
-            } else if (textureId) { // Otherwise activate texture if we do have one
-                if (loading) {
-
-                    /* Just finished loading a texture - notify backend, which will kill the load process
-                    */
-                    backend.textureLoaded(process, textureId);
-                    process = null;
+            } else if (textureId) {
+                if (loading) {  // Just loaded - notify backend, which kills process and binds texture
                     loading = false;
+                    try {
+                        backend.textureLoaded(process, textureId);
+                    } catch (e) {
+                        alert("texture: " + e);
+                        var x;
+                    }
+                    process = null;
+
                 }
                 backend.activateTexture(textureId);
                 SceneJs.utils.visitChildren(cfg, scope);
             } else if (!params.wait) {
-
-                /* Texture configured to render children without texturing while the texture is still loading
-                 */
-                SceneJs.utils.visitChildren(cfg, scope);
+                SceneJs.utils.visitChildren(cfg, scope);  // Render children while loading texture
             }
         }
     };

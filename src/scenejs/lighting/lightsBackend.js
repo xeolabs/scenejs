@@ -17,12 +17,12 @@ SceneJs.backends.installBackend(
 
                 ctx.lights = (function() {
                     var lightStack = [];
-
                     var loaded = false;
 
                     /** When a new program is activated we will need to lazy-load our current lights
                      */
-                    ctx.scenes.onEvent("program-activated", function() {
+                    ctx.scenes.onEvent("scene-activated", function() {
+                        lightStack = [];
                         loaded = false;
                     });
 

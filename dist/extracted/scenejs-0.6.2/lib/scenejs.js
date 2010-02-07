@@ -820,6 +820,11 @@ SceneJs.exceptions.NodeConfigExpectedException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJs.exceptions.ShaderCompilationFailureException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 SceneJs.exceptions.ShaderLinkFailureException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;

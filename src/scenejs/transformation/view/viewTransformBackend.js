@@ -8,15 +8,19 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
-            var init = function() {
-
+            this.install = function(_ctx) {
+                ctx = _ctx;
                 ctx.viewTransform = (function() {
-                    var transform = {
-                        matrix : SceneJs.math.identityMat4(),
-                        fixed: true
-                    };
+                    var transform;
+                    var loaded;
 
-                    var loaded = false;
+                    ctx.scenes.onEvent("scene-activated", function() {
+                        transform = {
+                            matrix : SceneJs.math.identityMat4(),
+                            fixed: true
+                        };
+                        loaded = false;
+                    });
 
                     /** When a new program is activated we will need to lazy-load our current matrix
                      */
@@ -65,20 +69,11 @@ SceneJs.backends.installBackend(
                 })();
             };
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
-                init();
-            };
-
             this.setTransform = function(transform) {
                 ctx.viewTransform.setTransform(transform);
             };
 
             this.getTransform = function() {
                 return ctx.viewTransform.getTransform();
-            };
-
-            this.reset = function() {
-                init();
             };
         })());

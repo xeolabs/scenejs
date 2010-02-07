@@ -26,8 +26,9 @@ SceneJs.shaderBackend = function(cfg) {
                     context.shaderSource(shader, script);
                     context.compileShader(shader);
                     if (context.getShaderParameter(shader, 0x8B81 /*gl.COMPILE_STATUS*/) != 1) {
-                        alert(context.getShaderInfoLog(shader));
-                        return null;
+                        var msg = context.getShaderInfoLog(shader);
+                        ctx.logger.error(msg);
+                        throw new SceneJs.exceptions.ShaderCompilationFailureException("Failed to compile shader: " + msg);
                     }
                     return shader;
                 };

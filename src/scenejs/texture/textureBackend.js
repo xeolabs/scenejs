@@ -11,12 +11,15 @@ SceneJs.backends.installBackend(
             this.install = function(_ctx) {
                 ctx = _ctx;
                 ctx.textures = (function() {
-
                     var textures = {
                     };
                     var activeTexture = null;
-
                     var loaded = false;
+
+                    ctx.scenes.onEvent("scene-activated", function() {
+                        activeTexture = null;
+                        loaded = false;
+                    });
 
                     /** When a new program is activated we will need to lazy-load our current texture
                      */
@@ -131,13 +134,11 @@ SceneJs.backends.installBackend(
                 });
                 ctx.textures.loadTexture(uri,
                         onSuccess,
-                        function() {
-                            ctx.logger.logError("Texture load failed: " + uri);
+                        function() {  // onError
                             ctx.scenes.destroyProcess(process);
                             onError();
                         },
-                        function() {
-                            ctx.logger.logWarning("Texture load aborted: " + uri);
+                        function() {  // onAbort
                             ctx.scenes.destroyProcess(process);
                             onAbort();
                         });

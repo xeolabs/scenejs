@@ -23,6 +23,10 @@ SceneJs.backends.installBackend(
                      */
                     var currentBoundBufId;
 
+                    ctx.scenes.onEvent("scene-activated", function() {
+                        currentBoundBufId = null;
+                    });
+
                     /** When a new program is activated we will need to lazy-bind our current buffers
                      */
                     ctx.scenes.onEvent("program-activated", function() {
