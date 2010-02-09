@@ -1,6 +1,5 @@
 /*
  * Backend for a geometry node. Manages geometry buffers (VBOs), allowing their creation, loading and activation.
- * More on VBOs: http://www.opengl.org/wiki/Vertex_Buffer_Objects
  */
 
 SceneJs.backends.installBackend(
@@ -12,7 +11,6 @@ SceneJs.backends.installBackend(
 
             var ctx;
 
-
             this.install = function(_ctx) {
                 ctx = _ctx;
 
@@ -22,6 +20,71 @@ SceneJs.backends.installBackend(
                     /* Currently bound buffer - prevents continuous rebind of same buffer
                      */
                     var currentBoundBufId;
+
+                    var createArrayBuffer = function(context, items, bufType, itemSize, glArray) {
+                        var bufferId = context.createBuffer();
+                        ctx.memory.allocate("geometry", // Get memory management backend to allocate
+                                function() {
+                                    context.bindBuffer(bufType, bufferId);
+                                    context.bufferData(bufType, glArray, context.STATIC_DRAW);
+                                });
+                        return {
+                            bufferId : bufferId,
+                            itemSize: itemSize,
+                            numItems : items.length
+                        };
+                    };
+
+                    /** Deletes a geometry buffer, returning true if any memory was freed, or false, in which
+                     * case the canvas cannot be found and there was nothing there to free anyway.
+                     */
+                    var deleteGeoBuffer = function(buffer) {
+                        if (buffer.bufId == currentBoundBufId) {
+                            currentBoundBufId = null;
+                        }
+                        if (document.getElementById(buffer.canvas.canvasId)) { // Context won't exist if canvas has disappeared
+                            if (buffer.vertexBuf) {
+                                buffer.context.deleteBuffer(buffer.vertexBuf.bufferId);
+                            }
+                            if (buffer.normalBuf) {
+                                buffer.context.deleteBuffer(buffer.normalBuf.bufferId);
+                            }
+                            if (buffer.indexBuf) {
+                                buffer.context.deleteBuffer(buffer.indexBuf.bufferId);
+                            }
+                            if (buffer.textureBuf) {
+                                buffer.context.deleteBuffer(buffer.textureBuf.bufferId);
+                            }
+                            buffers[buffer.bufId] = undefined;
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    };
+
+                    /** Memory manager may call upon this backend to evict the least-recently-used geometry buffer
+                     * from memory when it fails to fulfill an allocation request. The currently-active buffer is
+                     * excluded because at least one buffer should really exist for a functional scene.
+                     */
+                    ctx.memory.registerCacher({
+
+                        evict: function() {
+                            var earliest;
+                            for (var bufId in buffers) {
+                                if (bufId) {
+                                    var buffer = buffers[bufId];
+                                    if ((!earliest || buffer.lastUsed < earliest.lastUsed) && bufId != currentBoundBufId) {
+                                        earliest = buffer;
+                                    }
+                                }
+                            }
+                            if (earliest) {
+                                deleteGeoBuffer(earliest);
+                                return true;
+                            }
+                            return false;   // Couldnt find suitable buffer to delete
+                        }
+                    });
 
                     ctx.scenes.onEvent("scene-activated", function() {
                         currentBoundBufId = null;
@@ -39,16 +102,6 @@ SceneJs.backends.installBackend(
                         currentBoundBufId = null;
                     });
 
-                    var createArrayBuffer = function(context, items, bufType, itemSize, glArray) {
-                        var handle = {
-                            bufferId : context.createBuffer(),
-                            itemSize: itemSize,
-                            numItems : items.length
-                        };
-                        context.bindBuffer(bufType, handle.bufferId);
-                        context.bufferData(bufType, glArray, context.STATIC_DRAW);
-                        return handle;
-                    };
 
                     return {
 
@@ -58,7 +111,8 @@ SceneJs.backends.installBackend(
                          */
                         findGeoBuffer : function(geoType) {
                             var bufId = ctx.renderer.canvas.canvasId + geoType;
-                            return (buffers[bufId]) ? bufId : null;
+                            var buf = (buffers[bufId]) ? bufId : null;
+                            return buf;
                         },
 
                         /** Creates a buffer containing the given geometry, associated with the activate canvas and returns its ID.
@@ -84,10 +138,9 @@ SceneJs.backends.installBackend(
                                 if (geo.texCoords) {
                                     textureBuf = createArrayBuffer(context, geo.texCoords, context.ARRAY_BUFFER, 2, new WebGLFloatArray(geo.texCoords));
                                 }
-
                                 buffers[bufId] = {
                                     bufId: bufId,
-                                    age: 0,
+                                    lastUsed: ctx.scenes.getTime(),
                                     canvas : ctx.renderer.canvas,
                                     context : context,
                                     vertexBuf : vertexBuf,
@@ -95,7 +148,6 @@ SceneJs.backends.installBackend(
                                     indexBuf : indexBuf,
                                     textureBuf: textureBuf
                                 };
-
                                 return bufId;
                             } catch (e) {
 
@@ -121,6 +173,11 @@ SceneJs.backends.installBackend(
                          */
                         drawGeoBuffer : function(bufId) {
                             var buffer = buffers[bufId];
+
+                            /** Update last used time
+                             */
+                            buffer.lastUsed = ctx.scenes.getTime();
+
                             var context = ctx.renderer.canvas.context;
 
                             /** Tell observers that we're about to draw
@@ -151,33 +208,10 @@ SceneJs.backends.installBackend(
                             }
                             context.drawElements(context.TRIANGLES, buffer.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                             context.flush();
-
-
                         },
 
-                        deleteGeoBuffer : function(buffer) { // TODO: freeGeoBuffer  - maybe use auto cache eviction?
-
-                            // TODO: delete individual buffer
-
-                            if (document.getElementById(buffer.canvas.canvasId)) { // Context won't exist if canvas has disappeared
-                                if (buffer.vertexBuf) {
-                                    buffer.context.deleteBuffer(buffer.vertexBuf.bufferId);
-                                }
-                                if (buffer.normalBuf) {
-                                    buffer.context.deleteBuffer(buffer.normalBuf.bufferId);
-                                }
-                                if (buffer.indexBuf) {
-                                    buffer.context.deleteBuffer(buffer.indexBuf.bufferId);
-                                }
-                                if (buffer.textureBuf) {
-                                    buffer.context.deleteBuffer(buffer.textureBuf.bufferId);
-                                }
-                            }
-                            if (buffer.bufId == currentBoundBufId) {
-                                currentBoundBufId = null;
-                            }
-                        },
-
+                        /** Deletes all geometry buffers
+                         */
                         reset : function() {
                             for (var bufId in buffers) {
                                 deleteGeoBuffer(buffers[bufId]);
@@ -211,10 +245,6 @@ SceneJs.backends.installBackend(
 
             this.drawGeoBuffer = function(bufId) {
                 return ctx.geometry.drawGeoBuffer(bufId);
-            };
-
-            var deleteGeoBuffer = function(buffer) { // TODO: freeGeoBuffer  - maybe use auto cache eviction?
-                return ctx.geometry.deleteGeoBuffer(buffer);
             };
 
             /** Frees resources (geometry buffers) held by this backend

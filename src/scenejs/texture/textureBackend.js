@@ -16,6 +16,15 @@ SceneJs.backends.installBackend(
                     var activeTexture = null;
                     var loaded = false;
 
+                    /** Memory manager may call upon this backend to evict something
+                     * from memory when it fails to fulfill an allocation request
+                     */
+                    ctx.memory.registerCacher({
+                        evict: function() {
+                            return false; // Eviction not supported yet
+                        }
+                    });
+
                     ctx.scenes.onEvent("scene-activated", function() {
                         activeTexture = null;
                         loaded = false;
@@ -42,7 +51,6 @@ SceneJs.backends.installBackend(
                         }
                     });
 
-
                     return {
 
                         getTexture : function(textureId) {
@@ -59,6 +67,7 @@ SceneJs.backends.installBackend(
                             var textureId = uri;
                             var image = new Image();
                             var texture = {
+                                uri: uri,
                                 textureId:textureId,
                                 image: image,
                                 timeToLive : 1000
@@ -75,15 +84,21 @@ SceneJs.backends.installBackend(
                         bindTexture: function(textureId) {
                             var texture = textures[textureId];
                             var context = ctx.renderer.canvas.context;
-                            texture.ptexture = context.createTexture();
-                            texture.canvas = ctx.renderer.canvas;
-                            texture.context = context;
-                            context.bindTexture(context.TEXTURE_2D, texture.ptexture);
-                            context.texImage2D(context.TEXTURE_2D, 0, texture.image);
-                            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
-                            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR_MIPMAP_NEAREST);
-                            context.generateMipmap(context.TEXTURE_2D);
-                            context.bindTexture(context.TEXTURE_2D, null);
+
+                            /* Get memory management backend to manage binding of texture.
+                             */
+                            ctx.memory.allocate("Binding texture " + texture.uri,
+                                    function() {
+                                        texture.ptexture = context.createTexture();
+                                        texture.canvas = ctx.renderer.canvas;
+                                        texture.context = context;
+                                        context.bindTexture(context.TEXTURE_2D, texture.ptexture);
+                                        context.texImage2D(context.TEXTURE_2D, 0, texture.image);
+                                        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+                                        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR_MIPMAP_NEAREST);
+                                        context.generateMipmap(context.TEXTURE_2D);
+                                        context.bindTexture(context.TEXTURE_2D, null);
+                                    });
                         },
 
                         activateTexture: function(textureId) {
@@ -148,7 +163,9 @@ SceneJs.backends.installBackend(
             /** Notifies backend that load has completed; backend then binds the texture and kills the process.
              */
             this.textureLoaded = function(process, textureId) {
-                ctx.textures.bindTexture(textureId);
+                ctx.memory.allocate("Binding texture", function() {
+                    ctx.textures.bindTexture(textureId);
+                });
                 ctx.scenes.destroyProcess(process);
             };
 

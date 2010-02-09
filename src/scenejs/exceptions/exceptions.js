@@ -82,5 +82,10 @@ SceneJs.exceptions.AssetTypeUnsupportedException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJs.exceptions.OutOfMemoryException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 

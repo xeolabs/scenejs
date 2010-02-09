@@ -22,37 +22,33 @@ SceneJs.geometry = function() {
             throw new SceneJs.exceptions.NodeConfigExpectedException("Geometry type parameter expected");
         }
 
-        if (params.type) {
-
-            /* Buffer geometry that is identified with a type
-             */
-            if (canvasId != backend.getActiveCanvasId()) { // TODO: backend should listen for canvas switch and throw out buffer
-                bufId = null;
-            }
-
-            /* Backend may have evicted geometry buffer, so we may have to reallocate it
-             */
-            bufId = backend.findGeoBuffer(params.type);
-            if (!bufId) {
-                if (params.create) {
-
-                    /** Callback function lazy-computes geometry
-                     */
-                    bufId = backend.createGeoBuffer(params.type, params.create());
-                } else {
-                    bufId = backend.createGeoBuffer(params.type, {
-                        vertices : params.vertices || [],
-                        normals: params.normals || [],
-                        colors : params.colors || [],
-                        indices : params.indices || [],
-                        texCoords : params.texCoords || []
-                    });
-                }
-            }
-            canvasId = backend.getActiveCanvasId();
-        } else {
-            // TODO: render eometry without using VBO
+        /* Buffer geometry that is identified with a type
+         */
+        if (canvasId != backend.getActiveCanvasId()) { // TODO: backend should listen for canvas switch and throw out buffer
+            bufId = null;
         }
+
+        /* Backend may have evicted geometry buffer, so we may have to reallocate it
+         */
+        bufId = backend.findGeoBuffer(params.type);
+        if (!bufId) {
+            if (params.create) {
+
+                /** Callback function lazy-computes geometry
+                 */
+                bufId = backend.createGeoBuffer(params.type, params.create());
+            } else {
+                bufId = backend.createGeoBuffer(params.type, {
+                    vertices : params.vertices || [],
+                    normals: params.normals || [],
+                    colors : params.colors || [],
+                    indices : params.indices || [],
+                    texCoords : params.texCoords || []
+                });
+            }
+        }
+        canvasId = backend.getActiveCanvasId();
+
         backend.drawGeoBuffer(bufId);
         SceneJs.utils.visitChildren(cfg, scope);
     };

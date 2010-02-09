@@ -35,6 +35,14 @@ SceneJs.backends.installBackend(
 
                     return {
 
+                        /** Gets current time
+                         *
+                         */
+                        getTime: function() {
+                            return time;
+                        },
+
+
                         /** Registers listener for a backend-generated event. These are set by backends
                          * on installation to set up permanent triggers for them to synchronise themselves
                          * with each other. An example: when geometry backend fires "geo-drawing" event
@@ -60,8 +68,10 @@ SceneJs.backends.installBackend(
                          */
                         registerScene : function(scene) {
                             var i = 0;
+                            var j = Math.random() * 10;
                             while (true) {
-                                var sceneId = "scene" + i++;
+                                var sceneId = "scene" + i;
+                                i += j;
                                 if (!scenes[sceneId]) {
                                     scenes[sceneId] = {
                                         sceneId: sceneId,
@@ -196,7 +206,7 @@ SceneJs.backends.installBackend(
                         },
 
                         reset: function() {
-                            
+
                         }
                     };
                 })();
