@@ -11,17 +11,45 @@ SceneJs.backends.installBackend(
             this.install = function(_ctx) {
                 ctx = _ctx;
                 ctx.textures = (function() {
-                    var textures = {
-                    };
+                    var textures = {};
                     var activeTexture = null;
                     var loaded = false;
+
+                    /** Removes texture from shader and deregisters it from backend
+                     */
+                    var deleteTexture = function(texture) {
+                        if (document.getElementById(texture.canvas.canvasId)) {  // Context can't exist if canvas not in DOM
+                            if (texture.context) {
+                                texture.context.deleteTexture(texture.ptexture);
+                            }
+                        }
+                        textures[texture.textureId] = undefined;
+                        if (activeTexture.textureId == textureId) {
+                            activeTexture = null;
+                        }
+                    };
 
                     /** Memory manager may call upon this backend to evict something
                      * from memory when it fails to fulfill an allocation request
                      */
                     ctx.memory.registerCacher({
                         evict: function() {
-                            return false; // Eviction not supported yet
+                            var earliest = ctx.scenes.getTime(); // Dont evict textures that we have traversed into
+                            var evictee;
+                            for (var id in textures) {
+                                if (id) {
+                                    var texture = textures[id];
+                                    if (texture.lastUsed < earliest) {
+                                        evictee = texture;
+                                        earliest = texture.lastUsed;
+                                    }
+                                }
+                            }
+                            if (evictee) { // Delete LRU texture
+                                deleteTexture(evictee);
+                                return true;
+                            }
+                            return false;   // Couldnt find suitable texture to delete
                         }
                     });
 
@@ -56,8 +84,6 @@ SceneJs.backends.installBackend(
                         getTexture : function(textureId) {
                             var texture = textures[textureId];
                             if (texture) {
-                                texture.timeToLive--;
-                                //    evict();
                                 return textureId;
                             }
                             return null;
@@ -107,6 +133,7 @@ SceneJs.backends.installBackend(
                                 throw "No such texture loaded \"" + textureId + "\"";
                             }
                             activeTexture = texture;
+                            activeTexture.lastUsed = ctx.scenes.getTime();
                             loaded = false;
                         },
 

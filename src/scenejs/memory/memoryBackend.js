@@ -57,7 +57,7 @@ SceneJs.backends.installBackend(
                             var maxTries = 10; // TODO: heuristic to calculate this?
                             var context = ctx.renderer.canvas.context;
                             if (context.getError() == context.OUT_OF_MEMORY) {
-                                throw "Unhandled out-of-memory error"; // Already out of memory - should have handled this
+                                throw "Unhandled out-of-memory error"; // Should have handled this prior
                             }
                             var tries = 0;
                             while (true) {
@@ -71,17 +71,13 @@ SceneJs.backends.installBackend(
                                     if (++tries > maxTries || !evict()) { // Too many tries or no cacher wants to evict
                                         throw new SceneJs.exceptions.OutOfMemoryException(
                                                 "Out of memory - failed to allocate memory for " + description);
-
                                     }
                                 }
                             }
                         }
                     }
                 })();
-
             };
-
-
         })());
 
 

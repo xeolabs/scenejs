@@ -44,8 +44,6 @@
 with (SceneJs) {
     var exampleScene = scene({}, // node always has a config object
 
-            // TODO: asynch errors logged to wrong logger! - log from node instead
-
             logger({
                 error: function(msg) {
                     alert(msg);
@@ -54,6 +52,7 @@ with (SceneJs) {
                     alert(msg);
                 }
             }),
+
             renderer({
                 canvasId: 'theCanvas',
                 clearColor : { r:0, g:0, b:0.0, a: 1 },

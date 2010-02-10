@@ -69,17 +69,19 @@ SceneJs.backends.installBackend(
                     ctx.memory.registerCacher({
 
                         evict: function() {
-                            var earliest;
+                            var earliest = ctx.scenes.getTime();
+                            var evictee;
                             for (var bufId in buffers) {
                                 if (bufId) {
                                     var buffer = buffers[bufId];
-                                    if ((!earliest || buffer.lastUsed < earliest.lastUsed) && bufId != currentBoundBufId) {
-                                        earliest = buffer;
+                                    if (buffer.lastUsed < earliest) {
+                                        evictee = buffer;
+                                        earliest = buffer.lastUsed;
                                     }
                                 }
                             }
-                            if (earliest) {
-                                deleteGeoBuffer(earliest);
+                            if (evictee) {
+                                deleteGeoBuffer(evictee);
                                 return true;
                             }
                             return false;   // Couldnt find suitable buffer to delete
@@ -102,7 +104,6 @@ SceneJs.backends.installBackend(
                         currentBoundBufId = null;
                     });
 
-
                     return {
 
                         /** Tests if a buffer for the given geometry type exists on the current canvas
@@ -111,8 +112,7 @@ SceneJs.backends.installBackend(
                          */
                         findGeoBuffer : function(geoType) {
                             var bufId = ctx.renderer.canvas.canvasId + geoType;
-                            var buf = (buffers[bufId]) ? bufId : null;
-                            return buf;
+                            return (buffers[bufId]) ? bufId : null;
                         },
 
                         /** Creates a buffer containing the given geometry, associated with the activate canvas and returns its ID.
