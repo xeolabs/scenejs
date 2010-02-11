@@ -1028,11 +1028,11 @@ SceneJs.backends.installBackend(
 
             this.setActiveScene = function(sceneId) {
                 return ctx.scenes.setActiveScene(sceneId);
-                ctx.scenes.fireEvent("scene-activated");
+                ctx.events.fireEvent("scene-activated");
             };
 
             this.flush = function() {
-                ctx.scenes.fireEvent("scene-flushed");
+                ctx.events.fireEvent("scene-flushed");
                 return ctx.scenes.setActiveScene(null);
             };
 
@@ -8579,7 +8579,6 @@ SceneJs.backends.installBackend(
                         matrix : SceneJs.math.identityMat4(),
                         fixed: true
                     };
-                    var transformStack = [];
                     var loaded = false;
 
                     /** When a new program is activated we will need to lazy-load our current matrix
@@ -8591,7 +8590,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to drawn we load our matrix if not loaded already
                      */
-                    ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL arrays
@@ -8791,7 +8790,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                     ctx.scenes.onEvent("geo-drawing", function() {
+                     ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                                     /* Lazy-compute WebGL array
@@ -8966,7 +8965,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                     ctx.scenes.onEvent("geo-drawing", function() {
+                     ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                                     /* Lazy-compute WebGL array
@@ -9095,7 +9094,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our lights if not loaded already
                      */
-                     ctx.scenes.onEvent("geo-drawing", function() {
+                     ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Lights', lightStack);
                             loaded = true;
@@ -9278,7 +9277,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to render we load our material if not loaded already
                      */
-                    ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Material', material);
                             loaded = true;
@@ -9675,7 +9674,7 @@ SceneJs.assetBackend = function(cfg) {
                             }
                             head.removeChild(script);
                         };
-                        ctx.scenes.createProcess(); // Notify load started
+                        ctx.processes.createProcess(); // Notify load started
                         head.appendChild(script);
                     };
 
@@ -9745,14 +9744,14 @@ SceneJs.assetBackend = function(cfg) {
          * asset has loaded and allow backend to kill the process.
          */
         this.loadAsset = function(proxy, uri, callback) {
-            ctx.scenes.createProcess();
+            ctx.processes.createProcess();
             ctx.assets.loadAsset(proxy, uri, cfg.type, callback);
         };
 
         /** Notifies backend that load has completed; backend then kills the process.
          */
         this.assetLoaded = function() {
-            ctx.scenes.destroyProcess();
+            ctx.processes.destroyProcess();
         };
 
         /** Frees resources held by this backend (ie. parsers and cached scene graph fragments)
@@ -9870,7 +9869,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our texture if not loaded already
                      */
-                    ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded && activeTexture) {
                             ctx.programs.bindTexture(activeTexture.ptexture);
                             loaded = true;
@@ -9961,14 +9960,14 @@ SceneJs.backends.installBackend(
              * the texture has loaded and allow backend to kill the process.
              */
             this.loadTexture = function(uri, callback) {
-                ctx.scenes.createProcess();
+                ctx.processes.createProcess();
                 ctx.textures.loadTexture(uri, callback);
             };
 
             /** Notifies backend that load has completed; backend then kills the process.
              */
             this.textureLoaded = function(textureId) {
-                ctx.scenes.destroyProcess();
+                ctx.processes.destroyProcess();
                 ctx.textures.bindTexture(textureId);
             };
 

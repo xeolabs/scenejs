@@ -73,6 +73,7 @@ SceneJs.shaderBackend = function(cfg) {
                                 }
                             }
                             if (evictee) { // Delete LRU program's shaders and deregister program
+                                ctx.logger.info("Evicting shader: " + id);
                                 deleteShaders(evictee);
                                 programs[evictee.programId] = undefined;
                                 return true;
@@ -198,7 +199,7 @@ SceneJs.shaderBackend = function(cfg) {
                             vars: {},
                             fixed: true // Cacheable vars by default
                         };
-                        ctx.scenes.fireEvent("program-activated", {});
+                        ctx.events.fireEvent("program-activated", {});
                     };
 
                     /** Returns the ID of the currently active program
@@ -297,7 +298,7 @@ SceneJs.shaderBackend = function(cfg) {
                             ctx.renderer.canvas.context.useProgram(null);
 
                         }
-                        ctx.scenes.fireEvent("program-deactivated", {});
+                        ctx.events.fireEvent("program-deactivated", {});
                     };
 
                     /** Deletes all programs

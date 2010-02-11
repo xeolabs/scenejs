@@ -15,8 +15,9 @@ SceneJs.backends.installBackend(
 
                     var projection;
                     var loaded;
+                    var planes;
 
-                    ctx.scenes.onEvent("scene-activated", function() {
+                    ctx.events.onEvent("scene-activated", function() {
                         projection = {
                             matrix : SceneJs.math.identityMat4(),
                             volume : null,
@@ -27,20 +28,20 @@ SceneJs.backends.installBackend(
 
                     /** When a new program is activated we will need to lazy-load our current matrix
                      */
-                    ctx.scenes.onEvent("program-activated", function() {
+                    ctx.events.onEvent("program-activated", function() {
                         loaded = false;
                     });
 
                     /** When a program is deactivated we may need to re-load into the previously active program
                      */
-                    ctx.scenes.onEvent("program-deactivated", function() {
+                    ctx.events.onEvent("program-deactivated", function() {
                         loaded = false;
                     });
 
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                    ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL array
@@ -56,8 +57,10 @@ SceneJs.backends.installBackend(
                     });
 
                     return {
+
                         setProjection: function(t) {
                             projection = t;
+                            planes = SceneJs.math.extractPlanes(projection.matrix, true); // Normalised planes
                             loaded = false;
                         },
 
@@ -67,57 +70,6 @@ SceneJs.backends.installBackend(
 
                         transformPoint3: function(v) {
                             return SceneJs.math.transformPoint3(projection.matrix, v);
-                        },
-
-                        /** Tests for intersection of the current view volume with the given
-                         * coordinates
-                         *
-                         * @returns -1 if all outside, 0 if some inside, 1 if all inside
-                         */
-                        testVolumeCoordsIntersection: function(coords) {
-                            var v = projection.volume;
-
-                            var xminOut = 0;
-                            var yminOut = 0;
-                            var zminOut = 0;
-                            var xmaxOut = 0;
-                            var ymaxOut = 0;
-                            var zmaxOut = 0;
-
-                            for (var i = 0; i < coords.length; i++) {
-                                var p = coords[i];
-
-                                if ((v.xmin * p.w) > p.x) {
-                                    xminOut++;
-                                }
-                                if ((v.xmax * p.w) < p.x) {
-                                    xmaxOut++;
-                                }
-                                if ((v.ymin * p.w) > p.y) {
-                                    yminOut++;
-                                }
-                                if ((v.ymax * p.w) < p.y) {
-                                    ymaxOut++;
-                                }
-                                if (v.zmin > p.z) {
-                                    zminOut++;
-                                }
-                                //                                if ((v.zmin * p.w) < p.z) {
-                                //                                    zmaxOut++;
-                                //                                }
-                            }
-                            if (xminOut + yminOut + zminOut + xmaxOut + ymaxOut + zmaxOut == 0) {
-                                return 1;
-                            }
-                            if (xminOut == coords.length ||
-                                yminOut == coords.length ||
-                                zminOut == coords.length ||
-                                xmaxOut == coords.length ||
-                                ymaxOut == coords.length ||
-                                zmaxOut == coords.length) {
-                                return -1;
-                            }
-                            return 0;
                         }
                     };
                 })();

@@ -340,7 +340,7 @@ SceneJs.backends.installBackend(
                  *  where it fails to provide them. Also prepares a map of current
                  *  properties that will internally keep track of state.
                  */
-                ctx.scenes.onEvent("scene-activated",
+                ctx.events.onEvent("scene-activated",
                         function() {
                             stateStack = [
                                 {

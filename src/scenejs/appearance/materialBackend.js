@@ -16,7 +16,7 @@ SceneJs.backends.installBackend(
                     var material;
                     var loaded = false;
 
-                    ctx.scenes.onEvent("scene-activated", function() {
+                    ctx.events.onEvent("scene-activated", function() {
                         material = {  // Default to some colour so we'll see at least something while debugging a scene
                             ambient:  { r: .3, g : .3, b : .3 },
                             diffuse:  { r: 1, g : 1, b : 1 },
@@ -28,14 +28,14 @@ SceneJs.backends.installBackend(
 
                     /** When a program is deactivated we may need to re-load into the previously active program
                      */
-                    ctx.scenes.onEvent("program-deactivated", function() {
+                    ctx.events.onEvent("program-deactivated", function() {
                         loaded = false;
                     });
 
                     /**
                      * When geometry is about to render we load our material if not loaded already
                      */
-                    ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Material', material);
                             loaded = true;

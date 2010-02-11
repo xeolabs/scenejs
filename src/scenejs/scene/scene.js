@@ -7,6 +7,7 @@
 (function() {
 
     var backend = SceneJs.backends.getBackend('scene');
+    var processesBackend = SceneJs.backends.getBackend('processes');
 
     /** Creates a new scene
      */
@@ -54,7 +55,7 @@
              * performed within the scene
              */
             getNumProcesses : function() {
-                return (sceneId) ? backend.getNumProcesses(sceneId) : 0;
+                return (sceneId) ? processesBackend.getNumProcesses(sceneId) : 0;
             },
 
             /** Destroys this scene, after which it cannot be rendered any more. You should destroy

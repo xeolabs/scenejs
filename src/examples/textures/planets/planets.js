@@ -38,36 +38,49 @@ try {
 
                                                     },
                                                             translate({y:-9},
-                                                                    asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/mercury.js",
+                                                                    asset({
+                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/mercury.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
+
                                                             translate({y:-6},
-                                                                    asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/venus.js",
+                                                                    asset({
+                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/venus.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
+
                                                             translate({y:-3},
-                                                                    asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/earth.js",
+                                                                    asset({
+                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/earth.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
+
                                                             translate({y:-0},
-                                                                    asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/mars.js",
+                                                                    asset({
+                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/mars.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
+
                                                             translate({y:3},
 
-                                                                    asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/jupiter.js",
+                                                                    asset({
+                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/jupiter.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
-                                                    translate({y:6},
 
-                                                            asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/uranus.js",
-                                                                proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
-                                                            ),
-                                                    translate({y:9},
+                                                            translate({y:6},
 
-                                                            asset({ uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/neptune.js",
-                                                                proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
-                                                            ) )
+                                                                    asset({
+                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/uranus.js",
+                                                                        proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                    ),
+
+                                                            translate({y:9},
+
+                                                                    asset({
+                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/neptune.js",
+                                                                        proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                    ))
 
                                                 // ) // lookat
                                                     ) // perspective

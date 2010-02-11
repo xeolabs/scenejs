@@ -21,20 +21,20 @@ SceneJs.backends.installBackend(
 
                     /** When a new program is activated we will need to lazy-load our current lights
                      */
-                    ctx.scenes.onEvent("scene-activated", function() {
+                    ctx.events.onEvent("scene-activated", function() {
                         lightStack = [];
                         loaded = false;
                     });
 
                     /** When a program is deactivated we may need to re-load into the previously active program
                      */
-                    ctx.scenes.onEvent("program-deactivated", function() {
+                    ctx.events.onEvent("program-deactivated", function() {
                         loaded = false;
                     });
                     /**
                      * When geometry is about to draw we load our lights if not loaded already
                      */
-                    ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Lights', lightStack);
                             loaded = true;

@@ -54,6 +54,7 @@ SceneJs.backends.installBackend(
                          * again.
                          */
                         allocate:function(description, callback) {
+                            ctx.logger.info("Allocating memory for : " + description);
                             var maxTries = 10; // TODO: heuristic to calculate this?
                             var context = ctx.renderer.canvas.context;
                             if (context.getError() == context.OUT_OF_MEMORY) {

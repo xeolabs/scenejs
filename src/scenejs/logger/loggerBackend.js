@@ -24,7 +24,7 @@ SceneJs.backends.installBackend(
 
                     var logger;
 
-                    ctx.scenes.onEvent("scene-activated", function() {
+                    ctx.events.onEvent("scene-activated", function() {
                         logger = defaultLogger;
                     });
 

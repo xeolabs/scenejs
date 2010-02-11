@@ -52,18 +52,9 @@ with (SceneJs) {
                                                                 return { angle : scope.get("angle"), y: 1.0 };
                                                             },
 
-                                                                /* Bounding box around teapot
-                                                                 */
-                                                                    axisBoundary({
-                                                                        xmin: -4,
-                                                                        ymin: -4,
-                                                                        zmin: -4,
-                                                                        xmax: 4,
-                                                                        ymax: 4,
-                                                                        zmax: 4 },
-
+                                                              
                                                                             objects.teapot()
-                                                                            )
+
                                                                     )
                                                             )
                                                     ) // lookat

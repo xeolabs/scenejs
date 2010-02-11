@@ -46,6 +46,7 @@ SceneJs.backends.installBackend(
                                 }
                             }
                             if (evictee) { // Delete LRU texture
+                                ctx.logger.info("Evicting texture: " + id);
                                 deleteTexture(evictee);
                                 return true;
                             }
@@ -53,26 +54,26 @@ SceneJs.backends.installBackend(
                         }
                     });
 
-                    ctx.scenes.onEvent("scene-activated", function() {
+                    ctx.events.onEvent("scene-activated", function() {
                         activeTexture = null;
                         loaded = false;
                     });
 
                     /** When a new program is activated we will need to lazy-load our current texture
                      */
-                    ctx.scenes.onEvent("program-activated", function() {
+                    ctx.events.onEvent("program-activated", function() {
                         loaded = false;
                     });
 
                     /** When a program is deactivated we may need to re-load into the previously active program
                      */
-                    ctx.scenes.onEvent("program-deactivated", function() {
+                    ctx.events.onEvent("program-deactivated", function() {
                         loaded = false;
                     });
                     /**
                      * When geometry is about to draw we load our texture if not loaded already
                      */
-                    ctx.scenes.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent("geo-drawing", function() {
                         if (!loaded && activeTexture) {
                             ctx.programs.bindTexture(activeTexture.ptexture);
                             loaded = true;
@@ -171,17 +172,17 @@ SceneJs.backends.installBackend(
              * the backend that the texture has loaded and allow backend to kill the process.
              */
             this.loadTexture = function(uri, onSuccess, onError, onAbort) {
-                var process = ctx.scenes.createProcess({
+                var process = ctx.processes.createProcess({
                     description:"Texture load: " + uri
                 });
                 ctx.textures.loadTexture(uri,
                         onSuccess,
                         function() {  // onError
-                            ctx.scenes.destroyProcess(process);
+                            ctx.processes.destroyProcess(process);
                             onError();
                         },
                         function() {  // onAbort
-                            ctx.scenes.destroyProcess(process);
+                            ctx.processes.destroyProcess(process);
                             onAbort();
                         });
                 return process;
@@ -193,7 +194,7 @@ SceneJs.backends.installBackend(
                 ctx.memory.allocate("Binding texture", function() {
                     ctx.textures.bindTexture(textureId);
                 });
-                ctx.scenes.destroyProcess(process);
+                ctx.processes.destroyProcess(process);
             };
 
             /** Activates currently loaded texture of given ID

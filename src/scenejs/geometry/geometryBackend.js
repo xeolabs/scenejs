@@ -81,6 +81,7 @@ SceneJs.backends.installBackend(
                                 }
                             }
                             if (evictee) {
+                                ctx.logger.info("Evicting geometry buffer: " + bufId);
                                 deleteGeoBuffer(evictee);
                                 return true;
                             }
@@ -88,19 +89,19 @@ SceneJs.backends.installBackend(
                         }
                     });
 
-                    ctx.scenes.onEvent("scene-activated", function() {
+                    ctx.events.onEvent("scene-activated", function() {
                         currentBoundBufId = null;
                     });
 
                     /** When a new program is activated we will need to lazy-bind our current buffers
                      */
-                    ctx.scenes.onEvent("program-activated", function() {
+                    ctx.events.onEvent("program-activated", function() {
                         currentBoundBufId = null;
                     });
 
                     /** When a program is deactivated we may need to re-bind buffers to the previously active program
                      */
-                    ctx.scenes.onEvent("program-deactivated", function() {
+                    ctx.events.onEvent("program-deactivated", function() {
                         currentBoundBufId = null;
                     });
 
@@ -182,7 +183,7 @@ SceneJs.backends.installBackend(
 
                             /** Tell observers that we're about to draw
                              */
-                            ctx.scenes.fireEvent("geo-drawing", {});
+                            ctx.events.fireEvent("geo-drawing", {});
 
                             /* Dont rebind buffer if already bound - this is the case when
                              * we're drawing a batch of the same object, like a bunch of cubes

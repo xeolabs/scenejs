@@ -23,21 +23,35 @@ SceneJs.assetBackend = function(cfg) {
 
                 ctx.assets = new function() {
                     var importers = {}; // Backend extensions each create one of these
-                    var entries = {}; // Nodes created by parsers, cached against file name
-                    var evictionCountdown = 1000;
+                    var assets = {}; // Nodes created by parsers, cached against file name
 
-                    var evict = function() {
-                        if (--evictionCountdown == 0) {
-                            //                            var oldest = -1;
-                            //                            for (var src in entries) {
-                            //                                var entry = entries[src];
-                            //                                if (entry.age > oldest) {
-                            //                                    oldest = entries[src].age;
-                            //                                }
-                            //                            }
-                            //                            evictionCountdown = 1000;
-                        }
+                    var deleteAsset = function(asset) {
+                        assets[asset.uri] = undefined;
                     };
+
+                    /** Memory manager may call upon this backend to evict the least-recently-used asset
+                     * from memory when it fails to fulfill an allocation request.
+                     */
+                    ctx.memory.registerCacher({
+                        evict: function() {
+                            var earliest = ctx.scenes.getTime();
+                            var evictee;
+                            for (var uri in assets) {
+                                if (uri) {
+                                    var asset = assets[uri];
+                                    if (asset.lastUsed < earliest) {
+                                        evictee = asset;
+                                        earliest = asset.lastUsed;
+                                    }
+                                }
+                            }
+                            if (evictee) {
+                                deleteAsset(evictee);
+                                return true;
+                            }
+                            return false;   // Couldnt find suitable asset to delete
+                        }
+                    });
 
                     /** Installs parser function provided in extension's configs
                      */
@@ -67,11 +81,10 @@ SceneJs.assetBackend = function(cfg) {
                     };
 
                     this.getAsset = function(uri) {
-                        var entry = entries[uri];
-                        if (entry) {
-                            entry.age = 0;
-                            //    evict();
-                            return entry.node;
+                        var asset = assets[uri];
+                        if (asset) {
+                            asset.lastUsed = ctx.scenes.getTime();
+                            return asset.node;
                         }
                         return null;
                     };
@@ -97,9 +110,10 @@ SceneJs.assetBackend = function(cfg) {
                                             onError(msg);
                                         });
                                         if (assetNode) {
-                                            entries[uri] = {
+                                            assets[uri] = {
+                                                uri: uri, // Asset idenitifed by URI
                                                 node: assetNode,
-                                                age: 0
+                                                lastUsed: ctx.scenes.getTime()
                                             };
                                             onSuccess(assetNode);
                                         }
@@ -110,7 +124,7 @@ SceneJs.assetBackend = function(cfg) {
                     /** Clears nodes cached from previous imports.
                      */
                     this.clearAssets = function() {
-                        entries = {};
+                        assets = {};
                     };
                 };
             }
@@ -135,7 +149,7 @@ SceneJs.assetBackend = function(cfg) {
          * JSON does nto handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
          */
         this.loadAsset = function(proxy, uri, onSuccess, onTimeout, onError) {
-            var process = ctx.scenes.createProcess({
+            var process = ctx.processes.createProcess({
                 onTimeout: function() {  // process killed automatically on timeout
                     onTimeout();
                 },
@@ -145,7 +159,7 @@ SceneJs.assetBackend = function(cfg) {
             ctx.assets.loadAsset(proxy, uri, cfg.type, callbackName,
                     onSuccess,
                     function(msg) {  // onError
-                        ctx.scenes.destroyProcess(process);
+                        ctx.processes.destroyProcess(process);
                         onError(msg);
                     });
             return process;
@@ -154,7 +168,7 @@ SceneJs.assetBackend = function(cfg) {
         /** Notifies backend that load has completed; backend then kills the process.
          */
         this.assetLoaded = function(process) {
-            ctx.scenes.destroyProcess(process);
+            ctx.processes.destroyProcess(process);
         };
 
         /** Frees resources held by this backend (ie. parsers and cached scene graph fragments)

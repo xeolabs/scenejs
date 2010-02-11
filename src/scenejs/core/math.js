@@ -594,5 +594,129 @@ SceneJs.math = {
             y: (m[1] * v.x) + (m[5] * v.y) + (m[9] * v.z),
             z: (m[2] * v.x) + (m[6] * v.y) + (m[10] * v.z)
         };
+    },
+
+    normalizePlane : function(plane) {
+        var mag = Math.sqrt(plane.a * plane.a + plane.b * plane.b + plane.c * plane.c);
+        plane.a = plane.a / mag;
+        plane.b = plane.b / mag;
+        plane.c = plane.c / mag;
+        plane.d = plane.d / mag;
+    } ,
+
+    /** Extracts frustum planes from the given matrix, optionally normalised
+     */
+    extractPlanes : function(m, normalize) {
+        var planes = {
+            left : {
+                a : m[3] + m[0],
+                b : m[7] + m[4],
+                c : m[11] + m[8],
+                d : m[15] + m[12]
+            },
+
+            right : {
+                a : m[3] - m[0],
+                b : m[7] - m[4],
+                c : m[11] - m[8],
+                d : m[15] - m[12]
+            },
+
+            top : {
+                a : m[3] - m[1],
+                b : m[7] - m[5],
+                c : m[11] - m[9],
+                d: m[15] - m[13]
+            },
+
+            bottom :{
+                a : m[3] + m[1],
+                b : m[7] + m[5],
+                c : m[11] + m[9],
+                d : m[15] + m[13]
+            },
+            near : {
+                a : m[3] + m[2],
+                b : m[7] + m[6],
+                c : m[11] + m[10],
+                d : m[15] + m[14]
+            },
+            far : {
+                a : m[3] - m[2],
+                b : m[7] - m[6],
+                c : m[11] - m[10],
+                d : m[15] - m[14]
+            }
+        };
+
+        if (normalize) {
+            SceneJs.math.normalizePlane(planes.left);
+            SceneJs.math.normalizePlane(planes.right);
+            SceneJs.math.normalizePlane(planes.top);
+            SceneJs.math.normalizePlane(planes.bottom);
+            SceneJs.math.normalizePlane(planes.near);
+            SceneJs.math.normalizePlane(planes.far);
+        }
+        return planes;
+    },
+
+    /**
+     *   Tests which side of a plane a point lies - (-1) for negative half-space, 0 in plane, +1 positive half-space
+     */
+    planePointDist : function(plane, pt) {
+        var d = plane.a * pt.x + plane.b * pt.y + plane.c * pt.z + plane.d;
+        return (d < 0) ? -1 : ( (d > 0) ? +1 : 0);
+    },
+
+    /** Tests for intersection of the current view volume with the given
+     * coordinates
+     *
+     * @returns -1 if all outside, 0 if some inside, 1 if all inside
+     */
+    frustumIntersction : function(planes, coords) {
+        var xminOut = 0;
+        var yminOut = 0;
+        var zminOut = 0;
+        var xmaxOut = 0;
+        var ymaxOut = 0;
+        var zmaxOut = 0;
+
+        var planeTest = SceneJs.math.planePointDist;
+
+        for (var i = 0; i < coords.length; i++) {
+            var p = coords[i];
+            if (planeTest(planes.left, p) < 0) {
+                xminOut++;
+            }
+            if (planeTest(planes.right, p) > 0) {
+                xmaxOut++;
+            }
+            if (planeTest(planes.bottom, p) < 0) {
+                yminOut++;
+            }
+            if (planeTest(planes.top, p) > 0) {
+                ymaxOut++;
+            }
+            if (planeTest(planes.near, p) < 0) {
+                zminOut++;
+            }
+            if (planeTest(planes.far, p) > 0) {
+                zmaxOut++;
+            }
+        }
+        if (xminOut + yminOut + zminOut + xmaxOut + ymaxOut + zmaxOut == 0) {
+            return 1;
+        }
+        if (xminOut == coords.length ||
+            yminOut == coords.length ||
+            zminOut == coords.length ||
+            xmaxOut == coords.length ||
+            ymaxOut == coords.length ||
+            zmaxOut == coords.length) {
+            return -1;
+        }
+        return 0;
     }
 };
+
+
