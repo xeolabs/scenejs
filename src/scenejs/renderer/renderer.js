@@ -3,20 +3,21 @@
  * the DOM. Nested renderes may then omit the canvas ID to reuse the current canvas, or
  * may specify a different canvas ID to activate a different canvas.
  */
-SceneJs.renderer = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
-    var backend = SceneJs.backends.getBackend('renderer');
+SceneJS.renderer = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var backend = SceneJS._backends.getBackend('renderer');
     var env;
 
-    return function(scope) {
-        var params = cfg.getParams(scope);
-        if (!env || !params.fixed) {
-            env = backend.createRendererState(params);
-        }
-        backend.setRendererState(env);
-        SceneJs.utils.visitChildren(cfg, scope);
-        backend.restoreRendererState(env);
-    };
+    return SceneJS._utils.createNode(
+            function(scope) {
+                if (!env || !cfg.fixed) {
+                    var params = cfg.getParams(scope);
+                    env = backend.createRendererState(params);
+                }
+                backend.setRendererState(env);
+                SceneJS._utils.visitChildren(cfg, scope);
+                backend.restoreRendererState(env);
+            });
 };
 
 

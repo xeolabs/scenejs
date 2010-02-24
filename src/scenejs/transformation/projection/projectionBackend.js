@@ -1,86 +1,75 @@
 /**
- * Backend for projection nodes, creates context that holds the current
- * scene projection state
+ * Backend for projection nodes
  */
-SceneJs.backends.installBackend(
-        new (function() {
+SceneJS._backends.installBackend(
 
-            this.type = 'projection';
+        "projection",
 
-            var ctx;
+        function(ctx) {
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
-                ctx.projection = (function() {
+            var transform;
+            var loaded;
 
-                    var projection;
-                    var loaded;
-                    var planes;
-
-                    ctx.events.onEvent("scene-activated", function() {
-                        projection = {
-                            matrix : SceneJs.math.identityMat4(),
-                            volume : null,
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
+                        transform = {
+                            matrix : SceneJS._math.identityMat4(),
                             fixed: true
                         };
                         loaded = false;
                     });
 
-                    /** When a new program is activated we will need to lazy-load our current matrix
-                     */
-                    ctx.events.onEvent("program-activated", function() {
+            /** When a new program is activated we will need to lazy-load our current matrix
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
                         loaded = false;
                     });
 
-                    /** When a program is deactivated we may need to re-load into the previously active program
-                     */
-                    ctx.events.onEvent("program-deactivated", function() {
+            /** When a program is deactivated we may need to re-load into the previously active program
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
                         loaded = false;
                     });
 
-                    /**
-                     * When geometry is about to draw we load our matrix if not loaded already
-                     */
-                    ctx.events.onEvent("geo-drawing", function() {
+            /**
+             * Lazy-load transform matrix only when geometry about to render
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.GEOMETRY_RENDERING,
+                    function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL array
                              */
-                            if (!projection.matrixAsArray) {
-                                projection.matrixAsArray = new WebGLFloatArray(projection.matrix);
+                            if (!transform.matrixAsArray) {
+                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                             }
-
-                            ctx.programs.setVar('scene_ProjectionMatrix', projection.matrixAsArray);
-
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
+                                    [
+                                        SceneJS._webgl.shaderVarNames.PROJECTION_MATRIX,    // Name
+                                        transform.matrixAsArray                             // Value
+                                    ]);
                             loaded = true;
                         }
                     });
 
-                    return {
+            return { // Node- facing API
 
-                        setProjection: function(t) {
-                            projection = t;
-                            planes = SceneJs.math.extractPlanes(projection.matrix, true); // Normalised planes
-                            loaded = false;
-                        },
+                setTransform: function(t) {
+                    ctx.logging.debug("Setting projection transform");
+                    transform = t;
+                    loaded = false;
+                    ctx.events.fireEvent(SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED, transform);
+                },
 
-                        getProjection: function() {
-                            return projection;
-                        },
-
-                        transformPoint3: function(v) {
-                            return SceneJs.math.transformPoint3(projection.matrix, v);
-                        }
-                    };
-                })();
+                getTransform: function() {
+                    return transform;
+                }
             };
-
-            this.setProjection = function(projection) {
-                ctx.projection.setProjection(projection);
-            };
-
-            this.getProjection = function() {
-                return ctx.projection.getProjection();
-            };
-
-        })());
+        });

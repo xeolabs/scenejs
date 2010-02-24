@@ -17,7 +17,7 @@
  * they will interpolate within their key-vaue sequences by the alpha,
  * then write the output to a fresh child scope for their sub-nodes.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({
@@ -36,7 +36,7 @@ with (SceneJs) {
                                 ]},
                                     perspective({ fovy : 55.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
-                                            lookat({
+                                            lookAt({
                                                 eye : { x: 0.0, y: 5.0, z: -8},
                                                 look : { x : 0.0, y : 1.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -71,7 +71,7 @@ with (SceneJs) {
                                                                                     )
                                                                             )
                                                                     )
-                                                            ) // lookat
+                                                            ) // lookAt
                                                     ) // perspective
                                             ) // lights
                                     ) // shader

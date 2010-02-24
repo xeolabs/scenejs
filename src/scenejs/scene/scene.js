@@ -1,58 +1,60 @@
 /**
- * Root node of a scene graph. Like all nodes, its arguments are a config object followed by
+ * Root node of a scene graph. Like all nodes, its arguments are an optional config object followed by
  * zero or more child nodes. The members of the config object are set on the root data scope when rendered.
  *
  */
 
 (function() {
 
-    var backend = SceneJs.backends.getBackend('scene');
-    var processesBackend = SceneJs.backends.getBackend('processes');
+    var backend = SceneJS._backends.getBackend('scene');
+    var processesBackend = SceneJS._backends.getBackend('processes');   // For process queries through scene object
 
     /** Creates a new scene
      */
-    SceneJs.scene = function() {
+    SceneJS.scene = function() {
 
-        /* Check that backends installed OK
+        /* Check that backend modules installed OK
          */
-        if (SceneJs.backends.getStatus().error) {
-            throw SceneJs.backends.getStatus().error;
+        if (SceneJS._backends.getStatus().error) {
+            throw SceneJS._backends.getStatus().error;
         }
 
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
-        var sceneId = null;
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-        var _render = function(paramOverrides) {
-            if (sceneId) {
-                backend.activateScene(sceneId);
-                var scope = SceneJs.utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
-                var params = cfg.getParams();
-                for (var key in params) {    // Push scene params into scope
-                    scope.put(key, params[key]);
-                }
-                if (paramOverrides) {        // Override with traversal params
-                    for (var key in paramOverrides) {
-                        scope.put(key, paramOverrides[key]);
-                    }
-                }
-                SceneJs.utils.visitChildren(cfg, scope);
-                backend.deactivateScene();
-            }
-        };
+        var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
 
+        /* Create, register and return the scene graph
+         */
         var _scene = {
 
             /**
-             * Renders the scene scene, passing in the given parameters to override node parameters
-             * set on the root data scope, then returns an object that indicates the new scene status.
+             * Renders the scene, passing in the given parameters to override any node parameters
+             * that were set on the config.
              */
             render : function(paramOverrides) {
-                _render(paramOverrides);
+                if (sceneId) {
+                    backend.activateScene(sceneId);
+                    var scope = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
+                    var params = cfg.getParams();
+                    for (var key in params) {    // Push scene params into scope
+                        scope.put(key, params[key]);
+                    }
+                    if (paramOverrides) {        // Override with traversal params
+                        for (var key in paramOverrides) {
+                            scope.put(key, paramOverrides[key]);
+                        }
+                    }
+                    SceneJS._utils.visitChildren(cfg, scope);
+                    backend.deactivateScene();
+                }
             },
 
-            /** Returns count of active processes. A non-zero count indicates that the scene should be rendered
-             * at least one more time to show the "final" image because asynchronous tasks are still being
-             * performed within the scene
+            /**
+             * Returns count of active processes. A non-zero count indicates that the scene should be rendered
+             * at least one more time to allow asynchronous processes to complete - since processes are
+             * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
+             * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
+             * a race condition.
              */
             getNumProcesses : function() {
                 return (sceneId) ? processesBackend.getNumProcesses(sceneId) : 0;
@@ -64,7 +66,8 @@
              */
             destroy : function() {
                 if (sceneId) {
-                    sceneId = backend.deregisterScene(sceneId);
+                    backend.deregisterScene(sceneId); // Last one fires RESET command
+                    sceneId = null;
                 }
             },
 
@@ -73,66 +76,28 @@
             isActive: function() {
                 return (sceneId != null);
             }
-            //            ,
-            //
-            //            run : function(cfg) {
-            //                cfg.idleFunc = cfg.idleFunc ||
-            //                               function(params, state) {
-            //                                   return (state.getNumProcesses() > 0);
-            //                               };
-            //                var pInterval;
-            //                var funcId = "renderScene" + sceneId;
-            //                var params = cfg.params || {};
-            //                var stop = function() {
-            //                    clearInterval(pInterval);
-            //                    window[funcId] = undefined;
-            //                    sceneId = backend.deregisterScene(sceneId);
-            //                };
-            //                var state = {
-            //                    getNumProcesses: function() {
-            //                        return (sceneId) ? backend.getNumProcesses(sceneId) : 0;
-            //                    }
-            //                };
-            //                window[funcId] = function() {
-            //                    try {
-            //                        switch (cfg.idleFunc(params, state)) {
-            //                            case true:
-            //                                _render(params);
-            //                                break;
-            //                            case false:
-            //                                if (state.getNumProcesses() > 0) {
-            //                                    _render(params);
-            //                                }
-            //                                break;
-            //                            default:
-            //                                stop();
-            //                                break;
-            //                        }
-            //                    } catch (e) {
-            //                        stop();
-            //                        if (cfg.onError) {
-            //                            cfg.onError(e);
-            //                        } else {
-            //                            throw e;
-            //                        }
-            //                    }
-            //                };
-            //                pInterval = setInterval("window." + funcId, cfg.interval || 10);
-            //            }
         };
+
+        /* Register scene - fires a SCENE_CREATED event
+         */
         sceneId = backend.registerScene(_scene);
+
         return _scene;
     };
 
-    /** Destroys all scenes and causes SceneJS to release all resources it is currently holding for them.
+    /** Total SceneJS reset - destroys all scenes and cached resources.
      */
-    SceneJs.reset = function() {
+    SceneJS.reset = function() {
         var scenes = backend.getAllScenes();
         var temp = [];
         for (var i = 0; i < scenes.length; i++) {
             temp.push(scenes[i]);
         }
         while (temp.length > 0) {
+
+            /* Destroy each scene individually so it they can mark itself as destroyed.
+             * A RESET command will be fired after the last one is destroyed.
+             */
             temp.pop().destroy();
         }
     };

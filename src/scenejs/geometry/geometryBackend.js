@@ -1,257 +1,331 @@
-/*
- * Backend for a geometry node. Manages geometry buffers (VBOs), allowing their creation, loading and activation.
+/**
+ * Backend module for the geometry node. Buffers geometry on the
+ * currently-active canvas, triggers loading into shader, performs
+ * rendering. Also performs eviction of least-used geometry buffers
+ * on request from memory management module.
  */
+SceneJS._backends.installBackend(
 
-SceneJs.backends.installBackend(
-        new (function() {
+        "geometry",
 
-            var nextBufId = 0;
+        function(ctx) {
 
-            this.type = 'geometry';
+            var time = (new Date()).getTime();               // For LRU caching
+            var canvas;             // Currently active canvas
+            var geometries = {};    // Buffered geometries for all existing canvases
+            var nextTypeId = 0;     // For random geometry type when no type specified
+            var currentBoundGeo;    // prevents continuous rebind of same buffer
 
-            var ctx;
+            ctx.events.onEvent(// System time update
+                    SceneJS._eventTypes.TIME_UPDATED,
+                    function(t) {
+                        time = t;
+                    });
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
+            ctx.events.onEvent(// Scene traversal begun - no canvas active, no geometry bound
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
+                        canvas = null;
+                        currentBoundGeo = null;
+                    });
 
-                ctx.geometry = (function() {
-                    var buffers = {};
+            ctx.events.onEvent(// Canvas activated - no geometry bound
+                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+                    function(c) {
+                        canvas = c;
+                        currentBoundGeo = null;
+                    });
 
-                    /* Currently bound buffer - prevents continuous rebind of same buffer
-                     */
-                    var currentBoundBufId;
+            ctx.events.onEvent(// Canvas deactivated
+                    SceneJS._eventTypes.CANVAS_DEACTIVATED,
+                    function() {
+                        canvas = null;
+                        currentBoundGeo = null;
+                    });
 
-                    var createArrayBuffer = function(context, items, bufType, itemSize, glArray) {
-                        var bufferId = context.createBuffer();
-                        ctx.memory.allocate("geometry", // Get memory management backend to allocate
-                                function() {
-                                    context.bindBuffer(bufType, bufferId);
-                                    context.bufferData(bufType, glArray, context.STATIC_DRAW);
-                                });
-                        return {
-                            bufferId : bufferId,
-                            itemSize: itemSize,
-                            numItems : items.length
-                        };
-                    };
+            ctx.events.onEvent(// Shader activated - now need lazy-bind of buffers and vars
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
+                        currentBoundGeo = null;
+                    });
 
-                    /** Deletes a geometry buffer, returning true if any memory was freed, or false, in which
-                     * case the canvas cannot be found and there was nothing there to free anyway.
-                     */
-                    var deleteGeoBuffer = function(buffer) {
-                        if (buffer.bufId == currentBoundBufId) {
-                            currentBoundBufId = null;
+            ctx.events.onEvent(// Shader deactivated - may need re-bind to previous shader
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        currentBoundGeo = null;
+                    });
+
+            /**
+             * Destroys geometry, returning true if memory freed, else false
+             * where canvas not found and geometry was implicitly destroyed
+             */
+            function destroyGeometry(geo) {
+                ctx.logging.debug("Destroying geometry : " + geo.type);
+                if (geo.geoId == currentBoundGeo) {
+                    currentBoundGeo = null;
+                }
+                if (document.getElementById(geo.canvas.canvasId)) { // Context won't exist if canvas has disappeared
+                    if (geo.vertexBuf) {
+                        geo.vertexBuf.destroy();
+                    }
+                    if (geo.normalBuf) {
+                        geo.normalBuf.destroy();
+                    }
+                    if (geo.normalBuf) {
+                        geo.indexBuf.destroy();
+                    }
+                    if (geo.texCoordBuf) {
+                        geo.texCoordBuf.destroy();
+                    }
+                    geometries[geo.geoId] = null;
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            ctx.events.onEvent(// Framework reset - destroy geometries
+                    SceneJS._eventTypes.RESET,
+                    function() {
+                        for (var geoId in geometries) {
+                            destroyGeometry(geometries[geoId]);
                         }
-                        if (document.getElementById(buffer.canvas.canvasId)) { // Context won't exist if canvas has disappeared
-                            if (buffer.vertexBuf) {
-                                buffer.context.deleteBuffer(buffer.vertexBuf.bufferId);
+                        canvas = null;
+                        geometries = {};
+                        currentBoundGeo = null;
+                    });
+
+            /**
+             * Volunteer to destroy a shader when asked to by
+             * memory management module when memory runs low
+             */
+            ctx.memory.registerEvictor(
+                    function() {
+                        var earliest = time;
+                        var evictee;
+                        for (var geoId in geometries) {
+                            if (geoId) {
+                                var buffer = geometries[geoId];
+                                if (buffer.lastUsed < earliest) {
+                                    evictee = buffer;
+                                    earliest = buffer.lastUsed;
+                                }
                             }
-                            if (buffer.normalBuf) {
-                                buffer.context.deleteBuffer(buffer.normalBuf.bufferId);
-                            }
-                            if (buffer.indexBuf) {
-                                buffer.context.deleteBuffer(buffer.indexBuf.bufferId);
-                            }
-                            if (buffer.textureBuf) {
-                                buffer.context.deleteBuffer(buffer.textureBuf.bufferId);
-                            }
-                            buffers[buffer.bufId] = undefined;
+                        }
+                        if (evictee) {
+                            ctx.logging.warn("Evicting geometry from shader memory: " + evictee.type);
+                            destroyGeometry(evictee);
                             return true;
-                        } else {
-                            return false;
-                        }
-                    };
-
-                    /** Memory manager may call upon this backend to evict the least-recently-used geometry buffer
-                     * from memory when it fails to fulfill an allocation request. The currently-active buffer is
-                     * excluded because at least one buffer should really exist for a functional scene.
-                     */
-                    ctx.memory.registerCacher({
-
-                        evict: function() {
-                            var earliest = ctx.scenes.getTime();
-                            var evictee;
-                            for (var bufId in buffers) {
-                                if (bufId) {
-                                    var buffer = buffers[bufId];
-                                    if (buffer.lastUsed < earliest) {
-                                        evictee = buffer;
-                                        earliest = buffer.lastUsed;
-                                    }
-                                }
-                            }
-                            if (evictee) {
-                                ctx.logger.info("Evicting geometry buffer: " + bufId);
-                                deleteGeoBuffer(evictee);
-                                return true;
-                            }
-                            return false;   // Couldnt find suitable buffer to delete
-                        }
+                        }                                                  
+                        return false;   // Couldnt find suitable buffer to delete
                     });
 
-                    ctx.events.onEvent("scene-activated", function() {
-                        currentBoundBufId = null;
-                    });
-
-                    /** When a new program is activated we will need to lazy-bind our current buffers
-                     */
-                    ctx.events.onEvent("program-activated", function() {
-                        currentBoundBufId = null;
-                    });
-
-                    /** When a program is deactivated we may need to re-bind buffers to the previously active program
-                     */
-                    ctx.events.onEvent("program-deactivated", function() {
-                        currentBoundBufId = null;
-                    });
-
-                    return {
-
-                        /** Tests if a buffer for the given geometry type exists on the current canvas
-                         *
-                         * @param geoType - IE. "teapot", "cube" etc.
-                         */
-                        findGeoBuffer : function(geoType) {
-                            var bufId = ctx.renderer.canvas.canvasId + geoType;
-                            return (buffers[bufId]) ? bufId : null;
-                        },
-
-                        /** Creates a buffer containing the given geometry, associated with the activate canvas and returns its ID.
-                         * When the geoType is given, the buffer ID is the concatenation of the geoID with the canvas ID, otherwise
-                         * an "anonymous" unique buffer ID is generated.
-                         */
-                        createGeoBuffer : function(geoType, geo) {
-                            if (!ctx.programs.getActiveProgramId()) {
-                                throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
-                            }
-                            var bufId = ctx.renderer.canvas.canvasId + (geoType || nextBufId++);
-                            var context = ctx.renderer.canvas.context;
-
-                            var vertexBuf;
-                            var normalBuf;
-                            var indexBuf;
-                            var textureBuf;
-
-                            try {
-                                vertexBuf = createArrayBuffer(context, geo.vertices, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.vertices));
-                                normalBuf = createArrayBuffer(context, geo.normals, context.ARRAY_BUFFER, 3, new WebGLFloatArray(geo.normals));
-                                indexBuf = createArrayBuffer(context, geo.indices, context.ELEMENT_ARRAY_BUFFER, 1, new WebGLUnsignedShortArray(geo.indices));
-                                if (geo.texCoords) {
-                                    textureBuf = createArrayBuffer(context, geo.texCoords, context.ARRAY_BUFFER, 2, new WebGLFloatArray(geo.texCoords));
-                                }
-                                buffers[bufId] = {
-                                    bufId: bufId,
-                                    lastUsed: ctx.scenes.getTime(),
-                                    canvas : ctx.renderer.canvas,
-                                    context : context,
-                                    vertexBuf : vertexBuf,
-                                    normalBuf : normalBuf,
-                                    indexBuf : indexBuf,
-                                    textureBuf: textureBuf
-                                };
-                                return bufId;
-                            } catch (e) {
-
-                                /* Failure to allocate an array buffer - delete any that were allocated
-                                 */
-                                if (vertexBuf) {
-                                    context.deleteBuffer(vertexBuf.bufferId);
-                                }
-                                if (normalBuf) {
-                                    context.deleteBuffer(normalBuf.bufferId);
-                                }
-                                if (normalBuf) {
-                                    context.deleteBuffer(indexBuf.bufferId);
-                                }
-                                if (textureBuf) {
-                                    context.deleteBuffer(textureBuf.bufferId);
-                                }
-                                throw e;
-                            }
-                        },
-
-                        /** Draws the geometry in the given buffer
-                         */
-                        drawGeoBuffer : function(bufId) {
-                            var buffer = buffers[bufId];
-
-                            /** Update last used time
-                             */
-                            buffer.lastUsed = ctx.scenes.getTime();
-
-                            var context = ctx.renderer.canvas.context;
-
-                            /** Tell observers that we're about to draw
-                             */
-                            ctx.events.fireEvent("geo-drawing", {});
-
-                            /* Dont rebind buffer if already bound - this is the case when
-                             * we're drawing a batch of the same object, like a bunch of cubes
-                             */
-                            if (currentBoundBufId != bufId) {
-
-                                /* Bind vertex and normal buffers to active program
-                                 */
-                                ctx.programs.bindVertexBuffer(buffer.vertexBuf.bufferId);
-                                ctx.programs.bindNormalBuffer(buffer.normalBuf.bufferId);
-
-                                /* Textures optional in geometry
-                                 */
-                                if (buffer.textureBuf) {
-                                    ctx.programs.bindTextureCoordBuffer(buffer.textureBuf.bufferId);
-                                }
-
-                                /* Bind index buffer and draw geometry using the active program
-                                 */
-                                context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, buffer.indexBuf.bufferId);
-
-                                currentBoundBufId = bufId;
-                            }
-                            context.drawElements(context.TRIANGLES, buffer.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-                            context.flush();
-                        },
-
-                        /** Deletes all geometry buffers
-                         */
-                        reset : function() {
-                            for (var bufId in buffers) {
-                                deleteGeoBuffer(buffers[bufId]);
-                            }
-                            buffers = {};
-                            currentBoundBufId = null;
-                        }
-                    };
-                })();
-
-            };
-
-            this.intersects = function(boundary) {
-                return true; // TODO
-            };
-
-            /* Geometry node needs to know to obtain new VBOs if the super canvas node
-             * has dynamically switched to some other canvas.
+            /**
+             * Creates an array buffer
+             *
+             * @param context WebGL context
+             * @param type Eg. ARRAY_BUFFER
+             * @param values WebGL array
+             * @param numItems
+             * @param itemSize
+             * @param usage Eg. STATIC_DRAW
              */
-            this.getActiveCanvasId = function() {
-                return ctx.renderer.canvas.canvasId;
-            };
+            function createArrayBuffer(description, context, type, values, numItems, itemSize, usage) {
+                var buf;
+                ctx.memory.allocate(
+                        description,
+                        function() {
+                            buf = new SceneJS._webgl.ArrayBuffer
+                                    (context, type, values, numItems, itemSize, usage);
+                        });
+                return buf;
+            }
 
-            this.findGeoBuffer = function(geoType) {
-                return ctx.geometry.findGeoBuffer(geoType);
-            };
-
-            this.createGeoBuffer = function(geoType, geo) {
-                return ctx.geometry.createGeoBuffer(geoType, geo);
-            };
-
-            this.drawGeoBuffer = function(bufId) {
-                return ctx.geometry.drawGeoBuffer(bufId);
-            };
-
-            /** Frees resources (geometry buffers) held by this backend
+            /**
+             * Converts SceneJS primitive type string to WebGL constant
              */
-            this.reset = function() {
-                return ctx.geometry.reset();
-            };
+            function getPrimitiveType(context, type) {
+                switch (type) {
+                    case "points":
+                        return context.POINTS;
+                    case "lines":
+                        return context.LINES;
+                    case "line-loop":
+                        return context.LINE_LOOP;
+                    case "line-strip":
+                        return context.LINE_STRIP;
+                    case "triangles":
+                        return context.TRIANGLES;
+                    case "triangle-strip":
+                        return context.TRIANGLE_STRIP;
+                    case "triangle-fan":
+                        return context.TRIANGLE_FAN;
+                    default:
+                        throw new SceneJS.exceptions.InvalidGeometryConfigException(
+                                "Unsupported geometry primitive: '" +
+                                type +
+                                "' - supported types are: 'points', 'lines', 'line-loop', " +
+                                "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
+                }
+            }
 
-        })());
+            return { // Node-facing API
+
+                /**
+                 * Returns the ID of the geometry of the given type if it exists on the active canvas
+                 */
+                findGeometry : function(type) {
+                    if (!canvas) {
+                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                    }
+                    var geoId = canvas.canvasId + type;
+                    return (geometries[geoId]) ? geoId : null;
+                },
+
+                /**
+                 * Creates geometry of the given type on the active canvas and returns its ID
+                 *
+                 * @param type Optional type for geometry - when null, a random type will be used
+                 * @param data Contains vertices, normals, indexes etc.
+                 */
+                createGeometry : function(type, data) {
+                    ctx.logging.debug("Creating geometry: " + type);
+                    if (!canvas) {
+                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                    }
+                    var geoId = canvas.canvasId + (type || nextTypeId++);
+                    var context = canvas.context;
+
+                    var usage = context.STATIC_DRAW;
+                    //var usage = (!data.fixed) ? context.STREAM_DRAW : context.STATIC_DRAW;
+
+                    var vertexBuf;
+                    var normalBuf;
+                    var texCoordBuf;
+                    var indexBuf;
+
+                    try { // TODO: Modify usage flags in accordance with how often geometry is evicted
+
+                        vertexBuf = createArrayBuffer("geometry vertex buffer", context, context.ARRAY_BUFFER,
+                                new WebGLFloatArray(data.vertices), data.vertices.length, 3, usage);
+
+                        normalBuf = createArrayBuffer("geometry normal buffer", context, context.ARRAY_BUFFER,
+                                new WebGLFloatArray(data.normals), data.normals.length, 3, usage);
+
+                        if (data.texCoords) {
+                            texCoordBuf = createArrayBuffer("geometry texture buffer", context, context.ARRAY_BUFFER,
+                                    new WebGLFloatArray(data.texCoords), data.texCoords.length, 2, usage);
+                        }
+
+                        indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
+                                new WebGLUnsignedShortArray(data.indices), data.indices.length, 1, usage);
+
+                        var geo = {
+                            fixed : true, // TODO: support dynamic geometry
+                            primitive: getPrimitiveType(context, data.primitive),
+                            type: type,
+                            geoId: geoId,
+                            lastUsed: time,
+                            canvas : canvas,
+                            context : context,
+                            vertexBuf : vertexBuf,
+                            normalBuf : normalBuf,
+                            indexBuf : indexBuf,
+                            texCoordBuf: texCoordBuf
+                        };
+
+                        geometries[geoId] = geo;
+
+                        return geoId;
+
+                    } catch (e) { // Allocation failure - delete whatever buffers got allocated
+
+                        if (vertexBuf) {
+                            vertexBuf.destroy();
+                        }
+                        if (normalBuf) {
+                            normalBuf.destroy();
+                        }
+                        if (texCoordBuf) {
+                            texCoordBuf.destroy();
+                        }
+                        if (indexBuf) {
+                            indexBuf.destroy();
+                        }
+                        throw e;
+                    }
+                },
+
+                /**
+                 * Draws the geometry of the given ID that exists on the current canvas.
+                 * Client node must ensure prior that the geometry exists on the canvas
+                 * using findGeometry, and have created it if neccessary with createGeometry.
+                 */
+                drawGeometry : function(geoId) {
+                    if (!canvas) {
+                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                    }
+
+                    var geo = geometries[geoId];
+
+                    geo.lastUsed = time;
+
+                    var context = canvas.context;
+
+                    /* Prompt other backends to lazy-load their resources into the active shader
+                     */
+                    ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, {});
+
+                    /* Dont rebind buffer if already bound - this is the case when
+                     * we're drawing a batch of the same object, Eg. a bunch of cubes in a row
+                     */
+                    if (currentBoundGeo != geoId) {
+
+                        /* Bind vertex buffers to active shader
+                         */
+                        ctx.events.fireEvent(
+                                SceneJS._eventTypes.SHADER_ARRAY_BUFFER_BIND,
+                                [
+                                    SceneJS._webgl.shaderVarNames.VERTEX,       // name
+                                    geo.vertexBuf                               // value
+                                ]);
+
+                        ctx.events.fireEvent(
+                                SceneJS._eventTypes.SHADER_ARRAY_BUFFER_BIND,
+                                [
+                                    SceneJS._webgl.shaderVarNames.NORMAL,
+                                    geo.normalBuf
+                                ]);
+
+                        /* Bind texture coords to active shader - texture sampler is bound by texture backend
+                         */
+                        if (geo.texCoordBuf) {
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.SHADER_ARRAY_BUFFER_BIND,
+                                    [
+                                        SceneJS._webgl.shaderVarNames.TEXTURE_COORD,
+                                        geo.texCoordBuf
+                                    ]);
+                        }
+
+                        geo.indexBuf.bind(); // Bind index buffer
+
+                        currentBoundGeo = geoId;
+                    }
+
+                    /* Draw geometry
+                     */
+                    context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
+                    context.flush();
+
+                    /* Don't need to unbind buffers - only one is bound at a time anyway                    
+                     */
+
+                    /* Destroy one-off geometry
+                     */
+                    if (!geo.fixed) {
+                        destroyGeometry(geo);
+                    }
+                }
+            };
+        });

@@ -1,7 +1,7 @@
 /**
  * Shader backend for texturing
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         (function() {
 
             /** Default value for script matrices, injected on activation
@@ -19,9 +19,9 @@ SceneJs.backends.installBackend(
             var getDefaultMat4 = function() {
                 if (!defaultMat4) {
                     try {
-                        defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
+                        defaultMat4 = new WebGLFloatArray(SceneJS._math.identityMat4());
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultMat4;
@@ -32,20 +32,20 @@ SceneJs.backends.installBackend(
                     try {
                         defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultNormalMat;
             };
 
-            return SceneJs.shaderBackend({
+            return SceneJS.shaderBackend({
 
                 type: 'texture-shader',
 
                 vertexShaders: [
                     "attribute vec3 Vertex;" +
                     "attribute vec3 Normal;" +
-                    "attribute vec2 aTextureCoord;" +
+                    "attribute vec2 TextureCoord;" +
 
                     "uniform vec4 LightPos;" +
 
@@ -68,7 +68,7 @@ SceneJs.backends.installBackend(
                     "   vec3 lightDir = vec3(normalize(mv - LightPos));" + // Lighting is done in model-space
                     "   float directionalLightWeighting = max(dot(lightDir, nn), 0.0);" +
                     "   vLightWeighting = MaterialAmbient + MaterialDiffuse * directionalLightWeighting;" +
-                    "   vTextureCoord = aTextureCoord;" +
+                    "   vTextureCoord = TextureCoord;" +
                     "}"
                 ],
 
@@ -101,7 +101,7 @@ SceneJs.backends.installBackend(
                     /** Binds the given buffer to the Sampler attribute
                      */
                     bindTextureCoordBuffer : function(context, findVar, buffer) {
-                        var texCoordAttribute = findVar(context, 'aTextureCoord');
+                        var texCoordAttribute = findVar(context, 'TextureCoord');
                         context.enableVertexAttribArray(texCoordAttribute);
                         context.bindBuffer(context.ARRAY_BUFFER, buffer);
                         context.vertexAttribPointer(texCoordAttribute, 2, context.FLOAT, false, 0, 0);
@@ -160,7 +160,7 @@ SceneJs.backends.installBackend(
                     scene_Lights: function(context, findVar, lights) {
                         if (lights && lights.length > 0) {
                             var l = lights[0];
-                            context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
+                            context.uniform4fv(findVar(context, 'LightPos'), l.pos);
                         } else {
                             context.uniform4fv(findVar(context, 'LightPos'), [10.0, 0.0, -10.0, 1.0]);
                         }

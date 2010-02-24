@@ -1,21 +1,19 @@
 /**
- * Backend for asset nodes which extends the basic type to provide support for parsing (evaluating)
- * scene chunks that are the usual SceneJS scene definitions as JavaScript.
- *
- * @param cfg
+ * Extend the assets backend to support import of native SceneJS JavaScript assets
  */
+SceneJS._backends.extend(
 
-SceneJs.backends.installBackend(
-        (function() {
+        function(ctx) {
 
-            return SceneJs.assetBackend({
+            ctx.assets.installImporter({
 
                 /** All asset backends have an type ID of this form:
-                 * "asset." concatenated with the target file extension
+                 * "asset." concatenated with the target file extension.
+                 * If you made one for COLLADA, you would give it type "asset.dae".
                  */
-                type: 'asset.js',
+                type: '.js',
 
-                /** Special params for asset server
+                /** Special params for asset (proxy) server
                  */
                 serverParams: {
                     mode: 'js'
@@ -32,8 +30,6 @@ SceneJs.backends.installBackend(
                     }
                 }
             });
-        })()
-        )
-        ;
+        });
 
 

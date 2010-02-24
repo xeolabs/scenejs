@@ -11,34 +11,44 @@
         &lt;canvas&gt; feature.</p>
 </canvas>
 
+<div id="logging"></div>
+
 
 <!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/math.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/core/webgl.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/node.js"></script>
 
 <!-- Exceptions -->
 
 <script type="application/x-javascript" src="../../../scenejs/exceptions/exceptions.js"></script>
 
+
 <!-- Events -->
 
 <script type="application/x-javascript" src="../../../scenejs/events/eventsBackend.js"></script>
+
+<!-- Time -->
+
+<script type="application/x-javascript" src="../../../scenejs/time/timeBackend.js"></script>
+
+<!-- Logger -->
+
+<script type="application/x-javascript" src="../../../scenejs/logging/loggingBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/logging/logging.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/logging/loggingToPage.js"></script>
 
 <!-- Process management -->
 
 <script type="application/x-javascript" src="../../../scenejs/processes/processesBackend.js"></script>
 
+
 <!-- Scene -->
 
 <script type="application/x-javascript" src="../../../scenejs/scene/sceneBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/scene/scene.js"></script>
-
-<!-- Logger -->
-
-<script type="application/x-javascript" src="../../../scenejs/logger/loggerBackend.js"></script>
-
 
 
 <!-- Memory manager -->
@@ -48,10 +58,10 @@
 
 <!-- Shading -->
 
-<script type="application/x-javascript" src="../../../scenejs/shading/shaderBackendBase.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/shader.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/simple/simpleBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/texturing/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
 
 <!-- Renderer -->
 <!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
@@ -83,7 +93,7 @@
 <!-- Viewing transforms -->
 
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/transformation/view/lookat.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
 
 <!-- Lighting -->
 
@@ -108,14 +118,20 @@
 
 <script type="application/x-javascript" src="../../../scenejs/generation/generator.js"></script>
 
+<!-- Axis-aligned bounding boxes -->
+
+<script type="application/x-javascript" src="../../../scenejs/boundary/viewVolumeBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/axisBoundary.js"></script>
+
 <!-- Assets -->
 
 <script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/assetBackendBase.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackendExtension.js"></script>
 
 <script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
+
 
 <script type="application/x-javascript" src="teapot.js"></script>
 </body>

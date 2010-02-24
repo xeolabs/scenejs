@@ -1,34 +1,32 @@
 /** Sets material properties on the current shader for sub-nodes
  *
  */
-SceneJs.material = function(scenejs) {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
-    var backend;
+SceneJS.material = function(scenejs) {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var backend = SceneJS._backends.getBackend('material');
 
-    var cloneColor = function(v) {
-        return v ? { r: v.r || 0, g: v.g || 0, b: v.b || 0, a:v.a || 1 } : { r: 0, g : 0, b: 0};
-    };
+    function colourToArray(v) {
+        return v ? [ v.r || 0, v.g || 0, v.b || 0, v.a || 1 ] : [ 0,  0,  0];
+    }
 
-    var material;   // memoized
+    var material;
 
-    return function(scope) {
-        if (!backend) {
-            backend = SceneJs.backends.getBackend('material');
-        }
-        if (!material || !cfg.fixed) { // if not memoized or params are variable
-            var params = cfg.getParams(scope);
-            material = {
-                ambient:  cloneColor(params.ambient),
-                diffuse:  cloneColor(params.diffuse),
-                specular: cloneColor(params.specular),
-                shininess:cloneColor(params.shininess)
-            };
-        }
+    return SceneJS._utils.createNode(
+            function(scope) {
+                if (!material || !cfg.fixed) {
+                    var params = cfg.getParams(scope);
+                    material = {
+                        ambient:  colourToArray(params.ambient),
+                        diffuse:  colourToArray(params.diffuse),
+                        specular: colourToArray(params.specular),
+                        shininess:colourToArray(params.shininess)
+                    };
+                }
 
-        var saveMaterial = backend.getMaterial();
+                var saveMaterial = backend.getMaterial();
 
-        backend.setMaterial(material);
-        SceneJs.utils.visitChildren(cfg, scope);
-        backend.setMaterial(saveMaterial);
-    };
+                backend.setMaterial(material);
+                SceneJS._utils.visitChildren(cfg, scope);
+                backend.setMaterial(saveMaterial);
+            });
 };

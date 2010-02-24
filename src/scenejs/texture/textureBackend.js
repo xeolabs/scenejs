@@ -1,209 +1,254 @@
 /**
  *
  */
-SceneJs.backends.installBackend(
-        new (function() {
+SceneJS._backends.installBackend(
 
-            this.type = 'texture';
+        "texture",
 
-            var ctx;
+        function(ctx) {
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
-                ctx.textures = (function() {
-                    var textures = {};
-                    var activeTexture = null;
-                    var loaded = false;
+            var time = (new Date()).getTime();      // Current system time for LRU caching
+            var canvas;                             // Currently active canvas
+            var textures = {};                      // Texture cache
+            var activeTexture;                      // Currently active texture
+            var loaded = false;                     // True when certain that current texture is loaded
 
-                    /** Removes texture from shader and deregisters it from backend
-                     */
-                    var deleteTexture = function(texture) {
-                        if (document.getElementById(texture.canvas.canvasId)) {  // Context can't exist if canvas not in DOM
-                            if (texture.context) {
-                                texture.context.deleteTexture(texture.ptexture);
-                            }
-                        }
-                        textures[texture.textureId] = undefined;
-                        if (activeTexture.textureId == textureId) {
-                            activeTexture = null;
-                        }
-                    };
-
-                    /** Memory manager may call upon this backend to evict something
-                     * from memory when it fails to fulfill an allocation request
-                     */
-                    ctx.memory.registerCacher({
-                        evict: function() {
-                            var earliest = ctx.scenes.getTime(); // Dont evict textures that we have traversed into
-                            var evictee;
-                            for (var id in textures) {
-                                if (id) {
-                                    var texture = textures[id];
-                                    if (texture.lastUsed < earliest) {
-                                        evictee = texture;
-                                        earliest = texture.lastUsed;
-                                    }
-                                }
-                            }
-                            if (evictee) { // Delete LRU texture
-                                ctx.logger.info("Evicting texture: " + id);
-                                deleteTexture(evictee);
-                                return true;
-                            }
-                            return false;   // Couldnt find suitable texture to delete
-                        }
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TIME_UPDATED, // System time update
+                    function(t) {
+                        time = t;
                     });
 
-                    ctx.events.onEvent("scene-activated", function() {
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED, // Scene traversal begun - texture not loaded
+                    function() {
                         activeTexture = null;
                         loaded = false;
                     });
 
-                    /** When a new program is activated we will need to lazy-load our current texture
-                     */
-                    ctx.events.onEvent("program-activated", function() {
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+                    function(c) {
+                        canvas = c;
                         loaded = false;
                     });
 
-                    /** When a program is deactivated we may need to re-load into the previously active program
-                     */
-                    ctx.events.onEvent("program-deactivated", function() {
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.CANVAS_DEACTIVATED,
+                    function() {
+                        canvas = null;
                         loaded = false;
                     });
-                    /**
-                     * When geometry is about to draw we load our texture if not loaded already
-                     */
-                    ctx.events.onEvent("geo-drawing", function() {
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.GEOMETRY_RENDERING,
+                    function() {
                         if (!loaded && activeTexture) {
-                            ctx.programs.bindTexture(activeTexture.ptexture);
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.SHADER_SAMPLER_BIND,
+                                    [
+                                        SceneJS._webgl.shaderVarNames.SAMPLER,      // Name
+                                        activeTexture                               // Value
+                                    ]);
                             loaded = true;
                         }
                     });
 
-                    return {
+            /** Removes texture from shader (if canvas exists in DOM) and deregisters it from backend
+             */
+            function deleteTexture(texture) {
+                textures[texture.textureId] = undefined;
+                if (document.getElementById(texture.canvas.canvasId)) {
+                    texture.destroy();
+                }
+            }
 
-                        getTexture : function(textureId) {
-                            var texture = textures[textureId];
-                            if (texture) {
-                                return textureId;
-                            }
-                            return null;
-                        },
+            /**
+             * Deletes all textures from their GL contexts - does not attempt
+             * to delete them when their canvases no longer exist in the DOM.
+             */
+            function deleteTextures() {
+                for (var textureId in textures) {
+                    var texture = textures[textureId];
+                    deleteTexture(texture);
+                }
+                textures = {};
+                activeTexture = null;
+                loaded = false;
+            }
 
-                        loadTexture: function(uri, onSuccess, onError, onAbort) {
-                            var textureId = uri;
-                            var image = new Image();
-                            var texture = {
-                                uri: uri,
-                                textureId:textureId,
-                                image: image,
-                                timeToLive : 1000
-                            };
-                            texture.image.onload = function() {
-                                textures[textureId] = texture;
-                                onSuccess(texture.textureId);
-                            };
-                            texture.image.onerror = onError;
-                            texture.image.onabort = onAbort;
-                            texture.image.src = uri;
-                        },
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.RESET, // Framework reset - delete textures
+                    function() {
+                        deleteTextures();
+                    });
 
-                        bindTexture: function(textureId) {
-                            var texture = textures[textureId];
-                            var context = ctx.renderer.canvas.context;
-
-                            /* Get memory management backend to manage binding of texture.
-                             */
-                            ctx.memory.allocate("Binding texture " + texture.uri,
-                                    function() {
-                                        texture.ptexture = context.createTexture();
-                                        texture.canvas = ctx.renderer.canvas;
-                                        texture.context = context;
-                                        context.bindTexture(context.TEXTURE_2D, texture.ptexture);
-                                        context.texImage2D(context.TEXTURE_2D, 0, texture.image);
-                                        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
-                                        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR_MIPMAP_NEAREST);
-                                        context.generateMipmap(context.TEXTURE_2D);
-                                        context.bindTexture(context.TEXTURE_2D, null);
-                                    });
-                        },
-
-                        activateTexture: function(textureId) {
-                            var texture = textures[textureId];
-                            if (!texture) {
-                                throw "No such texture loaded \"" + textureId + "\"";
-                            }
-                            activeTexture = texture;
-                            activeTexture.lastUsed = ctx.scenes.getTime();
-                            loaded = false;
-                        },
-
-                        getActiveTextureId: function() {
-                            return activeTexture ? activeTexture.textureId : null;
-                        },
-
-                        deleteTextures : function() {
-                            for (var textureId in textures) {
-                                var texture = textures[textureId];
-                                if (document.getElementById(texture.canvas.canvasId)) {  // Context can't exist if canvas not in DOM
-                                    if (texture.context) {
-                                        texture.context.deleteTexture(texture.ptexture);
-                                    }
+            /**
+             * Registers this backend module with the memory management module as willing
+             * to attempt to destroy a texture when asked, in order to free up memory. Eviction
+             * is done on a least-recently-used basis, where a texture may be evicted if the
+             * time that it was last used is the earliest among all textures, and after the current
+             * system time. Since system time is updated just before scene traversal, this ensures that
+             * textures previously or currently active during this traversal are not suddenly evicted.
+             */
+            ctx.memory.registerEvictor(
+                    function() {
+                        var earliest = time; // Doesn't evict textures that we have traversed into
+                        var evictee;
+                        for (var id in textures) {
+                            if (id) {
+                                var texture = textures[id];
+                                if (texture.lastUsed < earliest) {
+                                    evictee = texture;
+                                    earliest = texture.lastUsed;
                                 }
                             }
-                            textures = {};
-                            activeTexture = null;
-                            loaded = false;
                         }
+                        if (evictee) { // Delete LRU texture
+                            ctx.logging.info("Evicting texture: " + id);
+                            deleteTexture(evictee);
+                            return true;
+                        }
+                        return false;   // Couldnt find suitable evictee
+                    });
+
+            /**
+             * Translates a SceneJS param value to a WebGL enum value,
+             * or to default if undefined. Throws exception when defined
+             * but not mapped to an enum.
+             */
+            function getGLOption(value, defaultVal) {
+                if (value == undefined) {
+                    return defaultVal;
+                }
+                var glVal = SceneJS._webgl.enumMap[value];
+                if (glVal == undefined) {
+                    throw new SceneJS.exceptions.InvalidNodeConfigException(
+                            "Unrecognised texture node configuration value: '" + value + "'");
+                }
+                return glVal;
+            }
+
+            /** Returns default value for when given value is undefined
+             */
+            function getOption(value, defaultVal) {
+                return (value == undefined) ? defaultVal : value;
+            }
+
+            return { // Node-facing API
+
+                /** Returns the ID of the currently active texture
+                 */
+                getActiveTexture : function() {
+                    return activeTexture ? activeTexture.textureId : null;
+                },
+
+                /** Looks for loaded texture, which may have been evicted after lack of recent use,
+                 * in which case client texture node will have to recreate it.
+                 */
+                getTexture : function(textureId) {
+                    return textures[textureId];
+                },
+
+                /**
+                 * Starts a process to load a texture image.
+                 *
+                 * @param uri Image location
+                 * @param onSuccess Callback returns image on success - client node than must kill process with imageLoaded
+                 * @param onError Callback fired on failure
+                 * @param onAbort Callback fired when load aborted, eg. user hits "stop" button in browser
+                 */
+                loadImage : function(uri, onSuccess, onError, onAbort) {
+                    var process = ctx.processes.createProcess({
+                        description:"Texture image load: " + uri
+                    });
+                    var image = new Image();
+                    image.onload = function() {
+                        onSuccess(image);
                     };
-                })();
-            };
+                    image.onerror = function() {
+                        ctx.processes.destroyProcess(process);
+                        onError();
+                    };
+                    image.onabort = function() {
+                        ctx.processes.destroyProcess(process);
+                        onAbort();
+                    };
+                    image.src = uri;  // Starts image load
+                    return process;
+                },
 
-            /** Looks for loaded texture, which may have been evicted after lack of recent use
-             */
-            this.getTexture = function(textureId) {
-                return ctx.textures.getTexture(textureId);
-            };
+                /**
+                 * Kills texture image load process.
+                 */
+                imageLoaded : function(process) {
+                    ctx.processes.destroyProcess(process);
+                },
 
-            /** Starts load of texture image in a new process and returns the ID of the process. When the
-             * process later completes, either the given onSuccess or the onError will be called
-             * depending on whether the load was successful ot not. On failure, the process will have been
-             * be killed.  On success, the client texture node will have to then call textureLoaded to notify
-             * the backend that the texture has loaded and allow backend to kill the process.
-             */
-            this.loadTexture = function(uri, onSuccess, onError, onAbort) {
-                var process = ctx.processes.createProcess({
-                    description:"Texture load: " + uri
-                });
-                ctx.textures.loadTexture(uri,
-                        onSuccess,
-                        function() {  // onError
-                            ctx.processes.destroyProcess(process);
-                            onError();
-                        },
-                        function() {  // onAbort
-                            ctx.processes.destroyProcess(process);
-                            onAbort();
-                        });
-                return process;
-            };
+                /**
+                 * Creates new texture and returns its unique ID.
+                 */
+                createTexture : function(cfg) {
+                    if (!canvas) {
+                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                    }
+                    var context = canvas.context;
 
-            /** Notifies backend that load has completed; backend then binds the texture and kills the process.
-             */
-            this.textureLoaded = function(process, textureId) {
-                ctx.memory.allocate("Binding texture", function() {
-                    ctx.textures.bindTexture(textureId);
-                });
-                ctx.processes.destroyProcess(process);
-            };
+                    var textureId = SceneJS._utils.createKeyForMap(textures);
 
-            /** Activates currently loaded texture of given ID
-             */
-            this.activateTexture = function(textureId) {
-                ctx.textures.activateTexture(textureId);
-            };
+                    ctx.events.fireEvent(
+                            SceneJS._eventTypes.MEMORY_ALLOCATE,
+                            "texture",
+                            function() {
+                                textures[textureId] = new SceneJS._webgl.Texture2D({
+                                    textureId : textureId,
+                                    image : cfg.image,
+                                    texels :cfg.texels,
+                                    minFilter : getGLOption(cfg.minFilter, context.LINEAR),
+                                    magFilter :  getGLOption(cfg.magFilter, context.LINEAR),
+                                    wrapS : getGLOption(cfg.wrapS, context.CLAMP_TO_EDGE),
+                                    wrapT :   getGLOption(cfg.wrapT, context.CLAMP_TO_EDGE),
+                                    isDepth :  getOption(cfg.isDepth, false),
+                                    depthMode : getGLOption(cfg.depthMode, context.LUMINANCE),
+                                    depthCompareMode : getGLOption(cfg.depthCompareMode, context.COMPARE_R_TO_TEXTURE),
+                                    depthCompareFunc : getGLOption(cfg.depthCompareFunc, context.LEQUAL),
+                                    flipY : getOption(cfg.flipY, true),
+                                    width: getOption(cfg.width, 1),
+                                    height: getOption(cfg.height, 1),
+                                    internalFormat : getGLOption(cfg.internalFormat, context.LEQUAL),
+                                    sourceFormat : getGLOption(cfg.sourceType, context.ALPHA),
+                                    sourceType : getGLOption(cfg.sourceType, context.UNSIGNED_BYTE),
+                                    logging: ctx.logging
+                                });
+                            });
 
-            this.reset = function() {
-                ctx.textures.deleteTextures();
+                    return textureId;
+                },
+
+                /** Activates currently existing texture of given ID and bumps its last-used
+                 * time.
+                 */
+                activateTexture : function(textureId) {
+                    var texture = textures[textureId];
+                    if (!texture) {
+                        throw "No such texture loaded \"" + textureId + "\"";
+                    }
+                    activeTexture = texture;
+                    activeTexture.lastUsed = time;
+                    loaded = false;
+                    ctx.events.fireEvent(SceneJS._eventTypes.TEXTURE_ACTIVATED, texture);
+                }
             };
-        })());
+        });

@@ -12,9 +12,9 @@
  * is available in the generator examples. Then we repeatedly render
  * the scene, each time feeding in a scope containing an increasing
  * value for the eye's location on the Z-axis, which is read by the
- * lookat node.
+ * lookAt node.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({
@@ -34,11 +34,11 @@ with (SceneJs) {
                                 ]},
                                     perspective({ fovy : 63.0, aspect : 2.0, near : .5, far : 1500.0
                                     },
-                                            
+
 
                                         /* Viewing transform
                                          */
-                                            lookat(function(scope) {
+                                            lookAt(function(scope) {
                                                 return{
                                                     eye : { x: 0.0, y: 0, z: scope.get("z")},
                                                     look : { x : 0.0, y : 0.0, z : 0 },
@@ -80,7 +80,7 @@ with (SceneJs) {
 //                                                                                        ymax: 3.4,
 //                                                                                        zmax: 3.4 },
                                                                                             objects.teapot()
-                                                                                          //  )
+                                                                                           // )
                                                                                     )
                                                                             )
                                                                     )
@@ -115,7 +115,7 @@ with (SceneJs) {
 
         zpos += 3.0;
         try {
-            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookat node's 'look' to equal its 'at'
+            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookAt node's 'look' to equal its 'at'
         } catch (e) {
             clearInterval(p);
             handleError(e);
@@ -125,15 +125,15 @@ with (SceneJs) {
     /* Hack to get any scene definition exceptions up front.
      * Chrome seemed to absorb them in setInterval!
      */
-    try {
+  //  try {
         exampleScene.render({z:zpos});
 
         /* Continue animation
          */
         pInterval = setInterval("doit()", 10);
-    } catch (e) {
-        handleError(e);
-    }
+//    } catch (e) {
+//        handleError(e);
+//    }
 
 
 }

@@ -1,13 +1,18 @@
-SceneJs.utils.ns("SceneJs.objects");
+SceneJS._utils.ns("SceneJS.objects");
 
-/** Cube geometry
+/**
+ * Provides a cube geometry node by wrapping a call to the core SceneJS.geometry node.
  *
+ * Cube geometry. This node type takes no parameters, and the cube is fixed to size [-1..1] on each axis,
+ * so if you want to resize it you should wrap it in a scale node.
  */
-SceneJs.objects.cube = function() {
+SceneJS.objects.cube = function() {
 
-    return SceneJs.geometry({
+    return SceneJS.geometry({
 
         type: "cube",
+
+        primitive : "triangle",
 
         vertices :
                 [

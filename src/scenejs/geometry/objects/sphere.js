@@ -1,18 +1,20 @@
-SceneJs.utils.ns("SceneJs.objects");
+SceneJS._utils.ns("SceneJS.objects");
 
-/** Sphere geometry
+/**
+ * Provides a sphere geometry node by wrapping a call to the core SceneJS.geometry node.
  *
+ * Example of use:
+ *
+ * SceneJS.objects.sphere({ rings: 30, slices: 30 })
  */
-SceneJs.objects.sphere = function() {
+SceneJS.objects.sphere = function() {
 
-    var cfg = SceneJs.utils.getNodeConfig(arguments || [{}]);
+    var cfg = SceneJS._utils.getNodeConfig(arguments || [
+        {}
+    ]);
 
     if (!cfg.fixed) {
-
-        /* Since I'm always using VBOs, we cant buffer geometry if it's going to keep changing.
-         * In future versions I'll allow dynamic geometry config and just not buffer it in that case.
-         */
-        throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of sphere objects is not supported");
+        throw new SceneJS.exceptions.UnsupportedOperationException("Dynamic configuration of sphere objects is not supported");
     }
 
     var params = cfg.getParams();
@@ -20,13 +22,25 @@ SceneJs.objects.sphere = function() {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 
-    return SceneJs.geometry({
-        type: "sphere_" + params.rings + "_" + params.slices,
+    /* A geometry node is normally configured with arrays of vertices, normals, indices etc., but can instead be
+     * configured with a "create" callback, as demonstrated here, that returns an object containing those arrays.
+     *
+     * Every geometry must get a type that globally identifies it within SceneJS. In this case, the
+     * type is generated from the number of rings and slices.
+     *
+     * Since SceneJS caches geometry by type, it will attempt to reuse the geometry if it can find it in the cache,
+     * otherwise it will use the callback to create it.
+     */
+    return SceneJS.geometry({
 
+        /* Unique global ID for this geometry
+         */
+        type: "sphere_" + rings + "_" + slices,
+
+        /* Callback to create sphere geometry
+         */
         create: function() {
-
             var radius = 1;
-
             var vertices = [];
             var normals = [];
             var texCoords = [];
@@ -73,6 +87,7 @@ SceneJs.objects.sphere = function() {
             }
 
             return {
+                primitive : "triangle",
                 vertices : vertices,
                 normals: normals,
                 texCoords : texCoords,

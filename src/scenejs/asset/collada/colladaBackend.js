@@ -4,7 +4,7 @@
  * @param cfg
  */
 
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         (function() {
 
 
@@ -98,7 +98,7 @@ SceneJs.backends.installBackend(
                 parser.parse(xml);
             }
 
-            return SceneJs.assetBackend({
+            return SceneJS.assetBackend({
 
                 /** All asset backends have an type ID of this form:
                  * "asset." concatenated with the target file extension

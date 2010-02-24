@@ -1,10 +1,9 @@
-SceneJs.utils.ns("SceneJs.objects");
+SceneJS._utils.ns("SceneJS.objects");
 
-/** Specialises (as a higher-order function) a geometry node to define the venerable OpenGL teapot.
+/** Provides a teapot geometry node by wrapping a call to the core SceneJS.geometry node.
  *
  */
-SceneJs.objects.teapot = function() {
-
+SceneJS.objects.teapot = function() {
 
     var vertices = [
         [-3.000000, 1.650000, 0.000000],
@@ -5752,10 +5751,10 @@ SceneJs.objects.teapot = function() {
             var v2 = vertices[j1];
             var v3 = vertices[j2];
 
-            var va = SceneJs.math.subVec4(v2, v1);
-            var vb = SceneJs.math.subVec4(v3, v1);
+            var va = SceneJS._math.subVec4(v2, v1);
+            var vb = SceneJS._math.subVec4(v3, v1);
 
-            var n = SceneJs.math.normalizeVec4(SceneJs.math.cross3Vec4(va, vb));
+            var n = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(va, vb));
 
             if (!nvecs[j0]) nvecs[j0] = [];
             if (!nvecs[j1]) nvecs[j1] = [];
@@ -5788,15 +5787,16 @@ SceneJs.objects.teapot = function() {
         var result = [];
         for (var i = 0; i < ar.length; i++) {
             if (numPerElement && ar[i].length != numPerElement)
-                throw new SceneJs.exceptions.InvalidGeometryConfigException("Bad geometry array element");
+                throw new SceneJS.exceptions.InvalidGeometryConfigException("Bad geometry array element");
             for (var j = 0; j < ar[i].length; j++)
                 result.push(ar[i][j]);
         }
         return result;
     };
 
-    return SceneJs.geometry({
+    return SceneJS.geometry({
         type:"teapot",
+        primitive:"triangles",
         vertices: flatten(vertices, 3),
         indices:flatten(indices, 3),
         normals:flatten(calculateNormals(vertices, indices), 3)

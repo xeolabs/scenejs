@@ -1,79 +1,69 @@
 /**
  * Manages the current view transformation
  */
-SceneJs.backends.installBackend(
-        new (function() {
+SceneJS._backends.installBackend(
 
-            this.type = 'view-transform';
+        "view-transform",
 
-            var ctx;
+        function(ctx) {
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
-                ctx.viewTransform = (function() {
-                    var transform;
-                    var loaded;
+            var transform;
+            var loaded = false;
 
-                    ctx.events.onEvent("scene-activated", function() {
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
                         transform = {
-                            matrix : SceneJs.math.identityMat4(),
+                            matrix : SceneJS._math.identityMat4(),
                             fixed: true
                         };
                         loaded = false;
                     });
 
-                    /** When a new program is activated we will need to lazy-load our current matrix
-                     */
-                    ctx.events.onEvent("program-activated", function() {
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
                         loaded = false;
                     });
 
-                    /** When a program is deactivated we may need to re-load into the previously active program
-                     */
-                    ctx.events.onEvent("program-deactivated", function() {
-                        loaded = false;
-                    });
-
-                    /**
-                     * When geometry is about to draw we load our matrix if not loaded already
-                     */
-                    ctx.events.onEvent("geo-drawing", function() {
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.GEOMETRY_RENDERING,
+                    function() {
                         if (!loaded) {
 
-                            /* Lazy-compute WebGL array
+                            /* Lazy-compute WebGL array - cool thing about this is that we only
+                             * compute and memoize it for those matrices that actually get loaded
                              */
                             if (!transform.matrixAsArray) {
                                 transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                             }
-
-                            ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
-
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
+                                    [
+                                        SceneJS._webgl.shaderVarNames.VIEW_MATRIX,
+                                        transform.matrixAsArray
+                                    ]);
                             loaded = true;
                         }
                     });
 
-                    return {
-                        setTransform: function(t) {
-                            transform = t;
-                            loaded = false;
-                        },
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED, // May need to reload into last program
+                    function() {
+                        loaded = false;
+                    });
 
-                        getTransform: function() {
-                            return transform;
-                        },
+            return { // Node-facing API
 
-                        transformPoint3: function(v) {
-                            return SceneJs.math.transformPoint3(transform.matrix, v);
-                        }
-                    };
-                })();
+                setTransform : function(t) {
+                    ctx.logging.debug("Setting viewing transform");
+                    transform = t;
+                    loaded = false;
+                    ctx.events.fireEvent(SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED, transform);
+                },
+
+                getTransform : function() {
+                    return transform;
+                }
             };
-
-            this.setTransform = function(transform) {
-                ctx.viewTransform.setTransform(transform);
-            };
-
-            this.getTransform = function() {
-                return ctx.viewTransform.getTransform();
-            };
-        })());
+        });

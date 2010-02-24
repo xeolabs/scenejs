@@ -7,12 +7,12 @@
  *
  * In this example we are using a stationary node to specify
  * a scene subtree that will rotate in accordance with the
- * higher lookat view transform, but will never translate. Within
+ * higher lookAt view transform, but will never translate. Within
  * that subtree we'll define elements to make up a background that
  * will never move closer, no matter where the viewpoint moves to.
  *
- * Effectively, when defined as a sub-node of a lookat, a stationary node
- * disables the effects of the lookat's translation for its sub-nodes.
+ * Effectively, when defined as a sub-node of a lookAt, a stationary node
+ * disables the effects of the lookAt's translation for its sub-nodes.
  *
  * One of the cool things about the stationary node is that you can
  * use it to created sophisticated animated backgrounds, because you
@@ -23,7 +23,7 @@
  * of the view coordinate system.
  *
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({
@@ -48,14 +48,14 @@ with (SceneJs) {
 
                                         /* Viewing transform
                                          */
-                                            lookat(function(scope) {
+                                            lookAt(function(scope) {
                                                 return{
                                                     eye : { x: scope.get("z"), y: 0, z: scope.get("z")},
                                                     look : { x : 0, y : 0.0, z : -scope.get("z") * 2 },
                                                     up : { x: 0.0, y: 1.0, z: 0.0 }
                                                 };
                                             },
-                                                /* Stationary node - disables the lookat node's
+                                                /* Stationary node - disables the lookAt node's
                                                  * translation for its subnodes
                                                  */
                                                     stationary({},
@@ -143,7 +143,7 @@ with (SceneJs) {
 
         zpos += 3.0;
         try {
-            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookat node's 'look' to equal its 'at'
+            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookAt node's 'look' to equal its 'at'
         } catch (e) {
             clearInterval(pInterval);
             handleError(e);

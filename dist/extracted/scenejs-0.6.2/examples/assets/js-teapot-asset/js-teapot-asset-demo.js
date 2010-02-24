@@ -41,7 +41,7 @@
  * SceneJS currently caches assets with a max-time-inactive
  * eviction policy.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({
@@ -61,7 +61,7 @@ with (SceneJs) {
                                 ]},
                                     perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
-                                            lookat({
+                                            lookAt({
                                                 eye : { x: 0.0, y: 20.0, z: -20},
                                                 look : { x : 0.0, y : 0.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -79,7 +79,7 @@ with (SceneJs) {
                                                         uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
                                                     })
-                                                    ) // lookat
+                                                    ) // lookAt
                                             ) // perspective
                                     ) // lights
                             ) // shader                             

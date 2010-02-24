@@ -1,44 +1,39 @@
 /**
  * Manages the current modelling transformation
  */
-SceneJs.backends.installBackend(
-        new (function() {
+SceneJS._backends.installBackend(
 
-            this.type = 'model-transform';
+        "model-transform",
 
-            var ctx;
+        function(ctx) {
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
+            var transform;
+            var loaded;
 
-                ctx.modelTransform = (function() {
-                    var transform;
-                    var loaded;
-
-                    ctx.events.onEvent("scene-activated", function() {
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
                         transform = {
-                            matrix : SceneJs.math.identityMat4(),
+                            matrix : SceneJS._math.identityMat4(),
                             fixed: true
                         };
                         loaded = false;
                     });
 
-                    /** When a new program is activated we will need to lazy-load our current matrix
-                     */
-                    ctx.events.onEvent("program-activated", function() {
+            /** When a new program is activated we will need to lazy-load our current matrix
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
                         loaded = false;
                     });
 
-                    /** When a program is deactivated we may need to re-load into the previously active program
-                     */
-                    ctx.events.onEvent("program-deactivated", function() {
-                        loaded = false;
-                    });
-
-                    /**
-                     * When geometry is about to drawn we load our matrix if not loaded already
-                     */
-                    ctx.events.onEvent("geo-drawing", function() {
+            /**
+             * Lazy-load matrix only when geometry about to render
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.GEOMETRY_RENDERING,
+                    function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL arrays
@@ -50,46 +45,46 @@ SceneJs.backends.installBackend(
                             /* Lazy compute normal matrix
                              */
                             if (!transform.normalMatrixAsArray) {
-                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.mat4To3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
+                                transform.normalMatrixAsArray = new WebGLFloatArray(
+                                        SceneJS._math.mat4To3(
+                                                SceneJS._math.transposeMat4(
+                                                        SceneJS._math.inverseMat4(transform.matrix))));
                             }
-
-                            ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);
-                            ctx.programs.setVar('scene_NormalMatrix', transform.normalMatrixAsArray);
-
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
+                                    [
+                                        SceneJS._webgl.shaderVarNames.MODEL_MATRIX,
+                                        transform.matrixAsArray
+                                    ]);
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
+                                    [
+                                        SceneJS._webgl.shaderVarNames.NORMAL_MATRIX,
+                                        transform.normalMatrixAsArray
+                                    ]);
                             loaded = true;
                         }
                     });
 
-                    return {
-                        setTransform: function(t) {
-                            transform = t;
-                            loaded = false;
-                        },
+            /** When a program is deactivated we may need to re-load into the previously active program
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
 
-                        getTransform: function() {
-                            return transform;
-                        },
+            return {   // Node-facing API
 
-                        transformPoint3: function(v) {
-                            return SceneJs.math.transformPoint3(transform.matrix, v);
-                        } ,
+                setTransform : function(t) {
+                    ctx.logging.debug("Setting modelling transform");
+                    transform = t;
+                    loaded = false;
+                    ctx.events.fireEvent(SceneJS._eventTypes.MODEL_TRANSFORM_UPDATED, transform);
+                },
 
-                        transformVector: function(v) {
-                            return SceneJs.math.transformVector3(transform.matrix, v);
-                        } ,
-
-                        isFixed: function() {
-                            return transform.fixed;
-                        }
-                    };
-                })();
+                getTransform : function() {
+                    return transform;
+                }
             };
-
-            this.setTransform = function(transform) {
-                ctx.modelTransform.setTransform(transform);
-            };
-
-            this.getTransform = function() {
-                return ctx.modelTransform.getTransform();
-            };
-        })());
+        });

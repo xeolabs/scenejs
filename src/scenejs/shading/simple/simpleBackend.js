@@ -18,7 +18,7 @@
  * @param cfg
  */
 
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         (function() {
 
             /** Default value for script matrices, injected on activation
@@ -36,9 +36,9 @@ SceneJs.backends.installBackend(
             var getDefaultMat4 = function() {
                 if (!defaultMat4) {
                     try {
-                        defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
+                        defaultMat4 = new WebGLFloatArray(SceneJS._math.identityMat4());
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultMat4;
@@ -49,13 +49,13 @@ SceneJs.backends.installBackend(
                     try {
                         defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultNormalMat;
             };
 
-            return SceneJs.shaderBackend({
+            return SceneJS.shaderBackend({
 
                 type: 'simple-shader',
 
@@ -160,7 +160,7 @@ SceneJs.backends.installBackend(
                     scene_Lights: function(context, findVar, lights) {
                         if (lights && lights.length > 0) {
                             var l = lights[0];
-                            context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
+                            context.uniform4fv(findVar(context, 'LightPos'), l.pos);
                         } else {
                             context.uniform4fv(findVar(context, 'LightPos'), [10.0, 0.0, -10.0, 1.0]);
                         }

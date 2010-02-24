@@ -12,9 +12,9 @@
  * is available in the generator examples. Then we repeatedly render
  * the scene, each time feeding in a scope containing an increasing
  * value for the eye's location on the Z-axis, which is read by the
- * lookat node.
+ * lookAt node.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({
@@ -36,7 +36,7 @@ with (SceneJs) {
 
                                         /* Viewing transform
                                          */
-                                            lookat(function(scope) {
+                                            lookAt(function(scope) {
                                                 return{
                                                     eye : { x: 0.0, y: 0, z: scope.get("z")},
                                                     look : { x : 0.0, y : 0.0, z : 0 },
@@ -110,7 +110,7 @@ with (SceneJs) {
 
         zpos += 3.0;
         try {
-            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookat node's 'look' to equal its 'at'
+            exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookAt node's 'look' to equal its 'at'
         } catch (e) {
             clearInterval(p);
             handleError(e);

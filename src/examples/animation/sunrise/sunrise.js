@@ -14,7 +14,7 @@
  only specify values where defaults are overridden, such as non-zero
  vector components, for example.
  */
-with (SceneJs) {
+with (SceneJS) {
 
     var exampleScene = scene(
     {},
@@ -44,7 +44,7 @@ with (SceneJs) {
                                 /* Viewing transform specifies eye position, looking
                                  at the origin by default
                                  */
-                                    lookat(
+                                    lookAt(
                                     {
                                         eye : { x: 0.0, y: 10.0, z: -15 },
                                         up : { y: 1.0 }
@@ -87,7 +87,7 @@ with (SceneJs) {
                                                                     objects.teapot()
                                                                     )
                                                             ) // rotate
-                                                    ) // lookat
+                                                    ) // lookAt
                                             ) // frustum
                                     )
                             ) // shader                            

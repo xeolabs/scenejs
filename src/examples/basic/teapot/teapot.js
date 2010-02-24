@@ -20,64 +20,64 @@
  * Lots of wicked scene features are not demonstrated here, such as animation, multiple canvases, advanced shaders
  * and so on. I'll show you those in later examples.
  */
-with (SceneJs) {
-    var introScene = scene({}, // node always has a config object
+with (SceneJS) {
+    var introScene = scene(
 
-            renderer({
-                canvasId: 'theCanvas',
-                clear : { depth : true, color : true}
-            },
-                    shader({ type: 'simple-shader' },
+            loggingToPage({ elementId: "logging" },
+                    renderer({
+                        canvasId: 'theCanvas',
+                        clear : { depth : true, color : true }
+                    },
+                            basicShading(
 
-                            lights({
-                                lights: [
-                                    {
-                                        pos: { x: -30.0, y: 30.0, z: -30.0 }
-                                    }
-                                ]},
-                                    perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
-                                    },
-                                            lookat({
-                                                eye : { x: 0.0, y: 7.0, z: -15},
-                                                look : { x : 0.0, y : 1.0, z : 0 },
-                                                up : { x: 0.0, y: 1.0, z: 0.0 }
-
+                                    lights({
+                                        lights: [
+                                            {
+                                                pos: { x: -30.0, y: 30.0, z: -30.0 }
+                                            }
+                                        ]},
+                                            perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
-                                                    material({
-                                                        ambient:  { r:0.2, g:0.2, b:0.5 },
-                                                        diffuse:  { r:0.6, g:0.6, b:0.9 }
-                                                    },
+                                                    lookAt({
+                                                        eye : { x: 0.0, y: 7.0, z: -15},
+                                                        look : { x : 0.0, y : 1.0, z : 0 },
+                                                        up : { x: 0.0, y: 1.0, z: 0.0 }
 
-                                                            rotate(function(scope) {
-                                                                return { angle : scope.get("angle"), y: 1.0 };
+                                                    },
+                                                            material({
+                                                                ambient:  { r:0.2, g:0.2, b:0.5 },
+                                                                diffuse:  { r:0.6, g:0.6, b:0.9 }
                                                             },
 
-                                                              
-                                                                            objects.teapot()
+                                                                    rotate(function(scope) {
+                                                                        return { angle : scope.get("angle"), y: 1.0 };
+                                                                    },
 
+                                                                            objects.teapot()
+                                                                            )
                                                                     )
-                                                            )
-                                                    ) // lookat
-                                            ) // perspective
-                                    ) // lights
-                            ) // shader                      
-                    ) // renderer
+                                                            ) // lookAt
+                                                    ) // perspective
+                                            ) // lights
+                                    ) // shader
+                            ) // renderer
+                    )
             ); // scene
 
     /* Lets do it - render one frame of the scene frontend. The teapot's X-rotation angle is fed into the scene here, to
      * be passed to the rotate node in the 'scope' as used in the rotate node config. Note that if your scene frontend
      * was interactive or animated, you would call this method in a loop.
      */
-    try {
+    //try {
         introScene.render({angle: 45});
-    } catch (e) {
-        if (e.message) {
-            alert(e.message);
-        } else {
-            alert(e);
-        }
-        throw e.message || e;
-    }
+//    } catch (e) {
+//        if (e.message) {
+//            alert(e.message);
+//        } else {
+//            alert(e);
+//        }
+//        throw e.message || e;
+//    }
 
     /* Finished with the scene, so we might as well tell SceneJS to free wharever resources it has allocated for the
      * scene, such as the shader scripts and the vertex buffer objects (VBOs) it created for the teapot geometry.

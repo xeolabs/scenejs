@@ -1,10 +1,10 @@
-var SceneJs = {version: '1.0'};
+var SceneJS = {version: '1.0'};
 
 (function() {
 
     /** All exceptions thrown by SceneJS
      */
-    SceneJs.exceptions = {
+    SceneJS.exceptions = {
 
     };
 
@@ -14,7 +14,7 @@ var SceneJs = {version: '1.0'};
 
     /** Public resources
      */
-    SceneJs.utils = {
+    SceneJS._utils = {
 
         /** Converts degrees to radiians
          */
@@ -84,7 +84,7 @@ var SceneJs = {version: '1.0'};
          */
         getNodeConfig : function(args) {
             if (args.length == 0) {
-                throw new SceneJs.exceptions.InvalidNodeConfigException('Invalid node parameters: should be a configuration followed by zero or more child nodes');
+                throw new SceneJS.exceptions.InvalidNodeConfigException('Invalid node parameters: should be a configuration followed by zero or more child nodes');
             }
             var result = { };
             var a0 = args[0];
@@ -125,7 +125,7 @@ var SceneJs = {version: '1.0'};
 
     /** Registry of modules that provide backend functionality for scene graph nodes
      */
-    SceneJs.backends = new (function() {
+    SceneJS._modules = new (function() {
         var status = {
             error: null
         };
@@ -146,7 +146,7 @@ var SceneJs = {version: '1.0'};
                     backend.install(ctx);
                     backends[backend.type] = backend;
                 } catch (e) {
-                    status.error = new SceneJs.exceptions.NodeBackendInstallFailedException
+                    status.error = new SceneJS.exceptions.NodeBackendInstallFailedException
                             ("Failed to install backend module for node type \"" + backend.type + "\": " + (e.message || e), e);
                 }
             }
@@ -157,7 +157,7 @@ var SceneJs = {version: '1.0'};
         this.getBackend = function(type) {
             var backend = backends[type];
             if (!backend) {
-                throw new SceneJs.exceptions.NodeBackendNotFoundException("No backend installed of type \'' + type + '\'");
+                throw new SceneJS.exceptions.NodeBackendNotFoundException("No backend installed of type \'' + type + '\'");
             }
             return backend;
         };
@@ -168,7 +168,7 @@ var SceneJs = {version: '1.0'};
             return status;
         };
 
-         /** Clears current SceneJS backend error status
+        /** Clears current SceneJS backend error status
          */
         this.clearStatus = function() {
             status = {};
@@ -187,13 +187,13 @@ var SceneJs = {version: '1.0'};
     })();
 })();
 
-SceneJs.utils.ns = SceneJs.utils.namespace; // in intellij using keyword "namespace" causes parsing errors
-SceneJs.utils.ns("SceneJs");
+SceneJS._utils.ns = SceneJS._utils.namespace; // in intellij using keyword "namespace" causes parsing errors
+SceneJS._utils.ns("SceneJS");
 
 
 /** Private math utilities. These are not part of the SceneJS API!
  */
-SceneJs.math = {
+SceneJS._math = {
     negateVector4: function(v) {
         return [-v[0],-v[1],-v[2],-v[3]];
     },
@@ -207,7 +207,7 @@ SceneJs.math = {
     },
 
     addScalarVec4: function(s, v) {
-        return SceneJs.math.addVec4s(v, s)
+        return SceneJS._math.addVec4s(v, s)
     },
 
     subVec4: function(u, v) {
@@ -251,16 +251,16 @@ SceneJs.math = {
     },
 
     sqLenVec4:function(v) {
-        return SceneJs.math.dotVector4(v, v);
+        return SceneJS._math.dotVector4(v, v);
     },
 
     lenVec4:function(v) {
-        return Math.sqrt(SceneJs.math.sqLenVec4(v));
+        return Math.sqrt(SceneJS._math.sqLenVec4(v));
     },
 
     normalizeVec4:function(v) {
-        var f = 1.0 / SceneJs.math.lenVec4(v);
-        return SceneJs.math.mulVec4Scalar(v, f);
+        var f = 1.0 / SceneJS._math.lenVec4(v);
+        return SceneJS._math.mulVec4Scalar(v, f);
     },
 
     mat4:function() {
@@ -291,11 +291,11 @@ SceneJs.math = {
     },
 
     setRowMat4c:function(m, r, x, y, z, w) {
-        SceneJs.math.setRowMat4(m, r, [x,y,z,w]);
+        SceneJS._math.setRowMat4(m, r, [x,y,z,w]);
     },
 
     setRowMat4s:function(m, r, s) {
-        SceneJs.math.setRowMat4c(m, r, s, s, s, s);
+        SceneJS._math.setRowMat4c(m, r, s, s, s, s);
     },
 
     getColMat4:function(m, c) {
@@ -312,11 +312,11 @@ SceneJs.math = {
     },
 
     setColMat4c:function(m, c, x, y, z, w) {
-        SceneJs.math.setColMat4v(m, c, [x,y,z,w]);
+        SceneJS._math.setColMat4v(m, c, [x,y,z,w]);
     },
 
     setColMat4Scalar:function(m, c, s) {
-        SceneJs.math.setColMat4c(m, c, s, s, s, s);
+        SceneJS._math.setColMat4c(m, c, s, s, s, s);
     },
 
     mat4To3:function(m) {
@@ -337,11 +337,11 @@ SceneJs.math = {
     },
 
     setMat4ToZeroes:function() {
-        return SceneJs.math.m4s(0.0);
+        return SceneJS._math.m4s(0.0);
     },
 
     setMat4ToOnes:function() {
-        return SceneJs.math.m4s(1.0);
+        return SceneJS._math.m4s(1.0);
     },
 
     diagonalMat4v:function(v) {
@@ -354,15 +354,15 @@ SceneJs.math = {
     },
 
     diagonalMat4c:function(x, y, z, w) {
-        return SceneJs.math.diagonalMat4v([x,y,z,w]);
+        return SceneJS._math.diagonalMat4v([x,y,z,w]);
     },
 
     diagonalMat4s:function(s) {
-        return SceneJs.math.diagonalMat4c(s, s, s, s);
+        return SceneJS._math.diagonalMat4c(s, s, s, s);
     },
 
     identityMat4:function() {
-        return SceneJs.math.diagonalMat4s(1.0);
+        return SceneJS._math.diagonalMat4s(1.0);
     },
 
     isIdentityMat4:function(m) {
@@ -388,7 +388,7 @@ SceneJs.math = {
     },
 
     negateMat4:function(m) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         for (var i = 0; i < 16; ++i) {
             r[i] = -m[i];
         }
@@ -396,7 +396,7 @@ SceneJs.math = {
     },
 
     addMat4:function(a, b) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         for (var i = 0; i < 16; ++i) {
             r[i] = a[i] + b[i];
         }
@@ -404,7 +404,7 @@ SceneJs.math = {
     },
 
     addMat4Scalar:function(m, s) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         for (var i = 0; i < 16; ++i) {
             r[i] = m[i] + s;
         }
@@ -412,11 +412,11 @@ SceneJs.math = {
     },
 
     addScalarMat4:function(s, m) {
-        return SceneJs.math.addMat4Scalar(m, s);
+        return SceneJS._math.addMat4Scalar(m, s);
     },
 
     subMat4:function(a, b) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         for (var i = 0; i < 16; ++i) {
             r[i] = a[i] - b[i];
         }
@@ -424,7 +424,7 @@ SceneJs.math = {
     },
 
     subMat4Scalar:function(m, s) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         for (var i = 0; i < 16; ++i) {
             r[i] = m[i] - s;
         }
@@ -432,7 +432,7 @@ SceneJs.math = {
     },
 
     subScalarMat4:function(s, m) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         for (var i = 0; i < 16; ++i) {
             r[i] = s - m[i];
         }
@@ -440,7 +440,7 @@ SceneJs.math = {
     },
 
     mulMat4:function(a, b) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         var i = 0;
         var j = 0;
         var k = 0;
@@ -459,7 +459,7 @@ SceneJs.math = {
 
     mulMat4s:function(m, s)
     {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         for (var i = 0; i < 16; ++i) {
             r[i] = m[i] * s;
         }
@@ -476,7 +476,7 @@ SceneJs.math = {
     },
 
     transposeMat4:function(m) {
-        var r = new SceneJs.math.mat4();
+        var r = new SceneJS._math.mat4();
         var i = 0;
         var j = 0;
         for (i = 0; i < 4; ++i) {
@@ -488,7 +488,7 @@ SceneJs.math = {
     },
 
     determinantMat4:function(m) {
-        var f = SceneJs.math.getCellMat4;
+        var f = SceneJS._math.getCellMat4;
         return (
                 f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 0) + f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 0) +
                 f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 1) + f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 1) +
@@ -500,9 +500,9 @@ SceneJs.math = {
     },
 
     inverseMat4:function(m) {
-        var t = new SceneJs.math.mat4();
+        var t = new SceneJS._math.mat4();
 
-        var f = SceneJs.math.getCellMat4;
+        var f = SceneJS._math.getCellMat4;
 
         t[0] = f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 1) - f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 1) + f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 2) - f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 2) - f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 3) + f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 3);
         t[1] = f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 0) - f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 2) + f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 2) + f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 3) - f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 3);
@@ -524,8 +524,8 @@ SceneJs.math = {
         t[14] = f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 0) - f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 0) - f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 1) + f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 1) + f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 3) - f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 3);
         t[15] = f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 0) - f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 0) + f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 1) - f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 1) - f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 2) + f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 2);
 
-        var s = 1.0 / SceneJs.math.determinantMat4(m);
-        return SceneJs.math.mulMat4s(t, s);
+        var s = 1.0 / SceneJS._math.determinantMat4(m);
+        return SceneJS._math.mulMat4s(t, s);
     },
 
     traceMat4:function(m) {
@@ -533,7 +533,7 @@ SceneJs.math = {
     },
 
     translationMat4v:function(v) {
-        var m = SceneJs.math.identityMat4();
+        var m = SceneJS._math.identityMat4();
         m[12] = v[0];
         m[13] = v[1];
         m[14] = v[2];
@@ -541,15 +541,15 @@ SceneJs.math = {
     },
 
     translationMat4c:function(x, y, z) {
-        return SceneJs.math.translationMat4v([x,y,z]);
+        return SceneJS._math.translationMat4v([x,y,z]);
     },
 
     translationMat4s:function(s) {
-        return SceneJs.math.translationMat4c(s, s, s);
+        return SceneJS._math.translationMat4c(s, s, s);
     },
 
     rotationMat4v:function(anglerad, axis) {
-        var ax = SceneJs.math.normalizeVec4([axis[0],axis[1],axis[2],0.0]);
+        var ax = SceneJS._math.normalizeVec4([axis[0],axis[1],axis[2],0.0]);
         var s = Math.sin(anglerad);
         var c = Math.cos(anglerad);
         var q = 1.0 - c;
@@ -570,7 +570,7 @@ SceneJs.math = {
         ys = y * s;
         zs = z * s;
 
-        var m = new SceneJs.math.mat4();
+        var m = new SceneJS._math.mat4();
 
         m[0] = (q * xx) + c;
         m[1] = (q * xy) + zs;
@@ -596,11 +596,11 @@ SceneJs.math = {
     },
 
     rotationMat4c:function(anglerad, x, y, z) {
-        return SceneJs.math.rotationMat4v(anglerad, [x,y,z]);
+        return SceneJS._math.rotationMat4v(anglerad, [x,y,z]);
     },
 
     scalingMat4v:function(v) {
-        var m = SceneJs.math.identityMat4();
+        var m = SceneJS._math.identityMat4();
         m[0] = v[0];
         m[5] = v[1];
         m[10] = v[2];
@@ -608,25 +608,25 @@ SceneJs.math = {
     },
 
     scalingMat4c:function(x, y, z) {
-        return SceneJs.math.scalingMat4v([x,y,z]);
+        return SceneJS._math.scalingMat4v([x,y,z]);
     },
 
     scalingMat4s:function(s) {
-        return SceneJs.math.scalingMat4c(s, s, s);
+        return SceneJS._math.scalingMat4c(s, s, s);
     },
 
-    lookatMat4v:function(pos, target, up) {
+    lookAtMat4v:function(pos, target, up) {
         var pos4 = [pos[0],pos[1],pos[2],0.0];
         var target4 = [target[0],target[1],target[2],0.0];
         var up4 = [up[0],up[1],up[2],0.0];
 
-        var v = SceneJs.math.normalizeVec4(SceneJs.math.subVec4(target4, pos4));
-        var u = SceneJs.math.normalizeVec4(up4);
-        var s = SceneJs.math.normalizeVec4(SceneJs.math.cross3Vec4(v, u));
+        var v = SceneJS._math.normalizeVec4(SceneJS._math.subVec4(target4, pos4));
+        var u = SceneJS._math.normalizeVec4(up4);
+        var s = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(v, u));
 
-        u = SceneJs.math.normalizeVec4(SceneJs.math.cross3Vec4(s, v));
+        u = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(s, v));
 
-        var m = new SceneJs.math.mat4();
+        var m = new SceneJS._math.mat4();
 
         m[0] = s[0];
         m[1] = u[0];
@@ -648,22 +648,22 @@ SceneJs.math = {
         m[14] = 0.0;
         m[15] = 1.0;
 
-        m = SceneJs.math.mulMat4(m, SceneJs.math.translationMat4v(SceneJs.math.negateVector4(pos4)));
+        m = SceneJS._math.mulMat4(m, SceneJS._math.translationMat4v(SceneJS._math.negateVector4(pos4)));
 
         return m;
     },
 
-    lookatMat4c:function(posx, posy, posz, targetx, targety, targetz, upx, upy, upz) {
-        return SceneJs.math.lookatMat4v([posx,posy,posz], [targetx,targety,targetz], [upx,upy,upz]);
+    lookAtMat4c:function(posx, posy, posz, targetx, targety, targetz, upx, upy, upz) {
+        return SceneJS._math.lookAtMat4v([posx,posy,posz], [targetx,targety,targetz], [upx,upy,upz]);
     },
 
     orthoMat4v:function(omin, omax) {
         var omin4 = [omin[0],omin[1],omin[2],0.0];
         var omax4 = [omax[0],omax[1],omax[2],0.0];
-        var vsum = SceneJs.math.addVec4(omax4, omin4);
-        var vdif = SceneJs.math.subVec4(omax4, omin4);
+        var vsum = SceneJS._math.addVec4(omax4, omin4);
+        var vdif = SceneJS._math.subVec4(omax4, omin4);
 
-        var m = new SceneJs.math.mat4();
+        var m = new SceneJS._math.mat4();
 
         m[0] = 2.0 / vdif[0];
         m[1] = 0.0;
@@ -689,17 +689,17 @@ SceneJs.math = {
     },
 
     orthoMat4c:function(left, right, bottom, top, znear, zfar) {
-        return SceneJs.math.orthoMat4v([left,bottom,znear], [right,top,zfar]);
+        return SceneJS._math.orthoMat4v([left,bottom,znear], [right,top,zfar]);
     },
 
     frustumMat4v:function(fmin, fmax) {
         var fmin4 = [fmin[0],fmin[1],fmin[2],0.0];
         var fmax4 = [fmax[0],fmax[1],fmax[2],0.0];
-        var vsum = SceneJs.math.addVec4(fmax4, fmin4);
-        var vdif = SceneJs.math.subVec4(fmax4, fmin4);
+        var vsum = SceneJS._math.addVec4(fmax4, fmin4);
+        var vdif = SceneJS._math.subVec4(fmax4, fmin4);
         var t = 2.0 * fmin4[2];
 
-        var m = new SceneJs.math.mat4();
+        var m = new SceneJS._math.mat4();
 
         m[0] = t / vdif[0];
         m[1] = 0.0;
@@ -727,11 +727,11 @@ SceneJs.math = {
     frustumMatrix4:function(left, right, bottom, top, znear, zfar) {
         var fmin4 = [left,right,bottom,0.0];
         var fmax4 = [top,znear,zfar,0.0];
-        var vsum = SceneJs.math.addVec4(fmax4, fmin4);
-        var vdif = SceneJs.math.subVec4(fmax4, fmin4);
+        var vsum = SceneJS._math.addVec4(fmax4, fmin4);
+        var vdif = SceneJS._math.subVec4(fmax4, fmin4);
         var t = 2.0 * fmin4[2];
 
-        var m = new SceneJs.math.mat4();
+        var m = new SceneJS._math.mat4();
 
         m[0] = t / vdif[0];
         m[1] = 0.0;
@@ -769,133 +769,149 @@ SceneJs.math = {
         pmax[0] = pmax[1] * aspectratio;
         pmin[0] = -pmax[0];
 
-        return SceneJs.math.frustumMat4v(pmin, pmax);
+        return SceneJS._math.frustumMat4v(pmin, pmax);
     },
 
-    transformPoint3:function(m, p) {
-        return {
-            x : (m[0] * p.x) + (m[4] * p.y) + (m[8] * p.z) + m[12],
-            y : (m[1] * p.x) + (m[5] * p.y) + (m[9] * p.z) + m[13],
-            z : (m[2] * p.x) + (m[6] * p.y) + (m[10] * p.z) + m[14],
-            w : (m[3] * p.x) + (m[7] * p.y) + (m[11] * p.z) + m[15]
-        };
-    },
+//    transformPoint3:function(m, p) {
+//        return {
+//            x : (m[0] * p.x) + (m[4] * p.y) + (m[8] * p.z) + m[12],
+//            y : (m[1] * p.x) + (m[5] * p.y) + (m[9] * p.z) + m[13],
+//            z : (m[2] * p.x) + (m[6] * p.y) + (m[10] * p.z) + m[14],
+//            w : (m[3] * p.x) + (m[7] * p.y) + (m[11] * p.z) + m[15]
+//        };
+//    },
+
+            transformPoint3:function(m, p) {
+            return {
+                x : (m[0] * p[0]) + (m[4] * p[1]) + (m[8] * p[2]) + m[12],
+                y : (m[1] * p[0]) + (m[5] * p[1]) + (m[9] * p[2]) + m[13],
+                z : (m[2] * p[0]) + (m[6] * p[1]) + (m[10] * p[2]) + m[14],
+                w : (m[3] * p[0]) + (m[7] * p[1]) + (m[11] * p[2]) + m[15]
+            };
+        },
+
+//    transformVector3:function(m, v) {
+//        return {
+//            x: (m[0] * v.x) + (m[4] * v.y) + (m[8] * v.z),
+//            y: (m[1] * v.x) + (m[5] * v.y) + (m[9] * v.z),
+//            z: (m[2] * v.x) + (m[6] * v.y) + (m[10] * v.z)
+//        };
+//    }  ,
 
     transformVector3:function(m, v) {
         return {
-            x: (m[0] * v.x) + (m[4] * v.y) + (m[8] * v.z),
-            y: (m[1] * v.x) + (m[5] * v.y) + (m[9] * v.z),
-            z: (m[2] * v.x) + (m[6] * v.y) + (m[10] * v.z)
+            x: (m[0] * v[0]) + (m[4] * v[1]) + (m[8] * v[2]),
+            y: (m[1] * v[0]) + (m[5] * v[1]) + (m[9] * v[2]),
+            z: (m[2] * v[0]) + (m[6] * v[1]) + (m[10] * v[3])
         };
     }
 };
 /** Basic scene graph node. If the config contains any members, then they will be within scope for
  * child nodes.
  */
-SceneJs.node = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.node = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
     return function(scope) {
         var params = cfg.getParams();
-        var childScope = SceneJs.utils.newScope(scope, false);
+        var childScope = SceneJS._utils.newScope(scope, false);
         if (params) {
             for (var key in params) {
                 childScope.put(key, params[key]);
             }
         }
-        SceneJs.utils.visitChildren(cfg, childScope || scope);
+        SceneJS._utils.visitChildren(cfg, childScope || scope);
     };
 };
-SceneJs.exceptions.WebGLNotSupportedException = function(msg, cause) {
+SceneJS.exceptions.WebGLNotSupportedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NodeBackendInstallFailedException = function(msg, cause) {
+SceneJS.exceptions.NodeBackendInstallFailedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NodeConfigExpectedException = function(msg, cause) {
+SceneJS.exceptions.NodeConfigExpectedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.ShaderCompilationFailureException = function(msg, cause) {
+SceneJS.exceptions.ShaderCompilationFailureException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.ShaderLinkFailureException = function(msg, cause) {
+SceneJS.exceptions.ShaderLinkFailureException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.ShaderVariableNotFoundException = function(msg, cause) {
+SceneJS.exceptions.ShaderVariableNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NoCanvasActiveException = function(msg, cause) {
+SceneJS.exceptions.NoCanvasActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NoShaderActiveException = function(msg, cause) {
+SceneJS.exceptions.NoShaderActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.CanvasNotFoundException = function(msg, cause) {
+SceneJS.exceptions.CanvasNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.CanvasAlreadyActiveException = function(msg, cause) {
+SceneJS.exceptions.CanvasAlreadyActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.InvalidLookAtConfigException = function(msg, cause) {
+SceneJS.exceptions.InvalidLookAtConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.InvalidGeometryConfigException = function(msg, cause) {
+SceneJS.exceptions.InvalidGeometryConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.UnsupportedOperationException = function(msg, cause) {
+SceneJS.exceptions.UnsupportedOperationException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.IllegalRotateConfigException = function(msg, cause) {
+SceneJS.exceptions.IllegalRotateConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.InvalidNodeConfigException = function(msg, cause) {
+SceneJS.exceptions.InvalidNodeConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NodeBackendNotFoundException = function(msg, cause) {
+SceneJS.exceptions.NodeBackendNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
 
-SceneJs.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      // TODO: handle more cases for asset failure?
+SceneJS.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      // TODO: handle more cases for asset failure?
     this.message = msg + " (uri=\"" + (uri || "null") + "\", proxy=\"" + (proxy || "null") + "\")";
 };
-
 
 
 /**
  * Backend for a scene node.
  */
-SceneJs.backends.installBackend(
+SceneJS._modules.installBackend(
         new (function() {
 
             this.type = 'scene';
@@ -942,7 +958,7 @@ SceneJs.backends.installBackend(
                             scenes[sceneId] = null;
                             nScenes--;
                             if (nScenes == 0) {
-                                SceneJs.backends.reset();
+                                SceneJS._modules.reset();
                             }
                             if (activeSceneId == sceneId) {
                                 activeSceneId = null;
@@ -1028,11 +1044,11 @@ SceneJs.backends.installBackend(
 
             this.setActiveScene = function(sceneId) {
                 return ctx.scenes.setActiveScene(sceneId);
-                ctx.events.fireEvent("scene-activated");
+                ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED);
             };
 
             this.flush = function() {
-                ctx.events.fireEvent("scene-flushed");
+//                ctx.events.fireEvent("scene-flushed");
                 return ctx.scenes.setActiveScene(null);
             };
 
@@ -1048,25 +1064,25 @@ SceneJs.backends.installBackend(
 
 (function() {
 
-    var backend = SceneJs.backends.getBackend('scene');
+    var backend = SceneJS._modules.getBackend('scene');
 
     /** Creates a new scene
      */
-    SceneJs.scene = function() {
+    SceneJS.scene = function() {
 
         /* Check that backends installed OK
          */
-        if (SceneJs.backends.getStatus().error) {
-            throw SceneJs.backends.getStatus().error;
+        if (SceneJS._modules.getStatus().error) {
+            throw SceneJS._modules.getStatus().error;
         }
 
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
         var sceneId = null;
 
         var _render = function(paramOverrides) {
             if (sceneId) {
                 backend.setActiveScene(sceneId);
-                var scope = SceneJs.utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
+                var scope = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
                 var params = cfg.getParams();
                 for (var key in params) {    // Push scene params into scope
                     scope.put(key, params[key]);
@@ -1076,7 +1092,7 @@ SceneJs.backends.installBackend(
                         scope.put(key, paramOverrides[key]);
                     }
                 }
-                SceneJs.utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, scope);
                 backend.setActiveScene(null);
             }
         };
@@ -1114,52 +1130,52 @@ SceneJs.backends.installBackend(
             isActive: function() {
                 return (sceneId != null);
             }
-//            ,
-//
-//            run : function(cfg) {
-//                cfg.idleFunc = cfg.idleFunc ||
-//                               function(params, state) {
-//                                   return (state.getNumProcesses() > 0);
-//                               };
-//                var pInterval;
-//                var funcId = "renderScene" + sceneId;
-//                var params = cfg.params || {};
-//                var stop = function() {
-//                    clearInterval(pInterval);
-//                    window[funcId] = undefined;
-//                    sceneId = backend.deregisterScene(sceneId);
-//                };
-//                var state = {
-//                    getNumProcesses: function() {
-//                        return (sceneId) ? backend.getNumProcesses(sceneId) : 0;
-//                    }
-//                };
-//                window[funcId] = function() {
-//                    try {
-//                        switch (cfg.idleFunc(params, state)) {
-//                            case true:
-//                                _render(params);
-//                                break;
-//                            case false:
-//                                if (state.getNumProcesses() > 0) {
-//                                    _render(params);
-//                                }
-//                                break;
-//                            default:
-//                                stop();
-//                                break;
-//                        }
-//                    } catch (e) {
-//                        stop();
-//                        if (cfg.onError) {
-//                            cfg.onError(e);
-//                        } else {
-//                            throw e;
-//                        }
-//                    }
-//                };
-//                pInterval = setInterval("window." + funcId, cfg.interval || 10);
-//            }
+            //            ,
+            //
+            //            run : function(cfg) {
+            //                cfg.idleFunc = cfg.idleFunc ||
+            //                               function(params, state) {
+            //                                   return (state.getNumProcesses() > 0);
+            //                               };
+            //                var pInterval;
+            //                var funcId = "renderScene" + sceneId;
+            //                var params = cfg.params || {};
+            //                var stop = function() {
+            //                    clearInterval(pInterval);
+            //                    window[funcId] = undefined;
+            //                    sceneId = backend.deregisterScene(sceneId);
+            //                };
+            //                var state = {
+            //                    getNumProcesses: function() {
+            //                        return (sceneId) ? backend.getNumProcesses(sceneId) : 0;
+            //                    }
+            //                };
+            //                window[funcId] = function() {
+            //                    try {
+            //                        switch (cfg.idleFunc(params, state)) {
+            //                            case true:
+            //                                _render(params);
+            //                                break;
+            //                            case false:
+            //                                if (state.getNumProcesses() > 0) {
+            //                                    _render(params);
+            //                                }
+            //                                break;
+            //                            default:
+            //                                stop();
+            //                                break;
+            //                        }
+            //                    } catch (e) {
+            //                        stop();
+            //                        if (cfg.onError) {
+            //                            cfg.onError(e);
+            //                        } else {
+            //                            throw e;
+            //                        }
+            //                    }
+            //                };
+            //                pInterval = setInterval("window." + funcId, cfg.interval || 10);
+            //            }
         };
         sceneId = backend.registerScene(_scene);
         return _scene;
@@ -1167,7 +1183,7 @@ SceneJs.backends.installBackend(
 
     /** Destroys all scenes and causes SceneJS to release all resources it is currently holding for them.
      */
-    SceneJs.reset = function() {
+    SceneJS.reset = function() {
         var scenes = backend.getAllScenes();
         var temp = [];
         for (var i = 0; i < scenes.length; i++) {
@@ -1181,14 +1197,11 @@ SceneJs.backends.installBackend(
 /** Backend for renderer nodes. When it activates a canvas for its renderer node, this backend gets the
  * "simple-shader" backend to activate its program on the canvas context as the default shader.
  */
-SceneJs.backends.installBackend(
+SceneJS._modules.installBackend(
         new (function() {
 
             this.type = 'renderer';
-
-            /** IDs of supported WebGL canvas contexts
-             */
-            var CONTEXT_TYPES = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
+                       
             var ctx;
             var stateStack;   // Stack of renderer properties
             var glEnumMap;    // Maps renderer props to WebGL enums - lazy created when first GL context available
@@ -1201,19 +1214,20 @@ SceneJs.backends.installBackend(
             var findCanvas = function(canvasId) {
                 var canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw new SceneJs.exceptions.CanvasNotFoundException
+                    throw new SceneJS.exceptions.CanvasNotFoundException
                             ('Could not find canvas document element with id \'' + canvasId + '\'');
                 }
                 var context;
-                for (var i = 0; (!context) && i < CONTEXT_TYPES.length; i++) {
+                var contextNames = SceneJS._webgl.contextNames;
+                for (var i = 0; (!context) && i < contextNames.length; i++) {
                     try {
-                        context = canvas.getContext(CONTEXT_TYPES[i]);
+                        context = canvas.getContext(contextNames[i]);
                     } catch (e) {
 
                     }
                 }
                 if (!context) {
-                    throw new SceneJs.exceptions.WebGLNotSupportedException
+                    throw new SceneJS.exceptions.WebGLNotSupportedException
                             ('Canvas document element with id \''
                                     + canvasId
                                     + '\' failed to provide a supported context');
@@ -1272,12 +1286,12 @@ SceneJs.backends.installBackend(
                     };
                 }
                 if (!name) {
-                    throw new SceneJs.exceptions.InvalidNodeConfigException(
+                    throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Null renderer node config: \"" + name + "\"");
                 }
                 var result = glEnumMap[name];
                 if (!result) {
-                    throw new SceneJs.exceptions.InvalidNodeConfigException(
+                    throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Unknown renderer node config: \"" + name + "\"");
                 }
                 return result;
@@ -1551,7 +1565,7 @@ SceneJs.backends.installBackend(
                 var canvas;
                 if (props.canvasId) {                      // Canvas specified to activate
                     if (ctx.renderer.canvas) {
-                        throw new SceneJs.exceptions.CanvasAlreadyActiveException("A canvas is already activated by a higher renderer node");
+                        throw new SceneJS.exceptions.CanvasAlreadyActiveException("A canvas is already activated by a higher renderer node");
                     }
                     canvas = findCanvas(props.canvasId);
 
@@ -1559,7 +1573,7 @@ SceneJs.backends.installBackend(
                     canvas = ctx.renderer.canvas;          // Using current canvas
 
                 } else {                                   // No canvas specified, but none already active
-                    throw new SceneJs.exceptions.NoCanvasActiveException(
+                    throw new SceneJS.exceptions.NoCanvasActiveException(
                             'Outermost renderer node must have a canvasId');
                 }
 
@@ -1581,7 +1595,7 @@ SceneJs.backends.installBackend(
                 return state;
             };
 
-            //var simpleShaderBackend = SceneJs.backends.getBackend('simple-shader');
+            //var simpleShaderBackend = SceneJS._modules.getBackend('simple-shader');
 
             /** Activates the given renderer state. If no state is active, then it must specify a canvas to activate,
              * in which case the default simple shader will be activated as well
@@ -1591,12 +1605,12 @@ SceneJs.backends.installBackend(
                 stateStack.push(state);
                 setProperties(state.props);
 
-//                /* Ensure that at least the default simple shader is active
-//                 */
-//                if (!ctx.programs.getActiveProgramId()) {
-//                    var programId = simpleShaderBackend.loadProgram();
-//                    simpleShaderBackend.activateProgram(programId);
-//                }
+                //                /* Ensure that at least the default simple shader is active
+                //                 */
+                //                if (!ctx.programs.getActiveProgramId()) {
+                //                    var programId = simpleShaderBackend.loadProgram();
+                //                    simpleShaderBackend.activateProgram(programId);
+                //                }
             };
 
             /** Restores previous renderer state, if any.
@@ -1607,9 +1621,9 @@ SceneJs.backends.installBackend(
                     setProperties(state.restore);
                 } else {
 
-//                    /* Canvas deactivating - don't leave default simple shader active
-//                     */
-//                    simpleShaderBackend.deactivateProgram();
+                    //                    /* Canvas deactivating - don't leave default simple shader active
+                    //                     */
+                    //                    simpleShaderBackend.deactivateProgram();
                     ctx.renderer.canvas = null;
                 }
             };
@@ -1620,24 +1634,23 @@ SceneJs.backends.installBackend(
         })());
 
 
-
 /** Scene graph node that sets renderer state for nodes in its subtree. These nodes may
  * be nested, and the root renderer node must specify the ID of a WebGL canvas node in
  * the DOM. Nested renderes may then omit the canvas ID to reuse the current canvas, or
  * may specify a different canvas ID to activate a different canvas.
  */
-SceneJs.renderer = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
-    var backend = SceneJs.backends.getBackend('renderer');
+SceneJS.renderer = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var backend = SceneJS._backends.getBackend('renderer');
     var env;
 
     return function(scope) {
         var params = cfg.getParams(scope);
-        if (!env || !params.fixed) {
+        if (!env || !cfg.fixed) {
             env = backend.createRendererState(params);
         }
         backend.setRendererState(env);
-        SceneJs.utils.visitChildren(cfg, scope);
+        SceneJS._utils.visitChildren(cfg, scope);
         backend.restoreRendererState(env);
     };
 };
@@ -1647,10 +1660,10 @@ SceneJs.renderer = function() {
  * Backend for shader scene nodes.
  *
  */
-SceneJs.shaderBackend = function(cfg) {
+SceneJS.shaderBackend = function(cfg) {
 
     if (!cfg.type) {
-        throw new SceneJs.exceptions.NodeConfigExpectedException("SceneJs.ShaderBackendBase mandatory config missing: \'type\'");
+        throw new SceneJS.exceptions.NodeConfigExpectedException("SceneJS.ShaderBackendBase mandatory config missing: \'type\'");
     }
 
     return new (function() {
@@ -1720,7 +1733,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.loadProgram = function(_cfg) {
                         if (!ctx.renderer.canvas) {
-                            throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
+                            throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                         }
                         var programId = ctx.renderer.canvas.canvasId + ":" + _cfg.type;
 
@@ -1770,7 +1783,7 @@ SceneJs.shaderBackend = function(cfg) {
                          */
                         if (context.getProgramParameter(program.program, 0x8B82 /*gl.LINK_STATUS*/) != 1) {
                             deleteProgram(program);
-                            throw new SceneJs.exceptions.ShaderLinkFailureException("Failed to link shader program: " + context.getProgramInfoLog(program.program));
+                            throw new SceneJS.exceptions.ShaderLinkFailureException("Failed to link shader program: " + context.getProgramInfoLog(program.program));
                         }
 
                         /* Create variable location map on program
@@ -1784,7 +1797,7 @@ SceneJs.shaderBackend = function(cfg) {
                                     if (loc == -1) {
                                         loc = context.getUniformLocation(activeProgram.program, name);
                                         if (loc == -1) {
-                                            throw new SceneJs.exceptions.ShaderVariableNotFoundException("Variable not found in active shader: \'" + name + "\'");
+                                            throw new SceneJS.exceptions.ShaderVariableNotFoundException("Variable not found in active shader: \'" + name + "\'");
                                         }
                                     }
                                     locations[name] = loc;
@@ -1813,7 +1826,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.activateProgram = function(programId) {
                         if (!ctx.renderer.canvas) {
-                            throw new SceneJs.exceptions.NoCanvasActiveException("No canvas active");
+                            throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                         }
                         activeProgram = programs[programId];
                         ctx.renderer.canvas.context.useProgram(activeProgram.program);
@@ -1833,7 +1846,7 @@ SceneJs.shaderBackend = function(cfg) {
 
                     this.setVar = function(name, value) {
                         if (!activeProgram) {
-                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                         }
                         var setter = activeProgram.setters[name];
                         if (setter) {
@@ -1848,7 +1861,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.setVars = function(v) {
                         if (!activeProgram) {
-                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                         }
                         for (var key in activeProgram.setters) {
                             activeProgram.setters[key].call(this, ctx.renderer.canvas.context,
@@ -1876,7 +1889,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.bindVertexBuffer = function(buffer) {
                         if (!activeProgram) {
-                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                         }
                         activeProgram.binders.bindVertexBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
                     };
@@ -1885,7 +1898,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.bindNormalBuffer = function(buffer) {
                         if (!activeProgram) {
-                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                         }
                         activeProgram.binders.bindNormalBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
                     };
@@ -1894,7 +1907,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.bindTextureCoordBuffer = function(buffer) {
                         if (!activeProgram) {
-                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                         }
                         if (activeProgram.binders.bindTextureCoordBuffer) { // Texture support optional in shader
                             activeProgram.binders.bindTextureCoordBuffer.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, buffer);
@@ -1905,7 +1918,7 @@ SceneJs.shaderBackend = function(cfg) {
                      */
                     this.bindTexture = function(texture) {
                         if (!activeProgram) {
-                            throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                         }
                         if (activeProgram.binders.bindTextureSampler) { // Texture support optional in shader
                             activeProgram.binders.bindTextureSampler.call(this, ctx.renderer.canvas.context, activeProgram.getVarLocation, texture);
@@ -1987,8 +2000,8 @@ SceneJs.shaderBackend = function(cfg) {
 /** Activates a shader program for sub-nodes.
  *
  */
-SceneJs.shader = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.shader = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
     var canvasId;
     var programId;
     var backend;
@@ -1998,9 +2011,9 @@ SceneJs.shader = function() {
 
         if (!backend) {
             if (!params.type) {
-                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory shader parameter missing: \'type\'");
+                throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory shader parameter missing: \'type\'");
             }
-            backend = SceneJs.backends.getBackend(params.type);
+            backend = SceneJS._backends.getBackend(params.type);
         }
 
         /* Load shader if not yet loaded, or the containing canvas
@@ -2029,7 +2042,7 @@ SceneJs.shader = function() {
             });
         }
 
-        SceneJs.utils.visitChildren(cfg, scope);
+        SceneJS._utils.visitChildren(cfg, scope);
 
         /* Restore any state saved for higher
          */
@@ -2065,7 +2078,7 @@ SceneJs.shader = function() {
  * @param cfg
  */
 
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         (function() {
 
             /** Default value for script matrices, injected on activation
@@ -2083,9 +2096,9 @@ SceneJs.backends.installBackend(
             var getDefaultMat4 = function() {
                 if (!defaultMat4) {
                     try {
-                        defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
+                        defaultMat4 = new WebGLFloatArray(SceneJS._math.identityMat4());
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultMat4;
@@ -2096,13 +2109,13 @@ SceneJs.backends.installBackend(
                     try {
                         defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultNormalMat;
             };
 
-            return SceneJs.shaderBackend({
+            return SceneJS.shaderBackend({
 
                 type: 'simple-shader',
 
@@ -2241,7 +2254,7 @@ SceneJs.backends.installBackend(
  * More on VBOs: http://www.opengl.org/wiki/Vertex_Buffer_Objects
  */
 
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             var nextBufId = 0;
@@ -2305,7 +2318,7 @@ SceneJs.backends.installBackend(
                          */
                         createGeoBuffer : function(geoType, geo) {
                             if (!ctx.programs.getActiveProgramId()) {
-                                throw new SceneJs.exceptions.NoShaderActiveException("No shader active");
+                                throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                             }
                             var bufId = ctx.renderer.canvas.canvasId + (geoType || nextBufId++);
                             var context = ctx.renderer.canvas.context;
@@ -2366,7 +2379,7 @@ SceneJs.backends.installBackend(
                              */
                             var tempShader = false;
                             var shaderBackend = null;
-//                         
+                            //
 
                             /** Tell observers that we're about to draw
                              */
@@ -2479,10 +2492,10 @@ SceneJs.backends.installBackend(
  * Defines geometry on the currently-active canvas, to be shaded with the current shader.
  *
  */
-SceneJs.geometry = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.geometry = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.backends.getBackend('geometry');
+    var backend = SceneJS._backends.getBackend('geometry');
     var canvasId;
     var bufId; // handle to backend geometry buffer
 
@@ -2493,10 +2506,10 @@ SceneJs.geometry = function() {
             /* Since I'm always using VBOs, we cant buffer geometry if it's going to keep changing.
              * In future versions I'll allow dynamic geometry config and just not buffer it in that case.
              */
-            throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
+            throw new SceneJS.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
         }
         if (!params.type) {
-            throw new SceneJs.exceptions.NodeConfigExpectedException("Geometry type parameter expected");
+            throw new SceneJS.exceptions.NodeConfigExpectedException("Geometry type parameter expected");
         }
 
         if (params.type) {
@@ -2531,16 +2544,16 @@ SceneJs.geometry = function() {
             // TODO: render eometry without using VBO
         }
         backend.drawGeoBuffer(bufId);
-        SceneJs.utils.visitChildren(cfg, scope);
+        SceneJS._utils.visitChildren(cfg, scope);
     };
 };
 
-SceneJs.utils.ns("SceneJs.objects");
+SceneJS._utils.ns("SceneJS.objects");
 
 /** Specialises (as a higher-order function) a geometry node to define the venerable OpenGL teapot.
  *
  */
-SceneJs.objects.teapot = function() {
+SceneJS.objects.teapot = function() {
 
 
     var vertices = [
@@ -8289,10 +8302,10 @@ SceneJs.objects.teapot = function() {
             var v2 = vertices[j1];
             var v3 = vertices[j2];
 
-            var va = SceneJs.math.subVec4(v2, v1);
-            var vb = SceneJs.math.subVec4(v3, v1);
+            var va = SceneJS._math.subVec4(v2, v1);
+            var vb = SceneJS._math.subVec4(v3, v1);
 
-            var n = SceneJs.math.normalizeVec4(SceneJs.math.cross3Vec4(va, vb));
+            var n = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(va, vb));
 
             if (!nvecs[j0]) nvecs[j0] = [];
             if (!nvecs[j1]) nvecs[j1] = [];
@@ -8325,14 +8338,14 @@ SceneJs.objects.teapot = function() {
         var result = [];
         for (var i = 0; i < ar.length; i++) {
             if (numPerElement && ar[i].length != numPerElement)
-                throw new SceneJs.exceptions.InvalidGeometryConfigException("Bad geometry array element");
+                throw new SceneJS.exceptions.InvalidGeometryConfigException("Bad geometry array element");
             for (var j = 0; j < ar[i].length; j++)
                 result.push(ar[i][j]);
         }
         return result;
     };
 
-    return SceneJs.geometry({
+    return SceneJS.geometry({
         type:"teapot",
         vertices: flatten(vertices, 3),
         indices:flatten(indices, 3),
@@ -8341,15 +8354,14 @@ SceneJs.objects.teapot = function() {
 };
 
 
-
-SceneJs.utils.ns("SceneJs.objects");
+SceneJS._utils.ns("SceneJS.objects");
 
 /** Cube geometry
  *
  */
-SceneJs.objects.cube = function() {
+SceneJS.objects.cube = function() {
 
-    return SceneJs.geometry({
+    return SceneJS.geometry({
 
         type: "cube",
 
@@ -8477,22 +8489,21 @@ SceneJs.objects.cube = function() {
 };
 
 
-
-SceneJs.utils.ns("SceneJs.objects");
+SceneJS._utils.ns("SceneJS.objects");
 
 /** Sphere geometry
  *
  */
-SceneJs.objects.sphere = function() {
+SceneJS.objects.sphere = function() {
 
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     if (!cfg.fixed) {
 
         /* Since I'm always using VBOs, we cant buffer geometry if it's going to keep changing.
          * In future versions I'll allow dynamic geometry config and just not buffer it in that case.
          */
-        throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of sphere objects is not supported");
+        throw new SceneJS.exceptions.UnsupportedOperationException("Dynamic configuration of sphere objects is not supported");
     }
 
     var params = cfg.getParams();
@@ -8500,7 +8511,7 @@ SceneJs.objects.sphere = function() {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 
-    return SceneJs.geometry({
+    return SceneJS.geometry({
         type: "sphere_" + params.rings + "_" + params.slices,
 
         create: function() {
@@ -8565,7 +8576,7 @@ SceneJs.objects.sphere = function() {
 /**
  * Manages the current modelling transformation
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'model-transform';
@@ -8576,7 +8587,7 @@ SceneJs.backends.installBackend(
 
                 ctx.modelTransform = (function() {
                     var transform = {
-                        matrix : SceneJs.math.identityMat4(),
+                        matrix : SceneJS._math.identityMat4(),
                         fixed: true
                     };
                     var loaded = false;
@@ -8590,7 +8601,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to drawn we load our matrix if not loaded already
                      */
-                    ctx.events.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL arrays
@@ -8602,7 +8613,7 @@ SceneJs.backends.installBackend(
                             /* Lazy compute normal matrix
                              */
                             if (!transform.normalMatrixAsArray) {
-                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJs.math.mat4To3(SceneJs.math.transposeMat4(SceneJs.math.inverseMat4(transform.matrix))));
+                                transform.normalMatrixAsArray = new WebGLFloatArray(SceneJS._math.mat4To3(SceneJS._math.transposeMat4(SceneJS._math.inverseMat4(transform.matrix))));
                             }
 
                             ctx.programs.setVar('scene_ModelMatrix', transform.matrixAsArray);
@@ -8623,11 +8634,11 @@ SceneJs.backends.installBackend(
                         },
 
                         transformPoint3: function(v) {
-                            return SceneJs.math.transformPoint3(transform.matrix, v);
+                            return SceneJS._math.transformPoint3(transform.matrix, v);
                         } ,
 
                         transformVector: function(v) {
-                            return SceneJs.math.transformVector3(transform.matrix, v);
+                            return SceneJS._math.transformVector3(transform.matrix, v);
                         } ,
 
                         isFixed: function() {
@@ -8658,10 +8669,10 @@ SceneJs.backends.installBackend(
  * Sets a rotation modelling transformation on the current shader. The transform will be cumulative with transforms at
  * higher nodes.
  */
-SceneJs.rotate = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.rotate = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.backends.getBackend('model-transform');
+    var backend = SceneJS._backends.getBackend('model-transform');
 
     var mat;
     var xform;
@@ -8674,21 +8685,21 @@ SceneJs.rotate = function() {
             params.y = params.y || 0;
             params.z = params.z || 0;
             if (params.x + params.y + params.z == 0) {
-                throw new SceneJs.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
+                throw new SceneJS.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
             }
-            mat = SceneJs.math.rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
+            mat = SceneJS._math.rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
         }
         var superXform = backend.getTransform();
         if (!xform || !superXform.fixed || !cfg.fixed) {
-            var tempMat = SceneJs.math.mulMat4(superXform.matrix, mat);
+            var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
             xform = {
                 localMatrix: mat,
-                matrix: tempMat,              
+                matrix: tempMat,
                 fixed: superXform.fixed && cfg.fixed
             };
         }
         backend.setTransform(xform);
-        SceneJs.utils.visitChildren(cfg, scope);
+        SceneJS._utils.visitChildren(cfg, scope);
         backend.setTransform(superXform);
     };
 };
@@ -8698,10 +8709,10 @@ SceneJs.rotate = function() {
  */
 (function() {
 
-    SceneJs.translate = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
+    SceneJS.translate = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-        var backend = SceneJs.backends.getBackend('model-transform');
+        var backend = SceneJS._backends.getBackend('model-transform');
 
         var mat;
         var xform;
@@ -8709,11 +8720,11 @@ SceneJs.rotate = function() {
         return function(scope) {
             if (!mat || !cfg.fixed) {  // Memoize matrix if node config is constant
                 var params = cfg.getParams(scope);
-                mat = SceneJs.math.translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
+                mat = SceneJS._math.translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
             }
             var superXform = backend.getTransform();
             if (!xform || !superXform.fixed || !cfg.fixed) {
-                var tempMat = SceneJs.math.mulMat4(superXform.matrix, mat);
+                var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
                 xform = {
                     localMatrix: mat,
                     matrix: tempMat,
@@ -8721,7 +8732,7 @@ SceneJs.rotate = function() {
                 };
             }
             backend.setTransform(xform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
             backend.setTransform(superXform);
         };
     };
@@ -8733,10 +8744,10 @@ SceneJs.rotate = function() {
 
 (function() {
 
-    SceneJs.scale = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
+    SceneJS.scale = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-        var backend = SceneJs.backends.getBackend('model-transform');
+        var backend = SceneJS._backends.getBackend('model-transform');
 
         var mat;
         var xform;
@@ -8744,19 +8755,19 @@ SceneJs.rotate = function() {
         return function(scope) {
             if (!mat || !cfg.fixed) {   // Memoize matrix if node config is constant
                 var params = cfg.getParams(scope);
-                mat = SceneJs.math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
+                mat = SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
             }
             var superXform = backend.getTransform();
             if (!xform || !superXform.fixed || !cfg.fixed) {
-                var tempMat = SceneJs.math.mulMat4(superXform.matrix, mat);
+                var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
                 xform = {
                     localMatrix: mat,
-                    matrix: tempMat,                   
+                    matrix: tempMat,
                     fixed: superXform.fixed && cfg.fixed
                 };
             }
             backend.setTransform(xform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
             backend.setTransform(superXform);
         };
     };
@@ -8765,7 +8776,7 @@ SceneJs.rotate = function() {
 /**
  * Manages the current model-view transformation
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'projection_transform';
@@ -8775,7 +8786,7 @@ SceneJs.backends.installBackend(
             var init = function() {
                 ctx.projection = (function() {
                     var transform = {
-                        matrix : SceneJs.math.identityMat4(),
+                        matrix : SceneJS._math.identityMat4(),
                         fixed: true
                     };
 
@@ -8790,20 +8801,20 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                     ctx.events.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
                         if (!loaded) {
 
-                                    /* Lazy-compute WebGL array
-                                     */
-                                    if (!transform.matrixAsArray) {
-                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                                    }
+                            /* Lazy-compute WebGL array
+                             */
+                            if (!transform.matrixAsArray) {
+                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                            }
 
-                                    ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
+                            ctx.programs.setVar('scene_ProjectionMatrix', transform.matrixAsArray);
 
-                                    loaded = true;
-                                }
-                            });
+                            loaded = true;
+                        }
+                    });
 
                     return {
                         setTransform: function(t) {
@@ -8842,9 +8853,9 @@ SceneJs.backends.installBackend(
 (function() {
 
 
-    SceneJs.perspective = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
-        var backend = SceneJs.backends.getBackend('projection_transform');
+    SceneJS.perspective = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        var backend = SceneJS._backends.getBackend('projection_transform');
         var xform;
 
         return function(scope) {
@@ -8856,8 +8867,8 @@ SceneJs.backends.installBackend(
                 params.near = params.near || 0.1;
                 params.far = params.far || 400.0;
 
-                var tempMat = SceneJs.math.perspectiveMatrix4(
-                        params.fovy* Math.PI / 180.0,
+                var tempMat = SceneJS._math.perspectiveMatrix4(
+                        params.fovy * Math.PI / 180.0,
                         params.aspect,
                         params.near,
                         params.far);
@@ -8868,7 +8879,7 @@ SceneJs.backends.installBackend(
             }
             var prevXform = backend.getTransform();
             backend.setTransform(xform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
             backend.setTransform(prevXform);
         };
     };
@@ -8877,15 +8888,15 @@ SceneJs.backends.installBackend(
  * Scene node that constructs an ortographic projection matrix and sets it on the current shader.
  */
 (function() {
-   
-    SceneJs.ortho = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
-        var backend = SceneJs.backends.getBackend('projection_transform');
+
+    SceneJS.ortho = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        var backend = SceneJS._backends.getBackend('projection_transform');
         var xform;
         return function(scope) {
             if (!xform || !cfg.fixed) {
                 var params = cfg.getParams(scope);
-                var tempMat = SceneJs.math.orthoMat4c(
+                var tempMat = SceneJS._math.orthoMat4c(
                         params.left || -1.0,
                         params.right || 1.0,
                         params.bottom || -1.0,
@@ -8899,7 +8910,7 @@ SceneJs.backends.installBackend(
             }
             var prevXform = backend.getTransform();
             backend.setTransform(xform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
             backend.setTransform(prevXform);
         };
     };
@@ -8909,14 +8920,14 @@ SceneJs.backends.installBackend(
  */
 
 (function() {
-    SceneJs.frustum = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
-        var backend = SceneJs.backends.getBackend('projection_transform');
+    SceneJS.frustum = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        var backend = SceneJS._backends.getBackend('projection_transform');
         var xform;
         return function(scope) {
             if (!xform || cfg.fixed) {    // Memoize matrix if node config is constant
                 var params = cfg.getParams(scope);
-                var tempMat = SceneJs.math.frustumMatrix4(
+                var tempMat = SceneJS._math.frustumMatrix4(
                         params.left || -1.0,
                         params.right || 1.0,
                         params.bottom || -1.0,
@@ -8930,7 +8941,7 @@ SceneJs.backends.installBackend(
             }
             var prevXform = backend.getTransform();
             backend.setTransform(xform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
             backend.setTransform(prevXform);
         };
     };
@@ -8939,7 +8950,7 @@ SceneJs.backends.installBackend(
 /**
  * Manages the current view transformation
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'view-transform';
@@ -8950,7 +8961,7 @@ SceneJs.backends.installBackend(
 
                 ctx.viewTransform = (function() {
                     var transform = {
-                        matrix : SceneJs.math.identityMat4(),
+                        matrix : SceneJS._math.identityMat4(),
                         fixed: true
                     };
 
@@ -8965,20 +8976,20 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                     ctx.events.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
                         if (!loaded) {
 
-                                    /* Lazy-compute WebGL array
-                                     */
-                                    if (!transform.matrixAsArray) {
-                                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                                    }
+                            /* Lazy-compute WebGL array
+                             */
+                            if (!transform.matrixAsArray) {
+                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                            }
 
-                                    ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
+                            ctx.programs.setVar('scene_ViewMatrix', transform.matrixAsArray);
 
-                                    loaded = true;
-                                }
-                            });
+                            loaded = true;
+                        }
+                    });
 
                     return {
                         setTransform: function(t) {
@@ -9011,15 +9022,15 @@ SceneJs.backends.installBackend(
             };
         })());
 /**
- * Scene node that constructs a 'lookat' view transformation matrix and sets it on the current shader.
+ * Scene node that constructs a 'lookAt' view transformation matrix and sets it on the current shader.
  */
 
 (function() {
 
-    SceneJs.lookat = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
+    SceneJS.lookAt = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-        var backend = SceneJs.backends.getBackend('view-transform');
+        var backend = SceneJS._backends.getBackend('view-transform');
 
         var cloneVec = function(v) {
             return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
@@ -9038,12 +9049,12 @@ SceneJs.backends.installBackend(
                 params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
 
                 if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
-                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookat parameters: eye and look cannot be identical");
+                    throw new SceneJS.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: eye and look cannot be identical");
                 }
                 if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
-                    throw new SceneJs.exceptions.InvalidLookAtConfigException("Invald lookat parameters: up vector cannot be of zero length, ie. all elements zero");
+                    throw new SceneJS.exceptions.InvalidLookAtConfigException("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                 }
-                mat = SceneJs.math.lookatMat4c(
+                mat = SceneJS._math.lookAtMat4c(
                         params.eye.x, params.eye.y, params.eye.z,
                         params.look.x, params.look.y, params.look.z,
                         params.up.x, params.up.y, params.up.z);
@@ -9051,14 +9062,14 @@ SceneJs.backends.installBackend(
 
             var superXform = backend.getTransform();
             if (!xform || !superXform.fixed || !cfg.fixed) {
-                var tempMat = SceneJs.math.mulMat4(superXform.matrix, mat);
+                var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
                 xform = {
                     matrix: tempMat,
                     fixed: superXform.fixed && cfg.fixed
                 };
             }
             backend.setTransform(xform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
             backend.setTransform(superXform);
         };
     };
@@ -9070,7 +9081,7 @@ SceneJs.backends.installBackend(
  * that many lights from the top of the stack downwards will be effectively active within the shader.
  */
 
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'lights';
@@ -9094,7 +9105,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our lights if not loaded already
                      */
-                     ctx.events.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Lights', lightStack);
                             loaded = true;
@@ -9184,10 +9195,10 @@ SceneJs.backends.installBackend(
                 ctx.lights.reset();
             };
         })());
-SceneJs.lights = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.lights = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.backends.getBackend('lights');
+    var backend = SceneJS._backends.getBackend('lights');
 
     var lights;
 
@@ -9200,15 +9211,15 @@ SceneJs.lights = function() {
             lights = backend.transformLights(cfg.getParams(scope).lights);
         }
         backend.pushLights(lights);
-        SceneJs.utils.visitChildren(cfg, scope);
+        SceneJS._utils.visitChildren(cfg, scope);
         backend.popLights(lights.length);
     };
 };
 /** Sets material properties on the current shader for sub-nodes
  *
  */
-SceneJs.material = function(scenejs) {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.material = function(scenejs) {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend;
 
     var cloneColor = function(v) {
@@ -9219,7 +9230,7 @@ SceneJs.material = function(scenejs) {
 
     return function(scope) {
         if (!backend) {
-            backend = SceneJs.backends.getBackend('material');
+            backend = SceneJS._backends.getBackend('material');
         }
         if (!material || !cfg.fixed) { // if not memoized or params are variable
             var params = cfg.getParams(scope);
@@ -9234,14 +9245,14 @@ SceneJs.material = function(scenejs) {
         var saveMaterial = backend.getMaterial();
 
         backend.setMaterial(material);
-        SceneJs.utils.visitChildren(cfg, scope);
+        SceneJS._utils.visitChildren(cfg, scope);
         backend.setMaterial(saveMaterial);
     };
 };
 /**
  * Backend for a material node, feeds given material properties into the active shader and retains them.
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'material';
@@ -9277,7 +9288,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to render we load our material if not loaded already
                      */
-                    ctx.events.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Material', material);
                             loaded = true;
@@ -9319,8 +9330,8 @@ SceneJs.backends.installBackend(
  * Takes a key value from the current scope and creates a child scope containing an output value that is
  * interpolated within the configured keyframe sequence.
  */
-SceneJs.scalarInterpolator = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.scalarInterpolator = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     var NOT_FOUND = 0;
     var BEFORE_FIRST = 1;
@@ -9339,7 +9350,7 @@ SceneJs.scalarInterpolator = function() {
 
                 /* Can't dynamically configure an interpolator - TODO: would that be useful?            
                  */
-                throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of interpolators is not supported");
+                throw new SceneJS.exceptions.UnsupportedOperationException("Dynamic configuration of interpolators is not supported");
             }
 
             // Validate
@@ -9496,27 +9507,25 @@ SceneJs.scalarInterpolator = function() {
 
         update();
 
-        var childScope = SceneJs.utils.newScope(scope, cfg.fixed);
+        var childScope = SceneJS._utils.newScope(scope, cfg.fixed);
         childScope.put(params.output, outputValue);
 
-        SceneJs.utils.visitChildren(cfg, childScope);
+        SceneJS._utils.visitChildren(cfg, childScope);
     };
 };
 
 
-
-
 /**
- * Scene node that creates a child scope containing the elements of its configuration. 
+ * Scene node that creates a child scope containing the elements of its configuration.
  */
-SceneJs.scope = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.scope = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     var childScope;
 
     return function(scope) {
         if (!childScope || !cfg.fixed || !scope.isfixed()) { // memoize scope if config and scope are constant
-            childScope = SceneJs.utils.newScope(scope, cfg.fixed);
+            childScope = SceneJS._utils.newScope(scope, cfg.fixed);
             var params = cfg.getParams(scope);
             if (params) {
                 for (var key in params) {
@@ -9524,7 +9533,7 @@ SceneJs.scope = function() {
                 }
             }
         }
-        SceneJs.utils.visitChildren(cfg, childScope);
+        SceneJS._utils.visitChildren(cfg, childScope);
     };
 };
 
@@ -9536,19 +9545,19 @@ SceneJs.scope = function() {
  * This node type is useful for procedurally generating subtrees within a scene. Its most common application would be
  * to dynamically instance elements of primitive geometry to build complex objects.
  */
-SceneJs.generator = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.generator = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
     return function(scope) {
         if (cfg.fixed) {
-            throw new SceneJs.exceptions.InvalidNodeConfigException('generator node must be configured with a function');
+            throw new SceneJS.exceptions.InvalidNodeConfigException('generator node must be configured with a function');
         }
         var params = cfg.getParams(scope);
         while (params) {
-            var childScope = SceneJs.utils.newScope(scope);
+            var childScope = SceneJS._utils.newScope(scope);
             for (var key in params) {
                 childScope.put(key, params[key]);
             }
-            SceneJs.utils.visitChildren(cfg, childScope);
+            SceneJS._utils.visitChildren(cfg, childScope);
             params = cfg.getParams(scope);
         }
     };
@@ -9560,8 +9569,8 @@ SceneJs.generator = function() {
  * graph to become its subtree, providing that a backend has been installed to help SceneJS asset that particular file
  * type.
  */
-SceneJs.asset = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.asset = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend;
     var loading = false;
     return function(scope) {
@@ -9577,12 +9586,12 @@ SceneJs.asset = function() {
 
         if (!backend) {
             if (!params.proxy) {
-                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: proxy");
+                throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: proxy");
             }
             if (!params.uri) {
-                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: uri");
+                throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: uri");
             }
-            backend = SceneJs.backends.getBackend("asset." + getFileExtension(params.uri));
+            backend = SceneJS._backends.getBackend("asset." + getFileExtension(params.uri));
         }
 
         var assetNode = backend.getAsset(params.uri); // Backend may have evicted asset after lack of recent use
@@ -9602,7 +9611,7 @@ SceneJs.asset = function() {
             }
             assetNode.call(this, scope);
         }
-        SceneJs.utils.visitChildren(cfg, scope); // For completeness - probably wont have children on an asset node        
+        SceneJS._utils.visitChildren(cfg, scope); // For completeness - probably wont have children on an asset node
     };
 };
 
@@ -9610,14 +9619,14 @@ SceneJs.asset = function() {
 /**
  * Base for backends for the asset scene node. This is extended for each file type.
  */
-SceneJs.assetBackend = function(cfg) {
+SceneJS.assetBackend = function(cfg) {
 
     if (!cfg.type) {
-        throw new SceneJs.exceptions.NodeConfigExpectedException("Asset backend config missing: type");
+        throw new SceneJS.exceptions.NodeConfigExpectedException("Asset backend config missing: type");
     }
 
     if (!cfg.parse) {
-        throw new SceneJs.exceptions.NodeConfigExpectedException("Asset backend config missing: parser");
+        throw new SceneJS.exceptions.NodeConfigExpectedException("Asset backend config missing: parser");
     }
 
     return new (function() {
@@ -9639,14 +9648,14 @@ SceneJs.assetBackend = function(cfg) {
 
                     var evict = function() {
                         if (--evictionCountdown == 0) {
-//                            var oldest = -1;
-//                            for (var src in entries) {
-//                                var entry = entries[src];
-//                                if (entry.age > oldest) {
-//                                    oldest = entries[src].age;
-//                                }
-//                            }
-//                            evictionCountdown = 1000;
+                            //                            var oldest = -1;
+                            //                            for (var src in entries) {
+                            //                                var entry = entries[src];
+                            //                                if (entry.age > oldest) {
+                            //                                    oldest = entries[src].age;
+                            //                                }
+                            //                            }
+                            //                            evictionCountdown = 1000;
                         }
                     };
 
@@ -9703,11 +9712,11 @@ SceneJs.assetBackend = function(cfg) {
                         jsonp(url.join(""),
                                 function(data) {
                                     if (!data) { // TODO: be way more specific about asset load failures, but what can we determine here since it's asynch?
-                                        throw new SceneJs.exceptions.AssetLoadFailureException("Asset load failed", uri, proxy);
+                                        throw new SceneJS.exceptions.AssetLoadFailureException("Asset load failed", uri, proxy);
                                     }
                                     var assetNode = importer.parse(data);
                                     if (!assetNode || (typeof assetNode != 'function')) {
-                                        throw new SceneJs.exceptions.AssetLoadFailureException("Asset load failed - parser failure? ", uri, proxy);
+                                        throw new SceneJS.exceptions.AssetLoadFailureException("Asset load failed - parser failure? ", uri, proxy);
                                     }
                                     entries[uri] = {
                                         node: assetNode,
@@ -9770,17 +9779,17 @@ SceneJs.assetBackend = function(cfg) {
  * @param cfg
  */
 
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         (function() {
 
-            return SceneJs.assetBackend({
+            return SceneJS.assetBackend({
 
                 /** All asset backends have an type ID of this form:
                  * "asset." concatenated with the target file extension
                  */
                 type: 'asset.js',
 
-               /** Special params for asset server
+                /** Special params for asset server
                  */
                 serverParams: {
                     mode: 'js'
@@ -9797,15 +9806,15 @@ SceneJs.backends.installBackend(
         ;
 
 
-SceneJs.texture = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
-    var backend = SceneJs.backends.getBackend("texture");
+SceneJS.texture = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var backend = SceneJS._backends.getBackend("texture");
 
     var loading = false;
     return function(scope) {
         var params = cfg.getParams(scope);
         if (!params.uri) {
-            throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory texture parameter missing: uri");
+            throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory texture parameter missing: uri");
         }
 
         /* By default, texture will block rendering of its child nodes until it is loaded
@@ -9828,22 +9837,21 @@ SceneJs.texture = function() {
                 loading = false;
             }
             backend.activateTexture(textureId);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
         } else if (!params.wait) {
 
             /* Texture configured to render children without texturing while the texture is still loading             
              */
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, scope);
         }
     };
 };
 
 
-
 /**
  *
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'texture';
@@ -9869,7 +9877,7 @@ SceneJs.backends.installBackend(
                     /**
                      * When geometry is about to draw we load our texture if not loaded already
                      */
-                    ctx.events.onEvent("geo-drawing", function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
                         if (!loaded && activeTexture) {
                             ctx.programs.bindTexture(activeTexture.ptexture);
                             loaded = true;
@@ -9986,7 +9994,7 @@ SceneJs.backends.installBackend(
 /**
  * Shader backend for texturing
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         (function() {
 
             /** Default value for script matrices, injected on activation
@@ -10004,9 +10012,9 @@ SceneJs.backends.installBackend(
             var getDefaultMat4 = function() {
                 if (!defaultMat4) {
                     try {
-                        defaultMat4 = new WebGLFloatArray(SceneJs.math.identityMat4());
+                        defaultMat4 = new WebGLFloatArray(SceneJS._math.identityMat4());
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultMat4;
@@ -10017,13 +10025,13 @@ SceneJs.backends.installBackend(
                     try {
                         defaultNormalMat = new WebGLFloatArray([1, 0, 0, 0, 1, 0, 0, 0, 1]);
                     } catch (e) {
-                        throw new SceneJs.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Failed to find WebGL support (WebGLFloatArray)", e);
                     }
                 }
                 return defaultNormalMat;
             };
 
-            return SceneJs.shaderBackend({
+            return SceneJS.shaderBackend({
 
                 type: 'texture-shader',
 

@@ -1,88 +1,93 @@
-SceneJs.exceptions.WebGLNotSupportedException = function(msg, cause) {
+SceneJS.exceptions.WebGLNotSupportedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NodeBackendInstallFailedException = function(msg, cause) {
+SceneJS.exceptions.NodeBackendInstallFailedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NodeConfigExpectedException = function(msg, cause) {
+SceneJS.exceptions.NodeConfigExpectedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.ShaderLinkFailureException = function(msg, cause) {
+SceneJS.exceptions.ShaderLinkFailureException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.ShaderVariableNotFoundException = function(msg, cause) {
+SceneJS.exceptions.ShaderVariableNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NoCanvasActiveException = function(msg, cause) {
+SceneJS.exceptions.NoSceneActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NoShaderActiveException = function(msg, cause) {
+SceneJS.exceptions.NoCanvasActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.CanvasNotFoundException = function(msg, cause) {
+SceneJS.exceptions.NoShaderActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.CanvasAlreadyActiveException = function(msg, cause) {
+SceneJS.exceptions.CanvasNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.InvalidLookAtConfigException = function(msg, cause) {
+SceneJS.exceptions.CanvasAlreadyActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.InvalidGeometryConfigException = function(msg, cause) {
+SceneJS.exceptions.InvalidLookAtConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.UnsupportedOperationException = function(msg, cause) {
+SceneJS.exceptions.InvalidGeometryConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.IllegalRotateConfigException = function(msg, cause) {
+SceneJS.exceptions.UnsupportedOperationException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.InvalidNodeConfigException = function(msg, cause) {
+SceneJS.exceptions.IllegalRotateConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.NodeBackendNotFoundException = function(msg, cause) {
+SceneJS.exceptions.InvalidNodeConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      // TODO: handle more cases for asset failure?
+SceneJS.exceptions.NodeBackendNotFoundException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      // TODO: handle more cases for asset failure?
     this.message = msg + " (uri=\"" + (uri || "null") + "\", proxy=\"" + (proxy || "null") + "\")";
 };
 
-SceneJs.exceptions.AssetTypeUnsupportedException = function(msg, cause) {
+SceneJS.exceptions.AssetTypeUnsupportedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJs.exceptions.OutOfMemoryException = function(msg, cause) {
+SceneJS.exceptions.OutOfMemoryException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };

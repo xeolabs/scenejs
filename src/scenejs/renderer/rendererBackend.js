@@ -1,18 +1,46 @@
-/** Backend for renderer nodes. When it activates a canvas for its renderer node, this backend gets the
- * "simple-shader" backend to activate its program on the canvas context as the default shader.
+/** Backend for renderer nodes.
  */
-SceneJs.backends.installBackend(
-        new (function() {
+SceneJS._backends.installBackend(
 
-            this.type = 'renderer';
+        "renderer",
+
+        function(ctx) {
 
             /** IDs of supported WebGL canvas contexts
              */
-            var CONTEXT_TYPES = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
-            var ctx;
+
             var stateStack;   // Stack of renderer properties
-            var glEnumMap;    // Maps renderer props to WebGL enums - lazy created when first GL context available
             var currentProps; // Selection of current renderer properties used as fallbacks
+            var renderer;
+
+            var defaultProps = {
+                clearColor: {r: 0, g : 0, b : 0, a: 1.0},
+                clearDepth: 1.0,
+                enableDepthTest:true,
+                enableCullFace: false,
+                enableTexture2D: false,
+                depthRange: { zNear: 0, zFar: 1},
+                enableScissorTest: false,
+                viewport: {} // will default to canvas extents
+            };
+
+            /** Initialises backend - sets up a renderer state stack with an
+             *  initial set of essential default properties. The first renderer
+             *  state created by a client renderer node will fall back on these
+             *  where it fails to provide them. Also prepares a map of current
+             *  properties that will internally keep track of state.
+             */
+            ctx.events.onEvent(// Scene traversal begun - init renderer state stack
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
+                        stateStack = [
+                            {
+                                props: defaultProps
+                            }
+                        ];
+                        currentProps = {};
+                        renderer = {};
+                    });
 
             /** Locates canvas in DOM, finds WebGL context on it,
              *  sets some default state on the context, then returns
@@ -21,19 +49,20 @@ SceneJs.backends.installBackend(
             var findCanvas = function(canvasId) {
                 var canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw new SceneJs.exceptions.CanvasNotFoundException
+                    throw new SceneJS.exceptions.CanvasNotFoundException
                             ('Could not find canvas document element with id \'' + canvasId + '\'');
                 }
                 var context;
-                for (var i = 0; (!context) && i < CONTEXT_TYPES.length; i++) {
+                var contextNames = SceneJS._webgl.contextNames;
+                for (var i = 0; (!context) && i < contextNames.length; i++) {
                     try {
-                        context = canvas.getContext(CONTEXT_TYPES[i]);
+                        context = canvas.getContext(contextNames[i]);
                     } catch (e) {
 
                     }
                 }
                 if (!context) {
-                    throw new SceneJs.exceptions.WebGLNotSupportedException
+                    throw new SceneJS.exceptions.WebGLNotSupportedException
                             ('Canvas document element with id \''
                                     + canvasId
                                     + '\' failed to provide a supported context');
@@ -56,49 +85,14 @@ SceneJs.backends.installBackend(
              * Maps renderer node properties to WebGL context enums
              */
             var glEnum = function(context, name) {
-                if (!glEnumMap) {   // Lazy-create from context
-                    glEnumMap = {
-                        "funcAdd": context.FUNC_ADD,
-                        "funcSubtract": context.FUNC_SUBTRACT,
-                        "funcReverseSubtract": context.FUNC_REVERSE_SUBTRACT,
-                        "zero" : context.ZERO,
-                        "one" : context.ONE,
-                        "srcColor":context.SRC_COLOR,
-                        "oneMinusSrcColor":context.ONE_MINUS_SRC_COLOR,
-                        "dstColor":context.DST_COLOR,
-                        "oneMinusDstColor":context.ONE_MINUS_DST_COLOR,
-                        "srcAlpha":context.SRC_ALPHA,
-                        "oneMinusSrcAlpha":context.ONE_MINUS_SRC_ALPHA,
-                        "dstAlpha":context.DST_ALPHA,
-                        "oneMinusDstAlpha":context.ONE_MINUS_DST_ALPHA,
-                        "contantColor":context.CONSTANT_COLOR,
-                        "oneMinusConstantColor":context.ONE_MINUS_CONSTANT_COLOR,
-                        "constantAlpha":context.CONSTANT_ALPHA,
-                        "oneMinusConstantAlpha":context.ONE_MINUS_CONSTANT_ALPHA,
-                        "srcAlphaSaturate":context.SRC_ALPHA_SATURATE    ,
-                        "front": context.FRONT,
-                        "back": context.BACK,
-                        "frontAndBack": context.FRONT_AND_BACK ,
-                        "never":   context.NEVER,
-                        "less":context.LESS,
-                        "equal":context.EQUAL,
-                        "lequal":context.LEQUAL,
-                        "greater":context.GREATER,
-                        "notequal":context.NOTEQUAL,
-                        "gequal":context.GEQUAL,
-                        "always":context.ALWAYS  ,
-                        "cw":context.CW,
-                        "ccw":context.CCW
-                    };
-                }
                 if (!name) {
-                    throw new SceneJs.exceptions.InvalidNodeConfigException(
+                    throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Null renderer node config: \"" + name + "\"");
                 }
-                var result = glEnumMap[name];
+                var result = SceneJS._webgl.enumMap[name];
                 if (!result) {
-                    throw new SceneJs.exceptions.InvalidNodeConfigException(
-                            "Unknown renderer node config: \"" + name + "\"");
+                    throw new SceneJS.exceptions.InvalidNodeConfigException(
+                            "Unrecognised renderer node config value: \"" + name + "\"");
                 }
                 return result;
             };
@@ -257,8 +251,8 @@ SceneJs.backends.installBackend(
                     v = {
                         x : v.x || 1,
                         y : v.y || 1,
-                        width: v.width || ctx.renderer.canvas.width,
-                        height: v.height || ctx.renderer.canvas.renderer.height
+                        width: v.width || renderer.canvas.width,
+                        height: v.height || renderer.canvas.renderer.height
                     };
                     currentProps.viewport = v;
                     context.viewport(v.x, v.y, v.width, v.height);
@@ -298,15 +292,14 @@ SceneJs.backends.installBackend(
 
             /** Sets current renderer properties on the given WebGL context
              */
-            var setProperties = function(props) {
-                var context = ctx.renderer.canvas.context;
+            var setProperties = function(context, props) {
 
                 /* Set state variables that map to properties
                  */
                 for (var key in props) {
                     var setter = glSetters[key];
                     if (setter) {
-                        setter(context, props[key], ctx.renderer);
+                        setter(context, props[key], renderer);
                     }
                 }
                 if (props.viewport) {
@@ -320,37 +313,6 @@ SceneJs.backends.installBackend(
                 }
             };
 
-            var defaultProps = {
-                clearColor: {r: 0, g : 0, b : 0, a: 1.0},
-                clearDepth: 1.0,
-                enableDepthTest:true,
-                enableCullFace: false,
-                enableTexture2D: false,
-                depthRange: { zNear: 0, zFar: 1},
-                enableScissorTest: false,
-                viewport: {} // will default to canvas extents
-            };
-
-            this.install = function(_ctx) {
-                ctx = _ctx;
-
-                /** Initialises backend - sets up a renderer state stack with an
-                 *  initial set of essential default properties. The first renderer
-                 *  state created by a client renderer node will fall back on these
-                 *  where it fails to provide them. Also prepares a map of current
-                 *  properties that will internally keep track of state.
-                 */
-                ctx.events.onEvent("scene-activated",
-                        function() {
-                            stateStack = [
-                                {
-                                    props: defaultProps
-                                }
-                            ];
-                            currentProps = {};
-                            ctx.renderer = {};
-                        });
-            };
 
             /** Gets value of the given property on the first higher renderer state that has it
              */
@@ -364,78 +326,92 @@ SceneJs.backends.installBackend(
                 throw "Internal error - renderer backend stateStack underflow!";
             };
 
-            /** Creates a new renderer state - does not set it yet
-             */
-            this.createRendererState = function(props) {
-
-                /* Select a canvas
-                 */
-                var canvas;
-                if (props.canvasId) {                      // Canvas specified to activate
-                    if (ctx.renderer.canvas) {
-                        throw new SceneJs.exceptions.CanvasAlreadyActiveException("A canvas is already activated by a higher renderer node");
-                    }
-                    canvas = findCanvas(props.canvasId);
-
-                } else if (ctx.renderer.canvas) {
-                    canvas = ctx.renderer.canvas;          // Using current canvas
-
-                } else {                                   // No canvas specified, but none already active
-                    throw new SceneJs.exceptions.NoCanvasActiveException(
-                            'Outermost renderer node must have a canvasId');
-                }
-
-                /* For each property supplied, find the previous value to restore it to
-                 */
-                var restore = {};
-                for (var name in props) {
-                    if ((!props[name] === undefined)) {
-                        restore[name] = getSuperProperty(name);
+            function fireEventIfTextureModeUpdated(state, lastState) {
+                var enableTexture2D = state.props.enableTexture2D;
+                if (enableTexture2D != undefined) {
+                    if (enableTexture2D != lastState.enableTexture2D) {
+                        ctx.events.fireEvent(
+                                enableTexture2D
+                                        ? SceneJS._eventTypes.TEXTURE_ENABLED
+                                        : SceneJS._eventTypes.TEXTURE_DISABLED);
                     }
                 }
+            }
 
-                var state = {
-                    canvas: canvas,
-                    props : props,
-                    restore : restore,
-                    prevCanvas: ctx.renderer.canvas // To restore null when no higher state
-                };
-                return state;
-            };
+            return {// Node-facing API
 
-            //var simpleShaderBackend = SceneJs.backends.getBackend('simple-shader');
+                /**
+                 * Returns a new renderer state to the caller, without making it active.
+                 */
+                createRendererState : function(props) {
 
-            /** Activates the given renderer state. If no state is active, then it must specify a canvas to activate,
-             * in which case the default simple shader will be activated as well
-             */
-            this.setRendererState = function(state) {
-                ctx.renderer.canvas = state.canvas;
-                stateStack.push(state);
-                setProperties(state.props);
+                    /* Select a canvas if specified
+                     */
+                    var canvas;
+                    if (props.canvasId) {                      // Canvas specified
+                        if (renderer.canvas) {                 //  - but canvas already active
+                            throw new SceneJS.exceptions.CanvasAlreadyActiveException
+                                    ("A canvas is already activated by a higher renderer node");
+                        }
+                        canvas = findCanvas(props.canvasId);
 
-                //                /* Ensure that at least the default simple shader is active
-                //                 */
-                //                if (!ctx.programs.getActiveProgramId()) {
-                //                    var programId = simpleShaderBackend.loadProgram();
-                //                    simpleShaderBackend.activateProgram(programId);
-                //                }
-            };
+                    } else if (renderer.canvas) {               // No canvas specified, but canvas already active
+                        canvas = renderer.canvas;               //  - continue using active canvas
 
-            /** Restores previous renderer state, if any.
-             */
-            this.restoreRendererState = function(state) {
-                stateStack.pop();
-                if (state.prevCanvas) {
-                    setProperties(state.restore);
-                } else {
+                    } else {                                    // No canvas specified, but none already active
+                        throw new SceneJS.exceptions.NoCanvasActiveException(
+                                'Outermost renderer node must have a canvasId');
+                    }
 
-                    //                    /* Canvas deactivating - don't leave default simple shader active
-                    //                     */
-                    //                    simpleShaderBackend.deactivateProgram();
-                    ctx.renderer.canvas = null;
+                    /* For each property supplied, find the previous value to restore it to
+                     */
+                    var restore = {};
+                    for (var name in props) {
+                        if ((!props[name] === undefined)) {
+                            restore[name] = getSuperProperty(name);
+                        }
+                    }
+
+                    return {
+                        canvas: canvas,
+                        props : props,
+                        restore : restore,
+                        prevCanvas: renderer.canvas // To restore null when no higher state
+                    };
+                },
+
+                /** Activates the given renderer state. If no state is active, then it must specify a canvas to activate,
+                 * in which case the default simple shader will be activated as well
+                 */
+                setRendererState : function(state) {
+
+                    var prevCanvas = renderer.canvas;
+
+                    renderer.canvas = state.canvas;
+                    var lastState = stateStack[stateStack.length - 1];
+                    stateStack.push(state);
+                    setProperties(renderer.canvas.context, state.props);
+
+                    fireEventIfTextureModeUpdated(state, lastState);
+
+                    if (!prevCanvas) {
+                        ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_ACTIVATED, renderer.canvas);
+                    }
+                },
+
+                /** Restores previous renderer state, if any.
+                 */
+                restoreRendererState : function(state) {
+                    stateStack.pop();
+                    if (state.prevCanvas) {
+                        setProperties(renderer.canvas.context, state.restore); // Undo property settings
+                    } else {
+                        renderer.canvas = null;
+                        ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_DEACTIVATED);
+                    }
                 }
             };
-        })());
+        });
 
 
 

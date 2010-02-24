@@ -17,7 +17,7 @@
  * loops, where in each one it sets a scope containing different extents for its
  * child viewport node. It stops the loop by not returning anything.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({
@@ -38,7 +38,7 @@ with (SceneJs) {
                                     perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
 
-                                            lookat({
+                                            lookAt({
                                                 eye : { x: 0.0, y: 30.0, z: -20.0},
                                                 look : { x : 0.0, y : 15.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -77,7 +77,7 @@ with (SceneJs) {
                                                                             ) // translate
                                                                     ) // generator
                                                             ) // material
-                                                    ) // lookat
+                                                    ) // lookAt
 
 
                                             ) // frustum

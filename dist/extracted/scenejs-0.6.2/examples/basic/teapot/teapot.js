@@ -20,7 +20,7 @@
  * Lots of wicked scene features are not demonstrated here, such as animation, multiple canvases, advanced shaders
  * and so on. I'll show you those in later examples.
  */
-with (SceneJs) {
+with (SceneJS) {
     var introScene = scene({}, // node always has a config object
 
             renderer({
@@ -37,7 +37,7 @@ with (SceneJs) {
                                 ]},
                                     perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
-                                            lookat({
+                                            lookAt({
                                                 eye : { x: 0.0, y: 7.0, z: -15},
                                                 look : { x : 0.0, y : 1.0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -54,7 +54,7 @@ with (SceneJs) {
                                                                     objects.teapot()
                                                                     )
                                                             )
-                                                    ) // lookat
+                                                    ) // lookAt
                                             ) // perspective
                                     ) // lights
                             ) // shader                      

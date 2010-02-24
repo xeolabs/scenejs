@@ -2,55 +2,62 @@
  * Backend for scene vars node, sets variables on the active shader and retains them.
  *
  */
-SceneJs.backends.installBackend(
-        new (function() {
+SceneJS._backends.installBackend(
 
-            this.type = 'vars';
+        "vars",
 
-            var ctx;
+        function(ctx) {
+            var vars = {
+                vars : {
+                },
+                fixed: true
+            };
 
-            this.install = function(_ctx) {
-                ctx = _ctx;
+            var loaded = false;
 
-                ctx.shaderVars = (function() {
-                    var vars = {
-                        vars : {
-                        },
-                        fixed: true
-                    };
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
+                        vars = {
+                            vars : {
+                            },
+                            fixed: true
+                        };
+                        loaded = false;
+                    });
 
-                    var loaded = false;
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
 
-                    return {
-                        setVars: function(v) {
-                            vars = v;
-                            loaded = false;
-                        },
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
 
-                        getVars: function() {
-                            return vars;
-                        },
-
-                        load: function() {
-                            if (!loaded) {
-
-                                
-                                loaded = true;
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.GEOMETRY_RENDERING,
+                    function() {
+                        if (!loaded) {
+                            for (var name in vars) {
+                                ctx.events.fireEvent(SceneJS._eventTypes.SHADER_UNIFORM_SET, name, vars[name]);
                             }
-                        },
-
-                        needLoad: function() {
-                            loaded = false;
+                            loaded = true;
                         }
-                    };
-                })();
-            };
+                    });
 
-            this.setVars = function(v) {
-                ctx.programs.setVars(ctx.renderer.canvas.context, v);
-            };
+            return { // Node-facing API
 
-            this.getVars = function() {
-                ctx.programs.getVars(ctx.renderer.canvas.context);
+                setVars: function(v) {
+                    vars = v;
+                    loaded = false;
+                },
+
+                getVars: function() {
+                    return vars;
+                }
             };
-        })());
+        });

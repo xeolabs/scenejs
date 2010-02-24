@@ -8,7 +8,7 @@
  *
  */
 try {
-    with (SceneJs) {
+    with (SceneJS) {
         var exampleScene;
         var makeScene = function() {
             exampleScene = scene({}, // node always has a config object
@@ -31,7 +31,7 @@ try {
                                         ]},
                                             perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
-                                                    lookat({
+                                                    lookAt({
                                                         eye : { x: 0.0, y: 0.0, z: -120},
                                                         look : { x : 0.0, y : 0.0, z : 0 },
                                                         up : { x: 0.0, y: 1.0, z: 0.0 }
@@ -82,7 +82,7 @@ try {
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ))
 
-                                                // ) // lookat
+                                                // ) // lookAt
                                                     ) // perspective
                                             ) // lights
                                     ) // shader

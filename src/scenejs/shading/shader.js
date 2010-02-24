@@ -1,65 +1,77 @@
 /** Activates a shader program for sub-nodes.
- *
  */
-SceneJs.shader = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
-    var canvasId;
+SceneJS.shader = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+
+    if (!cfg.fixed) {
+        throw new SceneJS.exceptions.UnsupportedOperationException
+                ("Dynamic configuration of shaders is not supported");
+    }
+
     var programId;
-    var backend;
+    var backend = SceneJS._backends.getBackend("shader");
+    var params;
 
-    return function(scope) {
-        var params = cfg.getParams(scope);
+    return SceneJS._utils.createNode(
+            function(scope) {
+                if (!params) {
+                    params = cfg.getParams(scope);
+                    if (!params.type) {
+                        throw new SceneJS.exceptions.NodeConfigExpectedException
+                                ("Mandatory shader parameter missing: type");
+                    }
+                    if (!params.vertexShaders) {
+                        throw new SceneJS.exceptions.NodeConfigExpectedException
+                                ("Mandatory shader parameter missing: vertexShaders");
+                    }
+                    if (!params.fragmentShaders) {
+                        throw new SceneJS.exceptions.NodeConfigExpectedException
+                                ("Mandatory shader parameter missing: fragmentShaders");
+                    }
+                }
 
-        if (!backend) {
-            if (!params.type) {
-                throw new SceneJs.exceptions.NodeConfigExpectedException("Mandatory shader parameter missing: \'type\'");
-            }
-            backend = SceneJs.backends.getBackend(params.type);
-        }
+                /* Load shader if not yet loaded, or the containing canvas
+                 * node has dynamically switched to some other canvas
+                 */
+                if (!programId) {
+                    programId = backend.createProgram(params.type, params.vertexShaders, params.fragmentShaders);
+                }
 
-        /* Load shader if not yet loaded, or the containing canvas
-         * node has dynamically switched to some other canvas
-         */
-        if (!programId || (canvasId != backend.getActiveCanvasId())) {
-            canvasId = backend.getActiveCanvasId();
-            programId = backend.loadProgram();
-        }
+                /* Save any state set by higher shader node
+                 */
+                var previousProgramId = backend.getActiveProgramId();
+                //        var previousVars;
+                //        if (previousProgramId) {
+                //            previousVars = backend.getVars();
+                //        }
 
-        /* Save any state set by higher shader node
-         */
-        var previousProgramId = backend.getActiveProgramId(); // Save active shaders
-        var previousVars;
-        if (previousProgramId) {
-            previousVars = backend.getVars();
-        }
+                /* Activate new shaders and vars
+                 */
+                if (previousProgramId != programId) {
+                    backend.activateProgram(programId);
+                }
+                //        if (params.vars) {
+                //            backend.setVars({
+                //                vars: params.vars,
+                //                fixed : cfg.fixed // Sub-vars are cacheable if these are not dynamically-generated
+                //            });
+                //        }
 
-        /* Activate new shaders and vars
-         */
-        if (previousProgramId != programId) {
-            backend.activateProgram(programId);
-        }
-//        if (params.vars) {
-//            backend.setVars({
-//                vars: params.vars,
-//                fixed : cfg.fixed // Sub-vars are cacheable if these are not dynamically-generated
-//            });
-//        }
+                SceneJS._utils.visitChildren(cfg, scope);
 
-        SceneJs.utils.visitChildren(cfg, scope);
-
-        /* Restore any state saved for higher
-         */
-        if (previousProgramId) {
-            if (previousProgramId != programId) {
-                backend.activateProgram(previousProgramId);
-            }
-//            if (previousVars) {
-//                backend.setVars(previousVars);
-//            }
-        } else {
-            backend.deactivateProgram();
-        }
-    };
+                /* Restore any state saved for higher
+                 */
+                if (previousProgramId) {
+                    if (previousProgramId != programId) {
+                        backend.activateProgram(previousProgramId);
+                    }
+                    //            if (previousVars) {
+                    //                backend.setVars(previousVars);
+                    //            }
+                } else {
+                    backend.deactivateProgram();
+                }
+            });
 };
 
 

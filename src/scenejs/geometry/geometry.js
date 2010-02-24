@@ -1,56 +1,49 @@
 /**
- * Defines geometry on the currently-active canvas, to be shaded with the current shader.
- *
+ * An element of geometry
  */
-SceneJs.geometry = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.geometry = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.backends.getBackend('geometry');
-    var canvasId;
-    var bufId; // handle to backend geometry buffer
+    if (!cfg.fixed) {
+        throw new SceneJS.exceptions.UnsupportedOperationException
+                ("Dynamic configuration of geometry nodes is not supported");
+    }
 
-    return function(scope) {
-        var params = cfg.getParams(scope);
-        if (!cfg.fixed) {
+    var backend = SceneJS._backends.getBackend('geometry');
 
-            /* Since I'm always using VBOs, we cant buffer geometry if it's going to keep changing.
-             * In future versions I'll allow dynamic geometry config and just not buffer it in that case.
-             */
-            throw new SceneJs.exceptions.UnsupportedOperationException("Dynamic configuration of geometry is not yet supported");
-        }
-        if (!params.type) {
-            throw new SceneJs.exceptions.NodeConfigExpectedException("Geometry type parameter expected");
-        }
+    return SceneJS._utils.createNode(
+            function(scope) {
+                var params = cfg.getParams(scope);
 
-        /* Buffer geometry that is identified with a type
-         */
-        if (canvasId != backend.getActiveCanvasId()) { // TODO: backend should listen for canvas switch and throw out buffer
-            bufId = null;
-        }
+                if (!params.type) { // Identifies VBO's on canvas
+                    throw new SceneJS.exceptions.NodeConfigExpectedException("Geometry node parameter expected : type");
+                }
 
-        /* Backend may have evicted geometry buffer, so we may have to reallocate it
-         */
-        bufId = backend.findGeoBuffer(params.type);
-        if (!bufId) {
-            if (params.create) {
+                if (!params.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
+                    throw new SceneJS.exceptions.NodeConfigExpectedException("Geometry node parameter expected : primitive");
+                }
 
-                /** Callback function lazy-computes geometry
+                /* Backend may have evicted the geometry, so we may have to re-create it
                  */
-                bufId = backend.createGeoBuffer(params.type, params.create());
-            } else {
-                bufId = backend.createGeoBuffer(params.type, {
-                    vertices : params.vertices || [],
-                    normals: params.normals || [],
-                    colors : params.colors || [],
-                    indices : params.indices || [],
-                    texCoords : params.texCoords || []
-                });
-            }
-        }
-        canvasId = backend.getActiveCanvasId();
+                var geoId = backend.findGeometry(params.type);
 
-        backend.drawGeoBuffer(bufId);
-        SceneJs.utils.visitChildren(cfg, scope);
-    };
+                if (!geoId) {
+                    if (params.create) {
+                        geoId = backend.createGeometry(params.type, params.create()); // Lazy-create geometry through callback
+                    } else {
+                        geoId = backend.createGeometry(params.type, {
+                            vertices : params.vertices || [],
+                            normals: params.normals || [],
+                            colors : params.colors || [],
+                            indices : params.indices || [],
+                            texCoords : params.texCoords || [],
+                            primitive : params.primitive
+                        });
+                    }
+                }
+
+                backend.drawGeometry(geoId);
+                SceneJS._utils.visitChildren(cfg, scope);
+            });
 };
 

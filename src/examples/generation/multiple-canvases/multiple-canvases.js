@@ -15,12 +15,12 @@
  * traverses the subtree, stopping its loop as soon as the function result is
  * undefined. Our generator causes three loops, where in each one it sets a
  * scope containing the ID of a different canvas, with different parameters for
- * a lookat transform. It stops the loop by not returning anything.
+ * a lookAt transform. It stops the loop by not returning anything.
  *
- * The canvas and lookat nodes in the generator's subtree then accept those
+ * The canvas and lookAt nodes in the generator's subtree then accept those
  * parameters for their configurations.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             generator((function() {
@@ -54,7 +54,7 @@ with (SceneJs) {
                                         ]},
                                             perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
-                                                    lookat(function(scope) {
+                                                    lookAt(function(scope) {
                                                         return {
                                                             eye : scope.get("eye"),
                                                             look : scope.get("look"),
@@ -67,7 +67,7 @@ with (SceneJs) {
                                                             },
                                                                     objects.teapot()
                                                                     )
-                                                            ) // lookat
+                                                            ) // lookAt
                                                     ) // perspective
                                             ) // lights
                                     ) // shader
