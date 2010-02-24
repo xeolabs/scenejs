@@ -81,8 +81,86 @@ SceneJS._webgl = {
         LIGHT_POS: "LightPos"
     },
 
+    /**
+     * SceneJS built-in default shaders, used when no
+     * shader nodes are defined in a scene graph
+     */
+    defaultShaders: {
+
+        /* Default shader with single light source and no texturing
+         */
+        defaultBasicShader :{ // TODO: multiple diretional light sources, specular material
+            vertexShaders: [
+                "attribute vec3 Vertex;" +
+                "attribute vec3 Normal;" +
+                "uniform vec4 LightPos;" +
+                'uniform mat4 PMatrix; ' +
+                'uniform mat4 VMatrix; ' +
+                'uniform mat4 MMatrix; ' +
+                'uniform mat3 NMatrix; ' +
+                "uniform vec3 MaterialAmbient;" +
+                "uniform vec3 MaterialDiffuse;" +
+                "varying vec4 FragColor;" +
+                "void main(void) {" +
+                "   vec4 v = vec4(Vertex, 1.0);" +
+                "   vec4 mv =     MMatrix * v;" + // Modelling transformation
+                "   vec4 vv =     VMatrix * mv;" + // Viewing transformation
+                "   gl_Position = PMatrix * vv;" + // Perspective transformation
+                "   vec3 nn = normalize(NMatrix * Normal);" +
+                "   vec3 lightDir = vec3(normalize(mv - LightPos));" + // Lighting is done in model-space
+                "   float NdotL = max(dot(lightDir, nn), 0.0);" +
+                "   FragColor = vec4(NdotL * MaterialDiffuse + MaterialAmbient, 1.0);" +
+                "}"
+            ],
+            fragmentShaders: [
+                "varying vec4 FragColor;" +
+                "void main(void) { " +
+                "      gl_FragColor = FragColor;  " +
+                "} "
+            ]
+        },
+
+        /* Default shader with texturing        
+         */
+        defaultTextureShader : {
+            vertexShaders: [
+                "attribute vec3 Normal;" +
+                "attribute vec3 Vertex;" +
+                "attribute vec2 TextureCoord;" +
+                "uniform vec4 LightPos;" +
+                'uniform mat4 PMatrix; ' +
+                'uniform mat4 VMatrix; ' +
+                'uniform mat4 MMatrix; ' +
+                'uniform mat3 NMatrix; ' +
+                "uniform vec3 MaterialAmbient;" +
+                "uniform vec3 MaterialDiffuse;" +
+                "varying vec2 vTextureCoord;" +
+                "varying vec3 vLightWeighting; " +
+                "void main(void) {" +
+                "   vec4 mv =     MMatrix * vec4(Vertex, 1.0);" + // Modelling transformation
+                "   vec4 vv =     VMatrix * mv;" + // Viewing transformation
+                "   gl_Position = PMatrix * vv;" + // Perspective transformation
+                "   vec3 nn = normalize(NMatrix * Normal);" +
+                "   vec3 lightDir = vec3(normalize(mv - LightPos));" + // Lighting is done in model-space
+                "   float directionalLightWeighting = max(dot(lightDir, nn), 0.0);" +
+                "   vLightWeighting = MaterialAmbient + MaterialDiffuse * directionalLightWeighting;" +
+                "   vTextureCoord = TextureCoord;" +
+                "}"
+            ],
+            fragmentShaders: [
+                "varying vec2 vTextureCoord;" +
+                "uniform sampler2D Sampler;" +
+                "varying vec3 vLightWeighting; " +
+                "void main(void) {" +
+                "   vec4 textureColor = texture2D(Sampler, vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)); " +
+                "   gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a); " +
+                "}"
+            ]
+        }
+    },
+
     ProgramUniform : function(context, program, name, type, size, location, logging) {
-        logging.debug("Registering uniform: " + name);
+       logging.debug("Program uniform found: " + name);
         var func = null;
         if (type == context.BOOL) {
             func = function (v) {
@@ -158,7 +236,7 @@ SceneJS._webgl = {
     },
 
     ProgramSampler : function(context, program, name, type, size, location, logging) {
-        logging.debug("Registering sampler: " + name);
+        logging.debug("Program sampler found: " + name);
         this.bindTexture = function(texture) {
             texture.bind();
             context.uniform1i(location, 0);
@@ -168,7 +246,7 @@ SceneJS._webgl = {
     /** An attribute within a shader
      */
     ProgramAttribute : function(context, program, name, type, size, location, logging) {
-        logging.debug("Registering attribute: " + name);
+        logging.debug("Program attribute found: " + name);
         this.bindArrayBuffer = function(buffer) {
             context.enableVertexAttribArray(location);
             buffer.bind();
@@ -188,8 +266,6 @@ SceneJS._webgl = {
     Shader : function(context, type, source, logging) {
         this.handle = context.createShader(type);
 
-        logging.debug("");
-        logging.debug("--------------------------");
         logging.debug("Creating " + ((type == context.VERTEX_SHADER) ? "vertex" : "fragment") + " shader");
         this.valid = true;
 
@@ -197,14 +273,12 @@ SceneJS._webgl = {
         context.compileShader(this.handle);
 
         if (context.getShaderParameter(this.handle, context.COMPILE_STATUS) != 0) {
-            logging.debug("Compile succeeded:" + context.getShaderInfoLog(this.handle));
+            logging.debug("Shader compile succeeded:" + context.getShaderInfoLog(this.handle));
         }
         else {
             this.valid = false;
-            logging.error("Compile failed:" + context.getShaderInfoLog(this.handle));
+            logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
         }
-        logging.debug("--------------------------");
-        logging.debug("");
         if (!this.valid) {
             if (this.valid) {
                 throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
@@ -256,16 +330,14 @@ SceneJS._webgl = {
         this.valid = this.valid && (context.getProgramParameter(handle, context.LINK_STATUS) != 0);
         this.valid = this.valid && (context.getProgramParameter(handle, context.VALIDATE_STATUS) != 0);
 
-        logging.debug("");
-        logging.debug("--------------------------");
-        logging.debug("Creating shader program: " + type);
+        logging.debug("Creating shader program: '" + type + "'");
         if (this.valid) {
-            logging.debug("Link succeeded: " + context.getProgramInfoLog(handle));
+            logging.debug("Program link succeeded: " + context.getProgramInfoLog(handle));
         }
         else {
-            logging.debug("Link failed: " + context.getProgramInfoLog(handle));
+            logging.debug("Program link failed: " + context.getProgramInfoLog(handle));
         }
-        
+
         if (!this.valid) {
             throw new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link");
         }
@@ -274,7 +346,7 @@ SceneJS._webgl = {
          */
         var uniforms = {};
         var samplers = {};
-        
+
         var numUniforms = context.getProgramParameter(handle, context.ACTIVE_UNIFORMS);
 
         for (var i = 0; i < numUniforms; ++i) {
@@ -345,20 +417,17 @@ SceneJS._webgl = {
         //        }
         //        context.useProgram(null);
 
-        logging.debug("--------------------------");
-
 
         this.bind = function() {
             context.useProgram(handle);
         };
 
         this.setUniform = function(name, value) {
-            logging.debug("Loading uniform.." + name);
             var u = uniforms[name];
             if (u) {
                 u.setValue(value);
             } else {
-                logging.warn("Program uniform not found: " + name);
+            //    logging.warn("Shader uniform load failed - uniform not found in shader '" + type + "': " + name);
             }
         };
 
@@ -367,7 +436,7 @@ SceneJS._webgl = {
             if (attr) {
                 attr.bindArrayBuffer(buffer);
             } else {
-                logging.warn("Attribute not found: " + name);
+              //  logging.warn("Shader attribute bind failed - attribute not found in shader '" + type + "': " + name);
             }
         };
 
@@ -376,7 +445,7 @@ SceneJS._webgl = {
             if (sampler) {
                 sampler.bindTexture(texture);
             } else {
-                logging.warn("Sampler not found: " + name);
+              //  logging.warn("Sampler not found: " + name);
             }
         };
 

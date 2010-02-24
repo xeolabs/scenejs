@@ -41,6 +41,7 @@
  * SceneJS currently caches assets with a max-time-inactive
  * eviction policy.
  */
+var SceneJs = SceneJS;
 with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
@@ -53,15 +54,14 @@ with (SceneJS) {
                 }
             }),
 
-            renderer({
-                canvasId: 'theCanvas',
-                clearColor : { r:0, g:0, b:0.0, a: 1 },
-                viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                clear : { depth : true, color : true}
-            },
-
-                    shader({ type: 'simple-shader' },
-
+            loggingToPage({ elementId: "logging" },
+                    
+                    renderer({
+                        canvasId: 'theCanvas',
+                        clearColor : { r:0, g:0, b:0.0, a: 1 },
+                        viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                        clear : { depth : true, color : true}
+                    },
                             lights({
                                 lights: [
                                     {
@@ -85,7 +85,7 @@ with (SceneJS) {
                                                  * is at SceneJS.com.
                                                  */
                                                     asset({
-                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
+                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/spiralstaircase.js",
                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
                                                     })
                                                     ) // lookAt

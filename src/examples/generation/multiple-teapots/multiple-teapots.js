@@ -15,16 +15,16 @@
  * (Vertex Buffer Objects) so repeatedly rendering them is fast.
  */
 with (SceneJS) {
-    var exampleScene = scene({}, // node always has a config object
+    var exampleScene = scene(
 
-            renderer({
-                canvasId: 'theCanvas',
-                clearColor : { r:0, g:0, b:0.0, a: 1 },
-                viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                clear : { depth : true, color : true}
-            },
-
-                    shader({ type: 'simple-shader' },
+            loggingToPage({ elementId: "logging" },
+                    
+                    renderer({
+                        canvasId: 'theCanvas',
+                        clearColor : { r:0, g:0, b:0.0, a: 1 },
+                        viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                        clear : { depth : true, color : true}
+                    },
 
                             lights({
                                 lights: [
@@ -61,8 +61,8 @@ with (SceneJS) {
                                                                     },
                                                                             translate({ x: 8.0},
 
-                                                                                            objects.teapot()
-                                                                                           
+                                                                                    objects.teapot()
+
                                                                                     ) // translate
                                                                             ) // rotate
                                                                     ) // generator
@@ -72,8 +72,9 @@ with (SceneJS) {
 
                                             ) // frustum
                                     ) // lights
-                            ) // shader
-                    ) // renderer
+
+                            ) // renderer
+                    ) // logging
             ); // scene
 
     try {

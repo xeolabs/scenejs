@@ -8,52 +8,97 @@ SceneJS._backends.installBackend(
 
         function(ctx) {
 
-            var logging = {
+            var activeSceneId;
+
+            var funcs = {
+            };
+
+            var queues = {
+            };
+
+            function log(channel, message) {
+                if (activeSceneId) {
+                    message = activeSceneId + ": " + message;
+                }
+                var func = funcs[channel];
+                if (func) {
+                    func(message);
+                } else {
+                    var queue = queues[channel];
+                    if (!queue) {
+                        queue = queues[channel] = [];
+                    }
+                    queue.push(message);
+                }
+            }
+
+            function flush(channel) {
+                var queue = queues[channel];
+                if (queue) {
+                    var func = funcs[channel];
+                    if (func) {
+                        for (var i = 0; i < queue.length; i++) {
+                            func(queue[i]);
+                        }
+                        queues[channel] = [];
+                    }
+                }
+            }
+
+            ctx.logging = {
 
                 error:function(msg) {
+                    log("error", msg);
                 } ,
 
                 warn:function(msg) {
+                    log("warn", msg);
                 },
 
-                info:function() {
+                info:function(msg) {
+                    log("info", msg);
                 },
 
-                debug:function() {
+                debug:function(msg) {
+                    log("debug", msg);
                 }
             };
 
             ctx.events.onEvent(
+                    SceneJS._eventTypes.RESET,
+                    function() {
+                        queues = {};
+                        funcs = {};
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
+                    function(params) {
+                        activeSceneId = params.sceneId;
+                        funcs = {};
+                    });
+
+            ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
                     function() {
-                        ctx.logging = {
-
-                            error:function(msg) {
-                                logging.error(msg);
-                            } ,
-
-                            warn:function(msg) {
-                                logging.warn(msg);
-                            },
-
-                            info:function(msg) {
-                                logging.info(msg);
-                            },
-
-                            debug:function(msg) {
-                                logging.debug(msg);
-                            }
-                        };
+                        funcs = {};
                     });
 
             return { // Node-facing API
 
-                getLogger: function() {
+                getLogger : function() {
                     return ctx.logging;
                 },
 
-                setLogger : function(l) {
-                    logging = l;
+                getFuncs: function() {
+                    return funcs;
+                },
+
+                setFuncs : function(l) {
+                    funcs = l;
+                    for (var channel in queues) {
+                        flush(channel);
+                    }
                 }
             };
         });

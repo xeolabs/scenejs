@@ -20,14 +20,14 @@
 with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
-            renderer({
-                canvasId: 'theCanvas',
-                clearColor : { r:0, g:0, b:0.0, a: 1 },
-                viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                clear : { depth : true, color : true}
-            },
-                    shader({ type: 'simple-shader' },
+            loggingToPage({ elementId: "logging" },
 
+                    renderer({
+                        canvasId: 'theCanvas',
+                        clearColor : { r:0, g:0, b:0.0, a: 1 },
+                        viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                        clear : { depth : true, color : true}
+                    },
                             lights({
                                 lights: [
                                     {
@@ -74,7 +74,7 @@ with (SceneJS) {
                                                             ) // lookAt
                                                     ) // perspective
                                             ) // lights
-                                    ) // shader
+                                    )
                             )
                     )
             ); // scene

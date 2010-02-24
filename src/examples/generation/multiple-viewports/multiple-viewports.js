@@ -15,15 +15,16 @@
  * viewport of its child renderer node. It stops the loop by not returning anything.
  */
 with (SceneJS) {
-    var exampleScene = scene({},
+    var exampleScene = scene(
+
+            loggingToPage({ elementId: "logging" },
 
             renderer({
                 canvasId: 'theCanvas',
                 clearColor : { r:0, g:0, b:0.0, a: 1 },
-                viewport:{ x : 1, y : 1, width: 500, height: 500},
+                viewport:{ x : 1, y : 1, width: 600, height: 600},
                 clear : { depth : true, color : true}
             },
-                    shader({ type: 'simple-shader' },
                             lights({
                                 lights: [
                                     {
@@ -41,10 +42,10 @@ with (SceneJS) {
                                                         return function() {
                                                             i++;
                                                             switch (i) {
-                                                                case 1: return { viewport: {  x : 1, y : 1,  width: 250, height: 250  } };
-                                                                case 2: return { viewport: { x : 250, y : 1,  width: 250, height: 250  } };
-                                                                case 3: return { viewport: { x : 250, y : 250,  width: 250, height: 250  } };
-                                                                case 4: return { viewport: { x : 1, y : 250,  width: 250, height: 250  } };
+                                                                case 1: return { viewport: {  x : 1, y : 1,  width: 300, height: 300  } };
+                                                                case 2: return { viewport: { x : 300, y : 1,  width: 300, height: 300  } };
+                                                                case 3: return { viewport: { x : 300, y : 300,  width: 300, height: 300  } };
+                                                                case 4: return { viewport: { x : 1, y : 300,  width: 300, height: 300  } };
                                                                 case 5: i = 0;
                                                             }
                                                         };

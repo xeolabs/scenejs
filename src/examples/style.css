@@ -42,7 +42,6 @@ body {
     color: #444444;
     text-align: center;
     overflow-right: hidden; /* Remove scroll bars on browser window */
-
 }
 
 a {
@@ -80,6 +79,7 @@ h2 {
     padding: 25px 0 20px 0;
     font-size: 1.4em;
     font-weight: normal;
+    text-align: left;
 
 }
 
@@ -89,7 +89,7 @@ h3 {
     padding: 25px 0 20px;
     font-size: 1.2em;
     font-weight: normal;
-
+    text-align: left;
 }
 
 h4 {
@@ -98,7 +98,7 @@ h4 {
     padding: 5px 0 10px;
     font-size: 0.8em;
     font-weight: bold;
-
+    text-align: left;
 }
 
 #banner {

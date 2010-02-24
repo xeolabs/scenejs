@@ -77,7 +77,6 @@ SceneJS._backends.installBackend(
             return {   // Node-facing API
 
                 setTransform : function(t) {
-                    ctx.logging.debug("Setting modelling transform");
                     transform = t;
                     loaded = false;
                     ctx.events.fireEvent(SceneJS._eventTypes.MODEL_TRANSFORM_UPDATED, transform);

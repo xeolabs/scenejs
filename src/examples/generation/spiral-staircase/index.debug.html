@@ -5,23 +5,32 @@
     <title>SceneJS Example - Generation of a Spiral Staircase</title>
 </head>
 <body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
-<canvas id="theCanvas" width="600" height="600">
-    <p>This example requires a browser that supports the
-        <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-        &lt;canvas&gt; feature.</p>
-</canvas>
-
-
-
-<!-- Exceptions -->
-
-<script type="application/x-javascript" src="../../../scenejs/exceptions/exceptions.js"></script>
+<table>
+    <tr>
+        <td valign="top">
+            <canvas id="theCanvas" width="600" height="600">
+                <p>This example requires a browser that supports the
+                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                    &lt;canvas&gt; feature.</p>
+            </canvas>
+        </td>
+        <td>
+            <div id="logging"></div>
+        </td>
+    </tr>
+</table>
 
 <!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/math.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/core/webgl.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/node.js"></script>
+
+<!-- Exceptions -->
+
+<script type="application/x-javascript" src="../../../scenejs/exceptions/exceptions.js"></script>
+
 
 <!-- Events -->
 
@@ -30,6 +39,12 @@
 <!-- Time -->
 
 <script type="application/x-javascript" src="../../../scenejs/time/timeBackend.js"></script>
+
+<!-- Logger -->
+
+<script type="application/x-javascript" src="../../../scenejs/logging/loggingBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/logging/logging.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/logging/loggingToPage.js"></script>
 
 <!-- Process management -->
 
@@ -41,10 +56,6 @@
 <script type="application/x-javascript" src="../../../scenejs/scene/sceneBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/scene/scene.js"></script>
 
-<!-- Logger -->
-
-<script type="application/x-javascript" src="../../../scenejs/logging/loggingBackend.js"></script>
-
 
 <!-- Memory manager -->
 
@@ -53,10 +64,10 @@
 
 <!-- Shading -->
 
-<script type="application/x-javascript" src="../../../scenejs/shading/shaderBackendBase.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/shader.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/simple/simpleBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/texturing/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
 
 <!-- Renderer -->
 <!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
@@ -126,9 +137,6 @@
 
 <script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
-
-
-
 
 <script type="application/x-javascript" src="spiral-staircase.js"></script>
 </body>

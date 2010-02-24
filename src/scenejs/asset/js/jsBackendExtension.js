@@ -11,7 +11,7 @@ SceneJS._backends.extend(
                  * "asset." concatenated with the target file extension.
                  * If you made one for COLLADA, you would give it type "asset.dae".
                  */
-                type: '.js',
+                type: 'js',
 
                 /** Special params for asset (proxy) server
                  */
@@ -22,7 +22,7 @@ SceneJS._backends.extend(
                 /** Does no parsing, just returns data which is already a scene node
                  */
                 parse: function(data, onError) {
-                    if (typeof data != 'function') {
+                    if (!data.___isSceneJSNode) {
                         onError(data.error || "unkown server error");
                         return null;
                     } else {

@@ -17,14 +17,15 @@
 with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
-            renderer({
-                canvasId: 'theCanvas',
-                clearColor : { r:0, g:0, b:0.3, a: 1 },
-                viewport: { x:0, y:0, width:1900, height:950 },
-                clear : { depth : true, color : true} ,
-                depthRange : { near: .5, far: 1500 }
-            },
-                    shader({ type: 'simple-shader' },
+           loggingToPage({ elementId: "logging" },
+
+                    renderer({
+                        canvasId: 'theCanvas',
+                        clearColor : { r:0, g:0, b:0.3, a: 1 },
+                        viewport: { x:0, y:0, width:950, height:950 },
+                        clear : { depth : true, color : true} ,
+                        depthRange : { near: .5, far: 1500 }
+                    },
 
                             lights({
                                 lights: [
@@ -32,7 +33,7 @@ with (SceneJS) {
                                         pos: { x: 1000.0, y: 1000.0, z: 0.0 }
                                     }
                                 ]},
-                                    perspective({ fovy : 63.0, aspect : 2.0, near : .5, far : 1500.0
+                                    perspective({ fovy : 63.0, aspect : 1.0, near : .5, far : 1500.0
                                     },
 
 
@@ -72,15 +73,15 @@ with (SceneJS) {
                                                                         return scope.get("param");
                                                                     },
                                                                             scale({ x:2, y:2, z:2 },
-//                                                                                    axisBoundary({
-//                                                                                        xmin: -3.4,
-//                                                                                        ymin: -3.4,
-//                                                                                        zmin: -3.4,
-//                                                                                        xmax: 3.4,
-//                                                                                        ymax: 3.4,
-//                                                                                        zmax: 3.4 },
-                                                                                            objects.teapot()
-                                                                                           // )
+                                                                                //                                                                                    axisBoundary({
+                                                                                //                                                                                        xmin: -3.4,
+                                                                                //                                                                                        ymin: -3.4,
+                                                                                //                                                                                        zmin: -3.4,
+                                                                                //                                                                                        xmax: 3.4,
+                                                                                //                                                                                        ymax: 3.4,
+                                                                                //                                                                                        zmax: 3.4 },
+                                                                                    objects.teapot()
+                                                                                // )
                                                                                     )
                                                                             )
                                                                     )
@@ -88,10 +89,10 @@ with (SceneJS) {
 
                                                     )
                                             )
-
+                                       )
                                     )
                             )
-                    )
+                
 
             ); // scene
 
@@ -125,15 +126,15 @@ with (SceneJS) {
     /* Hack to get any scene definition exceptions up front.
      * Chrome seemed to absorb them in setInterval!
      */
-  //  try {
-        exampleScene.render({z:zpos});
+    //  try {
+    exampleScene.render({z:zpos});
 
-        /* Continue animation
-         */
-        pInterval = setInterval("doit()", 10);
-//    } catch (e) {
-//        handleError(e);
-//    }
+    /* Continue animation
+     */
+    pInterval = setInterval("doit()", 10);
+    //    } catch (e) {
+    //        handleError(e);
+    //    }
 
 
 }

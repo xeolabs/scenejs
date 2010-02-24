@@ -55,7 +55,7 @@ SceneJS._backends.installBackend(
                         iEvictor = 0;
                     }
                     if (evictors[iEvictor++]()) {
-                        ctx.logging.warn("Evicted other item from shader memory");
+                        ctx.logging.warn("Evicted least-used item from memory");
                         return true;
                     } else {
                         tries++;
@@ -67,9 +67,9 @@ SceneJS._backends.installBackend(
             }
 
             function outOfMemory(description) {
-                ctx.logging.error("Shader memory allocation failed");
+                ctx.logging.error("Memory allocation failed");
                 throw new SceneJS.exceptions.OutOfMemoryException(
-                        "Out of memory - failed to allocate shader memory for " + description);
+                        "Out of memory - failed to allocate memory for " + description);
             }
 
             ctx.memory = {
@@ -89,7 +89,7 @@ SceneJS._backends.installBackend(
                  * a closure, IE. not return it.
                  */
                 allocate: function(description, tryAllocate) {
-                    ctx.logging.debug("Allocating shader memory: " + description);
+                    ctx.logging.debug("Allocating memory for: " + description);
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException
                                 ("No canvas active - failed to allocate shader memory");

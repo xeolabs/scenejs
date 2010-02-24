@@ -20,15 +20,14 @@
 with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
-            renderer({
-                canvasId: 'theCanvas',
-                clearColor : { r:0, g:0, b:0.0, a: 1 },
-                viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                clear : { depth : true, color : true}
-            },
+            loggingToPage({ elementId: "logging" },
 
-                    shader({ type: 'simple-shader' },
-
+                    renderer({
+                        canvasId: 'theCanvas',
+                        clearColor : { r:0, g:0, b:0.0, a: 1 },
+                        viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                        clear : { depth : true, color : true}
+                    },
                             lights({
                                 lights: [
                                     {
@@ -37,7 +36,6 @@ with (SceneJS) {
                                 ]},
                                     perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
                                     },
-
                                             lookAt({
                                                 eye : { x: 0.0, y: 30.0, z: -20.0},
                                                 look : { x : 0.0, y : 15.0, z : 0 },
@@ -82,8 +80,8 @@ with (SceneJS) {
 
                                             ) // frustum
                                     ) // lights
-                            ) // shader
-                    ) // renderer
+                            ) // renderer
+                    ) // logging
             ); // scene
 
     try {

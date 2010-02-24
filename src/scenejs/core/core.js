@@ -275,10 +275,10 @@ var SceneJS = {version: '1.0'};
         /**
          * Returns a key for a vacant slot in the given map
          */
-        createKeyForMap : function(keyMap) {
+        createKeyForMap : function(keyMap, prefix) {
             var i = 0;
             while (true) {
-                var key = "id" + i++;
+                var key = prefix + i++;
                 if (!keyMap[key]) {
                     return key;
                 }

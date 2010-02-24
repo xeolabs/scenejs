@@ -60,7 +60,7 @@ SceneJS._backends.installBackend(
              * where canvas not found and geometry was implicitly destroyed
              */
             function destroyGeometry(geo) {
-                ctx.logging.debug("Destroying geometry : " + geo.type);
+                ctx.logging.debug("Destroying geometry : '" + geo.type + "'");
                 if (geo.geoId == currentBoundGeo) {
                     currentBoundGeo = null;
                 }
@@ -189,7 +189,7 @@ SceneJS._backends.installBackend(
                  * @param data Contains vertices, normals, indexes etc.
                  */
                 createGeometry : function(type, data) {
-                    ctx.logging.debug("Creating geometry: " + type);
+                    ctx.logging.debug("Creating geometry: '" + type + "'");
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
@@ -274,13 +274,12 @@ SceneJS._backends.installBackend(
 
                     /* Prompt other backends to lazy-load their resources into the active shader
                      */
-                    ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, {});
+                    ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_RENDERING);
 
                     /* Dont rebind buffer if already bound - this is the case when
                      * we're drawing a batch of the same object, Eg. a bunch of cubes in a row
                      */
                     if (currentBoundGeo != geoId) {
-
                         /* Bind vertex buffers to active shader
                          */
                         ctx.events.fireEvent(
@@ -325,6 +324,7 @@ SceneJS._backends.installBackend(
                      */
                     if (!geo.fixed) {
                         destroyGeometry(geo);
+                        currentBoundGeo = null;
                     }
                 }
             };

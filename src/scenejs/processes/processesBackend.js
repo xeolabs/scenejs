@@ -126,6 +126,7 @@ SceneJS._backends.installBackend(
                             };
                             group.processes[pid] = process;
                             group.numProcesses++;
+                            ctx.logging.debug("Created process: " + cfg.description);
                             return process;
                         }
                     }
@@ -138,6 +139,7 @@ SceneJS._backends.installBackend(
                 destroyProcess: function(process) {
                     if (process) {
                         process.destroyed = true;
+                        ctx.logging.debug("Destroyed process: " + process.description);
                     }
                 },
 
@@ -146,7 +148,11 @@ SceneJS._backends.installBackend(
                  * no ID supplied, the active scene. If no scene is active, returns zero.
                  */
                 getNumProcesses : function(sceneId) {
-                    return sceneId ? groups[sceneId].numProcesses : (activeSceneId ? groups[activeSceneId].numProcesses : 0);
+                    var group = groups[sceneId];
+                    if (!group) {
+                        return 0;
+                    }
+                    return sceneId ? group.numProcesses : (activeSceneId ? groups[activeSceneId].numProcesses : 0);
                 },
 
                 /**
@@ -164,7 +170,11 @@ SceneJS._backends.installBackend(
                  *          onTimeout :     <function>                  // Function that will fire on timeout
                  */
                 getProcesses : function(sceneId) {
-                    return sceneId ? groups[sceneId].processes : (activeSceneId ? groups[activeSceneId].processes : {});
+                    var group = groups[sceneId];
+                    if (!group) {
+                        return {};
+                    }
+                    return sceneId ? group.processes : (activeSceneId ? groups[activeSceneId].processes : {});
                 }
             };
 

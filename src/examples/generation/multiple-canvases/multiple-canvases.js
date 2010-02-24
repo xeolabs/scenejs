@@ -21,30 +21,30 @@
  * parameters for their configurations.
  */
 with (SceneJS) {
-    var exampleScene = scene({}, // node always has a config object
+    var exampleScene = scene(
 
-            generator((function() {
-                var i = 0;
-                return function() {
-                    i++;
-                    switch (i) {
-                        case 1: return { canvasId : "canvas1", eye: { z : 20, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
-                        case 2: return { canvasId : "canvas2", eye: { x : 20, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
-                        case 3: return { canvasId : "canvas3", eye: { y : 20 }, up: { z : 1 } };
-                        case 4: i = 0;
-                    }
-                };
-            })(),
-                    renderer(function(scope) {
-                        return {
-                            canvasId : scope.get("canvasId"),
-                            clearColor : { r:0, g:0, b:0.0, a: 1 },
-                            viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                            clear : { depth : true, color : true}
+            loggingToPage({ elementId: "logging" },
+
+                    generator((function() {
+                        var i = 0;
+                        return function() {
+                            i++;
+                            switch (i) {
+                                case 1: return { canvasId : "canvas1", eye: { z : 20, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
+                                case 2: return { canvasId : "canvas2", eye: { x : 20, y: 1 }, look :{ y: 1 }, up: { y : 1 } };
+                                case 3: return { canvasId : "canvas3", eye: { y : 20 }, up: { z : 1 } };
+                                case 4: i = 0;
+                            }
                         };
-                    },
-
-                            shader({ type: 'simple-shader' },
+                    })(),
+                            renderer(function(scope) {
+                                return {
+                                    canvasId : scope.get("canvasId"),
+                                    clearColor : { r:0, g:0, b:0.0, a: 1 },
+                                    viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                                    clear : { depth : true, color : true}
+                                };
+                            },
 
                                     lights({
                                         lights: [
@@ -70,9 +70,9 @@ with (SceneJS) {
                                                             ) // lookAt
                                                     ) // perspective
                                             ) // lights
-                                    ) // shader
-                            ) // renderer
-                    ) // generator
+                                    ) // renderer
+                            ) // generator
+                    ) // logging
             ) ; // scene
 
     try {

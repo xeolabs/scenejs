@@ -27,7 +27,6 @@ SceneJS._backends.installBackend(
                 var head = document.getElementsByTagName("head")[0];
                 var script = document.createElement("script");
                 script.type = "text/javascript";
-                script.src = fullUri;
                 window[callbackName] = function(data) {
                     onLoad(data);
                     window[callbackName] = undefined;
@@ -38,6 +37,7 @@ SceneJS._backends.installBackend(
                     head.removeChild(script);
                 };
                 head.appendChild(script);
+                script.src = fullUri;  // Request fires now
             }
 
             function getFileExtension(fileName) {
@@ -58,9 +58,11 @@ SceneJS._backends.installBackend(
                         throw "Asset file type not supported: \"" + type + "\"";
                     }
                 }
-                var url = [proxy, "?callback=" , callbackName , "&uri=" + uri];
-                for (var param in importer.serverParams) { // TODO: memoize string portion that contains params
-                    url.push("&", param, "=", importer.serverParams[param]);
+                var url = [proxy, "?callback=", callbackName , "&uri=" + uri, "&mode=js"];
+                if (importer.serverParams) {
+                    for (var param in importer.serverParams) { // TODO: memoize string portion that contains params
+                        url.push("&", param, "=", importer.serverParams[param]);
+                    }
                 }
                 jsonp(url.join(""),
                         callbackName,
@@ -117,19 +119,20 @@ SceneJS._backends.installBackend(
                  *
                  * JSON does nto handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
                  */
-                loadAsset : function(uri, proxy, parser, onSuccess, onTimeout, onError) {
+                loadAsset : function(uri, proxy, importer, onSuccess, onTimeout, onError) {
+                    ctx.logging.debug("Loading asset from " + uri);
                     var process = ctx.processes.createProcess({
                         onTimeout: function() {  // process killed automatically on timeout
                             onTimeout();
                         },
-                        description:"Asset load: " + uri
+                        description:"asset load from " + uri
                     });
                     var callbackName = "callback" + process.id; // Process ID is globally unique
                     _loadAsset(
                             proxy,
                             uri,
                             callbackName,
-                            parser,
+                            importer,
                             onSuccess,
                             function(msg) {  // onError
                                 ctx.processes.destroyProcess(process);

@@ -3,20 +3,20 @@
 SceneJS.logging = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend = SceneJS._backends.getBackend('logging');
-    var logging;
+    var funcs;
     return SceneJS._utils.createNode(
             function(scope) {
-                var prevLogger = backend.getLogger();
-                if (!logging || !cfg.fixed) {
-                    logging = cfg.getParams(scope);
-                    logging.warn = logging.warn || prevLogger.warn;
-                    logging.error = logging.error || prevLogger.error;
-                    logging.debug = logging.debug || prevLogger.debug;
-                    logging.info = logging.info || prevLogger.info;
+                var prevFuncs = backend.getFuncs();
+                if (!funcs || !cfg.fixed) {
+                    funcs = cfg.getParams(scope);
+                    funcs.warn = funcs.warn || prevFuncs.warn;
+                    funcs.error = funcs.error || prevFuncs.error;
+                    funcs.debug = funcs.debug || prevFuncs.debug;
+                    funcs.info = funcs.info || prevFuncs.info;
                 }
-                backend.setLogger(logging);
+                backend.setFuncs(funcs);
                 SceneJS._utils.visitChildren(cfg, scope);
-                backend.setLogger(prevLogger);
+                backend.setFuncs(prevFuncs);
             });
 };
 

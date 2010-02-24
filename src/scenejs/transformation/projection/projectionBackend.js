@@ -62,7 +62,6 @@ SceneJS._backends.installBackend(
             return { // Node- facing API
 
                 setTransform: function(t) {
-                    ctx.logging.debug("Setting projection transform");
                     transform = t;
                     loaded = false;
                     ctx.events.fireEvent(SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED, transform);

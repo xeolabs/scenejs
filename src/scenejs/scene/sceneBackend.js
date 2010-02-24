@@ -24,13 +24,14 @@ SceneJS._backends.installBackend(
                 /** Registers a scene and returns the ID under which it is registered
                  */
                 registerScene : function(scene) {
-                    var sceneId = SceneJS._utils.createKeyForMap(scenes);
+                    var sceneId = SceneJS._utils.createKeyForMap(scenes, "scene");
                     scenes[sceneId] = {
                         sceneId: sceneId,
                         scene:scene
                     };
                     nScenes++;
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_CREATED, {sceneId : sceneId });
+                    ctx.logging.info("Scene defined: " + sceneId);
                     return sceneId;
                 },
 
@@ -43,8 +44,10 @@ SceneJS._backends.installBackend(
                     if (activeSceneId == sceneId) {
                         activeSceneId = null;
                     }
+                    ctx.logging.info("Scene destroyed: " + sceneId);
                     if (nScenes == 0) {
                         ctx.events.fireEvent(SceneJS._eventTypes.RESET);
+                        ctx.logging.info("SceneJS reset: " + sceneId);
                     }
                 },
 
@@ -53,6 +56,7 @@ SceneJS._backends.installBackend(
                 activateScene : function(sceneId) {
                     activeSceneId = sceneId;
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED, { sceneId: sceneId });
+                  //  ctx.logging.info("Scene activated: " + sceneId);
                 },
 
                 /** Returns all registered scenes
@@ -82,6 +86,7 @@ SceneJS._backends.installBackend(
                     }
                     var sceneId = activeSceneId;
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_DEACTIVATED, {sceneId : sceneId });
+                    //ctx.logging.info("Scene deactivated: " + sceneId);
                     activeSceneId = null;
                 }
             };

@@ -61,7 +61,6 @@ SceneJS._backends.installBackend(
                 },
 
                 fireEvent: function(type, params) {
-                 
                     var list = events[type];
                     if (list) {
                         for (var i = 0; i < list.length; i++) {

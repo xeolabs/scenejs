@@ -12,7 +12,7 @@ SceneJS.objects.cube = function() {
 
         type: "cube",
 
-        primitive : "triangle",
+        primitive : "triangles",
 
         vertices :
                 [

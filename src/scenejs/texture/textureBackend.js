@@ -206,7 +206,7 @@ SceneJS._backends.installBackend(
                     }
                     var context = canvas.context;
 
-                    var textureId = SceneJS._utils.createKeyForMap(textures);
+                    var textureId = SceneJS._utils.createKeyForMap(textures, "tex");
 
                     ctx.events.fireEvent(
                             SceneJS._eventTypes.MEMORY_ALLOCATE,

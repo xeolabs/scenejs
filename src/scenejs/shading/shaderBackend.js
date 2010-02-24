@@ -67,24 +67,6 @@ SceneJS._backends.installBackend(
                         textureEnabled = false;
                     });
 
-            /* Texturing has been disabled - if we're currently using the default shader,
-             * switch to the default texturing shader
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURE_ENABLED,
-                    function() {
-                        textureEnabled = true;
-                    });
-
-            /* Texturing has been disabled - if we're currently using the default shader,
-             * switch to the default non-texturing shader
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURE_DISABLED,
-                    function() {
-                        textureEnabled = false;
-                    });
-
             /**
              * Registers this backend module with the memory management module as willing
              * to attempt to destroy a shader when asked, in order to free up memory. Eviction
@@ -115,6 +97,50 @@ SceneJS._backends.installBackend(
                         return false;   // Couldnt find suitable program to delete
                     });
 
+            function _createProgram(type, vertexShaders, fragmentShaders, isDefault) {
+                var programId = canvas.canvasId + ":" + type;
+                if (!programs[programId]) {
+                    ctx.memory.allocate(
+                            "shader",
+                            function() {
+                                programs[programId] = new SceneJS._webgl.Program(
+                                        type,
+                                        programId,
+                                        time,
+                                        canvas.context,
+                                        vertexShaders,
+                                        fragmentShaders,                                        
+                                        ctx.logging);
+                            });
+                }
+                return programId;
+            }
+
+            function _activateProgram(programId) {
+                activeProgram = programs[programId];
+                activeProgram.lastUsed = time;
+                activeProgram.bind();
+                ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATED, {});
+            }
+
+            /* Texturing has been disabled - if we're currently using the default shader,
+             * switch to the default texturing shader
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TEXTURE_ENABLED,
+                    function() {
+                        textureEnabled = true;
+                    });
+
+            /* Texturing has been disabled - if we're currently using the default shader,
+             * switch to the default non-texturing shader
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TEXTURE_DISABLED,
+                    function() {
+                        textureEnabled = false;
+                    });
+
             /**
              * If geometry about to render and no shader active, then we had better load a
              * default one, with or without texture support, depending on whether texturing is
@@ -124,7 +150,10 @@ SceneJS._backends.installBackend(
                     SceneJS._eventTypes.GEOMETRY_RENDERING,
                     function() {
                         if (!activeProgram) {
-
+                            var shaderType = (textureEnabled) ? "defaultTextureShader" : "defaultBasicShader";                        
+                            var shader = SceneJS._webgl.defaultShaders[shaderType];
+                            var isDefault = true;
+                            _activateProgram(_createProgram(shaderType, shader.vertexShaders, shader.fragmentShaders, isDefault));
                         }
                     });
 
@@ -171,22 +200,7 @@ SceneJS._backends.installBackend(
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
-                    var programId = canvas.canvasId + ":" + type;
-                    if (!programs[programId]) {
-                        ctx.memory.allocate(
-                                "shader",
-                                function() {
-                                    programs[programId] = new SceneJS._webgl.Program(
-                                            type,
-                                            programId,
-                                            time,
-                                            canvas.context,
-                                            vertexShaders,
-                                            fragmentShaders,
-                                            ctx.logging);
-                                });
-                    }
-                    return programId;
+                    return _createProgram(type, vertexShaders, fragmentShaders);
                 },
 
                 /** Activates the shader program of the given ID
@@ -195,10 +209,7 @@ SceneJS._backends.installBackend(
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
-                    activeProgram = programs[programId];
-                    activeProgram.lastUsed = time;
-                    activeProgram.bind();
-                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATED, {});
+                    _activateProgram(programId);
                 },
 
                 /** Returns the ID of the currently active shader program

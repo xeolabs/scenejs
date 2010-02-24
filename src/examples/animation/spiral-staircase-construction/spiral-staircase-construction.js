@@ -26,87 +26,83 @@ with (SceneJS) {
                 viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
                 clear : { depth : true, color : true}
             },
-                    shader({ type: 'simple-shader' },
 
-                            lights({
-                                lights: [
-                                    {
-                                        pos: { x: 100.0, y: 40.0, z: 0.0 }
-                                    }
-                                ]},
-                                    perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 300.0
+                    lights({
+                        lights: [
+                            {
+                                pos: { x: 100.0, y: 40.0, z: 0.0 }
+                            }
+                        ]},
+                            perspective({ fovy : 45.0, aspect : 1.0, near : 0.10, far : 300.0
+                            },
+                                    scalarInterpolator({
+                                        type:"linear",
+                                        input:"alpha",
+                                        output:"eyez",
+                                        keys: [0.0, 0.3, 1.0],
+                                        values: [-50, -20, 60]
                                     },
                                             scalarInterpolator({
                                                 type:"linear",
                                                 input:"alpha",
-                                                output:"eyez",
-                                                keys: [0.0, 0.3, 1.0],
-                                                values: [-50, -20, 60]
+                                                output:"eyex",
+                                                keys: [0.0,  0.3, 1.0],
+                                                values: [-50, 60, 0]
                                             },
-                                                    scalarInterpolator({
-                                                        type:"linear",
-                                                        input:"alpha",
-                                                        output:"eyex",
-                                                        keys: [0.0,  0.3, 1.0],
-                                                        values: [-50, 60, 0]
+                                                    lookAt(function(scope) {
+                                                        return {
+
+                                                            eye : { x: scope.get("eyex"), y: 5.0, z: scope.get("eyez")},
+                                                            look : { x : 0.0, y : .0, z : 0 },
+                                                            up : { x: 0.0, y: 1.0, z: 0.0 }
+                                                        };
                                                     },
-                                                            lookAt(function(scope) {
-                                                                return {
-
-                                                                    eye : { x: scope.get("eyex"), y: 5.0, z: scope.get("eyez")},
-                                                                    look : { x : 0.0, y : .0, z : 0 },
-                                                                    up : { x: 0.0, y: 1.0, z: 0.0 }
-                                                                };
+                                                            material({
+                                                                ambient:  { r:0.6, g:0.6, b:0.6 },
+                                                                diffuse:  { r:0.7, g:0.7, b:0.9 }
                                                             },
-                                                                    material({
-                                                                        ambient:  { r:0.6, g:0.6, b:0.6 },
-                                                                        diffuse:  { r:0.7, g:0.7, b:0.9 }
-                                                                    },
-                                                                            generator(
-                                                                                    (function() {
-                                                                                        var elems = [];
+                                                                    generator(
+                                                                            (function() {
+                                                                                var elems = [];
 
-                                                                                        for (var i = -24; i < 24; i += 5) {
-                                                                                            for (var i2 = -25; i2 < 25; i2 += 5) {
-                                                                                                var height = (Math.random() * 50.0) - 25;
-                                                                                                elems.push({
-                                                                                                    x: i,
+                                                                                for (var i = -24; i < 24; i += 5) {
+                                                                                    for (var i2 = -25; i2 < 25; i2 += 5) {
+                                                                                        var height = (Math.random() * 50.0) - 25;
+                                                                                        elems.push({
+                                                                                            x: i,
 
-                                                                                                    y: -(height ),
-                                                                                                    z: i2,
+                                                                                            y: -(height ),
+                                                                                            z: i2,
 
-                                                                                                    height:height
-                                                                                                });
-                                                                                            }
-                                                                                        }
-                                                                                        var j = 0;
-                                                                                        return function() {
-                                                                                            if (j < elems.length) {
-                                                                                                return { param: elems[j++] };
-                                                                                            } else {
-                                                                                                j = 0;
-                                                                                            }
-                                                                                        };
-                                                                                    })(),
-                                                                                    translate(function(scope) {
-                                                                                        return scope.get("param");
-                                                                                    },
-                                                                                            scale(function(scope) {
-                                                                                                return  {y: scope.get("param.height")}
-                                                                                            },
+                                                                                            height:height
+                                                                                        });
+                                                                                    }
+                                                                                }
+                                                                                var j = 0;
+                                                                                return function() {
+                                                                                    if (j < elems.length) {
+                                                                                        return { param: elems[j++] };
+                                                                                    } else {
+                                                                                        j = 0;
+                                                                                    }
+                                                                                };
+                                                                            })(),
+                                                                            translate(function(scope) {
+                                                                                return scope.get("param");
+                                                                            },
+                                                                                    scale({ x: 2, y: 2, z: 2},
 
-                                                                                                    objects.sphere()
-                                                                                                    )
+                                                                                            objects.cube()
                                                                                             )
                                                                                     )
                                                                             )
                                                                     )
                                                             )
+                                                    )
 
-                                                    ) // frustum
-                                            ) // lights
-                                    ) // shader
-                            ) 
+                                            ) // frustum
+                                    ) // lights
+                            ) // shader
                     )
             );
     var alpha = 0;

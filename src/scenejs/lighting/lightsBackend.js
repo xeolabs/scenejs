@@ -51,7 +51,6 @@ SceneJS._backends.installBackend(
                 /** Push lights onto active lights stack
                  */
                 pushLights : function(l) {
-                    ctx.logging.debug("Pushing lights: " + l.length);
                     for (var i = 0; i < l.length; i++) {
                         lights.push(l[i]);
                     }
@@ -60,8 +59,7 @@ SceneJS._backends.installBackend(
 
                 /** Pop given number of lights off active lights stack
                  */
-                popLights : function(numLights) {
-                    ctx.logging.debug("Popping lights: " + lights.length);
+                popLights : function(numLights) {                    
                     for (var i = 0; i < numLights; i++) {
                         lights.pop();
                     }

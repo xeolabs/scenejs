@@ -40,9 +40,9 @@ SceneJS.asset = function() {
                         process = backend.loadAsset(
                                 params.uri,
                                 params.proxy,
-
-                                function(_assetNode) { // Success
-                                    assetNode = _assetNode;
+                                params.parser,
+                                function(asset) { // Success
+                                    assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
                                 },
                                 function() { // onTimeout
                                     error = true;
@@ -71,9 +71,9 @@ SceneJS.asset = function() {
                             for (var key in params.params) {
                                 childScope.put(key, params.params[key]);
                             }
-                            assetNode.call(this, childScope);
+                            assetNode.func.call(this, childScope);
                         } else {
-                            assetNode.call(this, scope);
+                            assetNode.func.call(this, scope);
                         }
                     }
                 }

@@ -7,19 +7,19 @@ SceneJS.loggingToPage = function() {
     }
 
     var backend = SceneJS._backends.getBackend('logging');
-    var logging;
+    var funcs;
 
     function findElement(elementId) {
         var element = document.getElementById(elementId);
         if (!element) {
-            throw "Failed to find loggingToPage element: " + elementId;
+            throw "Failed to find target DOM element for loggingToPage: " + elementId;
         }
         return element;
     }
 
     return SceneJS._utils.createNode(
             function(scope) {
-                if (!logging) {
+                if (!funcs) {
                     var params = cfg.getParams();
                     if (!params.elementId) {
                         throw new SceneJS.exceptions.NodeConfigExpectedException
@@ -32,7 +32,7 @@ SceneJS.loggingToPage = function() {
                         element.innerHTML = "<p>" + msg + "</p>";
                     }
 
-                    logging = {
+                    funcs = {
                         warn : function log(msg) {
                             element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
                         },
@@ -47,9 +47,9 @@ SceneJS.loggingToPage = function() {
                         }
                     };
                 }
-                var prevLogger = backend.getLogger();
-                backend.setLogger(logging);
+                var prevFuncs = backend.getFuncs();
+                backend.setFuncs(funcs);
                 SceneJS._utils.visitChildren(cfg, scope);
-                backend.setLogger(prevLogger);
+                backend.setFuncs(prevFuncs);
             });
 };
