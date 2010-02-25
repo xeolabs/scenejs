@@ -6,7 +6,7 @@ SceneJS.material = function(scenejs) {
     var backend = SceneJS._backends.getBackend('material');
 
     function colourToArray(v) {
-        return v ? [ v.r || 0, v.g || 0, v.b || 0, v.a || 1 ] : [ 0,  0,  0];
+        return v ? [ v.r || 0, v.g || 0, v.b || 0] : [ 0,  0,  0];
     }
 
     var material;

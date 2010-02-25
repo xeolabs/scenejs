@@ -6,20 +6,28 @@ SceneJS.texture = function() {
                 ("Dynamic configuration of texture nodes is not supported");
     }
 
+    const STATE_INITIAL = 0;            // Ready to get texture
+    const STATE_IMAGE_LOADING = 2;      // Texture image load in progress
+    const STATE_IMAGE_LOADED = 3;       // Texture image load completed
+    const STATE_TEXTURE_CREATED = 4;    // Texture created
+    const STATE_ERROR = -1;             // Image load or texture creation failed
+
+    var state = STATE_INITIAL;
+
     var backend = SceneJS._backends.getBackend("texture");
     var logging = SceneJS._backends.getBackend("logging");
     var params;
     var process = null;             // Handle to asynchronous load process for texture configured with image url
-    var imageLoading = false;       // True while texture node is loading texture image
-    var imageLoadFailed = false;    // Node has given up trying to load image when this true
-
+    var textureId;
+    var image;
 
     /** Activates texture, renders children, then restores previosuly active texture
      */
-    function doTexture(textureId) {
+    function doTexture(scope) {
         var lastTexture = backend.getActiveTexture();
         backend.activateTexture(textureId);
         SceneJS._utils.visitChildren(cfg, scope);
+        backend.deactivateTexture();
         if (lastTexture) {
             backend.activateTexture(lastTexture);
         }
@@ -51,102 +59,91 @@ SceneJS.texture = function() {
                 if (!params) {
                     params = cfg.getParams(scope);
 
-                    ensureOneOf([params.uri, params.texels, params.image]);
+                    if (!params.uri) {
+                        throw new SceneJS.exceptions.WebGLNotSupportedException("Only uri is supported in textures in this version");
+                    }
+
+                    //ensureOneOf([params.uri, params.texels, params.image]);
 
                     if (params.wait == undefined) {  // By default, dont render children until texture loaded
                         params.wait = true;
                     }
                 }
 
-                var textureId = backend.getTexture(params.uri); // Backend may have evicted texture after lack use
+                /* Backend may evict texture when not recently used,
+                 * in which case we'll have to load it again
+                 */
+                if (state == STATE_TEXTURE_CREATED) {
+                    if (!backend.getTexture(textureId)) {
+                        state = STATE_INITIAL;
+                    }
+                }
 
                 if (!params.uri) {
 
-                    /* Trivial case: texture image/texels are supplied in configs,
-                     * so we can create and apply the texture immediately
-                     */
-                    if (!textureId) {
-                        textureId = backend.createTexture(params);
-                    }
-                    doTexture(textureId);
-
+                    //                    /* Trivial case: texture image/texels are supplied in configs,
+                    //                     * so we can create and apply the texture immediately
+                    //                     */
+                    //                    if (!textureId) {
+                    //                        textureId = backend.createTexture(params);
+                    //                    }
+                    //                    doTexture(scope);
                 } else {
 
-                    /* Trickier case: texture image URI supplied in configs, so we
-                     * must do a two-step process to load then apply it. On this node visit,
-                     * we'll start an asynchronous process to get the load underway, then on
-                     * future visits we'll check to see if the load has completed, at which
-                     * point we'll kill the process and begin applying the texture.
-                     */
-                    if (imageLoadFailed) {
+                    switch (state) {
 
-                        /* If load failed last time then stop trying in vain to load
-                         */
-                        if (!params.wait) {
+                        case STATE_TEXTURE_CREATED: // Most frequent case, hopefully
+                            doTexture(scope);
+                            break;
 
-                            /* If we were rendering children while waiting for the load,
-                             * then render them without a texture.
-                             */
-                            SceneJS._utils.visitChildren(cfg, scope);
-                        }
-                    } else {
-                        if (!textureId && !imageLoading) {
+                        case STATE_INITIAL:
 
-                            /* Start the load process
-                             */
-                            imageLoading = true;
-                            process = backend.loadImage(
+                            state = STATE_IMAGE_LOADING;
+
+                            process = backend.loadImage(// Process killed automatically on error or abort
                                     params.uri,
-                                    function() {
+                                    function(_image) {
 
-                                        /* Image loaded successfully - create the texture. Note that this callback will
+                                        /* Image loaded successfully. Note that this callback will
                                          * be called in the idle period between render traversals (ie. scheduled by a
                                          * setInterval), so we're not actually visiting this node at this point. We'll
-                                         * defer application of the texture to the subsequent visit. We'll also defer
+                                         * defer creation and application of the texture to the subsequent visit. We'll also defer
                                          * killing the load process to then so that we don't suddenly alter the list of
                                          * running scene processes during the idle period, when the list is likely to
-                                         * be queried. 
+                                         * be queried.
                                          */
-                                        textureId = backend.createTexture(params);
+                                        image = _image;
+                                        state = STATE_IMAGE_LOADED;
                                     },
                                     function() {
-
-                                        /* Image load failed - backend kills process for us. We'll flag the failed
-                                         * load so we don't keep trying.
-                                         */
-                                        imageLoadFailed = true;
                                         logging.getLogger().error("Texture image load failed: " + params.uri);
+                                        state = STATE_ERROR;
                                     },
                                     function() {
-
-                                        /* Image load aborted - backend kills process for us. Flag the load as failed.
-                                         */
-                                        imageLoadFailed = true;
                                         logging.getLogger().warn("Texture image load aborted: " + params.uri);
+                                        state = STATE_ERROR;
                                     });
+                            break;
 
-                        } else if (textureId) {
-
-                            /* Texture exists, image loaded
-                             */
-                            if (imageLoading) {
-
-                                /* Subsequent visit after image loaded successfully and texture created.
-                                 * Get backend to kill the load process.
-                                 */
-                                imageLoading = false;
-                                backend.imageLoaded(process);
-                                process = null;
+                        case STATE_IMAGE_LOADING:
+                            if (!params.wait) {
+                                SceneJS._utils.visitChildren(cfg, scope);  // Render children while image loading
                             }
+                            break;
 
-                            /* Apply texture and render children
-                             */
-                            doTexture(textureId);
+                        case STATE_IMAGE_LOADED:
+                            params.image = image;
+                            textureId = backend.createTexture(params);
+                            backend.imageLoaded(process);
+                            state = STATE_TEXTURE_CREATED;
+                            doTexture(scope);
+                            break;
 
-                        } else if (!params.wait) {
-
-                            SceneJS._utils.visitChildren(cfg, scope);  // Render children while image loading
-                        }
+                        case STATE_ERROR:
+                            if (!params.wait) {
+                                SceneJS._utils.visitChildren(cfg, scope);
+                            }
+                            break;
                     }
                 }
             });

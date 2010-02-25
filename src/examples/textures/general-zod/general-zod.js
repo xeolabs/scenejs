@@ -20,17 +20,16 @@
  */
 try {
     with (SceneJS) {
-        var exampleScene = scene({}, // node always has a config object
+        var exampleScene = scene(
 
-                renderer({ canvasId: 'theCanvas',    clear : { depth : true, color : true}},
+                loggingToPage({ elementId: "logging" },
 
-                    /** The texture will only work within a shader
-                     * that will perform the texture mapping, like this
-                     * default one:
-                     */
-                        shader({
-                            type: 'texture-shader'
+                        renderer({
+                            canvasId: 'theCanvas',
+                            clear : { depth : true, color : true },
+                            enableTexture2D: true
                         },
+
                                 lights({
                                     lights: [
                                         {
@@ -45,8 +44,6 @@ try {
                                                     up : { x: 0.0, y: 1.0, z: 0.0 }
 
                                                 },
-
-
                                                         material({
                                                             ambient:  { r:0.3, g:0.3, b:0.3 },
                                                             diffuse:  { r:1.0, g:1.0, b:1.0 }
@@ -60,14 +57,14 @@ try {
                                                              * thier child geometries to appear all naked and shivering
                                                              * while the texture image loads.
                                                              */
-                                                                texture({                                                               
+                                                                texture({
                                                                     uri:"./general-zod.jpg",
                                                                     wait: false
                                                                 },
                                                                         rotate(function(scope) {
                                                                             return { angle: scope.get("angle"), x : 1.0, y : 1.0};
                                                                         },
-                                                                                
+
                                                                                 SceneJS.objects.cube()
                                                                                 )
                                                                         )
@@ -120,7 +117,7 @@ try {
             }
 
         }
-
+  
         /* Keep rendering until texture loaded, ie. no scene processes running
          */
         pInterval = setInterval("doit()", 10);

@@ -7,22 +7,18 @@
  *
  *
  */
+var SceneJs = SceneJS;
 try {
     with (SceneJS) {
         var exampleScene;
         var makeScene = function() {
-            exampleScene = scene({}, // node always has a config object
+            exampleScene = scene(
 
 
-                    renderer({ canvasId: 'theCanvas',    clear : { depth : true, color : true}},
+                    loggingToPage({ elementId: "logging" },
 
-                        /** The texture will only work within a shader
-                         * that will perform the texture mapping, like this
-                         * default one:
-                         */
-                            shader({
-                                type: 'simple-shader'
-                            },
+                            renderer({ canvasId: 'theCanvas',    clear : { depth : true, color : true}},
+
                                     lights({
                                         lights: [
                                             {
@@ -85,8 +81,8 @@ try {
                                                 // ) // lookAt
                                                     ) // perspective
                                             ) // lights
-                                    ) // shader
-                            ) // renderer
+                                    ) // renderer
+                            ) // logger
                     ); // scene
         };
 

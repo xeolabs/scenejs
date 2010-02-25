@@ -283,14 +283,14 @@ SceneJS._backends.installBackend(
                         /* Bind vertex buffers to active shader
                          */
                         ctx.events.fireEvent(
-                                SceneJS._eventTypes.SHADER_ARRAY_BUFFER_BIND,
+                                SceneJS._eventTypes.SHADER_FLOAT_ARRAY_BUFFER,
                                 [
                                     SceneJS._webgl.shaderVarNames.VERTEX,       // name
                                     geo.vertexBuf                               // value
                                 ]);
 
                         ctx.events.fireEvent(
-                                SceneJS._eventTypes.SHADER_ARRAY_BUFFER_BIND,
+                                SceneJS._eventTypes.SHADER_FLOAT_ARRAY_BUFFER,
                                 [
                                     SceneJS._webgl.shaderVarNames.NORMAL,
                                     geo.normalBuf
@@ -300,7 +300,7 @@ SceneJS._backends.installBackend(
                          */
                         if (geo.texCoordBuf) {
                             ctx.events.fireEvent(
-                                    SceneJS._eventTypes.SHADER_ARRAY_BUFFER_BIND,
+                                    SceneJS._eventTypes.SHADER_FLOAT_ARRAY_BUFFER,
                                     [
                                         SceneJS._webgl.shaderVarNames.TEXTURE_COORD,
                                         geo.texCoordBuf

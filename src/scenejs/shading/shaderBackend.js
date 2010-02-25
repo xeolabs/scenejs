@@ -12,7 +12,8 @@ SceneJS._backends.installBackend(
             var canvas;                             // Currently active canvas
             var programs = {};                      // Buffered programs for all existing canvases
             var activeProgram = null;               // Currently active program
-            var textureEnabled = false;             // Tracks whether scene texture enabled or not
+            var textureEnabled = false;             // True when scene texture enabled
+            var textureActive = false;              // True when a texture is active
 
             var vars = {                            // Vars on currently active program
                 vars: {},
@@ -97,9 +98,10 @@ SceneJS._backends.installBackend(
                         return false;   // Couldnt find suitable program to delete
                     });
 
-            function _createProgram(type, vertexShaders, fragmentShaders, isDefault) {
+            function _createProgram(type, vertexShaders, fragmentShaders) {
                 var programId = canvas.canvasId + ":" + type;
                 if (!programs[programId]) {
+                    ctx.logging.info("Creating shader: '" + programId + "'"); // TODO: should default shaders be evictable?
                     ctx.memory.allocate(
                             "shader",
                             function() {
@@ -141,6 +143,25 @@ SceneJS._backends.installBackend(
                         textureEnabled = false;
                     });
 
+            /* Texture has been activated
+             *
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TEXTURE_ACTIVATED,
+                    function() {
+                        textureActive = true;
+                    });
+
+            /* Texturing has been disabled - if we're currently using the default shader,
+             * switch to the default non-texturing shader
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TEXTURE_DEACTIVATED,
+                    function() {
+                        textureActive = false;
+                    });
+
+
             /**
              * If geometry about to render and no shader active, then we had better load a
              * default one, with or without texture support, depending on whether texturing is
@@ -150,10 +171,9 @@ SceneJS._backends.installBackend(
                     SceneJS._eventTypes.GEOMETRY_RENDERING,
                     function() {
                         if (!activeProgram) {
-                            var shaderType = (textureEnabled) ? "defaultTextureShader" : "defaultBasicShader";                        
+                            var shaderType = (textureEnabled && textureActive) ? "defaultTextureShader" : "defaultBasicShader";                        
                             var shader = SceneJS._webgl.defaultShaders[shaderType];
-                            var isDefault = true;
-                            _activateProgram(_createProgram(shaderType, shader.vertexShaders, shader.fragmentShaders, isDefault));
+                            _activateProgram(_createProgram(shaderType, shader.vertexShaders, shader.fragmentShaders));
                         }
                     });
 
@@ -183,12 +203,12 @@ SceneJS._backends.installBackend(
             /** Handle a vertex array buffer bind request
              */
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ARRAY_BUFFER_BIND,
+                    SceneJS._eventTypes.SHADER_FLOAT_ARRAY_BUFFER,
                     function(params) {
                         if (!activeProgram) {
                             throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
                         }
-                        activeProgram.bindArrayBuffer(params[0], params[1]); // name, buffer
+                        activeProgram.bindFloatArrayBuffer(params[0], params[1]); // name, buffer
                     });
 
             return { // Node-facing API

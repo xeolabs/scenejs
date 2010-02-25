@@ -9,18 +9,14 @@ SceneJS._backends.installBackend(
         function(ctx) {
 
             var activeSceneId;
-
-            var funcs = {
-            };
-
-            var queues = {
-            };
+            var funcs = null;
+            var queues = {};
 
             function log(channel, message) {
                 if (activeSceneId) {
                     message = activeSceneId + ": " + message;
                 }
-                var func = funcs[channel];
+                var func = funcs ? funcs[channel] : null;
                 if (func) {
                     func(message);
                 } else {
@@ -35,7 +31,7 @@ SceneJS._backends.installBackend(
             function flush(channel) {
                 var queue = queues[channel];
                 if (queue) {
-                    var func = funcs[channel];
+                    var func = funcs ? funcs[channel] : null;
                     if (func) {
                         for (var i = 0; i < queue.length; i++) {
                             func(queue[i]);
@@ -68,20 +64,22 @@ SceneJS._backends.installBackend(
                     SceneJS._eventTypes.RESET,
                     function() {
                         queues = {};
-                        funcs = {};
-                    });
+                        funcs = null;
+                    },
+                    100000);  // Really low priority - must be reset last
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
                     function(params) {
                         activeSceneId = params.sceneId;
-                        funcs = {};
+                        funcs = null;
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
+                    SceneJS._eventTypes.SCENE_DEACTIVATED, // Set default logging for scene root
                     function() {
-                        funcs = {};
+                        activeSceneId = null;
+                        //funcs = {};
                     });
 
             return { // Node-facing API
@@ -95,9 +93,11 @@ SceneJS._backends.installBackend(
                 },
 
                 setFuncs : function(l) {
-                    funcs = l;
-                    for (var channel in queues) {
-                        flush(channel);
+                    if (l) {
+                        funcs = l;
+                        for (var channel in queues) {
+                            flush(channel);
+                        }
                     }
                 }
             };

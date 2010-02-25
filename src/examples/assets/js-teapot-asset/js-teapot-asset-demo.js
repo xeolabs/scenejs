@@ -43,16 +43,7 @@
  */
 var SceneJs = SceneJS;
 with (SceneJS) {
-    var exampleScene = scene({}, // node always has a config object
-
-            logging({
-                error: function(msg) {
-                    alert(msg);
-                },
-                warn: function(msg) {
-                    alert(msg);
-                }
-            }),
+    var exampleScene = scene({}, // node always has a config object           
 
             loggingToPage({ elementId: "logging" },
                     
@@ -85,7 +76,7 @@ with (SceneJS) {
                                                  * is at SceneJS.com.
                                                  */
                                                     asset({
-                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/spiralstaircase.js",
+                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
                                                     })
                                                     ) // lookAt

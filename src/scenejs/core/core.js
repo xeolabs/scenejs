@@ -1,4 +1,6 @@
-var SceneJS = {version: '1.0'};
+var SceneJS = {
+    version: '0.7.0'
+};
 
 (function() {
 
@@ -260,8 +262,7 @@ var SceneJS = {version: '1.0'};
 
         /** Visits child nodes in the given node configuration
          */
-        visitChildren
-                :
+        visitChildren :
                 function(config, scope) {
                     if (config.children) {
                         for (var i = 0; i < config.children.length; i++) {
@@ -320,8 +321,7 @@ var SceneJS = {version: '1.0'};
                             }
                         } catch (e) {
                             status.error = new SceneJS.exceptions.NodeBackendInstallFailedException
-                                    ("Failed to install backend module for node type \"" + id + "\": " + (e.message || e), e);
-                            alert(status.error);
+                                    ("Failed to install backend module for node type \"" + id + "\": " + (e.message || e), e);                        
                             throw status.error;
                         }
                     }

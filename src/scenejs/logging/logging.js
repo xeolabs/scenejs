@@ -9,10 +9,11 @@ SceneJS.logging = function() {
                 var prevFuncs = backend.getFuncs();
                 if (!funcs || !cfg.fixed) {
                     funcs = cfg.getParams(scope);
-                    funcs.warn = funcs.warn || prevFuncs.warn;
-                    funcs.error = funcs.error || prevFuncs.error;
-                    funcs.debug = funcs.debug || prevFuncs.debug;
-                    funcs.info = funcs.info || prevFuncs.info;
+                    var p = prevFuncs || {};
+                    funcs.warn = funcs.warn || p.warn;
+                    funcs.error = funcs.error || p.error;
+                    funcs.debug = funcs.debug || p.debug;
+                    funcs.info = funcs.info || p.info;
                 }
                 backend.setFuncs(funcs);
                 SceneJS._utils.visitChildren(cfg, scope);

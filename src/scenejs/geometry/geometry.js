@@ -4,13 +4,15 @@
 SceneJS.geometry = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
+    var logger = SceneJS._backends.getBackend("logging").getLogger();
+    logger.info("Defining geometry");
+
     if (!cfg.fixed) {
         throw new SceneJS.exceptions.UnsupportedOperationException
                 ("Dynamic configuration of geometry nodes is not supported");
     }
 
     var backend = SceneJS._backends.getBackend('geometry');
-
     return SceneJS._utils.createNode(
             function(scope) {
                 var params = cfg.getParams(scope);

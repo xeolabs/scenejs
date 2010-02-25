@@ -53,7 +53,7 @@ with (SceneJS) {
                                                             generator(
                                                                     (function() {
                                                                         var elems = [];
-                                                                        for (var i = 0; i < 200; i++) {
+                                                                        for (var i = 0; i < 300; i++) {
                                                                             elems.push({
                                                                                 x: (250 * Math.random()) - 125.0,
                                                                                 y: (50 * Math.random()) - 25.0,

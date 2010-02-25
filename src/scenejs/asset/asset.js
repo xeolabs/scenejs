@@ -14,14 +14,34 @@ SceneJS.asset = function() {
     var backend = SceneJS._backends.getBackend("asset");
     var logging = SceneJS._backends.getBackend("logging");
     var process = null;
-    var loading = false; // Node is trying to load asset when this is true
-    var error = false;  // Node has given up trying to load when this is true
+    var params;
+    var assetNode;
+
+    const STATE_INITIAL = 0;            // Ready to get asset
+    const STATE_ASSET_LOADING = 2;      // Asset load in progress
+    const STATE_ASSET_LOADED = 3;       // Asset load completed
+    const STATE_ASSET_ATTACHED = 4;     // Asset created
+    const STATE_ERROR = -1;             // Asset load or texture creation failed
+
+    var state = STATE_INITIAL;
+
+    function visitAsset(params, scope) {
+        if (params) { // Parameters for asset - supply in a new child scope
+            var childScope = SceneJS._utils.newScope(scope, cfg.fixed);
+            for (var key in params.params) {
+                childScope.put(key, params.params[key]);
+            }
+            assetNode.func.call(this, childScope);
+        } else {
+            assetNode.func.call(this, scope);
+        }
+    }
 
     return SceneJS._utils.createNode(
             function(scope) {
 
-                if (!error) { // Asset functionality permanently short-circuits when error ocurred
-                    var params = cfg.getParams(scope);
+                if (!params) {
+                    params = cfg.getParams(scope);
 
                     if (!params.proxy) {
                         throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: proxy");
@@ -31,18 +51,44 @@ SceneJS.asset = function() {
                         throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: uri");
                     }
 
-                    var assetNode = backend.getAsset(params.uri); // Backend may have evicted asset after lack of recent use
+//                    if (params.wait == undefined) {  // By default, dont render children until asset loaded
+//                        params.wait = true;
+//                    }
+                }
 
-                    if (!assetNode && !loading) {
+                if (state == STATE_ASSET_ATTACHED) {
+                    if (!backend.getAsset(params.uri)) {
+                        state = STATE_INITIAL;
+                    }
+                }
 
-                        loading = true;
+                switch (state) {
+                    case STATE_ASSET_ATTACHED:
+                        visitAsset(params.params, scope);
+                        break;
 
-                        process = backend.loadAsset(
+                    case STATE_ASSET_LOADING:
+//                        if (!params.wait) {
+//                            SceneJS._utils.visitChildren(cfg, scope);
+//                        }
+                        break;
+
+                    case STATE_ASSET_LOADED:
+                        backend.assetLoaded(process);  // Finish loading - kill process
+                        process = null;
+                        state = STATE_ASSET_ATTACHED;
+                        visitAsset(params.params, scope);
+                        break;
+
+                    case STATE_INITIAL:
+                        state = STATE_ASSET_LOADING;
+                        process = backend.loadAsset(// Process killed automatically on error or abort
                                 params.uri,
                                 params.proxy,
                                 params.parser,
                                 function(asset) { // Success
                                     assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
+                                    state = STATE_ASSET_LOADED;
                                 },
                                 function() { // onTimeout
                                     error = true;
@@ -58,27 +104,17 @@ SceneJS.asset = function() {
                                             " - proxy: " + params.proxy + ", uri: " + params.uri);
                                 });
 
-                    } else if (assetNode) {
+//                        if (!params.wait) {
+//                            SceneJS._utils.visitChildren(cfg, scope);
+//                        }
+                        break;
 
-                        if (loading) {
-                            backend.assetLoaded(process);  // Finish loading - kill process
-                            process = null;
-                            loading = false;
-                        }
-
-                        if (params.params) { // Parameters for asset - supply in a new child scope
-                            var childScope = SceneJS._utils.newScope(scope, cfg.fixed);
-                            for (var key in params.params) {
-                                childScope.put(key, params.params[key]);
-                            }
-                            assetNode.func.call(this, childScope);
-                        } else {
-                            assetNode.func.call(this, scope);
-                        }
-                    }
+                    case STATE_ERROR:
+//                        if (!params.wait) {
+//                            SceneJS._utils.visitChildren(cfg, scope);
+//                        }
+                        break;
                 }
-
-                SceneJS._utils.visitChildren(cfg, scope);
             });
 };
 

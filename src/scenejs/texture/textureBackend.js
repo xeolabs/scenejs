@@ -205,14 +205,14 @@ SceneJS._backends.installBackend(
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
                     var context = canvas.context;
+                    var textureId = cfg.uri
+                            ? (canvas.canvasId + ":" + cfg.uri)
+                            : SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
 
-                    var textureId = SceneJS._utils.createKeyForMap(textures, "tex");
-
-                    ctx.events.fireEvent(
-                            SceneJS._eventTypes.MEMORY_ALLOCATE,
-                            "texture",
+                    ctx.memory.allocate(
+                            "texture '" + textureId + "'",
                             function() {
-                                textures[textureId] = new SceneJS._webgl.Texture2D({
+                                textures[textureId] = new SceneJS._webgl.Texture2D(context, {
                                     textureId : textureId,
                                     image : cfg.image,
                                     texels :cfg.texels,
@@ -235,6 +235,18 @@ SceneJS._backends.installBackend(
                             });
 
                     return textureId;
+                },
+
+                /** Deactives the currently-active texture - does nothing if none active
+                 *
+                 */
+                deactivateTexture: function() {
+                    if (activeTexture) {
+                        var texture = activeTexture;
+                        activeTexture = null;
+                        loaded = false;
+                        ctx.events.fireEvent(SceneJS._eventTypes.TEXTURE_DEACTIVATED, texture);
+                    }
                 },
 
                 /** Activates currently existing texture of given ID and bumps its last-used

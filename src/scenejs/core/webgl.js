@@ -156,11 +156,65 @@ SceneJS._webgl = {
                 "   gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a); " +
                 "}"
             ]
+        },
+
+        defaultDirectionalShader : {
+            vertexShaders: [
+                "varying vec2 vTextureCoord; " +
+                "varying vec4 vTransformedNormal; " +
+                "varying vec4 vPosition; " +
+
+                "uniform float uMaterialShininess; " +
+
+                "uniform bool uShowSpecularHighlights; " +
+                "uniform bool uUseLighting; " +
+                "uniform bool uUseTextures; " +
+
+                "uniform vec3 uAmbientColor; " +
+
+                "uniform vec3 uPointLightingLocation; " +
+                "uniform vec3 uPointLightingSpecularColor; " +
+                "uniform vec3 uPointLightingDiffuseColor; " +
+
+                "uniform sampler2D uSampler; " +
+
+
+                "void main(void) { " +
+                "   vec3 lightWeighting; " +
+                "   if (!uUseLighting) { " +
+                "       lightWeighting = vec3(1.0, 1.0, 1.0); " +
+                "   } else { " +
+                "       vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz); " +
+                "       vec3 normal = normalize(vTransformedNormal.xyz); " +
+
+                "       float specularLightWeighting = 0.0; " +
+                "       if (uShowSpecularHighlights) { " +
+                "           vec3 eyeDirection = normalize(-vPosition.xyz); " +
+                "           vec3 reflectionDirection = reflect(-lightDirection, normal); " +
+
+                "           specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess); " +
+                "       } " +
+
+                "       float diffuseLightWeighting = max(dot(normal, lightDirection), 0.0); " +
+                "       lightWeighting = uAmbientColor " +
+                "           + uPointLightingSpecularColor * specularLightWeighting " +
+                "           + uPointLightingDiffuseColor * diffuseLightWeighting; " +
+                "   } " +
+
+                "   vec4 fragmentColor; " +
+                "   if (uUseTextures) { " +
+                "       fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)); " +
+                "   } else { " +
+                "       fragmentColor = vec4(1.0, 1.0, 1.0, 1.0); " +
+                "   } " +
+                "       gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a); " +
+                "}"
+            ]
         }
     },
 
     ProgramUniform : function(context, program, name, type, size, location, logging) {
-       logging.debug("Program uniform found: " + name);
+        logging.debug("Program uniform found: " + name);
         var func = null;
         if (type == context.BOOL) {
             func = function (v) {
@@ -247,10 +301,10 @@ SceneJS._webgl = {
      */
     ProgramAttribute : function(context, program, name, type, size, location, logging) {
         logging.debug("Program attribute found: " + name);
-        this.bindArrayBuffer = function(buffer) {
+        this.bindFloatArrayBuffer = function(buffer) {
             context.enableVertexAttribArray(location);
             buffer.bind();
-            context.vertexAttribPointer(location, 3, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
+            context.vertexAttribPointer(location, buffer.itemSize, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
         };
 
     },
@@ -311,8 +365,6 @@ SceneJS._webgl = {
             shaders.push(new SceneJS._webgl.Shader(context, context.FRAGMENT_SHADER, fragmentSources[i], logging));
         }
 
-        logging.debug("");
-
         /* Create program, attach shaders, link and validate program
          */
         var handle = context.createProgram();
@@ -330,7 +382,7 @@ SceneJS._webgl = {
         this.valid = this.valid && (context.getProgramParameter(handle, context.LINK_STATUS) != 0);
         this.valid = this.valid && (context.getProgramParameter(handle, context.VALIDATE_STATUS) != 0);
 
-        logging.debug("Creating shader program: '" + type + "'");
+        logging.debug("Creating shader program: '" + programId + "'");
         if (this.valid) {
             logging.debug("Program link succeeded: " + context.getProgramInfoLog(handle));
         }
@@ -427,16 +479,16 @@ SceneJS._webgl = {
             if (u) {
                 u.setValue(value);
             } else {
-            //    logging.warn("Shader uniform load failed - uniform not found in shader '" + type + "': " + name);
+                //    logging.warn("Shader uniform load failed - uniform not found in shader '" + type + "': " + name);
             }
         };
 
-        this.bindArrayBuffer = function(name, buffer) {
+        this.bindFloatArrayBuffer = function(name, buffer) {
             var attr = attributes[name];
             if (attr) {
-                attr.bindArrayBuffer(buffer);
+                attr.bindFloatArrayBuffer(buffer);
             } else {
-              //  logging.warn("Shader attribute bind failed - attribute not found in shader '" + type + "': " + name);
+                //  logging.warn("Shader attribute bind failed - attribute not found in shader '" + type + "': " + name);
             }
         };
 
@@ -445,7 +497,7 @@ SceneJS._webgl = {
             if (sampler) {
                 sampler.bindTexture(texture);
             } else {
-              //  logging.warn("Sampler not found: " + name);
+                //  logging.warn("Sampler not found: " + name);
             }
         };
 
@@ -455,7 +507,7 @@ SceneJS._webgl = {
 
         this.destroy = function() {
             if (this.valid) {
-                logging.debug("Destroying program");
+                logging.debug("Destroying shader program: '" + programId + "'");
                 context.deleteProgram(handle);
                 for (var s in shaders) {
                     context.deleteShader(shaders[s].handle);
@@ -469,7 +521,7 @@ SceneJS._webgl = {
     },
 
     Texture2D : function(context, cfg) {
-        cfg.logging.debug("Creating texture");
+        cfg.logging.debug("Creating texture: '" + cfg.textureId + "'");
         this.textureId = cfg.textureId;
         this.handle = context.createTexture();
         this.target = context.TEXTURE_2D;

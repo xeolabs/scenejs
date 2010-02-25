@@ -7,9 +7,11 @@ SceneJS._backends.installBackend(
 
         function(ctx) {
 
+            var initialised = false; // True as soon as first scene registered
             var scenes = {};
             var nScenes = 0;
             var activeSceneId;
+
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.RESET,
@@ -24,6 +26,10 @@ SceneJS._backends.installBackend(
                 /** Registers a scene and returns the ID under which it is registered
                  */
                 registerScene : function(scene) {
+                    if (!initialised) {
+                        ctx.logging.info("SceneJS V" + SceneJS.version + " initialised");
+                        ctx.events.fireEvent(SceneJS._eventTypes.INIT);
+                    }
                     var sceneId = SceneJS._utils.createKeyForMap(scenes, "scene");
                     scenes[sceneId] = {
                         sceneId: sceneId,
@@ -46,8 +52,9 @@ SceneJS._backends.installBackend(
                     }
                     ctx.logging.info("Scene destroyed: " + sceneId);
                     if (nScenes == 0) {
+                        ctx.logging.info("SceneJS reset");
                         ctx.events.fireEvent(SceneJS._eventTypes.RESET);
-                        ctx.logging.info("SceneJS reset: " + sceneId);
+
                     }
                 },
 
@@ -56,7 +63,7 @@ SceneJS._backends.installBackend(
                 activateScene : function(sceneId) {
                     activeSceneId = sceneId;
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED, { sceneId: sceneId });
-                  //  ctx.logging.info("Scene activated: " + sceneId);
+                    //  ctx.logging.info("Scene activated: " + sceneId);
                 },
 
                 /** Returns all registered scenes
