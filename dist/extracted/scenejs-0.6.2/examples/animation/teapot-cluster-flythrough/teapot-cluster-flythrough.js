@@ -2,7 +2,7 @@
  * SceneJS Example - Teapot cluster flythrough
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * In this scene, the viewpoint moves through a randomly-generated

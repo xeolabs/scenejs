@@ -5,16 +5,15 @@
  */
 SceneJS.asset = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-
     if (!cfg.fixed) {
         throw new SceneJS.exceptions.UnsupportedOperationException
                 ("Dynamic configuration of asset nodes is not supported");
     }
+    var params;
 
-    var backend = SceneJS._backends.getBackend("asset");
+    var backend = SceneJS._backends.getBackend("assets");
     var logging = SceneJS._backends.getBackend("logging");
     var process = null;
-    var params;
     var assetNode;
 
     const STATE_INITIAL = 0;            // Ready to get asset
@@ -24,6 +23,15 @@ SceneJS.asset = function() {
     const STATE_ERROR = -1;             // Asset load or texture creation failed
 
     var state = STATE_INITIAL;
+
+    function sceneJSParser(data, onError) {
+        if (!data.___isSceneJSNode) {
+            onError(data.error || "unkown server error");
+            return null;
+        } else {
+            return data;
+        }
+    }
 
     function visitAsset(params, scope) {
         if (params) { // Parameters for asset - supply in a new child scope
@@ -42,18 +50,12 @@ SceneJS.asset = function() {
 
                 if (!params) {
                     params = cfg.getParams(scope);
-
-                    if (!params.proxy) {
-                        throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: proxy");
-                    }
-
                     if (!params.uri) {
                         throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: uri");
                     }
-
-//                    if (params.wait == undefined) {  // By default, dont render children until asset loaded
-//                        params.wait = true;
-//                    }
+                    if (!params.proxy) {
+                        throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: proxy");
+                    }
                 }
 
                 if (state == STATE_ASSET_ATTACHED) {
@@ -68,9 +70,6 @@ SceneJS.asset = function() {
                         break;
 
                     case STATE_ASSET_LOADING:
-//                        if (!params.wait) {
-//                            SceneJS._utils.visitChildren(cfg, scope);
-//                        }
                         break;
 
                     case STATE_ASSET_LOADED:
@@ -85,37 +84,34 @@ SceneJS.asset = function() {
                         process = backend.loadAsset(// Process killed automatically on error or abort
                                 params.uri,
                                 params.proxy,
-                                params.parser,
+                                params.serverParams || {
+                                    format: "scenejs"
+                                },
+                                params.parser || sceneJSParser,
                                 function(asset) { // Success
                                     assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
                                     state = STATE_ASSET_LOADED;
                                 },
                                 function() { // onTimeout
-                                    error = true;
+                                    state = STATE_ERROR;
                                     logging.getLogger().error(
                                             "Asset load failed - timed out waiting for a reply " +
                                             "(incorrect proxy URI?) - proxy: " + params.proxy +
                                             ", uri: " + params.uri);
                                 },
                                 function(msg) { // onError - backend has killed process
-                                    error = true;
+                                    state = STATE_ERROR;
                                     logging.getLogger().error(
                                             "Asset load failed - " + msg +
                                             " - proxy: " + params.proxy + ", uri: " + params.uri);
                                 });
 
-//                        if (!params.wait) {
-//                            SceneJS._utils.visitChildren(cfg, scope);
-//                        }
+                        SceneJS._utils.visitChildren(cfg, scope);
                         break;
 
                     case STATE_ERROR:
-//                        if (!params.wait) {
-//                            SceneJS._utils.visitChildren(cfg, scope);
-//                        }
+                        SceneJS._utils.visitChildren(cfg, scope);
                         break;
                 }
             });
 };
-
-

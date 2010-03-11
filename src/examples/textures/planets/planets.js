@@ -2,7 +2,7 @@
  * Introductory SceneJS Example - Cube Textured with Image of General Zod
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  *
@@ -35,46 +35,46 @@ try {
                                                     },
                                                             translate({y:-9},
                                                                     asset({
-                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/mercury.js",
+                                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/mercury.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
 
                                                             translate({y:-6},
                                                                     asset({
-                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/venus.js",
+                                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/venus.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
 
                                                             translate({y:-3},
                                                                     asset({
-                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/earth.js",
+                                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/earth.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
 
                                                             translate({y:-0},
                                                                     asset({
-                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/mars.js",
+                                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/mars.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
 
                                                             translate({y:3},
 
                                                                     asset({
-                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/jupiter.js",
+                                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/jupiter.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
 
                                                             translate({y:6},
 
                                                                     asset({
-                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/uranus.js",
+                                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/uranus.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ),
 
                                                             translate({y:9},
 
                                                                     asset({
-                                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/neptune.js",
+                                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/neptune.js",
                                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
                                                                     ))
 

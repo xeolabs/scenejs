@@ -2,7 +2,7 @@
  * Introductory SceneJS Example - Interpolated rotation of a teapot
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * This example crudely pours some tea from the OpenGL teapot, using

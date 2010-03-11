@@ -1,6 +1,20 @@
 /**
- * Backend module for material properties. Enables material node to set and get the current material,
- * handles lazy-load into shader whenever geometry about to render.
+ * Backend that manages the current material properties.
+ *
+ * Services the SceneJS.material scene node, providing it with methods to set and get the current material.
+ *
+ * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * MATERIAL_EXPORTED to pass the material properties to the shading backend.
+ *
+ * Avoids redundant export of the material properties with a dirty flag; they are only exported when that is set, which
+ * occurs when material is set by the SceneJS.material node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
+ * SHADER_DEACTIVATED events.
+ *
+ * Sets the properties to defaults on SCENE_ACTIVATED.
+ *
+ * Whenever a SceneJS.material sets the material properties, this backend publishes it with a MATERIAL_UPDATED to allow
+ * other dependent backends to synchronise their resources. One such backend is the shader backend, which taylors the
+ * active shader according to the material properties.
  */
 SceneJS._backends.installBackend(
 
@@ -9,61 +23,57 @@ SceneJS._backends.installBackend(
         function(ctx) {
 
             var material;
-            var loaded = false;
+            var dirty;
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,        // Scene traversal begun - default material load pending
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
                         material = {
-                            ambient:  [ 0.3, 0.3, 0.3 ], // R,G,B
-                            diffuse:  [ 1,   1,   1   ],
-                            specular: [ 1,   1,   1   ],
-                            shininess:[ 0,   0,   1   ]
+                            color: [1, 1, 1],
+                            specularColor: [1, 1, 1],
+                            reflectivity: 0.7,
+                            specular:1,
+                            emissive:0,
+                            shininess:10,
+                            alpha:1
                         };
-                        loaded = false;
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,       // Shader activated - material load pending
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
                     function() {
-                        loaded = false;
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,     // Shader deactivated - material load pending
+                    SceneJS._eventTypes.SHADER_RENDERING,
                     function() {
-                        loaded = false;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.GEOMETRY_RENDERING,     // Geometry about to render - do pending material load
-                    function() {
-                        if (!loaded) {
+                        if (dirty) {
                             ctx.events.fireEvent(
-                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
-                                    [SceneJS._webgl.shaderVarNames.MATERIAL_AMBIENT, material.ambient]);
-
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
-                                    [SceneJS._webgl.shaderVarNames.MATERIAL_DIFFUSE, material.diffuse]);
-
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
-                                    [SceneJS._webgl.shaderVarNames.MATERIAL_SPECULAR, material.specular]);
-
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
-                                    [SceneJS._webgl.shaderVarNames.MATERIAL_SHININESS, material.shininess]);
-
-                            loaded = true;
+                                    SceneJS._eventTypes.MATERIAL_EXPORTED,
+                                    material);
+                            dirty = false;
                         }
                     });
 
-            return {   // Node-facing API
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        dirty = true;
+                    });
+
+
+            /* Node-facing API
+             */
+            return {
 
                 setMaterial : function(m) {
                     material = m;
-                    loaded = false;
+                    ctx.events.fireEvent(
+                            SceneJS._eventTypes.MATERIAL_UPDATED,
+                            material);
+                    dirty = true;
                 },
 
                 getMaterial : function() {

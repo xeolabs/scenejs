@@ -1,7 +1,7 @@
 /*  Introductory SceneJS scene which renders the venerable OpenGL teapot.
 
  Lindsay S. Kay,
- lindsay.stanley.kay AT gmail.com
+ lindsay.kay AT xeolabs.com
  December 21, 2009
 
  To render the teapot, SceneJS will traverse the scene in depth-first

@@ -1,4 +1,5 @@
-/** Backend for renderer nodes.
+/**
+ * Manages a stack of WebGL state frames that may be pushed and popped by SceneJS.renderer nodes.
  */
 SceneJS._backends.installBackend(
 
@@ -6,40 +7,62 @@ SceneJS._backends.installBackend(
 
         function(ctx) {
 
-            /** IDs of supported WebGL canvas contexts
-             */
+            var currentCanvas;  // Currently active canvas
+            var stateStack;     // Stack of WebGL state frames
+            var currentProps;   // Current map of set WebGL modes and states
+            var loaded;         // True when current state exported
 
-            var stateStack;   // Stack of renderer properties
-            var currentProps; // Selection of current renderer properties used as fallbacks
-            var renderer;
-
-            var defaultProps = {
-                clearColor: {r: 0, g : 0, b : 0, a: 1.0},
-                clearDepth: 1.0,
-                enableDepthTest:true,
-                enableCullFace: false,
-                enableTexture2D: false,
-                depthRange: { zNear: 0, zFar: 1},
-                enableScissorTest: false,
-                viewport: {} // will default to canvas extents
-            };
-
-            /** Initialises backend - sets up a renderer state stack with an
-             *  initial set of essential default properties. The first renderer
-             *  state created by a client renderer node will fall back on these
-             *  where it fails to provide them. Also prepares a map of current
-             *  properties that will internally keep track of state.
-             */
-            ctx.events.onEvent(// Scene traversal begun - init renderer state stack
+            ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
+                        currentCanvas = null;
+                        currentProps = {
+                            clearColor: {r: 0, g : 0, b : 0, a: 1.0},
+                            clearDepth: 1.0,
+                            enableDepthTest:true,
+                            enableCullFace: false,
+                            enableTexture2D: false,
+                            depthRange: { zNear: 0, zFar: 1},
+                            enableScissorTest: false,
+                            viewport: {} // will default to canvas extents
+                        };
                         stateStack = [
                             {
-                                props: defaultProps
+                                canvas: null,
+                                // Current canvas
+                                props: currentProps,
+                                // WebGL properties set for this state
+                                prevCanvas: null,
+                                // Previous canvas
+                                restore : null          // WebGL properties to set for reverting to previous state
                             }
                         ];
-                        currentProps = {};
-                        renderer = {};
+                        loaded = false;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
+
+            /* WebGL state is exported on demand to construct shaders as required
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_RENDERING,
+                    function() {
+                        if (!loaded) {
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.RENDERER_EXPORTED,
+                                    currentProps);
+                            loaded = true;
+                        }
                     });
 
             /** Locates canvas in DOM, finds WebGL context on it,
@@ -97,15 +120,22 @@ SceneJS._backends.installBackend(
                 return result;
             };
 
-            /** Functions, mapped to renderer properties, that each wrap a state-setter
-             *  function on the WebGL context. Each function also uses the glEnum map to
-             *  convert its renderer node property argument to the WebGL enum constant
-             *  required by its context function.
+            /**
+             * Order-insensitive functions that set WebGL modes ie. not actually causing an
+             * immediate change.
+             *
+             * These map to renderer properties and are called in whatever order their
+             * property is found on the renderer config.
+             *
+             * Each of these wrap a state-setter function on the WebGL context. Each function
+             * also uses the glEnum map to convert its renderer node property argument to the
+             * WebGL enum constant required by its wrapped function.
              */
-            var glSetters = {
+            var glModeSetters = {
 
                 enableBlend: function(context, flag) {
                     context.enable(context.BLEND, flag);
+                    currentProps.enableBlend = flag;
                 },
 
                 blendColor: function(context, color) {
@@ -116,10 +146,12 @@ SceneJS._backends.installBackend(
                         a: color.a || 1
                     };
                     context.blendColor(color.r, color.g, color.b, color.a);
+                    currentProps.blendColor = color;
                 },
 
                 blendEquation: function(context, eqn) {
                     context.blendEquation(context, eqn);
+                    currentProps.blendEquation = eqn;
                 },
 
                 /** Sets the RGB blend equation and the alpha blend equation separately
@@ -130,6 +162,7 @@ SceneJS._backends.installBackend(
                         alpha : glEnum(context, eqn.alpha || "func_add")
                     };
                     context.blendEquation(eqn.rgb, eqn.alpha);
+                    currentProps.blendEquationSeperate = eqn;
                 },
 
                 blendFunc: function(context, funcs) {
@@ -138,6 +171,7 @@ SceneJS._backends.installBackend(
                         dfactor : glEnum(context, funcs.dfactor || "zero")
                     };
                     context.blendFunc(funcs.sfactor, funcs.dfactor);
+                    currentProps.blendFunc = funcs;
                 },
 
                 blendFuncSeparate: function(context, func) {
@@ -148,6 +182,7 @@ SceneJS._backends.installBackend(
                         dstAlpha :  glEnum(context, func.dstAlpha || "zero")
                     };
                     context.blendFuncSeparate(func.srcRGB, func.dstRGB, func.srcAlpha, func.dstAlpha);
+                    currentProps.blendFuncSeparate = func;
                 },
 
                 clearColor: function(context, color) {
@@ -156,14 +191,17 @@ SceneJS._backends.installBackend(
                     color.b = color.b || 0;
                     color.a = color.a || 1;
                     context.clearColor(color.r, color.g, color.b, color.a);
+                    currentProps.clearColor = color;
                 },
 
                 clearDepth: function(context, depth) {
                     context.clearDepth(depth);
+                    currentProps.clearDepth = depth;
                 },
 
                 clearStencil: function(context, clearValue) {
                     context.clearStencil(clearValue);
+                    currentProps.clearStencil = clearValue;
                 },
 
                 colorMask: function(context, color) {
@@ -172,36 +210,44 @@ SceneJS._backends.installBackend(
                     color.b = color.b || 0;
                     color.a = color.a || 1;
                     context.colorMask(color.r, color.g, color.b, color.a);
+                    currentProps.colorMask = color;
                 },
 
                 enableCullFace: function(context, flag) {
                     if (flag) {
                         context.enable(context.CULL_FACE);
                     } else {
+                        flag = false;
                         context.disable(context.CULL_FACE);
                     }
+                    currentProps.enableCullFace = flag;
                 },
 
                 cullFace: function(context, mode) {
                     mode = glEnum(context, mode);
                     context.cullFace(mode);
+                    currentProps.cullFace = mode;
                 },
 
                 enableDepthTest: function(context, flag) {
                     if (flag === false) {
                         context.disable(context.DEPTH_TEST);
                     } else {
+                        flag = true;
                         context.enable(context.DEPTH_TEST);
                     }
+                    currentProps.enableDepthTest = flag;
                 },
 
                 depthFunc: function(context, func) {
                     func = glEnum(context, func);
                     context.depthFunc(glEnum(context, func));
+                    currentProps.depthFunc = func;
                 },
 
                 enableDepthMask: function(context, flag) {
                     context.depthMask(flag);
+                    currentProps.enableDepthMask = flag;
                 },
 
                 depthRange: function(context, range) {
@@ -210,40 +256,52 @@ SceneJS._backends.installBackend(
                         zFar : range.zFar || 1
                     };
                     context.depthRange(range.zNear, range.zFar);
+                    currentProps.depthRange = range;
                 },
 
                 frontFace: function(context, mode) {
                     mode = glEnum(context, mode);
                     context.frontFace(mode);
+                    currentProps.frontFace = mode;
                 },
 
                 lineWidth: function(context, width) {
                     context.lineWidth(width);
+                    currentProps.lineWidth = width;
                 },
 
                 enableTexture2D: function(context, flag) {
                     if (flag) {
                         context.enable(context.TEXTURE_2D);
                     } else {
+                        flag = false;
                         context.disable(context.TEXTURE_2D);
                     }
+                    currentProps.enableTexture2D = flag;
                 },
 
                 enableScissorTest: function(context, flag) {
                     if (flag) {
                         context.enable(context.SCISSOR_TEST);
                     } else {
+                        flag = false;
                         context.disable(context.SCISSOR_TEST);
                     }
+                    currentProps.enableScissorTest = flag;
                 }
             };
 
             /**
-             * Functions to change renderer state, in reverse order
-             * of their possible dependency on each other. State is
-             * carried between them in the currentProps object.
+             * Order-sensitive functions that immediately effect WebGL state change.
+             *
+             * These map to renderer properties and are called in a particular order since they
+             * affect one another.
+             *
+             * Each of these wrap a state-setter function on the WebGL context. Each function
+             * also uses the glEnum map to convert its renderer node property argument to the
+             * WebGL enum constant required by its wrapped function.
              */
-            var funcs = {
+            var glStateSetters = {
 
                 /** Set viewport on the given context
                  */
@@ -251,11 +309,12 @@ SceneJS._backends.installBackend(
                     v = {
                         x : v.x || 1,
                         y : v.y || 1,
-                        width: v.width || renderer.canvas.width,
-                        height: v.height || renderer.canvas.renderer.height
+                        width: v.width || currentCanvas.width,
+                        height: v.height || currentCanvas.height
                     };
                     currentProps.viewport = v;
                     context.viewport(v.x, v.y, v.width, v.height);
+                    ctx.events.fireEvent(SceneJS._eventTypes.VIEWPORT_UPDATED, v);
                 },
 
                 /** Sets scissor region on the given context
@@ -290,29 +349,39 @@ SceneJS._backends.installBackend(
                 }
             };
 
-            /** Sets current renderer properties on the given WebGL context
+            /**
+             * Sets current renderer properties on the given WebGL context. These will then
+             * appear on currentProps.
              */
             var setProperties = function(context, props) {
 
-                /* Set state variables that map to properties
+                /* Set order-insensitive properties (modes)
                  */
                 for (var key in props) {
-                    var setter = glSetters[key];
+                    var setter = glModeSetters[key];
                     if (setter) {
-                        setter(context, props[key], renderer);
+                        setter(context, props[key]);
                     }
                 }
+
+                /* Set order-sensitive properties (states)
+                 */
                 if (props.viewport) {
-                    funcs.viewport(context, props.viewport);
+                    glStateSetters.viewport(context, props.viewport);
                 }
                 if (props.scissor) {
-                    funcs.clear(context, props.scissor);
+                    glStateSetters.clear(context, props.scissor);
                 }
                 if (props.clear) {
-                    funcs.clear(context, props.clear);
+                    glStateSetters.clear(context, props.clear);
                 }
-            };
 
+                ctx.events.fireEvent(
+                        SceneJS._eventTypes.RENDERER_UPDATED,
+                        currentProps);
+
+                loaded = false;
+            };
 
             /** Gets value of the given property on the first higher renderer state that has it
              */
@@ -325,38 +394,26 @@ SceneJS._backends.installBackend(
                 }
                 throw "Internal error - renderer backend stateStack underflow!";
             };
-
-            function fireEventIfTextureModeUpdated(state, lastState) {
-                var enableTexture2D = state.props.enableTexture2D;
-                if (enableTexture2D != undefined) {
-                    if (enableTexture2D != lastState.enableTexture2D) {
-                        ctx.events.fireEvent(
-                                enableTexture2D
-                                        ? SceneJS._eventTypes.TEXTURE_ENABLED
-                                        : SceneJS._eventTypes.TEXTURE_DISABLED);
-                    }
-                }
-            }
-
+            
             return {// Node-facing API
 
                 /**
-                 * Returns a new renderer state to the caller, without making it active.
+                 * Returns a new WebGL state object to the caller, without making it active.
                  */
                 createRendererState : function(props) {
 
                     /* Select a canvas if specified
                      */
                     var canvas;
-                    if (props.canvasId) {                      // Canvas specified
-                        if (renderer.canvas) {                 //  - but canvas already active
+                    if (props.canvasId) {                       // Canvas specified
+                        if (currentCanvas) {                    //  - but canvas already active
                             throw new SceneJS.exceptions.CanvasAlreadyActiveException
                                     ("A canvas is already activated by a higher renderer node");
                         }
                         canvas = findCanvas(props.canvasId);
 
-                    } else if (renderer.canvas) {               // No canvas specified, but canvas already active
-                        canvas = renderer.canvas;               //  - continue using active canvas
+                    } else if (currentCanvas) {                 // No canvas specified, but canvas already active
+                        canvas = currentCanvas;                 //  - continue using active canvas
 
                     } else {                                    // No canvas specified, but none already active
                         throw new SceneJS.exceptions.NoCanvasActiveException(
@@ -372,41 +429,38 @@ SceneJS._backends.installBackend(
                         }
                     }
 
-                    return {
+                    var state = {
                         canvas: canvas,
                         props : props,
                         restore : restore,
-                        prevCanvas: renderer.canvas // To restore null when no higher state
+                        prevCanvas: currentCanvas // Will restore canvas to null when no higher state
                     };
+
+                    return state;
                 },
 
-                /** Activates the given renderer state. If no state is active, then it must specify a canvas to activate,
+                /** Activates the given WebGL state. If no state is active, then it must specify a canvas to activate,
                  * in which case the default simple shader will be activated as well
                  */
                 setRendererState : function(state) {
-
-                    var prevCanvas = renderer.canvas;
-
-                    renderer.canvas = state.canvas;
+                    var prevCanvas = currentCanvas;
+                    currentCanvas = state.canvas;
                     var lastState = stateStack[stateStack.length - 1];
                     stateStack.push(state);
-                    setProperties(renderer.canvas.context, state.props);
-
-                    fireEventIfTextureModeUpdated(state, lastState);
-
+                    setProperties(currentCanvas.context, state.props);
                     if (!prevCanvas) {
-                        ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_ACTIVATED, renderer.canvas);
+                        ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_ACTIVATED, currentCanvas);
                     }
                 },
 
-                /** Restores previous renderer state, if any.
+                /** Restores previous WebGL state, if any.
                  */
                 restoreRendererState : function(state) {
                     stateStack.pop();
                     if (state.prevCanvas) {
-                        setProperties(renderer.canvas.context, state.restore); // Undo property settings
+                        setProperties(currentCanvas.context, state.restore); // Undo property settings
                     } else {
-                        renderer.canvas = null;
+                        currentCanvas = null;
                         ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_DEACTIVATED);
                     }
                 }

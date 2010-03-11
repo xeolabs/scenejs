@@ -2,7 +2,7 @@
  * SceneJS Example - Procedural scene generation of multiple viewports on a canvas
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * Here's one way to create multiple viewports on a canvas, using a generator node.

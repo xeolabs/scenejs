@@ -30,9 +30,9 @@ var SceneJS = {version: '1.0'};
                 d = a[i].split(".");
                 rt = d[0];
                 eval('if (typeof ' + rt + ' == "undefined"){' + rt + ' = {};} o = ' + rt + ';');
-                for (j = 1; j < d.length; ++j) {
-                    o[d[j]] = o[d[j]] || {};
-                    o = o[d[j]];
+                for (i = 1; i < d.length; ++i) {
+                    o[d[i]] = o[d[i]] || {};
+                    o = o[d[i]];
                 }
             }
         },
@@ -101,8 +101,8 @@ var SceneJS = {version: '1.0'};
             for (var i = 1; i < args.length; i++) {
                 var arg = args[i];
                 if (isArray(arg)) {
-                    for (var j = 0; j < arg.length; j++) {
-                        result.children.push(arg[j]);
+                    for (var j = 0; i < arg.length; i++) {
+                        result.children.push(arg[i]);
                     }
                 } else {
                     result.children.push(arg);
@@ -370,9 +370,9 @@ SceneJS._math = {
         var j = 0;
         var s = 0.0;
         for (i = 0; i < 4; ++i) {
-            for (j = 0; j < 4; ++j) {
-                s = m[i + j * 4];
-                if ((i == j)) {
+            for (i = 0; i < 4; ++i) {
+                s = m[i + i * 4];
+                if ((i == i)) {
                     if (s != 1.0) {
                         return false;
                     }
@@ -446,12 +446,12 @@ SceneJS._math = {
         var k = 0;
         var s = 0.0;
         for (i = 0; i < 4; ++i) {
-            for (j = 0; j < 4; ++j) {
+            for (i = 0; i < 4; ++i) {
                 s = 0.0;
-                for (k = 0; k < 4; ++k) {
-                    s += a[i + k * 4] * b[k + j * 4];
+                for (j = 0; j < 4; ++j) {
+                    s += a[i + j * 4] * b[j + i * 4];
                 }
-                r[i + j * 4] = s;
+                r[i + i * 4] = s;
             }
         }
         return r;
@@ -480,8 +480,8 @@ SceneJS._math = {
         var i = 0;
         var j = 0;
         for (i = 0; i < 4; ++i) {
-            for (j = 0; j < 4; ++j) {
-                r[i + j * 4] = m[i * 4 + j];
+            for (i = 0; i < 4; ++i) {
+                r[i + i * 4] = m[i * 4 + i];
             }
         }
         return r;
@@ -772,31 +772,31 @@ SceneJS._math = {
         return SceneJS._math.frustumMat4v(pmin, pmax);
     },
 
-//    transformPoint3:function(m, p) {
-//        return {
-//            x : (m[0] * p.x) + (m[4] * p.y) + (m[8] * p.z) + m[12],
-//            y : (m[1] * p.x) + (m[5] * p.y) + (m[9] * p.z) + m[13],
-//            z : (m[2] * p.x) + (m[6] * p.y) + (m[10] * p.z) + m[14],
-//            w : (m[3] * p.x) + (m[7] * p.y) + (m[11] * p.z) + m[15]
-//        };
-//    },
+    //    transformPoint3:function(m, p) {
+    //        return {
+    //            x : (m[0] * p.x) + (m[4] * p.y) + (m[8] * p.z) + m[12],
+    //            y : (m[1] * p.x) + (m[5] * p.y) + (m[9] * p.z) + m[13],
+    //            z : (m[2] * p.x) + (m[6] * p.y) + (m[10] * p.z) + m[14],
+    //            w : (m[3] * p.x) + (m[7] * p.y) + (m[11] * p.z) + m[15]
+    //        };
+    //    },
 
-            transformPoint3:function(m, p) {
-            return {
-                x : (m[0] * p[0]) + (m[4] * p[1]) + (m[8] * p[2]) + m[12],
-                y : (m[1] * p[0]) + (m[5] * p[1]) + (m[9] * p[2]) + m[13],
-                z : (m[2] * p[0]) + (m[6] * p[1]) + (m[10] * p[2]) + m[14],
-                w : (m[3] * p[0]) + (m[7] * p[1]) + (m[11] * p[2]) + m[15]
-            };
-        },
+    transformPoint3:function(m, p) {
+        return {
+            x : (m[0] * p[0]) + (m[4] * p[1]) + (m[8] * p[2]) + m[12],
+            y : (m[1] * p[0]) + (m[5] * p[1]) + (m[9] * p[2]) + m[13],
+            z : (m[2] * p[0]) + (m[6] * p[1]) + (m[10] * p[2]) + m[14],
+            w : (m[3] * p[0]) + (m[7] * p[1]) + (m[11] * p[2]) + m[15]
+        };
+    },
 
-//    transformVector3:function(m, v) {
-//        return {
-//            x: (m[0] * v.x) + (m[4] * v.y) + (m[8] * v.z),
-//            y: (m[1] * v.x) + (m[5] * v.y) + (m[9] * v.z),
-//            z: (m[2] * v.x) + (m[6] * v.y) + (m[10] * v.z)
-//        };
-//    }  ,
+    //    transformVector3:function(m, v) {
+    //        return {
+    //            x: (m[0] * v.x) + (m[4] * v.y) + (m[8] * v.z),
+    //            y: (m[1] * v.x) + (m[5] * v.y) + (m[9] * v.z),
+    //            z: (m[2] * v.x) + (m[6] * v.y) + (m[10] * v.z)
+    //        };
+    //    }  ,
 
     transformVector3:function(m, v) {
         return {
@@ -1044,11 +1044,13 @@ SceneJS._modules.installBackend(
 
             this.setActiveScene = function(sceneId) {
                 return ctx.scenes.setActiveScene(sceneId);
-                ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED);
+                ctx.events.fireEvent(
+                        SceneJS._eventTypes.SCENE_ACTIVATED,
+                        sceneId);
             };
 
             this.flush = function() {
-//                ctx.events.fireEvent("scene-flushed");
+                //                ctx.events.fireEvent("scene-flushed");
                 return ctx.scenes.setActiveScene(null);
             };
 
@@ -1201,7 +1203,7 @@ SceneJS._modules.installBackend(
         new (function() {
 
             this.type = 'renderer';
-                       
+
             var ctx;
             var stateStack;   // Stack of renderer properties
             var glEnumMap;    // Maps renderer props to WebGL enums - lazy created when first GL context available
@@ -2220,7 +2222,7 @@ SceneJS._backends.installBackend(
                     scene_Lights: function(context, findVar, lights) {
                         if (lights && lights.length > 0) {
                             var l = lights[0];
-                            context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
+                            context.uniform4fv(findVar(context, 'LightPos'), [k.pos.x, k.pos.y, k.pos.z, 1.0]);
                         } else {
                             context.uniform4fv(findVar(context, 'LightPos'), [10.0, 0.0, -10.0, 1.0]);
                         }
@@ -8324,10 +8326,10 @@ SceneJS.objects.teapot = function() {
             var x = 0;
             var y = 0;
             var z = 0;
-            for (var j = 0; j < count; j++) {
-                x += nvecs[i][j][0];
-                y += nvecs[i][j][1];
-                z += nvecs[i][j][2];
+            for (var j = 0; i < count; i++) {
+                x += nvecs[i][i][0];
+                y += nvecs[i][i][1];
+                z += nvecs[i][i][2];
             }
             normals[i] = [x / count, y / count, z / count];
         }
@@ -8339,8 +8341,8 @@ SceneJS.objects.teapot = function() {
         for (var i = 0; i < ar.length; i++) {
             if (numPerElement && ar[i].length != numPerElement)
                 throw new SceneJS.exceptions.InvalidGeometryConfigException("Bad geometry array element");
-            for (var j = 0; j < ar[i].length; j++)
-                result.push(ar[i][j]);
+            for (var j = 0; i < ar[i].length; i++)
+                result.push(ar[i][i]);
         }
         return result;
     };
@@ -8601,7 +8603,7 @@ SceneJS._backends.installBackend(
                     /**
                      * When geometry is about to drawn we load our matrix if not loaded already
                      */
-                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.SHADER_RENDERING, function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL arrays
@@ -8801,7 +8803,7 @@ SceneJS._backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.SHADER_RENDERING, function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL array
@@ -8976,7 +8978,7 @@ SceneJS._backends.installBackend(
                     /**
                      * When geometry is about to draw we load our matrix if not loaded already
                      */
-                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.SHADER_RENDERING, function() {
                         if (!loaded) {
 
                             /* Lazy-compute WebGL array
@@ -9105,7 +9107,7 @@ SceneJS._backends.installBackend(
                     /**
                      * When geometry is about to draw we load our lights if not loaded already
                      */
-                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.SHADER_RENDERING, function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Lights', lightStack);
                             loaded = true;
@@ -9149,14 +9151,14 @@ SceneJS._backends.installBackend(
              */
             var transform = function(l) {
                 return {
-                    pos : ctx.modelTransform.transformPoint3(cloneVec(l.pos)),
-                    ambient : l.ambient,
-                    diffuse : l.diffuse,
-                    specular : l.specular,
-                    dir: ctx.modelTransform.transformVector(cloneVec(l.dir)),
-                    constantAttenuation: l.constantAttenuation,
-                    linearAttenuation: l.linearAttenuation,
-                    quadraticAttenuation: l.quadraticAttenuation
+                    pos : ctx.modelTransform.transformPoint3(cloneVec(k.pos)),
+                    ambient : k.ambient,
+                    diffuse : k.diffuse,
+                    specular : k.specular,
+                    dir: ctx.modelTransform.transformVector(cloneVec(k.dir)),
+                    constantAttenuation: k.constantAttenuation,
+                    linearAttenuation: k.linearAttenuation,
+                    quadraticAttenuation: k.quadraticAttenuation
                 };
             };
 
@@ -9288,7 +9290,7 @@ SceneJS._backends.installBackend(
                     /**
                      * When geometry is about to render we load our material if not loaded already
                      */
-                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.SHADER_RENDERING, function() {
                         if (!loaded) {
                             ctx.programs.setVar('scene_Material', material);
                             loaded = true;
@@ -9415,13 +9417,13 @@ SceneJS.scalarInterpolator = function() {
 
         var linearInterpolate = function(k) {
             var u = params.keys[key2] - params.keys[key1];
-            var v = k - params.keys[key1];
+            var v = j - params.keys[key1];
             var w = params.values[key2] - params.values[key1];
             return params.values[key1] + ((v / u) * w);
         } ;
 
         var constantInterpolate = function(k) {
-            if (Math.abs((k - params.keys[key1])) < Math.abs((k - params.keys[key2]))) {
+            if (Math.abs((j - params.keys[key1])) < Math.abs((j - params.keys[key2]))) {
                 return params.keys[key1];
             } else
             {
@@ -9430,7 +9432,7 @@ SceneJS.scalarInterpolator = function() {
         };
 
         var cosineInterpolate = function(k) {
-            var mu2 = (1 - Math.cos(k * Math.PI()) / 2.0);
+            var mu2 = (1 - Math.cos(j * Math.PI()) / 2.0);
             return (params.keys[key1] * (1 - mu2) + params.keys[key2] * mu2);
         };
 
@@ -9438,18 +9440,18 @@ SceneJS.scalarInterpolator = function() {
             if (key1 == 0 || key2 == (params.keys.length - 1)) {
                 /* Between first or last pair of keyframes - need four keyframes for cubic, so fall back on cosine
                  */
-                return cosineInterpolate(k);
+                return cosineInterpolate(j);
             }
             var y0 = params.keys[key1 - 1];
             var y1 = params.keys[key1];
             var y2 = params.keys[key2];
             var y3 = params.keys[key2 + 1];
-            var mu2 = k * k;
+            var mu2 = j * j;
             var a0 = y3 - y2 - y0 + y1;
             var a1 = y0 - y1 - a0;
             var a2 = y2 - y0;
             var a3 = y1;
-            return (a0 * k * mu2 + a1 * mu2 + a2 * k + a3);
+            return (a0 * j * mu2 + a1 * mu2 + a2 * j + a3);
         };
 
         var findEnclosingFrame = function(key) {
@@ -9476,13 +9478,13 @@ SceneJS.scalarInterpolator = function() {
         var interpolate = function(k) {
             switch (params.type) {
                 case 'linear':
-                    return linearInterpolate(k);
+                    return linearInterpolate(j);
                 case 'cosine':
-                    return cosineInterpolate(k);
+                    return cosineInterpolate(j);
                 case 'cubic':
-                    return cubicInterpolate(k);
+                    return cubicInterpolate(j);
                 case 'constant':
-                    return constantInterpolate(k);
+                    return constantInterpolate(j);
                 default:
                     throw 'internal error - interpolation type not switched: "' + params.type + "'";
             }
@@ -9877,7 +9879,7 @@ SceneJS._backends.installBackend(
                     /**
                      * When geometry is about to draw we load our texture if not loaded already
                      */
-                    ctx.events.onEvent(SceneJS._eventTypes.GEOMETRY_RENDERING, function() {
+                    ctx.events.onEvent(SceneJS._eventTypes.SHADER_RENDERING, function() {
                         if (!loaded && activeTexture) {
                             ctx.programs.bindTexture(activeTexture.ptexture);
                             loaded = true;
@@ -10153,7 +10155,7 @@ SceneJS._backends.installBackend(
                     scene_Lights: function(context, findVar, lights) {
                         if (lights && lights.length > 0) {
                             var l = lights[0];
-                            context.uniform4fv(findVar(context, 'LightPos'), [l.pos.x, l.pos.y, l.pos.z, 1.0]);
+                            context.uniform4fv(findVar(context, 'LightPos'), [k.pos.x, k.pos.y, k.pos.z, 1.0]);
                         } else {
                             context.uniform4fv(findVar(context, 'LightPos'), [10.0, 0.0, -10.0, 1.0]);
                         }

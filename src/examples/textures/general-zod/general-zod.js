@@ -2,7 +2,7 @@
  * Introductory SceneJS Example - Cube Textured with Image of General Zod
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * Prior to the destruction of Krypton, the criminal General Zod was banished into
@@ -18,111 +18,82 @@
  *
  * Now, kneel before Zod.
  */
-try {
-    with (SceneJS) {
-        var exampleScene = scene(
+var exampleScene = SceneJS.scene(
 
-                loggingToPage({ elementId: "logging" },
+        SceneJS.loggingToPage({ elementId: "logging" },
 
-                        renderer({
-                            canvasId: 'theCanvas',
-                            clear : { depth : true, color : true },
-                            enableTexture2D: true
-                        },
+                SceneJS.renderer({
+                    canvasId: 'theCanvas',
+                    clear : { depth : true, color : true },
+                    enableTexture2D: true
+                },
 
-                                lights({
-                                    lights: [
-                                        {
-                                            pos: { x: -30.0, y: -1000.0, z: 300.0 }
-                                        }
-                                    ]},
-                                        perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
+                        SceneJS.lights({
+                            lights: [
+                                {
+                                    pos: { x: -30.0, y: -1000.0, z: 300.0 }
+                                }
+                            ]},
+                                SceneJS.perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
+                                },
+                                        SceneJS.lookAt({
+                                            eye : { x: 0.0, y: 0.0, z: -10},
+                                            look : { x : 0.0, y : 0.0, z : 0 },
+                                            up : { x: 0.0, y: 1.0, z: 0.0 }
+
                                         },
-                                                lookAt({
-                                                    eye : { x: 0.0, y: 0.0, z: -10},
-                                                    look : { x : 0.0, y : 0.0, z : 0 },
-                                                    up : { x: 0.0, y: 1.0, z: 0.0 }
-
+                                                SceneJS.material({
+                                                    ambient:  { r:0.3, g:0.3, b:0.3 },
+                                                    diffuse:  { r:1.0, g:1.0, b:1.0 }
                                                 },
-                                                        material({
-                                                            ambient:  { r:0.3, g:0.3, b:0.3 },
-                                                            diffuse:  { r:1.0, g:1.0, b:1.0 }
+
+                                                    /** Texture is configured with the URI at which its
+                                                     * image is stored. Textures are loaded asynchronously;
+                                                     * by default they will cause scene traversal to bypass their
+                                                     * child nodes until the texture image has loaded. However,
+                                                     * you can configure them with wait: false if you want
+                                                     * thier child geometries to appear all naked and shivering
+                                                     * while the texture image loads.
+                                                     */
+                                                        SceneJS.texture({
+                                                            uri:"general-zod.jpg",
+                                                            wait: false
                                                         },
+                                                                SceneJS.rotate({ angle: 45, x : 1.0, y : 1.0},
 
-                                                            /** Texture is configured with the URI at which its
-                                                             * image is stored. Textures are loaded asynchronously;
-                                                             * by default they will cause scene traversal to bypass their
-                                                             * child nodes until the texture image has loaded. However,
-                                                             * you can configure them with wait: false if you want
-                                                             * thier child geometries to appear all naked and shivering
-                                                             * while the texture image loads.
-                                                             */
-                                                                texture({
-                                                                    uri:"./general-zod.jpg",
-                                                                    wait: false
-                                                                },
-                                                                        rotate(function(scope) {
-                                                                            return { angle: scope.get("angle"), x : 1.0, y : 1.0};
-                                                                        },
-
-                                                                                SceneJS.objects.cube()
-                                                                                )
+                                                                        SceneJS.objects.cube()
                                                                         )
                                                                 )
                                                         )
-                                            // ) // lookAt
-                                                ) // perspective
-                                        ) // lights
-                                ) // shader
+                                                )
+                                    // ) // lookAt
+                                        ) // perspective
+                                ) // lights
                         ) // renderer
-                ); // scene
+                ) // loggingToPage
+        ); // scene
 
+var pInterval;
 
-        var pInterval;
-        var angle = 0;
-        /* Our periodic render function. This will stop the render interval when the count of
-         * scene processes is zero.
-         */
-        function doit() {
+/* First render starts loading the texture and renders an untextured box
+ */
+exampleScene.render();
 
-
-            angle += 1;
-            try {
-                exampleScene.render({angle:angle});
-            } catch (e) {
-                clearInterval(pInterval);
-                if (e.message) {
-                    alert(e.message);
-                    throw e.message;
-                } else {
-                    alert(e);
-                    throw e;
-                }
-
-            }
-
-        }
-
-        /* This initial render will trigger the texture load, starting one scene process
-         */
-        try {
-            exampleScene.render({angle:angle});
-        } catch (e) {
-            if (e.message) {
-                alert(e.message);
-                throw e.message;
-            } else {
-                alert(e);
-                throw e;
-            }
-
-        }
-  
-        /* Keep rendering until texture loaded, ie. no scene processes running
-         */
-        pInterval = setInterval("doit()", 10);
+/* Now we'll continuously render the scene until the count of running
+ * processes is zero (ie. at which point the texture load process will have
+ * completed and the texture has been applied and rendered). Processes
+ * are only started and killed within scene traversals, so as not to cause
+ * confusion (ie. race conditions) when we query them in the "idle"
+ * interval inbetween.
+ */
+function doit() {
+    if (exampleScene.getNumProcesses() > 0) {
+        exampleScene.render();
+    } else {
+        clearInterval(pInterval);
+        exampleScene.destroy();
     }
-
-} catch (e) {
-    alert(e.message || e);
 }
+pInterval = setInterval("window.doit()", 10);
+
+

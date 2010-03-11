@@ -2,7 +2,7 @@
  * SceneJS Example - Importing a remote SceneJS teapot asset into a scene
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * "Assets" are remotely-stored scene fragments which may be
@@ -76,7 +76,7 @@ with (SceneJS) {
                                                  * is at SceneJS.com.
                                                  */
                                                     asset({
-                                                        uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/orangeteapot.js",
+                                                        uri:"http://scenejs.org/app/data/assets/catalogue/assets/orangeteapot.js",
                                                         proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
                                                     })
                                                     ) // lookAt

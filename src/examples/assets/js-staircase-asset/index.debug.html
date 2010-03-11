@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>SceneJS Example - Parameterised Scene Asset</title>
+</head>
+<body margin=20px>
+<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Parameterised Scene Asset
+</h1>
+<table>
+    <tr>
+        <td valign="top">
+            <canvas id="theCanvas" width="600" height="600">
+                <p>This example requires a browser that supports the
+                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                    &lt;canvas&gt; feature.</p>
+            </canvas>
+        </td>
+        <td valign="top">
+             <h3>Source code</h3>
+            <ul>
+                <li><a href="js-staircase-asset-demo.js">This example</a></li>
+                <li><a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/staircase-example/staircase.js">Staircase
+                    asset</a></li>
+            </ul>
+            <h3>Resources</h3>
+            <ul>
+                <li><a href="http://lindsaystanleykay.blogspot.com/2010/01/collada-parser-for-scenejs.html"
+                       target="other">Blog article
+                    on assets</a></li>
+                <li><a href="http://lindsaystanleykay.blogspot.com/2010/01/scenejs-parameterised-assets.html"
+                       target="other">Blog
+                    article on parameterised assets</a></li>
+            </ul>
+             <h3>Description</h3>
+            <p><span>"Assets" are remotely-stored scene fragments which may be
+            dynamically imported, cross-domain, into your scene using asset nodes.</span></p>
+
+            <p><span><a href="js-staircase-asset-demo.js">This example</a> imports an
+                <a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/staircase-example/staircase.js">spiral staircase asset</a>
+                from the repository at SceneJS.org. Make sure
+                you're familiar with the simpler <a href="../js-teapot-asset/index.html">teapot asset example</a> 
+                before you dive into this one.</span></p>
+
+            <p><span>When the scene is first rendered, the SceneJS.assets.scenejs node
+            will make a JSONP request of the repository, which will respond with
+            the asset data, which is in this case JSON. The node will
+            then convert the data into a subtree of scene graph content.</span></p>
+
+            <p><span>What's extra-special about this example is how the
+            SceneJS.assets.scenejs node is wrapped with a SceneJS.scope node,
+            which parameterises the asset. Try tweaking some of the configurations
+            on the scope node and see what happens.</span></p>
+
+            <p><span>The node's request will always be asynchronous. This means
+            that when SceneJS renders the asset node, it's not going to wait
+            for the asset to load before continuing to render the rest of the
+            scene. SceneJS will just trigger the asset request and move on.
+            So if you're rendering one frame, you wont see the asset in the
+            image. But if you keep rendering the scene for a few frames like
+            in this example, as you would when animating, the asset will
+            magically appear once loaded.</span></p>
+
+            <p><span>SceneJS tracks these loads and tracks each one as a process that
+            is currently active within the scene. So you can tell if all assets
+            have loaded when the number of scene processes is zero.</span></p>
+
+            <p><span>A nice way to use assets is to somehow have them pre-load
+            bits of scene just before they fall into view, then rely on
+            SceneJS to flush them when they haven't been rendered recently.</span></p>
+
+            <p><span>SceneJS currently caches assets with a max-time-inactive
+            eviction policy.</span></p>
+
+
+            <h3>Scene logging output</h3>
+
+            <div id="logging"></div>
+        </td>
+    </tr>
+</table>
+
+<!-- Core -->
+
+<script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/core/math.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/core/webgl.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/core/node.js"></script>
+
+<!-- Exceptions -->
+
+<script type="application/x-javascript" src="../../../scenejs/exceptions/exceptions.js"></script>
+
+
+<!-- Events -->
+
+<script type="application/x-javascript" src="../../../scenejs/events/eventsBackend.js"></script>
+
+<!-- Time -->
+
+<script type="application/x-javascript" src="../../../scenejs/time/timeBackend.js"></script>
+
+<!-- Logger -->
+
+<script type="application/x-javascript" src="../../../scenejs/logging/loggingBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/logging/logging.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/logging/loggingToPage.js"></script>
+
+<!-- Process management -->
+
+<script type="application/x-javascript" src="../../../scenejs/processes/processesBackend.js"></script>
+
+
+<!-- Scene -->
+
+<script type="application/x-javascript" src="../../../scenejs/scene/sceneBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/scene/scene.js"></script>
+
+
+<!-- Memory manager -->
+
+<script type="application/x-javascript" src="../../../scenejs/memory/memoryBackend.js"></script>
+
+
+<!-- Shading -->
+
+<script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/programs/shader.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
+
+<!-- Renderer -->
+<!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
+
+<script type="application/x-javascript" src="../../../scenejs/renderer/rendererBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/renderer/renderer.js"></script>
+
+<!-- Geometry -->
+
+<script type="application/x-javascript" src="../../../scenejs/geometry/geometryBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/geometry/geometry.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/geometry/objects/teapot.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/geometry/objects/cube.js"></script>
+
+<!-- Modelling transforms -->
+
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/modelTransformBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>
+
+<!-- Projection transforms -->
+
+<script type="application/x-javascript" src="../../../scenejs/transformation/projection/projectionBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/projection/perspective.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/projection/ortho.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/projection/frustum.js"></script>
+
+<!-- Viewing transforms -->
+
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
+
+<!-- Lighting -->
+
+<script type="application/x-javascript" src="../../../scenejs/lighting/lightsBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/lighting/lights.js"></script>
+
+<!-- Material -->
+
+<script type="application/x-javascript" src="../../../scenejs/material/material.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/material/materialBackend.js"></script>
+
+
+<!-- Interpolation -->
+
+<script type="application/x-javascript" src="../../../scenejs/animation/scalarInterpolator.js"></script>
+
+<!-- Scope -->
+
+<script type="application/x-javascript" src="../../../scenejs/scope/scope.js"></script>
+
+<!-- Generation -->
+
+<script type="application/x-javascript" src="../../../scenejs/generation/generator.js"></script>
+
+<!-- Axis-aligned bounding boxes -->
+
+<script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
+
+<!-- Assets -->
+
+<script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/js/scenejsAsset.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/collada/colladaAsset.js"></script>
+
+
+<script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
+
+<script type="application/x-javascript" src="js-staircase-asset-demo.js"></script>
+</body>
+</html>

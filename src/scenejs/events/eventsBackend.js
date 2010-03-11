@@ -1,39 +1,67 @@
 /**
+ * Backend module that defines SceneJS events and provides an interface on the backend context through which
+ * backend modules can fire and subscribe to them.
+ *
+ * Events are actually somewhat more like commands; they are always synchronous, and are often used to decouple the
+ * transfer of data between backends, request events in response, and generally trigger some immediate action.
+ *
+ * Event subscription can optionally be prioritised, to control the order in which the subscriber will be notified of
+ * a given event relative to other suscribers. This is useful, for example, when a backend must be the first to handle
+ * an INIT, or the last to handle a RESET.
+ *
+ */
+
+/**
  * Types of events that occur among backend modules. These are given values by the
  * events backend module when it is installed. When you add your own, just give them
  * a zero value like these ones.
  */
 SceneJS._eventTypes = {
-    INIT : 0,                           // SceneJS framework initialised 
-    RESET : 0,                          // SceneJS framework global reset
-    TIME_UPDATED : 0,                   // System time updated
-    SCENE_CREATED : 0,                  // Scene defined
-    SCENE_DESTROYED : 0,                // Scene destroyed
-    SCENE_ACTIVATED : 0,                // Scene traversal begun
-    SCENE_DEACTIVATED : 0,              // Scene traversal complete
-    CANVAS_ACTIVATED : 0,               // Canvas activated after renderer scene node visited
-    CANVAS_DEACTIVATED : 0,             // Canvas deactivated after renderer scene node visited
-    SHADER_ACTIVATED : 0,               // Shader activated after shading node visited
-    SHADER_DEACTIVATED : 0,             // Program deactivated after a shader scene node departed from
-    GEOMETRY_RENDERING : 0,             // Geometry is about to render, shader elements are implicitly requested
-    MODEL_TRANSFORM_UPDATED : 0,        // Modelling transform updated after a modelling transform scene node visited
-    PROJECTION_TRANSFORM_UPDATED : 0,   // View transform updated after a projection transform scene node visited
-    VIEW_TRANSFORM_UPDATED : 0,         // View transform updated after a view transform node visited
-    LIGHTS_UPDATED : 0,                 // Light sources updated after a lights node visited
-    TEXTURE_ACTIVATED : 0,              // Texture activated after a texture node visited
-    TEXTURE_DEACTIVATED : 0,            // Texture deactivated after a texture node departed from
-    TEXTURE_ENABLED : 0,                // Texturing enabled (allows default texturing shader to be selected)
-    TEXTURE_DISABLED : 0,               // Texturing disabled (allows default non-texturing shader to be selected)
-    SHADER_SAMPLER_BIND : 0,            // Response to GEOMETRY_RENDERING, provides texture for loading into shader
-    VARS_UPDATED : 0,                   // Shader vars updated after a vars node visited
-    SHADER_UNIFORM_SET : 0 ,            // Load a value into a target uniform within the active shader
-    SHADER_FLOAT_ARRAY_BUFFER : 0        // Bind an ARRAY_BUFFER VBO to an attribute within the active shader
+    INIT : 0,                           // SceneJS framework initialised
+    RESET : 0,                          // SceneJS framework reset
 
+    TIME_UPDATED : 0,                   // System time updated
+
+    SCENE_CREATED : 0,                  // Scene has just been created
+    SCENE_ACTIVATED : 0,                // Scene about to be traversed
+    SCENE_DEACTIVATED : 0,              // Scene just been completely traversed
+    SCENE_DESTROYED : 0,                // Scene just been destroyed
+
+    RENDERER_UPDATED: 0,                // Current WebGL context has been updated to the given state
+    RENDERER_EXPORTED: 0,               // Export of the current WebGL context state
+
+    CANVAS_ACTIVATED : 0,
+    CANVAS_DEACTIVATED : 0,
+
+    VIEWPORT_UPDATED : 0,               // Viewport updated
+
+    GEOMETRY_EXPORTED : 0,              // Export of geometry for rendering
+
+    MODEL_TRANSFORM_UPDATED : 0,        // Model transform matrix updated
+    MODEL_TRANSFORM_EXPORTED : 0,       // Export transform matrix for rendering
+
+    PROJECTION_TRANSFORM_UPDATED : 0,   // 
+    PROJECTION_TRANSFORM_EXPORTED : 0,
+
+    VIEW_TRANSFORM_UPDATED : 0,
+    VIEW_TRANSFORM_EXPORTED : 0,
+
+    LIGHTS_UPDATED : 0,
+    LIGHTS_EXPORTED : 0,
+
+    MATERIAL_UPDATED : 0,
+    MATERIAL_EXPORTED : 0,
+
+    TEXTURE_ACTIVATED : 0,              // Texture activated after a texture node visited
+    TEXTURE_EXPORTED : 0,
+    TEXTURE_DEACTIVATED : 0,            // Texture deactivated after a texture node departed from
+
+    SHADER_ACTIVATE : 0,
+    SHADER_ACTIVATED : 0,
+    SHADER_RENDERING : 0,
+    SHADER_DEACTIVATED : 0
 };
 
-/**
- * Backend module to route events between backend modules
- */
 SceneJS._backends.installBackend(
 
         "events",
@@ -50,7 +78,7 @@ SceneJS._backends.installBackend(
             var events = new Array(nevents);
 
 
-            /* Node-facing API
+            /* Interface on backend context
              */
             ctx.events = {
 

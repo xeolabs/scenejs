@@ -4,10 +4,10 @@
 SceneJS.ortho = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend = SceneJS._backends.getBackend('projection');
-    var projection;
+    var transform;
     return SceneJS._utils.createNode(
             function(scope) {
-                if (!projection || !cfg.fixed) {
+                if (!transform || !cfg.fixed) {
                     var params = cfg.getParams(scope);
                     var volume = {
                         left: params.left || -1.0,
@@ -25,13 +25,13 @@ SceneJS.ortho = function() {
                             volume.near,
                             volume.far
                             );
-                    projection = {
+                    transform = {
                         matrix: tempMat
                     };
                 }
-                var prevProjection = backend.getTransform();
-                backend.setTransform(projection);
+                var prevTransform = backend.getTransform();
+                backend.setTransform(transform);
                 SceneJS._utils.visitChildren(cfg, scope);
-                backend.setTransform(prevProjection);
+                backend.setTransform(prevTransform);
             });
 };

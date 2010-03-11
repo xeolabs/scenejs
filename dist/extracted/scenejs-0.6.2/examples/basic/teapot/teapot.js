@@ -2,7 +2,7 @@
  * Introductory SceneJS Example - The OpenGL Teapot
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * This is a simple scene to demonstrate the general SceneJS idea. A scene basically renders images to

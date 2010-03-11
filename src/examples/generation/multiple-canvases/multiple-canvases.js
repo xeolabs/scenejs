@@ -2,7 +2,7 @@
  * Introductory SceneJS Example - Procedural scene generation of multiple canvases
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * Here's one way to create multiple views of the same scene, each in a

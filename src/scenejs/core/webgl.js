@@ -59,166 +59,12 @@ SceneJS._webgl = {
         compareRToTexture:"COMPARE_R_TO_TEXTURE" // Hardware Shadowing Z-depth
     },
 
-    /**
-     * Names that SceneJS expects for variables in shader scripts.
-     *
-     * Your custom shaders must use these names for their variables
-     * in order for SceneJS to find them.
-     */
-    shaderVarNames : {
-        VERTEX : "Vertex",
-        NORMAL : "Normal",
-        TEXTURE_COORD : "TextureCoord",
-        PROJECTION_MATRIX : "PMatrix",
-        VIEW_MATRIX : "VMatrix",
-        MODEL_MATRIX : "MMatrix",
-        NORMAL_MATRIX : "NMatrix",
-        SAMPLER : "Sampler",
-        MATERIAL_AMBIENT: "MaterialAmbient",
-        MATERIAL_DIFFUSE: "MaterialDiffuse",
-        MATERIAL_SPECULAR: "MaterialSpecular",
-        MATERIAL_SHININESS: "MaterialShininess",
-        LIGHT_POS: "LightPos"
-    },
-
-    /**
-     * SceneJS built-in default shaders, used when no
-     * shader nodes are defined in a scene graph
-     */
-    defaultShaders: {
-
-        /* Default shader with single light source and no texturing
-         */
-        defaultBasicShader :{ // TODO: multiple diretional light sources, specular material
-            vertexShaders: [
-                "attribute vec3 Vertex;" +
-                "attribute vec3 Normal;" +
-                "uniform vec4 LightPos;" +
-                'uniform mat4 PMatrix; ' +
-                'uniform mat4 VMatrix; ' +
-                'uniform mat4 MMatrix; ' +
-                'uniform mat3 NMatrix; ' +
-                "uniform vec3 MaterialAmbient;" +
-                "uniform vec3 MaterialDiffuse;" +
-                "varying vec4 FragColor;" +
-                "void main(void) {" +
-                "   vec4 v = vec4(Vertex, 1.0);" +
-                "   vec4 mv =     MMatrix * v;" + // Modelling transformation
-                "   vec4 vv =     VMatrix * mv;" + // Viewing transformation
-                "   gl_Position = PMatrix * vv;" + // Perspective transformation
-                "   vec3 nn = normalize(NMatrix * Normal);" +
-                "   vec3 lightDir = vec3(normalize(mv - LightPos));" + // Lighting is done in model-space
-                "   float NdotL = max(dot(lightDir, nn), 0.0);" +
-                "   FragColor = vec4(NdotL * MaterialDiffuse + MaterialAmbient, 1.0);" +
-                "}"
-            ],
-            fragmentShaders: [
-                "varying vec4 FragColor;" +
-                "void main(void) { " +
-                "      gl_FragColor = FragColor;  " +
-                "} "
-            ]
-        },
-
-        /* Default shader with texturing        
-         */
-        defaultTextureShader : {
-            vertexShaders: [
-                "attribute vec3 Normal;" +
-                "attribute vec3 Vertex;" +
-                "attribute vec2 TextureCoord;" +
-                "uniform vec4 LightPos;" +
-                'uniform mat4 PMatrix; ' +
-                'uniform mat4 VMatrix; ' +
-                'uniform mat4 MMatrix; ' +
-                'uniform mat3 NMatrix; ' +
-                "uniform vec3 MaterialAmbient;" +
-                "uniform vec3 MaterialDiffuse;" +
-                "varying vec2 vTextureCoord;" +
-                "varying vec3 vLightWeighting; " +
-                "void main(void) {" +
-                "   vec4 mv =     MMatrix * vec4(Vertex, 1.0);" + // Modelling transformation
-                "   vec4 vv =     VMatrix * mv;" + // Viewing transformation
-                "   gl_Position = PMatrix * vv;" + // Perspective transformation
-                "   vec3 nn = normalize(NMatrix * Normal);" +
-                "   vec3 lightDir = vec3(normalize(mv - LightPos));" + // Lighting is done in model-space
-                "   float directionalLightWeighting = max(dot(lightDir, nn), 0.0);" +
-                "   vLightWeighting = MaterialAmbient + MaterialDiffuse * directionalLightWeighting;" +
-                "   vTextureCoord = TextureCoord;" +
-                "}"
-            ],
-            fragmentShaders: [
-                "varying vec2 vTextureCoord;" +
-                "uniform sampler2D Sampler;" +
-                "varying vec3 vLightWeighting; " +
-                "void main(void) {" +
-                "   vec4 textureColor = texture2D(Sampler, vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)); " +
-                "   gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a); " +
-                "}"
-            ]
-        },
-
-        defaultDirectionalShader : {
-            vertexShaders: [
-                "varying vec2 vTextureCoord; " +
-                "varying vec4 vTransformedNormal; " +
-                "varying vec4 vPosition; " +
-
-                "uniform float uMaterialShininess; " +
-
-                "uniform bool uShowSpecularHighlights; " +
-                "uniform bool uUseLighting; " +
-                "uniform bool uUseTextures; " +
-
-                "uniform vec3 uAmbientColor; " +
-
-                "uniform vec3 uPointLightingLocation; " +
-                "uniform vec3 uPointLightingSpecularColor; " +
-                "uniform vec3 uPointLightingDiffuseColor; " +
-
-                "uniform sampler2D uSampler; " +
-
-
-                "void main(void) { " +
-                "   vec3 lightWeighting; " +
-                "   if (!uUseLighting) { " +
-                "       lightWeighting = vec3(1.0, 1.0, 1.0); " +
-                "   } else { " +
-                "       vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz); " +
-                "       vec3 normal = normalize(vTransformedNormal.xyz); " +
-
-                "       float specularLightWeighting = 0.0; " +
-                "       if (uShowSpecularHighlights) { " +
-                "           vec3 eyeDirection = normalize(-vPosition.xyz); " +
-                "           vec3 reflectionDirection = reflect(-lightDirection, normal); " +
-
-                "           specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess); " +
-                "       } " +
-
-                "       float diffuseLightWeighting = max(dot(normal, lightDirection), 0.0); " +
-                "       lightWeighting = uAmbientColor " +
-                "           + uPointLightingSpecularColor * specularLightWeighting " +
-                "           + uPointLightingDiffuseColor * diffuseLightWeighting; " +
-                "   } " +
-
-                "   vec4 fragmentColor; " +
-                "   if (uUseTextures) { " +
-                "       fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)); " +
-                "   } else { " +
-                "       fragmentColor = vec4(1.0, 1.0, 1.0, 1.0); " +
-                "   } " +
-                "       gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a); " +
-                "}"
-            ]
-        }
-    },
-
     ProgramUniform : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program uniform found: " + name);
+        logging.debug("Program uniform found in shader: " + name);
         var func = null;
         if (type == context.BOOL) {
             func = function (v) {
-                context.uniform1iv(location, v);
+                context.uniform1i(location, v);
             };
         } else if (type == context.BOOL_VEC2) {
             func = function (v) {
@@ -281,6 +127,7 @@ SceneJS._webgl = {
         }
 
         this.setValue = function(v) {
+         //   alert("setValue " + name + " = " + v);
             func(v);
         };
 
@@ -290,7 +137,7 @@ SceneJS._webgl = {
     },
 
     ProgramSampler : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program sampler found: " + name);
+        logging.debug("Program sampler found in shader: " + name);
         this.bindTexture = function(texture) {
             texture.bind();
             context.uniform1i(location, 0);
@@ -300,7 +147,7 @@ SceneJS._webgl = {
     /** An attribute within a shader
      */
     ProgramAttribute : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program attribute found: " + name);
+        logging.debug("Program attribute found in shader: " + name);
         this.bindFloatArrayBuffer = function(buffer) {
             context.enableVertexAttribArray(location);
             buffer.bind();
@@ -344,15 +191,15 @@ SceneJS._webgl = {
     /**
      * A program on an active WebGL context
      *
-     * @param programId SceneJS-managed ID for program
+     * @param hash SceneJS-managed ID for program
      * @param lastUsed Time program was lst activated, for LRU cache eviction
      * @param context WebGL context
      * @param vertexSources Source codes for vertex shaders
      * @param fragmentSources Source codes for fragment shaders
      * @param logging Program and shaders will write to logging's debug channel as they compile and link
      */
-    Program : function(type, programId, lastUsed, context, vertexSources, fragmentSources, logging) {
-        this.programId = programId;
+    Program : function(hash, lastUsed, context, vertexSources, fragmentSources, logging) {
+        this.hash = hash;
         this.lastUsed = lastUsed;
 
         /* Create shaders from sources
@@ -382,7 +229,7 @@ SceneJS._webgl = {
         this.valid = this.valid && (context.getProgramParameter(handle, context.LINK_STATUS) != 0);
         this.valid = this.valid && (context.getProgramParameter(handle, context.VALIDATE_STATUS) != 0);
 
-        logging.debug("Creating shader program: '" + programId + "'");
+        logging.debug("Creating shader program: '" + hash + "'");
         if (this.valid) {
             logging.debug("Program link succeeded: " + context.getProgramInfoLog(handle));
         }
@@ -416,7 +263,6 @@ SceneJS._webgl = {
                             location,
                             logging);
                 } else {
-
                     uniforms[u.name] = new SceneJS._webgl.ProgramUniform(
                             context,
                             handle,
@@ -449,27 +295,6 @@ SceneJS._webgl = {
             }
         }
 
-        //        var index = 0;
-        //        for (var v in attributes) {
-        //            var attr = attributes[v];
-        //            context.bindAttribLocation(handle, index, attr.name);
-        //            attr.index = index;
-        //            index++;
-        //        }
-        //        context.linkProgram(handle); // requires relink
-        //
-        //        // ensure texture unit is sequential in "for (attr in obj.samplers)" loops
-        //        context.useProgram(handle);
-        //
-        //        var unit = 0;
-        //        for (var s in samplers) {
-        //            var sampler = samplers[s];
-        //            context.uniform1i(sampler.location, unit);
-        //            unit++;
-        //        }
-        //        context.useProgram(null);
-
-
         this.bind = function() {
             context.useProgram(handle);
         };
@@ -479,7 +304,7 @@ SceneJS._webgl = {
             if (u) {
                 u.setValue(value);
             } else {
-                //    logging.warn("Shader uniform load failed - uniform not found in shader '" + type + "': " + name);
+                //    logging.warn("Shader uniform load failed - uniform not found in shader : " + name);
             }
         };
 
@@ -488,7 +313,7 @@ SceneJS._webgl = {
             if (attr) {
                 attr.bindFloatArrayBuffer(buffer);
             } else {
-                //  logging.warn("Shader attribute bind failed - attribute not found in shader '" + type + "': " + name);
+                //  logging.warn("Shader attribute bind failed - attribute not found in shader : " + name);
             }
         };
 
@@ -507,7 +332,7 @@ SceneJS._webgl = {
 
         this.destroy = function() {
             if (this.valid) {
-                logging.debug("Destroying shader program: '" + programId + "'");
+                logging.debug("Destroying shader program: '" + hash + "'");
                 context.deleteProgram(handle);
                 for (var s in shaders) {
                     context.deleteShader(shaders[s].handle);

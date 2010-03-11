@@ -2,7 +2,7 @@
  * Introductory SceneJS Example - Multiple objects with multiple materials
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * February 2010
  *
  * This example demonstrates multiple objects each with their own material

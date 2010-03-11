@@ -1,7 +1,7 @@
 <!--
 	Builds SceneJS
 
-	Guava3D home:	http://www.scenejs.com
+	Guava3D home:	http://scenejs.org
 	Author: 	Lindsay S. Kay, Jan 2, 2010
 -->
 <project name="" basedir="." default="package">

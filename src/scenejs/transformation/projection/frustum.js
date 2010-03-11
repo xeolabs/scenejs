@@ -4,10 +4,10 @@
 SceneJS.frustum = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend = SceneJS._backends.getBackend('projection');
-    var projection;
+    var transform;
     return SceneJS._utils.createNode(
             function(scope) {
-                if (!projection || cfg.fixed) {    // Memoize matrix if node config is constant
+                if (!transform || cfg.fixed) {    // Memoize matrix if node config is constant
                     var params = cfg.getParams(scope);
                     var volume = {
                         xmin: params.left || -1.0,
@@ -25,13 +25,13 @@ SceneJS.frustum = function() {
                             volume.zmin,
                             volume.zmax
                             );
-                    projection = {
+                    transform = {
                         matrix: tempMat
                     };
                 }
-                var prevProjection = backend.getTransform();
-                backend.setTransform(projection);
+                var prevTransform = backend.getTransform();
+                backend.setTransform(transform);
                 SceneJS._utils.visitChildren(cfg, scope);
-                backend.setTransform(prevProjection);
+                backend.setTransform(prevTransform);
             });
 };

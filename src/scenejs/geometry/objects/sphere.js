@@ -60,9 +60,9 @@ SceneJS.objects.sphere = function() {
                     var u = 1 - (ringNum / rings);
                     var v = sliceNum / slices;
 
-                    normals.push(x);
-                    normals.push(y);
-                    normals.push(z);
+                    normals.push(-x);
+                    normals.push(-y);
+                    normals.push(-z);
                     texCoords.push(u);
                     texCoords.push(v);
                     vertices.push(radius * x);
@@ -87,7 +87,7 @@ SceneJS.objects.sphere = function() {
             }
 
             return {
-                primitive : "triangle",
+                primitive : "triangles",
                 vertices : vertices,
                 normals: normals,
                 texCoords : texCoords,

@@ -2,17 +2,35 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>SceneJS Example - The OpenGL Teapot</title>
+    <title>SceneJS Example - Parameterised Scene Asset</title>
 </head>
-<body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
-<canvas id="theCanvas" width="600" height="600">
-    <p>This example requires a browser that supports the
-        <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-        &lt;canvas&gt; feature.</p>
-</canvas>
+<body margin=20px>
+<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Basic First Example
+</h1>
+<table>
+    <tr>
+        <td valign="top">
+            <canvas id="theCanvas" width="600" height="600">
+                <p>This example requires a browser that supports the
+                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                    &lt;canvas&gt; feature.</p>
+            </canvas>
+        </td>
+        <td valign="top">
+            <h3>Source code</h3>
+            <ul>
+                <li><a href="teapot.js">This example</a></li>
+            </ul>
+          
+            <h3>Description</h3>
+            <p><span>This is a really simple scene to demonstrate the general SceneJS idea. A scene basically renders images to
+one or more WebGL canvas elements in the browser page. The <a href="teapot.js">source code</a> has lots of comments that will tell you how this example works.<p><span>                  
+            <h3>Scene logging output</h3>
 
-<div id="logging"></div>
-
+            <div id="logging"></div>
+        </td>
+    </tr>
+</table>
 
 <!-- Core -->
 
@@ -59,9 +77,13 @@
 <!-- Shading -->
 
 <script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/shader.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/programs/shader.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
+
+
+<script type="application/x-javascript" src="../../../scenejs/shading/vars/shaderVarsBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/vars/shaderVars.js"></script>
 
 <!-- Renderer -->
 <!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
@@ -120,17 +142,18 @@
 
 <!-- Axis-aligned bounding boxes -->
 
-<script type="application/x-javascript" src="../../../scenejs/boundary/viewVolumeBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/boundary/axisBoundary.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
 
 <!-- Assets -->
 
-<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackendExtension.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/js/scenejsAsset.js"></script>
 
-<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
 
 
 <script type="application/x-javascript" src="teapot.js"></script>

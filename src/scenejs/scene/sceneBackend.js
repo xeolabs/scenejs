@@ -62,8 +62,7 @@ SceneJS._backends.installBackend(
                  */
                 activateScene : function(sceneId) {
                     activeSceneId = sceneId;
-                    ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED, { sceneId: sceneId });
-                    //  ctx.logging.info("Scene activated: " + sceneId);
+                    ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED, { sceneId: sceneId });                 
                 },
 
                 /** Returns all registered scenes

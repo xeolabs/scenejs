@@ -18,7 +18,7 @@ SceneJS._backends.installBackend(
             var groups = {};                            // A process group for each existing scene
             var activeSceneId;                          // ID of currently-active scene
 
-            ctx.events.onEvent(// System time update
+            ctx.events.onEvent(
                     SceneJS._eventTypes.TIME_UPDATED,
                     function(t) {
                         time = t;

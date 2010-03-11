@@ -6,12 +6,12 @@ function f() {
     return function() {
     }
 }
-function k(a) {
+function j(a) {
     return function(b) {
         this[a] = b
     }
 }
-function l(a) {
+function k(a) {
     return function() {
         return this[a]
     }
@@ -391,10 +391,10 @@ q.rc = function(a, b, c) {
 };
 q.sf = function(a, b, c) {
     var d = this.Normal.Ta(),e = this.Normal.ma(a.Normal),g = a.Normal.Ta(),j = d * g - e * e;
-    if (Math.abs(j) < 1.0E-8)return false;
-    j = 1 / j;
-    g = (g * -this.D + e * a.D) * j;
-    d = (d * -a.D + e * this.D) * j;
+    if (Math.abs(i) < 1.0E-8)return false;
+    i = 1 / i;
+    g = (g * -this.D + e * a.D) * i;
+    d = (d * -a.D + e * this.D) * i;
     this.Normal.ia(a.Normal).P(c);
     c = this.Normal.z(g);
     a = a.Normal.z(d);
@@ -416,21 +416,21 @@ q.Kh = function(a) {
 };
 Matrix4 = function(a) {
     if (a == null)a = true;
-    this.l = this.k = this.j = this.i = this.r = this.e = this.q = this.p = this.o = this.h = this.d = this.g = this.n = this.m = this.f = this.c = 0;
+    this.k = this.j = this.i = this.i = this.r = this.e = this.q = this.p = this.o = this.h = this.d = this.g = this.n = this.m = this.f = this.c = 0;
     this.ea = false;
     if (a) {
-        this.l = this.e = this.d = this.c = 1;
+        this.k = this.e = this.d = this.c = 1;
         this.ea = true
     }
 };
 Matrix4.prototype.s = function(a) {
-    return Core.s(this.c, a.c) && Core.s(this.f, a.f) && Core.s(this.m, a.m) && Core.s(this.n, a.n) && Core.s(this.g, a.g) && Core.s(this.d, a.d) && Core.s(this.h, a.h) && Core.s(this.o, a.o) && Core.s(this.p, a.p) && Core.s(this.q, a.q) && Core.s(this.e, a.e) && Core.s(this.r, a.r) && Core.s(this.i, a.i) && Core.s(this.j, a.j) && Core.s(this.k, a.k) && Core.s(this.l, a.l)
+    return Core.s(this.c, a.c) && Core.s(this.f, a.f) && Core.s(this.m, a.m) && Core.s(this.n, a.n) && Core.s(this.g, a.g) && Core.s(this.d, a.d) && Core.s(this.h, a.h) && Core.s(this.o, a.o) && Core.s(this.p, a.p) && Core.s(this.q, a.q) && Core.s(this.e, a.e) && Core.s(this.r, a.r) && Core.s(this.i, a.i) && Core.s(this.i, a.i) && Core.s(this.j, a.j) && Core.s(this.k, a.k)
 };
 function y(a, b) {
-    return new Vect3d(b.X * a.c + b.Y * a.g + b.Z * a.p + a.i, b.X * a.f + b.Y * a.d + b.Z * a.q + a.j, b.X * a.m + b.Y * a.h + b.Z * a.e + a.k)
+    return new Vect3d(b.X * a.c + b.Y * a.g + b.Z * a.p + a.i, b.X * a.f + b.Y * a.d + b.Z * a.q + a.i, b.X * a.m + b.Y * a.h + b.Z * a.e + a.j)
 }
 function z(a, b) {
-    var c = b.X * a.f + b.Y * a.d + b.Z * a.q + a.j,d = b.X * a.m + b.Y * a.h + b.Z * a.e + a.k;
+    var c = b.X * a.f + b.Y * a.d + b.Z * a.q + a.i,d = b.X * a.m + b.Y * a.h + b.Z * a.e + a.j;
     b.X = b.X * a.c + b.Y * a.g + b.Z * a.p + a.i;
     b.Y = c;
     b.Z = d
@@ -446,22 +446,22 @@ function C(a, b) {
         return c
     }
     c.c = a.c * b.c + a.g * b.f + a.p * b.m + a.i * b.n;
-    c.f = a.f * b.c + a.d * b.f + a.q * b.m + a.j * b.n;
-    c.m = a.m * b.c + a.h * b.f + a.e * b.m + a.k * b.n;
-    c.n = a.n * b.c + a.o * b.f + a.r * b.m + a.l * b.n;
+    c.f = a.f * b.c + a.d * b.f + a.q * b.m + a.i * b.n;
+    c.m = a.m * b.c + a.h * b.f + a.e * b.m + a.j * b.n;
+    c.n = a.n * b.c + a.o * b.f + a.r * b.m + a.k * b.n;
     c.g = a.c * b.g + a.g * b.d + a.p * b.h + a.i * b.o;
-    c.d = a.f * b.g + a.d * b.d + a.q * b.h + a.j * b.o;
-    c.h = a.m * b.g + a.h * b.d + a.e * b.h + a.k * b.o;
-    c.o = a.n * b.g + a.o * b.d + a.r * b.h + a.l * b.o;
+    c.d = a.f * b.g + a.d * b.d + a.q * b.h + a.i * b.o;
+    c.h = a.m * b.g + a.h * b.d + a.e * b.h + a.j * b.o;
+    c.o = a.n * b.g + a.o * b.d + a.r * b.h + a.k * b.o;
     c.p = a.c * b.p + a.g * b.q + a.p * b.e + a.i * b.r;
-    c.q = a.f * b.p + a.d * b.q + a.q * b.e + a.j * b.r;
-    c.e = a.m * b.p + a.h * b.q + a.e * b.e + a.k * b.r;
+    c.q = a.f * b.p + a.d * b.q + a.q * b.e + a.i * b.r;
+    c.e = a.m * b.p + a.h * b.q + a.e * b.e + a.j * b.r;
     c.r = a.n * b.p + a.o *
-                      b.q + a.r * b.e + a.l * b.r;
-    c.i = a.c * b.i + a.g * b.j + a.p * b.k + a.i * b.l;
-    c.j = a.f * b.i + a.d * b.j + a.q * b.k + a.j * b.l;
-    c.k = a.m * b.i + a.h * b.j + a.e * b.k + a.k * b.l;
-    c.l = a.n * b.i + a.o * b.j + a.r * b.k + a.l * b.l;
+                      b.q + a.r * b.e + a.k * b.r;
+    c.i = a.c * b.i + a.g * b.i + a.p * b.j + a.i * b.k;
+    c.i = a.f * b.i + a.d * b.i + a.q * b.j + a.i * b.k;
+    c.j = a.m * b.i + a.h * b.i + a.e * b.j + a.j * b.k;
+    c.k = a.n * b.i + a.o * b.i + a.r * b.j + a.k * b.k;
     return c
 }
 Matrix4.prototype.b = function() {
@@ -483,9 +483,9 @@ Matrix4.prototype.P = function(a) {
     a.e = this.e;
     a.r = this.r;
     a.i = this.i;
+    a.i = this.i;
     a.j = this.j;
     a.k = this.k;
-    a.l = this.l;
     a.ea = this.ea
 };
 function D(a, b, c, d, e) {
@@ -503,9 +503,9 @@ function D(a, b, c, d, e) {
     a.e = e / (e - d);
     a.r = 1;
     a.i = 0;
-    a.j = 0;
-    a.k = -d * e / (e - d);
-    a.l = 0;
+    a.i = 0;
+    a.j = -d * e / (e - d);
+    a.k = 0;
     a.ea = false
 }
 function E(a, b) {
@@ -513,23 +513,23 @@ function E(a, b) {
     b = Math.cos(c.X);
     var d = Math.sin(c.X),e = Math.cos(c.Y),g = Math.sin(c.Y),j = Math.cos(c.Z);
     c = Math.sin(c.Z);
-    a.c = e * j;
+    a.c = e * i;
     a.f = e * c;
     a.m = -g;
     var n = d * g;
     g = b * g;
-    a.g = n * j - b * c;
-    a.d = n * c + b * j;
+    a.g = n * i - b * c;
+    a.d = n * c + b * i;
     a.h = d * e;
-    a.p = g * j + d * c;
-    a.q = g * c - d * j;
+    a.p = g * i + d * c;
+    a.q = g * c - d * i;
     a.e = b * e;
     a.ea = false
 }
 function F(a, b) {
     a.i = b.X;
-    a.j = b.Y;
-    a.k = b.Z;
+    a.i = b.Y;
+    a.j = b.Z;
     a.ea = false
 }
 function G(a, b) {
@@ -557,33 +557,33 @@ ViewFrustrum.prototype.Qd = function(a) {
     b.Normal.X = a.n + a.c;
     b.Normal.Y = a.o + a.g;
     b.Normal.Z = a.r + a.p;
-    b.D = a.l + a.i;
+    b.D = a.k + a.i;
     b = this.J[ViewFrustrum.Te];
     b.Normal.X = a.n - a.c;
     b.Normal.Y = a.o - a.g;
     b.Normal.Z = a.r - a.p;
-    b.D = a.l - a.i;
+    b.D = a.k - a.i;
     b = this.J[ViewFrustrum.md];
     b.Normal.X = a.n - a.f;
     b.Normal.Y = a.o - a.d;
     b.Normal.Z = a.r - a.q;
-    b.D = a.l - a.j;
+    b.D = a.k - a.i;
     b = this.J[ViewFrustrum.Re];
     b.Normal.X = a.n + a.f;
     b.Normal.Y = a.o + a.d;
     b.Normal.Z = a.r + a.q;
-    b.D = a.l + a.j;
+    b.D = a.k + a.i;
     b = this.J[ViewFrustrum.hc];
     b.Normal.X = a.n - a.m;
     b.Normal.Y = a.o - a.h;
     b.Normal.Z = a.r -
                  a.e;
-    b.D = a.l - a.k;
+    b.D = a.k - a.j;
     b = this.J[ViewFrustrum.Ng];
     b.Normal.X = a.m;
     b.Normal.Y = a.h;
     b.Normal.Z = a.e;
-    b.D = a.k;
+    b.D = a.j;
     for (a = a = 0; a < ViewFrustrum.Se; ++a) {
         b = this.J[a];
         var c = -(1 / b.Normal.Ta());
@@ -684,11 +684,11 @@ Action.te.prototype.execute = function() {
 };
 Action.Je = f();
 Action.Je.prototype.execute = f();
-Action.Le = k("rb");
+Action.Le = j("rb");
 Action.Le.prototype.execute = function() {
     this.rb && aa(this.rb, this.Cg, true)
 };
-Action.He = k("rb");
+Action.He = j("rb");
 Action.He.prototype.execute = function(a, b) {
     if (a && b) {
         a = null;
@@ -796,7 +796,7 @@ Mesh = function() {
 Mesh.prototype.Xd = function(a) {
     this.sa.push(a)
 };
-Mesh.prototype.dg = l("sa");
+Mesh.prototype.dg = k("sa");
 TextureManager = function() {
     this.C = [];
     this.H = null;
@@ -817,14 +817,14 @@ TextureManager.prototype.yf = function(a, b) {
             if (g != null) {
                 gl = g.v;
                 var j = gl.ah();
-                gl.fb(gl.da, j);
+                gl.fb(gl.da, i);
                 gl.ni(gl.da, 0, e.Ub);
                 gl.Ac(gl.da, gl.Dg, gl.kg);
                 gl.Ac(gl.da, gl.Eg, gl.lg);
                 gl.lh(gl.da);
                 gl.fb(gl.da, null);
                 g.Td = true;
-                e.jd = j;
+                e.jd = i;
                 e.Yb = true
             }
         };
@@ -908,15 +908,15 @@ Renderer = function() {
     this.ra = [];
     this.pd = null
 };
-Renderer.prototype.Jd = l("width");
+Renderer.prototype.Jd = k("width");
 function fa(a) {
     var b = a.Td;
     a.Td = false;
     return b
 }
 q = Renderer.prototype;
-q.Gh = l("v");
-q.yd = l("height");
+q.Gh = k("v");
+q.yd = k("height");
 q.td = function(a) {
     if (a != null)for (var b = 0; b < a.sa.length; ++b) {
         var c = a.sa[b];
@@ -976,8 +976,8 @@ q.ud = function(a) {
                 g[o * 3 + 0] = p.Normal.X;
                 g[o * 3 + 1] = p.Normal.Y;
                 g[o * 3 + 2] = p.Normal.Z;
-                j[o * 2 + 0] = p.TCoords.X;
-                j[o * 2 + 1] = p.TCoords.Y;
+                i[o * 2 + 0] = p.TCoords.X;
+                i[o * 2 + 1] = p.TCoords.Y;
                 n[o * 2 + 0] = p.TCoords2.X;
                 n[o * 2 + 1] = p.TCoords2.Y
             }
@@ -993,7 +993,7 @@ q.ud = function(a) {
             b.Gb(b.$, e, b.yb);
             c.Pf = b.Hb();
             b.ha(b.$, c.Pf);
-            b.Gb(b.$, j, b.yb);
+            b.Gb(b.$, i, b.yb);
             c.Qf = b.Hb();
             b.ha(b.$, c.Qf);
             b.Gb(b.$, n, b.yb);
@@ -1029,7 +1029,7 @@ q.ud = function(a) {
         c = C(c, this.ic);
         c = C(c, this.kc);
         e = b.Jb(this.pd, "worldviewproj");
-        b.oi(e, false, new WebGLFloatArray([c.c,c.f,c.m,c.n,c.g,c.d,c.h,c.o,c.p,c.q,c.e,c.r,c.i,c.j,c.k,c.l]));
+        b.oi(e, false, new WebGLFloatArray([c.c,c.f,c.m,c.n,c.g,c.d,c.h,c.o,c.p,c.q,c.e,c.r,c.i,c.i,c.j,c.k]));
         b.fh(b.Hg, a.Ih, b.Kg, 0)
     }
 };
@@ -1160,7 +1160,7 @@ q.ga = function(a) {
         this.ra[Material.qb] = g;
         this.ra[Material.qb + 1] = g;
         this.ra[Material.qb + 2] = g;
-        this.ra[Material.qb + 3] = j;
+        this.ra[Material.qb + 3] = i;
         this.ra[Material.Lc] = o;
         this.ra[Material.Mc] = n;
         a.Rf(b);
@@ -1191,43 +1191,43 @@ function R(a, b, c) {
 }
 function Q(a, b, c, d, e, g) {
     var j;
-    j = a.v;
-    b = R(a, j.Mg, b);
-    a = R(a, j.bg, c);
+    i = a.v;
+    b = R(a, i.Mg, b);
+    a = R(a, i.bg, c);
     if (!b || !a) {
         v.print("Could not create shader program");
-        j = null
+        i = null
     } else {
-        c = j.Yg();
-        j.We(c, b);
-        j.We(c, a);
-        j.mc(c, 0, "vPosition");
-        j.mc(c, 1, "vTexCoord1");
-        j.mc(c, 2, "vTexCoord2");
-        j.mc(c, 3, "vNormal");
-        j.Bc(j.Jb(c, "texture1"), 0);
-        j.Bc(j.Jb(c, "texture2"), 1);
-        j.Oh(c);
-        j.yh(c, j.mg) || v.print("Could not link program:" + j.xh(c));
-        j = c
+        c = i.Yg();
+        i.We(c, b);
+        i.We(c, a);
+        i.mc(c, 0, "vPosition");
+        i.mc(c, 1, "vTexCoord1");
+        i.mc(c, 2, "vTexCoord2");
+        i.mc(c, 3, "vNormal");
+        i.Bc(i.Jb(c, "texture1"), 0);
+        i.Bc(i.Jb(c, "texture2"), 1);
+        i.Oh(c);
+        i.yh(c, i.mg) || v.print("Could not link program:" + i.xh(c));
+        i = c
     }
-    if (j) {
-        j.Sg = d ? d : false;
-        j.Tg = e;
-        j.Rg = g
+    if (i) {
+        i.Sg = d ? d : false;
+        i.Tg = e;
+        i.Rg = g
     }
-    return j
+    return i
 }
 q = Renderer.prototype;
 q.Mf = function(a) {
     a.P(this.ca)
 };
-q.wf = l("ca");
+q.wf = k("ca");
 q.Of = function(a) {
     a.P(this.ic)
 };
-q.Af = l("ic");
-q.Hh = l("kc");
+q.Af = k("ic");
+q.Hh = k("kc");
 q.zc = function(a) {
     a && a.P(this.kc)
 };
@@ -1268,9 +1268,9 @@ CopperLicht = function(a, b, c) {
             if (d.Zb ||
                 e) {
                 var j = "Loading";
-                if (e > 0)j = "Textures loaded: " + (g - e) + "/" + g;
-                switch (d.le % 4) {case 0:j += "   ";break;case 1:j += ".  ";break;case 2:j += ".. ";break;case 3:j += "...";break}
-                t(v, j)
+                if (e > 0)i = "Textures loaded: " + (g - e) + "/" + g;
+                switch (d.le % 4) {case 0:i += "   ";break;case 1:i += ".  ";break;case 2:i += ".. ";break;case 3:i += "...";break}
+                t(v, i)
             } else t(v, null)
         }
     }, 500)
@@ -1278,7 +1278,7 @@ CopperLicht = function(a, b, c) {
 CopperLicht.prototype.Jh = function() {
     return S(this)
 };
-CopperLicht.prototype.zh = l("H");
+CopperLicht.prototype.zh = k("H");
 CopperLicht.prototype.hb = function() {
     if (this.B == null)return null;
     return this.B.pc()
@@ -1325,7 +1325,7 @@ function S(a) {
     return true
 }
 q = CopperLicht.prototype;
-q.Lh = l("Zb");
+q.Lh = k("Zb");
 q.Md = function(a, b) {
     this.Zb = false;
     a = (new FlaceLoader).Ph(a, b, this.la, this);
@@ -1402,8 +1402,8 @@ CopperLicht.prototype.tc = function(a) {
     if (a.Ue)a.fa(); else {
         a.Ue = true;
         var e = false,g = a.hf("camera");
-        if (g)for (var j = 0; j < g.length; ++j) {
-            var n = g[j];
+        if (g)for (var j = 0; i < g.length; ++i) {
+            var n = g[i];
             if (n && n.Wd) {
                 d = n;
                 e = true;
@@ -1471,11 +1471,11 @@ q.handleMouseDown = function(a) {
         for (c = 0; c < b.Oa.length; ++c)b.Oa[c].onMouseDown(a)
     }
 };
-q.Bd = l("pe");
-q.Cd = l("qe");
-q.vc = l("Vc");
-q.zd = l("ne");
-q.Ad = l("oe");
+q.Bd = k("pe");
+q.Cd = k("qe");
+q.vc = k("Vc");
+q.zd = k("ne");
+q.Ad = k("oe");
 q.handleMouseUp = function(a) {
     this.Vc = false;
     var b = this.hb();
@@ -1514,12 +1514,12 @@ q.gf = function(a, b) {
     g.J[ViewFrustrum.hc].rc(g.J[ViewFrustrum.md], g.J[ViewFrustrum.Te], e);
     e = e.G(d);
     var j = new Vect3d;
-    g.J[ViewFrustrum.hc].rc(g.J[ViewFrustrum.Re], g.J[ViewFrustrum.ld], j);
-    g = j.G(d);
-    j = c.Jd();
+    g.J[ViewFrustrum.hc].rc(g.J[ViewFrustrum.Re], g.J[ViewFrustrum.ld], i);
+    g = i.G(d);
+    i = c.Jd();
     c = c.yd();
     b = b / c;
-    return d.add(e.z(a / j)).add(g.z(b))
+    return d.add(e.z(a / i)).add(g.z(b))
 };
 q.mh = function(a) {
     var b = new Matrix4(false),c = this.H;
@@ -1535,9 +1535,9 @@ q.mh = function(a) {
     var e = a.b();
     e.jc = a.W;
     a.X = e.X * b.c + e.Y * b.g + e.Z * b.p + e.jc * b.i;
-    a.Y = e.X * b.f + e.Y * b.d + e.Z * b.q + e.jc * b.j;
-    a.Z = e.X * b.m + e.Y * b.h + e.Z * b.e + e.jc * b.k;
-    a.W = e.X * b.n + e.Y * b.o + e.Z * b.r + e.jc * b.l;
+    a.Y = e.X * b.f + e.Y * b.d + e.Z * b.q + e.jc * b.i;
+    a.Z = e.X * b.m + e.Y * b.h + e.Z * b.e + e.jc * b.j;
+    a.W = e.X * b.n + e.Y * b.o + e.Z * b.r + e.jc * b.k;
     b = a.W == 0 ? 1 : 1 / a.W;
     if (a.Z < 0)return null;
     e = new Vect2d;
@@ -1548,7 +1548,7 @@ q.mh = function(a) {
 function ba(a, b) {
     if (b != null)a.vb = b
 }
-CopperLicht.prototype.Eh = l("la");
+CopperLicht.prototype.Eh = k("la");
 SceneNode = function() {
     this.Type = -1;
     this.Pos = new Vect3d;
@@ -1580,12 +1580,12 @@ q.Visible = true;
 q.Name = "";
 q.Id = -1;
 q.Parent = null;
-q.wh = l("Parent");
+q.wh = k("Parent");
 q.getType = m("none");
 q.getBoundingBox = function() {
     return new Box3d
 };
-q.ph = l("A");
+q.ph = k("A");
 q.jf = function(a) {
     for (i = 0; i < this.A.length; ++i) {
         var b = this.A[i];
@@ -1682,9 +1682,9 @@ q.Aa = function() {
     this.K = this.Parent != null ? C(this.Parent.K, this.Ed()) : this.Ed()
 };
 q.render = f();
-q.nh = l("K");
+q.nh = k("K");
 q.ja = function() {
-    return new Vect3d(this.K.i, this.K.j, this.K.k)
+    return new Vect3d(this.K.i, this.K.i, this.K.j)
 };
 q.getMaterialCount = m(0);
 q.getMaterial = m(null);
@@ -1714,8 +1714,8 @@ q.If = function(a) {
         V(this)
     }
 };
-q.qh = l("Ba");
-q.pf = l("Ca");
+q.qh = k("Ba");
+q.pf = k("Ca");
 q.Kf = function(a) {
     if (!Core.s(this.Ca, a)) {
         this.Ca = a;
@@ -1725,19 +1725,19 @@ q.Kf = function(a) {
 q.Ja = function(a) {
     if (a)this.pa = a.b()
 };
-q.xa = l("pa");
-q.Hd = l("Ga");
+q.xa = k("pa");
+q.Hd = k("Ga");
 q.li = function(a) {
     if (a)this.Ga = a.b()
 };
-q.uf = l("Ia");
+q.uf = k("Ia");
 q.gi = function(a) {
     if (!Core.s(this.Ia, a)) {
         this.Ia = a;
         V(this)
     }
 };
-q.of = l("Ha");
+q.of = k("Ha");
 q.di = function(a) {
     if (!Core.s(this.Ha, a)) {
         this.Ha = a;
@@ -1769,9 +1769,9 @@ q.OnAnimate = function(a, b) {
     b.e = c.Z;
     b.r = 0;
     b.i = -e.ma(d);
-    b.j = -g.ma(d);
-    b.k = -c.ma(d);
-    b.l = 1;
+    b.i = -g.ma(d);
+    b.j = -c.ma(d);
+    b.k = 1;
     b.ea = false;
     return a
 };
@@ -1823,9 +1823,9 @@ MeshSceneNode = function() {
 };
 MeshSceneNode.prototype = new SceneNode;
 q = MeshSceneNode.prototype;
-q.getBoundingBox = l("Box");
-q.uh = l("Q");
-q.ei = k("Q");
+q.getBoundingBox = k("Box");
+q.uh = k("Q");
+q.ei = j("Q");
 q.getType = m("mesh");
 q.OnRegisterSceneNode = function(a) {
     var b = this.Q;
@@ -1921,7 +1921,7 @@ BillboardSceneNode = function() {
 };
 BillboardSceneNode.prototype = new SceneNode;
 q = BillboardSceneNode.prototype;
-q.getBoundingBox = l("Box");
+q.getBoundingBox = k("Box");
 q.getType = m("billboard");
 q.OnRegisterSceneNode = function(a) {
     if (this.Visible) {
@@ -1996,7 +1996,7 @@ q = PathSceneNode.prototype;
 q.Tightness = 0;
 q.IsClosedCircle = false;
 q.Nodes = [];
-q.getBoundingBox = l("Box");
+q.getBoundingBox = k("Box");
 q.getType = m("path");
 q.createClone = function(a) {
     var b = new PathSceneNode;
@@ -2037,13 +2037,13 @@ PathSceneNode.prototype.Dd = function(a, b) {
     c = -2 * e * e * e + 3 * e * e;
     g = e * e * e - 2 * e * e + e;
     e = e * e * e - e * e;
-    j = a.G(j);
-    j.ya(this.Tightness);
+    i = a.G(i);
+    i.ya(this.Tightness);
     n = n.G(d);
     n.ya(this.Tightness);
     d = d.z(o);
     d.T(a.z(c));
-    d.T(j.z(g));
+    d.T(i.z(g));
     d.T(n.z(e));
     if (!b) {
         this.K ||
@@ -2079,7 +2079,7 @@ Scene.prototype.ga = function() {
     this.sb = new Matrix4
 };
 Scene.prototype.sc = m("unknown");
-Scene.prototype.sh = l("La");
+Scene.prototype.sh = k("La");
 function ia(a, b) {
     a.dc = [];
     a.Bb = [];
@@ -2120,17 +2120,17 @@ function ka(a) {
     }
 }
 q = Scene.prototype;
-q.ci = k("Ob");
-q.rh = l("Ob");
-q.getName = l("Name");
-q.fi = k("Name");
-q.Nf = k("bc");
-q.yc = k("ka");
-q.fa = l("ka");
+q.ci = j("Ob");
+q.rh = k("Ob");
+q.getName = k("Name");
+q.fi = j("Name");
+q.Nf = j("bc");
+q.yc = j("ka");
+q.fa = k("ka");
 q.ef = function() {
     this.Qc = true
 };
-q.Gd = l("N");
+q.Gd = k("N");
 q.Wa = function(a, b) {
     if (b == null)b = Scene.ab;
     switch (b) {case Scene.bd:this.Ke = a;break;case Scene.ab:this.dc.push(a);break;case Scene.ad:this.Xb.push(a);break;case Scene.$c:break;case Scene.wb:this.Bb.push(a);break;case Scene.Zc:this.$b.push(a);break}
@@ -2169,7 +2169,7 @@ function Z(a, b, c) {
     }
     return null
 }
-Scene.prototype.Ah = l("U");
+Scene.prototype.Ah = k("U");
 Scene.rg = 2;
 Scene.sg = 1;
 Scene.ye = 2;
@@ -2303,12 +2303,12 @@ FlaceLoader = function() {
             var d = this.ba,e = O(this.a),g = O(this.a),j = this.M(),n = this.t(),o = this.t(),p = this.t(),A = K(this.a),B = O(this.a),h = null,M = 0;
             if (c == 0) {
                 b.Visible = A;
-                b.Name = j;
+                b.Name = i;
                 b.qa = B
             }
             for (; J(this.a) > 0 && this.a.I < d;)switch (this.V()) {case 9:this.Ce(a, h ? h : b, c + 1);break;case 10:switch (e) {case 2037085030:h = new SkyBoxSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible =
-                                                                                                                                                                                                                      A;h.Name = j;h.qa = B;h.Id = g;h.R = a;this.Gf(h);b.wa(h);h = h;h.Aa();break;case 1752395110:h = new MeshSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = j;h.qa = B;h.Id = g;h.R = a;this.Gf(h);b.wa(h);h = h;h.Aa();break;case 1953526632:h = new HotspotSceneNode(CursorControl, null);h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = j;h.qa = B;h.Id = g;h.R = a;this.Wh(h);b.wa(h);h = h;h.Aa();break;case 1819042406:h = new BillboardSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = j;h.qa = B;h.Id = g;h.R =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                a;this.Uh(h);b.wa(h);h = h;h.Aa();break;case 1835098982:h = new CameraSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = j;h.qa = B;h.R = a;h.Id = g;this.Vh(h);b.wa(h);h = h;h.Aa();break;case 1752461414:h = new PathSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = j;h.qa = B;h.Id = g;h.R = a;this.Xh(h);b.wa(h);h = h;h.Aa();break;default:this.w();break}break;case 11:var ma = this.Be();h && h.getMaterial(M) && h.getMaterial(M).Qd(ma);++M;break;case 25:this.vg(h, a);break;default:this.w()}
+                                                                                                                                                                                                                      A;h.Name = i;h.qa = B;h.Id = g;h.R = a;this.Gf(h);b.wa(h);h = h;h.Aa();break;case 1752395110:h = new MeshSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = i;h.qa = B;h.Id = g;h.R = a;this.Gf(h);b.wa(h);h = h;h.Aa();break;case 1953526632:h = new HotspotSceneNode(CursorControl, null);h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = i;h.qa = B;h.Id = g;h.R = a;this.Wh(h);b.wa(h);h = h;h.Aa();break;case 1819042406:h = new BillboardSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = i;h.qa = B;h.Id = g;h.R =
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                a;this.Uh(h);b.wa(h);h = h;h.Aa();break;case 1835098982:h = new CameraSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = i;h.qa = B;h.R = a;h.Id = g;this.Vh(h);b.wa(h);h = h;h.Aa();break;case 1752461414:h = new PathSceneNode;h.Type = e;h.Pos = n;h.Rot = o;h.Scale = p;h.Visible = A;h.Name = i;h.qa = B;h.Id = g;h.R = a;this.Xh(h);b.wa(h);h = h;h.Aa();break;default:this.w();break}break;case 11:var ma = this.Be();h && h.getMaterial(M) && h.getMaterial(M).Qd(ma);++M;break;case 25:this.vg(h, a);break;default:this.w()}
         }
     };
     this.Gf = function(a) {
@@ -2747,16 +2747,16 @@ AnimatorFollowPath.prototype.animateNode = function(a, b) {
                     if (Math.abs(e) > Core.oa) {
                         var n = 1 / e;
                         g = d.e * n;
-                        j = d.h * n;
-                        e = Math.atan2(j, g) * Core.oa;
+                        i = d.h * n;
+                        e = Math.atan2(i, g) * Core.oa;
                         g = d.c * n;
-                        j = d.f * n
+                        i = d.f * n
                     } else {
                         e = 0;
                         g = d.d;
-                        j = -d.g
+                        i = -d.g
                     }
-                    d = Math.atan2(j, g) * Core.oa;
+                    d = Math.atan2(i, g) * Core.oa;
                     if (e < 0)e += 360;
                     if (b < 0)b += 360;
                     if (d < 0)d += 360;
@@ -2769,7 +2769,7 @@ AnimatorFollowPath.prototype.animateNode = function(a, b) {
     }
     return c
 };
-AnimatorFollowPath.prototype.Lf = k("ta");
+AnimatorFollowPath.prototype.Lf = j("ta");
 AnimatorFlyStraight = function(a, b, c, d, e, g) {
     this.cb = new Vect3d(0, 0, 0);
     this.Za = new Vect3d(40, 40, 40);
@@ -2948,27 +2948,27 @@ function na(a, b, c, d) {
         b.P(e);
         b = true
     } else {
-        var g = (b.c * b.d - b.f * b.g) * (b.e * b.l - b.r * b.k) - (b.c * b.h - b.m * b.g) * (b.q * b.l - b.r * b.j) + (b.c * b.o - b.n * b.g) * (b.q * b.k - b.e * b.j) + (b.f * b.h - b.m * b.d) * (b.p * b.l - b.r * b.i) - (b.f * b.o - b.n * b.d) * (b.p * b.k - b.e * b.i) + (b.m * b.o - b.n * b.h) * (b.p * b.j - b.q * b.i);
+        var g = (b.c * b.d - b.f * b.g) * (b.e * b.k - b.r * b.j) - (b.c * b.h - b.m * b.g) * (b.q * b.k - b.r * b.i) + (b.c * b.o - b.n * b.g) * (b.q * b.j - b.e * b.i) + (b.f * b.h - b.m * b.d) * (b.p * b.k - b.r * b.i) - (b.f * b.o - b.n * b.d) * (b.p * b.j - b.e * b.i) + (b.m * b.o - b.n * b.h) * (b.p * b.i - b.q * b.i);
         if (g > -1.0E-7 && g < 1.0E-7)b = false; else {
             g = 1 / g;
-            e.c = g * (b.d * (b.e * b.l - b.r * b.k) +
-                       b.h * (b.r * b.j - b.q * b.l) + b.o * (b.q * b.k - b.e * b.j));
-            e.f = g * (b.q * (b.m * b.l - b.n * b.k) + b.e * (b.n * b.j - b.f * b.l) + b.r * (b.f * b.k - b.m * b.j));
-            e.m = g * (b.j * (b.m * b.o - b.n * b.h) + b.k * (b.n * b.d - b.f * b.o) + b.l * (b.f * b.h - b.m * b.d));
+            e.c = g * (b.d * (b.e * b.k - b.r * b.j) +
+                       b.h * (b.r * b.i - b.q * b.k) + b.o * (b.q * b.j - b.e * b.i));
+            e.f = g * (b.q * (b.m * b.k - b.n * b.j) + b.e * (b.n * b.i - b.f * b.k) + b.r * (b.f * b.j - b.m * b.i));
+            e.m = g * (b.i * (b.m * b.o - b.n * b.h) + b.j * (b.n * b.d - b.f * b.o) + b.k * (b.f * b.h - b.m * b.d));
             e.n = g * (b.f * (b.o * b.e - b.h * b.r) + b.m * (b.d * b.r - b.o * b.q) + b.n * (b.h * b.q - b.d * b.e));
-            e.g = g * (b.h * (b.p * b.l - b.r * b.i) + b.o * (b.e * b.i - b.p * b.k) + b.g * (b.r * b.k - b.e * b.l));
-            e.d = g * (b.e * (b.c * b.l - b.n * b.i) + b.r * (b.m * b.i - b.c * b.k) + b.p * (b.n * b.k - b.m * b.l));
-            e.h = g * (b.k * (b.c * b.o - b.n * b.g) + b.l * (b.m * b.g - b.c * b.h) + b.i * (b.n * b.h - b.m * b.o));
+            e.g = g * (b.h * (b.p * b.k - b.r * b.i) + b.o * (b.e * b.i - b.p * b.j) + b.g * (b.r * b.j - b.e * b.k));
+            e.d = g * (b.e * (b.c * b.k - b.n * b.i) + b.r * (b.m * b.i - b.c * b.j) + b.p * (b.n * b.j - b.m * b.k));
+            e.h = g * (b.j * (b.c * b.o - b.n * b.g) + b.k * (b.m * b.g - b.c * b.h) + b.i * (b.n * b.h - b.m * b.o));
             e.o = g * (b.m * (b.o *
                               b.p - b.g * b.r) + b.n * (b.g * b.e - b.h * b.p) + b.c * (b.h * b.r - b.o * b.e));
-            e.p = g * (b.o * (b.p * b.j - b.q * b.i) + b.g * (b.q * b.l - b.r * b.j) + b.d * (b.r * b.i - b.p * b.l));
-            e.q = g * (b.r * (b.c * b.j - b.f * b.i) + b.p * (b.f * b.l - b.n * b.j) + b.q * (b.n * b.i - b.c * b.l));
-            e.e = g * (b.l * (b.c * b.d - b.f * b.g) + b.i * (b.f * b.o - b.n * b.d) + b.j * (b.n * b.g - b.c * b.o));
+            e.p = g * (b.o * (b.p * b.i - b.q * b.i) + b.g * (b.q * b.k - b.r * b.i) + b.d * (b.r * b.i - b.p * b.k));
+            e.q = g * (b.r * (b.c * b.i - b.f * b.i) + b.p * (b.f * b.k - b.n * b.i) + b.q * (b.n * b.i - b.c * b.k));
+            e.e = g * (b.k * (b.c * b.d - b.f * b.g) + b.i * (b.f * b.o - b.n * b.d) + b.i * (b.n * b.g - b.c * b.o));
             e.r = g * (b.n * (b.d * b.p - b.g * b.q) + b.c * (b.o * b.q - b.d * b.r) + b.f * (b.g * b.r - b.o * b.p));
-            e.i = g * (b.g * (b.e * b.j - b.q * b.k) + b.d * (b.p * b.k - b.e * b.i) + b.h * (b.q * b.i - b.p * b.j));
-            e.j = g * (b.p * (b.m * b.j - b.f * b.k) + b.q * (b.c * b.k - b.m * b.i) + b.e * (b.f * b.i - b.c * b.j));
-            e.k = g * (b.i * (b.m * b.d - b.f * b.h) + b.j * (b.c * b.h - b.m * b.g) + b.k * (b.f * b.g - b.c * b.d));
-            e.l = g * (b.c * (b.d * b.e - b.h * b.q) + b.f * (b.h * b.p - b.g * b.e) + b.m * (b.g * b.q - b.d * b.p));
+            e.i = g * (b.g * (b.e * b.i - b.q * b.j) + b.d * (b.p * b.j - b.e * b.i) + b.h * (b.q * b.i - b.p * b.i));
+            e.i = g * (b.p * (b.m * b.i - b.f * b.j) + b.q * (b.c * b.j - b.m * b.i) + b.e * (b.f * b.i - b.c * b.i));
+            e.j = g * (b.i * (b.m * b.d - b.f * b.h) + b.i * (b.c * b.h - b.m * b.g) + b.j * (b.f * b.g - b.c * b.d));
+            e.k = g * (b.c * (b.d * b.e - b.h * b.q) + b.f * (b.h * b.p - b.g * b.e) + b.m * (b.g * b.q - b.d * b.p));
             e.ea = b.ea;
             b = true
         }

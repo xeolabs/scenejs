@@ -5,11 +5,11 @@
 SceneJS.perspective = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend = SceneJS._backends.getBackend('projection');
-    var projection;
+    var transform;
 
     return SceneJS._utils.createNode(
             function(scope) {
-                if (!projection || !cfg.fixed) {
+                if (!transform || !cfg.fixed) {
                     var params = cfg.getParams(scope);
                     var tempMat = SceneJS._math.perspectiveMatrix4(
                             (params.fovy || 60.0) * Math.PI / 180.0,
@@ -17,14 +17,14 @@ SceneJS.perspective = function() {
                             params.near || 0.1,
                             params.far || 400.0);
 
-                    projection = {
+                    transform = {
                         matrix:tempMat
                     };
                 }
-                var prevProjection = backend.getTransform();
-                backend.setTransform(projection);
+                var prevTransform = backend.getTransform();
+                backend.setTransform(transform);
                 SceneJS._utils.visitChildren(cfg, scope);
-                backend.setTransform(prevProjection);
+                backend.setTransform(prevTransform);
             });
 };
 

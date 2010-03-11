@@ -10,9 +10,9 @@ on top of WebGL.
 
 ## Author
 
-SceneJS is written by [Lindsay Kay][xeolabs-github]. Lindsay has a skunkworks at [http://www.xeolabs.com][xeolabs.com] where you can find more of this kind of stuff.
+SceneJS is written by [Lindsay Kay][xeolabs-github]. Lindsay has a skunkworks at [http://xeolabs.com][xeolabs.com] where you can find more of this kind of stuff.
 
-[scenejs-home]: http://www.scenejs.com
+[scenejs-home]: http://scenejs.org
 [scenejs-issues]: http://github.com/xeolabs/scenejs/issues
 [xeolabs-github]: http://github.com/xeolabs
-[xeolabs-home]: http://www.xeolabs.com
+[xeolabs-home]: http://xeolabs.com

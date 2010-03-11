@@ -3,8 +3,8 @@ SceneJS - A JavaScript framework for building scene graphs on the WebGL canvas
 
 January 2, 2010
 
-Author: Lindsay Kay, lindsay.stanley.kay AT gmail.com
-Project home: http://www.scenejs.com
+Author: Lindsay Kay, lindsay.kay AT xeolabs.com
+Project home: http://scenejs.org
 GitHub: http://github.com/xeolabs/scenejs
 
 Contents

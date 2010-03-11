@@ -1,5 +1,4 @@
-/** Basic scene graph node. If the config contains any members, then they will be within scope for
- * child nodes.
+/** Basic scene graph node, generally used as a group node.
  */
 SceneJS.node = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);

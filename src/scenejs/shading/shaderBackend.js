@@ -1,6 +1,22 @@
 /**
- * Backend for shader scene nodes.
+ * This backend encapsulates shading behind an event API.
  *
+ * By listening to XXX_UPDATED events, this backend tracks various elements of scene state, such as WebGL settings,
+ * lighting, current material properties etc.
+ *
+ * On a SHADER_ACTIVATE event it will compose and activate a shader taylored to the current scene state
+ * (ie. where the shader has variables and routines for the current lights, materials etc), then fire a
+ * SHADER_ACTIVATED event when the shader is ready for business.
+ *
+ * Other backends will then handle the SHADER_ACTIVATED event by firing XXXXX_EXPORTED events parameterised with
+ * resources that they want loaded into the shader. This backend then handles those by loading their parameters into
+ * the shader.
+ *
+ * The backend will avoid constant re-generation of shaders by caching each of them against a hash code that it
+ * derives from the current collective scene state; on a SHADER_ACTIVATE event, it will attempt to reuse a shader
+ * cached for the hash of the current scene state.
+ *
+ * Shader allocation and LRU cache eviction is mediated by the "memory" backend.
  */
 SceneJS._backends.installBackend(
 
@@ -10,15 +26,13 @@ SceneJS._backends.installBackend(
 
             var time = (new Date()).getTime();      // For LRU caching
             var canvas;                             // Currently active canvas
-            var programs = {};                      // Buffered programs for all existing canvases
+            var rendererState;                      // WebGL settings state
+            var programs = {};                      // Program cache
             var activeProgram = null;               // Currently active program
-            var textureEnabled = false;             // True when scene texture enabled
-            var textureActive = false;              // True when a texture is active
-
-            var vars = {                            // Vars on currently active program
-                vars: {},
-                fixed: true
-            };
+            var lights = [];                        // Current lighting state
+            var material = {};                      // Current material state
+            var texture = false;                    // True when a texture is active
+            var sceneHash;                          // Current hash of collective scene state pertenant to shaders
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.TIME_UPDATED,
@@ -27,15 +41,24 @@ SceneJS._backends.installBackend(
                     });
 
             ctx.events.onEvent(
+                    SceneJS._eventTypes.RESET,
+                    function() {
+                        for (var programId in programs) {  // Just free allocated programs
+                            programs[programId].destroy();
+                        }
+                        programs = {};
+                    });
+
+            ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
                         canvas = null;
+                        rendererState = null;
                         activeProgram = null;
-                        vars = {
-                            vars: {},
-                            fixed: true
-                        };
-                        textureEnabled = false;
+                        lights = [];
+                        material = {};
+                        texture = false;
+                        sceneHash = null;
                     });
 
             ctx.events.onEvent(
@@ -43,6 +66,7 @@ SceneJS._backends.installBackend(
                     function(c) {
                         canvas = c;
                         activeProgram = null;
+                        sceneHash = null;
                     });
 
             ctx.events.onEvent(
@@ -50,203 +74,486 @@ SceneJS._backends.installBackend(
                     function() {
                         canvas = null;
                         activeProgram = null;
+                        sceneHash = null;
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        for (var programId in programs) {
-                            programs[programId].destroy();
-                        }
-                        canvas = null;
-                        programs = {};
-                        activeProgram = null;
-                        vars = {
-                            vars: {},
-                            fixed: true
-                        };
-                        textureEnabled = false;
+                    SceneJS._eventTypes.RENDERER_UPDATED,
+                    function(_rendererState) {
+                        rendererState = _rendererState;  // Canvas change will be signified by a CANVAS_UPDATED
+                        sceneHash = null;
                     });
 
-            /**
-             * Registers this backend module with the memory management module as willing
-             * to attempt to destroy a shader when asked, in order to free up memory. Eviction
-             * is done on a least-recently-used basis, where a shader may be evicted if the
-             * time that it was last used is the earliest among all shaders, and after the current
-             * system time. Since system time is updated just before scene traversal, this ensures that
-             * shaders previously or currently active during this traversal are not suddenly evicted.
-             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.RENDERER_EXPORTED,
+                    function(_rendererState) {
+
+                        /* Default ambient material colour is taken from canvas clear colour
+                         */
+                        var clearColor = _rendererState.clearColor;
+                        activeProgram.setUniform("uAmbient",
+                                clearColor
+                                        ? [clearColor.r, clearColor.g, clearColor.b]
+                                        : [0, 0, 0]);
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TEXTURE_ACTIVATED,
+                    function(t) {
+                        texture = t;
+                        sceneHash = null;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TEXTURE_EXPORTED,
+                    function(texture) {
+                        activeProgram.bindTexture("uSampler", texture);
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.TEXTURE_DEACTIVATED,
+                    function() {
+                        texture = null;
+                        sceneHash = null;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.LIGHTS_UPDATED,
+                    function(l) {
+                        lights = l;
+                        sceneHash = null;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.LIGHTS_EXPORTED,
+                    function(_lights) {
+                        for (var i = 0; i < _lights.length; i++) {
+                            var light = _lights[i];
+                            activeProgram.setUniform("uLightPos" + i, light.pos);
+                            activeProgram.setUniform("uLightDir" + i, light.dir);
+                            activeProgram.setUniform("uLightColor" + i, light.color);
+
+                            if (light.type == "spot") {
+                                activeProgram.setUniform("uSpotCosCutOff" + i, light.spotCosCutOff || 1);
+                                activeProgram.setUniform("uSpotExp" + i, light.spotExponent || 1);
+                            }
+
+                            activeProgram.setUniform("uLightAttenuation" + i,
+                                    [
+                                        light.constantAttenuation,
+                                        light.linearAttenuation,
+                                        light.quadraticAttenuation
+                                    ]);
+                        }
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.MATERIAL_UPDATED,
+                    function(m) {
+                        material = m;
+                        sceneHash = null;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.MATERIAL_EXPORTED,
+                    function(_material) {
+                        activeProgram.setUniform("uMatColor", _material.color);
+                        activeProgram.setUniform("uMatSpecularColor", _material.specularColor);
+                        activeProgram.setUniform("uMatReflectivity", _material.reflectivity);
+                        activeProgram.setUniform("uMatSpecular", _material.specular);
+                        activeProgram.setUniform("uMatEmissive", _material.emissive);
+                        activeProgram.setUniform("uMatShininess", _material.shininess);
+                        activeProgram.setUniform("uMatAlpha", _material.alpha);
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.MODEL_TRANSFORM_EXPORTED,
+                    function(transform) {
+                        activeProgram.setUniform("uMMatrix", transform.matrixAsArray);
+                        activeProgram.setUniform("uMNMatrix", transform.normalMatrixAsArray);
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.VIEW_TRANSFORM_EXPORTED,
+                    function(transform) {
+                        activeProgram.setUniform("uVMatrix", transform.matrixAsArray);
+                        activeProgram.setUniform("uVNMatrix", transform.normalMatrixAsArray);
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.PROJECTION_TRANSFORM_EXPORTED,
+                    function(transform) {
+                        activeProgram.setUniform("uPMatrix", transform.matrixAsArray);
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.GEOMETRY_EXPORTED,
+                    function(geo) {
+                        activeProgram.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
+                        activeProgram.bindFloatArrayBuffer("aNormal", geo.normalBuf);
+                        if (geo.texCoordBuf && texture && rendererState.enableTexture2D) {
+                            activeProgram.bindFloatArrayBuffer("aTextureCoord", geo.texCoordBuf);
+                        }
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATE, // Request to activate a shader
+                    function() {
+                        activateProgram();
+                    });
+
             ctx.memory.registerEvictor(
                     function() {
-                        var earliest = time; // Dont evict programs that we have traversed into
+                        var earliest = time;
                         var programToEvict;
-                        for (var id in programs) {
-                            if (id) {
-                                var program = programs[id];
-                                if (program.lastUsed < earliest) {
+                        for (var hash in programs) {
+                            if (hash) {
+                                var program = programs[hash];
+
+                                /* Avoiding eviction of shader just used,
+                                 * currently in use, or likely about to use
+                                 */
+                                if (program.lastUsed < earliest && program.hash != sceneHash) {
                                     programToEvict = program;
                                     earliest = programToEvict.lastUsed;
                                 }
                             }
                         }
                         if (programToEvict) { // Delete LRU program's shaders and deregister program
-                            ctx.logging.info("Evicting shader: " + id);
+                            ctx.logging.info("Evicting shader: " + hash);
                             programToEvict.destroy();
-                            programs[programToEvict.programId] = undefined;
+                            programs[programToEvict.hash] = null;
                             return true;
                         }
                         return false;   // Couldnt find suitable program to delete
                     });
 
-            function _createProgram(type, vertexShaders, fragmentShaders) {
-                var programId = canvas.canvasId + ":" + type;
-                if (!programs[programId]) {
-                    ctx.logging.info("Creating shader: '" + programId + "'"); // TODO: should default shaders be evictable?
-                    ctx.memory.allocate(
-                            "shader",
-                            function() {
-                                programs[programId] = new SceneJS._webgl.Program(
-                                        type,
-                                        programId,
-                                        time,
-                                        canvas.context,
-                                        vertexShaders,
-                                        fragmentShaders,                                        
-                                        ctx.logging);
-                            });
+            function activateProgram() {
+                if (!canvas) {
+                    throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                 }
-                return programId;
-            }
 
-            function _activateProgram(programId) {
-                activeProgram = programs[programId];
-                activeProgram.lastUsed = time;
-                activeProgram.bind();
-                ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATED, {});
-            }
+                if (!sceneHash) {
+                    generateHash();
+                }
 
-            /* Texturing has been disabled - if we're currently using the default shader,
-             * switch to the default texturing shader
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURE_ENABLED,
-                    function() {
-                        textureEnabled = true;
-                    });
-
-            /* Texturing has been disabled - if we're currently using the default shader,
-             * switch to the default non-texturing shader
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURE_DISABLED,
-                    function() {
-                        textureEnabled = false;
-                    });
-
-            /* Texture has been activated
-             *
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURE_ACTIVATED,
-                    function() {
-                        textureActive = true;
-                    });
-
-            /* Texturing has been disabled - if we're currently using the default shader,
-             * switch to the default non-texturing shader
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURE_DEACTIVATED,
-                    function() {
-                        textureActive = false;
-                    });
-
-
-            /**
-             * If geometry about to render and no shader active, then we had better load a
-             * default one, with or without texture support, depending on whether texturing is
-             * enabled and a texture is currently active.
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.GEOMETRY_RENDERING,
-                    function() {
-                        if (!activeProgram) {
-                            var shaderType = (textureEnabled && textureActive) ? "defaultTextureShader" : "defaultBasicShader";                        
-                            var shader = SceneJS._webgl.defaultShaders[shaderType];
-                            _activateProgram(_createProgram(shaderType, shader.vertexShaders, shader.fragmentShaders));
-                        }
-                    });
-
-            /** Handle a uniform load request
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
-                    function(params) {
-                        if (!activeProgram) { // Not likely since geometry backend prompted this event
-                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
-                        }
-                        activeProgram.setUniform(params[0], params[1]); // name, value                        
-                    });
-
-
-            /** Handle texture sampler bind request
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_SAMPLER_BIND,
-                    function(params) {
-                        if (!activeProgram) {
-                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
-                        }
-                        activeProgram.bindTexture(params[0], params[1]); // name, texture
-                    });
-
-            /** Handle a vertex array buffer bind request
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_FLOAT_ARRAY_BUFFER,
-                    function(params) {
-                        if (!activeProgram) {
-                            throw new SceneJS.exceptions.NoShaderActiveException("No shader active");
-                        }
-                        activeProgram.bindFloatArrayBuffer(params[0], params[1]); // name, buffer
-                    });
-
-            return { // Node-facing API
-
-                /** Creates a shader program, if it doesn't exist already, from the given vertex and fragment shader
-                 * sources and returns its ID. The type uniquely identifies the program on the current canvas.
-                 */
-                createProgram : function(type, vertexShaders, fragmentShaders) {
-                    if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
-                    }
-                    return _createProgram(type, vertexShaders, fragmentShaders);
-                },
-
-                /** Activates the shader program of the given ID
-                 */
-                activateProgram : function(programId) {
-                    if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
-                    }
-                    _activateProgram(programId);
-                },
-
-                /** Returns the ID of the currently active shader program
-                 */
-                getActiveProgramId : function() {
-                    return activeProgram ? activeProgram.programId : null;
-                },
-
-                /** Deactivates the currently active shader program
-                 */
-                deactivateProgram : function() {
+                if (!activeProgram || activeProgram.hash != sceneHash) {
                     if (activeProgram) {
                         canvas.context.flush();
                         activeProgram.unbind();
                         activeProgram = null;
-                        ctx.events.fireEvent(SceneJS._eventTypes.SHADER_DEACTIVATED, {});
+                        ctx.events.fireEvent(SceneJS._eventTypes.SHADER_DEACTIVATED);
+                    }
+
+                    if (!programs[sceneHash]) {
+                        ctx.logging.info("Creating shader: '" + sceneHash + "'");
+                        ctx.memory.allocate(
+                                "shader",
+                                function() {
+                                    programs[sceneHash] = new SceneJS._webgl.Program(
+                                            sceneHash,
+                                            time,
+                                            canvas.context,
+                                            [composeVertexShader()],
+                                            [composeFragmentShader()],
+                                            ctx.logging);
+                                });
+                    }
+                    activeProgram = programs[sceneHash];
+                    activeProgram.lastUsed = time;
+                    activeProgram.bind();
+                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATED);
+                }
+
+                ctx.events.fireEvent(SceneJS._eventTypes.SHADER_RENDERING);
+            }
+
+            /** Generates a shader hash code from current rendering state.
+             */
+            function generateHash() {
+                var val = [
+                    canvas.canvasId,
+                    ";",
+                    (texture && rendererState.enableTexture2D) ? "tex=yes;" : "tex=no;"
+                ];
+
+                /* Lighting
+                 */
+                val.push("lights=[");
+                for (var i = 0; i < lights.length; i++) {
+                    var light = lights[i];
+                    if (i > 0) {
+                        val.push(",");
+                    }
+                    val.push("{");
+                    val.push(light.type);
+                    val.push(";");
+                    if (light.specular) {
+                        val.push("specular;");
+                    }
+                    if (light.diffuse) {
+                        val.push("diffuse;");
+                    }
+                    val.push("}");
+                }
+                val.push("];");
+                sceneHash = val.join("");
+            }
+
+            /**
+             * Generates a vertex shader script for current rendering state. The vertex shader is
+             * the generic counterpart for whatever other specialised material/shadow/picking
+             * fragment shaders we also use.
+             */
+            function composeVertexShader() {
+
+                var texturing = texture && rendererState.enableTexture2D;
+
+                var src = ["\n"];
+
+
+                // --------- Inputs ---------------------------------------------------------------
+
+                /* Vertex and normal
+                 */
+                src.push("attribute vec3 aVertex;");                // World
+                src.push("attribute vec3 aNormal;");                // World
+
+                /* Texture coords
+                 */
+                if (texturing) {
+                    src.push("attribute vec3 aTextureCoord;");      // World
+                }
+
+                /* Matrices
+                 */
+                src.push("uniform mat4 uMMatrix;");               // Model
+                src.push("uniform mat4 uMNMatrix;");              // Model Normal
+
+                src.push("uniform mat4 uVMatrix;");               // View
+                src.push("uniform mat4 uVNMatrix;");              // View Normal
+
+                src.push("uniform mat4 uPMatrix;");               // Projection
+
+                /* Lights
+                 */
+                for (var i = 0; i < lights.length; i++) {
+                    var light = lights[i];
+                    src.push("uniform vec3 uLightPos" + i + ";");     // View position
+                    if (light.type == "dir") {
+                        src.push("uniform vec3 uLightDir" + i + ";"); // View direction
                     }
                 }
-            };
+
+                // --------- Outputs --------------------------------------------------------------
+
+                /* Vertex
+                 */
+                src.push("varying vec4 vViewVertex;");             // View-space vertex position
+                src.push("varying vec3 vNormal;");                 // View-space normal
+                src.push("varying vec3 vEyeVec;");
+
+
+                if (texturing) {
+                    src.push("varying vec2 vTextureCoord;");        // Straight-through texture coord
+                }
+
+                /* Lights
+                 */
+                for (var i = 0; i < lights.length; i++) {
+                    src.push("varying vec3 vLightVec" + i + ";"); // View-space light vector from vertex
+                    src.push("varying float vLightDist" + i + ";");// View-space light distance from vertex
+                }
+
+                // --------- Main -----------------------------------------------------------------
+
+                src.push("void main(void) {");
+
+                /* Normal - transform into view space via model and view normal matrices
+                 */
+                src.push("  vec4 tmpMNormal = uMNMatrix * vec4(aNormal, 1.0);");
+                src.push("  vec4 tmpVNormal = uVNMatrix * tmpMNormal; ");
+                src.push("  vNormal = tmpVNormal;");
+
+
+                /* Vertex - transform into view and eye space
+                 */
+                src.push("  vec4 mPos   = uMMatrix * vec4(aVertex, 1.0); ");
+                src.push("  vViewVertex = uVMatrix * mPos; ");                  // View-space
+                src.push("  gl_Position = uPMatrix * vViewVertex;");            // Eye-space
+                src.push("  vEyeVec     = -vViewVertex.xyz;");                      // Eye vector
+
+
+                /* Lights -  view-space vectors and distances from view-space vertex
+                 */
+                for (var i = 0; i < lights.length; i++) {
+                    var light = lights[i];
+                    if (light.type == "dir") {
+                        src.push("  vLightVec" + i + " = -uLightDir" + i + ";");
+                    } else {
+                        src.push("  vLightVec" + i + " = -(uLightPos" + i + " - vViewVertex.xyz);");
+                    }
+                    src.push("  vLightDist" + i + " = length(uLightPos" + i + " - vViewVertex.xyz);");
+                }
+
+                /* Pass texture coord through
+                 */
+                if (texturing) {
+                    src.push("  vTextureCoord = aTextureCoord;");
+                }
+
+                src.push("}");
+
+                return src.join("\n");
+            }
+
+
+            /**
+             * Generates a fragment shader script for current scene state.
+             */
+            function composeFragmentShader() {
+
+                var texturing = texture && rendererState.enableTexture2D;
+
+                var src = ["\n"];
+
+                // ------------ Inputs ----------------------------------------------
+
+                /* Global scene ambient colour, taken from clear color
+                 */
+                src.push("uniform vec3 uAmbient;");
+
+                /* Vertex and normal
+                 */
+                src.push("varying vec4 vViewVertex;");              // View
+                src.push("varying vec3 vNormal;");                  // View
+                src.push("varying vec3 vEyeVec;");
+
+                /* Texture coords
+                 */
+                if (texturing) {
+                    src.push("varying vec2 vTextureCoord;");
+                }
+
+                /* Lights
+                 */
+                if (lights) {
+                    for (var i = 0; i < lights.length; i++) {
+                        var light = lights[i];
+                        src.push("uniform vec3  uLightPos" + i + ";");
+                        src.push("uniform vec3  uLightDir" + i + ";");
+                        src.push("uniform vec3  uLightColor" + i + ";");
+                        src.push("uniform vec3  uLightAttenuation" + i + ";");
+
+                        if (light.type == "spot") {
+                            src.push("uniform float  uSpotCosCutOff" + i + ";");
+                            src.push("uniform float  uSpotExp" + i + ";");
+                        }
+
+                        src.push("varying vec3   vLightVec" + i + ";");
+                        src.push("varying float  vLightDist" + i + ";");
+                    }
+                }
+
+                /* Base material properties
+                 */
+                src.push("uniform vec3  uMatColor;");
+                src.push("uniform vec3  uMatSpecularColor;");
+                src.push("uniform float uMatReflectivity;");
+                src.push("uniform float uMatSpecular;");
+                src.push("uniform float uMatEmissive;");
+                src.push("uniform float uMatShininess;");
+                src.push("uniform float uMatAlpha;");
+
+                // --------- Main -----------------------------------------------------------------
+
+                src.push("void main(void) {");
+
+                src.push("  float   att = 1;");
+
+                src.push("  vec3    normal = vNormal;");
+                src.push("  vec3    lightValue=uAmbient;");
+                src.push("  vec3    specValue=vec3(0.0,0.0,0.0);");
+                src.push("  float   dotN;");
+                src.push("  float   spotEffect;");
+
+                src.push("  vec3    lightVec=vec3(0.0,0.0,0.0);");
+                src.push("  vec3    viewVec=vec3(0.0,0.0,0.0);");
+
+
+                for (var i = 0; i < lights.length; i++) {
+                    src.push("  lightVec = vLightVec" + i + ";");
+                    src.push("  viewVec = vEyeVec;");
+
+                    // -------- Point light ---------------------------------
+
+                    if (lights[i].type == "point") {
+                        src.push("  dotN = max(dot(vNormal, normalize(-lightVec)),0.0);");
+                        src.push("  if (dotN > 0.0) {");
+                        src.push("      att = 1.0 / (uLightAttenuation" + i + "[0] + " +
+                                 "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
+                                 "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
+
+                        if (lights[i].diffuse) {
+                            src.push("      lightValue += att * dotN * uLightColor" + i + ";");
+                        }
+                        src.push("}");
+
+                        if (lights[i].specular) {
+                            src.push("  specValue += att * uMatSpecularColor * uLightColor" + i +
+                                     " * uMatSpecular  * pow(max(dot(reflect(normalize(lightVec), normal),normalize(viewVec)),0.0), uMatShininess);");
+                        }
+                    }
+
+                    // -------- Spot light -----------------------------------
+
+
+                    src.push("spotEffect = 0.0;\n");
+
+                    if (lights[i].type == "spot") {
+                        //
+                        //                        hash.push("S");
+                        //
+                        //                        src.push(  "spotEffect = dot(normalize(lightdir" + i + "), normalize(-lightvec" + i + "));");
+                        //                        src.push(  "if (spotEffect > spotCosCutOff" + i + ") {\n");
+                        //                        src.push(  "spotEffect = pow(spotEffect, spotExp" + i + ");");
+                        //                        src.push(  "dotN=max(dot(normal,normalize(-lightvec)),0.0);\n");
+                        //                        src.push(  "if(dotN>0.0){\n");
+                        //                        src.push(  "att = spotEffect / (lightAttenuation" + i + "[0] + lightAttenuation" + i + "[1] * lightdist" + i + " + lightAttenuation" + i + "[2] * lightdist" + i + " * lightdist" + i + ");\n");
+                        //                        if (lights[i].diffuse) {
+                        //
+                        //                            hash.push("D");
+                        //
+                        //                            src.push(  "lightvalue += att * dotN * lightcolor" + i + ";\n");
+                        //                        }
+                        //                        if (lights[i].specular) {
+                        //
+                        //                            hash.push("S");
+                        //
+                        //                            src.push(  "specvalue += att * specC * lightcolor" + i + " * spec  * pow(max(dot(reflect(normalize(lightvec), normal),normalize(viewvec)),0.0), sh);\n");
+                        //                        }
+                        //                        src.push(  "}\n}\n");
+                    }
+                    //
+                    //                    if (lights[i].type == "dir") {
+                    //
+                    //                        hash.push("D");
+                    //
+                    //                        src.push(  "dotN=max(dot(normal,-normalize(lightvec)),0.0);\n");
+                    //                        if (lights[i].diffuse) {
+                    //                            hash.push("D");
+                    //                            src.push(  "lightvalue += dotN * lightcolor" + i + ";\n");
+                    //                        }
+                    //                        if (lights[i].specular) {
+                    //                            hash.push("S");
+                    //                            src.push(  "specvalue += specC * lightcolor" + i + " * spec  * pow(max(dot(reflect(normalize(lightvec), normal),normalize(viewvec)),0.0), sh);\n");
+                    //                        }
+                    //                    }
+                }
+                src.push("      gl_FragColor = vec4(specValue.rgb + uMatColor.rgb * lightValue.rgb, 1.0);  ");
+                //  src.push(  "      gl_FragColor = vec4(0, 0, 1.0, 1.0);  ");
+                src.push("}");
+
+                return src.join("\n");
+            }
         });

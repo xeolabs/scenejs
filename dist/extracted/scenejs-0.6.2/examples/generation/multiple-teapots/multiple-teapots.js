@@ -2,7 +2,7 @@
  * SceneJS Example - Procedural scene generation of a ring of teapots
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * Take a look at that generator node about half way down this scene definition. Its job

@@ -42,6 +42,7 @@ body {
     color: #444444;
     text-align: center;
     overflow-right: hidden; /* Remove scroll bars on browser window */
+
 }
 
 a {
@@ -79,7 +80,6 @@ h2 {
     padding: 25px 0 20px 0;
     font-size: 1.4em;
     font-weight: normal;
-    text-align: left;
 
 }
 
@@ -89,7 +89,7 @@ h3 {
     padding: 25px 0 20px;
     font-size: 1.2em;
     font-weight: normal;
-    text-align: left;
+
 }
 
 h4 {
@@ -98,7 +98,7 @@ h4 {
     padding: 5px 0 10px;
     font-size: 0.8em;
     font-weight: bold;
-    text-align: left;
+
 }
 
 #banner {
@@ -222,7 +222,7 @@ ul.site-tabs li.ui-state-active a {
 }
 
 .normal-width {
-    width: 1000px;
+    /*width: 100%;*/
 }
 
 #content {
@@ -246,7 +246,7 @@ ul.site-tabs li.ui-state-active a {
 
 #content-body {
     padding-bottom: 20px;
-    margin: 0 auto;
+    margin: auto;
     overflow: auto;
 }
 
@@ -303,11 +303,11 @@ ul.site-tabs li.ui-state-active a {
     font-size: 0.8em;
 }
 
-/*#intro {*/
-/*font-size: 1.1em;*/
-/*line-height: 1.5em;*/
-/*padding-bottom: 40px;*/
-/*}*/
+#intro {
+font-size: 1.1em;
+line-height: 1.5em;
+padding-bottom: 40px;
+}
 
 #footer {
     margin: auto;
@@ -325,100 +325,6 @@ ul.site-tabs li.ui-state-active a {
     text-align: center;
 }
 
-/* -----------------------/  Home /----------------- */
-
-.home-header {
-}
-
-#content #home-menu {
-    text-align: left;
-    margin-left: 35px;
-
-    float: left;
-    text-align: left;
-
-    width: 350px;
-    height: 350px; /*background: #EEFFEE  ;*/
-/*border:1px solid #668866;*/
-
-}
-
-#content #home-menu .home-menu-item {
-    height: auto;
-    padding: 15px 15px 15px 75px;
-    margin-bottom: 5px;
-}
-
-#content #home-menu .home-menu-item a.title {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.4em;
-    line-height: 1.4em;
-    font-weight: bold;
-}
-
-#content #home-menu .home-menu-item .copy {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.0em;
-    font-weight: normal;
-    line-height: 1.4em;
-    color: #444444;
-}
-
-#content #home-menu #share-this {
-    padding-left: 65px;
-
-}
-
-#content #home-menu #home-download {
-    background: url(../images/home/import1.png) no-repeat scroll 15px 15px;
-
-}
-
-#content #home-menu #home-playroom {
-    background: url(../images/home/registry.png) no-repeat scroll 15px 15px;
-}
-
-#content #home-menu #home-blog {
-    background: url(../images/home/blogger_logo.gif) no-repeat scroll 15px 15px;
-}
-
-#content #home-menu #home-dev {
-    background: url(../images/home/gears.png) no-repeat scroll 15px 15px;
-}
-
-#content #home-menu #home-contact {
-    background: url(../images/home/mail_write.png) no-repeat scroll 15px 15px;
-}
-
-#content #home-menu #home-assets {
-    background: url(../images/home/server_client_exchange.png) no-repeat scroll 15px 15px;
-}
-
-#home-table {
-    padding-top: 20px;
-    margin: 0 auto;
-    width: 1000px;
-}
-
-#home-example {
-    float: left;
-    text-align: left;
-    margin: 0 auto;
-    width: 600px;
-    height: auto;
-}
-
-#home-example h1 {
-    text-align: center;
-    font-size: 2.5em;
-}
-
-#home-example #script-text-area {
-    background: white;
-    border: 1px solid gray;
-    height: 600px;
-    margin-bottom: 10px;
-}
 
 #content p.intro {
     margin: auto;
@@ -428,532 +334,38 @@ ul.site-tabs li.ui-state-active a {
     padding-bottom: 30px;
 }
 
-#home-buzz {
-    float: right;
-    text-align: left;
-    margin: 0 auto;
-    width: 380px;
-    height: auto;
-    padding-left: 15px;
-}
-
-/* -----------------------/  Playroom /----------------- */
-
-.playroom-header {
-    background: transparent url(../images/playroom/lego.png) no-repeat scroll right center;
-    padding-left: 40px !important;
-}
-
-/* Min -width styles */
-.min_width {
-    padding: 0 480px;
-    text-align: left;
-}
-
-.min_width .min_width_inner {
-    width: 100%; /*  gives the element hasLayout */
-}
-
-.min_width .min_width_container {
-    margin: 0 -480px;
-    position: relative;
-    float: left;
-}
-
-/* Sangraal layout styles */
-#playroom-ide {
-    position: relative;
-    overflow: hidden;
-    min-width: 960px; /* For good browsers */
-}
-
-/* Left column */
-#playroom-ide .column01 {
-    padding-right: 10px;
-    padding-left: 30px;
-    float: left;
-    text-align: left;
-    text-align: left;
-
-}
-
-/* Width is set in inner div of column to avoid the use of negative margins */
-#playroom-ide .column01 .restraint {
-    width: 250px;
-}
-
-/* Width is set in inner div of column to avoid the use of negative margins */
-#playroom-ide .column03 .restraint {
-    width: 470px;
-}
-
-/* Left column */
-#playroom-ide .column03 {
-    padding: 0 20px 10px 10px;
-    float: right;
-}
-
-/* Middle column */
-#playroom-ide .column02 {
-    padding: 0 10px 10px 0;
-    overflow: hidden;
-}
-
-#playroom-ide .column02 .text-area-title {
-    height: 25px;
-    text-align: left;
-}
-
-#playroom-ide .column02 #script-text-area {
-    background: white;
-    border: 1px solid gray;
-    height: 450px;
-    margin-bottom: 10px;
-}
-
-#playroom-ide .column02 #layout-text-area {
-    background: white;
-    border: 1px solid gray;
-    height: 200px;
-}
-
-#playroom-ide .column02 .restraint {
-    width: 100%;
-}
-
-* html #playroom-ide .column02 {
-/* cause hasLayout so middle column will sit between left and right */
-    display: inline-block;
-}
-
-#playroom-ide ul.explorer-example-list {
-    background: none !important;
-    font-weight: bold !important;
-}
-
-#playroom-ide li.explorer-category {
-    color: #cc6600 !important;
-    font-weight: bold !important;
-    line-height: 1em;
-
-}
-
-#playroom-ide li.explorer-example {
-    font-weight: bold !important;
-    font-size: 1em;
-}
-
-/* Playroom error message */
-
-#playroom-ide #output-area {
-    overflow: auto;
-    overflow-x: hidden;
-    padding: 10px 10px 10px 10px;
-    white-space: normal;
-
-    border: 2px solid gray;
-    border-right-color: #bbbbbb;
-    border-bottom-color: #bbbbbb;
-    background: white;
-    text-align: left;
-    height: 665px;
-    width: 460px;
-}
-
-#playroom-ide #output-area #error #error-expletive {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.3em;
-    line-height: 1.6em;
-    font-weight: bold;
-    color: #cc0000;
-    padding: 5px 0 20px;
-}
-
-#playroom-ide #output-area #error #error-title {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.1em;
-    line-height: 1.5em;
-    font-weight: bold;
-    color: #cc0000;
-    padding: 5px 0 20px;
-}
-
-#playroom-ide #output-area #error #error-message {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.0em;
-    line-height: 1.4em;
-    font-weight: normal;
-    color: #666666;
-    padding: 0 0 15px;
-}
-
-#playroom-ide #output-area #error #error-advice {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.0em;
-    line-height: 1.4em;
-    font-weight: normal;
-}
-
-#playroom-ide #output-area p {
-    padding-top: 8px;
-
-}
-
-#playroom-ide #output-area span {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    line-height: 1.6em;
-    font-size: 0.8em;
-    font-weight: normal;
-}
-
-#playroom-ide #output-area a {
-/*border-bottom: 1px dotted;*/
-    text-decoration: none;
-}
-
-#playroom-ide #output-area p em {
-    float: right;
-    font-style: normal;
-    padding: 0 28% 0 0;
-}
-
-#playroom-ide #output-area h1 {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 25px 0 10px;
-    text-align: left;
-}
-
-#playroom-ide #output-area h2 {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    padding: 20px 0 10px 0;
-    font-size: 1.0em;
-    font-weight: bold;
-}
-
-#playroom-ide #output-area ol, ul {
-    margin: 0;
-    padding-left: 15px;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border: 0;
-    outline: 0;
-    font-size: 100%;
-    vertical-align: baseline;
-    background: transparent;
-}
-
-#playroom-ide #output-area li {
-    margin-left: 10px;
-    padding-left: 10px;
-    border: 0;
-    outline: 0;
-    font-size: 100%;
-    vertical-align: baseline;
-    background: transparent;
-}
-
-#playroom-ide #output-area code {
-    background: #eeeeee;
-    font-family: Courier, "Courier New", monospace;
-}
-
-#playroom-ide #output-area pre {
-    background: lightgray;
-    font-family: Courier, "Courier New", monospace;
-}
-
-#playroom-ide #output-area a {
-    text-decoration: none;
-}
-
-#playroom-ide #output-area a:hover {
-    text-decoration: none;
-    color: maroon;
-
-}
-
-/* Toolbar above example source and output tab sets
-*/
-#playroom-ide .playroom-panel-header {
-    width: auto;
-    padding: 15px 25px 5px 0;
-    height: 35px;
-    text-align: left;
-}
-
-#playroom-ide .green-title {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.1em;
-    font-weight: normal;
-    color: #336600;
-}
-
-#playroom-ide .come-back-often {
-    padding-top: 40px;
-    color: #999900 !important;
-    font-size: 0.8em;
-
-}
-
-#playroom-ide #explorer-title {
-}
-
-#playroom-ide #example-title {
-    font-weight: bold;
-}
-
-#playroom-ide #example-file-select {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.1em;
-    font-weight: normal;
-    color: #336600;
-    float: left;
-    width: auto;
-    padding: 10px 25px 25px 0;
-}
-
-#playroom-ide .playroom-panel-header #run-button {
-
-    width: auto;
-    padding: 10px 10px 10px 30px;
-    background: url(../images/playroom/media_play_green.png) no-repeat left center;
-    height: 25px;
-    vertical-align: middle;
-}
-
-/* -----------------------/  Dev /----------------- */
-
-.dev-header {
-    background: transparent url(../images/dev/github_logo_sm.png) no-repeat scroll right center;
-}
-
 #content #content-body #column1 {
-    width: 480px;
-    float: left;
+    width: 620px;
+    float: left;    
     padding-right: 20px;
 }
 
 #content #content-body #column2 {
-    width: 480px;
+    width: 620px;
     float: right;
-}
-
-#content #content-body .author {
-    padding-top: 5px;
-    padding-bottom: 20px;
-    margin: auto;
-    overflow: auto;
-}
-
-#content #content-body .author .portrait {
-    float: left;
-    padding-right: 10px;
-}
-
-#content #content-body .author .details {
-    float: right;
-    margin: auto;
-    text-align: left;
-    width: 360px;
-}
-
-/*==========================================================
- Downloads
-============================================================*/
-
-.downloads-header {
-
-}
-
-#content #content-body #releases .release {
-    clear: both;
-    padding-bottom: 30px;
-    overflow: auto;
-    margin: auto;
-    height: auto;
-}
-
-#content #content-body #releases .release .details {
-    width: 480px;
-    float: left;
-    padding-right: 20px;
-    padding-top: 20px;
-}
-
-#content #content-body #releases .release h2 {
-    border-bottom: 1px solid #CCCCCC;
-    color: #CC6600 !important;
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
-    padding: 15px 0 10px;
-}
-
-#content #content-body #releases .release .details .date {
-}
-
-#content #content-body #releases .release .details .description {
-}
-
-#content #content-body #releases .release .files {
-    width: 480px;
-    float: right;
-    padding-top: 20px;
-}
-
-#content #content-body #releases .release .files img {
-}
-
-#content #content-body #releases .release .files img {
-    margin-right: 10px;
-    padding: 15px;
-    border: dashed 1px;
-}
-
-#content #content-body #releases .release .files .download-count {
-    text-align: center;
-}
-
-#content #content-body #releases .release .files .download-count .download-count-line1 {
-    padding-top: 30px;
-    padding-bottom: 5px;
-    font-size: 2em;
-    font-weight: bold;
-    color: #999900 !important;
-}
-
-#content #content-body #releases .release .files .download-count .download-count-line2 {
-    font-weight: bold;
-    color: #999900 !important;
-}
-
-/* -----------------------/  Assets /----------------- */
-
-.assets-header {
-/*background: transparent url(../images/dev/github_logo_sm.png) no-repeat scroll right center;*/
-}
-
-/* Sangraal layout styles */
-#assets {
-    padding-bottom: 20px;
-    margin: 0 auto;
-    overflow: auto;
-    position: relative;
-    min-width: 960px; /* For good browsers */
-}
-
-#assets #explorer-title {
-}
-
-#assets #asset-title {
-    font-weight: bold;
-}
-
-#assets .assets-prompt {
-    width: auto;
-    padding: 15px 25px 5px 0;
-    height: 35px;
-    text-align: left;
-}
-
-#assets .green-title {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.1em;
-    font-weight: normal;
-    color: #336600;
-}
-
-#content #assets #column1 {
-    width: 260px;
-    float: left;
-    padding-right: 0px;
-}
-
-#content #assets #column2 {
-    width: 700px;
-    float: right;
-    border-left: 2px solid #cccccc;
-    padding-left: 10px;
-}
-
-#content #assets ul.explorer-asset-list {
-    background: none !important;
-    font-weight: bold !important;
-}
-
-#content #assets li.explorer-category {
-    color: #cc6600 !important;
-    font-weight: bold !important;
-    line-height: 1em;
-
-}
-
-#content #assets li.explorer-asset {
-    font-weight: bold !important;
-    font-size: 1em;
-}
-
-#content #assets #column2 #asset-selection {
-    margin: 0 auto;
-    overflow: hidden;
-}
-
-#content #assets #column2 #asset-selection #asset-preview {
-    float: left;
-    width: 400px;
-
-}
-
-#content #assets #column2 #asset-selection #asset-preview #previewCanvas {
-
-    background: black;
-}
-
-#content #assets #column2 #asset-selection #asset-metadata {
-    float: left;
-    width: 290px;
-    padding-left: 10px;
-}
-
-#content #assets #column2 .row {
-    margin: 0 auto;
-    font-size: 0.8em;
-    padding-bottom: 10px;
-}
-
-#content #assets #column2   .rowspan {
-    font-size: 0.8em;
-    width: 260px;
-}
-
-#content #assets #column2   .row .name {
-/*background-color: #cccccc;*/
-    color: #444444 !important;
-
-    padding: 3px 10px 3px 3px;
-}
-
-#content #assets #column2  .row .value {
-    background-color: #f4f4f4;
-    padding: 3px 3px 3px 3px;
-}
-
-#content #assets #column2   .row .textbox {
-    background: none;
+    text-align:left;
     padding: 0px;
 }
 
-#content #assets #column2   .row .textbox #asset-pastie {
-    background-color: #f4f4f4;
-    width: 100%;
 
+#logging {
+    overflow-x: auto;
+    overflow-y: scroll;
+    text-align: left;
+    padding: 0px;
+    margin: 0 auto;
+    width: 600px;
+    height: 500px;
+    border-top: 2px solid gray;
+    border-bottom: 2px solid lightgray;
+    border-left: 2px solid gray;
+    border-right: 2px solid lightgray;
+    background-color: #333333;
 }
 
-#assets #explorer-title {
-}
-
-#assets #example-title {
-    font-weight: bold;
+#logging p {
+    color: lightgray !important;
+    padding: 0px;
+    font-size: 0.8em;
+    line-height: 1.5em;
 }

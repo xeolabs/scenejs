@@ -1,5 +1,20 @@
 /**
- * Manages the current view transformation
+ * Backend that manages the current view transform matrices (view and normal).
+ *
+ * Services the scene view transform nodes, such as SceneJS.lookAt, providing them with methods to set and
+ * get the current view transform matrices.
+ *
+ * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * MODEL_TRANSFORM_EXPORTED to pass the view matrix and normal matrix as WebGLFloatArrays to the
+ * shading backend.
+ *
+ * Normal matrix and WebGLFloatArrays are lazy-computed and cached on export to avoid repeatedly regenerating them.
+ *
+ * Avoids redundant export of the matrices with a dirty flag; they are only exported when that is set, which occurs
+ * when transform is set by scene node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
+ *
+ * Whenever a scene node sets the matrix, this backend publishes it with a VIEW_TRANSFORM_UPDATED to allow other
+ * dependent backends (such as "view-frustum") to synchronise their resources.
  */
 SceneJS._backends.installBackend(
 
@@ -8,7 +23,7 @@ SceneJS._backends.installBackend(
         function(ctx) {
 
             var transform;
-            var loaded = false;
+            var dirty;
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
@@ -17,48 +32,54 @@ SceneJS._backends.installBackend(
                             matrix : SceneJS._math.identityMat4(),
                             fixed: true
                         };
-                        loaded = false;
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.SHADER_ACTIVATED,
                     function() {
-                        loaded = false;
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.GEOMETRY_RENDERING,
+                    SceneJS._eventTypes.SHADER_RENDERING,
                     function() {
-                        if (!loaded) {
+                        if (dirty) {
 
-                            /* Lazy-compute WebGL array - cool thing about this is that we only
-                             * compute and memoize it for those matrices that actually get loaded
-                             */
                             if (!transform.matrixAsArray) {
                                 transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                             }
+
+                            if (!transform.normalMatrixAsArray) {
+                                transform.normalMatrixAsArray = new WebGLFloatArray(
+                                        SceneJS._math.transposeMat4(
+                                                SceneJS._math.inverseMat4(transform.matrix)));
+                            }
+
                             ctx.events.fireEvent(
-                                    SceneJS._eventTypes.SHADER_UNIFORM_SET,
-                                    [
-                                        SceneJS._webgl.shaderVarNames.VIEW_MATRIX,
-                                        transform.matrixAsArray
-                                    ]);
-                            loaded = true;
+                                    SceneJS._eventTypes.VIEW_TRANSFORM_EXPORTED,
+                                    transform);
+
+                            dirty = false;
                         }
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED, // May need to reload into last program
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
                     function() {
-                        loaded = false;
+                        dirty = true;
                     });
 
-            return { // Node-facing API
+            /* Node-facing API
+             */
+            return {
 
                 setTransform : function(t) {
                     transform = t;
-                    loaded = false;
-                    ctx.events.fireEvent(SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED, transform);
+                    dirty = true;
+                    ctx.events.fireEvent(
+                            SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
+                            transform);
                 },
 
                 getTransform : function() {

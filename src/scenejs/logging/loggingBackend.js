@@ -1,6 +1,21 @@
 /**
- * Backend module to provide logging to backend modules and scene nodes, allows
- * logging node to set logging functions for selected scene subtrees.
+ * Backend module to provide logging that is aware of the current location of scene traversal.
+ *
+ * There are three "channels" of log message: error, warning, info and debug.
+ *
+ * Provides an interface on the backend context through which other backends may log messages.
+ *
+ * Provides an interface to scene nodes to allow them to log messages, as well as set and get the function
+ * that actually processes messages on each channel. Those getters and setters are used by the SceneJS.logging node,
+ * which may be distributed throughout a scene graph to cause messages to be processed in particular ways for different
+ * parts of the graph.
+ *
+ * Messages are queued. Initially, each channel has no function set for it and will queue messages until a function is
+ * set, at which point the queue flushes.  If the function is unset, subsequent messages will queue, then flush when a
+ * function is set again. This allows messages to be logged before any SceneJS.logging node is visited.
+ *
+ * This backend is always the last to handle a RESET
+ *
  */
 SceneJS._backends.installBackend(
 
@@ -11,11 +26,13 @@ SceneJS._backends.installBackend(
             var activeSceneId;
             var funcs = null;
             var queues = {};
+            var indent = 0;
+            var indentStr = "";
 
             function log(channel, message) {
-                if (activeSceneId) {
-                    message = activeSceneId + ": " + message;
-                }
+                message = activeSceneId
+                        ? indentStr + activeSceneId + ": " + message
+                        : indentStr + message;
                 var func = funcs ? funcs[channel] : null;
                 if (func) {
                     func(message);
@@ -43,6 +60,15 @@ SceneJS._backends.installBackend(
 
             ctx.logging = {
 
+                setIndent:function(_indent) {
+                    indent = _indent;
+                    var indentArray = [];
+                    for (var i = 0; i < indent; i++) {
+                        indentArray.push("----");
+                    }
+                    indentStr = indentArray.join("");
+                },
+
                 error:function(msg) {
                     log("error", msg);
                 } ,
@@ -61,14 +87,6 @@ SceneJS._backends.installBackend(
             };
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        queues = {};
-                        funcs = null;
-                    },
-                    100000);  // Really low priority - must be reset last
-
-            ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
                     function(params) {
                         activeSceneId = params.sceneId;
@@ -81,6 +99,14 @@ SceneJS._backends.installBackend(
                         activeSceneId = null;
                         //funcs = {};
                     });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.RESET,
+                    function() {
+                        queues = {};
+                        funcs = null;
+                    },
+                    100000);  // Really low priority - must be reset last
 
             return { // Node-facing API
 

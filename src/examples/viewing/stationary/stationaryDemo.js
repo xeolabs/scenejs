@@ -2,7 +2,7 @@
  * SceneJS Example - Using the background node for skyboxing
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * February 2010
  *
  * In this example we are using a stationary node to specify
@@ -85,10 +85,10 @@ with (SceneJS) {
                                                                         }
                                                                         var j = 0;
                                                                         return function() {
-                                                                            if (j < elems.length) {
-                                                                                return { param: elems[j++] };
+                                                                            if (i < elems.length) {
+                                                                                return { param: elems[i++] };
                                                                             } else {
-                                                                                j = 0;
+                                                                                i = 0;
                                                                             }
                                                                         };
                                                                     })(),

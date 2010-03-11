@@ -2,7 +2,7 @@
  * Introductory SceneJS Example - Cube Textured with Image of General Zod
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * Prior to the destruction of Krypton, the criminal General Zod was banished into

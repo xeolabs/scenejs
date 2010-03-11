@@ -1,35 +1,46 @@
 /**
- * Sets a scaling modelling transformation on the current shader. The transform will be cumulative with transforms at
- * higher nodes.
+ * Scaling modelling transform node
  */
+(function() {
 
-SceneJS.scale = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    /* Memoization levels
+     */
+    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
+    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
+    const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
 
     var backend = SceneJS._backends.getBackend('model-transform');
 
-    var mat;
-    var xform;
+    SceneJS.scale = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        var mat;
+        var xform;
+        var memoLevel = NO_MEMO;
 
-    return SceneJS._utils.createNode(
-            function(scope) {
-                if (!mat || !cfg.fixed) {   // Memoize matrix if node config is constant
-                    var params = cfg.getParams(scope);
-                    mat = SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
-                }
-                var superXform = backend.getTransform();
-                if (!xform || !superXform.fixed || !cfg.fixed) {
-                    var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
-                    xform = {
-                        localMatrix: mat,
-                        matrix: tempMat,
-                        fixed: superXform.fixed && cfg.fixed
-                    };
-                }
-                backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, scope);
-                backend.setTransform(superXform);
-            });
-};
-
-
+        return SceneJS._utils.createNode(
+                function(scope) {
+                    if (memoLevel == NO_MEMO) {   
+                        var params = cfg.getParams(scope);
+                        mat = SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
+                        if (cfg.fixed) {
+                            memoLevel = FIXED_CONFIG;
+                        }
+                    }
+                    var superXform = backend.getTransform();
+                    if (memoLevel < FIXED_MODEL_SPACE) {
+                        var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                        xform = {
+                            localMatrix: mat,
+                            matrix: tempMat,
+                            fixed: superXform.fixed && cfg.fixed
+                        };
+                        if (memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
+                            memoLevel = FIXED_MODEL_SPACE;
+                        }
+                    }
+                    backend.setTransform(xform);
+                    SceneJS._utils.visitChildren(cfg, scope);
+                    backend.setTransform(superXform);
+                });
+    };
+})();

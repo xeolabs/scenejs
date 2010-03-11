@@ -1,6 +1,11 @@
 /** Private math utilities.
  */
 SceneJS._math = {
+
+    divVec3:function(u, v) {
+        return [u[0] / v[0], u[1] / v[1], u[2] / v[2]];
+    },
+
     negateVector4: function(v) {
         return [-v[0],-v[1],-v[2],-v[3]];
     },
@@ -19,6 +24,10 @@ SceneJS._math = {
 
     subVec4: function(u, v) {
         return [u[0] - v[0],u[1] - v[1],u[2] - v[2],u[3] - v[3]];
+    },
+
+    subVec3: function(u, v) {
+        return [u[0] - v[0],u[1] - v[1],u[2] - v[2]];
     },
 
     subVec4Scalar: function(v, s) {
@@ -41,6 +50,15 @@ SceneJS._math = {
         return [u[0] / v[0],u[1] / v[1],u[2] / v[2],u[3] / v[3]];
     },
 
+    divScalarVec3:function(s, v) {
+        return [s / v[0], s / v[1], s / v[2]];
+    },
+
+
+    divVec3s:function(v, s) {
+        return [v[0] / s, v[1] / s, v[2] / s];
+    },
+
     divVec4s:function(v, s) {
         return [v[0] / s,v[1] / s,v[2] / s,v[3] / s];
     },
@@ -48,6 +66,7 @@ SceneJS._math = {
     divScalarVec4:function(s, v) {
         return [s / v[0],s / v[1],s / v[2],s / v[3]];
     },
+
 
     dotVector4:function(u, v) {
         return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3]);
@@ -63,6 +82,22 @@ SceneJS._math = {
 
     lenVec4:function(v) {
         return Math.sqrt(SceneJS._math.sqLenVec4(v));
+    },
+
+    dotVector3:function(u, v) {
+        return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2]);
+    },
+
+    sqLenVec3:function(v) {
+        return SceneJS._math.dotVector3(v, v);
+    },
+
+    lenVec3:function(v) {
+        return Math.sqrt(SceneJS._math.sqLenVec3(v));
+    },
+
+    rcpVec3 : function(v) {
+        return SceneJS._math.divScalarVec3(1.0, v);
     },
 
     normalizeVec4:function(v) {
@@ -579,15 +614,6 @@ SceneJS._math = {
         return SceneJS._math.frustumMat4v(pmin, pmax);
     },
 
-    //    transformPoint3:function(m, p) {
-    //        return {
-    //            x : (m[0] * p.x) + (m[4] * p.y) + (m[8] * p.z) + m[12],
-    //            y : (m[1] * p.x) + (m[5] * p.y) + (m[9] * p.z) + m[13],
-    //            z : (m[2] * p.x) + (m[6] * p.y) + (m[10] * p.z) + m[14],
-    //            w : (m[3] * p.x) + (m[7] * p.y) + (m[11] * p.z) + m[15]
-    //        };
-    //    },
-    //
     transformPoint3:function(m, p) {
         return [
             (m[0] * p[0]) + (m[4] * p[1]) + (m[8] * p[2]) + m[12],
@@ -597,14 +623,14 @@ SceneJS._math = {
         ];
     },
 
-
-    //    transformVector3:function(m, v) {
-    //        return {
-    //            x: (m[0] * v.x) + (m[4] * v.y) + (m[8] * v.z),
-    //            y: (m[1] * v.x) + (m[5] * v.y) + (m[9] * v.z),
-    //            z: (m[2] * v.x) + (m[6] * v.y) + (m[10] * v.z)
-    //        };
-    //    },
+    transformPoints3:function(m, points) {
+        var result = new Array(points.length);
+        var len = points.length;
+        for (var i = 0; i < len; i++) {
+            result[i] = SceneJS._math.transformPoint3(m, points[i]);
+        }
+        return result;
+    },
 
     transformVector3:function(m, v) {
         return [
@@ -613,6 +639,12 @@ SceneJS._math = {
             (m[2] * v[0]) + (m[6] * v[1]) + (m[10] * v[3])
         ];
     },
+
+    projectVec4:function(v) {
+        var f = 1.0 / v[3];
+        return [v[0] * f, v[1] * f, v[2] * f, 1.0];
+    },
+
 
     Plane3 : function(normal, offset, normalize) {
         this.normal = [0.0, 0.0, 1.0 ];
@@ -757,20 +789,8 @@ SceneJS._math = {
     },
 
     Sphere3 : function(center, radius) {
-        this.center = [ 0.0, 0.0, 0.0 ];
-        this.radius = -1.0;
-
-        this.init = function(center, radius) {
-            this.center[0] = center[0];
-            this.center[1] = center[1];
-            this.center[2] = center[2];
-            this.radius = radius;
-            return this;
-        };
-
-        if (center && radius) {
-            this.init(center, radius);
-        }
+        this.center = [center[0], center[1], center[2] ];
+        this.radius = radius;
 
         this.isEmpty = function() {
             return (this.radius == 0.0);
@@ -783,88 +803,119 @@ SceneJS._math = {
         this.getVolume = function() {
             return ((4.0 / 3.0) * Math.PI * this.radius * this.radius * this.radius);
         };
-    }
-    ,
-
-    FrustumPlane: function () {
-        this.normal = [ 0.0, 0.0, 1.0 ];
-        this.offset = 0.0;
-        this.testVertex = [ 0, 0, 0 ];
-
-        this.init = function(nx, ny, nz, off) {
-            var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
-
-            this.normal[0] = nx * s;
-            this.normal[1] = ny * s;
-            this.normal[2] = nz * s;
-
-            this.offset = off * s;
-
-            this.testVertex[0] = (this.normal[0] >= 0.0) ? (1) : (0);
-            this.testVertex[1] = (this.normal[1] >= 0.0) ? (1) : (0);
-            this.testVertex[2] = (this.normal[2] >= 0.0) ? (1) : (0);
-        };
     },
 
-    OUTSIDE_FRUSTUM : 0,
-    INTERSECT_FRUSTUM : 1,
-    INSIDE_FRUSTUM : 2,
+    FrustumPlane: function (nx, ny, nz, offset) {
+        var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
+        this.normal = [nx * s, ny * s, nz * s];
+        this.offset = offset * s;
+        this.testVertex = [
+            (this.normal[0] >= 0.0) ? (1) : (0),
+            (this.normal[1] >= 0.0) ? (1) : (0),
+            (this.normal[2] >= 0.0) ? (1) : (0)];
+    },
 
-    Frustum : function(mat) {
-        this.planes = new Array(6);
-        for (var i = 0; i < 6; ++i) {
-            this.planes[i] = new SceneJS._math.FrustumPlane();
-        }
+    OUTSIDE_FRUSTUM : 3,
+    INTERSECT_FRUSTUM : 4,
+    INSIDE_FRUSTUM : 5,
 
-        this.init = function (mat) {
-            this.mat = mat.slice(0, 16);
+    Frustum : function(viewMatrix, projectionMatrix, viewport) {
+        var math = SceneJS._math;
+        var m = math.mulMat4(projectionMatrix, viewMatrix);
+        var q = [ m[3], m[7], m[11] ];
+        var planes = [
+            new math.FrustumPlane(q[ 0] - m[ 0], q[ 1] - m[ 4], q[ 2] - m[ 8], m[15] - m[12]),
+            new math.FrustumPlane(q[ 0] + m[ 0], q[ 1] + m[ 4], q[ 2] + m[ 8], m[15] + m[12]),
+            new math.FrustumPlane(q[ 0] - m[ 1], q[ 1] - m[ 5], q[ 2] - m[ 9], m[15] - m[13]),
+            new math.FrustumPlane(q[ 0] + m[ 1], q[ 1] + m[ 5], q[ 2] + m[ 9], m[15] + m[13]),
+            new math.FrustumPlane(q[ 0] - m[ 2], q[ 1] - m[ 6], q[ 2] - m[10], m[15] - m[14]),
+            new math.FrustumPlane(q[ 0] + m[ 2], q[ 1] + m[ 6], q[ 2] + m[10], m[15] + m[14])
+        ];
 
-            var m = this.mat;
-            var q = [ m[3], m[7], m[11] ];
+        /* Resources for LOD         
+         */
+        var rotVec = [
+            math.getColMat4(viewMatrix, 0),
+            math.getColMat4(viewMatrix, 1),
+            math.getColMat4(viewMatrix, 2)
+        ];
 
-            this.planes[0].init(q[ 0] - m[ 0], q[ 1] - m[ 4], q[ 2] - m[ 8], m[15] - m[12]);
-            this.planes[1].init(q[ 0] + m[ 0], q[ 1] + m[ 4], q[ 2] + m[ 8], m[15] + m[12]);
-            this.planes[2].init(q[ 0] - m[ 1], q[ 1] - m[ 5], q[ 2] - m[ 9], m[15] - m[13]);
-            this.planes[3].init(q[ 0] + m[ 1], q[ 1] + m[ 5], q[ 2] + m[ 9], m[15] + m[13]);
-            this.planes[4].init(q[ 0] - m[ 2], q[ 1] - m[ 6], q[ 2] - m[10], m[15] - m[14]);
-            this.planes[5].init(q[ 0] + m[ 2], q[ 1] + m[ 6], q[ 2] + m[10], m[15] + m[14]);
-        };
+        var scaleVec = [
+            math.lenVec4(rotVec[0]),
+            math.lenVec4(rotVec[1]),
+            math.lenVec4(rotVec[2])
+        ];
 
-        this.init(mat || SceneJS._math.identityMat4());
+        var scaleVecRcp = math.rcpVec3(scaleVec);
+        var sMat = math.scalingMat4v(scaleVec);
+        var sMatInv = math.scalingMat4v(scaleVecRcp);
 
+        rotVec[0] = math.mulVec4Scalar(rotVec[0], scaleVecRcp[0]);
+        rotVec[1] = math.mulVec4Scalar(rotVec[1], scaleVecRcp[1]);
+        rotVec[2] = math.mulVec4Scalar(rotVec[2], scaleVecRcp[2]);
 
-        this.boxIntersection = function(box) {
+        var rotMatInverse = math.identityMat4();
+
+        math.setRowMat4(rotMatInverse, 0, rotVec[0]);
+        math.setRowMat4(rotMatInverse, 1, rotVec[1]);
+        math.setRowMat4(rotMatInverse, 2, rotVec[2]);
+
+        this.matrix = math.mulMat4(projectionMatrix, viewMatrix);
+        this.billboardMatrix = math.mulMat4(sMatInv, math.mulMat4(rotMatInverse, sMat));
+        this.viewport = viewport.slice(0, 4);
+
+        this.textAxisBoxIntersection = function(box) {
             var ret = SceneJS._math.INSIDE_FRUSTUM;
-
             var bminmax = [ box.min, box.max ];
-
-            var fp = null;
+            var plane = null;
             for (var i = 0; i < 6; ++i) {
-                fp = this.planes[i];
-                if (((fp.normal[0] * bminmax[fp.testVertex[0]][0]) +
-                     (fp.normal[1] * bminmax[fp.testVertex[1]][1]) +
-                     (fp.normal[2] * bminmax[fp.testVertex[2]][2]) +
-                     (fp.offset)) < 0.0) {
+                plane = planes[i];
+                if (((plane.normal[0] * bminmax[plane.testVertex[0]][0]) +
+                     (plane.normal[1] * bminmax[plane.testVertex[1]][1]) +
+                     (plane.normal[2] * bminmax[plane.testVertex[2]][2]) +
+                     (plane.offset)) < 0.0) {
                     return SceneJS._math.OUTSIDE_FRUSTUM;
                 }
 
-                if (((fp.normal[0] * bminmax[1 - fp.testVertex[0]][0]) +
-                     (fp.normal[1] * bminmax[1 - fp.testVertex[1]][1]) +
-                     (fp.normal[2] * bminmax[1 - fp.testVertex[2]][2]) +
-                     (fp.offset)) < 0.0) {
+                if (((plane.normal[0] * bminmax[1 - plane.testVertex[0]][0]) +
+                     (plane.normal[1] * bminmax[1 - plane.testVertex[1]][1]) +
+                     (plane.normal[2] * bminmax[1 - plane.testVertex[2]][2]) +
+                     (plane.offset)) < 0.0) {
                     ret = SceneJS._math.INTERSECT_FRUSTUM;
                 }
             }
             return ret;
         };
 
-        this.axisBoxIntersection = function(axisBox) {
-            return this.boxIntersection(axisBox.toBox3());
+
+        this.getProjectedSize = function(box) {
+            var diagVec = math.subVec3(box.max, box.min);
+
+            var diagSize = math.lenVec3(diagVec);
+
+            var size = Math.abs(diagSize);
+
+            var p0 = [
+                (box.min[0] + box.max[0]) * 0.5,
+                (box.min[1] + box.max[1]) * 0.5,
+                (box.min[2] + box.max[2]) * 0.5,
+                0.0];
+
+            var halfSize = size * 0.5;
+            var p1 = [ -halfSize, 0.0, 0.0, 1.0 ];
+            var p2 = [  halfSize, 0.0, 0.0, 1.0 ];
+
+            p1 = math.mulMat4v4(this.billboardMatrix, p1);
+            p1 = math.addVec4(p1, p0);
+            p1 = math.projectVec4(math.mulMat4v4(this.matrix, p1));
+
+            p2 = math.mulMat4v4(this.billboardMatrix, p2);
+            p2 = math.addVec4(p2, p0);
+            p2 = math.projectVec4(math.mulMat4v4(this.matrix, p2));
+
+            return viewport[2] * Math.abs(p2[0] - p1[0]);
         };
 
-        this.pointsIntersection = function(points) {
-            return this.boxIntersection(new SceneJS._math.Box3().fromPoints(points));
-        };
     }
 };
 

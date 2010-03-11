@@ -2,7 +2,7 @@
  * SceneJS Example - Procedural scene generation of a ring of teapots
  *
  * Lindsay Kay
- * lindsay.stanley.kay AT gmail.com
+ * lindsay.kay AT xeolabs.com
  * January 2010
  *
  * Take a look at that generator node about half way down this scene definition. Its job
@@ -18,7 +18,7 @@ with (SceneJS) {
     var exampleScene = scene(
 
             loggingToPage({ elementId: "logging" },
-                    
+
                     renderer({
                         canvasId: 'theCanvas',
                         clearColor : { r:0, g:0, b:0.0, a: 1 },
@@ -26,19 +26,20 @@ with (SceneJS) {
                         clear : { depth : true, color : true}
                     },
 
-                            lights({
-                                lights: [
-                                    {
-                                        pos: { x: 50.0, y: 20.0, z: -30.0 }
-                                    }
-                                ]},
-                                    perspective({ fovy : 45.0, aspect : 1.0, near : 1, far : 300.0
+
+                            perspective({ fovy : 45.0, aspect : 1.0, near : 1, far : 300.0
+                            },
+                                    lookAt({
+                                        eye : { x: 0.0, y: 4, z: -45.0},
+                                        look : { x : 0.0, y : 0.0, z : 0 },
+                                        up : { x: 0.0, y: 1.0, z: 0.0 }
                                     },
-                                            lookAt({
-                                                eye : { x: 0.0, y: 20, z: -30.0},
-                                                look : { x : 0.0, y : 0.0, z : 0 },
-                                                up : { x: 0.0, y: 1.0, z: 0.0 }
-                                            },
+                                            lights({
+                                                lights: [
+                                                    {
+                                                        pos: { x: 50.0, y: 20.0, z: -30.0 }
+                                                    }
+                                                ]},
                                                     material({
                                                         ambient:  { r:0.2, g:0.2, b:0.5 },
                                                         diffuse:  { r:0.6, g:0.6, b:0.9 }
@@ -60,8 +61,9 @@ with (SceneJS) {
                                                                         return { angle : scope.get("angle"), y: 1.0 };
                                                                     },
                                                                             translate({ x: 8.0},
-
-                                                                                    objects.teapot()
+                                                                                    boundingSphere({ radius: 3 },
+                                                                                            objects.teapot()
+                                                                                            )
 
                                                                                     ) // translate
                                                                             ) // rotate

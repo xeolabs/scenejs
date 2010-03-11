@@ -1,12 +1,12 @@
 /** Sets material properties on the current shader for sub-nodes
  *
  */
-SceneJS.material = function(scenejs) {
+SceneJS.material = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend = SceneJS._backends.getBackend('material');
 
     function colourToArray(v) {
-        return v ? [ v.r || 0, v.g || 0, v.b || 0] : [ 0,  0,  0];
+        return v ? [ v.r || 1.0, v.g || 1.0, v.b || 1.0] : [ 1.0,  1.0,  1.0];
     }
 
     var material;
@@ -16,10 +16,13 @@ SceneJS.material = function(scenejs) {
                 if (!material || !cfg.fixed) {
                     var params = cfg.getParams(scope);
                     material = {
-                        ambient:  colourToArray(params.ambient),
-                        diffuse:  colourToArray(params.diffuse),
-                        specular: colourToArray(params.specular),
-                        shininess:colourToArray(params.shininess)
+                        color: colourToArray(params.color),
+                        specularColor: colourToArray(params.specularColor),
+                        reflectivity: params.reflectivity || 0.7,
+                        specular: params.specular || 1,
+                        emissive:params.emissive || 0,
+                        shininess:params.shininess || 10.0,
+                        alpha:params.alpha || 1
                     };
                 }
 

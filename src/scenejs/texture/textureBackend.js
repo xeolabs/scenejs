@@ -47,23 +47,21 @@ SceneJS._backends.installBackend(
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        loaded = false;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.GEOMETRY_RENDERING,
+                    SceneJS._eventTypes.SHADER_RENDERING,
                     function() {
                         if (!loaded && activeTexture) {
                             ctx.events.fireEvent(
-                                    SceneJS._eventTypes.SHADER_SAMPLER_BIND,
-                                    [
-                                        SceneJS._webgl.shaderVarNames.SAMPLER,      // Name
-                                        activeTexture                               // Value
-                                    ]);
+                                    SceneJS._eventTypes.TEXTURE_EXPORTED,
+                                    activeTexture
+                                    );
                             loaded = true;
                         }
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        loaded = false;
                     });
 
             /** Removes texture from shader (if canvas exists in DOM) and deregisters it from backend
@@ -214,6 +212,7 @@ SceneJS._backends.installBackend(
                             function() {
                                 textures[textureId] = new SceneJS._webgl.Texture2D(context, {
                                     textureId : textureId,
+                                    canvas: canvas,
                                     image : cfg.image,
                                     texels :cfg.texels,
                                     minFilter : getGLOption(cfg.minFilter, context.LINEAR),

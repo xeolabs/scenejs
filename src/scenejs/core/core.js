@@ -10,13 +10,21 @@ var SceneJS = {
 
     };
 
-    function isArray(obj) {
-        return toString.call(obj) === "[object Array]";
-    }
-
     /** Private resources
      */
     SceneJS._utils = {
+
+        /** Adds members of o1 to o2 where not already on the latter
+         *
+         */
+        applyIf : function(o1, o2) {
+            for (var key in o1) {
+                if (!o2[key]) {
+                    o2[key] = o1[key];
+                }
+            }
+            return o2;
+        },
 
         /** Converts degrees to radiians
          */
@@ -159,10 +167,7 @@ var SceneJS = {
          * @param args
          */
         getNodeConfig : function(args) {
-            if (!args || args.length == 0) {
-                throw new SceneJS.exceptions.InvalidNodeConfigException
-                        ('Invalid node parameters: should be a configuration followed by zero or more child nodes');
-            }
+            args = args || [];
             var result = {
                 children : [],
                 fixed: true
@@ -260,18 +265,31 @@ var SceneJS = {
             return args;
         },
 
+        invokeNode : function(node, args, extraArgs) {
+            if (extraArgs) {
+                return node.apply(this, SceneJS._utils.extendNodeArgs(args, extraArgs));
+            } else {
+                return node.apply(this, args);
+            }
+        },
+
         /** Visits child nodes in the given node configuration
          */
-        visitChildren :
-                function(config, scope) {
-                    if (config.children) {
-                        for (var i = 0; i < config.children.length; i++) {
-                            config.children[i](scope);
-                        }
-                    }
+        visitChildren : function(config, scope) {
+            if (config.children) {
+                for (var i = 0; i < config.children.length; i++) {
+                    config.children[i](scope);
                 }
+            }
+        },
 
-        ,
+        /** Visits a selected child node in the given node configuration
+         */
+        visitChild : function(config, index, scope) {
+            if (config.children) {
+                config.children[index](scope);
+            }
+        },
 
         /**
          * Returns a key for a vacant slot in the given map
@@ -321,7 +339,7 @@ var SceneJS = {
                             }
                         } catch (e) {
                             status.error = new SceneJS.exceptions.NodeBackendInstallFailedException
-                                    ("Failed to install backend module for node type \"" + id + "\": " + (e.message || e), e);                        
+                                    ("Failed to install backend module for node type \"" + id + "\": " + (e.message || e), e);
                             throw status.error;
                         }
                     }

@@ -1,3 +1,9 @@
+/**
+ * Classes for exceptions thrown by SceneJS.
+ *
+ * Exceptions have classes so that they can be discriminated on by application code.
+ */
+
 SceneJS.exceptions.WebGLNotSupportedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
@@ -92,5 +98,19 @@ SceneJS.exceptions.OutOfMemoryException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJS.exceptions.ColladaParseException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.ColladaRootNotFoundException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.ColladaRootRequiredException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
 
 

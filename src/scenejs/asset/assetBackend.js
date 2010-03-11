@@ -1,23 +1,25 @@
 /**
- * Base for backends for the asset scene node.
+ * Backend module that services the SceneJS.assets.XXX nodes to manage the asynchronous cross-domain
+ * load and caching of remotely-stored scene fragments.
+ *
+ * Uses the memory management backend to mediate cache management.
  */
 SceneJS._backends.installBackend(
 
-        "asset",
+        "assets",
 
         function(ctx) {
 
             var time = (new Date()).getTime();
-            var importers = {};                     // Backend extensions each create one of these
             var assets = {};                        // Nodes created by parsers, cached against file name
 
-            ctx.events.onEvent(// System time update
+            ctx.events.onEvent(
                     SceneJS._eventTypes.TIME_UPDATED,
                     function(t) {
                         time = t;
                     });
 
-            ctx.events.onEvent(// Framework reset - clear asset cache
+            ctx.events.onEvent(
                     SceneJS._eventTypes.RESET,
                     function() {
                         assets = {};
@@ -40,29 +42,12 @@ SceneJS._backends.installBackend(
                 script.src = fullUri;  // Request fires now
             }
 
-            function getFileExtension(fileName) {
-                var i = fileName.lastIndexOf(".");
-                if (i == -1 || i == fileName.length - 1) {
-                    throw "Invalid location config for asset node - extension missing";
-                }
-                return fileName.substr(i + 1);
-            }
-
             /** Loads asset and caches it against uri
              */
-            function _loadAsset(proxy, uri, callbackName, importer, onSuccess, onError) {
-                var type = getFileExtension(uri);
-                if (!importer) {
-                    importer = importers[type];
-                    if (!importer) {
-                        throw "Asset file type not supported: \"" + type + "\"";
-                    }
-                }
-                var url = [proxy, "?callback=", callbackName , "&uri=" + uri, "&mode=js"];
-                if (importer.serverParams) {
-                    for (var param in importer.serverParams) { // TODO: memoize string portion that contains params
-                        url.push("&", param, "=", importer.serverParams[param]);
-                    }
+            function _loadAsset(uri, proxy, serverParams, callbackName, parser, onSuccess, onError) {
+                var url = [proxy, "?callback=", callbackName , "&uri=" + uri];
+                for (var param in serverParams) { // TODO: memoize string portion that contains params
+                    url.push("&", param, "=", serverParams[param]);
                 }
                 jsonp(url.join(""),
                         callbackName,
@@ -70,33 +55,25 @@ SceneJS._backends.installBackend(
                             if (!data) {
                                 onError("server response is empty");
                             } else {
-                                var assetNode = importer.parse(data, function(msg) {
-                                    onError(msg);
-                                });
-                                if (assetNode) {
+                                var assetNode = parser(
+                                        data,
+                                        function(msg) {
+                                            onError(msg);
+                                        });
+                                if (!assetNode) {
+                                    onError("asset node's parser returned null result");
+                                } else {
                                     assets[uri] = {
                                         uri: uri, // Asset idenitifed by URI
                                         node: assetNode,
                                         lastUsed: time
                                     };
+
                                     onSuccess(assetNode);
                                 }
                             }
                         });
             }
-
-            ctx.assets = {
-
-                /** Installs an importer
-                 */
-                installImporter : function(cfg) {
-                    importers[cfg.type] = {
-                        type: cfg.type,
-                        parse: cfg.parse,
-                        serverParams:cfg.serverParams
-                    };
-                }
-            };
 
             return { // Node-facing API
 
@@ -119,7 +96,7 @@ SceneJS._backends.installBackend(
                  *
                  * JSON does nto handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
                  */
-                loadAsset : function(uri, proxy, importer, onSuccess, onTimeout, onError) {
+                loadAsset : function(uri, proxy, serverParams, parser, onSuccess, onTimeout, onError) {
                     ctx.logging.debug("Loading asset from " + uri);
                     var process = ctx.processes.createProcess({
                         onTimeout: function() {  // process killed automatically on timeout
@@ -129,10 +106,11 @@ SceneJS._backends.installBackend(
                     });
                     var callbackName = "callback" + process.id; // Process ID is globally unique
                     _loadAsset(
-                            proxy,
                             uri,
+                            proxy,
+                            serverParams,
                             callbackName,
-                            importer,
+                            parser,
                             onSuccess,
                             function(msg) {  // onError
                                 ctx.processes.destroyProcess(process);

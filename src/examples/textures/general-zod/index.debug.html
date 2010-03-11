@@ -2,9 +2,11 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>SceneJS Example - Textured Cube</title>
+    <title>SceneJS Example - Basic Texturing</title>
 </head>
-<body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
+<body margin=20px>
+<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Basic Texturing
+</h1>
 <table>
     <tr>
         <td valign="top">
@@ -14,7 +16,28 @@
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
-        <td>
+        <td valign="top">
+            <h3>Source code</h3>
+            <ul>
+                <li><a href="general-zod.js">This example</a></li>
+                 <li><a href="general-zod.jpg">Texture JPEG</a></li>
+            </ul>
+
+            <h3>Description</h3>
+
+            <p><span>Prior to the destruction of Krypton, the criminal General Zod was banished into the Phantom Zone
+by the Kryptonian Council of Elders. Here is Zod, floating through space, trapped within the dimensional constraints of
+the Phantom Zone.</span></p>
+
+            <p><span>Actually, he is a JPEG file named general-zod.jpg, mapped onto a cube* by a texture node about half-way down this source code.</span>
+            </p>
+
+            <p><span>The texture has been configured to not wait for the texture to load before
+  rendering its subtree, so the cube will appear naked and untextured while the JPEG file
+  loads.</span></p>
+
+            <h3>Scene logging output</h3>
+
             <div id="logging"></div>
         </td>
     </tr>
@@ -65,7 +88,7 @@
 <!-- Shading -->
 
 <script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/shader.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/shading/programs/shader.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
 
@@ -126,17 +149,19 @@
 
 <!-- Axis-aligned bounding boxes -->
 
-<script type="application/x-javascript" src="../../../scenejs/boundary/viewVolumeBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/boundary/axisBoundary.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
 
 <!-- Assets -->
 
-<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackendExtension.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/js/scenejsAsset.js"></script>
 
-<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
 
 <script type="application/x-javascript" src="general-zod.js"></script>
 </body>
