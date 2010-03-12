@@ -96,7 +96,7 @@ SceneJS._webgl = {
             };
         } else if (type == context.FLOAT) {
             func = function (v) {
-                context.uniform1fv(location, v);
+                context.uniform1f(location, v);
             };
         } else if (type == context.FLOAT_VEC2) {
             func = function (v) {

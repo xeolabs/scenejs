@@ -51,28 +51,38 @@ var exampleScene = SceneJS.scene(
                                             lights: [
                                                 {
                                                     type:"point",
-                                                    color: {r: 0.2, g: 0.2, b: 0.7 },
-                                                    pos: { x: -30.0, y: 30.0, z: 30.0 },
-                                                    specular: false,
-                                                    diffuse: true
+                                                    color: {r: 0.7, g: 0.7, b: 0.9 },
+                                                    pos: { x: -15.0, y: -5.0, z: -10.0 },
+                                                    specular: true,
+                                                    diffuse: true,
+                                                    constantAttenuation: 0.001,
+                                                    quadraticAttenuation: 0.001,
+                                                    linearAttenuation: 0.05
                                                 }
                                                 ,
-                                                {
-                                                    type:"point",
-                                                    color: {r: 1.0, g: 1.0, b: 1.0 },
-                                                    pos: { x: 20.0, y: 0.0, z: 30.0 } ,
-                                                    specular: false,
-                                                    diffuse: true
-                                                }
-                                                    ,
-                                                {
-                                                    type:"point",
-                                                    color: {r: 1.0, g: .4, b: .4 },
-                                                    pos: { x: 20.0, y: -100.0, z: 100.0 } ,
-                                                    quadraticAttenuation: 0.01,
-                                                    specular: false,
-                                                    diffuse: true
-                                                }
+//                                                {
+//                                                    type:"spot",
+//                                                    color: {r: 0.7, g: 0.7, b: 0.9 },
+//                                                    pos: { x: -15.0, y: -15.0, z: -15.0 },
+//                                                    dir: {x:1, y: 1, z: 1 },
+//                                                   diffuse: true,
+//                                                       specular: true,
+//                                                    constantAttenuation: 0.0001,
+//                                                    quadraticAttenuation: 0.0001,
+//                                                    linearAttenuation: 0.0005,
+//                                                    spotCosCutOff: 20.0 ,   // Angle from edge of cone and and axis of direction
+//                                                    spotExponent: 10
+//                                                }
+                                                //                                                    ,
+                                                //                                                {
+                                                //                                                    type:"spot",
+                                                //                                                    color: {r: 1.0, g: .4, b: .4 },
+                                                //                                                    pos: { x: -100.0, y: -100.0, z: -100.0 } ,
+                                                //                                                    dir: { x: 1, y: 1, z: 1 },
+                                                ////                                                    specular: true
+                                                ////                                                    ,
+                                                //                                                    diffuse: true
+                                                //                                                }
                                             ]},
 
                                             /* Next, a modelling transform to orient our teapot
@@ -97,7 +107,9 @@ var exampleScene = SceneJS.scene(
                                                      */
                                                         SceneJS.material({
                                                             color:  { r:0.4, g:0.4, b:0.9 },
-                                                            specularColor: { r: 0.2, g: .7, b: .8 }
+                                                            specularColor: { r: 0.2, g: .7, b: .7 }
+                                                            ,
+                                                            specular: 20
 
                                                         },
 

@@ -19,9 +19,9 @@ SceneJS.material = function() {
                         color: colourToArray(params.color),
                         specularColor: colourToArray(params.specularColor),
                         reflectivity: params.reflectivity || 0.7,
-                        specular: params.specular || 1,
+                        specular: params.specular || 1.0,
                         emissive:params.emissive || 0,
-                        shininess:params.shininess || 10.0,
+                        shininess:params.shininess || 1.0,
                         alpha:params.alpha || 1
                     };
                 }

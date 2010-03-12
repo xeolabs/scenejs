@@ -1,12 +1,12 @@
 /**
  * Backend that manages scene lighting.
- * 
+ *
  * Holds the lights on a stack and provides the SceneJS.lights node with methods to push and pop them.
  *
  * Tracks the view and modelling transform matrices through incoming VIEW_TRANSFORM_UPDATED and
  * MODEL_TRANSFORM_UPDATED events. As each light are pushed, its position and/or direction is multipled by the
  * matrices. The stack will therefore contain lights that are instanced in view space by different modelling
- * transforms, with positions and directions that may be animated,  
+ * transforms, with positions and directions that may be animated,
  *
  * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
  * LIGHTS_EXPORTED to pass the entire light stack to the shading backend.
@@ -72,12 +72,12 @@ SceneJS._backends.installBackend(
                         dirty = true;
                     });
 
-            function vectorToArray(v) {
-                return v ? [ v.x || 0, v.y || 0, v.z || 0] : [ 0,  0,  0];
+            function vectorToArray(v, fallback) {
+                return v ? [ v.x || 0, v.y || 0, v.z || 0] : fallback;
             }
 
-            function colourToArray(v) {
-                return v ? [ v.r || 0, v.g || 0, v.b || 0, v.a || 1 ] : [ 0,  0,  0];
+            function colourToArray(v, fallback) {
+                return v ? [ v.r || 0, v.g || 0, v.b || 0] : fallback;
             }
 
             /* Transforms light by view and model matrices
@@ -97,22 +97,27 @@ SceneJS._backends.installBackend(
                             viewMat,
                             SceneJS._math.transformPoint3(
                                     modelMat,
-                                    vectorToArray(light.pos))),
+                                    vectorToArray(light.pos, [ 0,  0,  0]))),
 
                     dir: SceneJS._math.transformVector3(
                             viewMat,
                             SceneJS._math.transformVector3(
                                     modelMat,
-                                    vectorToArray(light.dir))),
+                                    vectorToArray(light.dir, [ 0,  0,  -1.0]))),
 
-                    color: colourToArray(light.color),
-                    spotCosCutOff: light.spotCosCutOff,
-                    spotExponent: light.spotExponent,
+                    color: colourToArray(light.color, [ 1,  1,  1]),
+
+
+                    spotCosCutOff: light.spotCosCutOff || 90.0, // Max angle of spread
+                    spotExponent: light.spotExponent || 1,
                     constantAttenuation: light.constantAttenuation || 1.0,
-                    linearAttenuation: light.linearAttenuation || 0.0,
-                    quadraticAttenuation: light.quadraticAttenuation || 0.0,
+                    linearAttenuation: light.linearAttenuation || 0.2,
+                    quadraticAttenuation: light.quadraticAttenuation || 0.2,
                     specular: light.specular,
                     diffuse: light.diffuse
+
+
+
                 };
             }
 
