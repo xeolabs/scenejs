@@ -31,7 +31,7 @@ with (SceneJS) {
                             lights({
                                 lights: [
                                     {
-                                        pos: { x: -30.0, y: 30.0, z: -30.0 }
+                                        pos: { x: 30.0, y: 30.0, z: 30.0 }
                                     }
                                 ]},
                                     perspective({ fovy : 55.0, aspect : 1.0, near : 0.10, far : 300.0
@@ -96,7 +96,7 @@ with (SceneJS) {
             exampleScene.destroy();
             clearInterval(p);
         }
-        alpha += 0.01;
+        alpha += 0.002;
         try {
             exampleScene.render({"alpha":alpha});
         } catch (e) {

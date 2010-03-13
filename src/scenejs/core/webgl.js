@@ -59,6 +59,12 @@ SceneJS._webgl = {
         compareRToTexture:"COMPARE_R_TO_TEXTURE" // Hardware Shadowing Z-depth
     },
 
+    fogModes: {
+        EXP: 0,
+        EXP2: 1,
+        LINEAR: 2
+    },
+
     ProgramUniform : function(context, program, name, type, size, location, logging) {
         logging.debug("Program uniform found in shader: " + name);
         var func = null;
@@ -127,7 +133,7 @@ SceneJS._webgl = {
         }
 
         this.setValue = function(v) {
-         //   alert("setValue " + name + " = " + v);
+            //   alert("setValue " + name + " = " + v);
             func(v);
         };
 

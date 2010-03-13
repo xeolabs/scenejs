@@ -77,7 +77,7 @@ SceneJS._backends.installBackend(
             }
 
             function colourToArray(v, fallback) {
-                return v ? [ v.r || 0, v.g || 0, v.b || 0] : fallback;
+                return v ? [ v.r || fallback[0], v.g || fallback[1], v.b || fallback[2]] : fallback;
             }
 
             /* Transforms light by view and model matrices
@@ -92,32 +92,27 @@ SceneJS._backends.installBackend(
                 }
                 return {
                     type: light.type || "point",
+                    ambient: colourToArray(light.diffuse, [ 0.2, 0.2, 0.2 ]),
+                    diffuse: colourToArray(light.diffuse, [ 1.0, 1.0, 1.0 ]),
+                    specular: colourToArray(light.specular, [ 1.0, 1.0, 1.0 ]),
 
                     pos : SceneJS._math.transformPoint3(
                             viewMat,
                             SceneJS._math.transformPoint3(
                                     modelMat,
-                                    vectorToArray(light.pos, [ 0,  0,  0]))),
-
-                    dir: SceneJS._math.transformVector3(
+                                    vectorToArray(light.pos, [ 0,  0,  1.0]))),
+                    spotDir: SceneJS._math.transformVector3(
                             viewMat,
                             SceneJS._math.transformVector3(
                                     modelMat,
-                                    vectorToArray(light.dir, [ 0,  0,  -1.0]))),
+                                    vectorToArray(light.spotDir, [ 0,  0,  -1.0]))),
 
-                    color: colourToArray(light.color, [ 1,  1,  1]),
+                    spotExponent: light.spotExponent || 0.0,
+                    spotCosCutOff: light.spotCosCutOff || 20.0,
 
-
-                    spotCosCutOff: light.spotCosCutOff || 90.0, // Max angle of spread
-                    spotExponent: light.spotExponent || 1,
                     constantAttenuation: light.constantAttenuation || 1.0,
-                    linearAttenuation: light.linearAttenuation || 0.2,
-                    quadraticAttenuation: light.quadraticAttenuation || 0.2,
-                    specular: light.specular,
-                    diffuse: light.diffuse
-
-
-
+                    linearAttenuation: light.linearAttenuation || 0.0,
+                    quadraticAttenuation: light.quadraticAttenuation || 0.0
                 };
             }
 

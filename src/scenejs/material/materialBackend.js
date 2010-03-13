@@ -25,20 +25,32 @@ SceneJS._backends.installBackend(
             var material;
             var dirty;
 
+            function colourToArray(v, fallback) {
+                return v ?
+                       [
+                           v.r != undefined ? v.r : fallback[0],
+                           v.g != undefined ? v.g : fallback[1],
+                           v.b != undefined ? v.b : fallback[2]
+                       ] : fallback;
+            }
+
+            function _createMaterial(m) {
+                return {
+                    ambient: colourToArray(m.ambient, [ 0.2,  0.2,  0.2]),
+                    diffuse: colourToArray(m.diffuse, [ 0.8,  0.8,  0.8]),
+                    specular: colourToArray(m.specular, [ 0.0,  0.0,  0.0]),
+                    shininess: m.shininess || 0,
+                    emission: colourToArray(m.emission, [ 0.0,  0.0,  0.0])
+                };
+            }
+
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        material = {
-                            color: [1, 1, 1],
-                            specularColor: [1, 1, 1],
-                            reflectivity: 0.7,
-                            specular:1,
-                            emissive:0,
-                            shininess:10,
-                            alpha:1
-                        };
+                        material = _createMaterial({});
                         dirty = true;
                     });
+
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.SHADER_ACTIVATED,
@@ -67,6 +79,8 @@ SceneJS._backends.installBackend(
             /* Node-facing API
              */
             return {
+
+                createMaterial: _createMaterial,
 
                 setMaterial : function(m) {
                     material = m;

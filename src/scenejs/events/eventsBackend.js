@@ -59,7 +59,10 @@ SceneJS._eventTypes = {
     SHADER_ACTIVATE : 0,
     SHADER_ACTIVATED : 0,
     SHADER_RENDERING : 0,
-    SHADER_DEACTIVATED : 0
+    SHADER_DEACTIVATED : 0 ,
+
+    FOG_UPDATED: 0,
+    FOG_EXPORTED: 0
 };
 
 SceneJS._backends.installBackend(

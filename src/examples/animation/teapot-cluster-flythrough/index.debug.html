@@ -65,9 +65,7 @@
 <!-- Shading -->
 
 <script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/programs/shader.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
+
 
 <!-- Renderer -->
 <!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
@@ -81,19 +79,14 @@
 <script type="application/x-javascript" src="../../../scenejs/geometry/geometry.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/objects/teapot.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/objects/cube.js"></script>
-
-<!-- Viewing transforms -->
-
-<script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
-<!--<script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>-->
+<script type="application/x-javascript" src="../../../scenejs/geometry/objects/sphere.js"></script>
 
 <!-- Modelling transforms -->
 
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/modelTransformBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/transformation/model/modelTransform.js"></script>
-<!--<script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>-->
-<!--<script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>-->
-<!--<script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>-->
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>
 
 <!-- Projection transforms -->
 
@@ -102,7 +95,10 @@
 <script type="application/x-javascript" src="../../../scenejs/transformation/projection/ortho.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/projection/frustum.js"></script>
 
+<!-- Viewing transforms -->
 
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
 
 <!-- Lighting -->
 
@@ -131,15 +127,19 @@
 
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/boundary/boundingSphere.js"></script>
 
 <!-- Assets -->
 
-<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
 
-<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
+
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
+<script type="application/x-javascript" src="../../../scenejs/fog/fogBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
 
 
 <script type="application/x-javascript" src="teapot-cluster-flythrough.js"></script>

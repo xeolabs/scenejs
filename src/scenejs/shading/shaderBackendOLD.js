@@ -31,7 +31,6 @@ SceneJS._backends.installBackend(
             var activeProgram = null;               // Currently active program
             var lights = [];                        // Current lighting state
             var material = {};                      // Current material state
-            var fog = null;                         // Current fog
             var texture = false;                    // True when a texture is active
             var sceneHash;                          // Current hash of collective scene state pertenant to shaders
 
@@ -130,13 +129,9 @@ SceneJS._backends.installBackend(
                     function(_lights) {
                         for (var i = 0; i < _lights.length; i++) {
                             var light = _lights[i];
-
-                            activeProgram.setUniform("uLightAmbient" + i, light.ambient);
-                            activeProgram.setUniform("uLightDiffuse" + i, light.diffuse);
-                            activeProgram.setUniform("uLightSpecular" + i, light.specular);
-
                             activeProgram.setUniform("uLightPos" + i, light.pos);
-                            activeProgram.setUniform("uLightSpotDir" + i, light.spotDir);
+                            activeProgram.setUniform("uLightDir" + i, light.dir);
+                            activeProgram.setUniform("uLightColor" + i, light.color);
 
                             if (light.type == "spot") {
                                 activeProgram.setUniform("uLightSpotCosCutOff" + i, light.spotCosCutOff);
@@ -161,28 +156,14 @@ SceneJS._backends.installBackend(
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.MATERIAL_EXPORTED,
-                    function(m) {
-                        activeProgram.setUniform("uMaterialAmbient", m.ambient);
-                        activeProgram.setUniform("uMaterialDiffuse", m.diffuse);
-                        activeProgram.setUniform("uMaterialSpecular", m.specular);
-                        activeProgram.setUniform("uMaterialShininess", m.shininess);
-                        activeProgram.setUniform("uMaterialEmission", m.emission);
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.FOG_UPDATED,
-                    function(f) {
-                        fog = f;
-                        sceneHash = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.FOG_EXPORTED,
-                    function(f) {
-                        activeProgram.setUniform("uFogColor", f.color);
-                        activeProgram.setUniform("uFogDensity", f.density);
-                        activeProgram.setUniform("uFogStart", f.start);
-                        activeProgram.setUniform("uFogEnd", f.end);
+                    function(_material) {
+                        activeProgram.setUniform("uMatColor", _material.color);
+                        activeProgram.setUniform("uMatSpecularColor", _material.specularColor);
+                        activeProgram.setUniform("uMatReflectivity", _material.reflectivity);
+                        activeProgram.setUniform("uMatSpecular", _material.specular);
+                        activeProgram.setUniform("uMatEmissive", _material.emissive);
+                        activeProgram.setUniform("uMatShininess", _material.shininess);
+                        activeProgram.setUniform("uMatAlpha", _material.alpha);
                     });
 
             ctx.events.onEvent(
@@ -316,71 +297,104 @@ SceneJS._backends.installBackend(
                     val.push("}");
                 }
                 val.push("];");
-
-                /* Fog
-                 */
-                if (fog) {
-                    val.push("fog={mode:");
-                    val.push(fog.mode);
-                    val.push("};");
-                }
                 sceneHash = val.join("");
             }
 
             /**
-             * Generic vertex shader, outputs:
-             *
-             *      Vertex in view-space
-             *      Normal in view-space
-             *      Direction of each light position from view-space vertex
-             *      Direction of vertex from eye position
+             * Generates a vertex shader script for current rendering state. The vertex shader is
+             * the generic counterpart for whatever other specialised material/shadow/picking
+             * fragment shaders we also use.
              */
             function composeVertexShader() {
 
                 var texturing = texture && rendererState.enableTexture2D;
 
                 var src = ["\n"];
+
+
+                // --------- Inputs ---------------------------------------------------------------
+
+                /* Vertex and normal
+                 */
                 src.push("attribute vec3 aVertex;");                // World
                 src.push("attribute vec3 aNormal;");                // World
+
+                /* Texture coords
+                 */
                 if (texturing) {
                     src.push("attribute vec2 aTextureCoord;");      // World
                 }
+
+                /* Matrices
+                 */
                 src.push("uniform mat4 uMMatrix;");               // Model
                 src.push("uniform mat4 uMNMatrix;");              // Model Normal
+
                 src.push("uniform mat4 uVMatrix;");               // View
                 src.push("uniform mat4 uVNMatrix;");              // View Normal
+
                 src.push("uniform mat4 uPMatrix;");               // Projection
 
+                /* Lights
+                 */
                 for (var i = 0; i < lights.length; i++) {
-                    src.push("uniform vec4 uLightPos" + i + ";");
+                    var light = lights[i];
+                    src.push("uniform vec4 uLightPos" + i + ";");     // View position
+                    if (light.type == "dir") {
+                        src.push("uniform vec3 uLightDir" + i + ";"); // View direction
+                    }
                 }
-                src.push("varying vec4 vViewVertex;");
-                src.push("varying vec3 vNormal;");
-                src.push("varying vec3 vEyeVec;");
-                if (texturing) {
-                    src.push("varying vec2 vTextureCoord;");
-                }
-                for (var i = 0; i < lights.length; i++) {
-                    src.push("varying vec3 vLightVec" + i + ";");
-                    src.push("varying float vLightDist" + i + ";");
-                }
-                src.push("void main(void) {");
-                src.push("  vec4 tmpVNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
-                src.push("  vNormal = normalize(tmpVNormal.xyz);");                                 // View-space normal
-                src.push("  vViewVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
-                src.push("  gl_Position = uPMatrix * vViewVertex;");
 
-                src.push("  vec3 tmpVec;");
-                for (var i = 0; i < lights.length; i++) {
-                    src.push("tmpVec = (uLightPos" + i + ".xyz - vViewVertex.xyz);");
-                    src.push("vLightVec" + i + " = tmpVec;");                   // Vector from light to vertex
-                    src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+                // --------- Outputs --------------------------------------------------------------
+
+                /* Vertex
+                 */
+                src.push("varying vec4 vViewVertex;");             // View-space vertex position
+                src.push("varying vec3 vNormal;");                 // View-space normal
+                src.push("varying vec3 vEyeVec;");
+
+
+                if (texturing) {
+                    src.push("varying vec2 vTextureCoord;");        // Straight-through texture coord
                 }
-                src.push("vEyeVec = normalize(-vViewVertex.xyz);");
+
+                /* Lights
+                 */
+                for (var i = 0; i < lights.length; i++) {
+                    src.push("varying vec3 vLightDir" + i + ";"); // View-space light vector from vertex
+                    src.push("varying float vLightDist" + i + ";");// View-space light distance from vertex
+                }
+
+                // --------- Main -----------------------------------------------------------------
+
+                src.push("void main(void) {");
+
+                /* Normal - transform into view space via model and view normal matrices
+                 */
+                src.push("vec4 tmpMNormal = uMNMatrix * vec4(aNormal, 1.0);");
+                src.push("vec4 tmpVNormal = uVNMatrix * tmpMNormal; ");
+                src.push("vNormal = tmpVNormal.xyz;");
+
+                /* Vertex - transform into view and eye space
+                 */
+                src.push("vViewVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+                src.push("gl_Position = uPMatrix * vViewVertex;");
+
+                for (var i = 0; i < lights.length; i++) {
+                    var light = lights[i];
+                    if (light.type == "dir") {
+                        src.push("vLightDir" + i + " = uLightDir" + i + ";");
+                    } else {
+                        src.push("vLightDir" + i + " = (uLightPos" + i + ".xyz - vViewVertex.xyz);");
+                    }
+                    src.push("vLightDist" + i + " = length(uLightPos" + i + ".xyz - vViewVertex.xyz);");
+                }
+                src.push("vEyeVec = -vViewVertex.xyz;");                      // Eye vector
                 if (texturing) {
                     src.push("vTextureCoord = aTextureCoord;");
                 }
                 src.push("}");
+
                 return src.join("\n");
             }
 
@@ -396,152 +410,170 @@ SceneJS._backends.installBackend(
 
                 // ------------ Inputs ----------------------------------------------
 
-                src.push("uniform vec3 uAmbient;");                 // Scene ambient colour
-                src.push("varying vec4 vViewVertex;");              // View-space vertex
-                src.push("varying vec3 vNormal;");                  // View-space normal
-                src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
+                /* Global scene ambient colour, taken from clear color
+                 */
+                src.push("uniform vec3 uAmbient;");
 
+                /* Vertex and normal
+                 */
+                src.push("varying vec4 vViewVertex;");              // View
+                src.push("varying vec3 vNormal;");                  // View
+                src.push("varying vec3 vEyeVec;");
+
+                /* Texture coords
+                 */
                 if (texturing) {
                     src.push("varying vec2 vTextureCoord;");
                 }
 
+                /* Lights
+                 */
                 if (lights) {
                     for (var i = 0; i < lights.length; i++) {
                         var light = lights[i];
-
-                        src.push("uniform vec3  uLightAmbient" + i + ";");
-                        src.push("uniform vec3  uLightDiffuse" + i + ";");
-                        src.push("uniform vec3  uLightSpecular" + i + ";");
-
                         src.push("uniform vec4  uLightPos" + i + ";");
-                        src.push("uniform vec3  uLightSpotDir" + i + ";");
+                        src.push("uniform vec3  uLightDir" + i + ";");
+                        src.push("uniform vec3  uLightColor" + i + ";");
+                        src.push("uniform vec3  uLightAttenuation" + i + ";");
 
                         if (light.type == "spot") {
                             src.push("uniform float  uLightSpotCosCutOff" + i + ";");
                             src.push("uniform float  uLightSpotExp" + i + ";");
                         }
 
-                        src.push("uniform vec3  uLightAttenuation" + i + ";");
-
-                        src.push("varying vec3   vLightVec" + i + ";");     // Vector from light to vertex
-                        src.push("varying float  vLightDist" + i + ";");    // Distance from light to vertex
+                        src.push("varying vec3   vLightDir" + i + ";");
+                        src.push("varying float  vLightDist" + i + ";");
                     }
                 }
 
-                src.push("uniform vec3  uMaterialAmbient;");
-                src.push("uniform vec3  uMaterialDiffuse;");
-                src.push("uniform vec3  uMaterialSpecular;");
-                src.push("uniform float uMaterialShininess;");
-                src.push("uniform vec3  uMaterialEmission;");
+                /* Base material properties
+                 */
+                src.push("uniform vec3  uMatColor;");
+                src.push("uniform vec3  uMatSpecularColor;");
+                src.push("uniform float uMatReflectivity;");
+                src.push("uniform float uMatSpecular;");
+                src.push("uniform float uMatEmissive;");
+                src.push("uniform float uMatShininess;");
+                src.push("uniform float uMatAlpha;");
 
-                if (fog) {
-                    src.push("uniform vec3  uFogColor;");
-                    src.push("uniform float uFogDensity;");
-                    src.push("uniform float uFogStart;");
-                    src.push("uniform float uFogEnd;");
-                }
+                // ========= Main =====================================================================================
 
                 src.push("void main(void) {");
 
-                src.push("  float   attenuation = 1.0;");
-                src.push("  vec3    ambientValue=uAmbient;");
-                src.push("  vec3    diffuseValue=vec3(0.0,0.0,0.0);");
-                src.push("  vec3    specularValue=vec3(0.0,0.0,0.0);");
+                src.push("float   attenuation = 1.0;");
 
-                src.push("  vec3    lightVec;");
-                src.push("  float   dotN;");
-                src.push("  float   spotFactor;");
-                src.push("  float   pf;");
+                src.push("vec3    normal = vNormal;");
 
-                src.push("  float alpha = 0.6;");
+                src.push("vec3    lightValue=uAmbient;");         // Total diffuse value
+                src.push("vec3    specValue=vec3(0.0,0.0,0.0);"); // Total specular value
+
+                src.push("float   dotN;");
+                src.push("float   spotEffect;");
+
+                src.push("vec3    lightVec=vec3(0.0,0.0,0.0);");
+                src.push("vec3    viewVec=vec3(0.0,0.0,0.0);");
+
 
                 for (var i = 0; i < lights.length; i++) {
-                    src.push("lightVec = normalize(vLightVec" + i + ");");
+                    src.push("lightVec = vLightDir" + i + ";");
+                    src.push("viewVec = vEyeVec;");
+
+                    // -------- Point light ---------------------------------
 
                     if (lights[i].type == "point") {
-
-                        /* Point light
-                         */
-                        src.push("dotN = max(dot(vNormal, -lightVec), 0.0);");
-
+                        src.push("dotN = max(dot(vNormal, normalize(lightVec)), 0.0);");
                         src.push("if (dotN > 0.0) {");
+                        src.push(" attenuation = 1.0 / (" +
 
-                        src.push("attenuation = 1.0 / (" +
+                            // constant
                                  "uLightAttenuation" + i + "[0] + " +
+
+                            // linear
                                  "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
+
+                            // quadratic
                                  "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
 
-                        src.push("diffuseValue += dotN *  uLightDiffuse" + i + " * attenuation;");
-
+                        if (lights[i].diffuse) {
+                            src.push("lightValue += attenuation * dotN * uLightColor" + i + ";");
+                        }
                         src.push("}");
 
-                        if (material.shininess > 0.0) {
-                            src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), uMaterialShininess);\n");
-                            src.push("specularValue += uLightSpecular" + i + "  * attenuation * pf;");
+                        if (lights[i].specular) {
+                            src.push("specValue += attenuation * uMatSpecularColor * uLightColor" + i +
+                                     " * uMatSpecular  * pow(max(dot(reflect(normalize(lightVec), normal), normalize(viewVec)),0.0), uMatShininess);");
                         }
+                    }
 
-                    } else if (lights[i].type == "spot") {
+                    // -------- Spot light -----------------------------------
 
-                        /* Spot light
-                         */
-                        src.push("spotFactor = dot(-lightVec, -normalize(uLightSpotDir" + i + "));");
 
-                        src.push("if (spotFactor > uLightSpotCosCutOff" + i + ") {\n");
+                    //
+                    //                        hash.push("S");
+                    //
+                    //                        src.push(  "spotEffect = dot(normalize(lightdir" + i + "), normalize(-lightvec" + i + "));");
+                    //                        src.push(  "if (spotEffect > spotCosCutOff" + i + ") {\n");
+                    //                        src.push(  "spotEffect = pow(spotEffect, spotExp" + i + ");");
+                    //                        src.push(  "dotN=max(dot(normal,normalize(-lightvec)),0.0);\n");
+                    //                        src.push(  "if(dotN>0.0){\n");
+                    //                        src.push(  "attenuation = spotEffect / (lightAttenuation" + i + "[0] + lightAttenuation" + i + "[1] * lightdist" + i + " + lightAttenuation" + i + "[2] * lightdist" + i + " * lightdist" + i + ");\n");
+                    //                        if (lights[i].diffuse) {
+                    //
+                    //                            hash.push("D");
+                    //
+                    //                            src.push(  "lightvalue += attenuation * dotN * lightcolor" + i + ";\n");
+                    //                        }
+                    //                        if (lights[i].specular) {
+                    //
+                    //                            hash.push("S");
+                    //
+                    //                            src.push(  "specvalue += attenuation * specC * lightcolor" + i + " * spec  * pow(max(dot(reflect(normalize(lightvec), normal),normalize(viewvec)),0.0), sh);\n");
+                    //                        }
+                    //                        src.push(  "}\n}\n");
 
-                        src.push("spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
+                    if (lights[i].type == "spot") {
+                        src.push("spotEffect = dot(normalize(uLightDir" + i + "), normalize(-vLightDir" + i + "));");
 
-                        src.push("dotN = max(dot(vNormal,lightVec),0.0);\n");
+                        src.push("if (spotEffect > uLightSpotCosCutOff" + i + ") {\n");
+                        src.push("spotEffect = pow(spotEffect, uLightSpotExp" + i + ");");
+
+
+                        src.push("dotN=max(dot(normal,normalize(-lightVec)),0.0);\n");
 
                         src.push("if(dotN>0.0){\n");
-
-                        src.push("attenuation = spotFactor / (" +
+                        src.push("attenuation = spotEffect / (" +
                                  "uLightAttenuation" + i + "[0] + " +
                                  "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
                                  "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");\n");
 
-                        src.push("diffuseValue += dotN *  uLightDiffuse" + i + " * attenuation;");
+                        if (lights[i].diffuse) {
+                            src.push("lightValue += attenuation * dotN * uLightColor" + i + ";\n");
+                        }
 
-                        if (material.shininess > 0.0) {
-                            src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), uMaterialShininess);\n");
-                            src.push("specularValue += uLightSpecular" + i + "  * attenuation * pf;");
+                        if (lights[i].specular) {
+                            src.push("specValue += attenuation * uMatSpecularColor * uLightColor" + i + " * uMatSpecular  * pow(max(dot(reflect(normalize(lightVec), normal),normalize(viewVec)),0.0), uMatShininess);\n");
                         }
 
                         src.push("}\n");
                         src.push("}\n");
-
-                    } else if (lights[i].type == "dir") {
-
-                        /* Directional light
-                         */
-
-                        if (lights[i].type == "dir") {
-                            src.push("dotN = max(dot(vNormal, -lightDir" + i + "), 0.0);");
-
-                            src.push("diffuseValue += dotN *  uLightDiffuse" + i + ";");
-                            if (material.shininess > 0.0) {
-                                src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), uMaterialShininess);\n");
-                                src.push("specularValue += uLightSpecular" + i + " * pf;");
-                            }
-                        }
                     }
-                    src.push("ambientValue += uLightAmbient" + i + ";");
+                    //
+                    //                    if (lights[i].type == "dir") {
+                    //
+                    //                        hash.push("D");
+                    //
+                    //                        src.push(  "dotN=max(dot(normal,-normalize(lightvec)),0.0);\n");
+                    //                        if (lights[i].diffuse) {
+                    //                            hash.push("D");
+                    //                            src.push(  "lightvalue += dotN * lightcolor" + i + ";\n");
+                    //                        }
+                    //                        if (lights[i].specular) {
+                    //                            hash.push("S");
+                    //                            src.push(  "specvalue += specC * lightcolor" + i + " * spec  * pow(max(dot(reflect(normalize(lightvec), normal),normalize(viewvec)),0.0), sh);\n");
+                    //                        }
+                    //                    }
                 }
-                if (lights.length > 0) {
-                    src.push("ambientValue /= " + lights.length + ";");
-                }
-
-                src.push("float fogFact=0.0;");
-                if (fog) {
-
-                    if (fog.mode == "exp") {
-                        src.push("fogFact=clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);\n");
-                    } else if (fog.mode == "linear") {
-                        src.push("fogFact=clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);\n");
-                    }
-                    src.push("gl_FragColor = vec4(uMaterialEmission + (ambientValue * uMaterialAmbient) + (diffuseValue  * uMaterialDiffuse) + (specularValue  * uMaterialSpecular) , 1) * fogFact + vec4(uFogColor, 1) * (1.0 - fogFact);  ");
-                } else {
-                    src.push("gl_FragColor = vec4(uMaterialEmission + (ambientValue * uMaterialAmbient) + (diffuseValue  * uMaterialDiffuse) + (specularValue  * uMaterialSpecular) , 1);  ");
-                }
+                src.push("    gl_FragColor = vec4(specValue.rgb + uMatColor.rgb * lightValue.rgb, 1.0);  ");
                 //  src.push(  "    gl_FragColor = vec4(0, 0, 1.0, 1.0);  ");
                 src.push("}");
 
