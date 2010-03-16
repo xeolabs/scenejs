@@ -9,15 +9,15 @@
     const STATE_TEXTURE_CREATED = 4;    // Texture created
     const STATE_ERROR = -1;             // Image load or texture creation failed
 
-    /** Activates texture, renders children, then restores previosuly active texture
+    /** Pushes texture layer, renders children, then pops layer
      */
-    function doTexture(cfg, scope, textureId) {
-        var lastTexture = backend.getActiveTexture();
-        backend.activateTexture(textureId);
-        SceneJS._utils.visitChildren(cfg, scope);
-        backend.deactivateTexture();
-        if (lastTexture) {
-            backend.activateTexture(lastTexture);
+    function doTextureLayer(cfg, scope, layer) {
+        if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+            SceneJS._utils.visitChildren(cfg, scope);
+        } else {
+            backend.pushLayer(layer);
+            SceneJS._utils.visitChildren(cfg, scope);
+            backend.popLayer();
         }
     }
 
@@ -42,16 +42,17 @@
 
     SceneJS.texture = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
-//        if (!cfg.fixed) {
-//            throw new SceneJS.exceptions.UnsupportedOperationException
-//                    ("Dynamic configuration of texture nodes is not supported");
-//        }
+        //        if (!cfg.fixed) {
+        //            throw new SceneJS.exceptions.UnsupportedOperationException
+        //                    ("Dynamic configuration of texture nodes is not supported");
+        //        }
 
         var state = STATE_INITIAL;
         var params;
-        var process = null;             // Handle to asynchronous load process for texture configured with image url
-        var textureId;
+        var layerParams;
+        var process = null;   // Handle to asynchronous load process for texture configured with image url
         var image;
+        var layer;
 
         return SceneJS._utils.createNode(
                 function(scope) {
@@ -67,13 +68,37 @@
                         if (params.wait == undefined) {  // By default, dont render children until texture loaded
                             params.wait = true;
                         }
+
+                        if (params.applyTo) {
+                            if (params.applyTo != "ambient" &&
+                                params.applyTo != "diffuse" &&
+                                params.applyTo != "specular" &&
+                                params.applyTo != "shininess" &&
+                                params.applyTo != "emission" &&
+                                params.applyTo != "red" &&
+                                params.applyTo != "green" &&
+                                params.applyTo != "blue" &&
+                                params.applyTo != "alpha" &&
+                                params.applyTo != "normal" &&
+                                params.applyTo != "height") {
+                                throw SceneJS.exceptions.InvalidNodeConfigException(
+                                        "SceneJS.texture node has an applyTo mode of unsupported type - " +
+                                        "should be 'diffuse', 'specular', 'shininess', " +
+                                        "'emission', 'red', 'green', " +
+                                        "'blue', alpha', 'normal' or 'height'");
+                            }
+                        }
+
+                        layerParams = {
+                            applyTo: params.applyTo || "diffuse"
+                        };
                     }
 
                     /* Backend may evict texture when not recently used,
                      * in which case we'll have to load it again
                      */
                     if (state == STATE_TEXTURE_CREATED) {
-                        if (!backend.getTexture(textureId)) {
+                        if (!backend.textureExists(layer.texture)) {
                             state = STATE_INITIAL;
                         }
                     }
@@ -86,12 +111,12 @@
                         //                    if (!textureId) {
                         //                        textureId = backend.createTexture(params);
                         //                    }
-                        //                    doTexture(cfg, scope, textureId);
+                        //                    doTextureLayer(cfg, scope, textureId);
                     } else {
 
                         switch (state) {
                             case STATE_TEXTURE_CREATED: // Most frequent case, hopefully
-                                doTexture(cfg, scope, textureId);
+                                doTextureLayer(cfg, scope, layer);
                                 break;
 
                             case STATE_INITIAL:
@@ -129,10 +154,13 @@
 
                             case STATE_IMAGE_LOADED:
                                 params.image = image;
-                                textureId = backend.createTexture(params);
+                                layer = {
+                                    texture: backend.createTexture(params),
+                                    params: layerParams
+                                };
                                 backend.imageLoaded(process);
                                 state = STATE_TEXTURE_CREATED;
-                                doTexture(cfg, scope, textureId);
+                                doTextureLayer(cfg, scope, layer);
                                 break;
 
                             case STATE_ERROR:

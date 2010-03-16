@@ -45,12 +45,11 @@
 
 var SceneJs = SceneJS; // Name changed after V0.6.0 - hack for older assets
 
-var exampleScene = SceneJS.scene(
+var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
-                    canvasId: 'theCanvas',
                     clearColor : { r:0, g:0, b:0.0, a: 1 },
                     viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
                     clear : { depth : true, color : true}
@@ -77,7 +76,7 @@ var exampleScene = SceneJS.scene(
                                              * This asset type is for native SceneJS JavaScript, and the proxy
                                              * is at SceneJS.com.
                                              */
-                                                SceneJS.assets.scenejs({
+                                                SceneJS.asset({
                                                     
                                                     uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/v0.7.0/" +
                                                         "orange-teapot-example/orangeteapot.js",

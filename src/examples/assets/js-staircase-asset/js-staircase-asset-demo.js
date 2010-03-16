@@ -41,12 +41,13 @@
  * SceneJS currently caches assets with a max-time-inactive
  * eviction policy.
  */
-var exampleScene = SceneJS.scene(
+
+var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
-                    canvasId: 'theCanvas',
+
                     clearColor : { r:0, g:0, b:0.0, a: 1 },
                     viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
                     clear : { depth : true, color : true}
@@ -65,41 +66,66 @@ var exampleScene = SceneJS.scene(
                                             up : { x: 0.0, y: 1.0, z: 0.0 }
 
                                         },
+                                                SceneJS.lights({
+                                                    lights: [
 
-                                            /**
-                                             * Asset is configured with the URI at which its
-                                             * definition is stored, and a proxy that will mediate
-                                             * the cross-domain request and wrap the response in JSONP.
-                                             *
-                                             * This asset is in native SceneJS JavaScript, and the proxy
-                                             * is at SceneJS.com.
-                                             *
-                                             * Being native SceneJS, we can provide any special configurations
-                                             * for it by wrapping the asset node in a scope node. What we
-                                             * effectively then have are parameterisable remote assets,
-                                             * pretty powerful stuff.
-                                             *
-                                             * Take a look at the asset definition to see how it uses the scope
-                                             * data.
-                                             */
-                                                SceneJS.scope({
-                                                    stepTexture: "redstone", // Try changing this to "marble"
-                                                    stepWidth:7,
-                                                    stepHeight:0.6,
-                                                    stepDepth:3,
-                                                    stepSpacing:1.5,
-                                                    innerRadius:10,
-                                                    numSteps:50,
-                                                    stepAngle:20 },
+                                                        /* Global ambient colour is taken from the canvas clear colour.
+                                                         */
+                                                        {
+                                                            type:                   "point",
+                                                            diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
+                                                            specular:               { r: 0.9, g: 0.9, b: 0.6 },
+                                                            pos:                    { x: 100.0, y: 0.0, z: -100.0 },
+                                                            constantAttenuation:    1.0,
+                                                            quadraticAttenuation:   0.0,
+                                                            linearAttenuation:      0.0
+                                                        },
+                                                        {
+                                                            type:                   "point",
+                                                            diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
+                                                            specular:               { r: 0.9, g: 0.9, b: 0.6 },
+                                                            pos:                    { x: -100.0, y: 200.0, z: 100.0 },
+                                                            constantAttenuation:    1.0,
+                                                            quadraticAttenuation:   0.0,
+                                                            linearAttenuation:      0.0
+                                                        }
+                                                    ]},
 
-                                                        SceneJS.assets.scenejs({
-                                                            
-                                                            uri:"http://scenejs.com/app/data/assets/catalogue/assets/" +
-                                                                "v0.7.0/staircase-example/staircase.js",
+                                                    /**
+                                                     * Asset is configured with the URI at which its
+                                                     * definition is stored, and a proxy that will mediate
+                                                     * the cross-domain request and wrap the response in JSONP.
+                                                     *
+                                                     * This asset is in native SceneJS JavaScript, and the proxy
+                                                     * is at SceneJS.com.
+                                                     *
+                                                     * Being native SceneJS, we can provide any special configurations
+                                                     * for it by wrapping the asset node in a scope node. What we
+                                                     * effectively then have are parameterisable remote assets,
+                                                     * pretty powerful stuff.
+                                                     *
+                                                     * Take a look at the asset definition to see how it uses the scope
+                                                     * data.
+                                                     */
+                                                        SceneJS.scope({
+                                                            stepTexture: "redstone", // Try changing this to "marble"
+                                                            stepWidth:7,
+                                                            stepHeight:0.6,
+                                                            stepDepth:3,
+                                                            stepSpacing:1.5,
+                                                            innerRadius:10,
+                                                            numSteps:50,
+                                                            stepAngle:20 },
 
-                                                            proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"
-                                                        })
-                                                        )
+                                                                SceneJS.asset({
+
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/" +
+                                                                        "v0.7.0/staircase-example/staircase.js",
+
+                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"
+                                                                })
+                                                                )
+                                                        ) // lights
                                                 ) // lookAt
                                         ) // perspective
                                 ) // lights

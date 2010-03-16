@@ -18,12 +18,11 @@
  *
  * Now, kneel before Zod.
  */
-var exampleScene = SceneJS.scene(
+var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
-                    canvasId: 'theCanvas',
                     clear : { depth : true, color : true },
                     enableTexture2D: true
                 },

@@ -52,9 +52,8 @@ SceneJS._eventTypes = {
     MATERIAL_UPDATED : 0,
     MATERIAL_EXPORTED : 0,
 
-    TEXTURE_ACTIVATED : 0,              // Texture activated after a texture node visited
-    TEXTURE_EXPORTED : 0,
-    TEXTURE_DEACTIVATED : 0,            // Texture deactivated after a texture node departed from
+    TEXTURES_UPDATED : 0,              // Texture activated after a texture node visited
+    TEXTURES_EXPORTED : 0,    
 
     SHADER_ACTIVATE : 0,
     SHADER_ACTIVATED : 0,
@@ -62,7 +61,11 @@ SceneJS._eventTypes = {
     SHADER_DEACTIVATED : 0 ,
 
     FOG_UPDATED: 0,
-    FOG_EXPORTED: 0
+    FOG_EXPORTED: 0,
+
+    NAME_UPDATED: 0 ,
+
+    MOUSE_DOWN: 0
 };
 
 SceneJS._backends.installBackend(

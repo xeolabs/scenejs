@@ -27,7 +27,7 @@ SceneJS.assets.collada = function() {
                 ("Mandatory SceneJS.assets.collada parameter missing: proxy");
     }
 
-    return SceneJS.assets.apply(
+    return SceneJS.asset.apply(
             this,
             SceneJS._utils.extendNodeArgs
                     (arguments, {
@@ -43,5 +43,5 @@ SceneJS.assets.collada = function() {
                                     xml,
                                     params.node);     // Optional cherry-picked asset in Collada file
                         }
-                    }), true); // Override params
+                    }, true)); // Override params
 };

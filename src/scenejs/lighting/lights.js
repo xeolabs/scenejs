@@ -9,10 +9,14 @@ SceneJS.lights = function() {
     var backend = SceneJS._backends.getBackend('lights');
     return SceneJS._utils.createNode(
             function(scope) {
-                var lights = cfg.getParams(scope).lights;
-                backend.pushLights(lights);
-                SceneJS._utils.visitChildren(cfg, scope);
-                backend.popLights(lights.length);
+                if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+                    SceneJS._utils.visitChildren(cfg, scope);
+                } else {
+                    var lights = cfg.getParams(scope).lights;
+                    backend.pushLights(lights);
+                    SceneJS._utils.visitChildren(cfg, scope);
+                    backend.popLights(lights.length);
+                }
             });
 };
 

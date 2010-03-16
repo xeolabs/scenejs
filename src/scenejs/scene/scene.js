@@ -20,6 +20,14 @@
         }
 
         var cfg = SceneJS._utils.getNodeConfig(arguments);
+        if (!cfg.fixed) {
+            throw new SceneJS.exceptions.UnsupportedOperationException
+                    ("Dynamic configuration of SceneJS.scene nodes is not supported");
+        }
+        var params = cfg.getParams();
+        if (!params.canvasId) {
+            throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory SceneJS.scene node parameter missing: canvasId");
+        }
 
         var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
 
@@ -48,6 +56,30 @@
                     backend.deactivateScene();
                 }
             },
+
+            pick : function(paramOverrides, canvasX, canvasY) {
+                if (sceneId) {
+                    try {
+                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
+                        backend.activateScene(sceneId);
+                        var scope = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
+                        var params = cfg.getParams();
+                        for (var key in params) {    // Push scene params into scope
+                            scope.put(key, params[key]);
+                        }
+                        if (paramOverrides) {        // Override with traversal params
+                            for (var key in paramOverrides) {
+                                scope.put(key, paramOverrides[key]);
+                            }
+                        }
+                        SceneJS._utils.visitChildren(cfg, scope);
+                        backend.deactivateScene();
+                    } finally {
+                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+                    }
+                }
+            },
+
 
             /**
              * Returns count of active processes. A non-zero count indicates that the scene should be rendered
@@ -80,7 +112,7 @@
 
         /* Register scene - fires a SCENE_CREATED event
          */
-        sceneId = backend.registerScene(_scene);
+        sceneId = backend.registerScene(_scene, params);
 
         return _scene;
     };

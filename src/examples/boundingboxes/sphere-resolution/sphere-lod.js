@@ -21,12 +21,11 @@
  * medium resolution sphere, then at the highest size threshold a high-resolution sphere, all
  * coloured differently so you can see when the selection switches.
  */
-var exampleScene = SceneJS.scene(
+var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
-                SceneJS.renderer({
-                    canvasId: 'theCanvas',
+                SceneJS.renderer({                    
                     clearColor : { r:0, g:0, b:0.0, a: 1 },
                     viewport:{ x : 0, y : 0, width: 600, height: 600}  ,
                     clear : { depth : true, color : true}

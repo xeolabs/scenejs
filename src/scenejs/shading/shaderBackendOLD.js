@@ -98,7 +98,7 @@ SceneJS._backends.installBackend(
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURE_ACTIVATED,
+                    SceneJS._eventTypes.TEXTURE_LAYER_UPDATED,
                     function(t) {
                         texture = t;
                         sceneHash = null;

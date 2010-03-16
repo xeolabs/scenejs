@@ -144,8 +144,8 @@ SceneJS._webgl = {
 
     ProgramSampler : function(context, program, name, type, size, location, logging) {
         logging.debug("Program sampler found in shader: " + name);
-        this.bindTexture = function(texture) {
-            texture.bind();
+        this.bindTexture = function(texture, unit) {
+            texture.bind(unit);
             context.uniform1i(location, 0);
         };
     },
@@ -323,10 +323,10 @@ SceneJS._webgl = {
             }
         };
 
-        this.bindTexture = function(name, texture) {
+        this.bindTexture = function(name, texture, unit) {
             var sampler = samplers[name];
             if (sampler) {
-                sampler.bindTexture(texture);
+                sampler.bindTexture(texture, unit);
             } else {
                 //  logging.warn("Sampler not found: " + name);
             }
@@ -353,6 +353,7 @@ SceneJS._webgl = {
 
     Texture2D : function(context, cfg) {
         cfg.logging.debug("Creating texture: '" + cfg.textureId + "'");
+        this.canvas = cfg.canvas;
         this.textureId = cfg.textureId;
         this.handle = context.createTexture();
         this.target = context.TEXTURE_2D;
@@ -405,7 +406,7 @@ SceneJS._webgl = {
             this.depthMode = cfg.depthMode;
             this.depthCompareMode = cfg.depthCompareMode;
             this.depthCompareFunc = cfg.depthCompareFunc;
-        }
+        }   
 
         context.texParameteri(// Filtered technique when scaling texture down
                 context.TEXTURE_2D,
@@ -441,7 +442,7 @@ SceneJS._webgl = {
 
         this.bind = function(unit) {
             if (unit) {
-                context.activeTexture(context.TEXTURE0 + unit);
+                context.activeTexture(context["TEXTURE" + unit]);
             } else {
                 context.activeTexture(context.TEXTURE0);
             }
@@ -450,7 +451,7 @@ SceneJS._webgl = {
 
         this.unbind = function(unit) {
             if (unit) {
-                context.activeTexture(context.TEXTURE0 + unit);
+                context.activeTexture(context["TEXTURE" + unit]);
             } else {
                 context.activeTexture(context.TEXTURE0);
             }
@@ -464,7 +465,7 @@ SceneJS._webgl = {
         this.destroy = function() {
             if (this.handle) {
                 cfg.logging.debug("Destroying texture");
-                context.destroyTexture(this.handle);
+                context.deleteTexture(this.handle);
                 this.handle = null;
             }
         };

@@ -1,5 +1,24 @@
 /**
+ * Backend that manages material texture layers.
  *
+ * Manages asynchronous load of texture images.
+ *
+ * Caches textures with a least-recently-used eviction policy.
+ *
+ * Holds currently-applied textures as "layers". Each layer specifies a texture and a set of parameters for
+ * how the texture is to be applied, ie. to modulate ambient, diffuse, specular material colors, geometry normals etc.
+ *
+ * Holds the layers on a stack and provides the SceneJS.texture node with methods to push and pop them.
+ *
+ * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * TEXTURES_EXPORTED to pass the entire layer stack to the shading backend.
+ *
+ * Avoids redundant export of the layers with a dirty flag; they are only exported when that is set, which occurs
+ * when the stack is pushed or popped by the texture node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
+ * SHADER_DEACTIVATED events.
+ *
+ * Whenever a texture node pushes or pops the stack, this backend publishes it with a TEXTURES_UPDATED to allow other
+ * dependent backends to synchronise their resources.
  */
 SceneJS._backends.installBackend(
 
@@ -8,60 +27,60 @@ SceneJS._backends.installBackend(
         function(ctx) {
 
             var time = (new Date()).getTime();      // Current system time for LRU caching
-            var canvas;                             // Currently active canvas
-            var textures = {};                      // Texture cache
-            var activeTexture;                      // Currently active texture
-            var loaded = false;                     // True when certain that current texture is loaded
+            var canvas;
+            var textures = {};
+            var layerStack = [];
+            var dirty;
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.TIME_UPDATED, // System time update
+                    SceneJS._eventTypes.TIME_UPDATED,
                     function(t) {
                         time = t;
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED, // Scene traversal begun - texture not loaded
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        activeTexture = null;
-                        loaded = false;
+                        layerStack = [];
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.CANVAS_ACTIVATED,
                     function(c) {
                         canvas = c;
-                        loaded = false;
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.CANVAS_DEACTIVATED,
                     function() {
                         canvas = null;
-                        loaded = false;
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.SHADER_ACTIVATED,
                     function() {
-                        loaded = false;
+                        dirty = true;
                     });
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.SHADER_RENDERING,
                     function() {
-                        if (!loaded && activeTexture) {
+                        if (dirty) {
                             ctx.events.fireEvent(
-                                    SceneJS._eventTypes.TEXTURE_EXPORTED,
-                                    activeTexture
+                                    SceneJS._eventTypes.TEXTURES_EXPORTED,
+                                    layerStack
                                     );
-                            loaded = true;
+                            dirty = false;
                         }
                     });
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.SHADER_DEACTIVATED,
                     function() {
-                        loaded = false;
+                        dirty = true;
                     });
 
             /** Removes texture from shader (if canvas exists in DOM) and deregisters it from backend
@@ -83,8 +102,8 @@ SceneJS._backends.installBackend(
                     deleteTexture(texture);
                 }
                 textures = {};
-                activeTexture = null;
-                loaded = false;
+                layerStack = [];
+                dirty = true;
             }
 
             ctx.events.onEvent(
@@ -103,7 +122,7 @@ SceneJS._backends.installBackend(
              */
             ctx.memory.registerEvictor(
                     function() {
-                        var earliest = time; // Doesn't evict textures that we have traversed into
+                        var earliest = time; // Doesn't evict textures that are current in layers
                         var evictee;
                         for (var id in textures) {
                             if (id) {
@@ -147,17 +166,11 @@ SceneJS._backends.installBackend(
 
             return { // Node-facing API
 
-                /** Returns the ID of the currently active texture
-                 */
-                getActiveTexture : function() {
-                    return activeTexture ? activeTexture.textureId : null;
-                },
-
-                /** Looks for loaded texture, which may have been evicted after lack of recent use,
+                /** Verifies that texture still cached - it may have been evicted after lack of recent use,
                  * in which case client texture node will have to recreate it.
                  */
-                getTexture : function(textureId) {
-                    return textures[textureId];
+                textureExists : function(texture) {
+                    return textures[texture.textureId];
                 },
 
                 /**
@@ -196,7 +209,7 @@ SceneJS._backends.installBackend(
                 },
 
                 /**
-                 * Creates new texture and returns its unique ID.
+                 * Creates and returns a new texture, or re-uses existing one if possible
                  */
                 createTexture : function(cfg) {
                     if (!canvas) {
@@ -233,33 +246,23 @@ SceneJS._backends.installBackend(
                                 });
                             });
 
-                    return textureId;
+                    return textures[textureId];
                 },
 
-                /** Deactives the currently-active texture - does nothing if none active
-                 *
-                 */
-                deactivateTexture: function() {
-                    if (activeTexture) {
-                        var texture = activeTexture;
-                        activeTexture = null;
-                        loaded = false;
-                        ctx.events.fireEvent(SceneJS._eventTypes.TEXTURE_DEACTIVATED, texture);
+                pushLayer : function(layer) {
+                    if (!textures[layer.texture.textureId]) {
+                        throw "No such texture loaded \"" + layer.texture.textureId + "\"";
                     }
+                    layer.texture.lastUsed = time;
+                    layerStack.push(layer);
+                    dirty = true;
+                    ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
                 },
 
-                /** Activates currently existing texture of given ID and bumps its last-used
-                 * time.
-                 */
-                activateTexture : function(textureId) {
-                    var texture = textures[textureId];
-                    if (!texture) {
-                        throw "No such texture loaded \"" + textureId + "\"";
-                    }
-                    activeTexture = texture;
-                    activeTexture.lastUsed = time;
-                    loaded = false;
-                    ctx.events.fireEvent(SceneJS._eventTypes.TEXTURE_ACTIVATED, texture);
+                popLayer : function() {
+                    layerStack.pop();
+                    dirty = true;
+                    ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
                 }
             };
         });

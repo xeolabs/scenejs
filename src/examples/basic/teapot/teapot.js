@@ -14,23 +14,20 @@
  only specify values where defaults are overridden, such as non-zero
  vector components, for example.
  */
-var exampleScene = SceneJS.scene(
+var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
     /* Write logging output to a DIV element in the page
      */
         SceneJS.loggingToPage({ elementId: "logging" },
 
-            /* A renderer node binds subnodes to a WebGL canvas element
-             defined in the HTML tab then clears the depth and colour buffers
+            /* A renderer node clears the depth and colour buffers
              */
                 SceneJS.renderer({
-                    canvasId: 'theCanvas',
                     clear : { depth : true, color : true},
                     viewport:{ x : 1, y : 1, width: 600, height: 600},
                     clearColor: { r:0.0, g: 0.0, b: 0.0 }
                 },
 
-                        
                     /* Perspective transformation
                      */
                         SceneJS.perspective({  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
@@ -72,19 +69,19 @@ var exampleScene = SceneJS.scene(
                                                     linearAttenuation:      0.0
                                                 }
 
-////                                                ,
-//                                                {
-//                                                    type:"spot",
-//                                                    diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-//                                                    specular:               { r: 0.9, g: 0.9, b: 0.6 },
-//                                                    pos:                    { x: 20.0, y: 0.0, z: -20.0 },
-//                                                    spotDir:                    { x: -1, y: .0, z: 1.0 },
-//                                                    constantAttenuation:    1.0,
-//                                                    quadraticAttenuation:   0.0,
-//                                                    linearAttenuation:      0.0,
-//                                                    spotCosCutOff: 30.0 ,
-//                                                    spotExponent: 20
-//                                                }
+                                                ////                                                ,
+                                                //                                                {
+                                                //                                                    type:"spot",
+                                                //                                                    diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
+                                                //                                                    specular:               { r: 0.9, g: 0.9, b: 0.6 },
+                                                //                                                    pos:                    { x: 20.0, y: 0.0, z: -20.0 },
+                                                //                                                    spotDir:                    { x: -1, y: .0, z: 1.0 },
+                                                //                                                    constantAttenuation:    1.0,
+                                                //                                                    quadraticAttenuation:   0.0,
+                                                //                                                    linearAttenuation:      0.0,
+                                                //                                                    spotCosCutOff: 30.0 ,
+                                                //                                                    spotExponent: 20
+                                                //                                                }
 
                                             ]},
 

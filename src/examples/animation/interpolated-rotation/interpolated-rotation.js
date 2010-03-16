@@ -18,12 +18,11 @@
  * then write the output to a fresh child scope for their sub-nodes.
  */
 with (SceneJS) {
-    var exampleScene = scene({}, // node always has a config object
+    var exampleScene = scene({ canvasId: 'theCanvas' },
 
             loggingToPage({ elementId: "logging" },
 
-                    renderer({
-                        canvasId: 'theCanvas',
+                    renderer({                        
                         clearColor : { r:0, g:0, b:0.0, a: 1 },
                         viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
                         clear : { depth : true, color : true}

@@ -5,7 +5,6 @@
     <title>SceneJS Example - Textured Cube</title>
 </head>
 <body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
-<body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
 <table>
     <tr>
         <td valign="top">
@@ -66,9 +65,7 @@
 <!-- Shading -->
 
 <script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/programs/shader.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
+
 
 <!-- Renderer -->
 <!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
@@ -90,6 +87,7 @@
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/modelMatrix.js"></script>
 
 <!-- Projection transforms -->
 
@@ -133,12 +131,19 @@
 
 <!-- Assets -->
 
-<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackendExtension.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
 
-<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/collada/colladaAsset.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/collada/colladaParser.js"></script>
+
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
+<script type="application/x-javascript" src="../../../scenejs/fog/fogBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
+
+
 
 
 <script type="application/x-javascript" src="planets.js"></script>

@@ -8,14 +8,17 @@ SceneJS.material = function() {
 
     return SceneJS._utils.createNode(
             function(scope) {
-                if (!material || !cfg.fixed) {
-                    material = backend.createMaterial(cfg.getParams(scope));
+                if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+                    SceneJS._utils.visitChildren(cfg, scope);
+                } else {
+                    if (!material || !cfg.fixed) {
+                        material = backend.createMaterial(cfg.getParams(scope));
+                    }
+                    var saveMaterial = backend.getMaterial();
+                    backend.setMaterial(material);
+                    SceneJS._utils.visitChildren(cfg, scope);
+                    backend.setMaterial(saveMaterial);
                 }
-
-                var saveMaterial = backend.getMaterial();
-
-                backend.setMaterial(material);
-                SceneJS._utils.visitChildren(cfg, scope);
-                backend.setMaterial(saveMaterial);
             });
+
 };

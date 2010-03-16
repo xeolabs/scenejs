@@ -7,7 +7,7 @@ SceneJS._backends.installBackend(
 
         function(ctx) {
 
-            var currentCanvas;  // Currently active canvas
+            var canvas;  // Currently active canvas
             var stateStack;     // Stack of WebGL state frames
             var currentProps;   // Current map of set WebGL modes and states
             var loaded;         // True when current state exported
@@ -15,7 +15,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        currentCanvas = null;
+                        canvas = null;
                         currentProps = {
                             clearColor: {r: 0, g : 0, b : 0, a: 1.0},
                             clearDepth: 1.0,
@@ -28,15 +28,17 @@ SceneJS._backends.installBackend(
                         };
                         stateStack = [
                             {
-                                canvas: null,
-                                // Current canvas
                                 props: currentProps,
-                                // WebGL properties set for this state
-                                prevCanvas: null,
-                                // Previous canvas
                                 restore : null          // WebGL properties to set for reverting to previous state
                             }
                         ];
+                        loaded = false;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+                    function(c) {
+                        canvas = c;
                         loaded = false;
                     });
 
@@ -65,44 +67,6 @@ SceneJS._backends.installBackend(
                         }
                     });
 
-            /** Locates canvas in DOM, finds WebGL context on it,
-             *  sets some default state on the context, then returns
-             *  canvas, canvas ID and context wrapped up in an object.
-             */
-            var findCanvas = function(canvasId) {
-                var canvas = document.getElementById(canvasId);
-                if (!canvas) {
-                    throw new SceneJS.exceptions.CanvasNotFoundException
-                            ('Could not find canvas document element with id \'' + canvasId + '\'');
-                }
-                var context;
-                var contextNames = SceneJS._webgl.contextNames;
-                for (var i = 0; (!context) && i < contextNames.length; i++) {
-                    try {
-                        context = canvas.getContext(contextNames[i]);
-                    } catch (e) {
-
-                    }
-                }
-                if (!context) {
-                    throw new SceneJS.exceptions.WebGLNotSupportedException
-                            ('Canvas document element with id \''
-                                    + canvasId
-                                    + '\' failed to provide a supported context');
-                }
-                context.clearColor(0.0, 0.0, 0.0, 1.0);
-                context.clearDepth(1.0);
-                context.enable(context.DEPTH_TEST);
-                context.disable(context.CULL_FACE);
-                context.disable(context.TEXTURE_2D);
-                context.depthRange(0, 1);
-                context.disable(context.SCISSOR_TEST);
-                return {
-                    canvas: canvas,
-                    context: context,
-                    canvasId : canvasId
-                };
-            };
 
             /**
              * Maps renderer node properties to WebGL context enums
@@ -309,8 +273,8 @@ SceneJS._backends.installBackend(
                     v = {
                         x : v.x || 1,
                         y : v.y || 1,
-                        width: v.width || currentCanvas.width,
-                        height: v.height || currentCanvas.height
+                        width: v.width || canvas.width,
+                        height: v.height || canvas.height
                     };
                     currentProps.viewport = v;
                     context.viewport(v.x, v.y, v.width, v.height);
@@ -394,31 +358,13 @@ SceneJS._backends.installBackend(
                 }
                 throw "Internal error - renderer backend stateStack underflow!";
             };
-            
+
             return {// Node-facing API
 
                 /**
                  * Returns a new WebGL state object to the caller, without making it active.
                  */
                 createRendererState : function(props) {
-
-                    /* Select a canvas if specified
-                     */
-                    var canvas;
-                    if (props.canvasId) {                       // Canvas specified
-                        if (currentCanvas) {                    //  - but canvas already active
-                            throw new SceneJS.exceptions.CanvasAlreadyActiveException
-                                    ("A canvas is already activated by a higher renderer node");
-                        }
-                        canvas = findCanvas(props.canvasId);
-
-                    } else if (currentCanvas) {                 // No canvas specified, but canvas already active
-                        canvas = currentCanvas;                 //  - continue using active canvas
-
-                    } else {                                    // No canvas specified, but none already active
-                        throw new SceneJS.exceptions.NoCanvasActiveException(
-                                'Outermost renderer node must have a canvasId');
-                    }
 
                     /* For each property supplied, find the previous value to restore it to
                      */
@@ -430,12 +376,9 @@ SceneJS._backends.installBackend(
                     }
 
                     var state = {
-                        canvas: canvas,
                         props : props,
-                        restore : restore,
-                        prevCanvas: currentCanvas // Will restore canvas to null when no higher state
+                        restore : restore
                     };
-
                     return state;
                 },
 
@@ -443,26 +386,15 @@ SceneJS._backends.installBackend(
                  * in which case the default simple shader will be activated as well
                  */
                 setRendererState : function(state) {
-                    var prevCanvas = currentCanvas;
-                    currentCanvas = state.canvas;
-                    var lastState = stateStack[stateStack.length - 1];
                     stateStack.push(state);
-                    setProperties(currentCanvas.context, state.props);
-                    if (!prevCanvas) {
-                        ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_ACTIVATED, currentCanvas);
-                    }
+                    setProperties(canvas.context, state.props);
                 },
 
                 /** Restores previous WebGL state, if any.
                  */
                 restoreRendererState : function(state) {
                     stateStack.pop();
-                    if (state.prevCanvas) {
-                        setProperties(currentCanvas.context, state.restore); // Undo property settings
-                    } else {
-                        currentCanvas = null;
-                        ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_DEACTIVATED);
-                    }
+                    setProperties(canvas.context, state.restore); // Undo property settings
                 }
             };
         });

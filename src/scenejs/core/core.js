@@ -14,6 +14,11 @@ var SceneJS = {
      */
     SceneJS._utils = {
 
+        traversalMode :0x1,
+
+        TRAVERSAL_MODE_RENDER: 0x1,
+        TRAVERSAL_MODE_PICKING:   0x2,
+
         /** Adds members of o1 to o2 where not already on the latter
          *
          */
@@ -246,7 +251,7 @@ var SceneJS = {
                 args[0] = function(scope) {
                     var result = func(scope);
                     for (var key in cfg) {
-                        if (!override && !result[key]) {
+                        if (override || !result[key]) {
                             result[key] = cfg[key];
                         }
                     }
@@ -257,7 +262,7 @@ var SceneJS = {
                 /* First arg is a configuration object - extend it
                  */
                 for (var key in cfg) {
-                    if (!override && !arg[key]) {
+                    if (override || !arg[key]) {
                         arg[key] = cfg[key];
                     }
                 }

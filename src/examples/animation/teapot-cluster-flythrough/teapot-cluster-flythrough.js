@@ -14,18 +14,17 @@
  * value for the eye's location on the Z-axis, which is read by the
  * lookAt node.
  */
-var exampleScene = SceneJS.scene(
+var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
-                SceneJS.renderer({
-                    canvasId: 'theCanvas',
+                SceneJS.renderer({                
                     clearColor : { r:.0, g:.0, b:.0, a: 0 },
-                    viewport: { x:0, y:0, width:800, height:800 },
+                    viewport: { x:0, y:0, width:1600, height:900 },
                     clear : { depth : true, color : true} ,
                     depthRange : { near: .5, far: 1500 }
                 },
-                        SceneJS.perspective({ fovy : 43.0, aspect : 1.0, near : .5, far : 1500.0
+                        SceneJS.perspective({ fovy : 43.0, aspect : 2.0, near : .5, far : 1500.0
                         },
                                 SceneJS.fog({
                                     mode:"exp",

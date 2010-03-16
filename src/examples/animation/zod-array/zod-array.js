@@ -18,12 +18,11 @@
  * child viewport node. It stops the loop by not returning anything.
  */
 
-var exampleScene = SceneJS.scene(
+var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
-                    canvasId: 'theCanvas',
                     clearColor : { r:0, g:0, b:0.0, a: 1 },
                     viewport:{ x : 0, y : 0, width: 800, height: 800}  ,
                     clear : { depth : true, color : true} ,
