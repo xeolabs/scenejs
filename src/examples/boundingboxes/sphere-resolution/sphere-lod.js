@@ -38,26 +38,26 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                             ]},
                                 SceneJS.perspective({ fovy : 55.0, aspect : 1, near : 0.10, far : 2000.0
                                 },
-                                        SceneJS.lookAt(function(scope) {
+                                        SceneJS.lookAt(function(data) {
                                             return {
-                                                eye : { z: scope.get("eyez") },
+                                                eye : { z: data.get("eyez") },
                                                 look : { x : 0.0, y : .0, z : 0 },
                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
                                             };
                                         },
                                                 SceneJS.boundingBox({
-                                                    xmin: -3,
-                                                    ymin: -3,
-                                                    zmin: -3,
-                                                    xmax:  3,
-                                                    ymax:  3,
-                                                    zmax:  3,
+                                                    xmin: -2,
+                                                    ymin: -2,
+                                                    zmin: -2,
+                                                    xmax:  2,
+                                                    ymax:  2,
+                                                    zmax:  2,
 
                                                     levels: [
                                                         10,
                                                         200,
-                                                        400,
-                                                        600
+                                                        300,
+                                                        500
                                                     ]
                                                 },
                                                     /* Size > 10px - draw a pink cube
@@ -115,12 +115,12 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                 )
         );
 
-var eyez = 300;
+var eyez = 100;
 var pInterval;
 
-function doit() {
+window.doit = function() {
     if (eyez > -300) {
-        eyez -= 0.5;
+        eyez -= 0.2;
         exampleScene.render({"eyez":eyez});
     } else {
         clearInterval(pInterval);
@@ -128,6 +128,6 @@ function doit() {
     }
 }
 
-pInterval = setInterval("doit()", 10);
+pInterval = setInterval("window.doit()", 10);
 
 

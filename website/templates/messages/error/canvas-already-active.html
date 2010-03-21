@@ -1,0 +1,10 @@
+{#template MAIN}
+<div id="error">
+    <div id="error-expletive">Nested canvas activations are not allowed</div>
+    <div id="error-title">CanvasAlreadyActiveException</div>
+    <div id="error-message">{$T.message}</div>
+    <div id="error-advice">There is a renderer node in the scene graph that is attempting to override the canvasId property of a renderer node
+        higher up the hierarchy - that's not supported in SceneJS. Only the outermost renderer is allowed to specify a canvas to activate.
+    </div>
+</div>
+{#/template MAIN}

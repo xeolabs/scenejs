@@ -8,7 +8,7 @@
  * "Assets" are remotely-stored scene fragments which may be
  * dynamically imported, cross-domain, into your scene using asset nodes.
  *
- * This example imports a spiral staircase from the asset repository
+ * This example imports a spiral staircase from an asset repository
  * at SceneJS.com.
  *
  * When the scene is first rendered, the SceneJS.assets.scenejs node
@@ -17,9 +17,9 @@
  * then convert the data into a subtree of scene graph content.
  *
  * What's extra-special about this example is how the
- * SceneJS.assets.scenejs node is wrapped with a SceneJS.scope node,
+ * SceneJS.assets.scenejs node is wrapped with a SceneJS.withData node,
  * which parameterises the asset. Try tweaking some of the configurations
- * on the scope node and see what happens.
+ * on the SceneJS.withData node and see how the staircase changes.
  *
  * The node's request will always be asynchronous. This means
  * that when SceneJS renders the asset node, it's not going to wait
@@ -31,7 +31,7 @@
  * magically appear once loaded.
  *
  * SceneJS tracks these loads and tracks each one as a process that
- * is currently within on the scene. So you can tell if all assets
+ * is currently within on the scene - you can then tell if all assets
  * have loaded when the number of scene processes is zero.
  *
  * A nice way to use assets is to somehow have them pre-load
@@ -42,7 +42,10 @@
  * eviction policy.
  */
 
-var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
+var exampleScene = SceneJS.scene({
+    canvasId: "theCanvas",
+
+    proxy:"http://scenejs.org/cgi-bin/jsonp_wrapper.pl" }, // Pull our asset through this proxy
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
@@ -64,7 +67,6 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                             eye : { x: -50.0, y: 80.0, z: -100},
                                             look : { x : 0.0, y : 30.0, z : 0 },
                                             up : { x: 0.0, y: 1.0, z: 0.0 }
-
                                         },
                                                 SceneJS.lights({
                                                     lights: [
@@ -93,21 +95,19 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
                                                     /**
                                                      * Asset is configured with the URI at which its
-                                                     * definition is stored, and a proxy that will mediate
-                                                     * the cross-domain request and wrap the response in JSONP.
-                                                     *
-                                                     * This asset is in native SceneJS JavaScript, and the proxy
-                                                     * is at SceneJS.com.
+                                                     * definition is stored. The SceneJS.scene node specifies the
+                                                     * the proxy that will mediate the cross-domain request and wrap
+                                                     *  the response in JSONP.
                                                      *
                                                      * Being native SceneJS, we can provide any special configurations
-                                                     * for it by wrapping the asset node in a scope node. What we
+                                                     * for it by wrapping the asset node in a withData node. What we
                                                      * effectively then have are parameterisable remote assets,
                                                      * pretty powerful stuff.
                                                      *
                                                      * Take a look at the asset definition to see how it uses the scope
                                                      * data.
                                                      */
-                                                        SceneJS.scope({
+                                                        SceneJS.withData({
                                                             stepTexture: "redstone", // Try changing this to "marble"
                                                             stepWidth:7,
                                                             stepHeight:0.6,
@@ -117,12 +117,9 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                             numSteps:50,
                                                             stepAngle:20 },
 
-                                                                SceneJS.asset({
-
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/" +
-                                                                        "v0.7.0/staircase-example/staircase.js",
-
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/" +
+                                                                        "v0.7.0/staircase-example/staircase.js"
                                                                 })
                                                                 )
                                                         ) // lights
@@ -135,20 +132,10 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
 var pInterval;
 
-
-function handleError(e) {
-    if (e.message) {
-        alert(e.message);
-    } else {
-        alert(e);
-    }
-    throw e;
-}
-
 /* Our periodic render function. This will stop the render interval when the count of
  * scene processes is zero.
  */
-function doit() {
+window.doit = function() {
     if (exampleScene.getNumProcesses() == 0) {
 
         /* No processes running in scene, so asset is loaded and we'll stop. The previous
@@ -167,19 +154,17 @@ function doit() {
         try {
             exampleScene.render();
         } catch (e) {
-            handleError(e);
+            clearInterval(pInterval);
+            throw e;
         }
     }
 }
 
 /* This initial render will trigger the asset load, starting one scene process
  */
-try {
-    exampleScene.render();
-} catch (e) {
-    handleError(e);
-}
+exampleScene.render();
 
 /* Keep rendering until asset loaded, ie. no scene processes running
  */
-pInterval = setInterval("doit()", 10);
+pInterval = setInterval("window.doit()", 10);
+  

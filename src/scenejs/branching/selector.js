@@ -4,8 +4,8 @@
 SceneJS.selector = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     return SceneJS._utils.createNode(
-            function(scope) {
-                var params = cfg.getParams(scope); // Don't memoize because selection is probably dynamic
+            function(data) {
+                var params = cfg.getParams(data); // Don't memoize because selection is probably dynamic
                 if (!params.selection) {
                     throw 'selection node\'s mandatory selection config is missing';
                 } else {
@@ -15,7 +15,7 @@ SceneJS.selector = function() {
                         if (i < 0 || i >= max) {
                             throw 'selection node\'s selection index out of range';
                         }
-                        cfg.children[i].call(this, scope);
+                        cfg.children[i].call(this, data);
                     }
                 }
             });

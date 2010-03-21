@@ -45,7 +45,12 @@
 
 var SceneJs = SceneJS; // Name changed after V0.6.0 - hack for older assets
 
-var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
+var exampleScene = SceneJS.scene({
+    canvasId: 'theCanvas',
+
+    /* Proxy that will mediate cross-domain asset loads.
+     */
+    proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
@@ -69,19 +74,13 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
                                         },
 
-                                            /** Asset is configured with the URI at which its
-                                             * definition is stored, and a proxy that will mediate
-                                             * the cross-domain request and wrap the response in JSONP.
-                                             *
-                                             * This asset type is for native SceneJS JavaScript, and the proxy
-                                             * is at SceneJS.com.
+                                            /** Load the asset
                                              */
-                                                SceneJS.asset({
-                                                    
-                                                    uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/v0.7.0/" +
-                                                        "orange-teapot-example/orangeteapot.js",
+                                                SceneJS.import({
 
-                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl" })
+                                                    uri:"http://www.scenejs.org/app/data/assets/catalogue/assets/v0.7.0/" +
+                                                        "orange-teapot-example/orangeteapot.js"
+                                                })
 
                                                 ) // lookAt
                                         ) // perspective
@@ -105,7 +104,7 @@ function handleError(e) {
 /* Our periodic render function. This will stop the render interval when the count of
  * scene processes is zero.
  */
-function doit() {
+window.doit = function() {
     if (exampleScene.getNumProcesses() == 0) {
 
         /* No processes running in scene, so asset is loaded and we'll stop. The previous
@@ -139,4 +138,4 @@ try {
 
 /* Keep rendering until asset loaded, ie. no scene processes running
  */
-pInterval = setInterval("doit()", 10);
+pInterval = setInterval("window.doit()", 10);

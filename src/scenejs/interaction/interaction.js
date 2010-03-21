@@ -3,10 +3,10 @@ SceneJS.interaction = function() {
     var backend = SceneJS._backends.getBackend('naming');
     var name;
     return SceneJS._utils.createNode(
-            function(scope) {
-                var params = cfg.getParams(scope);
+            function(data) {
+                var params = cfg.getParams(data);
                 backend.pushName(name);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.popName();
             });
 };

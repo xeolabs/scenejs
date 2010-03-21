@@ -1,0 +1,12 @@
+{#template MAIN}
+<div id="error">
+    <div id="error-expletive">Failed to run</div>
+    <div id="error-title">NoCanvasActiveException</div>
+    <div id="error-message">{$T.message}</div>
+    <div id="error-advice">A node in your scene definition is complaining that it expects a higher <b>canvas</b> node
+        to have activated a canvas DOM element for it. In other words, the node should be in the subtree os a
+        <b>canvas</b>
+        node in order to work.
+    </div>
+</div>
+{#/template MAIN}

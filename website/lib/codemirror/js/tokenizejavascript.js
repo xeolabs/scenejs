@@ -5,7 +5,6 @@ var tokenizeJavaScript = (function() {
   // backslash) is encountered, or the end of the line is reached.
   function nextUntilUnescaped(source, end) {
     var escaped = false;
-    var next;
     while (!source.endOfLine()) {
       var next = source.next();
       if (next == end && !escaped)

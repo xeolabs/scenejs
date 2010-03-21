@@ -15,7 +15,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
                 SceneJS.renderer({
                     clearColor : { r:0.2, g:0.2, b:0.2 },
-                    viewport:{ x : 0, y : 0, width: 800, height: 600}  ,
+                    viewport:{ x : 0, y : 0, width: 900, height: 900}  ,
                     enableTexture2D: true,
                     clear : { depth : true, color : true}
                 },
@@ -41,10 +41,10 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                     linearAttenuation:      0.0
                                 }
                             ]},
-                                SceneJS.perspective({ fovy : 45.0, aspect : 1.3, near : 0.10, far : 2000.0 },
+                                SceneJS.perspective({ fovy : 45.0, aspect : 1, near : 0.10, far : 2000.0 },
 
                                         SceneJS.lookAt({
-                                            eye : { x: 0, y: 2, z: 12},
+                                            eye : { x: 0, y: 2, z: 10},
                                             look : { x : 0.0, y : -1.0, z : 0 },
                                             up : { x: 0.0, y: 1.0, z: 0.0 }
                                         },
@@ -56,34 +56,34 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                     //   emission:  { r:0.5, g:0.5, b:0.5 },
                                                     shininess: 2},
 
-                                                        SceneJS.translate({x: -3},
-                                                                SceneJS.rotate(function(scope) {
-                                                                    return { angle: scope.get("angle"), y: 1 };
+                                                        SceneJS.translate({x: -2.5},
+                                                                SceneJS.rotate(function(data) {
+                                                                    return { angle: data.get("angle"), y: 1 };
                                                                 },
                                                                         SceneJS.objects.sphere()),
 
 
-                                                                SceneJS.translate({x: 3},
+                                                                SceneJS.translate({x: 2.5},
 
                                                                         SceneJS.texture({
                                                                             uri:"earth.jpg",
                                                                             applyTo: "diffuse",
                                                                             wait: false
                                                                         },
-                                                                                SceneJS.rotate(function(scope) {
-                                                                                    return { angle: scope.get("angle"), y: 1 };
+                                                                                SceneJS.rotate(function(data) {
+                                                                                    return { angle: data.get("angle"), y: 1 };
                                                                                 },
                                                                                         SceneJS.objects.sphere()),
 
-                                                                                SceneJS.translate({x: 3},
+                                                                                SceneJS.translate({x: 2.5},
 
                                                                                         SceneJS.texture({
                                                                                             uri:"earth-specular.gif",
-                                                                                            applyTo: "shininess",
+                                                                                            applyTo: "specular",
                                                                                             wait: false
                                                                                         },
-                                                                                                SceneJS.rotate(function(scope) {
-                                                                                                    return { angle: scope.get("angle"), y: 1 };
+                                                                                                SceneJS.rotate(function(data) {
+                                                                                                    return { angle: data.get("angle"), y: 1 };
                                                                                                 },
                                                                                                         SceneJS.objects.sphere())
                                                                                                 )

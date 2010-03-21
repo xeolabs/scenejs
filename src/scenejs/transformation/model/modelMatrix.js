@@ -19,9 +19,9 @@ SceneJS.modellingMatrix = function() {
     var xform;
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (memoLevel == NO_MEMO) {
-                    var params = cfg.getParams(scope);
+                    var params = cfg.getParams(data);
                     mat = params.elements || SceneJS._math.identityMat4();
                     if (cfg.fixed) {
                         memoLevel = FIXED_CONFIG;
@@ -40,7 +40,7 @@ SceneJS.modellingMatrix = function() {
                     }
                 }
                 backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.setTransform(superXform);
             });
 };

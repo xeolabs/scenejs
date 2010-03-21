@@ -18,9 +18,9 @@ SceneJS.scalarInterpolator = function() {
     var outputValue;
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (!params) {
-                    params = cfg.getParams(scope);
+                    params = cfg.getParams(data);
 
                     // Validate
 
@@ -73,10 +73,10 @@ SceneJS.scalarInterpolator = function() {
                     }
                 }
 
-                var key = scope.get(params.input);
+                var key = data.get(params.input);
 
                 if (!key && key != 0) {
-                    throw "scalarInterpolator failed to find input on scope";
+                    throw "scalarInterpolator failed to find input on data";
                 }
 
                 var key1 = 0;
@@ -176,7 +176,7 @@ SceneJS.scalarInterpolator = function() {
 
                 update();
 
-                var childScope = SceneJS._utils.newScope(scope, cfg.fixed);
+                var childScope = SceneJS._utils.newScope(data, cfg.fixed);
                 childScope.put(params.output, outputValue);
 
                 SceneJS._utils.visitChildren(cfg, childScope);

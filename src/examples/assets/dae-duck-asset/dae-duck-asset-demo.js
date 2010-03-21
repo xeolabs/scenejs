@@ -38,7 +38,9 @@
  * eviction policy.
  */
 
-var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
+var exampleScene = SceneJS.scene({
+    canvasId: 'theCanvas',
+    proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
@@ -62,25 +64,28 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                             up : { x: 0.0, y: 1.0, z: 0.0 }
 
                                         },
-                                                SceneJS.rotate(function(scope) {
-                                                    return {  angle: scope.get('angle'), y : 1.0};
+                                                SceneJS.rotate(function(data) {
+                                                    return {  angle: data.get('angle'), y : 1.0};
                                                 },
-                                                    /** Asset is configured with the URI at which the COLLADA file is stored,
-                                                     * and a proxy that will mediate the cross-domain request.
+
+                                                    /**
+                                                     * COLLADA importer requires us to feed two bits of data down to it:
+                                                     * the URL of the COLLADA file and the name of the target node it
+                                                     * is to parse within the file:
                                                      */
-                                                        SceneJS.assets.collada({
+                                                        SceneJS.withData({
 
-                                                            //                                                            uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/" +
-                                                            //                                                                "v0.7.0/collada-duck-example/duck.dae",
+                                                            uri: "http://www.scenejs.org/app/data/assets/catalogue/assets/" +
+                                                                 "v0.7.0/seymourplane_triangulate/seymourplane_triangulate.dae",
 
-                                                            uri:"http://www.scenejs.com/app/data/assets/catalogue/assets/" +
-                                                                "v0.7.0/seymourplane_triangulate/seymourplane_triangulate.dae",
-                                                            //
-                                                            proxy:"http://scenejs.com/cgi-bin/jsonp_proxy.pl"
-                                                            ,
-                                                            //
                                                             node: "plane"
-                                                        })
+                                                        },
+                                                                /* The COLLADA importation
+                                                                 */
+                                                                SceneJS.import({
+                                                                    uri: "http://www.scenejs.org/app/data/assets/" +
+                                                                         "catalogue/assets/v0.7.0/collada-import/colladaImport.js"
+                                                                }))
                                                         )
                                                 ) // lookAt
                                         ) // perspective

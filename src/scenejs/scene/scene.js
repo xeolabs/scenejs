@@ -1,13 +1,14 @@
 /**
  * Root node of a scene graph. Like all nodes, its arguments are an optional config object followed by
- * zero or more child nodes. The members of the config object are set on the root data scope when rendered.
+ * zero or more child nodes. The members of the config object are set on the root data data when rendered.
  *
  */
 
 (function() {
 
     var backend = SceneJS._backends.getBackend('scene');
-    var processesBackend = SceneJS._backends.getBackend('processes');   // For process queries through scene object
+    var assetsBackend = SceneJS._backends.getBackend('assets');
+    var processesBackend = SceneJS._backends.getBackend('processes');
 
     /** Creates a new scene
      */
@@ -25,15 +26,23 @@
                     ("Dynamic configuration of SceneJS.scene nodes is not supported");
         }
         var params = cfg.getParams();
-        if (!params.canvasId) {
-            throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory SceneJS.scene node parameter missing: canvasId");
-        }
 
         var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
 
         /* Create, register and return the scene graph
          */
         var _scene = {
+
+            /** Returns the canvas element that this scene is bound to. When no canvasId was configured, it will be one
+             * that SceneJS selected by default, hence the need to use this method to get the canvas through the scene
+             * node rather than assume its ID.
+             */
+            getCanvas : function() {
+                if (!sceneId) {
+                    return null;
+                }
+                return backend.getSceneCanvas(sceneId);
+            },
 
             /**
              * Renders the scene, passing in the given parameters to override any node parameters
@@ -42,17 +51,17 @@
             render : function(paramOverrides) {
                 if (sceneId) {
                     backend.activateScene(sceneId);
-                    var scope = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
-                    var params = cfg.getParams();
-                    for (var key in params) {    // Push scene params into scope
-                        scope.put(key, params[key]);
-                    }
+                    var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
                     if (paramOverrides) {        // Override with traversal params
                         for (var key in paramOverrides) {
-                            scope.put(key, paramOverrides[key]);
+                            data.put(key, paramOverrides[key]);
                         }
                     }
-                    SceneJS._utils.visitChildren(cfg, scope);
+                    if (params.proxy) {
+                        assetsBackend.setProxy(params.proxy);
+                    }
+                    SceneJS._utils.visitChildren(cfg, data);
+                    assetsBackend.setProxy(null);
                     backend.deactivateScene();
                 }
             },
@@ -62,24 +71,23 @@
                     try {
                         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
                         backend.activateScene(sceneId);
-                        var scope = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed scope for cacheing??
-                        var params = cfg.getParams();
-                        for (var key in params) {    // Push scene params into scope
-                            scope.put(key, params[key]);
-                        }
+                        var data = SceneJS._utils.newScope(null, false);
                         if (paramOverrides) {        // Override with traversal params
                             for (var key in paramOverrides) {
-                                scope.put(key, paramOverrides[key]);
+                                data.put(key, paramOverrides[key]);
                             }
                         }
-                        SceneJS._utils.visitChildren(cfg, scope);
+                        if (params.proxy) {
+                            assetsBackend.setProxy(params.proxy);
+                        }
+                        SceneJS._utils.visitChildren(cfg, data);
+                        assetsBackend.setProxy(null);
                         backend.deactivateScene();
                     } finally {
                         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
                     }
                 }
             },
-
 
             /**
              * Returns count of active processes. A non-zero count indicates that the scene should be rendered

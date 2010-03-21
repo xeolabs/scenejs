@@ -48,10 +48,10 @@ with (SceneJS) {
 
                                         /* Viewing transform
                                          */
-                                            lookAt(function(scope) {
+                                            lookAt(function(data) {
                                                 return{
-                                                    eye : { x: scope.get("z"), y: 0, z: scope.get("z")},
-                                                    look : { x : 0, y : 0.0, z : -scope.get("z") * 2 },
+                                                    eye : { x: data.get("z"), y: 0, z: data.get("z")},
+                                                    look : { x : 0, y : 0.0, z : -data.get("z") * 2 },
                                                     up : { x: 0.0, y: 1.0, z: 0.0 }
                                                 };
                                             },
@@ -102,8 +102,8 @@ with (SceneJS) {
                                                                             }
                                                                         };
                                                                     })(),
-                                                                    translate(function(scope) {
-                                                                        return scope.get("param");
+                                                                    translate(function(data) {
+                                                                        return data.get("param");
                                                                     },
                                                                             scale({ x:10, y:2, z:10 },
 

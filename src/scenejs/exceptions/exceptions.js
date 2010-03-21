@@ -88,12 +88,12 @@ SceneJS.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      
     this.message = msg + " (uri=\"" + (uri || "null") + "\", proxy=\"" + (proxy || "null") + "\")";
 };
 
-SceneJS.exceptions.AssetTypeUnsupportedException = function(msg, cause) {
+SceneJS.exceptions.OutOfVRAMException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.OutOfMemoryException = function(msg, cause) {
+SceneJS.exceptions.PageLoggingElementNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
@@ -112,5 +112,12 @@ SceneJS.exceptions.ColladaRootRequiredException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
+
+SceneJS.exceptions.ProxyNotSpecifiedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+
 
 

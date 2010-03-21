@@ -17,82 +17,125 @@
  * loops, where in each one it sets a scope containing different extents for its
  * child viewport node. It stops the loop by not returning anything.
  */
-with (SceneJS) {
-    var exampleScene = scene({}, // node always has a config object
 
-            loggingToPage({ elementId: "logging" },
+var exampleScene = SceneJS.scene({ canvasId: 'theCanvas'}, // node always has a config object
 
-                    renderer({
-                        canvasId: 'theCanvas',
-                        clearColor : { r:0, g:0, b:0.0, a: 1 },
-                        viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                        clear : { depth : true, color : true}
-                    },
-                            lights({
-                                lights: [
-                                    {
-                                        pos: { x: -30.0, y: -9.0, z: 100.0 }
-                                    }
-                                ]},
-                                    perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
-                                    },
-                                            lookAt({
-                                                eye : { x: 0.0, y: 30.0, z: -20.0},
-                                                look : { x : 0.0, y : 15.0, z : 0 },
-                                                up : { x: 0.0, y: 1.0, z: 0.0 }
-                                            },
-                                                    material({
-                                                        ambient:  { r:0.4, g:0.2, b:0.2 },
-                                                        diffuse:  { r:0.9, g:0.5, b:0.4 }
-                                                    },
+        SceneJS.loggingToPage({ elementId: "logging" },
 
-                                                        /**
-                                                         * Generate a sequence of Y-axis rotations
-                                                         */
-                                                            generator((function() {
-                                                                var angle = 0;
-                                                                var height = -10;
-                                                                return function() {
-                                                                    angle += 15.0;
-                                                                    height += 1.0;
-                                                                    if (angle <= 560.0) {
-                                                                        return { angle: angle, height: height };
-                                                                    }
-                                                                };
-                                                            })(),
-                                                                    rotate(function(scope) {
-                                                                        return { angle : scope.get("angle"), y: 1.0 };
-                                                                    },
-                                                                            translate(function(scope) {
-                                                                                return { x: 5.0, y : scope.get("height") };
-                                                                            },
-                                                                                /** Slab for step
-                                                                                 */
-                                                                                    scale({x: 3.0, y: 0.2, z: 1.0},
-                                                                                            objects.cube()
-                                                                                            )
-                                                                                    ) // rotate
-                                                                            ) // translate
-                                                                    ) // generator
-                                                            ) // material
-                                                    ) // lookAt
+                SceneJS.renderer({
 
+                    clearColor : { r:0, g:0, b:0.0, a: 1 },
+                    viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
+                    clear : { depth : true, color : true}
+                },
+                        SceneJS.lights({
+                            lights: [
+                                {
+                                    pos: { x: -30.0, y: -9.0, z: 100.0 }
+                                }
+                            ]},
+                                SceneJS.perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
+                                },
+                                        SceneJS.lookAt({
+                                            eye : { x: 0.0, y: 30.0, z: -20.0},
+                                            look : { x : 0.0, y : 15.0, z : 0 },
+                                            up : { x: 0.0, y: 1.0, z: 0.0 }
+                                        },
+                                                SceneJS.material({
+                                                    ambient:  { r:0.4, g:0.4, b:0.3 },
+                                                    diffuse:  { r:0.9, g:0.5, b:0.4 }
+                                                },
+                                                        SceneJS.rotate(function(data) {
+                                                            return {
+                                                                angle: data.get('pitch'), x : 1.0
+                                                            };
+                                                        },
+                                                                SceneJS.rotate(function(data) {
+                                                                    return {
+                                                                        angle: data.get('yaw'), y : 1.0
+                                                                    };
+                                                                },
+                                                                    /**
+                                                                     * Generate a sequence of Y-axis rotations
+                                                                     */
+                                                                        SceneJS.generator((function() {
+                                                                            var angle = 0;
+                                                                            var height = -10;
+                                                                            return function() {
+                                                                                angle += 15.0;
+                                                                                height += 1.0;
+                                                                                if (angle <= 560.0) {
+                                                                                    return { angle: angle, height: height };
 
-                                            ) // frustum
-                                    ) // lights
-                            ) // renderer
-                    ) // logging
-            ); // scene
+                                                                                } else {  // Reset the generator
+                                                                                    angle = 0;
+                                                                                    height = -10;
+                                                                                }
+                                                                            };
+                                                                        })(),
+                                                                                SceneJS.rotate(function(data) {
+                                                                                    return { angle : data.get("angle"), y: 1.0 };
+                                                                                },
+                                                                                        SceneJS.translate(function(data) {
+                                                                                            return { x: 5.0, y : data.get("height") };
+                                                                                        },
+                                                                                            /** Slab for step
+                                                                                             */
+                                                                                                SceneJS.scale({x: 3.0, y: 0.2, z: 1.0},
+                                                                                                        SceneJS.objects.cube()
+                                                                                                        )
+                                                                                                ) // rotate
+                                                                                        ) // translate
+                                                                                ) // generator
+                                                                        ) // rotate yaw
+                                                                ) // rotate pitch
+                                                        ) // material
+                                                ) // lookAt
+                                        ) // frustum
+                                ) // lights
+                        ) // renderer
+                ) // logging
+        ); // scene
 
-    try {
-        exampleScene.render();
-    } catch (e) {
-        if (e.message) {
-            alert(e.message);
-        } else {
-            alert(e);
-        }
-        throw e;
+var yaw = 0;
+var pitch = 0;
+var lastX;
+var lastY;
+var dragging = false;
+
+/* Throw the switch, Igor!
+ * We render the scene, injecting the initial angles for the rotate nodes.
+ */
+exampleScene.render({yaw: yaw, pitch: pitch});
+
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+/* On a mouse drag, we'll re-render the scene, passing in
+ * incremented angles in each time.
+ */
+function mouseMove(event) {
+    if (dragging) {
+        yaw += (event.clientX - lastX) * 0.5;
+        pitch += (event.clientY - lastY) * -0.5;
+        exampleScene.render({yaw: yaw, pitch: pitch});
+        lastX = event.clientX;
+        lastY = event.clientY;
     }
 }
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+
+
 

@@ -6,9 +6,9 @@ SceneJS.frustum = function() {
     var backend = SceneJS._backends.getBackend('projection');
     var transform;
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (!transform || cfg.fixed) {    // Memoize matrix if node config is constant
-                    var params = cfg.getParams(scope);
+                    var params = cfg.getParams(data);
                     var volume = {
                         xmin: params.left || -1.0,
                         xmax: params.right || 1.0,
@@ -31,7 +31,7 @@ SceneJS.frustum = function() {
                 }
                 var prevTransform = backend.getTransform();
                 backend.setTransform(transform);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.setTransform(prevTransform);
             });
 };

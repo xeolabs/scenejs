@@ -47,7 +47,7 @@ SceneJS.stationary = function() {
     };
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 var superXform = backend.getTransform();
                 var lookAt = superXform.lookAt;
                 if (lookAt) {
@@ -64,10 +64,10 @@ SceneJS.stationary = function() {
                         };
                     }
                     backend.setTransform(xform);
-                    SceneJS._utils.visitChildren(cfg, scope);
+                    SceneJS._utils.visitChildren(cfg, data);
                     backend.setTransform(superXform);
                 } else {
-                    SceneJS._utils.visitChildren(cfg, scope);
+                    SceneJS._utils.visitChildren(cfg, data);
                 }
             });
 };

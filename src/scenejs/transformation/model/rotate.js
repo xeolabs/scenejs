@@ -19,9 +19,9 @@ SceneJS.rotate = function() {
     var xform;
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (memoLevel == NO_MEMO) {
-                    var params = cfg.getParams(scope);
+                    var params = cfg.getParams(data);
                     params.angle = params.angle || 0;
                     params.x = params.x || 0;
                     params.y = params.y || 0;
@@ -47,7 +47,7 @@ SceneJS.rotate = function() {
                     }
                 }
                 backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.setTransform(superXform);
             });
 };

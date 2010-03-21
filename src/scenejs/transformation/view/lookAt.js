@@ -15,10 +15,10 @@ SceneJS.lookAt = function() {
     var xform;
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
 
                 if (!mat || !cfg.fixed) { // Memoize matrix if node config is constant
-                    var params = cfg.getParams(scope);
+                    var params = cfg.getParams(data);
 
                     params.eye = params.eye ? cloneVec(params.eye) : { x: 0.0, y: 0.0, z: 0.0 };
                     params.look = params.look ? cloneVec(params.look) : { x: 0.0, y: 0.0, z: 0.0 };
@@ -47,7 +47,7 @@ SceneJS.lookAt = function() {
                     };
                 }
                 backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.setTransform(superXform);
             });
 };

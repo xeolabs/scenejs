@@ -1,0 +1,281 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>SceneJS IDE</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="lib/site/utils.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery-1.3.2.min.js"></script>
+    <style type="text/css">
+        #exhibit-title {
+            width: 400px;
+            padding: 5px;
+            outline: none;
+            height: 36px;
+        }
+
+        #file-url {
+            width: 400px;
+            padding: 5px;
+            outline: none;
+            height: 36px;
+        }
+
+        .focusField {
+            border: solid 2px #73A6FF;
+            background: #EFF5FF;
+            color: #000;
+        }
+
+        .idleField {
+            background: #EEE;
+            color: #6F6F6F;
+            border: solid 2px #DFDFDF;
+        }
+
+        .formLayout {
+            background-color: #ffffff;
+            border: solid 1px #a1a1a1;
+            padding: 5px;
+            width: 550px;
+        }
+
+        .formLayout label, .formLayout input, .formLayout .button {
+            display: block;
+            width: 120px;
+            float: left;
+            margin-bottom: 10px;
+        }
+
+        .formLayout label {
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        br {
+            clear: left;
+        }
+    </style>
+</head>
+<body style="padding: 20px;">
+<div id="container">
+    <div id="header">
+        <h1><a href="index.html">SceneJS</a> &gt; Gallery</h1>
+
+        <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
+                src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
+                alt="Share/Bookmark"/></a>
+        <script type="text/javascript">
+            var a2a_linkname = "SceneJS Gallery";
+            var a2a_linkurl = window.location;
+            var a2a_onclick = 1;</script>
+        <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+    </div>
+
+
+    <div id="content">
+
+        <div id="home-table">
+            <div id="home-example">
+                <h2>What can SceneJS Do?</h2>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3>Define 3D Scenes Elegantly</h3>
+
+                <p><span>SceneJS gives you a big chunk of WebGL functionality up front, with minimal effort. It allows
+                    you to create interactive 3D scenes that are compact and expressive, without hiding
+                    JavaScript from you. It's also well-suited for learning 3D graphics - you can define a complete scene
+                    in one short JavaScript file, while covering a wide range of 3D concepts. </span></p>
+
+                <p><span>Try this one for starters:</span></span></p>
+
+                <p><span><a
+                        href="exhibit.html?title=Hello Teapot!&url=http://gist.github.com/raw/336018/5efa07cd9b46184d8bfd119560cf1113ec32e0ef/scenejs-teapot-demo.js">Example:
+                    Hello Teapot!</a></span></p>
+
+                <p><span>Shows off the bare basics - scene definition, viewing transforms, lighting, modelling transforms,
+                    and how data is injected into a scene graph.</span></p>
+
+
+                <!-- *********************************************************************************************** -->
+
+                <h3>Procedural Scene Generation</h3>
+
+                <p><span>Procedural generation involves generating scene content algorithmically rather than manually.
+                    SceneJS provides the ability to wrap a subgraph in a function that will loop over it, effectively
+                    instancing it multiple times within each frame, each time in a different state.</span></p>
+
+                <p><span><a
+                        href="exhibit.html?title=Generating a Spiral Staircase&url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">Example:
+                    Generating a Spiral Staircase</a></span></p>
+
+                <p><span>Generates a staircase by rotating and translating a flattened cube in a loop, where the generator
+                    function varies the rotation angle and translation offset for each iteration.</span></p>
+
+
+                <!-- *********************************************************************************************** -->
+
+                <h3>Interpolated Animation</h3>
+
+                <p><span>Almost anything in SceneJS can be interpolated within sequences of
+                    key values (usually as a function of time), including transformations, colours, light positions, fog,
+                    even other interpolations. While procedural generation is used for spatial generation, interpolation
+                is often used for temporal generation, ie. changing the state of objects over time. The two can be
+                combined for powerful effect, however.</span>
+                </p>
+
+                <p><span><a
+                        href="exhibit.html?title=Interpolated Animation of Rotations&url=http://gist.github.com/raw/336868/9d80342d35e7a6be6225e9a0a617accd8d50fbce/scenejs-interpolation-example1.js">Example:
+                    Interpolated Animation of Rotations</a>
+                                    <br/>
+                                    </span></p>
+
+                <p><span><a
+                        href="exhibit.html?title=Generating a Spiral Staircase&url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">Example:
+                    Generating a Spiral Staircase</a></span></p>
+
+                <p><span>Combines interpolation with procedural generation.</span></p>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3>Generalised Level-of-Detail</h3>
+
+                <p><span>Level-of-detail (LOD) selection involves decreasing the complexity of a 3D object representation
+                    as it moves away from the viewer. This enhances rendering efficiency by decreasing the rendering
+                    workload, while the reduced visual quality of the model is often unnoticed because of the small
+                    effect on object appearance when distant. SceneJS provides a completely generalised LOD mechanism;
+                    for a 3D object, a set of subgraphs, each representing the object at a different level of detail,
+                    can be wrapped in an efficient bounding volume so that the approprate subgraph is rendered for the
+                    current projected canvas size of the bounding volume.
+</span></p>      <br/>
+                <a href="exhibit.html?title=Level-of-Detail Example 1&url=http://gist.github.com/raw/338479/cd32f557f5f5a306ed9f1de0b836a38696e93f45/scenejs-lod-example1.js">Level-of-Detail
+                    Example 1</a>
+
+                <p><span>A simple example in which a sphere switches between different coloured versions of itself as a function of its projected canvas size: :</span>
+                </p>
+                <br/>
+
+                <a href="exhibit.html?title=Level-of-Detail Example 2&url=http://gist.github.com/raw/338469/e9961dd3c744e78288f641b067a3a023faf2dfe5/scenejs-teapot-army-example.js">Level-of-Detail
+                    Example 2</a>
+
+                <p><span>A more advanced example of procedurally-generated array of objects represented as cubes, spheres and teapots depending on their projected canvas size:</span>
+                </p>
+
+                <h3>Fogging</h3>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <h3>Multiple light sources</h3>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <h3>Procedural scene generation</h3>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <h3>Remotely loaded assets</h3>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3>Extensible</h3>
+
+                <p><span>Who knows what people will want to do with SceneJS?</span></p>
+
+            </div>
+        </div>
+
+        <div id="home-menu">
+            <h2>Run your scene</h2>
+
+            <p><span>Specify the location of a valid SceneJS scene definition file to create a live and tweakable instance of it that you can bookmark and share</span>
+            </p>
+
+            <div class="formLayout">
+                <label>Title</label>
+                <input name="url" id="exhibit-title" value="Yet Another Awesome SceneJS Example" type="text"/>
+                <br/>
+                <label>File URL:</label>
+                <input name="url" id="file-url"
+                       value="http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js"
+                       type="text"/>
+                <br/>
+                <label></label>
+                <input name="url" id="file-durl" value="Exhibit!" type="button"/>
+                <!--<div class="button">-->
+                <!--<a id="run-button" href="javascript:bla()"><img src="images/run-it.jpg" align="middle" alt=""/></a>-->
+                <!--</div>-->
+                <br/>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://www.xeolabs.com">Xeolabs</a></p>
+</div>
+
+<script type="text/javascript">
+    function bla() {
+    }
+    $(document).ready(function() {
+        /* Title
+         */
+
+        var titleField = $("#exhibit-title");
+        var defaultTitle = titleField.val();
+        titleField.addClass("idleField");
+        titleField.focus(function() {
+            $(this).removeClass("idleField").addClass("focusField");
+            if (this.value == this.defaultValue) {
+                this.value = '';
+            }
+            if (this.value != this.defaultValue) {
+                this.select();
+            }
+        });
+        titleField.blur(function() {
+            $(this).removeClass("focusField").addClass("idleField");
+            if ($.trim(this.value) == "") {
+                titleField.val(defaultTitle);
+            } else {
+
+            }
+        });
+
+        /* Scene definition file location
+         */
+
+        var fileUrlField = $("#file-url");
+        var defaultFileUrl = fileUrlField.val();
+        fileUrlField.addClass("idleField");
+        fileUrlField.focus(function() {
+            $(this).removeClass("idleField").addClass("focusField");
+
+            if (this.value == this.defaultValue) {
+                this.value = '';
+            }
+            if (this.value != this.defaultValue) {
+                this.select();
+            }
+        });
+        fileUrlField.blur(function() {
+            $(this).removeClass("focusField").addClass("idleField");
+            if ($.trim(this.value) == "") {
+                fileUrlField.val(defaultFileUrl);
+            } else {
+
+            }
+        });
+
+        $('#run-button').click(function() {
+            var fileUrl = fileUrlField.val().trim();
+            //            if (fileUrl == defaultFileUrl) {
+            //
+            //            }  else {
+            var redirectUrl = "open.html?url=" + fileUrl;
+
+            //window.location = "scenejs.org";
+            $(location).attr("href", redirectUrl);
+            //}
+        });
+    });
+</script>
+
+</body>
+</html>

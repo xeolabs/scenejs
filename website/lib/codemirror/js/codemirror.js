@@ -206,6 +206,7 @@ var CodeMirror = (function(){
     prevLine: function(line) {return this.editor.prevLine(line);},
     lineContent: function(line) {return this.editor.lineContent(line);},
     setLineContent: function(line, content) {this.editor.setLineContent(line, content);},
+    removeLine: function(line){this.editor.removeLine(line);},
     insertIntoLine: function(line, position, content) {this.editor.insertIntoLine(line, position, content);},
     selectLines: function(startLine, startOffset, endLine, endOffset) {
       this.win.focus();
@@ -241,6 +242,7 @@ var CodeMirror = (function(){
       var barWidth = null;
 
       function sizeBar() {
+        if (frame.offsetWidth == 0) return;
         for (var root = frame; root.parentNode; root = root.parentNode);
         if (!nums.parentNode || root != document || !win.Editor) {
           // Clear event handlers (their nodes might already be collected, so try/catch)
@@ -260,7 +262,7 @@ var CodeMirror = (function(){
       // Cleanup function, registered by nonWrapping and wrapping.
       var clear = function(){};
       sizeBar();
-      sizeInterval = setInterval(sizeBar, 500);
+      var sizeInterval = setInterval(sizeBar, 500);
 
       function nonWrapping() {
         var nextNum = 1;
@@ -275,6 +277,7 @@ var CodeMirror = (function(){
         var onScroll = win.addEventHandler(win, "scroll", update, true),
             onResize = win.addEventHandler(win, "resize", update, true);
         clear = function(){onScroll(); onResize();};
+        update();
       }
       function wrapping() {
         var node, lineNum, next, pos;
@@ -319,7 +322,8 @@ var CodeMirror = (function(){
         var pending = null;
         function update() {
           if (pending) clearTimeout(pending);
-          start();
+          if (self.editor.allClean()) start();
+          else pending = setTimeout(update, 200);
         }
         self.updateNumbers = update;
         var onScroll = win.addEventHandler(win, "scroll", doScroll, true),

@@ -1,5 +1,5 @@
 /**
- * The SceneJS.generator node loops over its children, each time creating a child scope for them from the result of its 
+ * The SceneJS.generator node loops over its children, each time creating a child data for them from the result of its
  * configuration function, repeating this process until the config function returns nothing.
  *
  * This node type must be configured dynamically therefore, in the SceneJS style, with a configuration function.
@@ -16,19 +16,19 @@
 SceneJS.generator = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (cfg.fixed) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException
                             ('SceneJS.generator node must be configured with a function');
                 }
-                var params = cfg.getParams(scope);
+                var params = cfg.getParams(data);
                 while (params) {
-                    var childScope = SceneJS._utils.newScope(scope);
+                    var childScope = SceneJS._utils.newScope(data);
                     for (var key in params) {
                         childScope.put(key, params[key]);
                     }
                     SceneJS._utils.visitChildren(cfg, childScope);
-                    params = cfg.getParams(scope);
+                    params = cfg.getParams(data);
                 }
             });
 };

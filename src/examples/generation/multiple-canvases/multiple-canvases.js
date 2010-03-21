@@ -37,9 +37,9 @@ with (SceneJS) {
                             }
                         };
                     })(),
-                            renderer(function(scope) {
+                            renderer(function(data) {
                                 return {
-                                    canvasId : scope.get("canvasId"),
+                                    canvasId : data.get("canvasId"),
                                     clearColor : { r:0, g:0, b:0.0, a: 1 },
                                     viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
                                     clear : { depth : true, color : true}
@@ -54,11 +54,11 @@ with (SceneJS) {
                                         ]},
                                             perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
                                             },
-                                                    lookAt(function(scope) {
+                                                    lookAt(function(data) {
                                                         return {
-                                                            eye : scope.get("eye"),
-                                                            look : scope.get("look"),
-                                                            up : scope.get("up")
+                                                            eye : data.get("eye"),
+                                                            look : data.get("look"),
+                                                            up : data.get("up")
                                                         };
                                                     },
                                                             material({

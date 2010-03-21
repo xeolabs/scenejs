@@ -285,7 +285,7 @@ var JSParser = Editor.Parser = (function() {
         if (type == ",") cont(what, proceed);
         else if (type == end) cont();
         else cont(expect(end));
-      };
+      }
       return function commaSeparated(type) {
         if (type == end) cont();
         else pass(what, proceed);

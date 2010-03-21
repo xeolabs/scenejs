@@ -14,8 +14,8 @@ SceneJS.geometry = function() {
     var geometryBackend = SceneJS._backends.getBackend('geometry');
 
     return SceneJS._utils.createNode(
-            function(scope) {
-                var params = cfg.getParams(scope);
+            function(data) {
+                var params = cfg.getParams(data);
 
                 if (!params.type) { // Identifies VBO's on canvas
                     throw new SceneJS.exceptions.NodeConfigExpectedException
@@ -42,7 +42,7 @@ SceneJS.geometry = function() {
                 }
 
                 geometryBackend.drawGeometry(geoId);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
             });
 };
 

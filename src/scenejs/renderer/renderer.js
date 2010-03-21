@@ -9,13 +9,13 @@ SceneJS.renderer = function() {
     var env;
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (!env || !cfg.fixed) {
-                    var params = cfg.getParams(scope);
+                    var params = cfg.getParams(data);
                     env = backend.createRendererState(params);
                 }
                 backend.setRendererState(env);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.restoreRendererState(env);
             });
 };

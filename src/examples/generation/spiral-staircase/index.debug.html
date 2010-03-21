@@ -20,6 +20,8 @@
     </tr>
 </table>
 
+
+
 <!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
@@ -50,6 +52,10 @@
 
 <script type="application/x-javascript" src="../../../scenejs/processes/processesBackend.js"></script>
 
+<!-- Assets -->
+
+<script type="application/x-javascript" src="../../../scenejs/asset/importBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/import.js"></script>
 
 <!-- Scene -->
 
@@ -65,9 +71,7 @@
 <!-- Shading -->
 
 <script type="application/x-javascript" src="../../../scenejs/shading/shaderBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/programs/shader.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/basicShading.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/shading/phongShading.js"></script>
+
 
 <!-- Renderer -->
 <!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
@@ -81,6 +85,7 @@
 <script type="application/x-javascript" src="../../../scenejs/geometry/geometry.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/objects/teapot.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/objects/cube.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/geometry/objects/sphere.js"></script>
 
 <!-- Modelling transforms -->
 
@@ -118,7 +123,7 @@
 
 <!-- Scope -->
 
-<script type="application/x-javascript" src="../../../scenejs/scope/scope.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/withData/withData.js"></script>
 
 <!-- Generation -->
 
@@ -129,14 +134,12 @@
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
 
-<!-- Assets -->
 
-<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/js/jsBackendExtension.js"></script>
-
-<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
+
+<script type="application/x-javascript" src="../../../scenejs/fog/fogBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
 
 <script type="application/x-javascript" src="spiral-staircase.js"></script>
 </body>

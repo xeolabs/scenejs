@@ -64,8 +64,8 @@ try {
                                                                     uri:"./general-zod.jpg",
                                                                     wait: false
                                                                 },
-                                                                        rotate(function(scope) {
-                                                                            return { angle: scope.get("angle"), x : 1.0, y : 1.0};
+                                                                        rotate(function(data) {
+                                                                            return { angle: data.get("angle"), x : 1.0, y : 1.0};
                                                                         },
                                                                                 
                                                                                 SceneJS.objects.cube()

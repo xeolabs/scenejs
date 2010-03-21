@@ -3,14 +3,14 @@
 SceneJS.node = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 var params = cfg.getParams();
-                var childScope = SceneJS._utils.newScope(scope, false);
+                var childScope = SceneJS._utils.newScope(data, false);
                 if (params) {
                     for (var key in params) {
                         childScope.put(key, params[key]);
                     }
                 }
-                SceneJS._utils.visitChildren(cfg, childScope || scope);
+                SceneJS._utils.visitChildren(cfg, childScope || data);
             });
 };

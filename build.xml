@@ -7,12 +7,14 @@
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="6"/>
-    <property name="BUILD_ID" value="2"/>
+    <property name="BUILD_MINOR" value="7"/>
+    <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
 
     <property name="SRC_DIR" location="${basedir}/src"/>
+
+    <property name="EXAMPLES_DIR" location="${basedir}/website"/>
 
     <property name="SCENEJS_JS_NAME" value="scenejs.js"/>
 
@@ -63,7 +65,6 @@
               tofile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_MIN_JS_NAME}"/>
     </target>
 
-
     <!-- Assemble javascript lib -->
 
     <target name="assemble-lib" depends="create-dist-directories" description="Create uncompressed SceneJS lib">
@@ -73,36 +74,61 @@
         <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}">
             <fileset dir="${basedir}" includes="license.txt"/>
 
-
             <!-- Core -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
 
             <!-- Exceptions -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
 
+            <!-- Event routing -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsBackend.js"/>
+
+            <!-- Time -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/time/timeBackend.js"/>
+
+            <!-- Logging -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
+
+            <!-- Process management -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/processes/processesBackend.js"/>
+
+            <!-- Assets -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/asset/assetBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/asset/asset.js"/>
+
             <!-- Scene -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
+
+            <!-- VRAM cache management -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryBackend.js"/>
+
+            <!-- Shader backend -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/shading/shaderBackend.js"/>
 
             <!-- Renderer -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
-
-            <!-- Shading -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/backendBase.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/shader.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/simple/simpleBackend.js"/>
 
             <!-- Geometry -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
@@ -110,32 +136,33 @@
 
             <!-- Modelling transforms -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/modelTransformBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/rotate.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/translate.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/scale.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/modelMatrix.js"/>
 
             <!-- Projection transforms -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/projectionBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/perspective.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/ortho.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/frustum.js"/>
 
             <!-- Viewing transforms -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewTransformBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/lookAt.js"/>
 
             <!-- Lighting -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightsBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
 
             <!-- Material -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/material.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/appearance/backend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/material/materialBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
 
             <!-- Interpolation -->
 
@@ -143,25 +170,32 @@
 
             <!-- Scope -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/scope/scope.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/withData/withData.js"/>
 
             <!-- Generation -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
 
-            <!-- Assets -->
+            <!-- Bounding boxes -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/asset/asset.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/asset/backendBase.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/asset/js/jsBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
 
             <!-- Textures -->
 
+            <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/texture/backend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/texturing/textureBackend.js"/>
+
+            <!-- Fog -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
 
         </concat>
+
+        <copy file="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}"
+              tofile="${EXAMPLES_DIR}/lib/scenejs/${SCENEJS_JS_NAME}"/>
+
         <echo message="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME} built."/>
     </target>
 
@@ -170,6 +204,7 @@
 
     <target name="create-dist-directories" description="Create dist directories">
 
+
         <delete includeemptydirs="true">
             <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
         </delete>
@@ -177,6 +212,10 @@
         <mkdir dir="${EXTRACTED_DIST_DIR}"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
+
+
+        <!--<copy file="${SRC_DIR}/examples/basic/teapot/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/basic/teapot/index.html"/>-->
 
         <!-- Examples -->
 
@@ -187,8 +226,6 @@
         <!-- Teapot -->
 
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/basic/teapot"/>
-        <copy file="${SRC_DIR}/examples/basic/teapot/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/basic/teapot/index.html"/>
         <copy file="src/examples/basic/teapot/teapot.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/basic/teapot/teapot.js"/>
 
@@ -196,83 +233,94 @@
 
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation"/>
 
-        <!-- Teapots flythrough -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough"/>
-        <copy file="${SRC_DIR}/examples/animation/teapot-cluster-flythrough/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/index.html"/>
-        <copy file="src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"/>
-
-        <!-- Generation -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation"/>
-
-        <!-- Multiple teapots -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots"/>
-        <copy file="${SRC_DIR}/examples/generation/multiple-teapots/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/index.html"/>
-        <copy file="src/examples/generation/multiple-teapots/multiple-teapots.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/multiple-teapots.js"/>
-
-        <!-- Multiple viewports -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports"/>
-        <copy file="${SRC_DIR}/examples/generation/multiple-viewports/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/index.html"/>
-        <copy file="src/examples/generation/multiple-viewports/multiple-viewports.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/multiple-viewports.js"/>
-
-        <!-- Spiral staircase -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase"/>
-        <copy file="${SRC_DIR}/examples/generation/spiral-staircase/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/index.html"/>
-        <copy file="src/examples/generation/spiral-staircase/spiral-staircase.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/spiral-staircase.js"/>
-
-        <copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
-        <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
-
-        <!-- Multiple canvases -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases"/>
-        <copy file="${SRC_DIR}/examples/generation/multiple-canvases/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/index.html"/>
-        <copy file="src/examples/generation/multiple-canvases/multiple-canvases.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/multiple-canvases.js"/>
-
-        <!-- Scalar inpterpolator -->
+        <!-- Interpolated teapot -->
 
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation"/>
-        <copy file="${SRC_DIR}/examples/animation/interpolated-rotation/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/index.html"/>
         <copy file="src/examples/animation/interpolated-rotation/interpolated-rotation.js"
               tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/interpolated-rotation.js"/>
 
+        <!-- Teapot cloud -->
+
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cloud"/>
+        <copy file="src/examples/animation/teapot-cloud/teapot-cloud.js"
+              tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cloud/teapot-cloud.js"/>
+
+
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough"/>-->
+        <!--<copy file="${SRC_DIR}/examples/animation/teapot-cluster-flythrough/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/index.html"/>-->
+        <!--<copy file="src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"/>-->
+
+        <!-- Generation -->
+
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation"/>-->
+
+        <!-- Multiple teapots -->
+
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots"/>-->
+        <!--<copy file="${SRC_DIR}/examples/generation/multiple-teapots/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/index.html"/>-->
+        <!--<copy file="src/examples/generation/multiple-teapots/multiple-teapots.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/multiple-teapots.js"/>-->
+
+        <!-- Multiple viewports -->
+
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports"/>-->
+        <!--<copy file="${SRC_DIR}/examples/generation/multiple-viewports/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/index.html"/>-->
+        <!--<copy file="src/examples/generation/multiple-viewports/multiple-viewports.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/multiple-viewports.js"/>-->
+
+        <!-- Spiral staircase -->
+
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase"/>-->
+        <!--<copy file="${SRC_DIR}/examples/generation/spiral-staircase/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/index.html"/>-->
+        <!--<copy file="src/examples/generation/spiral-staircase/spiral-staircase.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/spiral-staircase.js"/>-->
+
+        <!--<copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>-->
+        <!--<copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>-->
+
+        <!-- Multiple canvases -->
+
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases"/>-->
+        <!--<copy file="${SRC_DIR}/examples/generation/multiple-canvases/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/index.html"/>-->
+        <!--<copy file="src/examples/generation/multiple-canvases/multiple-canvases.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/multiple-canvases.js"/>-->
+
+        <!-- Scalar inpterpolator -->
+
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation"/>-->
+        <!--<copy file="${SRC_DIR}/examples/animation/interpolated-rotation/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/index.html"/>-->
+        <!--<copy file="src/examples/animation/interpolated-rotation/interpolated-rotation.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/interpolated-rotation.js"/>-->
+
         <!-- Assets -->
 
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset"/>
-        <copy file="${SRC_DIR}/examples/assets/js-teapot-asset/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/index.html"/>
-        <copy file="src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"/>
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset"/>-->
+        <!--<copy file="${SRC_DIR}/examples/assets/js-teapot-asset/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/index.html"/>-->
+        <!--<copy file="src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"/>-->
 
         <!-- Texturing -->
 
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/textures/general-zod"/>
-        <copy file="${SRC_DIR}/examples/textures/general-zod/index.html"
-              tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/index.html"/>
-        <copy file="src/examples/textures/general-zod/general-zod.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.js"/>
-        <copy file="src/examples/textures/general-zod/general-zod.jpg"
-              tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.jpg"/>
+        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/textures/general-zod"/>-->
+        <!--<copy file="${SRC_DIR}/examples/textures/general-zod/index.html"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/index.html"/>-->
+        <!--<copy file="src/examples/textures/general-zod/general-zod.js"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.js"/>-->
+        <!--<copy file="src/examples/textures/general-zod/general-zod.jpg"-->
+        <!--tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.jpg"/>-->
 
         <!-- License and readme -->
 
-        <copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>
-        <copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>
+        <!--<copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>-->
+        <!--<copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>-->
     </target>
 
 </project>

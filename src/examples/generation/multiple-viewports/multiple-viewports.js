@@ -50,9 +50,9 @@ with (SceneJS) {
                                                             }
                                                         };
                                                     })(),
-                                                            renderer(function(scope) {
+                                                            renderer(function(data) {
                                                                 return {
-                                                                    viewport: scope.get('viewport')
+                                                                    viewport: data.get('viewport')
                                                                 };
                                                             },
                                                                     lookAt({

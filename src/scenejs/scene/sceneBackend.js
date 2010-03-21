@@ -12,6 +12,9 @@ SceneJS._backends.installBackend(
             var nScenes = 0;
             var activeSceneId;
 
+            var projMat;
+            var viewMat;
+            var picking;
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.RESET,
@@ -21,15 +24,53 @@ SceneJS._backends.installBackend(
                         activeSceneId = null;
                     });
 
+            function updatePick() {
+
+            }
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED,
+                    function(params) {
+                        projMat = params.matrix;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
+                    function(params) {
+                        viewMat = params.matrix;
+                    });
+
             /** Locates canvas in DOM, finds WebGL context on it,
              *  sets some default state on the context, then returns
              *  canvas, canvas ID and context wrapped up in an object.
+             *
+             * If canvasId is null, will fall back on SceneJS._webgl.DEFAULT_CANVAS_ID
              */
             var findCanvas = function(canvasId) {
-                var canvas = document.getElementById(canvasId);
-                if (!canvas) {
-                    throw new SceneJS.exceptions.CanvasNotFoundException
-                            ('Could not find canvas document element with id \'' + canvasId + '\'');
+                var canvas;
+                if (!canvasId) {
+                    ctx.logging.info("SceneJS.scene config 'canvasId' omitted - looking for default canvas with ID '"
+                            + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                    canvasId = SceneJS._webgl.DEFAULT_CANVAS_ID;
+                    canvas = document.getElementById(canvasId);
+                    if (!canvas) {
+                        throw new SceneJS.exceptions.CanvasNotFoundException
+                                ("SceneJs.scene config 'canvasId' omitted and could not find default canvas with ID '"
+                                        + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                    }
+                } else {
+                    canvas = document.getElementById(canvasId);
+                    if (!canvas) {
+                        ctx.logging.info("SceneJS.scene config 'canvasId' unresolved - looking for default canvas with " +
+                                         "ID '" + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                        canvasId = SceneJS._webgl.DEFAULT_CANVAS_ID;
+                        canvas = document.getElementById(canvasId);
+                        if (!canvas) {
+                            throw new SceneJS.exceptions.CanvasNotFoundException
+                                    ("SceneJs.scene config 'canvasId' does not match any elements in the page and no " +
+                                     "default canvas found with ID '" + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                        }
+                    }
                 }
                 var context;
                 var contextNames = SceneJS._webgl.contextNames;
@@ -42,9 +83,9 @@ SceneJS._backends.installBackend(
                 }
                 if (!context) {
                     throw new SceneJS.exceptions.WebGLNotSupportedException
-                            ('Canvas document element with id \''
+                            ('Canvas document element with ID \''
                                     + canvasId
-                                    + '\' failed to provide a supported context');
+                                    + '\' failed to provide a supported WebGL context');
                 }
                 context.clearColor(0.0, 0.0, 0.0, 1.0);
                 context.clearDepth(1.0);
@@ -85,7 +126,77 @@ SceneJS._backends.installBackend(
                         context.FRAMEBUFFER, context.DEPTH_ATTACHMENT, context.RENDERBUFFER, buffer.renderBuffer);
                 context.bindFramebuffer(context.FRAMEBUFFER, null);
                 return buffer;
-            };
+            }
+
+            function activatePickBuffer(context, buffer) {
+                context.bindFramebuffer(context.FRAMEBUFFER, buffer.framePickBuffer);
+                context.viewport(0, 0, 1, 1);
+                context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+                context.disable(context.BLEND);
+            }
+
+            function getPick(context, buffer) {
+                var data = context.readPixels(0, 0, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
+                if (data.data) {
+                    data = data.data; // TODO: hack for firefox
+                }
+                var id = data[0] + data[1] * 256;
+                context.bindFramebuffer(context.FRAMEBUFFER, null);
+                return id;
+            }
+
+            function pick(x, y) {
+                //get camera space coords
+                var origmatrix = this.camera.matrix;
+                var origpmatrix = this.camera.pMatrix;
+                xcoord = -( ( ( 2 * x ) / this.renderer.canvas.width ) - 1 ) / this.camera.pMatrix.e(1, 1);
+                ycoord = ( ( ( 2 * y ) / this.renderer.canvas.height ) - 1 ) / this.camera.pMatrix.e(2, 2);
+                zcoord = 1;
+                if (this.camera.type == GLGE.C_PERSPECTIVE) {
+                    var coord = [xcoord,ycoord,zcoord,0];
+                    coord = this.camera.matrix.inverse().x(coord);
+                    var cameraPos = this.camera.getPosition();
+                    var zvec = coord.toUnitVector();
+                    var xvec = (new GLGE.Vec([0,0,1])).cross(zvec).toUnitVector();
+                    var yvec = zvec.cross(xvec).toUnitVector();
+                    this.camera.matrix = new GLGE.Mat([xvec.e(1), yvec.e(1), zvec.e(1), cameraPos.x,
+                        xvec.e(2), yvec.e(2), zvec.e(2), cameraPos.y,
+                        xvec.e(3), yvec.e(3), zvec.e(3), cameraPos.z,
+                        0, 0, 0, 1]).inverse();
+                }
+                if (this.camera.type == GLGE.C_ORTHO) {
+                    this.camera.matrix = this.camera.matrix.inv().x(GLGE.translateMatrix(-xcoord, -ycoord, 0)).inv();
+                }
+                this.camera.pMatrix = GLGE.makeOrtho(-0.0001, 0.0001, -0.0001, 0.0001, this.camera.near, this.camera.far);
+                //render for picking
+                var gl = this.renderer.gl;
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.framePickBuffer);
+                gl.viewport(0, 0, 1, 1);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                this.renderer.gl.disable(this.renderer.gl.BLEND);
+
+                for (var i = 0; i < this.objects.length; i++) {
+                    this.objects[i].GLRender(this.renderer.gl, GLGE.RENDER_PICK);
+                }
+                var data = gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE);
+                //TODO: firefox hack :-( remove when fixed!
+                if (data.data) data = data.data;
+                var index = data[0] + data[1] * 256;
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                gl.viewport(0, 0, this.renderer.canvas.width, this.renderer.canvas.height);
+
+                //revert the view matrix
+                this.camera.matrix = origmatrix;
+                this.camera.pMatrix = origpmatrix;
+
+                if (index > 0) {
+                    return this.objects[index - 1];
+                } else {
+                    return false;
+                }
+
+            }
+
 
             return { // Node-facing API
 
@@ -96,7 +207,7 @@ SceneJS._backends.installBackend(
                         ctx.logging.info("SceneJS V" + SceneJS.version + " initialised");
                         ctx.events.fireEvent(SceneJS._eventTypes.INIT);
                     }
-                    var canvas = findCanvas(params.canvasId);
+                    var canvas = findCanvas(params.canvasId); // canvasId can be null
                     var sceneId = SceneJS._utils.createKeyForMap(scenes, "scene");
                     scenes[sceneId] = {
                         sceneId: sceneId,
@@ -137,6 +248,20 @@ SceneJS._backends.installBackend(
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED, { sceneId: sceneId });
                     ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_ACTIVATED, scene.canvas);
                 },
+
+                /** Returns the canvas element the given scene is bound to
+                 */
+                getSceneCanvas : function(sceneId) {
+                    var scene = scenes[sceneId];
+                    if (!scene) {
+                        throw "Scene not defined: '" + sceneId + "'";
+                    }
+                    return scene.canvas.canvas;
+                },
+                //
+                //                activatePick : function(sceneId) {
+                //
+                //                },
 
                 /** Returns all registered scenes
                  */

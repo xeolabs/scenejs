@@ -1,0 +1,11 @@
+{#template MAIN}
+<div id="error">
+    <div id="error-expletive">Failed to run</div>
+    <div id="error-title">CanvasNotFoundException</div>
+    <div id="error-message">{$T.message}</div>
+    <div id="error-advice">Each canvas node in the JavaScript scene definition must specify
+        the ID of a WebGL canvas in HTML. A canvas node was found that has an ID that does not
+        match any WebGL canvases in the HTML.
+    </div>
+</div>
+{#/template MAIN}

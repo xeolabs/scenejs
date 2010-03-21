@@ -50,11 +50,11 @@ with (SceneJS) {
                                         up : { y: 1.0 }
                                     },
 
-                                            lights(function(scope) {
+                                            lights(function(data) {
                                                 return {
                                                     lights: [
                                                         {
-                                                            pos: { x: 0, y: scope.get("lightY"), z: 0 }
+                                                            pos: { x: 0, y: data.get("lightY"), z: 0 }
                                                         }
                                                     ]};
                                             },
@@ -70,9 +70,9 @@ with (SceneJS) {
                                                  Further down you'll see how we inject that angle
                                                  variable when we render the scene.
                                                  */
-                                                    rotate(function(scope) {
+                                                    rotate(function(data) {
                                                         return {
-                                                            angle: scope.get('angle'), y : 1.0
+                                                            angle: data.get('angle'), y : 1.0
                                                         };
                                                     },
 

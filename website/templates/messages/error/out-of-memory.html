@@ -1,0 +1,12 @@
+{#template MAIN}
+<div id="error">
+    <div id="error-expletive">Out of video RAM</div>
+    <div id="error-title">OutOfVRAMException</div>
+    <div id="error-message">{$T.message}</div>
+    <div id="error-advice">For efficiency SceneJS buffers as many elements as it can (shaders, geometry, textures etc.) in
+        video RAM (<a target="other" href="http://en.wikipedia.org/wiki/VRAM">VRAM</a>). This particular scene seems to
+        have gotten a little over-eager and has overrun the capacity of your VRAM. SceneJS tries to intelligently swap
+        elements in and out of VRAM as required. In this case, either SceneJS VRAM management has failed, or
+        this scene has some element, eg. texture or geometry, that is too big for your VRAM.</div>
+</div>
+{#/template MAIN}

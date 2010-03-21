@@ -51,10 +51,10 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                     keys: [0.0,  0.3, 1.0],
                                                     values: [-50, 60, 0]
                                                 },
-                                                        SceneJS.lookAt(function(scope) {
+                                                        SceneJS.lookAt(function(data) {
                                                             return {
 
-                                                                eye : { x: scope.get("eyex"), y: scope.get("eyex"), z: scope.get("eyez")},
+                                                                eye : { x: data.get("eyex"), y: data.get("eyex"), z: data.get("eyez")},
                                                                 look : { x : 0.0, y : .0, z : 0 },
                                                                 up : { x: 0.0, y: 1.0, z: 0.0 }
                                                             };
@@ -71,8 +71,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                                                     wait: false
                                                                                 }
                                                                             ];
-                                                                            for (var i = -350; i < 350; i += 5) {
-                                                                                for (var i2 = -350; i2 < 350; i2 += 5) {
+                                                                            for (var i = -100; i < 100; i += 5) {
+                                                                                for (var i2 = -100; i2 < 100; i2 += 5) {
                                                                                     var y = (Math.random() * 50.0) - 25;
                                                                                     textureNodeArgs.push(
 

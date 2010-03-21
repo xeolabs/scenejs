@@ -413,7 +413,15 @@ var select = {};
 
     select.selectMarked = function () {
       var cs = currentSelection;
-      if (!(cs && (cs.changed || (webkit && cs.start.node == cs.end.node)))) return;
+      // on webkit-based browsers, it is apparently possible that the
+      // selection gets reset even when a node that is not one of the
+      // endpoints get messed with. the most common situation where
+      // this occurs is when a selection is deleted or overwitten. we
+      // check for that here.
+      function focusIssue() {
+        return cs.start.node == cs.end.node && cs.start.offset == 0 && cs.end.offset == 0;
+      }
+      if (!cs || !(cs.changed || (webkit && focusIssue()))) return;
       var win = cs.window, range = win.document.createRange();
 
       function setPoint(point, which) {
@@ -440,7 +448,7 @@ var select = {};
       var selection = window.getSelection();
       selection.removeAllRanges();
       selection.addRange(range);
-    };
+    }
     function selectionRange(window) {
       var selection = window.getSelection();
       if (!selection || selection.rangeCount == 0)
@@ -562,13 +570,17 @@ var select = {};
           range = win.document.createRange();
 
       function setPoint(node, offset, side) {
+        if (offset == 0 && node && !node.nextSibling) {
+          range["set" + side + "After"](node);
+          return true;
+        }
+
         if (!node)
           node = container.firstChild;
         else
           node = node.nextSibling;
 
-        if (!node)
-          return;
+        if (!node) return;
 
         if (offset == 0) {
           range["set" + side + "Before"](node);

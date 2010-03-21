@@ -8,7 +8,9 @@
  *
  */
 
-var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
+var exampleScene = SceneJS.scene({
+    canvasId: 'theCanvas',
+    proxy:"http://scenejs.org/cgi-bin/jsonp_wrapper.pl" },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
@@ -38,49 +40,38 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                     shininess: 2},
 
                                                         SceneJS.translate({y:-9},
-                                                                SceneJS.asset({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/mercury/mercury.js",
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/mercury/mercury.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-6},
-                                                                SceneJS.asset({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/venus/venus.js",
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/venus/venus.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-3},
-                                                                SceneJS.asset({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/earth/earth.js",
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/earth/earth.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-0},
-                                                                SceneJS.asset({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/mars/mars.js",
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl",
-                                                                    wait: false})
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/mars/mars.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:3},
-
-                                                                SceneJS.asset({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/jupiter/jupiter.js",
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/jupiter/jupiter.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:6},
-
-                                                                SceneJS.asset({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/uranus/uranus.js",
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/uranus/uranus.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:9},
-
-                                                                SceneJS.asset({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/neptune/neptune.js",
-                                                                    proxy:"http://scenejs.com/cgi-bin/jsonp_wrapper.pl"})
+                                                                SceneJS.import({
+                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/neptune/neptune.js" })
                                                                 )
                                                         )
                                                 ) // lookAt
@@ -94,20 +85,10 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
 var pInterval;
 
-
-function handleError(e) {
-    if (e.message) {
-        alert(e.message);
-    } else {
-        alert(e);
-    }
-    throw e;
-}
-
 /* Our periodic render function. This will stop the render interval when the count of
  * scene processes is zero.
  */
-function doit() {
+window.doit = function() {
     if (exampleScene.getNumProcesses() == 0) {
 
         /* No processes running in scene, so asset is loaded and we'll stop. The previous
@@ -126,20 +107,17 @@ function doit() {
         try {
             exampleScene.render();
         } catch (e) {
-            handleError(e);
+            clearInterval(pInterval);
+            throw e;
         }
     }
 }
 
 /* This initial render will trigger the asset load, starting one scene process
  */
-try {
-    exampleScene.render();
-} catch (e) {
-    handleError(e);
-}
+exampleScene.render();
 
 /* Keep rendering until asset loaded, ie. no scene processes running
  */
-pInterval = setInterval("doit()", 10);
+pInterval = setInterval("window.doit()", 10);
   

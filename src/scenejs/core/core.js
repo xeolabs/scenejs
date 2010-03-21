@@ -4,6 +4,12 @@ var SceneJS = {
 
 (function() {
 
+    /** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
+     */
+//    SceneJS.require = function(url) {
+//
+//    };
+
     /** All exceptions thrown by SceneJS
      */
     SceneJS.exceptions = {
@@ -51,7 +57,7 @@ var SceneJS = {
                 }
             }
         },
-        /** Creates a new data scope for a scene graph subtree, optionally as a child of a
+        /** Creates a new data data for a scene graph subtree, optionally as a child of a
          * parent scope. The scope can be flagged as being either fixed or unfixed. The former
          * type has data that will be constant for the life of the scene graph, while the latter
          * has data that will vary. So, data derived from the former type may be cached (or 'memoized')
@@ -67,7 +73,7 @@ var SceneJS = {
                     data[key] = value;
                 },
 
-                /** Gets an element of data from this scope or the first one on the parent path that has it
+                /** Gets an element of data from this data or the first one on the parent path that has it
                  */
                 get : function(key) {
                     var value = data[key];
@@ -157,13 +163,13 @@ var SceneJS = {
          *
          * 4. Dynamic parameterisation function followed by zero or more child nodes
          *
-         *      SceneJS.rotate(function(scope) { return scope.get("angle"); }, node, node..)
+         *      SceneJS.rotate(function(data) { return data.get("angle"); }, node, node..)
          *
          *      Result:
          *
          *          {
-         *              getParams : function(scope) {    // Same function passed into the node function above
-         *                    return scope.get("angle");
+         *              getParams : function(data) {    // Same function passed into the node function above
+         *                    return data.get("angle");
          *              },
          *              fixed : false,                   // Params may vary because they are provided through a function
          *              children: [ node, node ]
@@ -248,8 +254,8 @@ var SceneJS = {
                 /* First arg is a dynamic configuration function - wrap it and override members on its result
                  */
                 var func = arg;
-                args[0] = function(scope) {
-                    var result = func(scope);
+                args[0] = function(data) {
+                    var result = func(data);
                     for (var key in cfg) {
                         if (override || !result[key]) {
                             result[key] = cfg[key];
@@ -280,19 +286,19 @@ var SceneJS = {
 
         /** Visits child nodes in the given node configuration
          */
-        visitChildren : function(config, scope) {
+        visitChildren : function(config, data) {
             if (config.children) {
                 for (var i = 0; i < config.children.length; i++) {
-                    config.children[i](scope);
+                    config.children[i](data);
                 }
             }
         },
 
         /** Visits a selected child node in the given node configuration
          */
-        visitChild : function(config, index, scope) {
+        visitChild : function(config, index, data) {
             if (config.children) {
-                config.children[index](scope);
+                config.children[index](data);
             }
         },
 

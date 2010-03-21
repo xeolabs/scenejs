@@ -2,6 +2,14 @@
  */
 SceneJS._webgl = {
 
+    /** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
+     */
+    DEFAULT_CANVAS_ID : "_scenejs-default-canvas",
+
+    /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one     
+     */
+    DEFAULT_LOGGING_ID : "_scenejs-default-logging",
+
     /** IDs of supported WebGL canvas contexts
      */
     contextNames : ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"],

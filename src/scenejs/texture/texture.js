@@ -11,12 +11,12 @@
 
     /** Pushes texture layer, renders children, then pops layer
      */
-    function doTextureLayer(cfg, scope, layer) {
+    function doTextureLayer(cfg, data, layer) {
         if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-            SceneJS._utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, data);
         } else {
             backend.pushLayer(layer);
-            SceneJS._utils.visitChildren(cfg, scope);
+            SceneJS._utils.visitChildren(cfg, data);
             backend.popLayer();
         }
     }
@@ -55,9 +55,9 @@
         var layer;
 
         return SceneJS._utils.createNode(
-                function(scope) {
+                function(data) {
                     if (!params) {
-                        params = cfg.getParams(scope);
+                        params = cfg.getParams(data);
 
                         if (!params.uri) {
                             throw new SceneJS.exceptions.WebGLNotSupportedException("Only uri is supported in textures in this version");
@@ -111,12 +111,12 @@
                         //                    if (!textureId) {
                         //                        textureId = backend.createTexture(params);
                         //                    }
-                        //                    doTextureLayer(cfg, scope, textureId);
+                        //                    doTextureLayer(cfg, data, textureId);
                     } else {
 
                         switch (state) {
                             case STATE_TEXTURE_CREATED: // Most frequent case, hopefully
-                                doTextureLayer(cfg, scope, layer);
+                                doTextureLayer(cfg, data, layer);
                                 break;
 
                             case STATE_INITIAL:
@@ -148,7 +148,7 @@
 
                             case STATE_IMAGE_LOADING:
                                 if (!params.wait) {
-                                    SceneJS._utils.visitChildren(cfg, scope);  // Render children while image loading
+                                    SceneJS._utils.visitChildren(cfg, data);  // Render children while image loading
                                 }
                                 break;
 
@@ -160,12 +160,12 @@
                                 };
                                 backend.imageLoaded(process);
                                 state = STATE_TEXTURE_CREATED;
-                                doTextureLayer(cfg, scope, layer);
+                                doTextureLayer(cfg, data, layer);
                                 break;
 
                             case STATE_ERROR:
                                 if (!params.wait) {
-                                    SceneJS._utils.visitChildren(cfg, scope);
+                                    SceneJS._utils.visitChildren(cfg, data);
                                 }
                                 break;
                         }

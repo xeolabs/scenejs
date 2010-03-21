@@ -3,15 +3,15 @@
  * graph to become its subtree, providing that a backend has been installed to help SceneJS asset that particular file
  * type.
  */
-SceneJS.asset = function() {
+SceneJS.withPlugin = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     if (!cfg.fixed) {
         throw new SceneJS.exceptions.UnsupportedOperationException
-                ("Dynamic configuration of asset nodes is not supported");
+                ("Dynamic configuration of withPlugin nodes is not supported");
     }
     var params;
 
-    var backend = SceneJS._backends.getBackend("assets");
+    var backend = SceneJS._backends.getBackend("import");
     var logging = SceneJS._backends.getBackend("logging");
     var process = null;
     var assetNode;
@@ -24,37 +24,27 @@ SceneJS.asset = function() {
 
     var state = STATE_INITIAL;
 
-    function sceneJSParser(data, onError) {
+    function responseParser(data, onError) {
         if (!data.___isSceneJSNode) {
-            onError(data.error || "unkown server error");
+            onError(data.error || "unknown server error");
             return null;
         } else {
             return data;
         }
     }
 
-    function visitAsset(params, scope) {
-        if (params) { // Parameters for asset - supply in a new child scope
-            var childScope = SceneJS._utils.newScope(scope, cfg.fixed);
-            for (var key in params.params) {
-                childScope.put(key, params.params[key]);
-            }
-            assetNode.func.call(this, childScope);
-        } else {
-            assetNode.func.call(this, scope);
-        }
-    }
-
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
 
                 if (!params) {
-                    params = cfg.getParams(scope);
+                    params = cfg.getParams(data);
                     if (!params.uri) {
-                        throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: uri");
+                        throw new SceneJS.exceptions.NodeConfigExpectedException
+                                ("Mandatory withPlugin parameter missing: uri");
                     }
                     if (!params.proxy) {
-                        throw new SceneJS.exceptions.NodeConfigExpectedException("Mandatory asset parameter missing: proxy");
+                        throw new SceneJS.exceptions.NodeConfigExpectedException
+                                ("Mandatory withPlugin parameter missing: proxy");
                     }
                 }
 
@@ -66,7 +56,7 @@ SceneJS.asset = function() {
 
                 switch (state) {
                     case STATE_ASSET_ATTACHED:
-                        visitAsset(params.params, scope);
+                        visitAsset(params.params, data);
                         break;
 
                     case STATE_ASSET_LOADING:
@@ -76,7 +66,7 @@ SceneJS.asset = function() {
                         backend.assetLoaded(process);  // Finish loading - kill process
                         process = null;
                         state = STATE_ASSET_ATTACHED;
-                        visitAsset(params.params, scope);
+                        SceneJS._utils.visitChildren(cfg, data);
                         break;
 
                     case STATE_INITIAL:
@@ -87,7 +77,7 @@ SceneJS.asset = function() {
                                 params.serverParams || {
                                     format: "scenejs"
                                 },
-                                params.parser || sceneJSParser,
+                                params.parser || responseParser,
                                 function(asset) { // Success
                                     assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
                                     state = STATE_ASSET_LOADED;
@@ -95,22 +85,19 @@ SceneJS.asset = function() {
                                 function() { // onTimeout
                                     state = STATE_ERROR;
                                     logging.getLogger().error(
-                                            "Asset load failed - timed out waiting for a reply " +
+                                            "Plugin load failed - timed out waiting for a reply " +
                                             "(incorrect proxy URI?) - proxy: " + params.proxy +
                                             ", uri: " + params.uri);
                                 },
                                 function(msg) { // onError - backend has killed process
                                     state = STATE_ERROR;
                                     logging.getLogger().error(
-                                            "Asset load failed - " + msg +
+                                            "Plugin load failed - " + msg +
                                             " - proxy: " + params.proxy + ", uri: " + params.uri);
                                 });
-
-                        SceneJS._utils.visitChildren(cfg, scope);
                         break;
 
                     case STATE_ERROR:
-                        SceneJS._utils.visitChildren(cfg, scope);
                         break;
                 }
             });

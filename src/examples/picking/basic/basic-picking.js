@@ -5,16 +5,12 @@
  * lindsay.kay AT xeolabs.com
  * March 2010
  *
- *
- *
- *
  */
-var exampleScene = SceneJS.scene(
+var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
-                    canvasId: 'theCanvas',
                     clearColor : { r:0, g:0, b:0.0 },
                     viewport:{ x : 0, y : 0, width: 800, height: 600}  ,
                     clear : { depth : true, color : true}
@@ -117,11 +113,17 @@ var exampleScene = SceneJS.scene(
                                 )
                         )
                 )
-        )
-        ;
-
+        );
 
 exampleScene.render();
 
-exampleScene.destroy();
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    alert("mouse down");
+    exampleScene.render();
+}
+
+canvas.addEventListener('mousedown', mouseDown, false);
+
 

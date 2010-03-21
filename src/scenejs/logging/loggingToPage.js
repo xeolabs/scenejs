@@ -9,22 +9,36 @@ SceneJS.loggingToPage = function() {
     var backend = SceneJS._backends.getBackend('logging');
     var funcs;
 
+
     function findElement(elementId) {
-        var element = document.getElementById(elementId);
-        if (!element) {
-            throw "Failed to find target DOM element for loggingToPage: " + elementId;
+        var element;
+        if (!elementId) {
+            elementId = SceneJS._webgl.DEFAULT_LOGGING_ID;
+            element = document.getElementById(elementId);
+            if (!element) {
+                throw new SceneJS.exceptions.PageLoggingElementNotFoundException
+                        ("SceneJs.loggingToPage config 'elementId' omitted and no default element found with ID '"
+                                + SceneJS._webgl.DEFAULT_LOGGING_ID + "'");
+            }
+        } else {
+            element = document.getElementById(elementId);
+            if (!element) {
+                elementId = SceneJS._webgl.DEFAULT_LOGGING_ID;
+                element = document.getElementById(elementId);
+                if (!element) {
+                    throw new SceneJS.exceptions.PageLoggingElementNotFoundException
+                            ("SceneJs.loggingToPage config 'elementId' does not match any elements in page and no " +
+                             "default element found with ID '" + SceneJS._webgl.DEFAULT_LOGGING_ID + "'");
+                }
+            }
         }
         return element;
     }
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (!funcs) {
-                    var params = cfg.getParams();
-                    if (!params.elementId) {
-                        throw new SceneJS.exceptions.NodeConfigExpectedException
-                                ("loggingToPage node parameter expected : elementId");
-                    }
+                    var params = cfg.getParams();                  
 
                     var element = findElement(params.elementId);
 
@@ -49,7 +63,7 @@ SceneJS.loggingToPage = function() {
                 }
                 var prevFuncs = backend.getFuncs();
                 backend.setFuncs(funcs);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.setFuncs(prevFuncs);
             });
 };

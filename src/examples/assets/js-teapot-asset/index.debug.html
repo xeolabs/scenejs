@@ -5,17 +5,19 @@
     <title>SceneJS Example - Simple Teapot Scene Asset</title>
 </head>
 <body margin=20px>
-<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Simple Teapot Scene Asset
+<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Simple Teapot Scene
+    Asset
 </h1>
 <table>
     <tr>
 
         <td valign="top">
-             <h3>Source code</h3>
+            <h3>Source code</h3>
             <ul>
                 <li><a href="js-teapot-asset-demo.js">This example</a></li>
-                <li><a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/orange-teapot-example/orangeteapot.js">Teapot
-                    asset</a></li>
+                <li>
+                    <a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/orange-teapot-example/orangeteapot.js">Teapot
+                        asset</a></li>
             </ul>
             <h3>Resources</h3>
             <ul>
@@ -23,12 +25,14 @@
                        target="other">Blog article
                     on assets</a></li>
             </ul>
-             <h3>Description</h3>
+            <h3>Description</h3>
+
             <p><span>"Assets" are remotely-stored scene fragments which may be
             dynamically imported, cross-domain, into your scene using asset nodes.</span></p>
 
             <p><span><a href="js-teapot-asset-demo.js">This example</a> imports an
-                <a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/orange-teapot-example/orangeteapot.js">orange teapot asset</a>
+                <a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/orange-teapot-example/orangeteapot.js">orange
+                    teapot asset</a>
                 from the repository at SceneJS.org.
             <p><span>When the scene is first rendered, the SceneJS.assets.scenejs node
             will make a JSONP request of the repository, which will respond with
@@ -60,7 +64,7 @@
 
             <div id="logging"></div>
         </td>
-         <td valign="top">
+        <td valign="top">
             <canvas id="theCanvas" width="600" height="600">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
@@ -69,6 +73,7 @@
         </td>
     </tr>
 </table>
+
 
 <!-- Core -->
 
@@ -100,6 +105,10 @@
 
 <script type="application/x-javascript" src="../../../scenejs/processes/processesBackend.js"></script>
 
+<!-- Assets -->
+
+<script type="application/x-javascript" src="../../../scenejs/asset/importBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/import.js"></script>
 
 <!-- Scene -->
 
@@ -167,7 +176,7 @@
 
 <!-- Scope -->
 
-<script type="application/x-javascript" src="../../../scenejs/scope/scope.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/withData/withData.js"></script>
 
 <!-- Generation -->
 
@@ -177,12 +186,6 @@
 
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
-
-<!-- Assets -->
-
-<script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
-
 
 
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>

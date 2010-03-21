@@ -47,9 +47,9 @@ with (SceneJS) {
 
                                         /* Viewing transform
                                          */
-                                            lookAt(function(scope) {
+                                            lookAt(function(data) {
                                                 return{
-                                                    eye : { x: 0.0, y: 0, z: scope.get("z")},
+                                                    eye : { x: 0.0, y: 0, z: data.get("z")},
                                                     look : { x : 0.0, y : 0.0, z : 0 },
                                                     up : { x: 0.0, y: 1.0, z: 0.0 }
                                                 };
@@ -92,8 +92,8 @@ with (SceneJS) {
                                                                             }
                                                                         };
                                                                     })(),
-                                                                    translate(function(scope) {
-                                                                        return scope.get("param");
+                                                                    translate(function(data) {
+                                                                        return data.get("param");
                                                                     },
                                                                             scale({ x:2, y:2, z:2 },
 

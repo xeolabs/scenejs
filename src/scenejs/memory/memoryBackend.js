@@ -68,7 +68,7 @@ SceneJS._backends.installBackend(
 
             function outOfMemory(description) {
                 ctx.logging.error("Memory allocation failed");
-                throw new SceneJS.exceptions.OutOfMemoryException(
+                throw new SceneJS.exceptions.OutOfVRAMException(
                         "Out of memory - failed to allocate memory for " + description);
             }
 

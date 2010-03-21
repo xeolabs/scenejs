@@ -1,0 +1,169 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>SceneJS Features</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
+
+</head>
+<body style="padding: 20px;">
+<div id="container">
+    <div id="header">
+        <h1><a href="index.html">SceneJS</a> &gt; Features</h1>
+
+        <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
+                src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
+                alt="Share/Bookmark"/></a>
+        <script type="text/javascript">
+            var a2a_linkname = "SceneJS Features";
+            var a2a_linkurl = window.location;
+            var a2a_onclick = 1;</script>
+        <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+    </div>
+
+
+    <div id="content">
+
+        <div id="features-table">
+            <div id="col1">
+
+                <h3 class="feature">Simple</h3>
+
+                <p><span>SceneJS makes it easy to become productive with WebGL, allowing you access to a big chunk of its functionality through
+            a terse and expressive pure JavaScript API. </span></p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=Hello Teapot!&url=http://gist.github.com/raw/336018/5efa07cd9b46184d8bfd119560cf1113ec32e0ef/scenejs-teapot-demo.js">Hello
+                    Teapot!</a></span></p>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3 class="feature">Efficient</h3>
+
+                <p><span>SceneJS uses WebGL efficiently for you, quietly behind the scenes. It caches aggressively to avoid
+                recalculation, automatically generates optimal shaders, intelligently swaps resources in and out of
+                video RAM, and avoids needless repetition of costly WebGL buffer loads by performing them lazily.</span>
+                </p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=300 Teapots&url=http://gist.github.com/raw/336142/299edcc6493bef53988554e5d8d0fa87d64c6a2f/scenejs-teapot-cloud.js">
+                    300 Teapots</a></span></p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=1600 Textured Cubes&url=http://gist.github.com/raw/336142/299edcc6493bef53988554e5d8d0fa87d64c6a2f/scenejs-teapot-cloud.js">
+                    1600 Textured Cubes</a></span></p>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3 class="feature">Dynamic Content Import</h3>
+
+                <p><span><b>Cross-domain asset import</b></span></p>
+
+                <p><span>SceneJS is geared towards composition of scenes from reusable fragments, which a scene can load
+            into itself cross-domain on demand. Its terse API means those fragments carry a lot of functionality for their size,
+            loading and evaluating quickly.</span></p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=Cross-Domain Import of a Teapot&url=http://gist.github.com/raw/338824/b58174d8b076df180b3cc8a06126029ffc91e795/scenejs-asset-example.js">
+                    Cross-Domain Import of a Teapot</a></span></p>
+
+                <p><span><b>Parameterised assets</b></span></p>
+
+                <p><span>Remember how data was passed down into the basic example <a href="index.html">back on the home
+                    page?</a>
+                     That that allows imported assets to be parameterised. Here's an example that imports a thoroughly
+                     parameterised spiral staircase, specifying it's dimensions, radius, number of steps, right down to
+                 which texture to apply to it:</span></p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=Import of a Parameterised Staircase Asset&url=http://gist.github.com/raw/339256/65f0e32844b704300242ba6a6031a01b2f097a3f/scenejs-spiral-staircase-asset-example.js">
+                    Import of a Parameterised Staircase Asset</a></span></p>
+
+            </div>
+
+
+            <div id="col2">
+                <!-- *********************************************************************************************** -->
+
+                <h3 class="feature">Frustum Culling</h3>
+
+                <p><span>SceneJS provides a flexible frustum culling mechanism whereby you may enclose subgraphs
+                    in bounding volumes, so that they are only processed when their volumes intersects the view volume.</span></p>
+                <br/>
+
+                <h3 class="feature">Level-of-Detail Culling</h3>
+
+                <p><span>Level-of-detail (LOD) selection enhances rendering efficiency by decreasing the
+                                   complexity of a 3D object representation as it moves away from the viewer. SceneJS provides a
+                                   very flexible LOD mechanism. For a 3D object, a set of subgraphs, each representing the object at a
+                                   different level of detail, can be wrapped in a bounding volume so that the approprate subgraph is
+                                   rendered for the current projected canvas size of the bounding volume.</span></p>
+                <br/>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=Level-of-Detail Demo 1&url=http://gist.github.com/raw/338479/cd32f557f5f5a306ed9f1de0b836a38696e93f45/scenejs-lod-example1.js">Basic
+                    Level-of-Detail Demo</a></span></p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=Level-of-Detail Demo 2&url=http://gist.github.com/raw/338469/e9961dd3c744e78288f641b067a3a023faf2dfe5/scenejs-teapot-army-example.js">Another
+                    Level-of-Detail Demo</a></span></p>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3 class="feature">Procedural Scene Generation</h3>
+
+                <p><span>Procedural generation involves defining scene content algorithmically rather than manually.
+                              SceneJS provides the ability to wrap a subgraph in a function that will loop over it, effectively
+                              instancing it multiple times within each frame, each time in a different state.</span></p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=Generating a Spiral Staircase&url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">
+                    Generating a Spiral Staircase</a></span></p>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3 class="feature">Interpolated Animation</h3>
+
+                <p><span>Almost anything in SceneJS can be interpolated within sequences of  key values, usually as a
+                              function of time. That includes transformations, materials, lighting, even other interpolations.</span>
+                </p>
+
+                <p><span>Demo: <a
+                        href="exhibit.html?title=Interpolated Animation of Rotations&url=http://gist.github.com/raw/336868/9d80342d35e7a6be6225e9a0a617accd8d50fbce/scenejs-interpolation-example1.js">
+                    Rotating a Teapot using Interpolators</a>
+                                              <br/>
+                                              </span></p>
+
+
+            </div>
+            <div id="col3">
+                <!-- *********************************************************************************************** -->
+
+                <h3 class="feature">An Growing List of Rendering Effects</h3>
+
+                <h3 class="feature">Texture Layers</h3>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <h3 class="feature">Flexible Lighting</h3>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <b>Fog</b>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <h3 class="feature">Remotely loaded assets</h3>
+                <a href="exhibit.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
+
+                <!-- *********************************************************************************************** -->
+
+                <h3 class="feature">Extensible</h3>
+
+                <p><span>Who knows what people will want to do with SceneJS?</span></p>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://www.xeolabs.com">Xeolabs</a></p>
+</div>
+
+
+</body>
+</html>

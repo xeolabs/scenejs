@@ -13,10 +13,10 @@
         var levels;
 
         return SceneJS._utils.createNode(
-                function(scope) {
+                function(data) {
 
                     if (!cfg.fixed || !(box || objectCoords)) {
-                        var params = cfg.getParams(scope);
+                        var params = cfg.getParams(data);
 
                         if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
                             throw new SceneJS.exceptions.NodeConfigExpectedException
@@ -83,12 +83,12 @@
                                 var size = backend.getProjectedSize(box);
                                 for (var i = levels.length - 1; i >= 0; i--) {
                                     if (levels[i] <= size) {
-                                        SceneJS._utils.visitChild(cfg, i, scope);
+                                        SceneJS._utils.visitChild(cfg, i, data);
                                         return;
                                     }
                                 }
                             } else {
-                                SceneJS._utils.visitChildren(cfg, scope);
+                                SceneJS._utils.visitChildren(cfg, data);
                             }
                             break;
 

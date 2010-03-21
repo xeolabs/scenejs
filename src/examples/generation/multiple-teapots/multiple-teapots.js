@@ -57,8 +57,8 @@ with (SceneJS) {
                                                                     }
                                                                 };
                                                             })(),
-                                                                    rotate(function(scope) {
-                                                                        return { angle : scope.get("angle"), y: 1.0 };
+                                                                    rotate(function(data) {
+                                                                        return { angle : data.get("angle"), y: 1.0 };
                                                                     },
                                                                             translate({ x: 8.0},
                                                                                     boundingSphere({ radius: 3 },

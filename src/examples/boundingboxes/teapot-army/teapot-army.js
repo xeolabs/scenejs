@@ -58,9 +58,9 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                                             keys: [0.0,  0.3, 1.0],
                                                             values: [-50, 60, 0]
                                                         },
-                                                                SceneJS.lookAt(function(scope) {
+                                                                SceneJS.lookAt(function(data) {
                                                                     return {
-                                                                        eye : { x: scope.get("eyex"), y: 100, z: scope.get("eyez")},
+                                                                        eye : { x: data.get("eyex"), y: 100, z: data.get("eyez")},
                                                                         look : { x : 0.0, y : .0, z : 0 },
                                                                         up : { x: 0.0, y: 1.0, z: 0.0 }
                                                                     };
@@ -145,7 +145,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
 var alpha = 0;
 var pInterval;
 
-function doit() {
+window.doit = function() {
     if (alpha < 1) {
         alpha += 0.0005;
         exampleScene.render({"alpha":alpha});
@@ -153,7 +153,8 @@ function doit() {
         clearInterval(pInterval);
         exampleScene.destroy();
     }
-}
-pInterval = setInterval("doit()", 10);
+};
+
+pInterval = setInterval("window.doit()", 10);
 
 

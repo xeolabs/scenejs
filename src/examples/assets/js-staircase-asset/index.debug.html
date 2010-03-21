@@ -48,7 +48,7 @@
             then convert the data into a subtree of scene graph content.</span></p>
 
             <p><span>What's extra-special about this example is how the
-            SceneJS.assets.scenejs node is wrapped with a SceneJS.scope node,
+            SceneJS.assets.scenejs node is wrapped with a SceneJS.withData node,
             which parameterises the asset. Try tweaking some of the configurations
             on the scope node and see what happens.</span></p>
 
@@ -80,6 +80,7 @@
     </tr>
 </table>
 
+
 <!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
@@ -110,6 +111,10 @@
 
 <script type="application/x-javascript" src="../../../scenejs/processes/processesBackend.js"></script>
 
+<!-- Assets -->
+
+<script type="application/x-javascript" src="../../../scenejs/asset/importBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/asset/import.js"></script>
 
 <!-- Scene -->
 
@@ -177,7 +182,7 @@
 
 <!-- Scope -->
 
-<script type="application/x-javascript" src="../../../scenejs/scope/scope.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/withData/withData.js"></script>
 
 <!-- Generation -->
 
@@ -187,12 +192,6 @@
 
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
-
-<!-- Assets -->
-
-<script type="application/x-javascript" src="../../../scenejs/asset/assetBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/asset/asset.js"></script>
-
 
 
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>

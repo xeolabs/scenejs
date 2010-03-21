@@ -1,0 +1,10 @@
+{#template MAIN}
+<div id="error">
+    <div id="error-expletive">Failed to run</div>
+    <div id="error-title">ShaderVariableNotFoundException</div>
+    <div id="error-message">{$T.message}</div>
+    <div id="error-advice">SceneJS could not find a variable it needs in one of its internally-generated GLSL scripts.
+        Unless there is a bug in SceneJS, it may mean that either the browser or graphics card is not supported by SceneJS.         
+    </div>
+</div>
+{#/template MAIN}

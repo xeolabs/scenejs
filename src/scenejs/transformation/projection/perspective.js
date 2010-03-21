@@ -8,9 +8,9 @@ SceneJS.perspective = function() {
     var transform;
 
     return SceneJS._utils.createNode(
-            function(scope) {
+            function(data) {
                 if (!transform || !cfg.fixed) {
-                    var params = cfg.getParams(scope);
+                    var params = cfg.getParams(data);
                     var tempMat = SceneJS._math.perspectiveMatrix4(
                             (params.fovy || 60.0) * Math.PI / 180.0,
                             params.aspect || 1.0,
@@ -23,7 +23,7 @@ SceneJS.perspective = function() {
                 }
                 var prevTransform = backend.getTransform();
                 backend.setTransform(transform);
-                SceneJS._utils.visitChildren(cfg, scope);
+                SceneJS._utils.visitChildren(cfg, data);
                 backend.setTransform(prevTransform);
             });
 };
