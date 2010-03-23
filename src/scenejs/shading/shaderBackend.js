@@ -217,7 +217,7 @@ SceneJS._backends.installBackend(
                     function() {
                         activateProgram();
                     });
-
+            
             ctx.events.onEvent(
                     SceneJS._eventTypes.NAME_UPDATED,
                     function(n) {
@@ -501,33 +501,33 @@ SceneJS._backends.installBackend(
                 src.push("  vec3    emissionValue=uMaterialEmission;");
 
                 src.push("  float alpha = 0.6;");
-                src.push("  float mask=1.0;");
+                src.push("  float mask=vec3(1.0,1.0,1.0);");
                 src.push("  vec2 textureCoords=vec2(0.0,0.0);");
 
                 if (texturing) {
                     for (var i = 0; i < textureLayers.length; i++) {
                         var layer = textureLayers[i];
                         if (layer.params.applyTo == "diffuse") {
-                            src.push("diffuseValue  *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb * mask;");
+                            src.push("diffuseValue  = diffuseValue  * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
                         }
 
                         if (layer.params.applyTo == "specular") {
-                            src.push("specularValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb * mask;");
+                            src.push("specularValue = specularValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
                         }
 
                         if (layer.params.applyTo == "ambient") {
-                            src.push("ambientValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb * mask;");
+                            src.push("ambientValue = ambientValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
                         }
 
                         if (layer.params.applyTo == "shininess") {
-                            src.push("shininessValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).b * mask * 255.0;");
+                            src.push("shininessValue = shininessValue *  texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).b * mask * 255.0;");
                         }
 
                         if (layer.params.applyTo == "emission") {
-                            src.push("emissionValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).r * mask;");
+                            src.push("emissionValue = emissionValue *  texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).r * mask;");
                         }
                     }
-                }
+                }            
 
                 src.push("  vec3    lightVec;");
                 src.push("  float   dotN;");

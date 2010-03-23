@@ -146,16 +146,22 @@ SceneJS._backends.installBackend(
              * or to default if undefined. Throws exception when defined
              * but not mapped to an enum.
              */
-            function getGLOption(value, defaultVal) {
+            function getGLOption(name, context, cfg, defaultVal) {
+                var value = cfg[name];
                 if (value == undefined) {
                     return defaultVal;
                 }
-                var glVal = SceneJS._webgl.enumMap[value];
-                if (glVal == undefined) {
+                var glName = SceneJS._webgl.enumMap[value];
+                if (glName == undefined) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised texture node configuration value: '" + value + "'");
+                            "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
                 }
-                return glVal;
+                var glValue = context[glName];
+//                if (!glValue) {
+//                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+//                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
+//                }
+                return glValue;
             }
 
             /** Returns default value for when given value is undefined
@@ -211,14 +217,12 @@ SceneJS._backends.installBackend(
                 /**
                  * Creates and returns a new texture, or re-uses existing one if possible
                  */
-                createTexture : function(cfg) {
+                createTexture : function(image, cfg) {
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
                     var context = canvas.context;
-                    var textureId = cfg.uri
-                            ? (canvas.canvasId + ":" + cfg.uri)
-                            : SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
+                    var textureId = SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
 
                     ctx.memory.allocate(
                             "texture '" + textureId + "'",
@@ -226,22 +230,22 @@ SceneJS._backends.installBackend(
                                 textures[textureId] = new SceneJS._webgl.Texture2D(context, {
                                     textureId : textureId,
                                     canvas: canvas,
-                                    image : cfg.image,
+                                    image : image,
                                     texels :cfg.texels,
-                                    minFilter : getGLOption(cfg.minFilter, context.LINEAR),
-                                    magFilter :  getGLOption(cfg.magFilter, context.LINEAR),
-                                    wrapS : getGLOption(cfg.wrapS, context.CLAMP_TO_EDGE),
-                                    wrapT :   getGLOption(cfg.wrapT, context.CLAMP_TO_EDGE),
+                                    minFilter : getGLOption("minFilter", context, cfg, context.LINEAR),
+                                    magFilter :  getGLOption("magFilter", context, cfg, context.LINEAR),
+                                    wrapS : getGLOption("wrapS", context, cfg, context.CLAMP_TO_EDGE),
+                                    wrapT :   getGLOption("wrapT", context, cfg, context.CLAMP_TO_EDGE),
                                     isDepth :  getOption(cfg.isDepth, false),
-                                    depthMode : getGLOption(cfg.depthMode, context.LUMINANCE),
-                                    depthCompareMode : getGLOption(cfg.depthCompareMode, context.COMPARE_R_TO_TEXTURE),
-                                    depthCompareFunc : getGLOption(cfg.depthCompareFunc, context.LEQUAL),
+                                    depthMode : getGLOption("depthMode", context, cfg, context.LUMINANCE),
+                                    depthCompareMode : getGLOption("depthCompareMode", context, cfg, context.COMPARE_R_TO_TEXTURE),
+                                    depthCompareFunc : getGLOption("depthCompareFunc", context, cfg, context.LEQUAL),
                                     flipY : getOption(cfg.flipY, true),
                                     width: getOption(cfg.width, 1),
                                     height: getOption(cfg.height, 1),
-                                    internalFormat : getGLOption(cfg.internalFormat, context.LEQUAL),
-                                    sourceFormat : getGLOption(cfg.sourceType, context.ALPHA),
-                                    sourceType : getGLOption(cfg.sourceType, context.UNSIGNED_BYTE),
+                                    internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
+                                    sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
+                                    sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
                                     logging: ctx.logging
                                 });
                             });
@@ -249,12 +253,15 @@ SceneJS._backends.installBackend(
                     return textures[textureId];
                 },
 
-                pushLayer : function(layer) {
-                    if (!textures[layer.texture.textureId]) {
-                        throw "No such texture loaded \"" + layer.texture.textureId + "\"";
+                pushLayer : function(texture, params) {
+                    if (!textures[texture.textureId]) {
+                        throw "No such texture loaded \"" + texture.textureId + "\"";
                     }
-                    layer.texture.lastUsed = time;
-                    layerStack.push(layer);
+                    texture.lastUsed = time;
+                    layerStack.push({
+                        texture: texture,
+                        params: params
+                    });
                     dirty = true;
                     ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
                 },

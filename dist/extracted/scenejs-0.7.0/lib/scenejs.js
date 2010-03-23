@@ -1792,7 +1792,7 @@ SceneJS._webgl = {
 
         this.bind = function(unit) {
             if (unit) {
-                context.activeTexture(context["TEXTURE" + unit]);
+                context.activeTexture(context["texture" + unit]);
             } else {
                 context.activeTexture(context.TEXTURE0);
             }
@@ -1801,7 +1801,7 @@ SceneJS._webgl = {
 
         this.unbind = function(unit) {
             if (unit) {
-                context.activeTexture(context["TEXTURE" + unit]);
+                context.activeTexture(context["texture" + unit]);
             } else {
                 context.activeTexture(context.TEXTURE0);
             }

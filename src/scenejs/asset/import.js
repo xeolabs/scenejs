@@ -13,7 +13,7 @@ SceneJS.import = function() {
     }
     var params;
 
-    var backend = SceneJS._backends.getBackend("load");
+    var backend = SceneJS._backends.getBackend("import");
     var logging = SceneJS._backends.getBackend("logging");
     var process = null;
     var assetNode;

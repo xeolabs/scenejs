@@ -92,7 +92,7 @@ SceneJS._backends.installBackend(
                 }
                 return {
                     type: light.type || "point",
-                    ambient: colourToArray(light.diffuse, [ 0.2, 0.2, 0.2 ]),
+                    ambient: colourToArray(light.ambient, [ 0.2, 0.2, 0.2 ]),
                     diffuse: colourToArray(light.diffuse, [ 1.0, 1.0, 1.0 ]),
                     specular: colourToArray(light.specular, [ 1.0, 1.0, 1.0 ]),
 

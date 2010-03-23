@@ -6,9 +6,9 @@ var SceneJS = {
 
     /** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
      */
-//    SceneJS.require = function(url) {
-//
-//    };
+    //    SceneJS.require = function(url) {
+    //
+    //    };
 
     /** All exceptions thrown by SceneJS
      */
@@ -29,12 +29,19 @@ var SceneJS = {
          *
          */
         applyIf : function(o1, o2) {
-            for (var key in o1) {
-                if (!o2[key]) {
-                    o2[key] = o1[key];
+            for (var key in o2) {
+                if (!o1[key]) {
+                    o1[key] = o2[key];
                 }
             }
-            return o2;
+            return o1;
+        },
+
+        apply : function(o1, o2) {
+            for (var key in o2) {
+                o1[key] = o2[key];
+            }
+            return o1;
         },
 
         /** Converts degrees to radiians

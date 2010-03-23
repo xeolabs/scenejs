@@ -74,15 +74,22 @@ SceneJS._backends.installBackend(
             var glEnum = function(context, name) {
                 if (!name) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Null renderer node config: \"" + name + "\"");
+                            "Null SceneJS.renderer node config: \"" + name + "\"");
                 }
                 var result = SceneJS._webgl.enumMap[name];
                 if (!result) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised renderer node config value: \"" + name + "\"");
+                            "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
                 }
-                return result;
+                var value = context[result];
+                if (!value) {
+                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+                            "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
+                }
+                return value;
             };
+           
+
 
             /**
              * Order-insensitive functions that set WebGL modes ie. not actually causing an

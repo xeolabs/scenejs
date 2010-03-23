@@ -1,6 +1,8 @@
 (function() {
 
-    var backend = SceneJS._backends.getBackend("texture");
+    /* Separate backends for texture and colour for simplicity
+     */
+    var textureBackend = SceneJS._backends.getBackend("texture");
     var logging = SceneJS._backends.getBackend("logging");
 
     const STATE_INITIAL = 0;            // Ready to get texture
@@ -9,167 +11,185 @@
     const STATE_TEXTURE_CREATED = 4;    // Texture created
     const STATE_ERROR = -1;             // Image load or texture creation failed
 
-    /** Pushes texture layer, renders children, then pops layer
-     */
-    function doTextureLayer(cfg, data, layer) {
-        if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-            SceneJS._utils.visitChildren(cfg, data);
-        } else {
-            backend.pushLayer(layer);
-            SceneJS._utils.visitChildren(cfg, data);
-            backend.popLayer();
-        }
-    }
-
-    /** Checks that only one texture source parameter is configured
-     */
-    function ensureOneOf(sourceParams) {
-        var n = 0;
-        for (var i = 0; i < sourceParams.length; i++) {
-            if (sourceParams[i]) {
-                n++;
-            }
-        }
-        if (n == 0) {
-            throw new SceneJS.exceptions.NodeConfigExpectedException
-                    ("Mandatory texture node parameter missing - must have one of: uri, texels or image");
-        }
-        if (n > 1) {
-            throw new SceneJS.exceptions.NodeConfigExpectedException
-                    ("Texture node has more than one texture source - must have one of: uri, texels or image");
-        }
-    }
-
     SceneJS.texture = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
-        //        if (!cfg.fixed) {
-        //            throw new SceneJS.exceptions.UnsupportedOperationException
-        //                    ("Dynamic configuration of texture nodes is not supported");
-        //        }
-
-        var state = STATE_INITIAL;
         var params;
-        var layerParams;
-        var process = null;   // Handle to asynchronous load process for texture configured with image url
-        var image;
-        var layer;
+        var layers = [];
 
         return SceneJS._utils.createNode(
                 function(data) {
+
+                    /* Node can be dynamically configured, but only once
+                     */
                     if (!params) {
                         params = cfg.getParams(data);
 
-                        if (!params.uri) {
-                            throw new SceneJS.exceptions.WebGLNotSupportedException("Only uri is supported in textures in this version");
+                         if (!params.layers) {
+                                throw new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.texture.layers is undefined");
+                            }
+
+                        params.layers = params.layers || [];
+
+                        /* Prepare texture layers from params
+                         */
+                        for (var i = 0; i < params.layers.length; i++) {
+
+                            var layerParam = params.layers[i];
+
+                            if (!layerParam.uri) {
+                                throw new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.texture.layers[" + i + "].uri is undefined");
+                            }
+
+                            if (layerParam.applyTo) {
+                                if (layerParam.applyTo != "ambient" &&
+                                    layerParam.applyTo != "diffuse" &&
+                                    layerParam.applyTo != "specular" &&
+                                    layerParam.applyTo != "shininess" &&
+                                    layerParam.applyTo != "emission" &&
+                                    layerParam.applyTo != "red" &&
+                                    layerParam.applyTo != "green" &&
+                                    layerParam.applyTo != "blue" &&
+                                    layerParam.applyTo != "alpha" &&
+                                    layerParam.applyTo != "normal" &&
+                                    layerParam.applyTo != "height") {
+
+                                    throw SceneJS.exceptions.InvalidNodeConfigException(
+                                            "SceneJS.texture.layers[" + i + "].applyTo is unsupported - " +
+                                            "should be either 'diffuse', 'specular', 'shininess', " +
+                                            "'emission', 'red', 'green', " +
+                                            "'blue', alpha', 'normal' or 'height'");
+                                }
+                            }
+
+                            layers.push({
+                                state : STATE_INITIAL,
+                                process: null,                  // Imageload process handle
+                                image : null,                   // Initialised when state == IMAGE_LOADED
+                                creationParams: layerParam,   // Create texture using this
+
+                                /* The layer that gets exported
+                                 */
+
+                                texture: null,          // Initialised when state == TEXTURE_LOADED
+                                applyParams : {         //
+                                    applyTo: layerParam.applyTo || "diffuse"
+                                }
+                            });
                         }
+                    }
 
-                        //ensureOneOf([params.uri, params.texels, params.image]);
+                    /* Update state of each texture layer and
+                     * count how many are created and ready to apply
+                     */
+                    var countLayersReady = 0;
 
-                        if (params.wait == undefined) {  // By default, dont render children until texture loaded
-                            params.wait = true;
-                        }
+                    for (var i = 0; i < layers.length; i++) {
+                        var layer = layers[i];
 
-                        if (params.applyTo) {
-                            if (params.applyTo != "ambient" &&
-                                params.applyTo != "diffuse" &&
-                                params.applyTo != "specular" &&
-                                params.applyTo != "shininess" &&
-                                params.applyTo != "emission" &&
-                                params.applyTo != "red" &&
-                                params.applyTo != "green" &&
-                                params.applyTo != "blue" &&
-                                params.applyTo != "alpha" &&
-                                params.applyTo != "normal" &&
-                                params.applyTo != "height") {
-                                throw SceneJS.exceptions.InvalidNodeConfigException(
-                                        "SceneJS.texture node has an applyTo mode of unsupported type - " +
-                                        "should be 'diffuse', 'specular', 'shininess', " +
-                                        "'emission', 'red', 'green', " +
-                                        "'blue', alpha', 'normal' or 'height'");
+                        /* Backend may evict texture when not recently used,
+                         * in which case we'll have to load it again
+                         */
+                        if (layer.state == STATE_TEXTURE_CREATED) {
+                            if (!textureBackend.textureExists(layer.texture)) {
+                                layer.state = STATE_INITIAL;
                             }
                         }
 
-                        layerParams = {
-                            applyTo: params.applyTo || "diffuse"
-                        };
-                    }
-
-                    /* Backend may evict texture when not recently used,
-                     * in which case we'll have to load it again
-                     */
-                    if (state == STATE_TEXTURE_CREATED) {
-                        if (!backend.textureExists(layer.texture)) {
-                            state = STATE_INITIAL;
-                        }
-                    }
-
-                    if (!params.uri) {
-
-                        //                    /* Trivial case: texture image/texels are supplied in configs,
-                        //                     * so we can create and apply the texture immediately
-                        //                     */
-                        //                    if (!textureId) {
-                        //                        textureId = backend.createTexture(params);
-                        //                    }
-                        //                    doTextureLayer(cfg, data, textureId);
-                    } else {
-
-                        switch (state) {
-                            case STATE_TEXTURE_CREATED: // Most frequent case, hopefully
-                                doTextureLayer(cfg, data, layer);
+                        switch (layer.state) {
+                            case STATE_TEXTURE_CREATED:
+                                countLayersReady++;
                                 break;
 
                             case STATE_INITIAL:
-                                state = STATE_IMAGE_LOADING;
-                                process = backend.loadImage(// Process killed automatically on error or abort
-                                        params.uri,
-                                        function(_image) {
 
-                                            /* Image loaded successfully. Note that this callback will
-                                             * be called in the idle period between render traversals (ie. scheduled by a
-                                             * setInterval), so we're not actually visiting this node at this point. We'll
-                                             * defer creation and application of the texture to the subsequent visit. We'll also defer
-                                             * killing the load process to then so that we don't suddenly alter the list of
-                                             * running scene processes during the idle period, when the list is likely to
-                                             * be queried.
+                                /* Start loading image for this texture layer.
+                                 *
+                                 * Do it in a new closure so that the right layer gets the process result.
+                                 */
+                                (function(_layer) {
+                                    _layer.state = STATE_IMAGE_LOADING;
+                                    _layer.process = textureBackend.loadImage(// Process killed automatically on error or abort
+                                            _layer.creationParams.uri,
+                                            function(_image) {
+
+                                                /* Image loaded successfully. Note that this callback will
+                                                 * be called in the idle period between render traversals (ie. scheduled by a
+                                                 * setInterval), so we're not actually visiting this node at this point. We'll
+                                                 * defer creation and application of the texture to the subsequent visit. We'll also defer
+                                                 * killing the load process to then so that we don't suddenly alter the list of
+                                                 * running scene processes during the idle period, when the list is likely to
+                                                 * be queried.
+                                                 */
+                                                _layer.image = _image;
+                                                _layer.state = STATE_IMAGE_LOADED;
+                                            },
+
+                                            /* General error, probably a 404
                                              */
-                                            image = _image;
-                                            state = STATE_IMAGE_LOADED;
-                                        },
-                                        function() {
-                                            logging.getLogger().error("Texture image load failed: " + params.uri);
-                                            state = STATE_ERROR;
-                                        },
-                                        function() {
-                                            logging.getLogger().warn("Texture image load aborted: " + params.uri);
-                                            state = STATE_ERROR;
-                                        });
+                                            function() {
+                                                logging.getLogger().error("SceneJS.texture image load failed: "
+                                                        + _layer.creationParams.uri);
+                                                _layer.state = STATE_ERROR;
+                                            },
+
+                                            /* Load aborted - eg. user stopped browser
+                                             */
+                                            function() {
+                                                logging.getLogger().warn("SceneJS.texture image load aborted: "
+                                                        + _layer.creationParams.uri);
+                                                _layer.state = STATE_ERROR;
+                                            });
+                                })(layer);
                                 break;
 
                             case STATE_IMAGE_LOADING:
-                                if (!params.wait) {
-                                    SceneJS._utils.visitChildren(cfg, data);  // Render children while image loading
-                                }
+
+                                /* Continue loading this texture layer
+                                 */
                                 break;
 
                             case STATE_IMAGE_LOADED:
-                                params.image = image;
-                                layer = {
-                                    texture: backend.createTexture(params),
-                                    params: layerParams
-                                };
-                                backend.imageLoaded(process);
-                                state = STATE_TEXTURE_CREATED;
-                                doTextureLayer(cfg, data, layer);
+
+                                /* Create this texture layer
+                                 */
+                                layer.texture = textureBackend.createTexture(layer.image, layer.creationParams);
+                                    layer.applyParams.image = layer.image;
+                                textureBackend.imageLoaded(layer.process);
+                                layer.state = STATE_TEXTURE_CREATED;
+                                countLayersReady++;
                                 break;
 
                             case STATE_ERROR:
-                                if (!params.wait) {
-                                    SceneJS._utils.visitChildren(cfg, data);
-                                }
+
+                                /* Give up on this texture layer, but we'll keep updating the others
+                                 * to at least allow diagnostics to log
+                                 */
                                 break;
                         }
                     }
-                });
+
+                    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+
+                        /* Dont apply textures if picking
+                         */
+                        SceneJS._utils.visitChildren(cfg, data);
+
+                    } else {
+
+                        if (countLayersReady == layers.length) {
+                            for (var i = 0; i < layers.length; i++) {
+                                var layer = layers[i];
+                                textureBackend.pushLayer(layer.texture, layer.applyParams);
+                            }
+                            SceneJS._utils.visitChildren(cfg, data);
+                            for (var i = 0; i < layers.length; i++) {
+                                textureBackend.popLayer();
+                            }
+                        }
+                    }
+                }
+                );
     };
 })();

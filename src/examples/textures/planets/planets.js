@@ -41,37 +41,37 @@ var exampleScene = SceneJS.scene({
 
                                                         SceneJS.translate({y:-9},
                                                                 SceneJS.import({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/mercury/mercury.js" })
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/mercury/mercury.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-6},
                                                                 SceneJS.import({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/venus/venus.js" })
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/venus/venus.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-3},
                                                                 SceneJS.import({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/earth/earth.js" })
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/earth/earth.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-0},
                                                                 SceneJS.import({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/mars/mars.js" })
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/mars/mars.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:3},
                                                                 SceneJS.import({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/jupiter/jupiter.js" })
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/jupiter/jupiter.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:6},
                                                                 SceneJS.import({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/uranus/uranus.js" })
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/uranus/uranus.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:9},
                                                                 SceneJS.import({
-                                                                    uri:"http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/planets/neptune/neptune.js" })
+                                                                    uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/neptune/neptune.js" })
                                                                 )
                                                         )
                                                 ) // lookAt

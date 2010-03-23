@@ -119,5 +119,10 @@ SceneJS.exceptions.ProxyNotSpecifiedException = function(msg, cause) {
 };
 
 
+SceneJS.exceptions.WebGLUnsupportedNodeConfigException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 

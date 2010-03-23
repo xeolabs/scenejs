@@ -6,7 +6,7 @@ SceneJS._webgl = {
      */
     DEFAULT_CANVAS_ID : "_scenejs-default-canvas",
 
-    /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one     
+    /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
      */
     DEFAULT_LOGGING_ID : "_scenejs-default-logging",
 
@@ -64,7 +64,8 @@ SceneJS._webgl = {
         luminanceAlpha:"LUMINANCE_ALPHA",
         textureBinding2D:"TEXTURE_BINDING_2D",
         textureBindingCubeMap:"TEXTURE_BINDING_CUBE_MAP",
-        compareRToTexture:"COMPARE_R_TO_TEXTURE" // Hardware Shadowing Z-depth
+        compareRToTexture:"COMPARE_R_TO_TEXTURE", // Hardware Shadowing Z-depth,
+        unsignedByte: "UNSIGNED_BYTE"
     },
 
     fogModes: {
@@ -154,7 +155,7 @@ SceneJS._webgl = {
         logging.debug("Program sampler found in shader: " + name);
         this.bindTexture = function(texture, unit) {
             texture.bind(unit);
-            context.uniform1i(location, 0);
+            context.uniform1i(location, unit);
         };
     },
 
@@ -402,9 +403,15 @@ SceneJS._webgl = {
             context.texImage2D(context.TEXTURE_2D, 0, cfg.internalFormat, cfg.width, cfg.height, 0, cfg.sourceFormat, cfg.sourceType, cfg.texels);
 
             if (cfg.isDepth) {
-                context.texParameteri(context.TEXTURE_2D, context.DEPTH_TEXTURE_MODE, cfg.depthMode);
-                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_MODE, cfg.depthCompareMode);
-                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_FUNC, cfg.depthCompareFunc);
+                if (cfg.depthMode) {
+                    context.texParameteri(context.TEXTURE_2D, context.DEPTH_TEXTURE_MODE, cfg.depthMode);
+                }
+                if (cfg.depthCompareMode) {
+                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_MODE, cfg.depthCompareMode);
+                }
+                if (cfg.depthCompareFunc) {
+                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_FUNC, cfg.depthCompareFunc);
+                }
             }
 
             this.format = cfg.internalFormat;
@@ -414,27 +421,34 @@ SceneJS._webgl = {
             this.depthMode = cfg.depthMode;
             this.depthCompareMode = cfg.depthCompareMode;
             this.depthCompareFunc = cfg.depthCompareFunc;
-        }   
+        }
 
-        context.texParameteri(// Filtered technique when scaling texture down
-                context.TEXTURE_2D,
-                context.TEXTURE_MIN_FILTER,
-                cfg.minFilter);
+        if (cfg.minFilter) {
+            context.texParameteri(// Filtered technique when scaling texture down
+                    context.TEXTURE_2D,
+                    context.TEXTURE_MIN_FILTER,
+                    cfg.minFilter);
+        }
 
-        context.texParameteri(// Filtering technique when scaling texture up
-                context.TEXTURE_2D,
-                context.TEXTURE_MAG_FILTER,
-                cfg.magFilter);
+        if (cfg.magFilter) {
+            context.texParameteri(// Filtering technique when scaling texture up
+                    context.TEXTURE_2D,
+                    context.TEXTURE_MAG_FILTER,
+                    cfg.magFilter);
+        }
+        if (cfg.wrapS) {
+            context.texParameteri(
+                    context.TEXTURE_2D,
+                    context.TEXTURE_WRAP_S,
+                    cfg.wrapS);
+        }
 
-        context.texParameteri(
-                context.TEXTURE_2D,
-                context.TEXTURE_WRAP_S,
-                cfg.wrapS);
-
-        context.texParameteri(
-                context.TEXTURE_2D,
-                context.TEXTURE_WRAP_T,
-                cfg.wrapT);
+        if (cfg.wrapT) {
+            context.texParameteri(
+                    context.TEXTURE_2D,
+                    context.TEXTURE_WRAP_T,
+                    cfg.wrapT);
+        }
 
         /* Generate MIP map if required
          */
@@ -448,21 +462,18 @@ SceneJS._webgl = {
 
         context.bindTexture(this.target, null);
 
+//        gl.activeTexture(gl.TEXTURE0);
+        //  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
+        //  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
+
         this.bind = function(unit) {
-            if (unit) {
-                context.activeTexture(context["TEXTURE" + unit]);
-            } else {
-                context.activeTexture(context.TEXTURE0);
-            }
+            context.activeTexture(context["TEXTURE" + unit]);
             context.bindTexture(this.target, this.handle);
+
         };
 
         this.unbind = function(unit) {
-            if (unit) {
-                context.activeTexture(context["TEXTURE" + unit]);
-            } else {
-                context.activeTexture(context.TEXTURE0);
-            }
+            context.activeTexture(context["TEXTURE" + unit]);
             context.bindTexture(this.target, null);
         };
 

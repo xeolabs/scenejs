@@ -341,11 +341,11 @@ ul.site-tabs li.ui-state-active a {
 
 #home-table #col1 h1 {
     text-align: left;
-    font-size: 2.6em;
-    line-height: 1em;
-    font-family: "Helvetica", Arial, Helvetica, sans-serif;
+    font-size: 2.4em;
+    line-height: 1.2em;
+    font-family: "Helvetica", sans-serif;
     padding: 25px 0 20px 0;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 #home-table #col1 h3 {
@@ -380,13 +380,13 @@ ul.site-tabs li.ui-state-active a {
     padding-left: 40px;
     text-align: left;
     margin: 0 auto;
-    width: 300px;
+    width: 320px;
     height: auto;
 }
 
 #home-table  #col3 .home-menu-item {
     height: auto;
-    padding: 0px 15px 15px 75px;
+    padding: 0px 20px 15px 75px;
     margin-bottom: 5px;
 }
 
@@ -414,11 +414,11 @@ ul.site-tabs li.ui-state-active a {
 }
 
 #home-table  #col3  #home-playroom {
-    background: url(../images/registry.png) no-repeat scroll 15px 5px;
+    background: url(../images/demo-icon-large.png) no-repeat scroll 15px 5px;
 }
 
-#home-table  #col3  #home-blog {
-    background: url(../images/blogger_logo.gif) no-repeat scroll 15px 5px;
+#home-table  #col3  #home-tutorials {
+    background: url(../images/tutorial-icon.png) no-repeat scroll 15px 5px;
 }
 
 #home-table  #col3  #home-facebook {
@@ -443,6 +443,15 @@ ul.site-tabs li.ui-state-active a {
     margin: 0 auto;
 }
 
+#features-table hr.line {
+    width: 320px;
+    height: 0px;
+    color: #666666;
+    background-color: #666666;
+    margin-left: 40px;
+
+}
+
 #features-table h1 {
     text-align: left;
     font-size: 2.6em;
@@ -453,17 +462,45 @@ ul.site-tabs li.ui-state-active a {
 }
 
 #features-table .feature {
-    background: transparent url(../images/tick.png) no-repeat scroll left center;
+    background: transparent url(../images/tick.png) no-repeat scroll left 25px;
     margin-top: 10px;
-    padding: 10px 40px 10px;
+    padding: 30px 40px 10px;
     color: #cc6600 !important;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 1.2em;
+    font-weight: bold;
+}
+
+#features-table .sub-feature {
+    padding: 10px 40px 10px;
+    color: #000000 !important;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.0em;
     font-weight: normal;
 }
 
 #features-table p {
     padding-left: 40px;
+}
+
+#features-table p.demo {
+    background: transparent url(../images/demo-icon-small.png) no-repeat scroll left center;
+    color: #444444 !important;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 25px;
+    margin-left: 40px;
+    font-size: 0.8em;
+}
+
+#features-table p.tutorial {
+    background: transparent url(../images/tutorial-icon-small.png) no-repeat scroll left center;
+    color: #444444 !important;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 25px;
+    margin-left: 40px;
+    font-size: 0.8em;
 }
 
 #features-table #col1 {
@@ -529,7 +566,7 @@ ul.site-tabs li.ui-state-active a {
     background: url(../images/registry.png) no-repeat scroll 15px 5px;
 }
 
-#features-table  #col3  #home-blog {
+#features-table  #col3  #home-tutorials {
     background: url(../images/blogger_logo.gif) no-repeat scroll 15px 5px;
 }
 

@@ -14,7 +14,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
-                    clearColor : { r:0.2, g:0.2, b:0.2 },
+                    clearColor : { r:0.0, g:0.0, b:0.0 },
                     viewport:{ x : 0, y : 0, width: 900, height: 900}  ,
                     enableTexture2D: true,
                     clear : { depth : true, color : true}
@@ -50,25 +50,38 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                         },
 
                                                 SceneJS.material({
-                                                    ambient:  { r:0.4, g:0.4, b:0.4 },
+                                                    ambient:  { r:0.7, g:0.7, b:0.7 },
                                                     diffuse:  { r:0.8, g:0.8, b:0.8 },
-                                                    specular:  { r:0.5, g:0.5, b:0.5 },
-                                                    //   emission:  { r:0.5, g:0.5, b:0.5 },
+                                                    specular:  { r:0.8, g:0.8, b:0.8 },
+                                                    emission:  { r:0.0, g:0.0, b:0.0 },
                                                     shininess: 2},
 
                                                         SceneJS.translate({x: -2.5},
                                                                 SceneJS.rotate(function(data) {
                                                                     return { angle: data.get("angle"), y: 1 };
                                                                 },
-                                                                        SceneJS.objects.sphere()),
+                                                                         SceneJS.texture({
+                                                                            layers: [
+                                                                                {
+                                                                                   uri:"earth.jpg",
+                                                                                    applyTo: "emission",
+                                                                                    flipY:true
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        SceneJS.objects.sphere())),
 
 
                                                                 SceneJS.translate({x: 2.5},
 
                                                                         SceneJS.texture({
-                                                                            uri:"earth.jpg",
-                                                                            applyTo: "diffuse",
-                                                                            wait: false
+                                                                            layers: [
+                                                                                {
+                                                                                   uri:"earth.jpg",
+                                                                                    applyTo: "diffuse",
+                                                                                    flipY:true
+                                                                                }
+                                                                            ]
                                                                         },
                                                                                 SceneJS.rotate(function(data) {
                                                                                     return { angle: data.get("angle"), y: 1 };
@@ -78,9 +91,13 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                                                 SceneJS.translate({x: 2.5},
 
                                                                                         SceneJS.texture({
-                                                                                            uri:"earth-specular.gif",
-                                                                                            applyTo: "specular",
-                                                                                            wait: false
+                                                                                            layers: [
+                                                                                                {
+                                                                                                    uri:"earth.jpg",
+                                                                                                    applyTo: "specular",
+                                                                                                    flipY:true
+                                                                                                }
+                                                                                            ]
                                                                                         },
                                                                                                 SceneJS.rotate(function(data) {
                                                                                                     return { angle: data.get("angle"), y: 1 };
@@ -95,7 +112,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                 )
                                         )
                                 )
-                        )
+                       )
                 )
         );
 

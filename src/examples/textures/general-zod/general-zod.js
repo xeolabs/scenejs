@@ -23,6 +23,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
+                    clearColor: { r:0.5, g:0.5, b:0.5 },
                     clear : { depth : true, color : true },
                     enableTexture2D: true
                 },
@@ -42,8 +43,9 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
 
                                         },
                                                 SceneJS.material({
-                                                    ambient:  { r:0.3, g:0.3, b:0.3 },
-                                                    diffuse:  { r:1.0, g:1.0, b:1.0 }
+                                                    ambient:  { r:0.5, g:0.5, b:0.5 },
+                                                    diffuse:  { r:0.6, g:0.6, b:0.6 },
+                                                    emission:  { r:.5, g:0.3, b:0.3 }
                                                 },
 
                                                     /** Texture is configured with the URI at which its
@@ -55,8 +57,45 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                                      * while the texture image loads.
                                                      */
                                                         SceneJS.texture({
-                                                            uri:"general-zod.jpg",
-                                                            wait: false
+                                                            layers: [
+                                                                {
+                                                                    uri:"general-zod.jpg",
+                                                                    minFilter: "linear",
+                                                                    magFilter: "linear",
+                                                                    wrapS: "clampToEdge",
+                                                                    wrapT: "clampToEdge",
+                                                                    isDepth: false,
+                                                                    depthMode:"luminance",
+                                                                    depthCompareMode: "compareRToTexture",
+                                                                    depthCompareFunc: "lequal",
+                                                                    flipY: true,
+                                                                    width: 1,
+                                                                    height: 1,
+                                                                    internalFormat:"lequal",
+                                                                    sourceFormat:"alpha",
+                                                                    sourceType: "unsignedByte",
+                                                                    applyTo:"ambient"
+                                                                }
+                                                                ,
+                                                                {
+                                                                    uri:"earth.jpg",
+                                                                    minFilter: "linear",
+                                                                    magFilter: "linear",
+                                                                    wrapS: "clampToEdge",
+                                                                    wrapT: "clampToEdge",
+                                                                    isDepth: false,
+                                                                    depthMode:"luminance",
+                                                                    depthCompareMode: "compareRToTexture",
+                                                                    depthCompareFunc: "lequal",
+                                                                    flipY: false,
+                                                                    width: 1,
+                                                                    height: 1,
+                                                                    internalFormat:"lequal",
+                                                                    sourceFormat:"alpha",
+                                                                    sourceType: "unsignedByte",
+                                                                    applyTo:"ambient"
+                                                                }
+                                                            ]
                                                         },
                                                                 SceneJS.rotate({ angle: 45, x : 1.0, y : 1.0},
 
@@ -85,14 +124,20 @@ exampleScene.render();
  * confusion (ie. race conditions) when we query them in the "idle"
  * interval inbetween.
  */
-function doit() {
+window.doit = function() {
     if (exampleScene.getNumProcesses() > 0) {
-        exampleScene.render();
+        try {
+            exampleScene.render();
+        } catch (e) {
+            clearInterval(pInterval);
+            throw e;
+        }
     } else {
         clearInterval(pInterval);
         exampleScene.destroy();
     }
-}
+};
+
 pInterval = setInterval("window.doit()", 10);
 
 

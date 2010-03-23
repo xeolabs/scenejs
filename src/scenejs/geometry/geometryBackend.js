@@ -328,6 +328,7 @@ SceneJS._backends.installBackend(
                         destroyGeometry(geo);
                         currentBoundGeo = null;
                     }
+                   
                 }
             };
         });

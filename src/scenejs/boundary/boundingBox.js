@@ -6,11 +6,16 @@
     var backend = SceneJS._backends.getBackend("view-frustum");
     var modelTransformBackend = SceneJS._backends.getBackend("model-transform");
 
+    const STAGE_REMOTE = 0;
+    const STAGE_SCENE = 1;
+    const STATE_BUFFERED = 2;
+
     SceneJS.boundingBox = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
         var objectCoords;
         var box;
         var levels;
+        var states;
 
         return SceneJS._utils.createNode(
                 function(data) {
@@ -53,6 +58,7 @@
                                     throw new SceneJS.exceptions.NodeConfigExpectedException
                                             ("boundingBox levels parameter should be an ascending list of unique values");
                                 }
+                                //states.push();
                             }
                             levels = params.levels;
                         }
@@ -71,29 +77,34 @@
                         }
                     }
 
-                    var result = backend.testAxisBoxIntersection(box);
+                    var local = backend.testLocality(box);
 
-                    switch (result) {
-                        case SceneJS._math.INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                    if (local) {
+                        var result = backend.testAxisBoxIntersection(box);
 
-                        case SceneJS._math.INSIDE_FRUSTUM:
+                        switch (result) {
+                            case SceneJS._math.INTERSECT_FRUSTUM:  // TODO: GL clipping hints
 
-                            if (levels) { // Level-of-detail mode
+                            case SceneJS._math.INSIDE_FRUSTUM:
 
-                                var size = backend.getProjectedSize(box);
-                                for (var i = levels.length - 1; i >= 0; i--) {
-                                    if (levels[i] <= size) {
-                                        SceneJS._utils.visitChild(cfg, i, data);
-                                        return;
+                                if (levels) { // Level-of-detail mode
+
+                                    var size = backend.getProjectedSize(box);
+                                    for (var i = levels.length - 1; i >= 0; i--) {
+                                        if (levels[i] <= size) {
+                                            var state = states[i];
+                                            SceneJS._utils.visitChild(cfg, i, data);
+                                            return;
+                                        }
                                     }
+                                } else {
+                                    SceneJS._utils.visitChildren(cfg, data);
                                 }
-                            } else {
-                                SceneJS._utils.visitChildren(cfg, data);
-                            }
-                            break;
+                                break;
 
-                        case SceneJS._math.OUTSIDE_FRUSTUM:
-                            break;
+                            case SceneJS._math.OUTSIDE_FRUSTUM:
+                                break;
+                        }
                     }
                 });
     };
