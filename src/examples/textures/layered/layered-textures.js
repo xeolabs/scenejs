@@ -24,8 +24,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                             lights: [
                                 {
                                     type:                   "point",
-                                    diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
-                                    specular:               { r: 0.9, g: 0.9, b: 0.9 },
+                                    diffuse:                { r: .5, g: .5, b: .5 },
+                                    specular:               { r: 0.5, g: 0.9, b: 0.9 },
                                     pos:                    { x: 10.0, y: 0.0, z: -10.0 },
                                     constantAttenuation:    1.0,
                                     quadraticAttenuation:   0.0,
@@ -33,7 +33,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                 },
                                 {
                                     type:                   "point",
-                                    diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
+                                    diffuse:                { r: .5, g: .5, b: .5 },
                                     specular:               { r: 0.9, g: 0.9, b: 0.9 },
                                     pos:                    { x: -10.0, y: 10.0, z: 0.0 },
                                     constantAttenuation:    1.0,
@@ -45,31 +45,31 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
                                         SceneJS.lookAt({
                                             eye : { x: 0, y: 2, z: 10},
-                                            look : { x : 0.0, y : -1.0, z : 0 },
+                                            look : { x : .0, y : -1.0, z : 0 },
                                             up : { x: 0.0, y: 1.0, z: 0.0 }
                                         },
 
                                                 SceneJS.material({
-                                                    ambient:  { r:0.7, g:0.7, b:0.7 },
-                                                    diffuse:  { r:0.8, g:0.8, b:0.8 },
-                                                    specular:  { r:0.8, g:0.8, b:0.8 },
-                                                    emission:  { r:0.0, g:0.0, b:0.0 },
-                                                    shininess: 2},
+                                                    ambient: { r:0.0, g:0.0, b:0.0 },
+                                                    diffuse:  { r:0.8, g:0.8, b:.8 },
+                                                    specular:  { r:0.5, g:0.5, b:0.5 },
+                                                    emission:  { r:1, g:1, b:1 },
+                                                    shininess: 64},
 
                                                         SceneJS.translate({x: -2.5},
                                                                 SceneJS.rotate(function(data) {
                                                                     return { angle: data.get("angle"), y: 1 };
                                                                 },
-                                                                         SceneJS.texture({
+                                                                        SceneJS.texture({
                                                                             layers: [
                                                                                 {
-                                                                                   uri:"earth.jpg",
-                                                                                    applyTo: "emission",
+                                                                                    uri:"earth.jpg",
+                                                                                    applyTo: "ambient",
                                                                                     flipY:true
                                                                                 }
                                                                             ]
                                                                         },
-                                                                        SceneJS.objects.sphere())),
+                                                                                SceneJS.objects.sphere())         ,
 
 
                                                                 SceneJS.translate({x: 2.5},
@@ -77,8 +77,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                                         SceneJS.texture({
                                                                             layers: [
                                                                                 {
-                                                                                   uri:"earth.jpg",
-                                                                                    applyTo: "diffuse",
+                                                                                    uri:"earth.jpg",
+                                                                                    applyTo: "emission",
                                                                                     flipY:true
                                                                                 }
                                                                             ]
@@ -86,33 +86,53 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                                                 SceneJS.rotate(function(data) {
                                                                                     return { angle: data.get("angle"), y: 1 };
                                                                                 },
-                                                                                        SceneJS.objects.sphere()),
-
-                                                                                SceneJS.translate({x: 2.5},
-
-                                                                                        SceneJS.texture({
-                                                                                            layers: [
-                                                                                                {
-                                                                                                    uri:"earth.jpg",
-                                                                                                    applyTo: "specular",
-                                                                                                    flipY:true
-                                                                                                }
-                                                                                            ]
-                                                                                        },
-                                                                                                SceneJS.rotate(function(data) {
-                                                                                                    return { angle: data.get("angle"), y: 1 };
-                                                                                                },
-                                                                                                        SceneJS.objects.sphere())
-                                                                                                )
+                                                                                        SceneJS.objects.sphere())
+//
+//                                                                                SceneJS.translate({x: 2.5},
+//
+//                                                                                        SceneJS.texture({
+//                                                                                            layers: [
+//                                                                                                {
+//                                                                                                    uri:"earth.jpg",
+//                                                                                                    applyTo: "diffuse",
+//                                                                                                    flipY:true
+//                                                                                                }
+//                                                                                            ]
+//                                                                                        },
+//                                                                                                SceneJS.rotate(function(data) {
+//                                                                                                    return { angle: data.get("angle"), y: 1 };
+//                                                                                                },
+//                                                                                                        SceneJS.objects.sphere()),
+//
+//                                                                                                SceneJS.translate({x: 2.5},
+//
+//                                                                                                        SceneJS.texture({
+//                                                                                                            layers: [
+//                                                                                                                {
+//                                                                                                                    uri:"earth-specular.gif",
+//                                                                                                                    applyTo: "shininess",
+//                                                                                                                    flipY:true
+//                                                                                                                }
+//                                                                                                            ]
+//
+//
+//                                                                                                        },
+//                                                                                                                SceneJS.rotate(function(data) {
+//                                                                                                                    return { angle: data.get("angle"), y: 1 };
+//                                                                                                                },
+ //                                                                                                                       SceneJS.objects.cube())
+ //                                                                                                               )
+//                                                                                                       )
+  //                                                                                              )
                                                                                         )
                                                                                 )
                                                                         )
                                                                 )
                                                         )
-                                                )
+                                               )
                                         )
                                 )
-                       )
+                        )
                 )
         );
 
@@ -132,7 +152,7 @@ exampleScene.render({ angle: angle });
  * interval inbetween.
  */
 function doit() {
-    if (angle < 720.0) {
+    if (angle < 1720.0) {
         exampleScene.render({ angle: angle });
         angle += 1.0;
     } else {

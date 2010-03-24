@@ -40,37 +40,37 @@ var exampleScene = SceneJS.scene({
                                                     shininess: 2},
 
                                                         SceneJS.translate({y:-9},
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/mercury/mercury.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-6},
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/venus/venus.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-3},
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/earth/earth.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:-0},
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/mars/mars.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:3},
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/jupiter/jupiter.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:6},
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/uranus/uranus.js" })
                                                                 ),
 
                                                         SceneJS.translate({y:9},
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/v0.7.0/planets/neptune/neptune.js" })
                                                                 )
                                                         )

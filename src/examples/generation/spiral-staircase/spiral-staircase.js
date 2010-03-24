@@ -108,7 +108,7 @@ var dragging = false;
  */
 exampleScene.render({yaw: yaw, pitch: pitch});
 
-var canvas = document.getElementById("theCanvas");
+var canvas = exampleScene.getCanvas();
 
 function mouseDown(event) {
     lastX = event.clientX;

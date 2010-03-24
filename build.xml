@@ -103,10 +103,10 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/processes/processesBackend.js"/>
 
-            <!-- Assets -->
+            <!-- Load -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/asset/assetBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/asset/asset.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/load/loadBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
 
             <!-- Scene -->
 

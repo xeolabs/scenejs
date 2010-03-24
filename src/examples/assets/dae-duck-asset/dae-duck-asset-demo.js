@@ -82,7 +82,7 @@ var exampleScene = SceneJS.scene({
                                                         },
                                                                 /* The COLLADA importation
                                                                  */
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri: "http://www.scenejs.org/app/data/assets/" +
                                                                          "catalogue/assets/v0.7.0/collada-import/colladaImport.js"
                                                                 }))

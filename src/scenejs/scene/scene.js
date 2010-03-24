@@ -7,7 +7,7 @@
 (function() {
 
     var backend = SceneJS._backends.getBackend('scene');
-    var importBackend = SceneJS._backends.getBackend('import');
+    var loadBackend = SceneJS._backends.getBackend('load');
     var processesBackend = SceneJS._backends.getBackend('processes');
 
     /** Creates a new scene
@@ -58,10 +58,10 @@
                         }
                     }
                     if (params.proxy) {
-                        importBackend.setProxy(params.proxy);
+                        loadBackend.setProxy(params.proxy);
                     }
                     SceneJS._utils.visitChildren(cfg, data);
-                    importBackend.setProxy(null);
+                    loadBackend.setProxy(null);
                     backend.deactivateScene();
                 }
             },
@@ -78,10 +78,10 @@
                             }
                         }
                         if (params.proxy) {
-                            importBackend.setProxy(params.proxy);
+                            loadBackend.setProxy(params.proxy);
                         }
                         SceneJS._utils.visitChildren(cfg, data);
-                        importBackend.setProxy(null);
+                        loadBackend.setProxy(null);
                         backend.deactivateScene();
                     } finally {
                         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;

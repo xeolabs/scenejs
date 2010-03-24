@@ -1,5 +1,5 @@
-/** Asynchronously imports an asset from a file into a scene graph. This node is configured with the location of a file
- * that describes a (portion of) a 3D scene. When first visited, it will cause that file to be imported into the scene
+/** Asynchronously loads an asset from a file into a scene graph. This node is configured with the location of a file
+ * that describes a (portion of) a 3D scene. When first visited, it will cause that file to be loaded into the scene
  * graph to become its subtree, providing that a backend has been installed to help SceneJS asset that particular file
  * type.
  */
@@ -11,7 +11,7 @@ SceneJS.withPlugin = function() {
     }
     var params;
 
-    var backend = SceneJS._backends.getBackend("import");
+    var backend = SceneJS._backends.getBackend("load");
     var logging = SceneJS._backends.getBackend("logging");
     var process = null;
     var assetNode;

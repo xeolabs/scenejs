@@ -1,5 +1,5 @@
 /**
- * Defines an asset that imports a COLLADA file. This asset expects two parameters to be
+ * Defines an asset that loads a COLLADA file. This asset expects two parameters to be
  * set on the data scope:
  *
  *      uri:   URL of the COLLADA file
@@ -14,14 +14,14 @@
  *           node: "teapot"
  *         },
  *
- *       SceneJS.import({
+ *       SceneJS.load({
  *           uri: "http://bar.com/colladaImport.js"
  *       })
  *     );
  *
  *  //...
  *
- * Then the SceneJS.import's subgraph will contain content parsed from the COLLADA file.
+ * Then the SceneJS.load's subgraph will contain content parsed from the COLLADA file.
  *
  */
 (function() {
@@ -44,7 +44,7 @@
          * Parsing large Collada documents client-side is not encouraged however, and is not likely to be seriously
          * supported by SceneJS.
          *
-         * The recommended way to import Collada is to use SceneJS.assets.scenejs nodes to pull SceneJS fragments from a
+         * The recommended way to load Collada is to use SceneJS.assets.scenejs nodes to pull SceneJS fragments from a
          * server-side proxy that parses Collada.
          */
         SceneJS.__ColladaParser = (function() {
@@ -625,7 +625,7 @@
             }
 
             /**
-             * Returns a SceneJS node created from the given DOM node. We're importing only
+             * Returns a SceneJS node created from the given DOM node. We're loading only
              * geometry, transforms and material for SceneJS assets, ignoring nodes like cameras and lights.
              */
             function parseNode(node, level) {

@@ -24,10 +24,10 @@
                     if (!params) {
                         params = cfg.getParams(data);
 
-                         if (!params.layers) {
-                                throw new SceneJS.exceptions.NodeConfigExpectedException(
-                                        "SceneJS.texture.layers is undefined");
-                            }
+                        if (!params.layers) {
+                            throw new SceneJS.exceptions.NodeConfigExpectedException(
+                                    "SceneJS.texture.layers is undefined");
+                        }
 
                         params.layers = params.layers || [];
 
@@ -41,6 +41,7 @@
                                 throw new SceneJS.exceptions.NodeConfigExpectedException(
                                         "SceneJS.texture.layers[" + i + "].uri is undefined");
                             }
+
 
                             if (layerParam.applyTo) {
                                 if (layerParam.applyTo != "ambient" &&
@@ -74,7 +75,7 @@
 
                                 texture: null,          // Initialised when state == TEXTURE_LOADED
                                 applyParams : {         //
-                                    applyTo: layerParam.applyTo || "diffuse"
+                                    applyTo: layerParam.applyTo // Optional - colour map my default 
                                 }
                             });
                         }
@@ -110,6 +111,8 @@
                                  */
                                 (function(_layer) {
                                     _layer.state = STATE_IMAGE_LOADING;
+                                
+
                                     _layer.process = textureBackend.loadImage(// Process killed automatically on error or abort
                                             _layer.creationParams.uri,
                                             function(_image) {
@@ -126,16 +129,16 @@
                                                 _layer.state = STATE_IMAGE_LOADED;
                                             },
 
-                                            /* General error, probably a 404
-                                             */
+                                        /* General error, probably a 404
+                                         */
                                             function() {
                                                 logging.getLogger().error("SceneJS.texture image load failed: "
                                                         + _layer.creationParams.uri);
                                                 _layer.state = STATE_ERROR;
                                             },
 
-                                            /* Load aborted - eg. user stopped browser
-                                             */
+                                        /* Load aborted - eg. user stopped browser
+                                         */
                                             function() {
                                                 logging.getLogger().warn("SceneJS.texture image load aborted: "
                                                         + _layer.creationParams.uri);
@@ -155,7 +158,7 @@
                                 /* Create this texture layer
                                  */
                                 layer.texture = textureBackend.createTexture(layer.image, layer.creationParams);
-                                    layer.applyParams.image = layer.image;
+                                layer.applyParams.image = layer.image;
                                 textureBackend.imageLoaded(layer.process);
                                 layer.state = STATE_TEXTURE_CREATED;
                                 countLayersReady++;
@@ -184,9 +187,8 @@
                                 textureBackend.pushLayer(layer.texture, layer.applyParams);
                             }
                             SceneJS._utils.visitChildren(cfg, data);
-                            for (var i = 0; i < layers.length; i++) {
-                                textureBackend.popLayer();
-                            }
+                            textureBackend.popLayers(layers.length);
+
                         }
                     }
                 }

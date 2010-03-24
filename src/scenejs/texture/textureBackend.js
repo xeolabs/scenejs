@@ -157,10 +157,10 @@ SceneJS._backends.installBackend(
                             "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
                 }
                 var glValue = context[glName];
-//                if (!glValue) {
-//                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
-//                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
-//                }
+                //                if (!glValue) {
+                //                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+                //                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
+                //                }
                 return glValue;
             }
 
@@ -266,8 +266,10 @@ SceneJS._backends.installBackend(
                     ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
                 },
 
-                popLayer : function() {
-                    layerStack.pop();
+                popLayers : function(nLayers) {
+                    for (var i = 0; i < nLayers; i++) {
+                        layerStack.pop();
+                    }
                     dirty = true;
                     ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
                 }

@@ -4,6 +4,7 @@
 (function() {
 
     var backend = SceneJS._backends.getBackend("view-frustum");
+    var localityBackend = SceneJS._backends.getBackend("view-locality");
     var modelTransformBackend = SceneJS._backends.getBackend("model-transform");
 
     const STAGE_REMOTE = 0;
@@ -15,7 +16,7 @@
         var objectCoords;
         var box;
         var levels;
-        var states;
+        var states = [];
 
         return SceneJS._utils.createNode(
                 function(data) {
@@ -58,7 +59,7 @@
                                     throw new SceneJS.exceptions.NodeConfigExpectedException
                                             ("boundingBox levels parameter should be an ascending list of unique values");
                                 }
-                                //states.push();
+                                states.push(STAGE_REMOTE);
                             }
                             levels = params.levels;
                         }
@@ -77,7 +78,7 @@
                         }
                     }
 
-                    var local = backend.testLocality(box);
+                    var local = localityBackend.testAxisBoxIntersection(box);
 
                     if (local) {
                         var result = backend.testAxisBoxIntersection(box);

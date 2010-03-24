@@ -6,14 +6,14 @@
  * January 2010
  *
  * "Assets" are remotely-stored scene fragments which may be
- * dynamically imported into your scene using asset nodes.
+ * dynamically loaded into your scene using asset nodes.
  *
  * They can potentially be stored in any format, such as COLLADA,
  * JSON etc., and you can extend SceneJS with plugins to parse
  * various formats. Asset nodes are able to make cross-domain
  * requests to get them.
  *
- * This example imports an orange teapot from the asset repository
+ * This example loads an orange teapot from the asset repository
  * at SceneJS.com.
  *
  * When the scene is first rendered, the "assets.scenejs" node will make a
@@ -76,7 +76,7 @@ var exampleScene = SceneJS.scene({
 
                                             /** Load the asset
                                              */
-                                                SceneJS.import({
+                                                SceneJS.load({
 
                                                     uri:"http://www.scenejs.org/app/data/assets/catalogue/assets/v0.7.0/" +
                                                         "orange-teapot-example/orangeteapot.js"

@@ -6,9 +6,9 @@
  * January 2010
  *
  * "Assets" are remotely-stored scene fragments which may be
- * dynamically imported, cross-domain, into your scene using asset nodes.
+ * dynamically loaded, cross-domain, into your scene using asset nodes.
  *
- * This example imports a spiral staircase from an asset repository
+ * This example loads a spiral staircase from an asset repository
  * at SceneJS.com.
  *
  * When the scene is first rendered, the SceneJS.assets.scenejs node
@@ -117,7 +117,7 @@ var exampleScene = SceneJS.scene({
                                                             numSteps:50,
                                                             stepAngle:20 },
 
-                                                                SceneJS.import({
+                                                                SceneJS.load({
                                                                     uri:"http://scenejs.org/app/data/assets/catalogue/assets/" +
                                                                         "v0.7.0/staircase-example/staircase.js"
                                                                 })

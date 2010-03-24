@@ -7,7 +7,7 @@
  * Parsing large Collada documents client-side is not encouraged however, and is not likely to be seriously
  * supported by SceneJS.
  *
- * The recommended way to import Collada is to use SceneJS.assets.scenejs nodes to pull SceneJS fragments from a
+ * The recommended way to load Collada is to use SceneJS.assets.scenejs nodes to pull SceneJS fragments from a
  * server-side proxy that parses Collada.  
  */
 SceneJS.assets._ColladaParser = (function() {
@@ -588,7 +588,7 @@ SceneJS.assets._ColladaParser = (function() {
     }
 
     /**
-     * Returns a SceneJS node created from the given DOM node. We're importing only
+     * Returns a SceneJS node created from the given DOM node. We're loading only
      * geometry, transforms and material for SceneJS assets, ignoring nodes like cameras and lights.
      */
     function parseNode(node, level) {

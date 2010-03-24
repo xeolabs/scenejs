@@ -6,9 +6,9 @@ var SceneJS = {
 
     /** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
      */
-//    SceneJS.require = function(url) {
-//
-//    };
+    //    SceneJS.require = function(url) {
+    //
+    //    };
 
     /** All exceptions thrown by SceneJS
      */
@@ -29,12 +29,19 @@ var SceneJS = {
          *
          */
         applyIf : function(o1, o2) {
-            for (var key in o1) {
-                if (!o2[key]) {
-                    o2[key] = o1[key];
+            for (var key in o2) {
+                if (!o1[key]) {
+                    o1[key] = o2[key];
                 }
             }
-            return o2;
+            return o1;
+        },
+
+        apply : function(o1, o2) {
+            for (var key in o2) {
+                o1[key] = o2[key];
+            }
+            return o1;
         },
 
         /** Converts degrees to radiians
@@ -1252,7 +1259,7 @@ SceneJS._math = {
             new math.FrustumPlane(q[ 0] + m[ 2], q[ 1] + m[ 6], q[ 2] + m[10], m[15] + m[14])
         ];
 
-        /* Resources for LOD         
+        /* Resources for LOD
          */
         var rotVec = [
             math.getColMat4(viewMatrix, 0),
@@ -1348,7 +1355,7 @@ SceneJS._webgl = {
      */
     DEFAULT_CANVAS_ID : "_scenejs-default-canvas",
 
-    /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one     
+    /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
      */
     DEFAULT_LOGGING_ID : "_scenejs-default-logging",
 
@@ -1406,7 +1413,8 @@ SceneJS._webgl = {
         luminanceAlpha:"LUMINANCE_ALPHA",
         textureBinding2D:"TEXTURE_BINDING_2D",
         textureBindingCubeMap:"TEXTURE_BINDING_CUBE_MAP",
-        compareRToTexture:"COMPARE_R_TO_TEXTURE" // Hardware Shadowing Z-depth
+        compareRToTexture:"COMPARE_R_TO_TEXTURE", // Hardware Shadowing Z-depth,
+        unsignedByte: "UNSIGNED_BYTE"
     },
 
     fogModes: {
@@ -1496,7 +1504,7 @@ SceneJS._webgl = {
         logging.debug("Program sampler found in shader: " + name);
         this.bindTexture = function(texture, unit) {
             texture.bind(unit);
-            context.uniform1i(location, 0);
+            context.uniform1i(location, unit);
         };
     },
 
@@ -1744,9 +1752,15 @@ SceneJS._webgl = {
             context.texImage2D(context.TEXTURE_2D, 0, cfg.internalFormat, cfg.width, cfg.height, 0, cfg.sourceFormat, cfg.sourceType, cfg.texels);
 
             if (cfg.isDepth) {
-                context.texParameteri(context.TEXTURE_2D, context.DEPTH_TEXTURE_MODE, cfg.depthMode);
-                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_MODE, cfg.depthCompareMode);
-                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_FUNC, cfg.depthCompareFunc);
+                if (cfg.depthMode) {
+                    context.texParameteri(context.TEXTURE_2D, context.DEPTH_TEXTURE_MODE, cfg.depthMode);
+                }
+                if (cfg.depthCompareMode) {
+                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_MODE, cfg.depthCompareMode);
+                }
+                if (cfg.depthCompareFunc) {
+                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_FUNC, cfg.depthCompareFunc);
+                }
             }
 
             this.format = cfg.internalFormat;
@@ -1756,27 +1770,34 @@ SceneJS._webgl = {
             this.depthMode = cfg.depthMode;
             this.depthCompareMode = cfg.depthCompareMode;
             this.depthCompareFunc = cfg.depthCompareFunc;
-        }   
+        }
 
-        context.texParameteri(// Filtered technique when scaling texture down
-                context.TEXTURE_2D,
-                context.TEXTURE_MIN_FILTER,
-                cfg.minFilter);
+        if (cfg.minFilter) {
+            context.texParameteri(// Filtered technique when scaling texture down
+                    context.TEXTURE_2D,
+                    context.TEXTURE_MIN_FILTER,
+                    cfg.minFilter);
+        }
 
-        context.texParameteri(// Filtering technique when scaling texture up
-                context.TEXTURE_2D,
-                context.TEXTURE_MAG_FILTER,
-                cfg.magFilter);
+        if (cfg.magFilter) {
+            context.texParameteri(// Filtering technique when scaling texture up
+                    context.TEXTURE_2D,
+                    context.TEXTURE_MAG_FILTER,
+                    cfg.magFilter);
+        }
+        if (cfg.wrapS) {
+            context.texParameteri(
+                    context.TEXTURE_2D,
+                    context.TEXTURE_WRAP_S,
+                    cfg.wrapS);
+        }
 
-        context.texParameteri(
-                context.TEXTURE_2D,
-                context.TEXTURE_WRAP_S,
-                cfg.wrapS);
-
-        context.texParameteri(
-                context.TEXTURE_2D,
-                context.TEXTURE_WRAP_T,
-                cfg.wrapT);
+        if (cfg.wrapT) {
+            context.texParameteri(
+                    context.TEXTURE_2D,
+                    context.TEXTURE_WRAP_T,
+                    cfg.wrapT);
+        }
 
         /* Generate MIP map if required
          */
@@ -1790,21 +1811,18 @@ SceneJS._webgl = {
 
         context.bindTexture(this.target, null);
 
+//        gl.activeTexture(gl.TEXTURE0);
+        //  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
+        //  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
+
         this.bind = function(unit) {
-            if (unit) {
-                context.activeTexture(context["TEXTURE" + unit]);
-            } else {
-                context.activeTexture(context.TEXTURE0);
-            }
+            context.activeTexture(context["TEXTURE" + unit]);
             context.bindTexture(this.target, this.handle);
+
         };
 
         this.unbind = function(unit) {
-            if (unit) {
-                context.activeTexture(context["TEXTURE" + unit]);
-            } else {
-                context.activeTexture(context.TEXTURE0);
-            }
+            context.activeTexture(context["TEXTURE" + unit]);
             context.bindTexture(this.target, null);
         };
 
@@ -1990,6 +2008,11 @@ SceneJS.exceptions.ProxyNotSpecifiedException = function(msg, cause) {
 };
 
 
+SceneJS.exceptions.WebGLUnsupportedNodeConfigException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 
 /**
@@ -2034,7 +2057,7 @@ SceneJS._eventTypes = {
     MODEL_TRANSFORM_UPDATED : 0,        // Model transform matrix updated
     MODEL_TRANSFORM_EXPORTED : 0,       // Export transform matrix for rendering
 
-    PROJECTION_TRANSFORM_UPDATED : 0,   // 
+    PROJECTION_TRANSFORM_UPDATED : 0,   //
     PROJECTION_TRANSFORM_EXPORTED : 0,
 
     VIEW_TRANSFORM_UPDATED : 0,
@@ -2047,7 +2070,7 @@ SceneJS._eventTypes = {
     MATERIAL_EXPORTED : 0,
 
     TEXTURES_UPDATED : 0,              // Texture activated after a texture node visited
-    TEXTURES_EXPORTED : 0,    
+    TEXTURES_EXPORTED : 0,
 
     SHADER_ACTIVATE : 0,
     SHADER_ACTIVATED : 0,
@@ -2348,7 +2371,7 @@ SceneJS.loggingToPage = function() {
     return SceneJS._utils.createNode(
             function(data) {
                 if (!funcs) {
-                    var params = cfg.getParams();                  
+                    var params = cfg.getParams();
 
                     var element = findElement(params.elementId);
 
@@ -2557,7 +2580,7 @@ SceneJS._backends.installBackend(
                 }
             };
 
-            /* Node-facing API            
+            /* Node-facing API
              */
             return {
 
@@ -2575,7 +2598,7 @@ SceneJS._backends.installBackend(
  */
 SceneJS._backends.installBackend(
 
-        "import",
+        "load",
 
         function(ctx) {
 
@@ -2680,7 +2703,7 @@ SceneJS._backends.installBackend(
                 loadAsset : function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
                     if (!proxyUri) {
                         throw new SceneJS.exceptions.ProxyNotSpecifiedException
-                                ("SceneJS.import node expects you to provide a 'proxy' configuration on the SceneJS.scene root node");
+                                ("SceneJS.load node expects you to provide a 'proxy' configuration on the SceneJS.scene root node");
                     }
                     ctx.logging.debug("Loading asset from " + uri);
                     var process = ctx.processes.createProcess({
@@ -2714,29 +2737,31 @@ SceneJS._backends.installBackend(
                 }
             };
         });
-/** Asynchronously imports an asset from a file into a scene graph. This node is configured with the location of a file
- * that describes a (portion of) a 3D scene. When first visited, it will cause that file to be imported into the scene
- * graph to become its subtree, providing that a backend has been installed to help SceneJS asset that particular file
- * type.
+/** Asynchronously loads a subgraph cross-domain. This node is configured with the location of a file
+ * that describes the subgraph. When first visited, it will start the load, then finish the load and
+ * integrate the subgraph on a future visit.
+ *
+ * Can be configured with child nodes to visit while the load is in progress, which will be replaced by
+ * the loaded subgraph.
  */
-SceneJS.import = function() {
+SceneJS.load = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     if (!cfg.fixed) {
         throw new SceneJS.exceptions.UnsupportedOperationException
-                ("Dynamic configuration of asset nodes is not supported");
+                ("Dynamic configuration of SceneJS.load nodes is not supported");
     }
     var params;
 
-    var backend = SceneJS._backends.getBackend("import");
+    var backend = SceneJS._backends.getBackend("load");
     var logging = SceneJS._backends.getBackend("logging");
     var process = null;
     var assetNode;
 
-    const STATE_INITIAL = 0;            // Ready to get asset
-    const STATE_ASSET_LOADING = 2;      // Asset load in progress
-    const STATE_ASSET_LOADED = 3;       // Asset load completed
-    const STATE_ASSET_ATTACHED = 4;     // Asset created
-    const STATE_ERROR = -1;             // Asset load or texture creation failed
+    const STATE_INITIAL = 0;        // Ready to start load
+    const STATE_LOADING = 2;        // Load in progress
+    const STATE_LOADED = 3;         // Load completed
+    const STATE_ATTACHED = 4;       // Subgraph integrated
+    const STATE_ERROR = -1;         // Asset load or texture creation failed
 
     var state = STATE_INITIAL;
 
@@ -2749,7 +2774,7 @@ SceneJS.import = function() {
         }
     }
 
-    function visitAsset(params, data) {
+    function visitSubgraph(params, data) {
         if (params) { // Parameters for asset - supply in a new child data
             var childScope = SceneJS._utils.newScope(data, cfg.fixed);
             for (var key in params.params) {
@@ -2768,33 +2793,33 @@ SceneJS.import = function() {
                     params = cfg.getParams(data);
                     if (!params.uri) {
                         throw new SceneJS.exceptions.NodeConfigExpectedException
-                                ("Mandatory asset parameter missing: uri");
-                    }                 
+                                ("Mandatory SceneJS.load parameter missing: uri");
+                    }
                 }
 
-                if (state == STATE_ASSET_ATTACHED) {
+                if (state == STATE_ATTACHED) {
                     if (!backend.getAsset(params.uri)) {
                         state = STATE_INITIAL;
                     }
                 }
 
                 switch (state) {
-                    case STATE_ASSET_ATTACHED:
-                        visitAsset(params.params, data);
+                    case STATE_ATTACHED:
+                        visitSubgraph(params.params, data);
                         break;
 
-                    case STATE_ASSET_LOADING:
+                    case STATE_LOADING:
                         break;
 
-                    case STATE_ASSET_LOADED:
+                    case STATE_LOADED:
                         backend.assetLoaded(process);  // Finish loading - kill process
                         process = null;
-                        state = STATE_ASSET_ATTACHED;
-                        visitAsset(params.params, data);
+                        state = STATE_ATTACHED;
+                        visitSubgraph(params.params, data);
                         break;
 
                     case STATE_INITIAL:
-                        state = STATE_ASSET_LOADING;
+                        state = STATE_LOADING;
                         process = backend.loadAsset(// Process killed automatically on error or abort
                                 params.uri,
                                 params.serverParams || {
@@ -2803,16 +2828,15 @@ SceneJS.import = function() {
                                 params.parser || sceneJSParser,
                                 function(asset) { // Success
                                     assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
-                                    state = STATE_ASSET_LOADED;
+                                    state = STATE_LOADED;
                                 },
                                 function() { // onTimeout
-                                    state = STATE_ERROR;                                 
+                                    state = STATE_ERROR;
                                 },
                                 function(msg) { // onError - backend has killed process
                                     state = STATE_ERROR;
                                     logging.getLogger().error(
-                                            "Asset load failed - " + msg +
-                                            " - proxy: " + params.proxy + ", uri: " + params.uri);
+                                            "SceneJS.load failed - " + msg + " - uri: " + params.uri);
                                 });
 
                         SceneJS._utils.visitChildren(cfg, data);
@@ -3136,7 +3160,7 @@ SceneJS._backends.installBackend(
 (function() {
 
     var backend = SceneJS._backends.getBackend('scene');
-    var assetsBackend = SceneJS._backends.getBackend('assets');
+    var loadBackend = SceneJS._backends.getBackend('load');
     var processesBackend = SceneJS._backends.getBackend('processes');
 
     /** Creates a new scene
@@ -3187,10 +3211,10 @@ SceneJS._backends.installBackend(
                         }
                     }
                     if (params.proxy) {
-                        assetsBackend.setProxy(params.proxy);
+                        loadBackend.setProxy(params.proxy);
                     }
                     SceneJS._utils.visitChildren(cfg, data);
-                    assetsBackend.setProxy(null);
+                    loadBackend.setProxy(null);
                     backend.deactivateScene();
                 }
             },
@@ -3207,10 +3231,10 @@ SceneJS._backends.installBackend(
                             }
                         }
                         if (params.proxy) {
-                            assetsBackend.setProxy(params.proxy);
+                            loadBackend.setProxy(params.proxy);
                         }
                         SceneJS._utils.visitChildren(cfg, data);
-                        assetsBackend.setProxy(null);
+                        loadBackend.setProxy(null);
                         backend.deactivateScene();
                     } finally {
                         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
@@ -3895,10 +3919,10 @@ SceneJS._backends.installBackend(
                 src.push("  vec3    ambientValue=uAmbient;");
                 src.push("  vec3    diffuseValue=uMaterialDiffuse;");
                 src.push("  vec3    specularValue=uMaterialSpecular;");
-                src.push("  vec3    shininessValue=uMaterialShininess;");
+                src.push("  float    shininessValue=uMaterialShininess;");
                 src.push("  vec3    emissionValue=uMaterialEmission;");
 
-                src.push("  float alpha = 0.6;");
+                src.push("  float alpha = 1.0;");
                 src.push("  float mask=1.0;");
                 src.push("  vec2 textureCoords=vec2(0.0,0.0);");
 
@@ -3906,23 +3930,23 @@ SceneJS._backends.installBackend(
                     for (var i = 0; i < textureLayers.length; i++) {
                         var layer = textureLayers[i];
                         if (layer.params.applyTo == "diffuse") {
-                            src.push("diffuseValue  *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb * mask;");
+                            src.push("diffuseValue  = diffuseValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
                         }
 
                         if (layer.params.applyTo == "specular") {
-                            src.push("specularValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb * mask;");
+                            src.push("specularValue = specularValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
                         }
 
                         if (layer.params.applyTo == "ambient") {
-                            src.push("ambientValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb * mask;");
+                            src.push("ambientValue = ambientValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
                         }
 
                         if (layer.params.applyTo == "shininess") {
-                            src.push("shininessValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).b * mask * 255.0;");
+                            src.push("shininessValue = shininessValue *  texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).r ;");
                         }
 
                         if (layer.params.applyTo == "emission") {
-                            src.push("emissionValue *= (1.0 - mask) + texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).r * mask;");
+                            src.push("emissionValue = emissionValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
                         }
                     }
                 }
@@ -3994,14 +4018,12 @@ SceneJS._backends.installBackend(
                         /* Directional light
                          */
 
-                        if (lights[i].type == "dir") {
-                            src.push("dotN = max(dot(vNormal, -lightDir" + i + "), 0.0);");
+                        src.push("dotN = max(dot(vNormal, -vLightVec" + i + "), 0.0);");
 
-                            src.push("diffuseWeighting += dotN *  uLightDiffuse" + i + ";");
-                            if (material.shininess > 0.0) {
-                                src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), shininessValue);\n");
-                                src.push("specularWeighting += uLightSpecular" + i + " * pf;");
-                            }
+                        src.push("diffuseWeighting += dotN *  uLightDiffuse" + i + ";");
+                        if (material.shininess > 0.0) {
+                            src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), shininessValue);\n");
+                            src.push("specularWeighting += uLightSpecular" + i + " * pf;");
                         }
                     }
                     src.push("ambientValue += uLightAmbient" + i + ";");
@@ -4106,15 +4128,22 @@ SceneJS._backends.installBackend(
             var glEnum = function(context, name) {
                 if (!name) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Null renderer node config: \"" + name + "\"");
+                            "Null SceneJS.renderer node config: \"" + name + "\"");
                 }
                 var result = SceneJS._webgl.enumMap[name];
                 if (!result) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised renderer node config value: \"" + name + "\"");
+                            "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
                 }
-                return result;
+                var value = context[result];
+                if (!value) {
+                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+                            "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
+                }
+                return value;
             };
+
+
 
             /**
              * Order-insensitive functions that set WebGL modes ie. not actually causing an
@@ -4774,10 +4803,11 @@ SceneJS._backends.installBackend(
 
                     /* Draw geometry
                      */
+
                     context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                     context.flush();
 
-                    /* Don't need to unbind buffers - only one is bound at a time anyway                    
+                    /* Don't need to unbind buffers - only one is bound at a time anyway
                      */
 
                     /* Destroy one-off geometry
@@ -4786,6 +4816,7 @@ SceneJS._backends.installBackend(
                         destroyGeometry(geo);
                         currentBoundGeo = null;
                     }
+
                 }
             };
         });
@@ -11091,7 +11122,7 @@ SceneJS.rotate = function() {
 
         return SceneJS._utils.createNode(
                 function(data) {
-                    if (memoLevel == NO_MEMO) {   
+                    if (memoLevel == NO_MEMO) {
                         var params = cfg.getParams(data);
                         mat = SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
                         if (cfg.fixed) {
@@ -11207,7 +11238,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SHADER_RENDERING,
                     function() {
-                        if (dirty) {                
+                        if (dirty) {
                             if (!transform.matrixAsArray) {
                                 transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                             }
@@ -11581,7 +11612,7 @@ SceneJS._backends.installBackend(
                 }
                 return {
                     type: light.type || "point",
-                    ambient: colourToArray(light.diffuse, [ 0.2, 0.2, 0.2 ]),
+                    ambient: colourToArray(light.ambient, [ 0.2, 0.2, 0.2 ]),
                     diffuse: colourToArray(light.diffuse, [ 1.0, 1.0, 1.0 ]),
                     specular: colourToArray(light.specular, [ 1.0, 1.0, 1.0 ]),
 
@@ -12105,11 +12136,16 @@ SceneJS._backends.installBackend(
     var backend = SceneJS._backends.getBackend("view-frustum");
     var modelTransformBackend = SceneJS._backends.getBackend("model-transform");
 
+    const STAGE_REMOTE = 0;
+    const STAGE_SCENE = 1;
+    const STATE_BUFFERED = 2;
+
     SceneJS.boundingBox = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
         var objectCoords;
         var box;
         var levels;
+        var states;
 
         return SceneJS._utils.createNode(
                 function(data) {
@@ -12152,6 +12188,7 @@ SceneJS._backends.installBackend(
                                     throw new SceneJS.exceptions.NodeConfigExpectedException
                                             ("boundingBox levels parameter should be an ascending list of unique values");
                                 }
+                                //states.push();
                             }
                             levels = params.levels;
                         }
@@ -12170,29 +12207,34 @@ SceneJS._backends.installBackend(
                         }
                     }
 
-                    var result = backend.testAxisBoxIntersection(box);
+                    var local = backend.testLocality(box);
 
-                    switch (result) {
-                        case SceneJS._math.INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                    if (local) {
+                        var result = backend.testAxisBoxIntersection(box);
 
-                        case SceneJS._math.INSIDE_FRUSTUM:
+                        switch (result) {
+                            case SceneJS._math.INTERSECT_FRUSTUM:  // TODO: GL clipping hints
 
-                            if (levels) { // Level-of-detail mode
+                            case SceneJS._math.INSIDE_FRUSTUM:
 
-                                var size = backend.getProjectedSize(box);
-                                for (var i = levels.length - 1; i >= 0; i--) {
-                                    if (levels[i] <= size) {
-                                        SceneJS._utils.visitChild(cfg, i, data);
-                                        return;
+                                if (levels) { // Level-of-detail mode
+
+                                    var size = backend.getProjectedSize(box);
+                                    for (var i = levels.length - 1; i >= 0; i--) {
+                                        if (levels[i] <= size) {
+                                            var state = states[i];
+                                            SceneJS._utils.visitChild(cfg, i, data);
+                                            return;
+                                        }
                                     }
+                                } else {
+                                    SceneJS._utils.visitChildren(cfg, data);
                                 }
-                            } else {
-                                SceneJS._utils.visitChildren(cfg, data);
-                            }
-                            break;
+                                break;
 
-                        case SceneJS._math.OUTSIDE_FRUSTUM:
-                            break;
+                            case SceneJS._math.OUTSIDE_FRUSTUM:
+                                break;
+                        }
                     }
                 });
     };
@@ -12345,16 +12387,22 @@ SceneJS._backends.installBackend(
              * or to default if undefined. Throws exception when defined
              * but not mapped to an enum.
              */
-            function getGLOption(value, defaultVal) {
+            function getGLOption(name, context, cfg, defaultVal) {
+                var value = cfg[name];
                 if (value == undefined) {
                     return defaultVal;
                 }
-                var glVal = SceneJS._webgl.enumMap[value];
-                if (glVal == undefined) {
+                var glName = SceneJS._webgl.enumMap[value];
+                if (glName == undefined) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised texture node configuration value: '" + value + "'");
+                            "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
                 }
-                return glVal;
+                var glValue = context[glName];
+                //                if (!glValue) {
+                //                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+                //                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
+                //                }
+                return glValue;
             }
 
             /** Returns default value for when given value is undefined
@@ -12410,14 +12458,12 @@ SceneJS._backends.installBackend(
                 /**
                  * Creates and returns a new texture, or re-uses existing one if possible
                  */
-                createTexture : function(cfg) {
+                createTexture : function(image, cfg) {
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
                     var context = canvas.context;
-                    var textureId = cfg.uri
-                            ? (canvas.canvasId + ":" + cfg.uri)
-                            : SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
+                    var textureId = SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
 
                     ctx.memory.allocate(
                             "texture '" + textureId + "'",
@@ -12425,22 +12471,22 @@ SceneJS._backends.installBackend(
                                 textures[textureId] = new SceneJS._webgl.Texture2D(context, {
                                     textureId : textureId,
                                     canvas: canvas,
-                                    image : cfg.image,
+                                    image : image,
                                     texels :cfg.texels,
-                                    minFilter : getGLOption(cfg.minFilter, context.LINEAR),
-                                    magFilter :  getGLOption(cfg.magFilter, context.LINEAR),
-                                    wrapS : getGLOption(cfg.wrapS, context.CLAMP_TO_EDGE),
-                                    wrapT :   getGLOption(cfg.wrapT, context.CLAMP_TO_EDGE),
+                                    minFilter : getGLOption("minFilter", context, cfg, context.LINEAR),
+                                    magFilter :  getGLOption("magFilter", context, cfg, context.LINEAR),
+                                    wrapS : getGLOption("wrapS", context, cfg, context.CLAMP_TO_EDGE),
+                                    wrapT :   getGLOption("wrapT", context, cfg, context.CLAMP_TO_EDGE),
                                     isDepth :  getOption(cfg.isDepth, false),
-                                    depthMode : getGLOption(cfg.depthMode, context.LUMINANCE),
-                                    depthCompareMode : getGLOption(cfg.depthCompareMode, context.COMPARE_R_TO_TEXTURE),
-                                    depthCompareFunc : getGLOption(cfg.depthCompareFunc, context.LEQUAL),
+                                    depthMode : getGLOption("depthMode", context, cfg, context.LUMINANCE),
+                                    depthCompareMode : getGLOption("depthCompareMode", context, cfg, context.COMPARE_R_TO_TEXTURE),
+                                    depthCompareFunc : getGLOption("depthCompareFunc", context, cfg, context.LEQUAL),
                                     flipY : getOption(cfg.flipY, true),
                                     width: getOption(cfg.width, 1),
                                     height: getOption(cfg.height, 1),
-                                    internalFormat : getGLOption(cfg.internalFormat, context.LEQUAL),
-                                    sourceFormat : getGLOption(cfg.sourceType, context.ALPHA),
-                                    sourceType : getGLOption(cfg.sourceType, context.UNSIGNED_BYTE),
+                                    internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
+                                    sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
+                                    sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
                                     logging: ctx.logging
                                 });
                             });
@@ -12448,18 +12494,23 @@ SceneJS._backends.installBackend(
                     return textures[textureId];
                 },
 
-                pushLayer : function(layer) {
-                    if (!textures[layer.texture.textureId]) {
-                        throw "No such texture loaded \"" + layer.texture.textureId + "\"";
+                pushLayer : function(texture, params) {
+                    if (!textures[texture.textureId]) {
+                        throw "No such texture loaded \"" + texture.textureId + "\"";
                     }
-                    layer.texture.lastUsed = time;
-                    layerStack.push(layer);
+                    texture.lastUsed = time;
+                    layerStack.push({
+                        texture: texture,
+                        params: params
+                    });
                     dirty = true;
                     ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
                 },
 
-                popLayer : function() {
-                    layerStack.pop();
+                popLayers : function(nLayers) {
+                    for (var i = 0; i < nLayers; i++) {
+                        layerStack.pop();
+                    }
                     dirty = true;
                     ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
                 }
@@ -12467,7 +12518,9 @@ SceneJS._backends.installBackend(
         });
 (function() {
 
-    var backend = SceneJS._backends.getBackend("texture");
+    /* Separate backends for texture and colour for simplicity
+     */
+    var textureBackend = SceneJS._backends.getBackend("texture");
     var logging = SceneJS._backends.getBackend("logging");
 
     const STATE_INITIAL = 0;            // Ready to get texture
@@ -12476,168 +12529,185 @@ SceneJS._backends.installBackend(
     const STATE_TEXTURE_CREATED = 4;    // Texture created
     const STATE_ERROR = -1;             // Image load or texture creation failed
 
-    /** Pushes texture layer, renders children, then pops layer
-     */
-    function doTextureLayer(cfg, data, layer) {
-        if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-            SceneJS._utils.visitChildren(cfg, data);
-        } else {
-            backend.pushLayer(layer);
-            SceneJS._utils.visitChildren(cfg, data);
-            backend.popLayer();
-        }
-    }
-
-    /** Checks that only one texture source parameter is configured
-     */
-    function ensureOneOf(sourceParams) {
-        var n = 0;
-        for (var i = 0; i < sourceParams.length; i++) {
-            if (sourceParams[i]) {
-                n++;
-            }
-        }
-        if (n == 0) {
-            throw new SceneJS.exceptions.NodeConfigExpectedException
-                    ("Mandatory texture node parameter missing - must have one of: uri, texels or image");
-        }
-        if (n > 1) {
-            throw new SceneJS.exceptions.NodeConfigExpectedException
-                    ("Texture node has more than one texture source - must have one of: uri, texels or image");
-        }
-    }
-
     SceneJS.texture = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
-        //        if (!cfg.fixed) {
-        //            throw new SceneJS.exceptions.UnsupportedOperationException
-        //                    ("Dynamic configuration of texture nodes is not supported");
-        //        }
-
-        var state = STATE_INITIAL;
         var params;
-        var layerParams;
-        var process = null;   // Handle to asynchronous load process for texture configured with image url
-        var image;
-        var layer;
+        var layers = [];
 
         return SceneJS._utils.createNode(
                 function(data) {
+
+                    /* Node can be dynamically configured, but only once
+                     */
                     if (!params) {
                         params = cfg.getParams(data);
 
-                        if (!params.uri) {
-                            throw new SceneJS.exceptions.WebGLNotSupportedException("Only uri is supported in textures in this version");
+                        if (!params.layers) {
+                            throw new SceneJS.exceptions.NodeConfigExpectedException(
+                                    "SceneJS.texture.layers is undefined");
                         }
 
-                        //ensureOneOf([params.uri, params.texels, params.image]);
+                        params.layers = params.layers || [];
 
-                        if (params.wait == undefined) {  // By default, dont render children until texture loaded
-                            params.wait = true;
+                        /* Prepare texture layers from params
+                         */
+                        for (var i = 0; i < params.layers.length; i++) {
+
+                            var layerParam = params.layers[i];
+
+                            if (!layerParam.uri) {
+                                throw new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.texture.layers[" + i + "].uri is undefined");
+                            }
+
+                            if (layerParam.applyTo) {
+                                if (layerParam.applyTo != "ambient" &&
+                                    layerParam.applyTo != "diffuse" &&
+                                    layerParam.applyTo != "specular" &&
+                                    layerParam.applyTo != "shininess" &&
+                                    layerParam.applyTo != "emission" &&
+                                    layerParam.applyTo != "red" &&
+                                    layerParam.applyTo != "green" &&
+                                    layerParam.applyTo != "blue" &&
+                                    layerParam.applyTo != "alpha" &&
+                                    layerParam.applyTo != "normal" &&
+                                    layerParam.applyTo != "height") {
+
+                                    throw SceneJS.exceptions.InvalidNodeConfigException(
+                                            "SceneJS.texture.layers[" + i + "].applyTo is unsupported - " +
+                                            "should be either 'diffuse', 'specular', 'shininess', " +
+                                            "'emission', 'red', 'green', " +
+                                            "'blue', alpha', 'normal' or 'height'");
+                                }
+                            }
+
+                            layers.push({
+                                state : STATE_INITIAL,
+                                process: null,                  // Imageload process handle
+                                image : null,                   // Initialised when state == IMAGE_LOADED
+                                creationParams: layerParam,   // Create texture using this
+
+                                /* The layer that gets exported
+                                 */
+
+                                texture: null,          // Initialised when state == TEXTURE_LOADED
+                                applyParams : {         //
+                                    applyTo: layerParam.applyTo // Optional - colour map my default
+                                }
+                            });
                         }
+                    }
 
-                        if (params.applyTo) {
-                            if (params.applyTo != "ambient" &&
-                                params.applyTo != "diffuse" &&
-                                params.applyTo != "specular" &&
-                                params.applyTo != "shininess" &&
-                                params.applyTo != "emission" &&
-                                params.applyTo != "red" &&
-                                params.applyTo != "green" &&
-                                params.applyTo != "blue" &&
-                                params.applyTo != "alpha" &&
-                                params.applyTo != "normal" &&
-                                params.applyTo != "height") {
-                                throw SceneJS.exceptions.InvalidNodeConfigException(
-                                        "SceneJS.texture node has an applyTo mode of unsupported type - " +
-                                        "should be 'diffuse', 'specular', 'shininess', " +
-                                        "'emission', 'red', 'green', " +
-                                        "'blue', alpha', 'normal' or 'height'");
+                    /* Update state of each texture layer and
+                     * count how many are created and ready to apply
+                     */
+                    var countLayersReady = 0;
+
+                    for (var i = 0; i < layers.length; i++) {
+                        var layer = layers[i];
+
+                        /* Backend may evict texture when not recently used,
+                         * in which case we'll have to load it again
+                         */
+                        if (layer.state == STATE_TEXTURE_CREATED) {
+                            if (!textureBackend.textureExists(layer.texture)) {
+                                layer.state = STATE_INITIAL;
                             }
                         }
 
-                        layerParams = {
-                            applyTo: params.applyTo || "diffuse"
-                        };
-                    }
-
-                    /* Backend may evict texture when not recently used,
-                     * in which case we'll have to load it again
-                     */
-                    if (state == STATE_TEXTURE_CREATED) {
-                        if (!backend.textureExists(layer.texture)) {
-                            state = STATE_INITIAL;
-                        }
-                    }
-
-                    if (!params.uri) {
-
-                        //                    /* Trivial case: texture image/texels are supplied in configs,
-                        //                     * so we can create and apply the texture immediately
-                        //                     */
-                        //                    if (!textureId) {
-                        //                        textureId = backend.createTexture(params);
-                        //                    }
-                        //                    doTextureLayer(cfg, data, textureId);
-                    } else {
-
-                        switch (state) {
-                            case STATE_TEXTURE_CREATED: // Most frequent case, hopefully
-                                doTextureLayer(cfg, data, layer);
+                        switch (layer.state) {
+                            case STATE_TEXTURE_CREATED:
+                                countLayersReady++;
                                 break;
 
                             case STATE_INITIAL:
-                                state = STATE_IMAGE_LOADING;
-                                process = backend.loadImage(// Process killed automatically on error or abort
-                                        params.uri,
-                                        function(_image) {
 
-                                            /* Image loaded successfully. Note that this callback will
-                                             * be called in the idle period between render traversals (ie. scheduled by a
-                                             * setInterval), so we're not actually visiting this node at this point. We'll
-                                             * defer creation and application of the texture to the subsequent visit. We'll also defer
-                                             * killing the load process to then so that we don't suddenly alter the list of
-                                             * running scene processes during the idle period, when the list is likely to
-                                             * be queried.
-                                             */
-                                            image = _image;
-                                            state = STATE_IMAGE_LOADED;
-                                        },
-                                        function() {
-                                            logging.getLogger().error("Texture image load failed: " + params.uri);
-                                            state = STATE_ERROR;
-                                        },
-                                        function() {
-                                            logging.getLogger().warn("Texture image load aborted: " + params.uri);
-                                            state = STATE_ERROR;
-                                        });
+                                /* Start loading image for this texture layer.
+                                 *
+                                 * Do it in a new closure so that the right layer gets the process result.
+                                 */
+                                (function(_layer) {
+                                    _layer.state = STATE_IMAGE_LOADING;
+                                    _layer.process = textureBackend.loadImage(// Process killed automatically on error or abort
+                                            _layer.creationParams.uri,
+                                            function(_image) {
+
+                                                /* Image loaded successfully. Note that this callback will
+                                                 * be called in the idle period between render traversals (ie. scheduled by a
+                                                 * setInterval), so we're not actually visiting this node at this point. We'll
+                                                 * defer creation and application of the texture to the subsequent visit. We'll also defer
+                                                 * killing the load process to then so that we don't suddenly alter the list of
+                                                 * running scene processes during the idle period, when the list is likely to
+                                                 * be queried.
+                                                 */
+                                                _layer.image = _image;
+                                                _layer.state = STATE_IMAGE_LOADED;
+                                            },
+
+                                        /* General error, probably a 404
+                                         */
+                                            function() {
+                                                logging.getLogger().error("SceneJS.texture image load failed: "
+                                                        + _layer.creationParams.uri);
+                                                _layer.state = STATE_ERROR;
+                                            },
+
+                                        /* Load aborted - eg. user stopped browser
+                                         */
+                                            function() {
+                                                logging.getLogger().warn("SceneJS.texture image load aborted: "
+                                                        + _layer.creationParams.uri);
+                                                _layer.state = STATE_ERROR;
+                                            });
+                                })(layer);
                                 break;
 
                             case STATE_IMAGE_LOADING:
-                                if (!params.wait) {
-                                    SceneJS._utils.visitChildren(cfg, data);  // Render children while image loading
-                                }
+
+                                /* Continue loading this texture layer
+                                 */
                                 break;
 
                             case STATE_IMAGE_LOADED:
-                                params.image = image;
-                                layer = {
-                                    texture: backend.createTexture(params),
-                                    params: layerParams
-                                };
-                                backend.imageLoaded(process);
-                                state = STATE_TEXTURE_CREATED;
-                                doTextureLayer(cfg, data, layer);
+
+                                /* Create this texture layer
+                                 */
+                                layer.texture = textureBackend.createTexture(layer.image, layer.creationParams);
+                                layer.applyParams.image = layer.image;
+                                textureBackend.imageLoaded(layer.process);
+                                layer.state = STATE_TEXTURE_CREATED;
+                                countLayersReady++;
                                 break;
 
                             case STATE_ERROR:
-                                if (!params.wait) {
-                                    SceneJS._utils.visitChildren(cfg, data);
-                                }
+
+                                /* Give up on this texture layer, but we'll keep updating the others
+                                 * to at least allow diagnostics to log
+                                 */
                                 break;
                         }
                     }
-                });
+
+                    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+
+                        /* Dont apply textures if picking
+                         */
+                        SceneJS._utils.visitChildren(cfg, data);
+
+                    } else {
+
+                        if (countLayersReady == layers.length) {
+                            for (var i = 0; i < layers.length; i++) {
+                                var layer = layers[i];
+                                textureBackend.pushLayer(layer.texture, layer.applyParams);
+                            }
+                            SceneJS._utils.visitChildren(cfg, data);
+                            textureBackend.popLayers(layers.length);
+
+                        }
+                    }
+                }
+                );
     };
 })();
 /**

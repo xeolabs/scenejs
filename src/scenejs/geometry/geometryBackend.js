@@ -316,6 +316,7 @@ SceneJS._backends.installBackend(
 
                     /* Draw geometry
                      */
+               
                     context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                     context.flush();
 

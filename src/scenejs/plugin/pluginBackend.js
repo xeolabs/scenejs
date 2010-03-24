@@ -2,7 +2,7 @@
  * Backend module that services the SceneJS.withPlugin nodes to manage the asynchronous cross-domain
  * load and caching of remotely-stored SceneJS plugins.
  *
- * Very similar to the "import" backend, except that plugin has a fixed format and provides its own ID.
+ * Very similar to the "load" backend, except that plugin has a fixed format and provides its own ID.
  *
  * Uses the memory management backend to mediate cache management.
  */
