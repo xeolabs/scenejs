@@ -44,8 +44,9 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                         },
                                                 SceneJS.material({
                                                     ambient:  { r:0.5, g:0.5, b:0.5 },
-                                                    diffuse:  { r:0.6, g:0.6, b:0.6 },
-                                                    emission:  { r:.5, g:0.3, b:0.3 }
+                                                    diffuse:  { r:0.6, g:0.6, b:0.6 }
+                                                    //                                                    ,
+                                                    //                                                    emission:  { r:.5, g:0.3, b:0.3 }
                                                 },
 
                                                     /** Texture is configured with the URI at which its
@@ -74,32 +75,41 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                                                     internalFormat:"lequal",
                                                                     sourceFormat:"alpha",
                                                                     sourceType: "unsignedByte",
-                                                                    applyTo:"ambient"
+                                                                    applyTo:"diffuse"
                                                                 }
-                                                                ,
-                                                                {
-                                                                    uri:"earth.jpg",
-                                                                    minFilter: "linear",
-                                                                    magFilter: "linear",
-                                                                    wrapS: "clampToEdge",
-                                                                    wrapT: "clampToEdge",
-                                                                    isDepth: false,
-                                                                    depthMode:"luminance",
-                                                                    depthCompareMode: "compareRToTexture",
-                                                                    depthCompareFunc: "lequal",
-                                                                    flipY: false,
-                                                                    width: 1,
-                                                                    height: 1,
-                                                                    internalFormat:"lequal",
-                                                                    sourceFormat:"alpha",
-                                                                    sourceType: "unsignedByte",
-                                                                    applyTo:"ambient"
-                                                                }
+                                                                //                                                                ,
+                                                                //                                                                {
+                                                                //                                                                    uri:"earth.jpg",
+                                                                //                                                                    minFilter: "linear",
+                                                                //                                                                    magFilter: "linear",
+                                                                //                                                                    wrapS: "clampToEdge",
+                                                                //                                                                    wrapT: "clampToEdge",
+                                                                //                                                                    isDepth: false,
+                                                                //                                                                    depthMode:"luminance",
+                                                                //                                                                    depthCompareMode: "compareRToTexture",
+                                                                //                                                                    depthCompareFunc: "lequal",
+                                                                //                                                                    flipY: false,
+                                                                //                                                                    width: 1,
+                                                                //                                                                    height: 1,
+                                                                //                                                                    internalFormat:"lequal",
+                                                                //                                                                    sourceFormat:"alpha",
+                                                                //                                                                    sourceType: "unsignedByte",
+                                                                //                                                                    applyTo:"ambient"
+                                                                //                                                                }
                                                             ]
                                                         },
-                                                                SceneJS.rotate({ angle: 45, x : 1.0, y : 1.0},
-
-                                                                        SceneJS.objects.cube()
+                                                                SceneJS.rotate(function(data) {
+                                                                    return {
+                                                                        angle: data.get('pitch'), x : 1.0
+                                                                    };
+                                                                },
+                                                                        SceneJS.rotate(function(data) {
+                                                                            return {
+                                                                                angle: data.get('yaw'), y : 1.0
+                                                                            };
+                                                                        },
+                                                                                SceneJS.objects.cube()
+                                                                                )
                                                                         )
                                                                 )
                                                         )
@@ -111,33 +121,48 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                 ) // loggingToPage
         ); // scene
 
-var pInterval;
+var yaw = 0;
+var pitch = 0;
+var lastX;
+var lastY;
+var dragging = false;
 
-/* First render starts loading the texture and renders an untextured box
- */
-exampleScene.render();
 
-/* Now we'll continuously render the scene until the count of running
- * processes is zero (ie. at which point the texture load process will have
- * completed and the texture has been applied and rendered). Processes
- * are only started and killed within scene traversals, so as not to cause
- * confusion (ie. race conditions) when we query them in the "idle"
- * interval inbetween.
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+/* On a mouse drag, we'll re-render the scene, passing in
+ * incremented angles in each time.
  */
-window.doit = function() {
-    if (exampleScene.getNumProcesses() > 0) {
-        try {
-            exampleScene.render();
-        } catch (e) {
-            clearInterval(pInterval);
-            throw e;
-        }
-    } else {
-        clearInterval(pInterval);
-        exampleScene.destroy();
+function mouseMove(event) {
+    if (dragging) {
+        yaw += (event.clientX - lastX) * 0.5;
+        pitch += (event.clientY - lastY) * -0.5;
+        exampleScene.render({yaw: yaw, pitch: pitch});
+        lastX = event.clientX;
+        lastY = event.clientY;
     }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+
+
+window.render = function() {
+    /* Throw the switch, Igor!
+     * We render the scene, injecting the initial angles for the rotate nodes.
+     */
+    exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
-pInterval = setInterval("window.doit()", 10);
-
-
+var pInterval = setInterval("window.render()", 10);

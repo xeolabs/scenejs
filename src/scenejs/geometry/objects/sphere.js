@@ -13,10 +13,8 @@ SceneJS.objects.sphere = function() {
         {}
     ]);
 
-    if (!cfg.fixed) {
-        throw new SceneJS.exceptions.UnsupportedOperationException("Dynamic configuration of sphere objects is not supported");
-    }
-
+    /* Dynamic config OK, but only applies first time - good for assets
+     */
     var params = cfg.getParams();
 
     var slices = params.slices || 30;

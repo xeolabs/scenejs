@@ -258,6 +258,10 @@ SceneJS._backends.installBackend(
                         throw "No such texture loaded \"" + texture.textureId + "\"";
                     }
                     texture.lastUsed = time;
+
+                    if (params.matrix && !params.matrixAsArray) { 
+                        params.matrixAsArray = new WebGLFloatArray(params.matrix);
+                    }
                     layerStack.push({
                         texture: texture,
                         params: params

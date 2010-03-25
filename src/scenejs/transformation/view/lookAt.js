@@ -20,22 +20,22 @@ SceneJS.lookAt = function() {
                 if (!mat || !cfg.fixed) { // Memoize matrix if node config is constant
                     var params = cfg.getParams(data);
 
-                    params.eye = params.eye ? cloneVec(params.eye) : { x: 0.0, y: 0.0, z: 0.0 };
-                    params.look = params.look ? cloneVec(params.look) : { x: 0.0, y: 0.0, z: 0.0 };
-                    params.up = params.up ? cloneVec(params.up) : { x: 0.0, y: 1.0, z: 0.0 };
+                    var eye = cloneVec(SceneJS._utils.getParam(params.eye, data), { x: 0.0, y: 0.0, z: 0.0 });
+                    var look = cloneVec(SceneJS._utils.getParam(params.look, data), { x: 0.0, y: 0.0, z: 0.0 });
+                    var up = cloneVec(SceneJS._utils.getParam(params.up, data), { x: 0.0, y: 1.0, z: 0.0 });
 
-                    if (params.eye.x == params.look.x && params.eye.y == params.look.y && params.eye.z == params.look.z) {
+                    if (eye.x == look.x && eye.y == look.y && eye.z == look.z) {
                         throw new SceneJS.exceptions.InvalidLookAtConfigException
                                 ("Invald lookAt parameters: eye and look cannot be identical");
                     }
-                    if (params.up.x == 0 && params.up.y == 0 && params.up.z == 0) {
+                    if (up.x == 0 && up.y == 0 && up.z == 0) {
                         throw new SceneJS.exceptions.InvalidLookAtConfigException
                                 ("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                     }
                     mat = SceneJS._math.lookAtMat4c(
-                            params.eye.x, params.eye.y, params.eye.z,
-                            params.look.x, params.look.y, params.look.z,
-                            params.up.x, params.up.y, params.up.z);
+                            eye.x, eye.y, eye.z,
+                            look.x, look.y, look.z,
+                            up.x, up.y, up.z);
                 }
 
                 var superXform = backend.getTransform();

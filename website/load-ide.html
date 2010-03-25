@@ -105,7 +105,7 @@
                 <br/>
                 <label>File URL:</label>
                 <input name="url" id="file-url"
-                       value="http://scenejs.org/site2/examples/v0.7.0/hello-teapot/hello-teapot.js"
+                       value="http://scenejs.org/library/v0.7/scenes/examples/hello-teapot/hello-teapot.js"
                        type="text"/>
 
                 <br/>
@@ -126,7 +126,7 @@
     </div>
 </div>
 
-<div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://www.xeolabs.com">Xeolabs</a></p>
+<div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://xeolabs.com">Xeolabs</a></p>
 </div>
 
 <script type="text/javascript">
@@ -136,7 +136,7 @@
     function showExamples() {
         $.ajax({
             type: 'GET',
-            url: 'examples/v0.7.0/index.json',
+            url: 'http://scenejs.org/library/v0.7/scenes/examples/index.json',
             dataType: 'json',
             success: function(json) {
                 $("#examples").setTemplateURL("templates/ide-examples.html");

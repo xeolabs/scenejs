@@ -112,6 +112,9 @@ SceneJS._backends.installBackend(
                         for (var i = 0; i < stack.length; i++) {
                             var layer = stack[i];
                             activeProgram.bindTexture("uSampler" + i, layer.texture, i);
+                            if (layer.params.matrixAsArray) {
+                                activeProgram.setUniform("uLayer" + i + "Matrix", layer.params.matrixAsArray);
+                            }
                         }
                     });
 
@@ -306,6 +309,9 @@ SceneJS._backends.installBackend(
                         var layer = textureLayers[i];
                         val.push(layer.params.applyTo);
                         val.push("/");
+                        if (layer.params.matrix) {
+                            val.push("/m");
+                        }
                     }
                 }
 
@@ -439,7 +445,11 @@ SceneJS._backends.installBackend(
 
                     //texture uniforms
                     for (var i = 0; i < textureLayers.length; i++) {
+                        var layer = textureLayers[i];
                         src.push("uniform sampler2D uSampler" + i + ";");
+                        if (layer.params.matrix) {
+                            src.push("uniform mat4 uLayer" + i + "Matrix;");
+                        }
                     }
                 }
 
@@ -488,31 +498,50 @@ SceneJS._backends.installBackend(
                 src.push("  float    shininessValue=uMaterialShininess;");
                 src.push("  vec3    emissionValue=uMaterialEmission;");
 
-                src.push("  float alpha = 1.0;");
-                src.push("  float mask=1.0;");
-                src.push("  vec2 textureCoords=vec2(0.0,0.0);");
+                src.push("  float   alpha = 1.0;");
+                src.push("  float   mask=1.0;");
+                src.push("  vec4    texturePos;");
+                src.push("  vec2    textureCoord=vec2(0.0,0.0);");
+
 
                 if (texturing) {
+
+                    /* Texture geometry source - object coords so far
+                     */
+                    src.push("texturePos = vec4(vTextureCoord.s, vTextureCoord.t, 1.0, 1.0);");
+
                     for (var i = 0; i < textureLayers.length; i++) {
                         var layer = textureLayers[i];
+
+                        /* Transform texture coord
+                         */
+                        if (layer.params.matrixAsArray) {
+                            src.push("textureCoord=(uLayer" + i + "Matrix * texturePos).xy;");
+                            //     src.push("textureCoord=texturePos.xy;");
+                        } else {
+                            src.push("textureCoord=texturePos.xy;");
+                        }
+
+                        /* Apply layers
+                         */
                         if (layer.params.applyTo == "diffuse") {
-                            src.push("diffuseValue  = diffuseValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
+                            src.push("diffuseValue  = diffuseValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                         }
 
                         if (layer.params.applyTo == "specular") {
-                            src.push("specularValue = specularValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
+                            src.push("specularValue = specularValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                         }
 
                         if (layer.params.applyTo == "ambient") {
-                            src.push("ambientValue = ambientValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
+                            src.push("ambientValue = ambientValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                         }
 
                         if (layer.params.applyTo == "shininess") {
-                            src.push("shininessValue = shininessValue *  texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).r ;");
+                            src.push("shininessValue = shininessValue *  texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r ;");
                         }
 
                         if (layer.params.applyTo == "emission") {
-                            src.push("emissionValue = emissionValue * texture2D(uSampler" + i + ", vec2(vTextureCoord.s, 1.0 - vTextureCoord.t)).rgb;");
+                            src.push("emissionValue = emissionValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                         }
                     }
                 }

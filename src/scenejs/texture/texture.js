@@ -1,15 +1,43 @@
 (function() {
 
-    /* Separate backends for texture and colour for simplicity
-     */
-    var textureBackend = SceneJS._backends.getBackend("texture");
-    var logging = SceneJS._backends.getBackend("logging");
+    var utils = SceneJS.__texture = {   // Just one object in closure
 
-    const STATE_INITIAL = 0;            // Ready to get texture
-    const STATE_IMAGE_LOADING = 2;      // Texture image load in progress
-    const STATE_IMAGE_LOADED = 3;       // Texture image load completed
-    const STATE_TEXTURE_CREATED = 4;    // Texture created
-    const STATE_ERROR = -1;             // Image load or texture creation failed
+        textureBackend : SceneJS._backends.getBackend("texture"),
+        loggingBackend : SceneJS._backends.getBackend("logging"),
+
+        getMatrix: function(translate, rotate, scale) {
+            var matrix = null;
+            var t;
+            if (translate) {
+                matrix = SceneJS._math.translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
+            }
+            if (scale) {
+                t = SceneJS._math.scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
+                matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+            }
+            if (rotate) {
+                if (rotate.x) {
+                    t = SceneJS._math.rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
+                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                }
+                if (rotate.y) {
+                    t = SceneJS._math.rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
+                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                }
+                if (rotate.z) {
+                    t = SceneJS._math.rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
+                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                }
+            }
+            return matrix;
+        },
+
+        STATE_INITIAL : 0,            // Ready to get texture
+        STATE_IMAGE_LOADING : 2,      // Texture image load in progress
+        STATE_IMAGE_LOADED : 3,       // Texture image load completed
+        STATE_TEXTURE_CREATED : 4,    // Texture created
+        STATE_ERROR : -1             // Image load or texture creation failed
+    };
 
     SceneJS.texture = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
@@ -63,9 +91,8 @@
                                             "'blue', alpha', 'normal' or 'height'");
                                 }
                             }
-
                             layers.push({
-                                state : STATE_INITIAL,
+                                state : utils.STATE_INITIAL,
                                 process: null,                  // Imageload process handle
                                 image : null,                   // Initialised when state == IMAGE_LOADED
                                 creationParams: layerParam,   // Create texture using this
@@ -74,8 +101,9 @@
                                  */
 
                                 texture: null,          // Initialised when state == TEXTURE_LOADED
-                                applyParams : {         //
-                                    applyTo: layerParam.applyTo // Optional - colour map my default 
+                                applyParams : {
+                                    applyTo: layerParam.applyTo, // Optional - colour map my default
+                                    matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
                                 }
                             });
                         }
@@ -92,28 +120,28 @@
                         /* Backend may evict texture when not recently used,
                          * in which case we'll have to load it again
                          */
-                        if (layer.state == STATE_TEXTURE_CREATED) {
-                            if (!textureBackend.textureExists(layer.texture)) {
+                        if (layer.state == utils.STATE_TEXTURE_CREATED) {
+                            if (!utils.textureBackend.textureExists(layer.texture)) {
                                 layer.state = STATE_INITIAL;
                             }
                         }
 
                         switch (layer.state) {
-                            case STATE_TEXTURE_CREATED:
+                            case utils.STATE_TEXTURE_CREATED:
                                 countLayersReady++;
                                 break;
 
-                            case STATE_INITIAL:
+                            case utils.STATE_INITIAL:
 
                                 /* Start loading image for this texture layer.
                                  *
                                  * Do it in a new closure so that the right layer gets the process result.
                                  */
                                 (function(_layer) {
-                                    _layer.state = STATE_IMAGE_LOADING;
-                                
+                                    _layer.state = utils.STATE_IMAGE_LOADING;
 
-                                    _layer.process = textureBackend.loadImage(// Process killed automatically on error or abort
+
+                                    _layer.process = utils.textureBackend.loadImage(// Process killed automatically on error or abort
                                             _layer.creationParams.uri,
                                             function(_image) {
 
@@ -126,45 +154,45 @@
                                                  * be queried.
                                                  */
                                                 _layer.image = _image;
-                                                _layer.state = STATE_IMAGE_LOADED;
+                                                _layer.state = utils.STATE_IMAGE_LOADED;
                                             },
 
                                         /* General error, probably a 404
                                          */
                                             function() {
-                                                logging.getLogger().error("SceneJS.texture image load failed: "
+                                                utils.loggingBackend.getLogger().error("SceneJS.texture image load failed: "
                                                         + _layer.creationParams.uri);
-                                                _layer.state = STATE_ERROR;
+                                                _layer.state = utils.STATE_ERROR;
                                             },
 
                                         /* Load aborted - eg. user stopped browser
                                          */
                                             function() {
-                                                logging.getLogger().warn("SceneJS.texture image load aborted: "
+                                                utils.loggingBackend.getLogger().warn("SceneJS.texture image load aborted: "
                                                         + _layer.creationParams.uri);
-                                                _layer.state = STATE_ERROR;
+                                                _layer.state = utils.STATE_ERROR;
                                             });
                                 })(layer);
                                 break;
 
-                            case STATE_IMAGE_LOADING:
+                            case utils.STATE_IMAGE_LOADING:
 
                                 /* Continue loading this texture layer
                                  */
                                 break;
 
-                            case STATE_IMAGE_LOADED:
+                            case utils.STATE_IMAGE_LOADED:
 
                                 /* Create this texture layer
                                  */
-                                layer.texture = textureBackend.createTexture(layer.image, layer.creationParams);
+                                layer.texture = utils.textureBackend.createTexture(layer.image, layer.creationParams);
                                 layer.applyParams.image = layer.image;
-                                textureBackend.imageLoaded(layer.process);
-                                layer.state = STATE_TEXTURE_CREATED;
+                                utils.textureBackend.imageLoaded(layer.process);
+                                layer.state = utils.STATE_TEXTURE_CREATED;
                                 countLayersReady++;
                                 break;
 
-                            case STATE_ERROR:
+                            case utils.STATE_ERROR:
 
                                 /* Give up on this texture layer, but we'll keep updating the others
                                  * to at least allow diagnostics to log
@@ -184,10 +212,10 @@
                         if (countLayersReady == layers.length) {
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
-                                textureBackend.pushLayer(layer.texture, layer.applyParams);
+                                utils.textureBackend.pushLayer(layer.texture, layer.applyParams);
                             }
                             SceneJS._utils.visitChildren(cfg, data);
-                            textureBackend.popLayers(layers.length);
+                            utils.textureBackend.popLayers(layers.length);
 
                         }
                     }
