@@ -56,6 +56,7 @@ SceneJS._eventTypes = {
     TEXTURES_EXPORTED : 0,    
 
     SHADER_ACTIVATE : 0,
+    
     SHADER_ACTIVATED : 0,
     SHADER_RENDERING : 0,
     SHADER_DEACTIVATED : 0 ,

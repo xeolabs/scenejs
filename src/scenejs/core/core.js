@@ -228,6 +228,28 @@ var SceneJS = {
             return result;
         },
 
+        NodeParams : function(nodeName, params, data) {
+            this.fixed = true;
+            this.getParam = function(name, mandatory) {
+                var param = params[name];
+                if (param instanceof Function) {
+                    this.fixed = false;
+                    param = param(data);
+                }
+                if (param) {
+                    return param;
+                }
+                if (mandatory) {
+                    throw SceneJS.exceptions.NodeConfigExpectedException(
+                            nodeName + " property expected: \"" + name + "\"");
+                }
+                else {
+                    return null;
+                }
+            };
+        },
+
+
         getParam : function(param, data, fallback) {
             if (param instanceof Function) {
                 return param.call(this, data);

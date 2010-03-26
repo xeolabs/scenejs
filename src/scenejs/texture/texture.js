@@ -43,6 +43,7 @@
         var cfg = SceneJS._utils.getNodeConfig(arguments);
         var params;
         var layers = [];
+        var matrix;
 
         return SceneJS._utils.createNode(
                 function(data) {
@@ -70,7 +71,6 @@
                                         "SceneJS.texture.layers[" + i + "].uri is undefined");
                             }
 
-
                             if (layerParam.applyTo) {
                                 if (layerParam.applyTo != "ambient" &&
                                     layerParam.applyTo != "diffuse" &&
@@ -91,6 +91,12 @@
                                             "'blue', alpha', 'normal' or 'height'");
                                 }
                             }
+
+                            //                            var lp = new SceneJS._utils.NodeParams("", layerParam, data);
+                            //                            var scale = lp.getParam("scale", data);
+                            //                            var translate = lp.getParam("translate", data);
+                            //                            var rotate = lp.getParam("rotate", data);
+                            //
                             layers.push({
                                 state : utils.STATE_INITIAL,
                                 process: null,                  // Imageload process handle
@@ -99,12 +105,41 @@
 
                                 /* The layer that gets exported
                                  */
+                                //
+                                //                                getMatrix : new (function() {
+                                //                                    var translate = layerParam.translate;
+                                //                                    var rotate = layerParam.rotate;
+                                //                                    var scale = layerParam.scale;
+                                //                                    return function(data) {
+                                //                                        return utils.getMatrix(
+                                //                                                (translate instanceof Function) ? translate(data) : translate,
+                                //                                                (rotate instanceof Function) ? rotate(data) : rotate,
+                                //                                                (scale instanceof Function) ? scale(data) : scale);
+                                //                                    };
+                                //                                })(),
 
                                 texture: null,          // Initialised when state == TEXTURE_LOADED
-                                applyParams : {
-                                    applyTo: layerParam.applyTo, // Optional - colour map my default
-                                    matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
-                                }
+                                createMatrix : new (function() {
+                                    var translate = layerParam.translate;
+                                    var rotate = layerParam.rotate;
+                                    var scale = layerParam.scale;
+                                    var dynamic = ((translate instanceof Function) ||
+                                                 (rotate instanceof Function) ||
+                                                 (scale instanceof Function));
+                                    var defined = dynamic || translate || rotate || scale;
+                                    return function(data) {
+                                        if (defined && (dynamic || !matrix)) {
+                                            matrix = utils.getMatrix(
+                                                    (translate instanceof Function) ? translate(data) : translate,
+                                                    (rotate instanceof Function) ? rotate(data) : rotate,
+                                                    (scale instanceof Function) ? scale(data) : scale);
+                                        }
+                                        return matrix;
+                                    };
+                                })(),
+                                applyTo: layerParam.applyTo // Optional - colour map my default
+                                //matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
+
                             });
                         }
                     }
@@ -122,7 +157,7 @@
                          */
                         if (layer.state == utils.STATE_TEXTURE_CREATED) {
                             if (!utils.textureBackend.textureExists(layer.texture)) {
-                                layer.state = STATE_INITIAL;
+                                layer.state = utils.STATE_INITIAL;
                             }
                         }
 
@@ -186,7 +221,6 @@
                                 /* Create this texture layer
                                  */
                                 layer.texture = utils.textureBackend.createTexture(layer.image, layer.creationParams);
-                                layer.applyParams.image = layer.image;
                                 utils.textureBackend.imageLoaded(layer.process);
                                 layer.state = utils.STATE_TEXTURE_CREATED;
                                 countLayersReady++;
@@ -212,7 +246,11 @@
                         if (countLayersReady == layers.length) {
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
-                                utils.textureBackend.pushLayer(layer.texture, layer.applyParams);
+                                utils.textureBackend.pushLayer(layer.texture, {
+                                    applyTo : layer.applyTo,
+                                    //    image: layer.image,
+                                    matrix: layer.createMatrix()
+                                });
                             }
                             SceneJS._utils.visitChildren(cfg, data);
                             utils.textureBackend.popLayers(layers.length);

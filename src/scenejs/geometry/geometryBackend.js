@@ -318,8 +318,7 @@ SceneJS._backends.installBackend(
                      */
                
                     context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-                    context.flush();
-
+                    context.flush();                  
                     /* Don't need to unbind buffers - only one is bound at a time anyway                    
                      */
 

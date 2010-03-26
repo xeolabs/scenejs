@@ -12,17 +12,17 @@ SceneJS.lookAt = function() {
     };
 
     var mat;
+    var fixed = cfg.fixed;
     var xform;
 
     return SceneJS._utils.createNode(
             function(data) {
+                if (!mat || !fixed) {
+                    var nodeParams = new SceneJS._utils.NodeParams("SceneJS.lookAt", cfg.getParams(data), data);
 
-                if (!mat || !cfg.fixed) { // Memoize matrix if node config is constant
-                    var params = cfg.getParams(data);
-
-                    var eye = cloneVec(SceneJS._utils.getParam(params.eye, data), { x: 0.0, y: 0.0, z: 0.0 });
-                    var look = cloneVec(SceneJS._utils.getParam(params.look, data), { x: 0.0, y: 0.0, z: 0.0 });
-                    var up = cloneVec(SceneJS._utils.getParam(params.up, data), { x: 0.0, y: 1.0, z: 0.0 });
+                    var eye = cloneVec(nodeParams.getParam("eye", data, true), { x: 0.0, y: 0.0, z: 0.0 });
+                    var look = cloneVec(nodeParams.getParam("look", data, false), { x: 0.0, y: 0.0, z: 0.0 });
+                    var up = cloneVec(nodeParams.getParam("up", data, false), { x: 0.0, y: 1.0, z: 0.0 });
 
                     if (eye.x == look.x && eye.y == look.y && eye.z == look.z) {
                         throw new SceneJS.exceptions.InvalidLookAtConfigException
@@ -32,18 +32,26 @@ SceneJS.lookAt = function() {
                         throw new SceneJS.exceptions.InvalidLookAtConfigException
                                 ("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                     }
+
                     mat = SceneJS._math.lookAtMat4c(
                             eye.x, eye.y, eye.z,
                             look.x, look.y, look.z,
                             up.x, up.y, up.z);
+
+                    fixed = cfg.fixed && nodeParams.fixed;
                 }
 
                 var superXform = backend.getTransform();
-                if (!xform || !superXform.fixed || !cfg.fixed) {
+                if (!xform || !superXform.fixed || !fixed) {
                     var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
                     xform = {
                         matrix: tempMat,
-                        fixed: superXform.fixed && cfg.fixed
+                        lookAt : {
+                            eye: eye,
+                            look: look,
+                            up: up
+                        },
+                        fixed: superXform.fixed && fixed
                     };
                 }
                 backend.setTransform(xform);

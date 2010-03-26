@@ -229,7 +229,7 @@ function loadScene(uri, onSuccess, onError) {
 
 function init(text) {
     showIDE();
-    scriptEditor = new CodeMirror(CodeMirror.replace("script-text"), {
+    scriptEditor = new CodeMirror(CodeMirror.replace("script-text-area"), {
         height: "100%",
         content: text,
         parserfile: [

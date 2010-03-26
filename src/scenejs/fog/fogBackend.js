@@ -23,19 +23,26 @@ SceneJS._backends.installBackend(
 
             function _createFog(f) {
                 if (f.mode &&
-                    (f.mode != "exp"
+                    (f.mode != "disabled"
+                            && f.mode != "exp"
                             && f.mode != "exp2"
                             && f.mode != "linear")) {
                     throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.fog node has a mode of unsupported type - should be 'exp', 'exp2' or 'linear'");
+                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'");
                 }
-                return {
-                    color: colourToArray(f.color, [ 0.5,  0.5, 0.5 ]),
-                    mode: f.mode || "exp",
-                    density: f.density || 1.0,
-                    start: f.start || 0,
-                    end: f.end || 1.0
-                };
+                if (f.mode == "disabled") {
+                    return {
+                        mode: f.mode || "exp"
+                    };
+                } else {
+                    return {
+                        mode: f.mode || "exp",
+                        color: colourToArray(f.color, [ 0.5,  0.5, 0.5 ]),
+                        density: f.density || 1.0,
+                        start: f.start || 0,
+                        end: f.end || 1.0
+                    };
+                }
             }
 
             ctx.events.onEvent(

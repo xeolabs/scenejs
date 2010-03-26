@@ -29,7 +29,7 @@ with (SceneJS) {
 
                         /* Perspective transformation
                          */
-                            perspective({  fovy : 45.0, aspect : 2.0, near : 0.10, far : 2000.0 },
+                            perspective({  fovy : 45.0, aspect : 2.0, near : 0.10, far : 7000.0 },
 
                                 /* Fog, nice and thick, just for fun
                                  */
@@ -57,6 +57,16 @@ with (SceneJS) {
 
                                                 up : { y: 1.0 }
                                             },
+
+                                                /* Sky sphere
+                                                 */
+                                                    withData({
+                                                        radius: 5000
+                                                    },
+                                                            load({
+                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                    "backgrounds/sphere/starrySky.js"
+                                                            })),
 
                                                 /* Lighting
                                                  */
@@ -89,7 +99,9 @@ with (SceneJS) {
                                                                 quadraticAttenuation:   0.0,
                                                                 linearAttenuation:      0.0
                                                             }
-                                                        ]},
+                                                        ]}
+                                                            ,
+
 
                                                         /* Tiled floor
                                                          */
@@ -97,6 +109,7 @@ with (SceneJS) {
                                                                 uri:"http://scenejs.org/library/v0.7/assets/" +
                                                                     "examples/tiled-floor/tiled-floor.js"
                                                             }),
+
 
                                                         /* And why not throw in Mars, just for fun
                                                          */
@@ -116,6 +129,67 @@ with (SceneJS) {
                                                                 emission: { r: 0.02, g: 0.02, b: 0.2 },
                                                                 shininess: 60.0
                                                             },
+
+                                                                // Why does this break stuff??
+                                                                //
+                                                                // Investigate ASAP
+
+                                                                //                                                                    translate({x:-50, y:50 },
+                                                                //                                                                            scale({x:20,y:20,z:20},
+                                                                //                                                                                    texture({ uri: "http://scenejs.org/library/textures/stars/gigapixel-milky-way.gif", applyTo: "emission" },
+                                                                //                                                                                            objects.sphere()))),
+                                                                    translate({x: 100, y:20, z: 0 },
+                                                                            SceneJS.scale({
+                                                                                x: 20,
+                                                                                y: 20,
+                                                                                z: 20
+
+                                                                            },
+                                                                                    SceneJS.texture({
+                                                                                        layers: [
+                                                                                            {
+                                                                                                uri:"general-zod.jpg",
+                                                                                                wrapS: "repeat",
+                                                                                                wrapT: "repeat",
+                                                                                                flipY: false,
+
+//                                                                                                rotate : (function() {
+//                                                                                                    var _x = 0;
+//                                                                                                    return function(data) {
+//                                                                                                        if (_x > 360.0) _x = 0;
+//                                                                                                        _x += 1;
+//                                                                                                        return { z: _x };
+//                                                                                                    };
+//                                                                                                })(),
+//
+//                                                                                                translate : (function() {
+//                                                                                                    var _x = 0;
+//                                                                                                    return function(data) {
+//                                                                                                        if (_x > 1.0) _x = 0;
+//                                                                                                        _x += .01;
+//                                                                                                        return { x: _x };
+//                                                                                                    };
+//                                                                                                })(),
+
+                                                                                                scale : (function() {
+                                                                                                    var _x = 0;
+                                                                                                    return function(data) {
+                                                                                                        if (_x > 10.0) _x = 0;
+                                                                                                        _x += .01;
+                                                                                                        return { x: _x, y: _x };
+                                                                                                    };
+                                                                                                })(),
+
+                                                                                                applyTo:"emission"
+                                                                                            }
+                                                                                        ]},
+                                                                                            SceneJS.material({
+
+                                                                                                diffuse: { r: .0, g: .0, b: .0 },
+                                                                                                emission: { r: 1., g: 1., b: 1. }
+                                                                                            },
+                                                                                                    SceneJS.objects.cube()
+                                                                                                    )))),
 
                                                                 /* Bounding box - roughly fitted to staircase
                                                                  */
@@ -299,9 +373,7 @@ with (SceneJS) {
         moveAngle -= moveAngleInc;
         var moveVec = _math.transformVector3(_math.rotationMat4v(moveAngle * 0.0174532925, [0,1,0]), [0,0,1]);
         if (speed) {
-            if (speed > 5) {
-                alert(speed);
-            }
+
             eye.x += moveVec[0] * speed;
             eye.z += moveVec[2] * speed;
         }

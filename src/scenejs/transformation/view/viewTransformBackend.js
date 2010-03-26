@@ -80,7 +80,7 @@ SceneJS._backends.installBackend(
                     ctx.events.fireEvent(
                             SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
                             transform);
-                },
+                },                               
 
                 getTransform : function() {
                     return transform;
