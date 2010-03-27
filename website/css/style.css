@@ -459,18 +459,18 @@ ul.site-tabs li.ui-state-active a {
 
 #features-table {
     float: left;
-    height: 1500px;
+    height: 2000px;
     width: 1200px;
     overflow: auto; /*padding-top: 20px;*/
     margin: 0 auto;
 }
 
 #features-table hr.line {
-    width: 320px;
+    width: 280px;
     height: 0px;
     color: #666666;
     background-color: #666666;
-    margin-left: 40px;
+    margin-left: 0px;
 
 }
 
@@ -480,13 +480,13 @@ ul.site-tabs li.ui-state-active a {
     line-height: 1em;
     font-family: "Helvetica", Arial, Helvetica, sans-serif;
     padding: 25px 0 20px 0;
+
     font-weight: normal;
 }
 
 #features-table .feature {
-    background: transparent url(../images/tick.png) no-repeat scroll left 25px;
-    margin-top: 10px;
-    padding: 30px 40px 10px;
+    margin-top: 10px; /*padding: 30px 40px 10px;*/
+    padding: 30px 0px 10px;
     color: #cc6600 !important;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 1.2em;
@@ -494,7 +494,8 @@ ul.site-tabs li.ui-state-active a {
 }
 
 #features-table .sub-feature {
-    padding: 10px 40px 10px;
+/ / padding : 10 px 40 px 10 px;
+    padding: 10px 0px 10px;
     color: #000000 !important;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 1.0em;
@@ -502,7 +503,8 @@ ul.site-tabs li.ui-state-active a {
 }
 
 #features-table p {
-    padding-left: 40px;
+/ / padding-left : 40 px;
+    padding-left: 0px;
 }
 
 #features-table p.demo {
@@ -510,8 +512,8 @@ ul.site-tabs li.ui-state-active a {
     color: #444444 !important;
     padding-top: 4px;
     padding-bottom: 4px;
+    margin-left: 0px;
     padding-left: 25px;
-    margin-left: 40px;
     font-size: 0.8em;
 }
 
@@ -521,7 +523,7 @@ ul.site-tabs li.ui-state-active a {
     padding-top: 4px;
     padding-bottom: 4px;
     padding-left: 25px;
-    margin-left: 40px;
+    margin-left: 0px;
     font-size: 0.8em;
 }
 
@@ -529,31 +531,32 @@ ul.site-tabs li.ui-state-active a {
     float: left;
     text-align: left;
     margin: 0 auto;
-    width: 350px;
+    width: 300px;
     height: auto;
 }
 
 #features-table #col2 {
     float: left;
-    padding-left: 40px;
+    padding-left: 30px;
     text-align: left;
     margin: 0 auto;
-    width: 350px;
+    width: 300px;
     height: auto;
 }
 
-#features-table  #col2 p {
-    padding-left: 40px;
-}
 
 #features-table #col3 {
-    float: right;
-    padding-left: 0px;
-        padding-top: 40px;
+    float: left;
+    padding-left: 50px;
+    padding-top: 30px;
     text-align: left;
     margin: 0 auto;
-    width: 350px;
+    width: 450px;
     height: auto;
+}
+
+#features-table  #col3 p {
+    padding-left: 0px;
 }
 
 #features-table  #col3 .home-menu-item {
@@ -673,7 +676,7 @@ ul.site-tabs li.ui-state-active a {
     text-align: right;
     margin: 0 auto;
     height: auto;
-    width: 200px;
+    width: 300px;
 }
 
 #load-ide h1 {
@@ -691,7 +694,8 @@ ul.site-tabs li.ui-state-active a {
 }
 
 #ide-examples-table p.title {
-    font-size: 1.1em;
+    font-size: 1.0em;
+    line-height:1.1em;
 }
 
 #ide-examples-table .col2 {
@@ -700,7 +704,7 @@ ul.site-tabs li.ui-state-active a {
     padding-left: 5px;
     text-align: left;
     margin: 0 auto;
-    width: 560px;
+    width: 450px;
     height: auto;
 
 }
@@ -752,7 +756,7 @@ ul.site-tabs li.ui-state-active a {
 #playroom-ide .column02 #script-text-area {
     background: #f6f6f6;
     border: 1px solid rgb(150, 150, 150);
-    height: 1000px;
+    height: 2000px;
     margin-bottom: 10px;
 }
 

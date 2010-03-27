@@ -145,6 +145,7 @@ with (SceneJS) {
                                                                                 z: 20
 
                                                                             },
+                                                                                    //SceneJS.text({ text : "Say a word of Zen", font: "Arial", size: "1em" }),
                                                                                     SceneJS.texture({
                                                                                         layers: [
                                                                                             {
@@ -153,23 +154,23 @@ with (SceneJS) {
                                                                                                 wrapT: "repeat",
                                                                                                 flipY: false,
 
-//                                                                                                rotate : (function() {
-//                                                                                                    var _x = 0;
-//                                                                                                    return function(data) {
-//                                                                                                        if (_x > 360.0) _x = 0;
-//                                                                                                        _x += 1;
-//                                                                                                        return { z: _x };
-//                                                                                                    };
-//                                                                                                })(),
-//
-//                                                                                                translate : (function() {
-//                                                                                                    var _x = 0;
-//                                                                                                    return function(data) {
-//                                                                                                        if (_x > 1.0) _x = 0;
-//                                                                                                        _x += .01;
-//                                                                                                        return { x: _x };
-//                                                                                                    };
-//                                                                                                })(),
+                                                                                                rotate : (function() {
+                                                                                                    var _x = 0;
+                                                                                                    return function(data) {
+                                                                                                        if (_x > 360.0) _x = 0;
+                                                                                                        _x += 1;
+                                                                                                        return { z: _x };
+                                                                                                    };
+                                                                                                })(),
+
+                                                                                                translate : (function() {
+                                                                                                    var _x = 0;
+                                                                                                    return function(data) {
+                                                                                                        if (_x > 1.0) _x = 0;
+                                                                                                        _x += .01;
+                                                                                                        return { x: _x };
+                                                                                                    };
+                                                                                                })(),
 
                                                                                                 scale : (function() {
                                                                                                     var _x = 0;

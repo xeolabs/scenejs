@@ -33,6 +33,8 @@
 </script>
 <script type="text/javascript" src="lib/jquery/jquery.jtemplates.js">
 </script>
+<script type="text/javascript" src="lib/sylvester/sylvester.js">
+</script>
 <script type="text/javascript" src="lib/scenejs/scenejs.js">
 </script>
 
@@ -98,7 +100,7 @@ function showFileOnPath(url) {
         }
         path += "..." + url.substring(url.lastIndexOf("/"));
     }
-    $("#file-url").append("<a href=\"" + url + "\">" + path + "</a>");
+    $("#file-url").append("<a target=\"other\" href=\"" + url + "\">" + path + "</a>");
 }
 
 function showErrorOnPath() {

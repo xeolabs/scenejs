@@ -40,7 +40,7 @@
             padding: 20px;
             padding-bottom: 15px;
             width: 550px;
-            height:125px;
+            height: 200px;
             margin: 0 auto;
             margin-top: 30px;
             margin-bottom: 20px;
@@ -74,6 +74,19 @@
         br {
             clear: left;
         }
+
+        .formLayout .notes {
+            width:250px;
+            text-align: left;
+            padding-top: 20px;
+            padding-left: 140px;
+        }
+
+        .formLayout ul {
+            padding-left: 20px;
+        }
+
+
     </style>
 </head>
 <body style="padding: 20px;">
@@ -99,6 +112,7 @@
 
             <p class="intro">Run it in an IDE session that you can bookmark and share.</p>
 
+
             <div class="formLayout">
                 <label>Title</label>
                 <input name="url" id="exhibit-title" value="Yet Another Awesome SceneJS Example" type="text"/>
@@ -117,11 +131,19 @@
                         Run!
                     </button>
                 </div>
+                <br/>
+
+                <div class="notes">
+                    <p><i>To support your example, the IDE provides<br/>these libraries in its runtime environment:</i></p>
+                    <ul>
+                        <li><a target="other" href="http://sylvester.jcoglan.com">Sylvester Matrix Library</a></li>
+                    </ul>
+                </div>
             </div>
 
             <h1>Or try one of these:</h1>
 
-            <div id="examples"/>
+            <div id="examples"></div>
         </div>
     </div>
 </div>
@@ -136,11 +158,11 @@
     function showExamples() {
         $.ajax({
             type: 'GET',
-            url: 'http://scenejs.org/library/v0.7/scenes/examples/index.json',
+            url: '../library/v0.7/scenes/examples/index.json',
             dataType: 'json',
             success: function(json) {
                 $("#examples").setTemplateURL("templates/ide-examples.html");
-                $("#examples").processTemplate({ examples: json });
+                $("#examples").processTemplate(json);
             }
         });
     }

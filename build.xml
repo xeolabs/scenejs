@@ -154,6 +154,10 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewTransformBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/lookAt.js"/>
 
+            <!-- Stationary view space -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/stationary.js"/>
+
             <!-- Lighting -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightsBackend.js"/>
@@ -179,6 +183,7 @@
             <!-- Bounding boxes -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
 
             <!-- Textures -->

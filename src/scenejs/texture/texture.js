@@ -92,32 +92,11 @@
                                 }
                             }
 
-                            //                            var lp = new SceneJS._utils.NodeParams("", layerParam, data);
-                            //                            var scale = lp.getParam("scale", data);
-                            //                            var translate = lp.getParam("translate", data);
-                            //                            var rotate = lp.getParam("rotate", data);
-                            //
                             layers.push({
                                 state : utils.STATE_INITIAL,
                                 process: null,                  // Imageload process handle
                                 image : null,                   // Initialised when state == IMAGE_LOADED
                                 creationParams: layerParam,   // Create texture using this
-
-                                /* The layer that gets exported
-                                 */
-                                //
-                                //                                getMatrix : new (function() {
-                                //                                    var translate = layerParam.translate;
-                                //                                    var rotate = layerParam.rotate;
-                                //                                    var scale = layerParam.scale;
-                                //                                    return function(data) {
-                                //                                        return utils.getMatrix(
-                                //                                                (translate instanceof Function) ? translate(data) : translate,
-                                //                                                (rotate instanceof Function) ? rotate(data) : rotate,
-                                //                                                (scale instanceof Function) ? scale(data) : scale);
-                                //                                    };
-                                //                                })(),
-
                                 texture: null,          // Initialised when state == TEXTURE_LOADED
                                 createMatrix : new (function() {
                                     var translate = layerParam.translate;
@@ -247,9 +226,8 @@
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
                                 utils.textureBackend.pushLayer(layer.texture, {
-                                    applyTo : layer.applyTo,
-                                    //    image: layer.image,
-                                    matrix: layer.createMatrix()
+                                    applyTo : layer.applyTo,                                    
+                                    matrix: layer.createMatrix(data)
                                 });
                             }
                             SceneJS._utils.visitChildren(cfg, data);
