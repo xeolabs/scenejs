@@ -127,8 +127,18 @@ h4 {
 }
 
 #container {
-    padding: 10px 10px 10px 50px;
-    margin: 0;
+    position: relative;
+    width: 960px;
+    min-width: 960px; /*padding: 10px 10px 10px 50px;*/
+    margin: 0 auto;
+    border: 0;
+    clear: both;
+}
+
+#wide-container {
+    position: relative;
+    width: 100%; /*padding: 10px 10px 10px 50px;*/
+    margin: 0 auto;
     border: 0;
 }
 
@@ -214,7 +224,7 @@ ul.site-tabs li.ui-state-active a {
     vertical-align: middle;
     margin: 0 auto;
     height: 120px;
-    margin-right: 20px;
+    width: 100%;
 }
 
 #header h1 {
@@ -235,7 +245,6 @@ ul.site-tabs li.ui-state-active a {
     overflow: auto;
     text-align: left;
     margin: 0 auto;
-    width: auto;
     border-top: 2px solid gray;
     border-bottom: 2px solid gray;
     height: auto; /*background: #E5ECF9;*/
@@ -322,9 +331,9 @@ ul.site-tabs li.ui-state-active a {
 /* -----------------------/  Home /----------------- */
 
 #home-table {
-    float: left;
+
     height: 1500px;
-    width: 1200px;
+
     overflow: auto; /*padding-top: 20px;*/
     margin: 0 auto;
 
@@ -334,7 +343,7 @@ ul.site-tabs li.ui-state-active a {
     float: left;
     text-align: left;
     margin: 0 auto;
-    width: 500px;
+    width: 600px;
     height: auto;
 }
 
@@ -364,39 +373,24 @@ ul.site-tabs li.ui-state-active a {
     height: auto;
 }
 
-#home-table #col2 h3 {
-    background: transparent url(../images/tick.png) no-repeat scroll left center;
-    margin-top: 10px;
-    padding: 10px 40px 10px;
-}
-
 #home-table  #col2 p {
-    padding-left: 40px;
+    padding-left: 0px;
 }
 
-#home-table #col3 {
-    float: left;
-    padding-left: 40px;
-    text-align: left;
-    margin: 0 auto;
-    width: 320px;
-    height: auto;
-}
-
-#home-table  #col3 .home-menu-item {
+#home-table  #col2 .home-menu-item {
     height: auto;
     padding: 0px 20px 15px 75px;
     margin-bottom: 5px;
 }
 
-#home-table  #col3  .home-menu-item a.title {
+#home-table  #col2  .home-menu-item a.title {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 1.4em;
     line-height: 1.4em;
     font-weight: bold;
 }
 
-#home-table  #col3  .home-menu-item .copy {
+#home-table  #col2  .home-menu-item .copy {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 1.0em;
     font-weight: normal;
@@ -431,42 +425,102 @@ ul.site-tabs li.ui-state-active a {
     line-height: 0.8em !important;
 }
 
-#home-table  #col3  #home-features {
+#home-table  #col2  #home-features {
     background: url(../images/registry.png) no-repeat scroll 15px 0px;
 }
 
-#home-table  #col3  #home-playroom {
+#home-table  #col2  #home-playroom {
     background: url(../images/demo-icon-large.png) no-repeat scroll 15px 0px;
 }
 
-#home-table  #col3  #home-tutorials {
+#home-table  #col2  #home-tutorials {
     background: url(../images/tutorial-icon.png) no-repeat scroll 15px 0px;
 }
 
-#home-table  #col3  #home-facebook {
+#home-table  #col2  #home-facebook {
     background: url(../images/facebook50.png) no-repeat scroll 15px 0px;
 }
 
-#home-table  #col3  #home-dev {
+#home-table  #col2  #home-dev {
     background: url(../images/gears.png) no-repeat scroll 15px 0px;
 }
 
-#home-table  #col3  #home-assets {
+#home-table  #col2  #home-assets {
     background: url(../images/server_client_exchange.png) no-repeat scroll 15px 0px;
 }
 
 /* -----------------------/  Features /----------------- */
 
-#features-table {
+/* Youtube Playlist */
+
+#youtube-playlist {
+    width: 960px;
+    height: auto;
+    overflow: auto; /*padding-top: 20px;*/
+    margin: 0 auto;
+}
+
+#youtube-video {
     float: left;
-    height: 2000px;
-    width: 1200px;
+    margin-right: 10px;
+}
+
+.youtube-playlist-holder {
+/*background: #f3f3f3;*/
+    padding: 0px;
+    float: left; /*border: 1px solid #e3e3e3;*/
+    margin-bottom: 15px;
+    width: auto;
+}
+
+.youtube-playlist-holder ul {
+/*background: #f3f3f3;*/
+    float: left;
+    margin: 0;
+    padding: 0;
+    width: 270px;
+    height: 505px;
+}
+
+.youtube-playlist-holder ul li {
+    list-style-type: none;
+    display: block;
+    background: #f1f1f1;
+    float: left;
+    width: 266px;
+    margin-bottom: 5px;
+    padding: 2px;
+
+}
+
+.youtube-playlist-holder ul li img {
+    width: 120px;
+    float: left;
+    margin-right: 5px;
+    border: 1px solid #999;
+}
+
+.youtube-playlist-holder ul li a {
+    font-family: georgia;
+    text-decoration: none;
+    display: block;
+    color: #000;
+}
+
+.youtube-playlist-holder .currentvideo {
+    background: #e6e6e6;
+}
+
+/* Features Table */
+
+#features-table {
+    height: 3000px;
     overflow: auto; /*padding-top: 20px;*/
     margin: 0 auto;
 }
 
 #features-table hr.line {
-    width: 280px;
+    width: auto;
     height: 0px;
     color: #666666;
     background-color: #666666;
@@ -494,7 +548,7 @@ ul.site-tabs li.ui-state-active a {
 }
 
 #features-table .sub-feature {
-/ / padding : 10 px 40 px 10 px;
+/*padding : 10 px 40 px 10 px;*/
     padding: 10px 0px 10px;
     color: #000000 !important;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -503,8 +557,8 @@ ul.site-tabs li.ui-state-active a {
 }
 
 #features-table p {
-/ / padding-left : 40 px;
-    padding-left: 0px;
+/*padding-left : 40 px;*/
+    /*padding-left: 0px;*/
 }
 
 #features-table p.demo {
@@ -531,7 +585,7 @@ ul.site-tabs li.ui-state-active a {
     float: left;
     text-align: left;
     margin: 0 auto;
-    width: 300px;
+    width: 280px;
     height: auto;
 }
 
@@ -540,24 +594,24 @@ ul.site-tabs li.ui-state-active a {
     padding-left: 30px;
     text-align: left;
     margin: 0 auto;
-    width: 300px;
+    width: 280px;
     height: auto;
 }
 
-
 #features-table #col3 {
-    float: left;
-    padding-left: 50px;
+    overflow: auto;
+    float: right;
+    padding-left: 0px;
     padding-top: 30px;
     text-align: left;
     margin: 0 auto;
-    width: 450px;
-    height: auto;
+    width: 320px;
+    height: 2000px;
 }
 
-#features-table  #col3 p {
-    padding-left: 0px;
-}
+/*#features-table  #col3 p {*/
+    /*padding-left: 0px;*/
+/*}*/
 
 #features-table  #col3 .home-menu-item {
     height: auto;
@@ -580,33 +634,33 @@ ul.site-tabs li.ui-state-active a {
     color: #444444;
 }
 
-#features-table  #col3  #home-download {
-    background: url(../images/import1.png) no-repeat scroll 15px 5px;
-}
+/*#features-table  #col3  #home-download {*/
+    /*background: url(../images/import1.png) no-repeat scroll 15px 5px;*/
+/*}*/
 
-#features-table  #col3  #home-plugins {
-    background: url(../images/registry.png) no-repeat scroll 15px 5px;
-}
+/*#features-table  #col3  #home-plugins {*/
+    /*background: url(../images/registry.png) no-repeat scroll 15px 5px;*/
+/*}*/
 
-#features-table  #col3  #home-playroom {
-    background: url(../images/registry.png) no-repeat scroll 15px 5px;
-}
+/*#features-table  #col3  #home-playroom {*/
+    /*background: url(../images/registry.png) no-repeat scroll 15px 5px;*/
+/*}*/
 
-#features-table  #col3  #home-tutorials {
-    background: url(../images/blogger_logo.gif) no-repeat scroll 15px 5px;
-}
+/*#features-table  #col3  #home-tutorials {*/
+    /*background: url(../images/blogger_logo.gif) no-repeat scroll 15px 5px;*/
+/*}*/
 
-#features-table  #col3  #home-facebook {
-    background: url(../images/facebook50.png) no-repeat scroll 15px 5px;
-}
+/*#features-table  #col3  #home-facebook {*/
+    /*background: url(../images/facebook50.png) no-repeat scroll 15px 5px;*/
+/*}*/
 
-#features-table  #col3  #home-dev {
-    background: url(../images/gears.png) no-repeat scroll 15px 5px;
-}
+/*#features-table  #col3  #home-dev {*/
+    /*background: url(../images/gears.png) no-repeat scroll 15px 5px;*/
+/*}*/
 
-#features-table  #col3  #home-assets {
-    background: url(../images/server_client_exchange.png) no-repeat scroll 15px 5px;
-}
+/*#features-table  #col3  #home-assets {*/
+    /*background: url(../images/server_client_exchange.png) no-repeat scroll 15px 5px;*/
+/*}*/
 
 /* ----------------------------------------------------- */
 
@@ -695,7 +749,7 @@ ul.site-tabs li.ui-state-active a {
 
 #ide-examples-table p.title {
     font-size: 1.0em;
-    line-height:1.1em;
+    line-height: 1.1em;
 }
 
 #ide-examples-table .col2 {
@@ -707,6 +761,10 @@ ul.site-tabs li.ui-state-active a {
     width: 450px;
     height: auto;
 
+}
+
+.ide-width {
+100 % !important;
 }
 
 /* Sangraal layout styles */
@@ -1221,11 +1279,11 @@ button.regular, .buttons a.regular {
 }
 
 #dev-table #col2 {
-    float: left;
+    float: right;
     padding-left: 120px;
     text-align: right;
     margin: 0 auto;
-    width: 320px;
+    width: auto;
     height: auto;
     padding-right: 0px;
 }

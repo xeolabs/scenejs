@@ -52,7 +52,7 @@ with (SceneJS) {
 
                                             lights(function(data) {
                                                 return {
-                                                    lights: [
+                                                    sources: [
                                                         {
                                                             pos: { x: 0, y: data.get("lightY"), z: 0 }
                                                         }

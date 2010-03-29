@@ -71,7 +71,7 @@ with (SceneJS) {
                                                 /* Lighting
                                                  */
                                                     lights({
-                                                        lights: [
+                                                        sources: [
                                                             {
                                                                 type:                   "point",
                                                                 diffuse:                { r: 0.6, g: 0.6, b: 0.3 },

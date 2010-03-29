@@ -1772,7 +1772,7 @@ SceneJs.backends.installBackend(
                 }
                 ctx.programs.setVar( 'scene_Lights', ctx.lightStack);
             };
-        })());SceneJs.lights = function() {
+        })());SceneJS.light = function() {
     var cfg = SceneJs.utils.getNodeConfig(arguments);
 
     var backend = SceneJs.backends.getBackend('lights');

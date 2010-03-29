@@ -1,4 +1,5 @@
-/*  Introductory SceneJS scene which renders the venerable OpenGL teapot.
+/*
+ Introductory SceneJS scene which renders the venerable OpenGL teapot.
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
@@ -40,35 +41,39 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                     up : { y: 1.0 }
                                 },
 
-                                    /* A lights node inserts  point lights into the world-space.
-                                     * You can have many of these, nested within modelling transforms
+                                    /* A lights node inserts lights into the world-space.
+                                     * You can have many of these, maybe nested within modelling transforms
                                      * if you want to move them around.
                                      */
                                         SceneJS.lights({
-                                            lights: [                                               
+                                            sources: [
+                                                {
+                                                    type:                   "dir",
+                                                    color:                  { r: .8, g: 0.8, b: 0.8 },
+                                                    diffuse:                true,
+                                                    specular:               false,
+                                                    pos:                    { x: 100.0, y: 4.0, z: -100.0 },
+                                                    constantAttenuation:    1.0,
+                                                    quadraticAttenuation:   0.0,
+                                                    linearAttenuation:      0.0
+                                                }
+                                                ,
                                                 {
                                                     type:                   "point",
-                                                    diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-                                                    specular:               { r: 0.9, g: 0.9, b: 0.6 },
-                                                    pos:                    { x: 100.0, y: 0.0, z: -100.0 },
+                                                    color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                    diffuse:                true,
+                                                    specular:               true,
+                                                    pos:                    { x: 100.0, y: -100.0, z: -100.0 },
                                                     constantAttenuation:    1.0,
                                                     quadraticAttenuation:   0.0,
                                                     linearAttenuation:      0.0
                                                 },
                                                 {
                                                     type:                   "point",
-                                                    diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-                                                    specular:               { r: 0.9, g: 0.9, b: 0.6 },
-                                                    pos:                    { x: -100.0, y: 100.0, z: 0.0 },
-                                                    constantAttenuation:    1.0,
-                                                    quadraticAttenuation:   0.0,
-                                                    linearAttenuation:      0.0
-                                                },
-                                                {
-                                                    type:                   "point",
-                                                    diffuse:                { r: 0.6, g: 0.3, b: 0.3 },
-                                                    specular:               { r: 0.9, g: 0.9, b: 0.6 },
-                                                    pos:                    { x: -0.0, y: 1000.0, z: 0.0 },
+                                                    color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                    diffuse:                true,
+                                                    specular:               true,
+                                                    pos:                    { x: -1000.0, y: -1000.0, z: 0.0 },
                                                     constantAttenuation:    1.0,
                                                     quadraticAttenuation:   0.0,
                                                     linearAttenuation:      0.0
@@ -99,22 +104,18 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                             };
                                                         },
 
-                                                            /* Specify the amounts of ambient, diffuse and specular
-                                                             * lights our teapot reflects
+                                                            /* Specify teapot's material colour properties
                                                              */
                                                                 SceneJS.material({
-                                                                    ambient:   { r: 0.5, g: 0.5, b: 0.5 },
-                                                                    diffuse:   { r: 0.6, g: 0.6, b: 0.6 },
-                                                                    specular:  { r: 1, g: 1, b: 1 },
-                                                                    emission: { r: 0.02, g: 0.02, b: 0.0 },
-                                                                    shininess: 6.0
+                                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                                    specular:       0.9,
+                                                                    shine:          6.0
                                                                 },
 
                                                                     /* Teapot's geometry
                                                                      */
-                                                                        SceneJS.scale({x:1.0,y:1.0,z:1.0},
-                                                                                SceneJS.objects.teapot()
-                                                                                )
+                                                                        SceneJS.objects.teapot()
                                                                         )
                                                                 )
                                                         ) // rotate
@@ -136,7 +137,10 @@ var dragging = false;
  */
 exampleScene.render({yaw: yaw, pitch: pitch});
 
-var canvas = document.getElementById("theCanvas");
+/* Always get canvas from scene - it will try to bind to a default canvas
+ * can't find the one specified
+ */
+var canvas = exampleScene.getCanvas();
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -164,5 +168,6 @@ function mouseMove(event) {
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
+
 
 

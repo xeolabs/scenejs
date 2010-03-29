@@ -32,7 +32,7 @@ try {
                             type: 'texture-shader'
                         },
                                 lights({
-                                    lights: [
+                                    sources: [
                                         {
                                             pos: { x: -30.0, y: -1000.0, z: 300.0 }
                                         }

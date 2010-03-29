@@ -24,7 +24,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                     clear : { depth : true, color : true}
                 },
                         SceneJS.lights({
-                            lights: [
+                            sources: [
                                 {
                                     type:                   "point",
                                     ambient:                { r: 0.4, g: 0.4, b: 0.6 },

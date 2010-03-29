@@ -51,7 +51,7 @@ var exampleScene = SceneJS.scene({
                     enableTexture2D: true
                 },
                         SceneJS.lights({
-                            lights: [
+                            sources: [
                                 {
                                     pos: { x: -600.0, y: 40.0, z: 50.0 }
                                 }

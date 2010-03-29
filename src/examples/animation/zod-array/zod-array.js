@@ -30,7 +30,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                 },
 
                         SceneJS.lights({
-                            lights: [
+                            sources: [
                                 {
                                     pos: { x: 50.0, y: 40.0, z: -100.0 }
                                 }

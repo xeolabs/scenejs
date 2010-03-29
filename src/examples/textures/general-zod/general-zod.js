@@ -24,7 +24,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                     enableTexture2D: true
                 },
                         SceneJS.lights({
-                            lights: [
+                            sources: [
                                 {
                                     type:                   "point",
                                     diffuse:                { r: 1.0, g: 1.0, b: 1.0 },

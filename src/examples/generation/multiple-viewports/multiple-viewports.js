@@ -26,7 +26,7 @@ with (SceneJS) {
                 clear : { depth : true, color : true}
             },
                             lights({
-                                lights: [
+                                sources: [
                                     {
                                         pos: { x: 50.0, y: 0.0, z: 30.0 }
                                     }

@@ -56,7 +56,7 @@ var exampleScene = SceneJS.scene({
                                             /* These lights are a hack for http://github.com/xeolabs/scenejs/issues/issue/19
                                              */
                                                 SceneJS.lights({
-                                                    lights: [
+                                                    sources: [
                                                         {
                                                             type:                   "point",
                                                             ambient:                { r: 0.0, g: 0.0, b: 0.0 },
@@ -87,7 +87,7 @@ var exampleScene = SceneJS.scene({
                                     /* Lighting
                                      */
                                         SceneJS.lights({
-                                            lights: [
+                                            sources: [
                                                 {
                                                     type:                   "point",
                                                     diffuse:                { r: 0.6, g: 0.6, b: 0.3 },

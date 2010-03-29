@@ -1,17 +1,17 @@
 /**
  * Backend that manages scene lighting.
  *
- * Holds the lights on a stack and provides the SceneJS.lights node with methods to push and pop them.
+ * Holds the sources on a stack and provides the SceneJS.light node with methods to push and pop them.
  *
  * Tracks the view and modelling transform matrices through incoming VIEW_TRANSFORM_UPDATED and
  * MODEL_TRANSFORM_UPDATED events. As each light are pushed, its position and/or direction is multipled by the
- * matrices. The stack will therefore contain lights that are instanced in view space by different modelling
+ * matrices. The stack will therefore contain sources that are instanced in view space by different modelling
  * transforms, with positions and directions that may be animated,
  *
  * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
  * LIGHTS_EXPORTED to pass the entire light stack to the shading backend.
  *
- * Avoids redundant export of the lights with a dirty flag; they are only exported when that is set, which occurs
+ * Avoids redundant export of the sources with a dirty flag; they are only exported when that is set, which occurs
  * when the stack is pushed or popped by the lights node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
@@ -73,14 +73,14 @@ SceneJS._backends.installBackend(
                     });
 
             function vectorToArray(v, fallback) {
-                return v ? [ v.x || 0, v.y || 0, v.z || 0] : fallback;
+                return v ? [ v.x || 0, v.y || 0, -v.z || 0] : fallback;    // TODO: Hack to negate vertex X and Y
             }
 
             function colourToArray(v, fallback) {
                 return v ? [ v.r || fallback[0], v.g || fallback[1], v.b || fallback[2]] : fallback;
             }
 
-            /* Transforms light by view and model matrices
+            /* Creates a view-space light
              */
             function createLight(light) {
                 if (light.type &&
@@ -88,7 +88,46 @@ SceneJS._backends.installBackend(
                             && light.type != "dir"
                             && light.type != "point")) {
                     throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.lights node has a light of unsupported type - should be 'spot', 'direction' or 'point'");
+                            "SceneJS.light node has a light of unsupported type - should be 'spot', 'direction' or 'point'");
+                }
+                return {
+                    type: light.type || "point",
+
+                    color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+
+                    diffuse : light.diffuse,                    
+                    specular : light.specular,
+
+                    pos : SceneJS._math.transformPoint3(
+                            viewMat,
+                            SceneJS._math.transformPoint3(
+                                    modelMat,
+                                    vectorToArray(light.pos, [ 0,  0,  1.0]))),
+
+                    spotDir: SceneJS._math.transformVector3(
+                            viewMat,
+                            SceneJS._math.transformVector3(
+                                    modelMat,
+                                    vectorToArray(light.spotDir, [ 0,  0,  -1.0]))),
+
+                    spotExponent: light.spotExponent == undefined ?  1.0 : light.spotExponent,
+                    spotCosCutOff: light.spotCosCutOff == undefined ?  20.0 : light.spotCosCutOff,
+
+                    constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
+                    linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
+                    quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
+                };
+            }
+
+              /* Transforms light by view and model matrices
+             */
+            function createLightOLD(light) {
+                if (light.type &&
+                    (light.type != "spot"
+                            && light.type != "dir"
+                            && light.type != "point")) {
+                    throw SceneJS.exceptions.InvalidNodeConfigException(
+                            "SceneJS.light node has a light of unsupported type - should be 'spot', 'direction' or 'point'");
                 }
                 return {
                     type: light.type || "point",
@@ -120,9 +159,9 @@ SceneJS._backends.installBackend(
              */
             return {
 
-                pushLights : function(lights) {
-                    for (var i = 0; i < lights.length; i++) {
-                        lightStack.push(createLight(lights[i]));
+                pushLights : function(sources) {
+                    for (var i = 0; i < sources.length; i++) {
+                        lightStack.push(createLight(sources[i]));
                     }
                     dirty = true;
                     ctx.events.fireEvent(
@@ -130,8 +169,8 @@ SceneJS._backends.installBackend(
                             lightStack);
                 },
 
-                popLights : function(numLights) {
-                    for (var i = 0; i < numLights; i++) {
+                popLights : function(numSources) {
+                    for (var i = 0; i < numSources; i++) {
                         lightStack.pop();
                     }
                     dirty = true;

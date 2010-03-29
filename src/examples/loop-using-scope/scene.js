@@ -8,7 +8,7 @@ with (SceneJS) {
                             shader({ type: 'simple-shader' },
 
                                     lights({
-                                        lights: [
+                                        sources: [
                                             {
                                                 pos: { x: 0.0, y: 50.0, z: -50.0 }
                                             }

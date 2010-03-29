@@ -25,7 +25,17 @@ SceneJS._backends.installBackend(
             var material;
             var dirty;
 
-            function colourToArray(v, fallback) {
+            function colour4ToArray(v, fallback) {
+                return v ?
+                       [
+                           v.r != undefined ? v.r : fallback[0],
+                           v.g != undefined ? v.g : fallback[1],
+                           v.b != undefined ? v.b : fallback[2],
+                           v.a != undefined ? v.a : fallback[3]
+                       ] : fallback;
+            }
+
+            function colour3ToArray(v, fallback) {
                 return v ?
                        [
                            v.r != undefined ? v.r : fallback[0],
@@ -35,6 +45,19 @@ SceneJS._backends.installBackend(
             }
 
             function _createMaterial(m) {
+                return {
+                    baseColor: colour4ToArray(m.baseColor, [ 0.2,  0.2,  0.2, 0.0]),       // IE. diffuse colour
+                    specularColor: colour3ToArray(m.specularColor, [ 0.8,  0.8,  0.8]),
+                    specular: m.specular,
+                    shine: m.shine || 0.0,
+                    reflect: m.reflect || 0.0,
+                    alpha: (m.alpha == undefined) ? 1.0 : m.alpha,
+                    emit: m.alpha || 0.0,
+                    blendMode: m.blendMode || "multiply"
+                };
+            }
+
+            function _createMaterialOLD(m) {
                 return {
                     ambient: colourToArray(m.ambient, [ 0.2,  0.2,  0.2]),
                     diffuse: colourToArray(m.diffuse, [ 0.8,  0.8,  0.8]),

@@ -35,7 +35,7 @@ with (SceneJS) {
                                         up : { x: 0.0, y: 1.0, z: 0.0 }
                                     },
                                             lights({
-                                                lights: [
+                                                sources: [
                                                     {
                                                         pos: { x: 50.0, y: 20.0, z: -30.0 }
                                                     }

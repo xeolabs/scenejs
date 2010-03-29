@@ -12,10 +12,10 @@ SceneJS.lights = function() {
                 if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
                     SceneJS._utils.visitChildren(cfg, data);
                 } else {
-                    var lights = cfg.getParams(data).lights;
-                    backend.pushLights(lights);
+                    var sources = cfg.getParams(data).sources;
+                    backend.pushLights(sources);
                     SceneJS._utils.visitChildren(cfg, data);
-                    backend.popLights(lights.length);
+                    backend.popLights(sources.length);
                 }
             });
 };

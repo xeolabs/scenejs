@@ -71,8 +71,20 @@
                                         "SceneJS.texture.layers[" + i + "].uri is undefined");
                             }
 
+                            if (layerParam.applyFrom) {
+                                if (layerParam.applyFrom != "uv1" &&
+                                    layerParam.applyFrom != "uv2" &&
+                                    layerParam.applyFrom != "normal" &&
+                                    layerParam.applyFrom != "geometry") {
+
+                                    throw SceneJS.exceptions.InvalidNodeConfigException(
+                                            "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
+                                            "should be either 'uv1', 'uv2', 'normal' or 'geometry'");
+                                }
+                            }
+
                             if (layerParam.applyTo) {
-                                if (layerParam.applyTo != "ambient" &&
+                                if (layerParam.applyTo != "color" && // Colour map
                                     layerParam.applyTo != "diffuse" &&
                                     layerParam.applyTo != "specular" &&
                                     layerParam.applyTo != "shininess" &&
@@ -85,8 +97,8 @@
                                     layerParam.applyTo != "height") {
 
                                     throw SceneJS.exceptions.InvalidNodeConfigException(
-                                            "SceneJS.texture.layers[" + i + "].applyTo is unsupported - " +
-                                            "should be either 'diffuse', 'specular', 'shininess', " +
+                                            "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
+                                            "should be either 'color', 'diffuse', 'specular', 'shininess', " +
                                             "'emission', 'red', 'green', " +
                                             "'blue', alpha', 'normal' or 'height'");
                                 }
@@ -103,8 +115,8 @@
                                     var rotate = layerParam.rotate;
                                     var scale = layerParam.scale;
                                     var dynamic = ((translate instanceof Function) ||
-                                                 (rotate instanceof Function) ||
-                                                 (scale instanceof Function));
+                                                   (rotate instanceof Function) ||
+                                                   (scale instanceof Function));
                                     var defined = dynamic || translate || rotate || scale;
                                     return function(data) {
                                         if (defined && (dynamic || !matrix)) {
@@ -116,7 +128,9 @@
                                         return matrix;
                                     };
                                 })(),
-                                applyTo: layerParam.applyTo // Optional - colour map my default
+                                applyFrom: layerParam.applyFrom || "geometry",
+                                applyTo: layerParam.applyTo || "color",
+                                blendMode: layerParam.blendMode || "multiply"
                                 //matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
 
                             });
@@ -226,7 +240,9 @@
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
                                 utils.textureBackend.pushLayer(layer.texture, {
-                                    applyTo : layer.applyTo,                                    
+                                    applyFrom : layer.applyFrom,
+                                    applyTo : layer.applyTo,
+                                    blendMode : layer.blendMode,
                                     matrix: layer.createMatrix(data)
                                 });
                             }

@@ -2,7 +2,8 @@
 <head>
     <title>SceneJS Features</title>
     <link href="css/style.css" rel="stylesheet" type="text/css"/>
-
+    <script type="text/javascript" src="lib/jquery/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery.youtubeplaylist.js"></script>
 </head>
 <body style="padding: 20px;">
 <div id="container">
@@ -17,10 +18,21 @@
 
 
 <div id="content">
+<br/>
+
+<!--<div class="youtube-playlist-holder">-->
+<!--<div id="youtube-video"></div>-->
+<!--<ul class="youtube-playlist">-->
+<!--<li><a href="http://www.youtube.com/watch?v=I1wObzEm4_4">Level-of-Detail Test 1</a></li>-->
+<!--<li><a href="http://www.youtube.com/watch?v=194YJ3AAO9M">Level-of-Detail Test 2</a></li>-->
+<!--<li><a href="http://www.youtube.com/watch?v=if7zfjJoBg4">Stress Test 1</a></li>-->
+<!--<li><a href="http://www.youtube.com/watch?v=_sz2fR9ijIk">Stress Test 2 with Fog</a></li>-->
+<!--</ul>-->
+<!--</div>-->
 
 <div id="features-table">
-<div id="col1">
 
+<div id="col1">
     <p class="feature">Simple API</p>
     <hr class="line"/>
     <p class="sub-feature">Terse and Expressive</p>
@@ -159,30 +171,25 @@
     <a href="ide.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
 
 </div>
+
+
 <div id="col3">
-
-
-    <br/>
-    <br/>
-    <object width="480" height="385">
-        <param name="movie" value="http://www.youtube.com/v/I1wObzEm4_4&hl=en_US&fs=1&rel=0"></param>
+    <object width="320" height="265">
+        <param name="movie" value="http://www.youtube.com/v/I1wObzEm4_4&hl=en_US&fs=1&"></param>
         <param name="allowFullScreen" value="true"></param>
         <param name="allowscriptaccess" value="always"></param>
-        <embed src="http://www.youtube.com/v/I1wObzEm4_4&hl=en_US&fs=1&rel=0" type="application/x-shockwave-flash"
-               allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed>
+        <embed src="http://www.youtube.com/v/I1wObzEm4_4&hl=en_US&fs=1&" type="application/x-shockwave-flash"
+               allowscriptaccess="always" allowfullscreen="true" width="320" height="265"></embed>
     </object>
-
     <br/>
     <br/>
 
-    <p><span><b>Latest Level-of-Detail Test</b></span></p>
-    <p><span>Latest test of the level-of-detail (LOD) culling feature, using a staircase model that displays a different representation for each
-        threshold of projected bounding volume size. The transition between representations is deliberately obvious.
-        In this example, the representations are being loaded on demand from
-        <a href="http://www.scenejs.org/library/v0.7/assets/examples/spiral-staircase/spiral-staircase.js">this asset
-            definition</a>
-        from the SceneJS library. LOD can be configured to "pre-stage" each level of geometry in anticipation as each
-        level is approached, to prevent the model from disappearing while the next representation is loaded.</span></p>
+    <p><span>Testing the level-of-detail (LOD) culling feature with staircase representations loaded cross-domain on demand</span>
+    </p>
+
+    <p class="demo"><span><a
+            href="http://www.scenejs.org/website/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js">Run
+        it live in the IDE</a></span></p>
 
     <br/>
     <br/>
@@ -223,46 +230,36 @@
         <param name="movie" value="http://www.youtube.com/v/if7zfjJoBg4&hl=en_US&fs=1&rel=0&hd=1"></param>
         <param name="allowFullScreen" value="true"></param>
         <param name="allowscriptaccess" value="always"></param>
-        <embed src="http://www.youtube.com/v/if7zfjJoBg4&hl=en_US&fs=1&rel=0&hd=1" type="application/x-shockwave-flash"
+        <embed src="http://www.youtube.com/v/if7zfjJoBg4&hl=en_US&fs=1&rel=0&hd=1"
+               type="application/x-shockwave-flash"
                allowscriptaccess="always" allowfullscreen="true" width="320" height="265"></embed>
     </object>
     <br/>
     <br/>
-
-    <p><span>Stress testing with textures</span></p>
-
-
-    <!-- *********************************************************************************************** -->
-
-    <!--<h3 class="feature">An Growing List of Rendering Effects</h3>-->
-    <!--<hr class="line"/>-->
-
-    <!--<h3 class="feature">Texture Layers</h3>-->
-    <!--<a href="ide.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>-->
-
-    <!--<h3 class="feature">Phong Shading with Unlimited Light Sources</h3>-->
-    <!--<a href="ide.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>-->
-
-    <!--<b>Fog</b>-->
-    <!--<a href="ide.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>-->
-
-    <!--<h3 class="feature">Remotely loaded assets</h3>-->
-    <!--<a href="ide.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>-->
-
-    <!-- *********************************************************************************************** -->
-
-    <!--<h3 class="feature">Extensible</h3>-->
-
-    <!--<p><span>Who knows what people will want to do with SceneJS?</span></p>-->
-
 </div>
 </div>
 </div>
 </div>
 <div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://www.xeolabs.com">Xeolabs</a></p>
 </div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("ul.youtube-playlist").ytplaylist({
+            holderId: 'youtube-video',
+            playerHeight: '505',
+            playerWidth: '640',
+            addThumbs: true,
+            thumbSize: 'small',
+            showInline: false,
+            autoPlay: false,
+            showRelated: false,
+            allowFullScreen: true
+        });
+    });
+</script>
 
 <script type="text/javascript">
+
     var a2a_linkname = "SceneJS Features";
     var a2a_linkurl = window.location;
     var a2a_onclick = 1;</script>

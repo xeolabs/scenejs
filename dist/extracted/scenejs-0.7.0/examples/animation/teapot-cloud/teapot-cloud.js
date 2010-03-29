@@ -41,7 +41,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                             };
                                         },
                                                 SceneJS.lights({
-                                                    lights: [
+                                                    sources: [
                                                         {
                                                             type:                   "point",
                                                             ambient:                { r: 0.5, g: 0.5, b: 0.9 },

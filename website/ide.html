@@ -35,11 +35,11 @@
 </script>
 <script type="text/javascript" src="lib/sylvester/sylvester.js">
 </script>
-<script type="text/javascript" src="lib/scenejs/scenejs.js">
+<script type="text/javascript" src="lib/scenejs/scenejs.min.js">
 </script>
 
 
-<div id="container">
+<div id="wide-container">
     <div id="header">
         <h1><a href="index.html">SceneJS</a> &gt; <a href="load-ide.html">IDE</a> &gt;<span
                 id="file-url"></span></h1>
@@ -223,6 +223,8 @@ function loadScene(uri, onSuccess, onError) {
                 } else if (data.error) {
                     onError("Error from server: " + data.error);
                 } else {
+//                    var padded = ([data, "\n\n\n\n\n\n"]).join("");
+//                    onSuccess(padded);
                     onSuccess(data);
                 }
             });
@@ -232,7 +234,7 @@ function loadScene(uri, onSuccess, onError) {
 function init(text) {
     showIDE();
     scriptEditor = new CodeMirror(CodeMirror.replace("script-text-area"), {
-        height: "100%",
+        height: "1000px",
         content: text,
         parserfile: [
             "tokenizejavascript.js",

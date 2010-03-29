@@ -131,9 +131,8 @@ SceneJS._backends.installBackend(
                         for (var i = 0; i < _lights.length; i++) {
                             var light = _lights[i];
 
-                            activeProgram.setUniform("uLightAmbient" + i, light.ambient);
+                            activeProgram.setUniform("uLightColor" + i, light.color);
                             activeProgram.setUniform("uLightDiffuse" + i, light.diffuse);
-                            activeProgram.setUniform("uLightSpecular" + i, light.specular);
 
                             activeProgram.setUniform("uLightPos" + i, light.pos);
                             activeProgram.setUniform("uLightSpotDir" + i, light.spotDir);
@@ -152,6 +151,7 @@ SceneJS._backends.installBackend(
                         }
                     });
 
+
             ctx.events.onEvent(
                     SceneJS._eventTypes.MATERIAL_UPDATED,
                     function(m) {
@@ -162,11 +162,13 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.MATERIAL_EXPORTED,
                     function(m) {
-                        activeProgram.setUniform("uMaterialAmbient", m.ambient);
-                        activeProgram.setUniform("uMaterialDiffuse", m.diffuse);
+                        activeProgram.setUniform("uMaterialBaseColor", m.baseColor);
+                        activeProgram.setUniform("uMaterialSpecularColor", m.specularColor);
+
                         activeProgram.setUniform("uMaterialSpecular", m.specular);
-                        activeProgram.setUniform("uMaterialShininess", m.shininess);
-                        activeProgram.setUniform("uMaterialEmission", m.emission);
+                        activeProgram.setUniform("uMaterialShine", m.shine);
+                        activeProgram.setUniform("uMaterialEmit", m.emit);
+                        activeProgram.setUniform("uMaterialAlpha", m.alpha);
                     });
 
             ctx.events.onEvent(
@@ -220,7 +222,6 @@ SceneJS._backends.installBackend(
                     function() {
                         activateProgram();
                     });
-
 
 
             ctx.events.onEvent(
@@ -309,7 +310,11 @@ SceneJS._backends.installBackend(
                     val.push("tex/");
                     for (var i = 0; i < textureLayers.length; i++) {
                         var layer = textureLayers[i];
+                        val.push(layer.params.applyFrom);
+                        val.push("/");
                         val.push(layer.params.applyTo);
+                        val.push("/");
+                        val.push(layer.params.blendMode);
                         val.push("/");
                         if (layer.params.matrix) {
                             val.push("/anim");
@@ -344,6 +349,15 @@ SceneJS._backends.installBackend(
                     val.push(";");
                 }
                 sceneHash = val.join("");
+            }
+
+            function getShaderLoggingSource(src) {
+                var src2 = [];
+                for (var i = 0; i < src.length; i++) {
+                    var padding = (i < 10) ? "&nbsp;&nbsp;&nbsp;" : ((i < 100) ? "&nbsp;&nbsp;" : (i < 1000 ? "&nbsp;" : ""));
+                    src2.push(i + padding + ": " + src[i]);
+                }
+                return src2.join("<br/>");
             }
 
             /**
@@ -418,15 +432,21 @@ SceneJS._backends.installBackend(
 
                 src.push("  vec3 tmpVec;");
                 for (var i = 0; i < lights.length; i++) {
-                    src.push("tmpVec = (uLightPos" + i + ".xyz - vViewVertex.xyz);");
+                    var light = lights[i];
+                    if (light.type == "dir") {
+                        src.push("tmpVec = uLightPos" + i + ";");
+                    } else {
+                        src.push("tmpVec = (uLightPos" + i + ".xyz - vViewVertex.xyz);");
+                    }
                     src.push("vLightVec" + i + " = tmpVec;");                   // Vector from light to vertex
                     src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
                 }
-                src.push("vEyeVec = normalize(-vViewVertex.xyz);");
+                src.push("vEyeVec = normalize(vViewVertex.xyz);");
                 if (texturing) {
                     src.push("vTextureCoord = aTextureCoord;");
                 }
                 src.push("}");
+                // ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
@@ -438,11 +458,11 @@ SceneJS._backends.installBackend(
 
                 var texturing = textureLayers.length > 0 && rendererState.enableTexture2D;
                 var lighting = (lights.length > 0);
+                var tangent = false;
 
                 var src = ["\n"];
 
                 // ------------ Inputs ----------------------------------------------
-
 
                 src.push("varying vec4 vViewVertex;");              // View-space vertex
                 src.push("varying vec3 vNormal;");                  // View-space normal
@@ -461,21 +481,26 @@ SceneJS._backends.installBackend(
                     }
                 }
 
-                src.push("uniform vec3  uMaterialEmission;");                   // Not lighting dependent
                 src.push("uniform vec3 uAmbient;");                         // Scene ambient colour - taken from clear colour
-                src.push("uniform vec3  uMaterialAmbient;");
 
+                /* Light-independent material uniforms
+                 */
+                src.push("uniform vec4 uMaterialBaseColor;");
+                src.push("uniform float uMaterialEmit;");
+                src.push("uniform float uMaterialAlpha;");
+
+                /* Light and lighting-dependent material uniforms
+                 */
                 if (lighting) {
-                    src.push("uniform vec3  uMaterialDiffuse;");
-                    src.push("uniform vec3  uMaterialSpecular;");
-                    src.push("uniform float uMaterialShininess;");
+
+                    src.push("uniform vec3  uMaterialSpecularColor;");
+                    src.push("uniform float uMaterialSpecular;");
+                    src.push("uniform float uMaterialShine;");
+
                     for (var i = 0; i < lights.length; i++) {
                         var light = lights[i];
 
-                        src.push("uniform vec3  uLightAmbient" + i + ";");
-                        src.push("uniform vec3  uLightDiffuse" + i + ";");
-                        src.push("uniform vec3  uLightSpecular" + i + ";");
-
+                        src.push("uniform vec3  uLightColor" + i + ";");
                         src.push("uniform vec4  uLightPos" + i + ";");
                         src.push("uniform vec3  uLightSpotDir" + i + ";");
 
@@ -486,11 +511,15 @@ SceneJS._backends.installBackend(
 
                         src.push("uniform vec3  uLightAttenuation" + i + ";");
 
+                        // Computed by vertex shader:
+
                         src.push("varying vec3   vLightVec" + i + ";");         // Vector from light to vertex
                         src.push("varying float  vLightDist" + i + ";");        // Distance from light to vertex
                     }
                 }
 
+                /* Fog uniforms
+                 */
                 if (fog && fog.mode != "disabled") {
                     src.push("uniform vec3  uFogColor;");
                     src.push("uniform float uFogDensity;");
@@ -500,31 +529,52 @@ SceneJS._backends.installBackend(
 
                 src.push("void main(void) {");
 
-                src.push("  vec3    emissionValue=uMaterialEmission;");
                 src.push("  vec3    ambientValue=uAmbient;");
 
-                if (lighting) {
-                    src.push("  float   attenuation = 1.0;");
+                /* Initial values for colours and coefficients that will be modulated by
+                 * by the application of texture layers and lighting
+                 */
+                src.push("  vec4    color   = uMaterialBaseColor;");
+                src.push("  float   emit    = uMaterialEmit;");
+                src.push("  float   alpha   = uMaterialAlpha;");
 
-                    src.push("  vec3    diffuseValue=uMaterialDiffuse;");
-                    src.push("  vec3    specularValue=uMaterialSpecular;");
-                    src.push("  float    shininessValue=uMaterialShininess;");
+                src.push("  vec4    normalmap = vec4(vNormal,0.0);");
+
+                if (lighting) {
+                    src.push("  float   specular=uMaterialSpecular;");
+                    src.push("  vec3    specularColor=uMaterialSpecularColor;");
+                    src.push("  float   shine=uMaterialShine;");
+
+
+                    src.push("  float   attenuation = 1.0;");
                 }
 
-                src.push("  float   alpha = 1.0;");
                 src.push("  float   mask=1.0;");
+
                 src.push("  vec4    texturePos;");
                 src.push("  vec2    textureCoord=vec2(0.0,0.0);");
 
+                /* ====================================================================================================
+                 * TEXTURING
+                 * ===================================================================================================*/
 
                 if (texturing) {
 
-                    /* Texture geometry source - object coords so far
+                    /* Get texturePos from image
                      */
-                    src.push("texturePos = vec4(vTextureCoord.s, vTextureCoord.t, 1.0, 1.0);");
 
                     for (var i = 0; i < textureLayers.length; i++) {
                         var layer = textureLayers[i];
+
+                        /* Get texture coord from specified source
+                         */
+                        if (layer.params.applyFrom == "normal") {
+                            src.push("texturePos=vec4(vNormal.xyz, 1.0);");
+                        }
+
+                        if (layer.params.applyFrom == "geometry") {
+                            src.push("texturePos = vec4(vTextureCoord.s, vTextureCoord.t, 1.0, 1.0);");
+                        }
 
                         /* Transform texture coord
                          */
@@ -534,150 +584,127 @@ SceneJS._backends.installBackend(
                             src.push("textureCoord=texturePos.xy;");
                         }
 
-                        /* Apply layers
+                        /* Apply the layer
                          */
 
-                        if (layer.params.applyTo == "diffuse") {
-                            if (lighting) {
-                                src.push("diffuseValue  = diffuseValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
+                        if (layer.params.applyTo == "color") {
+                            if (layer.params.blendMode == "multiply") {
+                                src.push("color  = color * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
                             } else {
-
-                                /* Wont see diffuse texturing with no lighting
-                                 */
-                                ctx.logging.warn("Texture applyTo = \"diffuse\" while no light");
+                                src.push("color  = color + texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
                             }
-                        }
-
-                        if (layer.params.applyTo == "specular") {
-                            if (lighting) {
-                                src.push("specularValue = specularValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
-                            } else {
-
-                                /* Wont see specular texturing with no lighting                                
-                                 */
-                                ctx.logging.warn("Texture applyTo = \"specular\" while no light");
-                            }
-                        }
-
-                        if (lighting) {
-                            src.push("specularValue = specularValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
-                        }
-
-                        if (layer.params.applyTo == "shininess") {
-                            src.push("shininessValue = shininessValue *  texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r ;");
-                        }
-
-                        if (layer.params.applyTo == "emission") {
-                            src.push("emissionValue = emissionValue * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                         }
                     }
+
                 }
+                /* ====================================================================================================
+                 * LIGHTING
+                 * ===================================================================================================*/
 
                 if (lighting) {
                     src.push("  vec3    lightVec;");
                     src.push("  float   dotN;");
                     src.push("  float   spotFactor;");
                     src.push("  float   pf;");
+                    src.push("  vec3    lightValue      = uAmbient;");
+                    src.push("  vec3    specularValue   = vec3(0.0,0.0,0.0);");
 
-                    src.push("  vec3 diffuseWeighting = 0.0;");
-                    src.push("  vec3 specularWeighting = 0.0;");
 
                     for (var i = 0; i < lights.length; i++) {
-                        src.push("lightVec = normalize(vLightVec" + i + ");");
+                        var light = lights[i];
+                        src.push("lightVec = normalize(-vLightVec" + i + ");");
 
-                        if (lights[i].type == "point") {
-
-                            /* Point light
-                             */
+                        /* Point Light
+                         */
+                        if (light.type == "point") {
                             src.push("dotN = max(dot(vNormal, -lightVec), 0.0);");
 
                             src.push("if (dotN > 0.0) {");
 
-                            src.push("attenuation = 1.0 / (" +
-                                     "uLightAttenuation" + i + "[0] + " +
-                                     "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
-                                     "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
+                            src.push("  attenuation = 1.0 / (" +
+                                     "  uLightAttenuation" + i + "[0] + " +
+                                     "  uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
+                                     "  uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
 
-                            src.push("diffuseWeighting += dotN *  uLightDiffuse" + i + " * attenuation;");
-
+                            if (light.diffuse) {
+                                src.push("  lightValue += dotN *  uLightColor" + i + " * attenuation;");
+                            }
                             src.push("}");
 
-                            if (material.shininess > 0.0) {
-                                src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), shininessValue);\n");
-                                src.push("specularWeighting += uLightSpecular" + i + "  * attenuation * pf;");
+                            if (light.specular) {
+                                src.push("specularValue += attenuation * specularColor * uLightColor" + i +
+                                         " * specular  * pow(max(dot(reflect(lightVec, vNormal), vEyeVec),0.0), shine);");
                             }
+                        }
 
-                        } else if (lights[i].type == "spot") {
+                        /* Directional Light
+                         */
+                        if (light.type == "dir") {
+                            src.push("dotN=max(dot(vNormal,-lightVec),0.0);");
+                            if (light.diffuse) {
+                                src.push("lightValue += dotN * uLightColor" + i + ";");
+                            }
+                            if (light.specular) {
+                                src.push("specularValue += specularColor * uLightColor" + i +
+                                         " * specular  * pow(max(dot(reflect(lightVec, vNormal),normalize(vEyeVec)),0.0), shine);");
+                            }
+                        }
 
-                            /* Spot light
-                             */
-                            src.push("spotFactor = dot(-lightVec, -normalize(uLightSpotDir" + i + "));");
 
-                            src.push("if (spotFactor > uLightSpotCosCutOff" + i + ") {\n");
+                        /* Spot light
+                         */
+                        if (light.type == "spot") {
+                            src.push("spotFactor = dot(-lightVec,-normalize(uLightSpotDir" + i + "));");
+                            src.push("if (spotFactor > uLightSpotCosCutOff" + i + ") {");
+                            src.push("  spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
 
-                            src.push("spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
+                            src.push("  dotN = max(dot(vNormal,-normalize(lightVec)),0.0);");
 
-                            src.push("dotN = max(dot(vNormal,lightVec),0.0);\n");
+                            src.push("      if(dotN>0.0){");
 
-                            src.push("if(dotN>0.0){\n");
-
-                            src.push("attenuation = spotFactor / (" +
+                            src.push("          attenuation = spotFactor / (" +
                                      "uLightAttenuation" + i + "[0] + " +
                                      "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
                                      "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");\n");
 
-                            src.push("diffuseWeighting += dotN *  uLightDiffuse" + i + " * attenuation;");
-
-                            if (material.shininess > 0.0) {
-                                src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), shininessValue);\n");
-                                src.push("specularWeighting += uLightSpecular" + i + "  * attenuation * pf;");
+                            if (light.diffuse) {
+                                src.push("lightValue += dotN * uLightColor" + i + ";");
+                            }
+                            if (lights[i].specular) {
+                                src.push("specularValue += specularColor * uLightColor" + i +
+                                         " * specular  * pow(max(dot(reflect(normalize(lightVec), vNormal),normalize(vEyeVec)),0.0), shine);");
                             }
 
-                            src.push("}\n");
-                            src.push("}\n");
-
-                        } else if (lights[i].type == "dir") {
-
-                            /* Directional light
-                             */
-
-                            src.push("dotN = max(dot(vNormal, -vLightVec" + i + "), 0.0);");
-
-                            src.push("diffuseWeighting += dotN *  uLightDiffuse" + i + ";");
-                            if (material.shininess > 0.0) {
-                                src.push("pf = pow(max(dot(reflect(-lightVec, vNormal), vEyeVec), 0.0), shininessValue);\n");
-                                src.push("specularWeighting += uLightSpecular" + i + " * pf;");
-                            }
+                            src.push("      }");
+                            src.push("}");
                         }
-                        src.push("ambientValue += uLightAmbient" + i + ";");
                     }
-                    src.push("ambientValue /= " + lights.length + ";");
-                    src.push("vec4 colourValue =vec4(emissionValue + (ambientValue * uMaterialAmbient) + (diffuseWeighting  * diffuseValue) + (specularWeighting  * specularValue), 1);");
-
-                } else { // else if not lighting
-                    src.push("vec4 colourValue = vec4(emissionValue + (ambientValue * uMaterialAmbient), 1);");
                 }
+
+                src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * lightValue.rgb, alpha);");
 
                 if (fog && fog.mode != "disabled") {
                     src.push("float fogFact=1.0;");
                     if (fog.mode == "exp") {
-                        src.push("fogFact=clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);\n");
+                        src.push("fogFact=clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);");
                     } else if (fog.mode == "linear") {
-                        src.push("fogFact=clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);\n");
+                        src.push("fogFact=clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);");
                     }
-                    src.push("gl_FragColor = colourValue * fogFact + vec4(uFogColor, 1) * (1.0 - fogFact);");
-
-
-
+                    src.push("gl_FragColor = fragColor * fogFact + vec4(uFogColor, 1) * (1.0 - fogFact);");
                 } else {
-                    src.push("gl_FragColor = colourValue;");
+                    src.push("gl_FragColor = fragColor;");
                 }
 
                 src.push("}");
                 // alert(src.join("\n"));
-                ctx.logging.info(src.join("<br/>"));
+
+
+                ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
 
-        });
+        }
+
+        )
+        ;

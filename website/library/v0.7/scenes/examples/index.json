@@ -1,0 +1,39 @@
+{
+    examples:[
+        {
+            title: "Intro Example: Hello, Teapot!",
+            description: "Basic example that demonstrates scene syntax, point lighting, material colours, mouse interaction, perspective, view and modelling transforms",
+            file: "hello-teapot/hello-teapot.js"
+        },
+        {
+            title: "Animated Rotation of a Teapot",
+            description: "\"But Master, what is SceneJS?\" \"Have a cup of Tea.\" Demonstrates animation of modelling transformations using interpolators.",
+            file: "pouring-teapot/pouring-teapot.js"
+        },
+        {
+            title: "Animated Texture Transformation",
+            description: "Demonstrates application of an animated texture applied to the diffuse reflective material properties of a cube that you can rotate with the mouse",
+            file: "animated-texture/animated-texture.js"
+        },
+        {
+            title: "Procedural Generation of a Spiral Staircase",
+            description: "Demonstrates procedural generation and data flow",
+            file: "spiral-staircase/spiral-staircase.js"
+        },
+        {
+            title: "Teapot Cloud with Fog",
+            description: "Demonstrates point lighting, material colours, perspective, view and modelling transforms, procedural scene generation, basic animation and fog",
+            file: "teapot-cloud/teapot-cloud.js"
+        },
+        {
+            title: "Level-of-Detail Staircase",
+            description: "Warning - this might stress your browser out! Use a nice fast one, like Chromium. This example demonstrates level-of-detail selection, remote asset loading, textures, fog, shading, and mouse interaction.",
+            file: "lod-staircase-with-tiles/lod-staircase-with-tiles.js"
+        },
+        {
+            title: "Planetarium",
+            description: "Demonstrates remote asset loading",
+            file: "planetarium/planetarium.js"
+        }
+    ]
+}

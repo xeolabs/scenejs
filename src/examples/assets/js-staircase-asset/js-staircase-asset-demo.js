@@ -56,7 +56,7 @@ var exampleScene = SceneJS.scene({
                     clear : { depth : true, color : true}
                 },
                         SceneJS.lights({
-                            lights: [
+                            sources: [
                                 {
                                     pos: { x: 500.0, y: -160.0, z: 50.0 }
                                 }
@@ -69,7 +69,7 @@ var exampleScene = SceneJS.scene({
                                             up : { x: 0.0, y: 1.0, z: 0.0 }
                                         },
                                                 SceneJS.lights({
-                                                    lights: [
+                                                    sources: [
 
                                                         /* Global ambient colour is taken from the canvas clear colour.
                                                          */
