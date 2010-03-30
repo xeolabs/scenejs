@@ -20,15 +20,6 @@
 <div id="content">
 <br/>
 
-<!--<div class="youtube-playlist-holder">-->
-<!--<div id="youtube-video"></div>-->
-<!--<ul class="youtube-playlist">-->
-<!--<li><a href="http://www.youtube.com/watch?v=I1wObzEm4_4">Level-of-Detail Test 1</a></li>-->
-<!--<li><a href="http://www.youtube.com/watch?v=194YJ3AAO9M">Level-of-Detail Test 2</a></li>-->
-<!--<li><a href="http://www.youtube.com/watch?v=if7zfjJoBg4">Stress Test 1</a></li>-->
-<!--<li><a href="http://www.youtube.com/watch?v=_sz2fR9ijIk">Stress Test 2 with Fog</a></li>-->
-<!--</ul>-->
-<!--</div>-->
 
 <div id="features-table">
 
@@ -37,13 +28,13 @@
     <hr class="line"/>
     <p class="sub-feature">Terse and Expressive</p>
 
-    <p><span>SceneJS makes it easy to become productive with WebGL, allowing you access to a big chunk of its functionality through
-            a really terse, pure JavaScript API. While most scene graph frameworks are object-oriented, SceneJS
-                    is <i>functional</i>, allowing it to hook a little more elegantly into the JavaScript language.</span>
+    <p><span>SceneJS provides easy access to WebGL through a simple and declarative JavaScript API. While most scene
+        graph frameworks are object-oriented, SceneJS is <i>functional</i>, which enables its scene definitions to be really 
+        compact and expressive, while hooking into other JavaScript code just that little bit more smoothly.</span>
     </p>
 
     <p class="demo"><span>Demo: <a
-            href="ide.html?title=Hello Teapot!&url=http://scenejs.org/library/v0.7/scenes/examples/hello-teapot/hello-teapot.js">Hello
+            href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/hello-teapot/hello-teapot.js&title=Intro%20Example:%20Hello,%20Teapot!">Hello
         Teapot!</a></span></p>
 
     <p class="tutorial"><span>Tutorial: <a target="other"
@@ -52,15 +43,16 @@
 
     <!-- *********************************************************************************************** -->
 
-    <p class="feature">Efficient</p>
+    <p class="feature">Efficiency</p>
     <hr class="line"/>
+    <p class="sub-feature">Memoization, Automatic Shader Generation and VRAM Management</p>
 
     <p><span>SceneJS uses WebGL efficiently for you, quietly behind the scenes. It caches aggressively to avoid
-                recalculation, automatically generates optimal shaders, intelligently swaps resources in and out of
+                recalculation, automatically generates optimal shaders, intelligently swaps resources like shaders, textures and vertex buffers in and out of
                 video RAM, and avoids needless repetition of costly WebGL buffer loads by performing them lazily.</span>
     </p>
 
-    <p class="demo"><span>Demo: <a
+    <p class="demo"><span>Benchmark demo: <a
             href="ide.html?title=300 Teapots&url=http://scenejs.org/library/v0.7/scenes/examples/teapot-cloud/teapot-cloud.js">
         300 Teapots</a></span></p>
 
@@ -70,31 +62,20 @@
 
     <!-- *********************************************************************************************** -->
 
-    <p class="feature">Content Staging</p>
+    <p class="feature">Distributed Content</p>
     <hr class="line"/>
 
-    <p class="sub-feature">On-demand subgraph load</p>
+    <p class="sub-feature">Cross-Domain Components</p>
 
-    <p><span>SceneJS is geared towards composition of scenes from reusable, parameterised fragments. To render massive
-                    scenes, SceneJS can load parts of them cross-domain as required, then evict them following a
-                    least-recently-used policy. The terse API means those fragments carry a lot of functionality for
-                    their size, while propagating and evaluating rapidly.</span></p>
+    <p><span>SceneJS is geared to composition of scenes from re-usable, parameterised fragments. It automatically manages
+        a lean set of in-memory fragments by loading them cross-domain on demand, while evicting them following a
+        least-recently-used policy to maintain the pool of free memory. Its terse API means that fragments are compact,
+        allowing them to propagate rapidly across the network. Being JavaScript, they evaluate straight into the browser
+        with no expensive parsing.</span></p>
 
     <p class="demo"><span>Demo: <a
-            href="ide.html?title=Cross-Domain Import of a Teapot&url=http://gist.github.com/raw/338824/b58174d8b076df180b3cc8a06126029ffc91e795/scenejs-asset-example.js">
+            href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/teapot-asset/teapot-asset.js&title=Cross-Domain%20Load%20of%20a%20Teapot">
         Cross-Domain Import of a Teapot</a></span></p>
-
-    <p class="demo"><span>Demo: <a
-            href="ide.html?title=Cross-Domain Import of a Parameterised Staircase Asset&url=http://gist.github.com/raw/339256/65f0e32844b704300242ba6a6031a01b2f097a3f/scenejs-spiral-staircase-asset-example.js">
-        Import of a Parameterised Staircase Asset</a></span></p>
-
-    <p class="sub-feature">Automatic VRAM Buffer Management</p>
-
-    <p><span>SceneJS is geared towards composition of scenes from reusable fragments. To render massive
-                                    scenes, SceneJS can load parts of them cross-domain as required, then evict them following a
-                                    least-recently-used policy. The terse API means those fragments carry a lot of functionality for 
-                                    their size, while propagating and evaluating rapidly.</span></p>
-
 
 </div>
 
@@ -126,17 +107,13 @@
     <br/>
 
     <p class="demo"><span>Demo: <a
-            href="ide.html?title=Level-of-Detail Demo 1&url=http://gist.github.com/raw/338479/cd32f557f5f5a306ed9f1de0b836a38696e93f45/scenejs-lod-example1.js">Basic
-        Level-of-Detail Demo</a></span></p>
-
-    <p class="demo"><span>Demo: <a
-            href="ide.html?title=Level-of-Detail Demo 2&url=http://gist.github.com/raw/338469/e9961dd3c744e78288f641b067a3a023faf2dfe5/scenejs-teapot-army-example.js">Another
+            href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js&title=Level-of-Detail%20Staircase">Basic
         Level-of-Detail Demo</a></span></p>
 
 
     <!-- *********************************************************************************************** -->
 
-    <p class="feature">Modelling</p>
+    <p class="feature">Generatable</p>
     <hr class="line"/>
 
     <p class="sub-feature">Procedural Generation</p>
@@ -146,30 +123,38 @@
                               instancing it multiple times within each frame, each time in a different state.</span></p>
 
     <p class="demo"><span>Demo: <a
-            href="ide.html?title=Generating a Spiral Staircase&url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">
+            href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/spiral-staircase/spiral-staircase.js&title=Procedural%20Generation%20of%20a%20Spiral%20Staircase">
         Generating a Spiral Staircase</a></span></p>
 
     <!-- *********************************************************************************************** -->
 
-    <p class="feature">Animation</p>
+    <p class="feature">Animatable</p>
     <hr class="line"/>
+
+    <p class="sub-feature">Dynamic Parameterisation</p>
+
+    <p><span>As you saw back in the <a
+            href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/hello-teapot/hello-teapot.js&title=Intro%20Example:%20Hello,%20Teapot!">Hello
+        Teapot</a> example, most scene nodes can be configured with functions that evaluate their parameters at render-time.</span>
+    </p>
 
     <p class="sub-feature">Scalar Interpolation</p>
 
     <p><span>Almost any scalar property in SceneJS can be animated by linear, cosine, cubic or constant interpolation
-                    of its value within sequences of  key values. That includes transformations, materials, lighting, even other interpolations, and
+                    within sequences of  key values. That includes transformations, materials, texture, lighting, even other interpolations, and
                     is usually done as a function of time.</span>
     </p>
 
     <p class="demo"><span>Demo: <a
-            href="ide.html?title=Interpolated Animation of Rotations&url=http://gist.github.com/raw/336868/9d80342d35e7a6be6225e9a0a617accd8d50fbce/scenejs-interpolation-example1.js">
+            href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/pouring-teapot/pouring-teapot.js&title=Animated%20Rotation%20of%20a%20Teapot">
         Rotating a Teapot using Interpolators</a>
                                               <br/>
                                               </span></p>
 
-    <p class="sub-feature">Phong Shading with Unlimited Light Sources</p>
-    <a href="ide.html?url=http://gist.github.com/raw/336164/e5d85a573db242595bc0769e968a2e39fe3e3dfc/scenejs-spiral-staircase-example.js">http://gist.github.com/.../scenejs-spiral-staircase-example.js</a>
 
+    <br/>
+    <br/>
+    <b>More to come...</b>
 </div>
 
 
@@ -188,7 +173,7 @@
     </p>
 
     <p class="demo"><span><a
-            href="http://www.scenejs.org/website/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js">Run
+            href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js&title=Level-of-Detail%20Staircase">Run
         it live in the IDE</a></span></p>
 
     <br/>
@@ -243,26 +228,22 @@
 <div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://www.xeolabs.com">Xeolabs</a></p>
 </div>
 <script type="text/javascript">
-    $(document).ready(function() {
-        $("ul.youtube-playlist").ytplaylist({
-            holderId: 'youtube-video',
-            playerHeight: '505',
-            playerWidth: '640',
-            addThumbs: true,
-            thumbSize: 'small',
-            showInline: false,
-            autoPlay: false,
-            showRelated: false,
-            allowFullScreen: true
-        });
-    });
-</script>
-
-<script type="text/javascript">
 
     var a2a_linkname = "SceneJS Features";
     var a2a_linkurl = window.location;
     var a2a_onclick = 1;</script>
 <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+<script src="./lib/ga/gatag.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-8036359-2");
+        pageTracker._setDomainName(".scenejs.com");
+        pageTracker._trackPageview();
+    } catch(err) {
+    }</script>
 </body>
 </html>

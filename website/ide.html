@@ -41,8 +41,8 @@
 
 <div id="wide-container">
     <div id="header">
-        <h1><a href="index.html">SceneJS</a> &gt; <a href="load-ide.html">IDE</a> &gt;<span
-                id="file-url"></span></h1>
+        <h1><a href="index.html">SceneJS</a> &gt; <a href="load-ide.html">IDE</a> &gt;&nbsp;<span id="title"></span>
+        </h1>
 
         <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                 src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -73,9 +73,12 @@ function showStartupError(template, message) {
     $("#playroom-ide").processTemplate({ message: message || "" });
 }
 
-function showIDE() {
+function showIDE(remoteUrl) {
     $("#playroom-ide").setTemplateURL("templates/ide.html");
-    $("#playroom-ide").processTemplate({});
+    $("#playroom-ide").processTemplate({
+        url: remoteUrl,
+        truncatedUrl: truncateUrl(remoteUrl)
+    });
 }
 
 function showFeedback(template, message) {
@@ -88,7 +91,7 @@ function showError(template, e) {
     $("#output-area").processTemplate({ message: e.message || e });
 }
 
-function showFileOnPath(url) {
+function truncateUrl(url) {
     var parts = url.split("/");
     var path;
     if (parts.length <= 4) {
@@ -100,11 +103,22 @@ function showFileOnPath(url) {
         }
         path += "..." + url.substring(url.lastIndexOf("/"));
     }
-    $("#file-url").append("<a target=\"other\" href=\"" + url + "\">" + path + "</a>");
+    return(path);
+}
+
+function showFileOnPath(title, url) {
+    var urlHtml = "&nbsp;<a target=\"other\" href=\"" + url + "\">" + truncateUrl(url) + "</a>";
+    if (title) {
+        $("#title").append(title);
+        $("#url").append(urlHtml);
+    } else {
+        $("#title").append(urlHtml);
+        $("#url").append("");
+    }
 }
 
 function showErrorOnPath() {
-    $("#file-url").append("Aaaargh!!");
+    $("title").append("Aaaargh!!");
 }
 
 function hideRunButton() {
@@ -223,16 +237,14 @@ function loadScene(uri, onSuccess, onError) {
                 } else if (data.error) {
                     onError("Error from server: " + data.error);
                 } else {
-//                    var padded = ([data, "\n\n\n\n\n\n"]).join("");
-//                    onSuccess(padded);
                     onSuccess(data);
                 }
             });
 }
 
 
-function init(text) {
-    showIDE();
+function init(remoteUrl, text) {
+    showIDE(remoteUrl);
     scriptEditor = new CodeMirror(CodeMirror.replace("script-text-area"), {
         height: "1000px",
         content: text,
@@ -257,10 +269,12 @@ $(document).ready(function() {
         showErrorOnPath();
         showStartupError("illegal-playroom-request.html", "Missing URL parameter: 'url'");
     } else {
+        var title = jQuery.url.param("title");
         loadScene(remoteUrl,
                 function(text) {
-                    showFileOnPath(remoteUrl);
-                    init(text);
+                    var title = jQuery.url.param("title");
+                    showFileOnPath(title, remoteUrl);
+                    init(remoteUrl, text);
                 },
                 function(message) {
                     showErrorOnPath();
@@ -274,5 +288,17 @@ function bla() {
 }
 
 </script>
+<script src="./lib/ga/gatag.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-8036359-2");
+        pageTracker._setDomainName(".scenejs.com");
+        pageTracker._trackPageview();
+    } catch(err) {
+    }</script>
 </body>
 </html>

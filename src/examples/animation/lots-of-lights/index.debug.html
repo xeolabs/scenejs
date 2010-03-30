@@ -2,68 +2,11 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>SceneJS Example - Simple Teapot Scene Asset</title>
+    <title>SceneJS Example - Interpolated rotation of a teapot</title>
 </head>
-<body margin=20px>
-<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Simple Teapot Scene
-    Asset
-</h1>
+<body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
 <table>
     <tr>
-
-        <td valign="top">
-            <h3>Source code</h3>
-            <ul>
-                <li><a href="js-teapot-asset-demo.js">This example</a></li>
-                <li>
-                    <a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/orange-teapot-example/orangeteapot.js">Teapot
-                        asset</a></li>
-            </ul>
-            <h3>Resources</h3>
-            <ul>
-                <li><a href="http://lindsaystanleykay.blogspot.com/2010/01/collada-parser-for-scenejs.html"
-                       target="other">Blog article
-                    on assets</a></li>
-            </ul>
-            <h3>Description</h3>
-
-            <p><span>"Assets" are remotely-stored scene fragments which may be
-            dynamically loaded, cross-domain, into your scene using asset nodes.</span></p>
-
-            <p><span><a href="js-teapot-asset-demo.js">This example</a> loads an
-                <a href="http://scenejs.com/app/data/assets/catalogue/assets/v0.7.0/orange-teapot-example/orangeteapot.js">orange
-                    teapot asset</a>
-                from the repository at SceneJS.org.
-            <p><span>When the scene is first rendered, the SceneJS.assets.scenejs node
-            will make a JSONP request of the repository, which will respond with
-            the asset data, which is in this case JSON. The node will
-            then convert the data into a subtree of scene graph content.</span></p>
-
-            <p><span>The node's request will always be asynchronous. This means
-            that when SceneJS renders the asset node, it's not going to wait
-            for the asset to load before continuing to render the rest of the
-            scene. SceneJS will just trigger the asset request and move on.
-            So if you're rendering one frame, you wont see the asset in the
-            image. But if you keep rendering the scene for a few frames like
-            in this example, as you would when animating, the asset will
-            magically appear once loaded.</span></p>
-
-            <p><span>SceneJS tracks these loads and tracks each one as a process that
-            is currently active within the scene. You can therefore tell if all assets
-            have loaded when the number of scene processes is zero.</span></p>
-
-            <p><span>A nice way to use assets is to somehow have them pre-load
-            bits of scene just before they fall into view, then rely on
-            SceneJS to flush them when they haven't been rendered recently.</span></p>
-
-            <p><span>SceneJS currently caches assets with a max-time-inactive
-            eviction policy.</span></p>
-
-
-            <h3>Scene logging output</h3>
-
-            <div id="logging"></div>
-        </td>
         <td valign="top">
             <canvas id="theCanvas" width="600" height="600">
                 <p>This example requires a browser that supports the
@@ -71,9 +14,15 @@
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
+        <td>
+            <div id="logging"></div>
+        </td>
     </tr>
 </table>
 
+
+
+<script type="application/x-javascript" src="sylvester.js"></script>
 
 <!-- Core -->
 
@@ -158,6 +107,7 @@
 
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/stationary.js"></script>
 
 <!-- Lighting -->
 
@@ -195,7 +145,6 @@
 <script type="application/x-javascript" src="../../../scenejs/fog/fogBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
 
-
-<script type="application/x-javascript" src="js-teapot-asset-demo.js"></script>
+<script type="application/x-javascript" src="lots-of-lights.js"></script>
 </body>
 </html>

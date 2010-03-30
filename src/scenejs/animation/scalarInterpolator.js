@@ -99,7 +99,7 @@ SceneJS.scalarInterpolator = function() {
                 };
 
                 var cosineInterpolate = function(k) {
-                    var mu2 = (1 - Math.cos(k * Math.PI()) / 2.0);
+                    var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
                     return (params.keys[key1] * (1 - mu2) + params.keys[key2] * mu2);
                 };
 

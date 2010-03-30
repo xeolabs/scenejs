@@ -7,14 +7,14 @@
     <script type="text/javascript" src="lib/jquery/jquery.jtemplates.js">
     </script>
     <style type="text/css">
-        #exhibit-title {
+        #ide-title {
             width: 400px;
             padding: 5px;
             outline: none;
             height: 36px;
         }
 
-        #file-url {
+        #ide-url {
             width: 400px;
             padding: 5px;
             outline: none;
@@ -76,7 +76,7 @@
         }
 
         .formLayout .notes {
-            width:250px;
+            width: 250px;
             text-align: left;
             padding-top: 20px;
             padding-left: 140px;
@@ -115,10 +115,10 @@
 
             <div class="formLayout">
                 <label>Title</label>
-                <input name="url" id="exhibit-title" value="Yet Another Awesome SceneJS Example" type="text"/>
+                <input name="title" id="ide-title" value="Hello, Teapot!" type="text"/>
                 <br/>
                 <label>File URL:</label>
-                <input name="url" id="file-url"
+                <input name="url" id="ide-url"
                        value="http://scenejs.org/library/v0.7/scenes/examples/hello-teapot/hello-teapot.js"
                        type="text"/>
 
@@ -141,7 +141,7 @@
                 </div>
             </div>
 
-            <h1>Or try one of these:</h1>
+            <h1>Gallery</h1>
 
             <div id="examples"></div>
         </div>
@@ -171,7 +171,7 @@
         /* Title
          */
 
-        var titleField = $("#exhibit-title");
+        var titleField = $("#ide-title");
         var defaultTitle = titleField.val();
         titleField.addClass("idleField");
         titleField.focus(function() {
@@ -195,7 +195,7 @@
         /* Scene definition file location
          */
 
-        var fileUrlField = $("#file-url");
+        var fileUrlField = $("#ide-url");
         var defaultFileUrl = fileUrlField.val();
         fileUrlField.addClass("idleField");
         fileUrlField.focus(function() {
@@ -219,19 +219,26 @@
 
         $('#run-button').click(function() {
             var fileUrl = fileUrlField.val().trim();
-            //            if (fileUrl == defaultFileUrl) {
-            //
-            //            }  else {
-            var redirectUrl = "ide.html?url=" + fileUrl;
-
-            //window.location = "scenejs.org";
+            var title = titleField.val().trim();
+            var redirectUrl = "ide.html?url=" + fileUrl + "&title=" + title;
             $(location).attr("href", redirectUrl);
-            //}
         });
         showExamples();
 
     });
 </script>
+<script src="./lib/ga/gatag.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-8036359-2");
+        pageTracker._setDomainName(".scenejs.com");
+        pageTracker._trackPageview();
+    } catch(err) {
+    }</script>
 
 </body>
 </html>

@@ -2,32 +2,37 @@
     examples:[
         {
             title: "Intro Example: Hello, Teapot!",
-            description: "Basic example that demonstrates scene syntax, point lighting, material colours, mouse interaction, perspective, view and modelling transforms",
+            description: "Basic example - the OpenGL teapot, demonstrating scene syntax, point lighting, material colours, mouse interaction, perspective, view and modelling transforms",
             file: "hello-teapot/hello-teapot.js"
         },
         {
             title: "Animated Rotation of a Teapot",
-            description: "\"But Master, what is SceneJS?\" \"Have a cup of Tea.\" Demonstrates animation of modelling transformations using interpolators.",
+            description: "Animates the teapot using interpolated modelling transformations.",
             file: "pouring-teapot/pouring-teapot.js"
         },
         {
+            title: "Cross-Domain Load of a Teapot",
+            description: "SceneJS is supports the composition of scenes from re-usable, parameterised, cross-domain fragments. This example loads our teapot into the scene graph, across the Internet, all the way from the SceneJS library.",
+            file: "teapot-asset/teapot-asset.js"
+        },
+        {
             title: "Animated Texture Transformation",
-            description: "Demonstrates application of an animated texture applied to the diffuse reflective material properties of a cube that you can rotate with the mouse",
+            description: "Almost anything can be animated in SceneJS, including the position, scale and rotation of the texture mapped onto the cube in this example.",
             file: "animated-texture/animated-texture.js"
         },
         {
             title: "Procedural Generation of a Spiral Staircase",
-            description: "Demonstrates procedural generation and data flow",
+            description: "All kinds of things in SceneJS can be algorithmically generated. This example demonstrates the generation of a winding staircase model using an interative function.",
             file: "spiral-staircase/spiral-staircase.js"
         },
         {
             title: "Teapot Cloud with Fog",
-            description: "Demonstrates point lighting, material colours, perspective, view and modelling transforms, procedural scene generation, basic animation and fog",
+            description: "Fog is great for making things look distant. This one demonstrates a cloud of teapots moving to and from the viewpoint, becoming clear then fogged as they go.",
             file: "teapot-cloud/teapot-cloud.js"
         },
         {
             title: "Level-of-Detail Staircase",
-            description: "Warning - this might stress your browser out! Use a nice fast one, like Chromium. This example demonstrates level-of-detail selection, remote asset loading, textures, fog, shading, and mouse interaction.",
+            description: "Warning - this might stress your browser out! Use a nice fast one, like Chromium. This example demonstrates level-of-detail coupled with cross-domain, parameterised content loading.",
             file: "lod-staircase-with-tiles/lod-staircase-with-tiles.js"
         },
         {

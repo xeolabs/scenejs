@@ -75,7 +75,7 @@ SceneJS._webgl = {
     },
 
     ProgramUniform : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program uniform found in shader: " + name);
+        //  logging.debug("Program uniform found in shader: " + name);
         var func = null;
         if (type == context.BOOL) {
             func = function (v) {
@@ -152,7 +152,7 @@ SceneJS._webgl = {
     },
 
     ProgramSampler : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program sampler found in shader: " + name);
+        //  logging.debug("Program sampler found in shader: " + name);
         this.bindTexture = function(texture, unit) {
             texture.bind(unit);
             context.uniform1i(location, unit);
@@ -162,7 +162,7 @@ SceneJS._webgl = {
     /** An attribute within a shader
      */
     ProgramAttribute : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program attribute found in shader: " + name);
+        // logging.debug("Program attribute found in shader: " + name);
         this.bindFloatArrayBuffer = function(buffer) {
             context.enableVertexAttribArray(location);
             buffer.bind();
@@ -196,9 +196,7 @@ SceneJS._webgl = {
             logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
         }
         if (!this.valid) {
-            if (this.valid) {
-                throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
-            }
+            throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
         }
     },
 
@@ -313,6 +311,7 @@ SceneJS._webgl = {
         this.bind = function() {
             context.useProgram(handle);
         };
+
 
         this.setUniform = function(name, value) {
             var u = uniforms[name];
@@ -462,7 +461,7 @@ SceneJS._webgl = {
 
         context.bindTexture(this.target, null);
 
-//        gl.activeTexture(gl.TEXTURE0);
+        //        gl.activeTexture(gl.TEXTURE0);
         //  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
         //  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
 

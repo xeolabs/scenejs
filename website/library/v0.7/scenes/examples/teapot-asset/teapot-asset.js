@@ -6,7 +6,7 @@
  * January 2010
  *
  * SceneJS is geared to composition of scenes from re-usable, parameterised
- * fragments. It automatically manages a lean set of in-memory fragments by
+ * fragments. It can automatically manage a lean set of in-memory fragments by
  * loading them cross-domain on demand, while evicting them following a
  * least-recently-used policy to maintain the pool of free memory. Its terse
  * API means that fragments are compact, allowing them to propagate rapidly
@@ -97,7 +97,7 @@ var exampleScene = SceneJS.scene({
                                                 SceneJS.load({
 
                                                     uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                "examples/orange-teapot/orangeteapot.js"
+                                                        "examples/orange-teapot/orange-teapot.js"
                                                 })
 
                                                 )

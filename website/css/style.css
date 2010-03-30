@@ -554,6 +554,7 @@ ul.site-tabs li.ui-state-active a {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 1.0em;
     font-weight: normal;
+    line-height:1.4em;
 }
 
 #features-table p {

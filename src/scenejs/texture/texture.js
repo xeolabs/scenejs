@@ -84,23 +84,12 @@
                             }
 
                             if (layerParam.applyTo) {
-                                if (layerParam.applyTo != "color" && // Colour map
-                                    layerParam.applyTo != "diffuse" &&
-                                    layerParam.applyTo != "specular" &&
-                                    layerParam.applyTo != "shininess" &&
-                                    layerParam.applyTo != "emission" &&
-                                    layerParam.applyTo != "red" &&
-                                    layerParam.applyTo != "green" &&
-                                    layerParam.applyTo != "blue" &&
-                                    layerParam.applyTo != "alpha" &&
-                                    layerParam.applyTo != "normal" &&
-                                    layerParam.applyTo != "height") {
+                                if (layerParam.applyTo != "baseColor" && // Colour map
+                                    layerParam.applyTo != "diffuseColor") {
 
                                     throw SceneJS.exceptions.InvalidNodeConfigException(
                                             "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
-                                            "should be either 'color', 'diffuse', 'specular', 'shininess', " +
-                                            "'emission', 'red', 'green', " +
-                                            "'blue', alpha', 'normal' or 'height'");
+                                            "should be either 'baseColor', 'diffuseColor'");
                                 }
                             }
 
@@ -129,7 +118,7 @@
                                     };
                                 })(),
                                 applyFrom: layerParam.applyFrom || "geometry",
-                                applyTo: layerParam.applyTo || "color",
+                                applyTo: layerParam.applyTo || "baseColor",
                                 blendMode: layerParam.blendMode || "multiply"
                                 //matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
 

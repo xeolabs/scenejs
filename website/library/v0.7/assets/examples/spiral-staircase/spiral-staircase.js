@@ -44,7 +44,7 @@ SceneJS.renderer({ enableTexture2D: true },
                             layers : [
                                 {
                                     uri:"http://scenejs.org/library/textures/" + texFile,
-                                    applyTo:"diffuse",
+                                    applyTo:"baseColor",
                                     minFilter: "nearestMipMapLinear",
                                     maxFilter: "linearMapLinear"
 

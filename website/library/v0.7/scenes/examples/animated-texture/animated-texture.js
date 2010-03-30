@@ -103,7 +103,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                                                     internalFormat:"lequal",
                                                                     sourceFormat:"alpha",
                                                                     sourceType: "unsignedByte",
-                                                                    applyTo:"color",
+                                                                    applyTo:"baseColor",
 
                                                                     /* The rotate, translate and scale properties
                                                                      * can be functions that pull properties (if required)

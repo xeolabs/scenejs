@@ -275,16 +275,26 @@ SceneJS._backends.installBackend(
 
                     if (!programs[sceneHash]) {
                         ctx.logging.info("Creating shader: '" + sceneHash + "'");
+                        var vertexShaderSrc = composeRenderingVertexShader();
+                        var fragmentShaderSrc = composeRenderingFragmentShader();
                         ctx.memory.allocate(
                                 "shader",
                                 function() {
-                                    programs[sceneHash] = new SceneJS._webgl.Program(
-                                            sceneHash,
-                                            time,
-                                            canvas.context,
-                                            [composeRenderingVertexShader()],
-                                            [composeRenderingFragmentShader()],
-                                            ctx.logging);
+                                    try {
+                                        programs[sceneHash] = new SceneJS._webgl.Program(
+                                                sceneHash,
+                                                time,
+                                                canvas.context,
+                                                [vertexShaderSrc],
+                                                [fragmentShaderSrc],
+                                                ctx.logging);
+                                    } catch (e) {
+                                        ctx.logging.debug("Vertex shader:");
+                                        ctx.logging.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
+                                        ctx.logging.debug("Fragment shader:");
+                                        ctx.logging.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
+                                        throw e;
+                                    }
                                 });
                     }
                     activeProgram = programs[sceneHash];
@@ -412,7 +422,7 @@ SceneJS._backends.installBackend(
                 src.push("uniform mat4 uPMatrix;");               // Projection
 
                 for (var i = 0; i < lights.length; i++) {
-                    src.push("uniform vec4 uLightPos" + i + ";");
+                    src.push("uniform vec3 uLightPos" + i + ";");
                 }
                 src.push("varying vec4 vViewVertex;");
                 src.push("varying vec3 vNormal;");
@@ -446,7 +456,7 @@ SceneJS._backends.installBackend(
                     src.push("vTextureCoord = aTextureCoord;");
                 }
                 src.push("}");
-                // ctx.logging.info(getShaderLoggingSource(src));
+              //   ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
@@ -501,7 +511,7 @@ SceneJS._backends.installBackend(
                         var light = lights[i];
 
                         src.push("uniform vec3  uLightColor" + i + ";");
-                        src.push("uniform vec4  uLightPos" + i + ";");
+                        src.push("uniform vec3  uLightPos" + i + ";");
                         src.push("uniform vec3  uLightSpotDir" + i + ";");
 
                         if (light.type == "spot") {
@@ -587,7 +597,7 @@ SceneJS._backends.installBackend(
                         /* Apply the layer
                          */
 
-                        if (layer.params.applyTo == "color") {
+                        if (layer.params.applyTo == "baseColor") {
                             if (layer.params.blendMode == "multiply") {
                                 src.push("color  = color * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
                             } else {
@@ -696,10 +706,8 @@ SceneJS._backends.installBackend(
                 }
 
                 src.push("}");
-                // alert(src.join("\n"));
 
-
-                ctx.logging.info(getShaderLoggingSource(src));
+                //    ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 

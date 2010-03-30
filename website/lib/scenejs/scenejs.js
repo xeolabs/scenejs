@@ -1465,7 +1465,7 @@ SceneJS._webgl = {
     },
 
     ProgramUniform : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program uniform found in shader: " + name);
+        //  logging.debug("Program uniform found in shader: " + name);
         var func = null;
         if (type == context.BOOL) {
             func = function (v) {
@@ -1542,7 +1542,7 @@ SceneJS._webgl = {
     },
 
     ProgramSampler : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program sampler found in shader: " + name);
+        //  logging.debug("Program sampler found in shader: " + name);
         this.bindTexture = function(texture, unit) {
             texture.bind(unit);
             context.uniform1i(location, unit);
@@ -1552,7 +1552,7 @@ SceneJS._webgl = {
     /** An attribute within a shader
      */
     ProgramAttribute : function(context, program, name, type, size, location, logging) {
-        logging.debug("Program attribute found in shader: " + name);
+        // logging.debug("Program attribute found in shader: " + name);
         this.bindFloatArrayBuffer = function(buffer) {
             context.enableVertexAttribArray(location);
             buffer.bind();
@@ -1586,9 +1586,7 @@ SceneJS._webgl = {
             logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
         }
         if (!this.valid) {
-            if (this.valid) {
-                throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
-            }
+            throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
         }
     },
 
@@ -1703,6 +1701,7 @@ SceneJS._webgl = {
         this.bind = function() {
             context.useProgram(handle);
         };
+
 
         this.setUniform = function(name, value) {
             var u = uniforms[name];
@@ -1852,7 +1851,7 @@ SceneJS._webgl = {
 
         context.bindTexture(this.target, null);
 
-//        gl.activeTexture(gl.TEXTURE0);
+        //        gl.activeTexture(gl.TEXTURE0);
         //  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
         //  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
 
@@ -1945,6 +1944,11 @@ SceneJS.exceptions.NodeBackendInstallFailedException = function(msg, cause) {
 };
 
 SceneJS.exceptions.NodeConfigExpectedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.ShaderCompilationFailureException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
@@ -3739,16 +3743,26 @@ SceneJS._backends.installBackend(
 
                     if (!programs[sceneHash]) {
                         ctx.logging.info("Creating shader: '" + sceneHash + "'");
+                        var vertexShaderSrc = composeRenderingVertexShader();
+                        var fragmentShaderSrc = composeRenderingFragmentShader();
                         ctx.memory.allocate(
                                 "shader",
                                 function() {
-                                    programs[sceneHash] = new SceneJS._webgl.Program(
-                                            sceneHash,
-                                            time,
-                                            canvas.context,
-                                            [composeRenderingVertexShader()],
-                                            [composeRenderingFragmentShader()],
-                                            ctx.logging);
+                                    try {
+                                        programs[sceneHash] = new SceneJS._webgl.Program(
+                                                sceneHash,
+                                                time,
+                                                canvas.context,
+                                                [vertexShaderSrc],
+                                                [fragmentShaderSrc],
+                                                ctx.logging);
+                                    } catch (e) {
+                                        ctx.logging.debug("Vertex shader:");
+                                        ctx.logging.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
+                                        ctx.logging.debug("Fragment shader:");
+                                        ctx.logging.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
+                                        throw e;
+                                    }
                                 });
                     }
                     activeProgram = programs[sceneHash];
@@ -3876,7 +3890,7 @@ SceneJS._backends.installBackend(
                 src.push("uniform mat4 uPMatrix;");               // Projection
 
                 for (var i = 0; i < lights.length; i++) {
-                    src.push("uniform vec4 uLightPos" + i + ";");
+                    src.push("uniform vec3 uLightPos" + i + ";");
                 }
                 src.push("varying vec4 vViewVertex;");
                 src.push("varying vec3 vNormal;");
@@ -3910,7 +3924,7 @@ SceneJS._backends.installBackend(
                     src.push("vTextureCoord = aTextureCoord;");
                 }
                 src.push("}");
-                // ctx.logging.info(getShaderLoggingSource(src));
+              //   ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
@@ -3965,7 +3979,7 @@ SceneJS._backends.installBackend(
                         var light = lights[i];
 
                         src.push("uniform vec3  uLightColor" + i + ";");
-                        src.push("uniform vec4  uLightPos" + i + ";");
+                        src.push("uniform vec3  uLightPos" + i + ";");
                         src.push("uniform vec3  uLightSpotDir" + i + ";");
 
                         if (light.type == "spot") {
@@ -4051,7 +4065,7 @@ SceneJS._backends.installBackend(
                         /* Apply the layer
                          */
 
-                        if (layer.params.applyTo == "color") {
+                        if (layer.params.applyTo == "baseColor") {
                             if (layer.params.blendMode == "multiply") {
                                 src.push("color  = color * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
                             } else {
@@ -4160,10 +4174,8 @@ SceneJS._backends.installBackend(
                 }
 
                 src.push("}");
-                // alert(src.join("\n"));
 
-
-                ctx.logging.info(getShaderLoggingSource(src));
+                //    ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
@@ -12166,7 +12178,7 @@ SceneJS.scalarInterpolator = function() {
                 };
 
                 var cosineInterpolate = function(k) {
-                    var mu2 = (1 - Math.cos(k * Math.PI()) / 2.0);
+                    var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
                     return (params.keys[key1] * (1 - mu2) + params.keys[key2] * mu2);
                 };
 
@@ -12920,23 +12932,12 @@ SceneJS._backends.installBackend(
                             }
 
                             if (layerParam.applyTo) {
-                                if (layerParam.applyTo != "color" && // Colour map
-                                    layerParam.applyTo != "diffuse" &&
-                                    layerParam.applyTo != "specular" &&
-                                    layerParam.applyTo != "shininess" &&
-                                    layerParam.applyTo != "emission" &&
-                                    layerParam.applyTo != "red" &&
-                                    layerParam.applyTo != "green" &&
-                                    layerParam.applyTo != "blue" &&
-                                    layerParam.applyTo != "alpha" &&
-                                    layerParam.applyTo != "normal" &&
-                                    layerParam.applyTo != "height") {
+                                if (layerParam.applyTo != "baseColor" && // Colour map
+                                    layerParam.applyTo != "diffuseColor") {
 
                                     throw SceneJS.exceptions.InvalidNodeConfigException(
                                             "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
-                                            "should be either 'color', 'diffuse', 'specular', 'shininess', " +
-                                            "'emission', 'red', 'green', " +
-                                            "'blue', alpha', 'normal' or 'height'");
+                                            "should be either 'baseColor', 'diffuseColor'");
                                 }
                             }
 
@@ -12965,7 +12966,7 @@ SceneJS._backends.installBackend(
                                     };
                                 })(),
                                 applyFrom: layerParam.applyFrom || "geometry",
-                                applyTo: layerParam.applyTo || "color",
+                                applyTo: layerParam.applyTo || "baseColor",
                                 blendMode: layerParam.blendMode || "multiply"
                                 //matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
 
