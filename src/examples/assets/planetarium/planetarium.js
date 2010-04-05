@@ -22,7 +22,7 @@ with (SceneJS) {
                  */
                     renderer({
                         clear : { depth : true, color : true},
-                        viewport:{ x : 1, y : 1, width: 600, height: 600},
+                        viewport:{ x : 1, y : 1, width: 1000, height: 1000},
                         clearColor: { r:.5, g: 0.5, b: 0.5 },
                         enableTexture2D:true
                     },
@@ -31,97 +31,71 @@ with (SceneJS) {
                          */
                             perspective({  fovy : 45.0, aspect : 1.0, near : 0.10, far : 7000.0 },
 
-                                        /* View transform - takes viewing parameters through the data passed
-                                         * into this scene as it is rendered. Those parameters are generated
-                                         * in mouse handlers outside the scene graph - see below.
+                                /* View transform - takes viewing parameters through the data passed
+                                 * into this scene as it is rendered. Those parameters are generated
+                                 * in mouse handlers outside the scene graph - see below.
+                                 */
+                                    lookAt({
+
+                                        eye : function(data) {
+                                            return data.get("eye");
+                                        },
+
+                                        look : function(data) {
+                                            return data.get("look");
+                                        },
+
+                                        up : { y: 1.0 }
+                                    },
+
+                                        /* Sky sphere
                                          */
-                                            lookAt({
 
-                                                eye : function(data) {
-                                                    return data.get("eye");
-                                                },
-
-                                                look : function(data) {
-                                                    return data.get("look");
-                                                },
-
-                                                up : { y: 1.0 }
-                                            },
-
-                                                /* Sky sphere
-                                                 */
-                                                    withData({
-                                                        radius: 5000
+                                            load({
+                                                uri:"http://scenejs.org/library/v0.7/assets/backgrounds/starry-sky/starry-sky.js"
+                                            }),
+                                            SceneJS.lights({
+                                                sources: [
+                                                    {
+                                                        type:                   "dir",
+                                                        color:                  { r: .8, g: 0.8, b: 0.8 },
+                                                        diffuse:                true,
+                                                        specular:               false,
+                                                        pos:                    { x: 100.0, y: 4.0, z: -100.0 },
+                                                        constantAttenuation:    1.0,
+                                                        quadraticAttenuation:   0.0,
+                                                        linearAttenuation:      0.0
+                                                    }
+                                                    ,
+                                                    {
+                                                        type:                   "dir",
+                                                        color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                        diffuse:                true,
+                                                        specular:               true,
+                                                        pos:                    { x: 100.0, y: -100.0, z: -100.0 },
+                                                        constantAttenuation:    1.0,
+                                                        quadraticAttenuation:   0.0,
+                                                        linearAttenuation:      0.0
                                                     },
-                                                            load({
-                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                    "backgrounds/sphere/starrySky.js"
-                                                            })),
+                                                    {
+                                                        type:                   "dir",
+                                                        color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                        diffuse:                true,
+                                                        specular:               true,
+                                                        pos:                    { x: -1000.0, y: -1000.0, z: 0.0 },
+                                                        constantAttenuation:    1.0,
+                                                        quadraticAttenuation:   0.0,
+                                                        linearAttenuation:      0.0
+                                                    }
+                                                ]}//,
 
-                                                /* Lighting
+                                                /** Load the asset
                                                  */
-                                                    lights({
-                                                        sources: [
-                                                            {
-                                                                type:                   "point",
-                                                                diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-                                                                specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                                                pos:                    { x: 100.0, y: 0.0, z: -100.0 },
-                                                                constantAttenuation:    1.0,
-                                                                quadraticAttenuation:   0.0,
-                                                                linearAttenuation:      0.0
-                                                            },
-                                                            {
-                                                                type:                   "point",
-                                                                diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
-                                                                specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                                                pos:                    { x: -20.0, y: 50.0, z: 0.0 },
-                                                                constantAttenuation:    1.0,
-                                                                quadraticAttenuation:   0.0,
-                                                                linearAttenuation:      0.0
-                                                            },
-                                                            {
-                                                                type:                   "point",
-                                                                diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
-                                                                specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                                                pos:                    { x: 50.0, y: 100.0, z: 0.0 },
-                                                                constantAttenuation:    1.0,
-                                                                quadraticAttenuation:   0.0,
-                                                                linearAttenuation:      0.0
-                                                            }
-                                                        ]},                                                        
+                                                   // SceneJS.scale({x:10,y:10,z:10}, SceneJS.objects.cube())
 
-                                                        /* Mars
-                                                         */
 
-                                                            rotate((function() {
-                                                                var angle = 0;
-                                                                return function(data) {
-                                                                    angle += data.get("time") * 0.01;
-                                                                    if (angle > 360.0) {
-                                                                        angle = 0;
-                                                                    }
-                                                                    return {
-                                                                        angle: angle,
-                                                                        y: 1
-                                                                    };
-                                                                };
-                                                            }()),
-                                                                    translate({x:200,y:40},
-                                                                            scale({x:20,y:-20, z:20},
-                                                                                    load({
-                                                                                        uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                            "examples/planets/mars/mars.js"
-                                                                                    })))),
+                                                    )
 
-                                                            translate({x:150,y:40},
-                                                                    scale({x:20,y:-20, z:20},
-                                                                            load({
-                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                    "examples/planets/earth/earth.js"
-                                                                            })))
-                                                            )
-                                        
                                             )
                                     )
                             )

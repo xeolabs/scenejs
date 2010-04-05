@@ -14,7 +14,7 @@
  * The backend is free to evict whatever geometry it chooses between scene traversals, so the node must always check
  * the existence of the geometry and possibly request its re-creation each time before requesting the backend render it.
  *
- * A geometry buffer consists of vertices, normals, optional texture coordinates, indices and a primitive type
+ * A geometry buffer consists of positions, normals, optional texture coordinates, indices and a primitive type
  * (eg. "triangles").
  *
  * When rendering a geometry element, the backend will first fire a SHADER_ACTIVATE to prompt the shader backend
@@ -200,7 +200,7 @@ SceneJS._backends.installBackend(
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
-                    var geoId = canvas.canvasId + type;
+                    var geoId = canvas.canvasId + ":" + type;
                     return (geometries[geoId]) ? geoId : null;
                 },
 
@@ -208,9 +208,13 @@ SceneJS._backends.installBackend(
                  * Creates geometry of the given type on the active canvas and returns its ID
                  *
                  * @param type Optional type for geometry - when null, a random type will be used
-                 * @param data Contains vertices, normals, indexes etc.
+                 * @param data Contains positions, normals, indexes etc.
                  */
                 createGeometry : function(type, data) {
+//                    if (!type) {
+//                        type = "g" + nextTypeId++;
+//                    }
+//
                     ctx.logging.debug("Creating geometry: '" + type + "'");
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
@@ -220,7 +224,7 @@ SceneJS._backends.installBackend(
                         throw new SceneJS.exceptions.NodeConfigExpectedException("Geometry node parameter expected : primitive");
                     }
 
-                    var geoId = canvas.canvasId + (type || nextTypeId++);
+                    var geoId = canvas.canvasId + ":" + type;
                     var context = canvas.context;
 
                     var usage = context.STATIC_DRAW;
@@ -234,14 +238,14 @@ SceneJS._backends.installBackend(
                     try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
                         vertexBuf = createArrayBuffer("geometry vertex buffer", context, context.ARRAY_BUFFER,
-                                new WebGLFloatArray(data.vertices), data.vertices.length, 3, usage);
+                                new WebGLFloatArray(data.positions), data.positions.length, 3, usage);
 
                         normalBuf = createArrayBuffer("geometry normal buffer", context, context.ARRAY_BUFFER,
                                 new WebGLFloatArray(data.normals), data.normals.length, 3, usage);
 
-                        if (data.texCoords) {
+                        if (data.uv) {
                             texCoordBuf = createArrayBuffer("geometry texture buffer", context, context.ARRAY_BUFFER,
-                                    new WebGLFloatArray(data.texCoords), data.texCoords.length, 2, usage);
+                                    new WebGLFloatArray(data.uv), data.uv.length, 2, usage);
                         }
 
                         indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
@@ -301,10 +305,14 @@ SceneJS._backends.installBackend(
 
                     var context = canvas.context;
 
+
                     /* Dont re-export and bind if already the last one exported and bound - this is the case when
                      * we're drawing a batch of the same object, Eg. a bunch of cubes in a row
                      */
                     if (currentBoundGeo != geoId) {
+                        for (var i = 0; i < 8; i++) {
+                            context.disableVertexAttribArray(i);
+                        }
                         ctx.events.fireEvent(
                                 SceneJS._eventTypes.GEOMETRY_EXPORTED,
                                 geo);
@@ -316,9 +324,10 @@ SceneJS._backends.installBackend(
 
                     /* Draw geometry
                      */
-               
+
                     context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-                    context.flush();                  
+                    context.flush();
+
                     /* Don't need to unbind buffers - only one is bound at a time anyway                    
                      */
 
@@ -328,7 +337,7 @@ SceneJS._backends.installBackend(
                         destroyGeometry(geo);
                         currentBoundGeo = null;
                     }
-                   
+
                 }
             };
         });

@@ -14,11 +14,12 @@
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
-        <td  valign="top">
+        <td valign="top">
             <div id="logging"></div>
         </td>
     </tr>
 </table>
+
 
 <!-- Core -->
 
@@ -49,6 +50,19 @@
 <!-- Process management -->
 
 <script type="application/x-javascript" src="../../../scenejs/processes/processesBackend.js"></script>
+
+<!-- Assets -->
+
+<script type="application/x-javascript" src="../../../scenejs/load/loadBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/load/load.js"></script>
+
+<!-- Picking -->
+
+<script type="application/x-javascript" src="../../../scenejs/pick/pickBackend.js"></script>
+
+<!-- Third-party lib : WebGL Trace -->
+
+<script type="application/x-javascript" src="../../../scenejs/core/webgl-trace.js"></script>
 
 
 <!-- Scene -->
@@ -98,6 +112,7 @@
 <!-- Viewing transforms -->
 
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/viewLocalityBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
 
 <!-- Lighting -->
@@ -128,19 +143,18 @@
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
 
-<!-- Assets -->
-
-<script type="application/x-javascript" src="../../../scenejs/load/loadBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/load/load.js"></script>
-
-
 
 <script type="application/x-javascript" src="../../../scenejs/texture/textureBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
 
+<script type="application/x-javascript" src="../../../scenejs/fog/fogBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
 
-<script type="application/x-javascript" src="../../../scenejs/interaction/namingBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/interaction/name.js"></script>
+
+<!-- Naming -->
+
+<script type="application/x-javascript" src="../../../scenejs/name/nameBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/name/name.js"></script>
 
 <script type="application/x-javascript" src="basic-picking.js"></script>
 </body>

@@ -7,16 +7,16 @@ SceneJS.material = function() {
     var material;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 } else {
                     if (!material || !cfg.fixed) {
                         material = backend.createMaterial(cfg.getParams(data));
                     }
                     var saveMaterial = backend.getMaterial();
                     backend.setMaterial(material);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setMaterial(saveMaterial);
                 }
             });

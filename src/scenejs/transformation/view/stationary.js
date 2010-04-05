@@ -6,11 +6,11 @@ SceneJS.stationary = function() {
     var backend = SceneJS._backends.getBackend('view-transform');
     var xform;
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 var superXform = backend.getTransform();
                 var lookAt = superXform.lookAt;
                 if (lookAt) {
-                    if (!lookAt || !superXform.fixed) {
+                    if (!xform || !superXform.fixed) {
                         xform = {
                             matrix: SceneJS._math.mulMat4(
                                     superXform.matrix,
@@ -23,10 +23,10 @@ SceneJS.stationary = function() {
                         };
                     }
                     backend.setTransform(xform);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setTransform(superXform);
                 } else {
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 }
             });
 };

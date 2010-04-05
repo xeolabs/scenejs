@@ -19,7 +19,7 @@
         var memoLevel = NO_MEMO;
 
         return SceneJS._utils.createNode(
-                function(data) {
+                function(traversalContext, data) {
                     if (memoLevel == NO_MEMO) {
                         var params = cfg.getParams(data);
                         mat = SceneJS._math.translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
@@ -37,7 +37,7 @@
                         }
                     }
                     backend.setTransform(xform);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setTransform(superXform);
                 });
     };

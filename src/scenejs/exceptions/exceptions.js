@@ -129,5 +129,10 @@ SceneJS.exceptions.WebGLUnsupportedNodeConfigException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJS.exceptions.PickWithoutRenderedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 

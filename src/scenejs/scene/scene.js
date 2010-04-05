@@ -6,9 +6,10 @@
 
 (function() {
 
-    var backend = SceneJS._backends.getBackend('scene');
+    var sceneBackend = SceneJS._backends.getBackend('scene');
     var loadBackend = SceneJS._backends.getBackend('load');
     var processesBackend = SceneJS._backends.getBackend('processes');
+    var pickBackend = SceneJS._backends.getBackend('pick');
 
     /** Creates a new scene
      */
@@ -27,6 +28,8 @@
         }
         var params = cfg.getParams();
 
+        var lastRenderedData = null; // Saves data from last render for picking traversal
+
         var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
 
         /* Create, register and return the scene graph
@@ -41,7 +44,7 @@
                 if (!sceneId) {
                     return null;
                 }
-                return backend.getSceneCanvas(sceneId);
+                return sceneBackend.getSceneCanvas(sceneId);
             },
 
             /**
@@ -50,7 +53,7 @@
              */
             render : function(paramOverrides) {
                 if (sceneId) {
-                    backend.activateScene(sceneId);
+                    sceneBackend.activateScene(sceneId);
                     var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
                     if (paramOverrides) {        // Override with traversal params
                         for (var key in paramOverrides) {
@@ -60,29 +63,43 @@
                     if (params.proxy) {
                         loadBackend.setProxy(params.proxy);
                     }
-                    SceneJS._utils.visitChildren(cfg, data);
+                    var traversalContext = {
+
+                    };
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     loadBackend.setProxy(null);
-                    backend.deactivateScene();
+                    sceneBackend.deactivateScene();
+                    lastRenderedData = data;
                 }
             },
 
-            pick : function(paramOverrides, canvasX, canvasY) {
+            /**
+             * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
+             * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
+             * The scene must have been previously rendered, since this method re-renders it (to a special
+             * pick frame buffer) using parameters retained from the prior render() call.
+             *
+             * @param canvasX
+             * @param canvasY
+             */
+            pick : function(canvasX, canvasY) {
                 if (sceneId) {
                     try {
-                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
-                        backend.activateScene(sceneId);
-                        var data = SceneJS._utils.newScope(null, false);
-                        if (paramOverrides) {        // Override with traversal params
-                            for (var key in paramOverrides) {
-                                data.put(key, paramOverrides[key]);
-                            }
+                        if (!lastRenderedData) {
+                            throw new SceneJS.exceptions.PickWithoutRenderedException
+                                    ("Scene not rendered - need to render before picking");
                         }
+                        sceneBackend.activateScene(sceneId);
+                        pickBackend.pick(canvasX, canvasY);
                         if (params.proxy) {
                             loadBackend.setProxy(params.proxy);
                         }
-                        SceneJS._utils.visitChildren(cfg, data);
+                        var traversalContext = {};
+                        SceneJS._utils.visitChildren(cfg, traversalContext, lastRenderedData);
                         loadBackend.setProxy(null);
-                        backend.deactivateScene();
+                        var picked = pickBackend.getPicked();
+                        sceneBackend.deactivateScene();
+                        return picked;
                     } finally {
                         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
                     }
@@ -106,7 +123,7 @@
              */
             destroy : function() {
                 if (sceneId) {
-                    backend.deregisterScene(sceneId); // Last one fires RESET command
+                    sceneBackend.deregisterScene(sceneId); // Last one fires RESET command
                     sceneId = null;
                 }
             },
@@ -120,7 +137,7 @@
 
         /* Register scene - fires a SCENE_CREATED event
          */
-        sceneId = backend.registerScene(_scene, params);
+        sceneId = sceneBackend.registerScene(_scene, params);
 
         return _scene;
     };
@@ -128,7 +145,7 @@
     /** Total SceneJS reset - destroys all scenes and cached resources.
      */
     SceneJS.reset = function() {
-        var scenes = backend.getAllScenes();
+        var scenes = sceneBackend.getAllScenes();
         var temp = [];
         for (var i = 0; i < scenes.length; i++) {
             temp.push(scenes[i]);

@@ -46,7 +46,7 @@
         var matrix;
 
         return SceneJS._utils.createNode(
-                function(data) {
+                function(traversalContext, data) {
 
                     /* Node can be dynamically configured, but only once
                      */
@@ -72,14 +72,14 @@
                             }
 
                             if (layerParam.applyFrom) {
-                                if (layerParam.applyFrom != "uv1" &&
+                                if (layerParam.applyFrom != "uv" &&
                                     layerParam.applyFrom != "uv2" &&
                                     layerParam.applyFrom != "normal" &&
                                     layerParam.applyFrom != "geometry") {
 
                                     throw SceneJS.exceptions.InvalidNodeConfigException(
                                             "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                            "should be either 'uv1', 'uv2', 'normal' or 'geometry'");
+                                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
                                 }
                             }
 
@@ -221,7 +221,7 @@
 
                         /* Dont apply textures if picking
                          */
-                        SceneJS._utils.visitChildren(cfg, data);
+                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
 
                     } else {
 
@@ -235,7 +235,7 @@
                                     matrix: layer.createMatrix(data)
                                 });
                             }
-                            SceneJS._utils.visitChildren(cfg, data);
+                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
                             utils.textureBackend.popLayers(layers.length);
 
                         }

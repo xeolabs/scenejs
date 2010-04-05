@@ -16,18 +16,18 @@
 SceneJS.generator = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (cfg.fixed) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException
                             ('SceneJS.generator node must be configured with a function');
                 }
                 var params = cfg.getParams(data);
                 while (params) {
-                    var childScope = SceneJS._utils.newScope(data);
+                    var childData = SceneJS._utils.newScope(data);
                     for (var key in params) {
-                        childScope.put(key, params[key]);
+                        childData.put(key, params[key]);
                     }
-                    SceneJS._utils.visitChildren(cfg, childScope);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, childData);
                     params = cfg.getParams(data);
                 }
             });

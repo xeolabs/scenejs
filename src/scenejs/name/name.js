@@ -7,7 +7,7 @@ SceneJS.name = function() {
     var backend = SceneJS._backends.getBackend('naming');
     var name;
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!name || !cfg.fixed) {
                     var params = cfg.getParams(data);
                     name = params.name;
@@ -22,7 +22,7 @@ SceneJS.name = function() {
                     }
                 }
                 backend.pushName(name);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.popName();
             });
 };

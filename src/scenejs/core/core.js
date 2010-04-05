@@ -334,19 +334,39 @@ var SceneJS = {
 
         /** Visits child nodes in the given node configuration
          */
-        visitChildren : function(config, data) {
+        visitChildren : function(config, traversalContext, data) {
             if (config.children) {
-                for (var i = 0; i < config.children.length; i++) {
-                    config.children[i](data);
+                var len = config.children.length;
+                if (len) {
+                    for (var i = 0; i < len; i++) {
+                        config.children[i]({ // Traversal context
+                            appendix : traversalContext.appendix,
+                            insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
+                        }, data);
+                    }
+                } else {
+                    
+                    /* Leaf node - if on right fringe of tree then
+                     * render appended nodes
+                     */
+                    if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
+                        len = traversalContext.appendix.length;
+                        for (var i = 0; i < len; i++) {
+                            traversalContext.appendix[i]({ // Traversal context
+                                appendix : null,
+                                insideRightFringe: (i < len - 1)
+                            }, data);
+                        }
+                    }
                 }
             }
         },
 
         /** Visits a selected child node in the given node configuration
          */
-        visitChild : function(config, index, data) {
+        visitChild : function(config, index, traversalContext, data) {
             if (config.children) {
-                config.children[index](data);
+                config.children[index](traversalContext, data);
             }
         },
 

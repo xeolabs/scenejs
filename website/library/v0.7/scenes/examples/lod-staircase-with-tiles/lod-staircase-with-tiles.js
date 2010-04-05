@@ -71,6 +71,12 @@ var exampleScene = SceneJS.scene({
                                             up : { y: 1.0 }
                                         },
 
+                                            /* A starry sky for fun!
+                                             */
+                                                SceneJS.load({
+                                                    uri:"http://scenejs.org/library/v0.7/assets/backgrounds/starry-sky/starry-sky.js"
+                                                }),
+
                                             /* Lighting
                                              */
                                                 SceneJS.lights({

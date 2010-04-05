@@ -18,19 +18,32 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                         SceneJS.lights({
                             sources: [
                                 {
+                                    type:                   "dir",
+                                    color:                  { r: .8, g: 0.8, b: 0.8 },
+                                    diffuse:                true,
+                                    specular:               false,
+                                    pos:                    { x: 100.0, y: 4.0, z: 100.0 },
+                                    constantAttenuation:    1.0,
+                                    quadraticAttenuation:   0.0,
+                                    linearAttenuation:      0.0
+                                }
+                                ,
+                                {
                                     type:                   "point",
-                                    diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
-                                    specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                    pos:                    { x: 100.0, y: 0.0, z: -100.0 },
+                                    color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    pos:                    { x: 100.0, y: -100.0, z: 100.0 },
                                     constantAttenuation:    1.0,
                                     quadraticAttenuation:   0.0,
                                     linearAttenuation:      0.0
                                 },
                                 {
                                     type:                   "point",
-                                    diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
-                                    specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                    pos:                    { x: -100.0, y: 100.0, z: 0.0 },
+                                    color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    pos:                    { x: -1000.0, y: -1000.0, z: 0.0 },
                                     constantAttenuation:    1.0,
                                     quadraticAttenuation:   0.0,
                                     linearAttenuation:      0.0
@@ -50,10 +63,10 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
                                                                 SceneJS.name({ name: "blueGroup" },
                                                                         SceneJS.material({
-                                                                            ambient:  { r:0.2, g:0.2, b:0.5 },
-                                                                            diffuse:  { r:0.6, g:0.6, b:0.9 },
-                                                                            specular:  { r:0.6, g:0.6, b:0.9 },
-                                                                            shininess: 10
+                                                                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                                            specular:       0.9,
+                                                                            shine:          6.0
                                                                         },
                                                                                 SceneJS.name({ name: "left" },
                                                                                         SceneJS.translate({x: .5, z: -2},
@@ -72,10 +85,10 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                         SceneJS.name({ name: "greenGroup" },
                                                                 SceneJS.translate({x: 3, z: 0},
                                                                         SceneJS.material({
-                                                                            ambient:  { r:0.2, g:0.5, b:0.5 },
-                                                                            diffuse:  { r:0.6, g:0.9, b:0.6 },
-                                                                            specular:  { r:1.0, g:0.9, b:0.6 },
-                                                                            shininess: 10
+                                                                            baseColor:      { r: 0.3, g: 0.9, b: 0.3 },
+                                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                                            specular:       0.9,
+                                                                            shine:          6.0
                                                                         },
                                                                                 SceneJS.name({ name: "left" },
                                                                                         SceneJS.translate({x: -2},
@@ -94,10 +107,10 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                         SceneJS.name({ name: "redGroup" },
                                                                 SceneJS.translate({x: 2, z: +7},
                                                                         SceneJS.material({
-                                                                            ambient:  { r:0.5, g:0.2, b:0.2 },
-                                                                            diffuse:  { r:0.9, g:0.6, b:0.6 },
-                                                                            specular:  { r:.9, g:0.9, b:0.9 },
-                                                                            shininess: 10
+                                                                            baseColor:      { r: 0.9, g: 0.3, b: 0.3 },
+                                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                                            specular:       0.9,
+                                                                            shine:          6.0
                                                                         },
                                                                                 SceneJS.name({ name: "front" },
                                                                                         SceneJS.translate({x: -2},
@@ -120,8 +133,7 @@ exampleScene.render();
 var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
-    alert("mouse down");
-    exampleScene.render();
+    exampleScene.pick(event.clientX, event.clientY);
 }
 
 canvas.addEventListener('mousedown', mouseDown, false);

@@ -334,19 +334,39 @@ var SceneJS = {
 
         /** Visits child nodes in the given node configuration
          */
-        visitChildren : function(config, data) {
+        visitChildren : function(config, traversalContext, data) {
             if (config.children) {
-                for (var i = 0; i < config.children.length; i++) {
-                    config.children[i](data);
+                var len = config.children.length;
+                if (len) {
+                    for (var i = 0; i < len; i++) {
+                        config.children[i]({ // Traversal context
+                            appendix : traversalContext.appendix,
+                            insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
+                        }, data);
+                    }
+                } else {
+                    
+                    /* Leaf node - if on right fringe of tree then
+                     * render appended nodes
+                     */
+                    if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
+                        len = traversalContext.appendix.length;
+                        for (var i = 0; i < len; i++) {
+                            traversalContext.appendix[i]({ // Traversal context
+                                appendix : null,
+                                insideRightFringe: (i < len - 1)
+                            }, data);
+                        }
+                    }
                 }
             }
         },
 
         /** Visits a selected child node in the given node configuration
          */
-        visitChild : function(config, index, data) {
+        visitChild : function(config, index, traversalContext, data) {
             if (config.children) {
-                config.children[index](data);
+                config.children[index](traversalContext, data);
             }
         },
 
@@ -1554,8 +1574,9 @@ SceneJS._webgl = {
     ProgramAttribute : function(context, program, name, type, size, location, logging) {
         // logging.debug("Program attribute found in shader: " + name);
         this.bindFloatArrayBuffer = function(buffer) {
-            context.enableVertexAttribArray(location);
             buffer.bind();
+            context.enableVertexAttribArray(location);
+
             context.vertexAttribPointer(location, buffer.itemSize, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
         };
 
@@ -1731,7 +1752,7 @@ SceneJS._webgl = {
         };
 
         this.unbind = function() {
-            context.useProgram(null);
+            //     context.useProgram(0);
         };
 
         this.destroy = function() {
@@ -2058,6 +2079,11 @@ SceneJS.exceptions.WebGLUnsupportedNodeConfigException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJS.exceptions.PickWithoutRenderedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 
 /**
@@ -2358,7 +2384,7 @@ SceneJS.logging = function() {
     var backend = SceneJS._backends.getBackend('logging');
     var funcs;
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 var prevFuncs = backend.getFuncs();
                 if (!funcs || !cfg.fixed) {
                     funcs = cfg.getParams(data);
@@ -2369,7 +2395,7 @@ SceneJS.logging = function() {
                     funcs.info = funcs.info || p.info;
                 }
                 backend.setFuncs(funcs);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setFuncs(prevFuncs);
             });
 };
@@ -2415,7 +2441,7 @@ SceneJS.loggingToPage = function() {
     }
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!funcs) {
                     var params = cfg.getParams();                  
 
@@ -2442,7 +2468,7 @@ SceneJS.loggingToPage = function() {
                 }
                 var prevFuncs = backend.getFuncs();
                 backend.setFuncs(funcs);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setFuncs(prevFuncs);
             });
 };
@@ -2821,19 +2847,22 @@ SceneJS.load = function() {
     }
 
     function visitSubgraph(params, data) {
+        var traversalContext = {
+            appendix : cfg.children
+        };
         if (params) { // Parameters for asset - supply in a new child data
-            var childScope = SceneJS._utils.newScope(data, cfg.fixed);
+            var childData = SceneJS._utils.newScope(data, cfg.fixed);
             for (var key in params.params) {
-                childScope.put(key, params.params[key]);
+                childData.put(key, params.params[key]);
             }
-            assetNode.func.call(this, childScope);
+            assetNode.func.call(this, traversalContext,  childData);
         } else {
-            assetNode.func.call(this, data);
+            assetNode.func.call(this, traversalContext, data);
         }
     }
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
 
                 if (!params) {
                     params = cfg.getParams(data);
@@ -2884,16 +2913,578 @@ SceneJS.load = function() {
                                     logging.getLogger().error(
                                             "SceneJS.load failed - " + msg + " - uri: " + params.uri);
                                 });
-
-                        SceneJS._utils.visitChildren(cfg, data);
                         break;
 
                     case STATE_ERROR:
-                        SceneJS._utils.visitChildren(cfg, data);
                         break;
                 }
             });
 };
+/* Backend that manages picking
+ *
+ * Services the SceneJS.scene node, providing it with methods to enter picking mode and collect names of
+ * subgraph that was picked.
+ *
+ */
+SceneJS._backends.installBackend(
+
+        "pick",
+
+        function(ctx) {
+            var pickX;
+            var pickY;
+            var canvas;
+            var pickBuffers;
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.RESET,
+                    function() {
+                        pickBuffers = {};
+                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
+                        canvas = null;
+                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+                    function(c) {
+                        canvas = c;
+//                        if (!pickBuffers[canvas.id]) {
+//                            createPickBuffer();
+//                        }
+                    });
+
+            function createPickBuffer() {
+                var context = canvas.context;
+
+                /* Create pick buffer
+                 */
+                var pickBuffer = {
+                    frameBuffer : context.createFramebuffer(),
+                    renderBuffer : context.createRenderbuffer(),
+                    texture : context.createTexture()
+                };
+                context.bindTexture(context.TEXTURE_2D, pickBuffer.texture);
+                try {
+                    context.texImage2D(
+                            context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, null);
+                } catch (e) {
+                    var texture = new WebcontextUnsignedByteArray(3);
+                    context.texImage2D(
+                            context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, texture);
+                }
+                context.bindFramebuffer(context.FRAMEBUFFER, pickBuffer.frameBuffer);
+                context.bindRenderbuffer(context.RENDERBUFFER, pickBuffer.renderBuffer);
+                context.renderbufferStorage(context.RENDERBUFFER, context.COLOR_COMPONENT, 1, 1);
+                context.bindRenderbuffer(context.RENDERBUFFER, null);
+                context.framebufferTexture2D(
+                        context.FRAMEBUFFER, context.COLOR_ATTACHMENT0, context.TEXTURE_2D, pickBuffer.texture, 0);
+                context.framebufferRenderbuffer(
+                        context.FRAMEBUFFER, context.DEPTH_ATTACHMENT, context.RENDERBUFFER, pickBuffer.renderBuffer);
+                context.bindFramebuffer(context.FRAMEBUFFER, null);
+
+                pickBuffers[canvas.id] = pickBuffer;
+            }
+
+            function activatePicking() {
+                var context = canvas.context;
+                var pickBuffer = pickBuffers[canvas.id];
+                context.bindFramebuffer(context.FRAMEBUFFER, pickBuffer.frameBuffer);
+                context.viewport(0, 0, 800, 600);
+                context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+                context.disable(context.BLEND);
+                SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
+            }
+
+            function deactivatePicking() {
+                canvas.context.bindFramebuffer(context.FRAMEBUFFER, null);
+                SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+            }
+
+            /* Node-facing API
+             */
+            return {
+
+                /** Begin picking at given coordinates, switch to picking mode
+                 */
+                pick: function(x, y) {
+                    if (!canvas) {
+                        throw "No canvas active";
+                    }
+                    activatePicking();
+                    pickX = x;
+                    pickY = y;
+                },
+
+                /** Get name path to whatever was picked, unbind pick buffers, switch back to rendering mode
+                 */
+                getPicked: function() {
+                    if (!pickBuffer) {
+                        //         throw "No pick buffer created";
+                    }
+                    var context = canvas.context;
+
+                    /* Read colour of picked pixel
+                     */
+                    var data = context.readPixels(pickX, pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
+                    if (data.data) {
+                        data = data.data; // TODO: hack for firefox
+                    }
+
+                    ctx.logging.info(pickX + ", " + pickY + ": " + data[0] + ", " + data[1] + "," + data[2]);
+
+                    var id = data[0] + data[1] * 256;
+                    //     alert(id);
+
+                    deactivatePicking();
+
+
+                    return id;
+                }
+            };
+        });
+//Copyright (c) 2009 The Chromium Authors. All rights reserved.
+//Use of this source code is governed by a BSD-style license that can be
+//found in the LICENSE file.
+
+// Various functions for helping debug WebGL apps.
+
+WebGLDebugUtils = function() {
+
+/**
+ * Wrapped logging function.
+ * @param {string} msg Message to log.
+ */
+var log = function(msg) {
+  if (window.console && window.console.log) {
+    window.console.log(msg);
+  }
+};
+
+/**
+ * Map of valid enum function argument positions.
+ */
+
+var glValidEnumContexts = {
+
+       // Generic setters and getters
+
+       'enable': { 0:true },
+       'disable': { 0:true },
+       'getParameter': { 0:true },
+
+       // Rendering
+
+       'drawArrays': { 0:true },
+       'drawElements': { 0:true, 2:true },
+
+       // Shaders
+
+       'createShader': { 0:true },
+       'getShaderParameter': { 1:true },
+       'getProgramParameter': { 1:true },
+
+       // Vertex attributes
+
+       'getVertexAttrib': { 1:true },
+       'vertexAttribPointer': { 2:true },
+
+       // Textures
+
+       'bindTexture': { 0:true },
+       'activeTexture': { 0:true },
+       'getTexParameter': { 0:true, 1:true },
+       'texParameterf': { 0:true, 1:true },
+       'texParameteri': { 0:true, 1:true, 2:true },
+       'texImage2D': { 0:true, 2:true, 6:true, 7:true },
+       'texSubImage2D': { 0:true, 6:true, 7:true },
+       'copyTexImage2D': { 0:true, 2:true },
+       'copyTexSubImage2D': { 0:true },
+       'generateMipmap': { 0:true },
+
+       // Buffer objects
+
+       'bindBuffer': { 0:true },
+       'bufferData': { 0:true, 2:true },
+       'bufferSubData': { 0:true },
+       'getBufferParameter': { 0:true, 1:true },
+
+       // Renderbuffers and framebuffers
+
+       'pixelStorei': { 0:true, 1:true },
+       'readPixels': { 4:true, 5:true },
+       'bindRenderbuffer': { 0:true },
+       'bindFramebuffer': { 0:true },
+       'checkFramebufferStatus': { 0:true },
+       'framebufferRenderbuffer': { 0:true, 1:true, 2:true },
+       'framebufferTexture2D': { 0:true, 1:true, 2:true },
+       'getFramebufferAttachmentParameter': { 0:true, 1:true, 2:true },
+       'getRenderbufferParameter': { 0:true, 1:true },
+       'renderbufferStorage': { 0:true, 1:true },
+
+       // Frame buffer operations (clear, blend, depth test, stencil)
+
+       'clear': { 0:true },
+       'depthFunc': { 0:true },
+       'blendFunc': { 0:true, 1:true },
+       'blendFuncSeparate': { 0:true, 1:true, 2:true, 3:true },
+       'blendEquation': { 0:true },
+       'blendEquationSeparate': { 0:true, 1:true },
+       'stencilFunc': { 0:true },
+       'stencilFuncSeparate': { 0:true, 1:true },
+       'stencilMaskSeparate': { 0:true },
+       'stencilOp': { 0:true, 1:true, 2:true },
+       'stencilOpSeparate': { 0:true, 1:true, 2:true, 3:true },
+
+       // Culling
+
+       'cullFace': { 0:true },
+       'frontFace': { 0:true },
+};
+
+/**
+ * Map of numbers to names.
+ * @type {Object}
+ */
+var glEnums = null;
+
+/**
+ * Initializes this module. Safe to call more than once.
+ * @param {!WebGLRenderingContext} ctx A WebGL context. If
+ *    you have more than one context it doesn't matter which one
+ *    you pass in, it is only used to pull out constants.
+ */
+function init(ctx) {
+  if (glEnums == null) {
+    glEnums = { };
+    for (var propertyName in ctx) {
+      if (typeof ctx[propertyName] == 'number') {
+        glEnums[ctx[propertyName]] = propertyName;
+      }
+    }
+  }
+}
+
+/**
+ * Checks the utils have been initialized.
+ */
+function checkInit() {
+  if (glEnums == null) {
+    throw 'WebGLDebugUtils.init(ctx) not called';
+  }
+}
+
+/**
+ * Returns true or false if value matches any WebGL enum
+ * @param {*} value Value to check if it might be an enum.
+ * @return {boolean} True if value matches one of the WebGL defined enums
+ */
+function mightBeEnum(value) {
+  checkInit();
+  return (glEnums[value] !== undefined);
+}
+
+/**
+ * Returns true if 'value' matches any WebGL enum, and the i'th parameter
+ * of the WebGL function 'fname' is expected to be (any) enum. Does not
+ * check that 'value' is actually a valid i'th parameter to 'fname', as
+ * that will be checked by the WebGL implementation itself.
+ *
+ * @param {string} fname the GL function to use for screening the enum
+ * @param {integer} i the parameter index to use for screening the enum
+ * @param {any} value the value to check for being a valid i'th parameter to 'fname'
+ * @return {boolean} true if value matches one of the defined WebGL enums,
+ *         and the i'th parameter to 'fname' is expected to be an enum
+ *
+ * @author Tomi Aarnio
+ */
+function mightBeValidEnum(fname, i, value) {
+       if (!mightBeEnum(value)) return false;
+       return (fname in glValidEnumContexts) && (i in glValidEnumContexts[fname]);
+}
+
+/**
+ * Gets an string version of an WebGL enum.
+ *
+ * Example:
+ *   var str = WebGLDebugUtil.glEnumToString(ctx.getError());
+ *
+ * @param {number} value Value to return an enum for
+ * @return {string} The string version of the enum.
+ */
+function glEnumToString(value) {
+  checkInit();
+  var name = glEnums[value];
+  return (name !== undefined) ? name :
+      ("*UNKNOWN WebGL ENUM (0x" + value.toString(16) + ")");
+}
+
+/**
+ * Given a WebGL context returns a wrapped context that calls
+ * gl.getError after every command and calls a function if the
+ * result is not gl.NO_ERROR.
+ *
+ * @param {!WebGLRenderingContext} ctx The webgl context to
+ *        wrap.
+ * @param {!function(err, funcName, args): void} opt_onErrorFunc
+ *        The function to call when gl.getError returns an
+ *        error. If not specified the default function calls
+ *        console.log with a message.
+ */
+function makeDebugContext(ctx, opt_onErrorFunc) {
+  init(ctx);
+  function formatFunctionCall(functionName, args) {
+        // apparently we can't do args.join(",");
+        var argStr = "";
+        for (var ii = 0; ii < args.length; ++ii) {
+          argStr += ((ii == 0) ? '' : ', ') +
+              (mightBeEnum(args[ii]) ? glEnumToString(args[ii]) : args[ii]);
+        }
+        return functionName +  "(" + argStr + ")";
+      };
+
+  opt_onErrorFunc = opt_onErrorFunc || function(err, functionName, args) {
+        log("WebGL error "+ glEnumToString(err) + " in "+
+            formatFunctionCall(functionName, args));
+      };
+
+  // Holds booleans for each GL error so after we get the error ourselves
+  // we can still return it to the client app.
+  var glErrorShadow = { };
+
+  var tracing = false;
+
+  ctx.setTracing = function (newTracing) {
+      if (!tracing && newTracing) {
+        log('gl.setTracing(' + newTracing + ');');
+      }
+      tracing = newTracing;
+  }
+
+  var escapeDict = {
+    '\'' : '\\\'',
+    '\"' : '\\\"',
+    '\\' : '\\\\',
+    '\b' : '\\b',
+    '\f' : '\\f',
+    '\n' : '\\n',
+    '\r' : '\\r',
+    '\t' : '\\t'
+  };
+
+  function quote(s) {
+    var q = '\'';
+    var l = s.length;
+    for (var i = 0; i < l; i++) {
+        var c = s.charAt(i);
+        var d = s.charCodeAt(i);
+        var e = escapeDict[c];
+        if ( e != undefined ) {
+            q += e;
+        } else if ( d < 32 || d >= 128 ) {
+            var h = '000' + d.toString(16);
+            q += '\\u' + h.substring(h.length - 4);
+        } else {
+            q += s.charAt(i);
+        }
+    }
+    q += '\'';
+    return q;
+  }
+
+  function genSymMaker(name) {
+      var counter = 0;
+      return function() {
+          var sym = name + counter;
+          counter++;
+          return sym;
+      }
+  }
+
+  var constructorDict = {
+    "createBuffer" : genSymMaker("buffer"),
+    "createFrameBuffer": genSymMaker("frameBuffer"),
+    "createProgram": genSymMaker("program"),
+    "createRenderbuffer": genSymMaker("renderBuffer"),
+    "createShader": genSymMaker("shader"),
+    "createTexture": genSymMaker("texture"),
+    "getUniformLocation": genSymMaker("uniformLocation"),
+    "readPixels": genSymMaker("pixels")
+  };
+
+  var objectNameProperty = '__webgl_trace_name__';
+
+  var arrayTypeDict = {
+    "[object WebGLByteArray]" : "WebGLByteArray",
+    "[object WebGLUnsignedByteArray]" : "WebGLUnsignedByteArray",
+    "[object WebGLShortArray]" : "WebGLShortArray",
+    "[object WebGLUnsignedShortArray]" : "WebGLUnsignedShortArray",
+    "[object WebGLIntArray]" : "WebGLIntArray",
+    "[object WebGLUnsignedIntArray]" : "WebGLUnsignedIntArray",
+    "[object WebGLFloatArray]" : "WebGLFloatArray"
+  }
+
+  function asWebGLArray(a) {
+    var arrayType = arrayTypeDict[a];
+    if (arrayType === undefined) {
+        return undefined;
+    }
+    var buf = 'new ' + arrayType + '( [';
+    for (var i = 0; i < a.length; i++) {
+        if (i > 0 ) {
+            buf += ', ';
+        }
+        buf += a.get(i);
+    }
+    buf += '] )';
+    return buf;
+  };
+
+  function traceFunctionCall(functionName, args) {
+        var argStr = "";
+        for (var ii = 0; ii < args.length; ++ii) {
+            var arg = args[ii];
+            if ( ii > 0 ) {
+                argStr += ', ';
+            }
+            var objectName;
+            try {
+            if (arg !== null) {
+                objectName = arg[objectNameProperty];
+            }
+            } catch (e) {
+                alert(functionName);
+                throw e;
+            }
+            var webGLArray = asWebGLArray(arg);
+            if (objectName != undefined ) {
+                argStr += objectName;
+            } else if (webGLArray != undefined) {
+                argStr += webGLArray;
+            }else if (typeof(arg) == "string") {
+                argStr += quote(arg);
+            } else if ( mightBeValidEnum(functionName, ii, arg) ) {
+                argStr += 'gl.' + glEnumToString(arg);
+            } else {
+                argStr += arg;
+            }
+        }
+        return "gl." + functionName +  "(" + argStr + ");";
+  };
+
+  // Makes a function that calls a WebGL function and then calls getError.
+  function makeErrorWrapper(ctx, functionName) {
+    return function() {
+      var resultName;
+      if (tracing) {
+          var prefix = '';
+          // Should we remember the result for later?
+          objectNamer = constructorDict[functionName];
+          if (objectNamer != undefined) {
+              resultName = objectNamer();
+              prefix = 'var ' + resultName + ' = ';
+          }
+          log(prefix + traceFunctionCall(functionName, arguments));
+      }
+
+      var result = ctx[functionName].apply(ctx, arguments);
+
+      if (tracing && resultName != undefined) {
+          result[objectNameProperty] = resultName;
+      }
+
+      var err = ctx.getError();
+      if (err != 0) {
+        glErrorShadow[err] = true;
+        opt_onErrorFunc(err, functionName, arguments);
+      }
+      return result;
+    };
+  }
+
+  // Make a an object that has a copy of every property of the WebGL context
+  // but wraps all functions.
+  var wrapper = {};
+  for (var propertyName in ctx) {
+    if (typeof ctx[propertyName] == 'function') {
+      wrapper[propertyName] = makeErrorWrapper(ctx, propertyName);
+     } else {
+       wrapper[propertyName] = ctx[propertyName];
+     }
+  }
+
+  // Override the getError function with one that returns our saved results.
+  wrapper.getError = function() {
+    for (var err in glErrorShadow) {
+      if (glErrorShadow[err]) {
+        glErrorShadow[err] = false;
+        return err;
+      }
+    }
+    return ctx.NO_ERROR;
+  };
+
+  return wrapper;
+}
+
+return {
+  /**
+   * Initializes this module. Safe to call more than once.
+   * @param {!WebGLRenderingContext} ctx A WebGL context. If
+   *    you have more than one context it doesn't matter which one
+   *    you pass in, it is only used to pull out constants.
+   */
+  'init': init,
+
+  /**
+   * Returns true or false if value matches any WebGL enum
+   * @param {*} value Value to check if it might be an enum.
+   * @return {boolean} True if value matches one of the WebGL defined enums
+   */
+  'mightBeEnum': mightBeEnum,
+
+  /**
+   * Gets an string version of an WebGL enum.
+   *
+   * Example:
+   *   WebGLDebugUtil.init(ctx);
+   *   var str = WebGLDebugUtil.glEnumToString(ctx.getError());
+   *
+   * @param {number} value Value to return an enum for
+   * @return {string} The string version of the enum.
+   */
+  'glEnumToString': glEnumToString,
+
+  /**
+   * Given a WebGL context returns a wrapped context that calls
+   * gl.getError after every command and calls a function if the
+   * result is not NO_ERROR.
+   *
+   * You can supply your own function if you want. For example, if you'd like
+   * an exception thrown on any GL error you could do this
+   *
+   *    function throwOnGLError(err, funcName, args) {
+   *      throw WebGLDebugUtils.glEnumToString(err) + " was caused by call to" +
+   *            funcName;
+   *    };
+   *
+   *    ctx = WebGLDebugUtils.makeDebugContext(
+   *        canvas.getContext("webgl"), throwOnGLError);
+   *
+   * @param {!WebGLRenderingContext} ctx The webgl context to wrap.
+   * @param {!function(err, funcName, args): void} opt_onErrorFunc The function
+   *     to call when gl.getError returns an error. If not specified the default
+   *     function calls console.log with a message.
+   */
+  'makeDebugContext': makeDebugContext
+};
+
+}();
 /**
  * Backend for a scene node.
  */
@@ -2972,7 +3563,13 @@ SceneJS._backends.installBackend(
                 var contextNames = SceneJS._webgl.contextNames;
                 for (var i = 0; (!context) && i < contextNames.length; i++) {
                     try {
+
                         context = canvas.getContext(contextNames[i]);
+
+
+//                                                alert("WebGL Trace enabled");
+//                                                context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
+//                                                context.setTracing(true);
                     } catch (e) {
 
                     }
@@ -3205,9 +3802,10 @@ SceneJS._backends.installBackend(
 
 (function() {
 
-    var backend = SceneJS._backends.getBackend('scene');
+    var sceneBackend = SceneJS._backends.getBackend('scene');
     var loadBackend = SceneJS._backends.getBackend('load');
     var processesBackend = SceneJS._backends.getBackend('processes');
+    var pickBackend = SceneJS._backends.getBackend('pick');
 
     /** Creates a new scene
      */
@@ -3226,6 +3824,8 @@ SceneJS._backends.installBackend(
         }
         var params = cfg.getParams();
 
+        var lastRenderedData = null; // Saves data from last render for picking traversal
+
         var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
 
         /* Create, register and return the scene graph
@@ -3240,7 +3840,7 @@ SceneJS._backends.installBackend(
                 if (!sceneId) {
                     return null;
                 }
-                return backend.getSceneCanvas(sceneId);
+                return sceneBackend.getSceneCanvas(sceneId);
             },
 
             /**
@@ -3249,7 +3849,7 @@ SceneJS._backends.installBackend(
              */
             render : function(paramOverrides) {
                 if (sceneId) {
-                    backend.activateScene(sceneId);
+                    sceneBackend.activateScene(sceneId);
                     var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
                     if (paramOverrides) {        // Override with traversal params
                         for (var key in paramOverrides) {
@@ -3259,29 +3859,43 @@ SceneJS._backends.installBackend(
                     if (params.proxy) {
                         loadBackend.setProxy(params.proxy);
                     }
-                    SceneJS._utils.visitChildren(cfg, data);
+                    var traversalContext = {
+
+                    };
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     loadBackend.setProxy(null);
-                    backend.deactivateScene();
+                    sceneBackend.deactivateScene();
+                    lastRenderedData = data;
                 }
             },
 
-            pick : function(paramOverrides, canvasX, canvasY) {
+            /**
+             * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
+             * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
+             * The scene must have been previously rendered, since this method re-renders it (to a special
+             * pick frame buffer) using parameters retained from the prior render() call.
+             *
+             * @param canvasX
+             * @param canvasY
+             */
+            pick : function(canvasX, canvasY) {
                 if (sceneId) {
                     try {
-                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
-                        backend.activateScene(sceneId);
-                        var data = SceneJS._utils.newScope(null, false);
-                        if (paramOverrides) {        // Override with traversal params
-                            for (var key in paramOverrides) {
-                                data.put(key, paramOverrides[key]);
-                            }
+                        if (!lastRenderedData) {
+                            throw new SceneJS.exceptions.PickWithoutRenderedException
+                                    ("Scene not rendered - need to render before picking");
                         }
+                        sceneBackend.activateScene(sceneId);
+                        pickBackend.pick(canvasX, canvasY);
                         if (params.proxy) {
                             loadBackend.setProxy(params.proxy);
                         }
-                        SceneJS._utils.visitChildren(cfg, data);
+                        var traversalContext = {};
+                        SceneJS._utils.visitChildren(cfg, traversalContext, lastRenderedData);
                         loadBackend.setProxy(null);
-                        backend.deactivateScene();
+                        var picked = pickBackend.getPicked();
+                        sceneBackend.deactivateScene();
+                        return picked;
                     } finally {
                         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
                     }
@@ -3305,7 +3919,7 @@ SceneJS._backends.installBackend(
              */
             destroy : function() {
                 if (sceneId) {
-                    backend.deregisterScene(sceneId); // Last one fires RESET command
+                    sceneBackend.deregisterScene(sceneId); // Last one fires RESET command
                     sceneId = null;
                 }
             },
@@ -3319,7 +3933,7 @@ SceneJS._backends.installBackend(
 
         /* Register scene - fires a SCENE_CREATED event
          */
-        sceneId = backend.registerScene(_scene, params);
+        sceneId = sceneBackend.registerScene(_scene, params);
 
         return _scene;
     };
@@ -3327,7 +3941,7 @@ SceneJS._backends.installBackend(
     /** Total SceneJS reset - destroys all scenes and cached resources.
      */
     SceneJS.reset = function() {
-        var scenes = backend.getAllScenes();
+        var scenes = sceneBackend.getAllScenes();
         var temp = [];
         for (var i = 0; i < scenes.length; i++) {
             temp.push(scenes[i]);
@@ -3499,7 +4113,6 @@ SceneJS._backends.installBackend(
             var activeProgram = null;               // Currently active program
             var lights = [];                        // Current lighting state
             var material = {};                      // Current material state
-            var namedItem;                          // Current named item
             var fog = null;                         // Current fog
             var textureLayers = [];                 // Texture layers are pushed/popped to this as they occur
             var sceneHash;                          // Current hash of collective scene state pertenant to shaders
@@ -3545,6 +4158,12 @@ SceneJS._backends.installBackend(
                         canvas = null;
                         activeProgram = null;
                         sceneHash = null;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.NAME_EXPORTED,
+                    function(item) {
+                        activeProgram.setUniform("uColor", item.color);
                     });
 
             ctx.events.onEvent(
@@ -3691,13 +4310,6 @@ SceneJS._backends.installBackend(
                         activateProgram();
                     });
 
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.NAME_UPDATED,
-                    function(n) {
-                        namedItem = n;
-                    });
-
             ctx.memory.registerEvictor(
                     function() {
                         var earliest = time;
@@ -3743,8 +4355,8 @@ SceneJS._backends.installBackend(
 
                     if (!programs[sceneHash]) {
                         ctx.logging.info("Creating shader: '" + sceneHash + "'");
-                        var vertexShaderSrc = composeRenderingVertexShader();
-                        var fragmentShaderSrc = composeRenderingFragmentShader();
+                        var vertexShaderSrc = composeVertexShader();
+                        var fragmentShaderSrc = composeFragmentShader();
                         ctx.memory.allocate(
                                 "shader",
                                 function() {
@@ -3782,49 +4394,60 @@ SceneJS._backends.installBackend(
                     ";"
                 ];
 
-                /* Textures
-                 */
-                if (textureLayers.length > 0) {
-                    val.push("tex/");
-                    for (var i = 0; i < textureLayers.length; i++) {
-                        var layer = textureLayers[i];
-                        val.push(layer.params.applyFrom);
-                        val.push("/");
-                        val.push(layer.params.applyTo);
-                        val.push("/");
-                        val.push(layer.params.blendMode);
-                        val.push("/");
-                        if (layer.params.matrix) {
-                            val.push("/anim");
-                        }
-                    }
-                    val.push(";");
-                }
+                if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
 
-                /* Lighting
-                 */
-                if (lights.length > 0) {
-                    val.push("light/");
-                    for (var i = 0; i < lights.length; i++) {
-                        var light = lights[i];
-                        val.push(light.type);
-                        val.push("/");
-                        if (light.specular) {
-                            val.push("spec/");
-                        }
-                        if (light.diffuse) {
-                            val.push("diff/");
-                        }
-                    }
-                    val.push(";");
-                }
+                    /* Trivial hash for picking mode shader
+                     */
+                    val.push("picking;");
+                } else {
 
-                /* Fog
-                 */
-                if (fog && fog.mode != "disabled") {
-                    val.push("fog/");
-                    val.push(fog.mode);
-                    val.push(";");
+                    /* Complex hash for rendering mode shader
+                     */
+
+                    /* Textures
+                     */
+                    if (textureLayers.length > 0) {
+                        val.push("tex/");
+                        for (var i = 0; i < textureLayers.length; i++) {
+                            var layer = textureLayers[i];
+                            val.push(layer.params.applyFrom);
+                            val.push("/");
+                            val.push(layer.params.applyTo);
+                            val.push("/");
+                            val.push(layer.params.blendMode);
+                            val.push("/");
+                            if (layer.params.matrix) {
+                                val.push("/anim");
+                            }
+                        }
+                        val.push(";");
+                    }
+
+                    /* Lighting
+                     */
+                    if (lights.length > 0) {
+                        val.push("light/");
+                        for (var i = 0; i < lights.length; i++) {
+                            var light = lights[i];
+                            val.push(light.type);
+                            val.push("/");
+                            if (light.specular) {
+                                val.push("spec/");
+                            }
+                            if (light.diffuse) {
+                                val.push("diff/");
+                            }
+                        }
+                        val.push(";");
+                    }
+
+                    /* Fog
+                     */
+                    if (fog && fog.mode != "disabled") {
+                        val.push("fog/");
+                        val.push(fog.mode);
+                        val.push(";");
+                    }
                 }
                 sceneHash = val.join("");
             }
@@ -3836,6 +4459,16 @@ SceneJS._backends.installBackend(
                     src2.push(i + padding + ": " + src[i]);
                 }
                 return src2.join("<br/>");
+            }
+
+            function composeVertexShader() {
+                return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
+                       composeRenderingVertexShader() : composePickingVertexShader();
+            }
+
+            function composeFragmentShader() {
+                return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
+                       composeRenderingFragmentShader() : composePickingFragmentShader();
             }
 
             /**
@@ -3857,12 +4490,19 @@ SceneJS._backends.installBackend(
              * Composes a fragment shader script for rendering mode in current scene state
              */
             function composePickingFragmentShader() {
-                return [
+                var g=parseFloat(Math.round((10+1)/256)/256);
+                var r=parseFloat((10-g*256+1)/256);
+                var src = [
                     "uniform vec3 uColor;",
                     "void main(void) {",
-                    "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
+
+                "gl_FragColor = vec4("+(r.toFixed(17))+", "+(g.toFixed(17))+",1.0,1.0);",
+
+              //      "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
                     "}"
                 ].join("\n");
+    
+                return src;
             }
 
             /**
@@ -3875,12 +4515,12 @@ SceneJS._backends.installBackend(
              */
             function composeRenderingVertexShader() {
 
-                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D;
+                var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
 
                 var src = ["\n"];
                 src.push("attribute vec3 aVertex;");                // World
                 src.push("attribute vec3 aNormal;");                // World
-                if (texturing) {
+                if (haveTextures) {
                     src.push("attribute vec2 aTextureCoord;");      // World
                 }
                 src.push("uniform mat4 uMMatrix;");               // Model
@@ -3895,7 +4535,7 @@ SceneJS._backends.installBackend(
                 src.push("varying vec4 vViewVertex;");
                 src.push("varying vec3 vNormal;");
                 src.push("varying vec3 vEyeVec;");
-                if (texturing) {
+                if (haveTextures) {
                     src.push("varying vec2 vTextureCoord;");
                 }
                 for (var i = 0; i < lights.length; i++) {
@@ -3920,11 +4560,11 @@ SceneJS._backends.installBackend(
                     src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
                 }
                 src.push("vEyeVec = normalize(vViewVertex.xyz);");
-                if (texturing) {
+                if (haveTextures) {
                     src.push("vTextureCoord = aTextureCoord;");
                 }
                 src.push("}");
-              //   ctx.logging.info(getShaderLoggingSource(src));
+                //   ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
@@ -3934,8 +4574,8 @@ SceneJS._backends.installBackend(
              */
             function composeRenderingFragmentShader() {
 
-                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D;
-                var lighting = (lights.length > 0);
+                var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
+                var haveLights = (lights.length > 0);
                 var tangent = false;
 
                 var src = ["\n"];
@@ -3946,7 +4586,7 @@ SceneJS._backends.installBackend(
                 src.push("varying vec3 vNormal;");                  // View-space normal
                 src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
 
-                if (texturing) {
+                if (haveTextures) {
                     src.push("varying vec2 vTextureCoord;");
 
                     //texture uniforms
@@ -3969,7 +4609,7 @@ SceneJS._backends.installBackend(
 
                 /* Light and lighting-dependent material uniforms
                  */
-                if (lighting) {
+                if (haveLights) {
 
                     src.push("uniform vec3  uMaterialSpecularColor;");
                     src.push("uniform float uMaterialSpecular;");
@@ -4018,7 +4658,7 @@ SceneJS._backends.installBackend(
 
                 src.push("  vec4    normalmap = vec4(vNormal,0.0);");
 
-                if (lighting) {
+                if (haveLights) {
                     src.push("  float   specular=uMaterialSpecular;");
                     src.push("  vec3    specularColor=uMaterialSpecularColor;");
                     src.push("  float   shine=uMaterialShine;");
@@ -4036,7 +4676,7 @@ SceneJS._backends.installBackend(
                  * TEXTURING
                  * ===================================================================================================*/
 
-                if (texturing) {
+                if (haveTextures) {
 
                     /* Get texturePos from image
                      */
@@ -4079,14 +4719,14 @@ SceneJS._backends.installBackend(
                  * LIGHTING
                  * ===================================================================================================*/
 
-                if (lighting) {
+                src.push("  vec3    lightValue      = uAmbient;");
+                src.push("  vec3    specularValue   = vec3(0.0,0.0,0.0);");
+
+                if (haveLights) {
                     src.push("  vec3    lightVec;");
                     src.push("  float   dotN;");
                     src.push("  float   spotFactor;");
                     src.push("  float   pf;");
-                    src.push("  vec3    lightValue      = uAmbient;");
-                    src.push("  vec3    specularValue   = vec3(0.0,0.0,0.0);");
-
 
                     for (var i = 0; i < lights.length; i++) {
                         var light = lights[i];
@@ -4178,12 +4818,7 @@ SceneJS._backends.installBackend(
                 //    ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
-
-
-        }
-
-        )
-        ;
+        });
 /**
  * Manages a stack of WebGL state frames that may be pushed and popped by SceneJS.renderer nodes.
  */
@@ -4605,13 +5240,13 @@ SceneJS.renderer = function() {
     var env;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!env || !cfg.fixed) {
                     var params = cfg.getParams(data);
                     env = backend.createRendererState(params);
                 }
                 backend.setRendererState(env);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.restoreRendererState(env);
             });
 };
@@ -4633,7 +5268,7 @@ SceneJS.renderer = function() {
  * The backend is free to evict whatever geometry it chooses between scene traversals, so the node must always check
  * the existence of the geometry and possibly request its re-creation each time before requesting the backend render it.
  *
- * A geometry buffer consists of vertices, normals, optional texture coordinates, indices and a primitive type
+ * A geometry buffer consists of positions, normals, optional texture coordinates, indices and a primitive type
  * (eg. "triangles").
  *
  * When rendering a geometry element, the backend will first fire a SHADER_ACTIVATE to prompt the shader backend
@@ -4819,7 +5454,7 @@ SceneJS._backends.installBackend(
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
-                    var geoId = canvas.canvasId + type;
+                    var geoId = canvas.canvasId + ":" + type;
                     return (geometries[geoId]) ? geoId : null;
                 },
 
@@ -4827,9 +5462,13 @@ SceneJS._backends.installBackend(
                  * Creates geometry of the given type on the active canvas and returns its ID
                  *
                  * @param type Optional type for geometry - when null, a random type will be used
-                 * @param data Contains vertices, normals, indexes etc.
+                 * @param data Contains positions, normals, indexes etc.
                  */
                 createGeometry : function(type, data) {
+//                    if (!type) {
+//                        type = "g" + nextTypeId++;
+//                    }
+//
                     ctx.logging.debug("Creating geometry: '" + type + "'");
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
@@ -4839,7 +5478,7 @@ SceneJS._backends.installBackend(
                         throw new SceneJS.exceptions.NodeConfigExpectedException("Geometry node parameter expected : primitive");
                     }
 
-                    var geoId = canvas.canvasId + (type || nextTypeId++);
+                    var geoId = canvas.canvasId + ":" + type;
                     var context = canvas.context;
 
                     var usage = context.STATIC_DRAW;
@@ -4853,14 +5492,14 @@ SceneJS._backends.installBackend(
                     try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
                         vertexBuf = createArrayBuffer("geometry vertex buffer", context, context.ARRAY_BUFFER,
-                                new WebGLFloatArray(data.vertices), data.vertices.length, 3, usage);
+                                new WebGLFloatArray(data.positions), data.positions.length, 3, usage);
 
                         normalBuf = createArrayBuffer("geometry normal buffer", context, context.ARRAY_BUFFER,
                                 new WebGLFloatArray(data.normals), data.normals.length, 3, usage);
 
-                        if (data.texCoords) {
+                        if (data.uv) {
                             texCoordBuf = createArrayBuffer("geometry texture buffer", context, context.ARRAY_BUFFER,
-                                    new WebGLFloatArray(data.texCoords), data.texCoords.length, 2, usage);
+                                    new WebGLFloatArray(data.uv), data.uv.length, 2, usage);
                         }
 
                         indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
@@ -4920,10 +5559,14 @@ SceneJS._backends.installBackend(
 
                     var context = canvas.context;
 
+
                     /* Dont re-export and bind if already the last one exported and bound - this is the case when
                      * we're drawing a batch of the same object, Eg. a bunch of cubes in a row
                      */
                     if (currentBoundGeo != geoId) {
+                        for (var i = 0; i < 8; i++) {
+                            context.disableVertexAttribArray(i);
+                        }
                         ctx.events.fireEvent(
                                 SceneJS._eventTypes.GEOMETRY_EXPORTED,
                                 geo);
@@ -4935,9 +5578,10 @@ SceneJS._backends.installBackend(
 
                     /* Draw geometry
                      */
-               
+
                     context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-                    context.flush();                  
+                    context.flush();
+
                     /* Don't need to unbind buffers - only one is bound at a time anyway                    
                      */
 
@@ -4947,7 +5591,7 @@ SceneJS._backends.installBackend(
                         destroyGeometry(geo);
                         currentBoundGeo = null;
                     }
-                   
+
                 }
             };
         });
@@ -4956,61 +5600,109 @@ SceneJS._utils.ns("SceneJS.geometry");
 /**
  * An element of geometry
  */
-SceneJS.geometry = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var geometryBackend = SceneJS._backends.getBackend('geometry');
+(function() {
 
-    var params;
-    var type;
-    var create;
-    var geo = {};
+    var calculateNormals = function(positions, indices) {
+        var nvecs = new Array(positions.length);
 
-    return SceneJS._utils.createNode(
-            function(data) {
+        for (var i = 0; i < indices.length; i++) {
+            var j0 = indices[i+0];
+            var j1 = indices[i+1];
+            var j2 = indices[i+2];
 
-                /* Dynamic config only happens first time
-                 */
-                if (!params) {
-                    params = cfg.getParams(data);
-                    if (!params.type) { // Identifies VBO's on canvas
-                        throw new SceneJS.exceptions.NodeConfigExpectedException
-                                ("Geometry node parameter expected : type");
+            var v1 = positions[j0];
+            var v2 = positions[j1];
+            var v3 = positions[j2];
+
+            var va = SceneJS._math.subVec4(v2, v1);
+            var vb = SceneJS._math.subVec4(v3, v1);
+
+            var n = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(va, vb));
+
+            if (!nvecs[j0]) nvecs[j0] = [];
+            if (!nvecs[j1]) nvecs[j1] = [];
+            if (!nvecs[j2]) nvecs[j2] = [];
+
+            nvecs[j0].push(n);
+            nvecs[j1].push(n);
+            nvecs[j2].push(n);
+        }
+
+        var normals = new Array(positions.length);
+
+        // now go through and average out everything
+        for (var i = 0; i < nvecs.length; i++) {
+            var count = nvecs[i].length;
+            var x = 0;
+            var y = 0;
+            var z = 0;
+            for (var j = 0; j < count; j++) {
+                x += nvecs[i][j][0];
+                y += nvecs[i][j][1];
+                z += nvecs[i][j][2];
+            }
+            normals[i] = [x / count, y / count, z / count];
+        }
+        return normals;
+    };
+
+    SceneJS.geometry = function() {
+
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        var geometryBackend = SceneJS._backends.getBackend('geometry');
+
+        var params;
+        var type;
+        var create;
+        var geo = {};
+
+        return SceneJS._utils.createNode(
+                function(traversalContext, data) {
+
+                    /* Dynamic config only happens first time
+                     */
+                    if (!params) {
+                        params = cfg.getParams(data);
+                        if (!params.type) { // Identifies VBO's on canvas
+                            throw new SceneJS.exceptions.NodeConfigExpectedException
+                                    ("Geometry node parameter expected : type");
+                        }
+                        type = SceneJS._utils.getParam(params.type, data);
+                        if (params.create instanceof Function) {
+
+                            /* Create must not be a dynamic config function!
+                             */
+                            create = params.create;
+                        } else {
+                            geo = {
+                                positions : SceneJS._utils.getParam(params.positions, data) || [],
+                                normals : SceneJS._utils.getParam(params.normals, data) || [],
+                                colors : SceneJS._utils.getParam(params.colors, data) || [],
+                                indices : SceneJS._utils.getParam(params.indices, data) || [],
+                                uv : SceneJS._utils.getParam(params.uv, data) || [],
+                                primitive : SceneJS._utils.getParam(params.primitive, data) || "triangles"
+                            };
+                        }
                     }
-                    type = SceneJS._utils.getParam(params.type, data);
-                    if (params.create instanceof Function) {
 
-                        /* Create must not be a dynamic config function!                        
-                         */
-                        create = params.create;
-                    } else {
-                        geo = {
-                            vertices : SceneJS._utils.getParam(params.vertices, data) || [],
-                            normals : SceneJS._utils.getParam(params.normals, data) || [],
-                            colors : SceneJS._utils.getParam(params.colors, data) || [],
-                            indices : SceneJS._utils.getParam(params.indices, data) || [],
-                            texCoords : SceneJS._utils.getParam(params.texCoords, data) || [],
-                            primitive : SceneJS._utils.getParam(params.primitive, data) || "triangles"
-                        };
+                    /* Backend may have evicted the geometry, so we may have to re-create it
+                     */
+                    var geoId = geometryBackend.findGeometry(type);
+
+                    if (!geoId) {
+                        if (create) {
+                            geoId = geometryBackend.createGeometry(type, create()); // Lazy-create geometry through callback
+                        } else {
+                            geoId = geometryBackend.createGeometry(type, geo);
+                        }
                     }
-                }
 
-                /* Backend may have evicted the geometry, so we may have to re-create it
-                 */
-                var geoId = geometryBackend.findGeometry(type);
+                    geometryBackend.drawGeometry(geoId);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                });
+    };
 
-                if (!geoId) {
-                    if (create) {
-                        geoId = geometryBackend.createGeometry(type, create()); // Lazy-create geometry through callback
-                    } else {
-                        geoId = geometryBackend.createGeometry(type, geo);
-                    }
-                }
-
-                geometryBackend.drawGeometry(geoId);
-                SceneJS._utils.visitChildren(cfg, data);
-            });
-};
-
+})();
 SceneJS._utils.ns("SceneJS.objects");
 
 /** Provides a teapot geometry node by wrapping a call to the core SceneJS.geometry node.
@@ -5018,7 +5710,7 @@ SceneJS._utils.ns("SceneJS.objects");
  */
 SceneJS.objects.teapot = function() {
 
-    var vertices = [
+    var positions = [
         [-3.000000, 1.650000, 0.000000],
         [-2.987110, 1.650000, -0.098438],
         [-2.987110, 1.650000, 0.098438],
@@ -10752,17 +11444,17 @@ SceneJS.objects.teapot = function() {
         [1401,1422,1418]
     ];
 
-    var calculateNormals = function(vertices, indices) {
-        var nvecs = new Array(vertices.length);
+    var calculateNormals = function(positions, indices) {
+        var nvecs = new Array(positions.length);
 
         for (var i = 0; i < indices.length; i++) {
             var j0 = indices[i][0];
             var j1 = indices[i][1];
             var j2 = indices[i][2];
 
-            var v1 = vertices[j0];
-            var v2 = vertices[j1];
-            var v3 = vertices[j2];
+            var v1 = positions[j0];
+            var v2 = positions[j1];
+            var v3 = positions[j2];
 
             var va = SceneJS._math.subVec4(v2, v1);
             var vb = SceneJS._math.subVec4(v3, v1);
@@ -10778,7 +11470,7 @@ SceneJS.objects.teapot = function() {
             nvecs[j2].push(n);
         }
 
-        var normals = new Array(vertices.length);
+        var normals = new Array(positions.length);
 
         // now go through and average out everything
         for (var i = 0; i < nvecs.length; i++) {
@@ -10810,9 +11502,9 @@ SceneJS.objects.teapot = function() {
     return SceneJS.geometry({
         type:"teapot",
         primitive:"triangles",
-        vertices: flatten(vertices, 3),
+        positions: flatten(positions, 3),
         indices:flatten(indices, 3),
-        normals:flatten(calculateNormals(vertices, indices), 3)
+        normals:flatten(calculateNormals(positions, indices), 3)
     });
 };
 
@@ -10841,7 +11533,7 @@ SceneJS.objects.cube = function() {
     var y = params.ySize || 1;
     var z = params.zSize || 1;
 
-    /* A geometry node is normally configured with arrays of vertices, normals, indices etc., but can instead be
+    /* A geometry node is normally configured with arrays of positions, normals, indices etc., but can instead be
      * configured with a "create" callback, as demonstrated here, that returns an object containing those arrays.
      *
      * Every geometry must get a type that globally identifies it within SceneJS. In this case, the
@@ -10857,7 +11549,7 @@ SceneJS.objects.cube = function() {
         /* Callback to create sphere geometry
          */
         create: function() {
-            var vertices = [
+            var positions = [
                 x, y, z,
                 -x, y, z,
                 -x,-y, z,
@@ -10921,7 +11613,7 @@ SceneJS.objects.cube = function() {
                 0, 0,1
             ];    // v4-v7-v6-v5 back
 
-            var texCoords = [
+            var uv = [
                 x, y,
                 0, y,
                 0, 0,
@@ -10975,9 +11667,9 @@ SceneJS.objects.cube = function() {
 
             return {
                 primitive : "triangles",
-                vertices : vertices,
+                positions : positions,
                 normals: normals,
-                texCoords : texCoords,
+                uv : uv,
                 indices : indices,
                 colors:[]
             };
@@ -11009,7 +11701,7 @@ SceneJS.objects.sphere = function() {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 
-    /* A geometry node is normally configured with arrays of vertices, normals, indices etc., but can instead be
+    /* A geometry node is normally configured with arrays of positions, normals, indices etc., but can instead be
      * configured with a "create" callback, as demonstrated here, that returns an object containing those arrays.
      *
      * Every geometry must get a type that globally identifies it within SceneJS. In this case, the
@@ -11028,9 +11720,9 @@ SceneJS.objects.sphere = function() {
          */
         create: function() {
             var radius = 1;
-            var vertices = [];
+            var positions = [];
             var normals = [];
-            var texCoords = [];
+            var uv = [];
             for (var sliceNum = 0; sliceNum <= slices; sliceNum++) {
                 var theta = sliceNum * Math.PI / slices;
                 var sinTheta = Math.sin(theta);
@@ -11050,11 +11742,11 @@ SceneJS.objects.sphere = function() {
                     normals.push(-x);
                     normals.push(-y);
                     normals.push(-z);
-                    texCoords.push(u);
-                    texCoords.push(v);
-                    vertices.push(radius * x);
-                    vertices.push(radius * y);
-                    vertices.push(radius * z);
+                    uv.push(u);
+                    uv.push(v);
+                    positions.push(radius * x);
+                    positions.push(radius * y);
+                    positions.push(radius * z);
                 }
             }
 
@@ -11075,9 +11767,9 @@ SceneJS.objects.sphere = function() {
 
             return {
                 primitive : "triangles",
-                vertices : vertices,
+                positions : positions,
                 normals: normals,
-                texCoords : texCoords,
+                uv : uv,
                 indices : indices,
                 colors:[]
             };
@@ -11194,7 +11886,7 @@ SceneJS.rotate = function() {
     var xform;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (memoLevel == NO_MEMO) {
                     var params = cfg.getParams(data);
                     params.angle = params.angle || 0;
@@ -11222,7 +11914,7 @@ SceneJS.rotate = function() {
                     }
                 }
                 backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(superXform);
             });
 };
@@ -11247,7 +11939,7 @@ SceneJS.rotate = function() {
         var memoLevel = NO_MEMO;
 
         return SceneJS._utils.createNode(
-                function(data) {
+                function(traversalContext, data) {
                     if (memoLevel == NO_MEMO) {
                         var params = cfg.getParams(data);
                         mat = SceneJS._math.translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
@@ -11265,7 +11957,7 @@ SceneJS.rotate = function() {
                         }
                     }
                     backend.setTransform(xform);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setTransform(superXform);
                 });
     };
@@ -11290,7 +11982,7 @@ SceneJS.rotate = function() {
         var memoLevel = NO_MEMO;
 
         return SceneJS._utils.createNode(
-                function(data) {
+                function(traversalContext, data) {
                     if (memoLevel == NO_MEMO) {   
                         var params = cfg.getParams(data);
                         mat = SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
@@ -11311,7 +12003,7 @@ SceneJS.rotate = function() {
                         }
                     }
                     backend.setTransform(xform);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setTransform(superXform);
                 });
     };
@@ -11337,7 +12029,7 @@ SceneJS.modellingMatrix = function() {
     var xform;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (memoLevel == NO_MEMO) {
                     var params = cfg.getParams(data);
                     mat = params.elements || SceneJS._math.identityMat4();
@@ -11358,7 +12050,7 @@ SceneJS.modellingMatrix = function() {
                     }
                 }
                 backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(superXform);
             });
 };
@@ -11451,7 +12143,7 @@ SceneJS.perspective = function() {
     var transform;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!transform || !cfg.fixed) {
                     var params = cfg.getParams(data);
                     var tempMat = SceneJS._math.perspectiveMatrix4(
@@ -11466,7 +12158,7 @@ SceneJS.perspective = function() {
                 }
                 var prevTransform = backend.getTransform();
                 backend.setTransform(transform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(prevTransform);
             });
 };
@@ -11479,7 +12171,7 @@ SceneJS.ortho = function() {
     var backend = SceneJS._backends.getBackend('projection');
     var transform;
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!transform || !cfg.fixed) {
                     var params = cfg.getParams(data);
                     var volume = {
@@ -11504,7 +12196,7 @@ SceneJS.ortho = function() {
                 }
                 var prevTransform = backend.getTransform();
                 backend.setTransform(transform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(prevTransform);
             });
 };
@@ -11516,7 +12208,7 @@ SceneJS.frustum = function() {
     var backend = SceneJS._backends.getBackend('projection');
     var transform;
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!transform || cfg.fixed) {    // Memoize matrix if node config is constant
                     var params = cfg.getParams(data);
                     var volume = {
@@ -11541,7 +12233,7 @@ SceneJS.frustum = function() {
                 }
                 var prevTransform = backend.getTransform();
                 backend.setTransform(transform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(prevTransform);
             });
 };
@@ -11652,7 +12344,7 @@ SceneJS.lookAt = function() {
     var xform;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!mat || !fixed) {
                     var nodeParams = new SceneJS._utils.NodeParams("SceneJS.lookAt", cfg.getParams(data), data);
 
@@ -11691,7 +12383,7 @@ SceneJS.lookAt = function() {
                     };
                 }
                 backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(superXform);
             });
 };
@@ -11703,11 +12395,11 @@ SceneJS.stationary = function() {
     var backend = SceneJS._backends.getBackend('view-transform');
     var xform;
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 var superXform = backend.getTransform();
                 var lookAt = superXform.lookAt;
                 if (lookAt) {
-                    if (!lookAt || !superXform.fixed) {
+                    if (!xform || !superXform.fixed) {
                         xform = {
                             matrix: SceneJS._math.mulMat4(
                                     superXform.matrix,
@@ -11720,10 +12412,10 @@ SceneJS.stationary = function() {
                         };
                     }
                     backend.setTransform(xform);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setTransform(superXform);
                 } else {
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 }
             });
 };
@@ -11828,9 +12520,9 @@ SceneJS._backends.installBackend(
                     diffuse : light.diffuse,                    
                     specular : light.specular,
 
-                    pos : SceneJS._math.transformPoint3(
+                    pos : SceneJS._math.transformVector3(
                             viewMat,
-                            SceneJS._math.transformPoint3(
+                            SceneJS._math.transformVector3(
                                     modelMat,
                                     vectorToArray(light.pos, [ 0,  0,  1.0]))),
 
@@ -11847,43 +12539,7 @@ SceneJS._backends.installBackend(
                     linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
                     quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
                 };
-            }
-
-              /* Transforms light by view and model matrices
-             */
-            function createLightOLD(light) {
-                if (light.type &&
-                    (light.type != "spot"
-                            && light.type != "dir"
-                            && light.type != "point")) {
-                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.light node has a light of unsupported type - should be 'spot', 'direction' or 'point'");
-                }
-                return {
-                    type: light.type || "point",
-                    ambient: colourToArray(light.ambient, [ 0.2, 0.2, 0.2 ]),
-                    diffuse: colourToArray(light.diffuse, [ 1.0, 1.0, 1.0 ]),
-                    specular: colourToArray(light.specular, [ 1.0, 1.0, 1.0 ]),
-
-                    pos : SceneJS._math.transformPoint3(
-                            viewMat,
-                            SceneJS._math.transformPoint3(
-                                    modelMat,
-                                    vectorToArray(light.pos, [ 0,  0,  1.0]))),
-                    spotDir: SceneJS._math.transformVector3(
-                            viewMat,
-                            SceneJS._math.transformVector3(
-                                    modelMat,
-                                    vectorToArray(light.spotDir, [ 0,  0,  -1.0]))),
-
-                    spotExponent: light.spotExponent || 0.0,
-                    spotCosCutOff: light.spotCosCutOff || 20.0,
-
-                    constantAttenuation: light.constantAttenuation || 1.0,
-                    linearAttenuation: light.linearAttenuation || 0.0,
-                    quadraticAttenuation: light.quadraticAttenuation || 0.0
-                };
-            }
+            }           
 
             /* Node-facing API
              */
@@ -11921,13 +12577,13 @@ SceneJS.lights = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend = SceneJS._backends.getBackend('lights');
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 } else {
                     var sources = cfg.getParams(data).sources;
                     backend.pushLights(sources);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.popLights(sources.length);
                 }
             });
@@ -11983,22 +12639,12 @@ SceneJS._backends.installBackend(
                 return {
                     baseColor: colour4ToArray(m.baseColor, [ 0.2,  0.2,  0.2, 0.0]),       // IE. diffuse colour
                     specularColor: colour3ToArray(m.specularColor, [ 0.8,  0.8,  0.8]),
-                    specular: m.specular,
+                    specular: m.specular || 0.0,
                     shine: m.shine || 0.0,
                     reflect: m.reflect || 0.0,
                     alpha: (m.alpha == undefined) ? 1.0 : m.alpha,
                     emit: m.alpha || 0.0,
                     blendMode: m.blendMode || "multiply"
-                };
-            }
-
-            function _createMaterialOLD(m) {
-                return {
-                    ambient: colourToArray(m.ambient, [ 0.2,  0.2,  0.2]),
-                    diffuse: colourToArray(m.diffuse, [ 0.8,  0.8,  0.8]),
-                    specular: colourToArray(m.specular, [ 0.0,  0.0,  0.0]),
-                    shininess: m.shininess || 0,
-                    emission: colourToArray(m.emission, [ 0.0,  0.0,  0.0])
                 };
             }
 
@@ -12062,16 +12708,16 @@ SceneJS.material = function() {
     var material;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 } else {
                     if (!material || !cfg.fixed) {
                         material = backend.createMaterial(cfg.getParams(data));
                     }
                     var saveMaterial = backend.getMaterial();
                     backend.setMaterial(material);
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setMaterial(saveMaterial);
                 }
             });
@@ -12097,7 +12743,7 @@ SceneJS.scalarInterpolator = function() {
     var outputValue;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!params) {
                     params = cfg.getParams(data);
 
@@ -12255,10 +12901,10 @@ SceneJS.scalarInterpolator = function() {
 
                 update();
 
-                var childScope = SceneJS._utils.newScope(data, cfg.fixed);
-                childScope.put(params.output, outputValue);
+                var childData = SceneJS._utils.newScope(data, cfg.fixed);
+                childData.put(params.output, outputValue);
 
-                SceneJS._utils.visitChildren(cfg, childScope);
+                SceneJS._utils.visitChildren(cfg, traversalContext, childData);
             });
 };
 
@@ -12274,7 +12920,7 @@ SceneJS.withData = function() {
     var childScope;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!childScope || !cfg.fixed || !data.isfixed()) { // memoize data if config and data are constant
                     childScope = SceneJS._utils.newScope(data, cfg.fixed);
                     var params = cfg.getParams(data);
@@ -12284,7 +12930,7 @@ SceneJS.withData = function() {
                         }
                     }
                 }
-                SceneJS._utils.visitChildren(cfg, childScope);
+                SceneJS._utils.visitChildren(cfg, traversalContext, childScope);
             });
 };
 
@@ -12307,18 +12953,18 @@ SceneJS.withData = function() {
 SceneJS.generator = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (cfg.fixed) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException
                             ('SceneJS.generator node must be configured with a function');
                 }
                 var params = cfg.getParams(data);
                 while (params) {
-                    var childScope = SceneJS._utils.newScope(data);
+                    var childData = SceneJS._utils.newScope(data);
                     for (var key in params) {
-                        childScope.put(key, params[key]);
+                        childData.put(key, params[key]);
                     }
-                    SceneJS._utils.visitChildren(cfg, childScope);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, childData);
                     params = cfg.getParams(data);
                 }
             });
@@ -12474,7 +13120,7 @@ SceneJS._backends.installBackend(
         var states = [];
 
         return SceneJS._utils.createNode(
-                function(data) {
+                function(traversalContext, data) {
 
                     if (!cfg.fixed || !(box || objectCoords)) {
                         var params = cfg.getParams(data);
@@ -12549,12 +13195,12 @@ SceneJS._backends.installBackend(
                                     for (var i = levels.length - 1; i >= 0; i--) {
                                         if (levels[i] <= size) {
                                             var state = states[i];
-                                            SceneJS._utils.visitChild(cfg, i, data);
+                                            SceneJS._utils.visitChild(cfg, i, traversalContext, data);
                                             return;
                                         }
                                     }
                                 } else {
-                                    SceneJS._utils.visitChildren(cfg, data);
+                                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                                 }
                                 break;
 
@@ -12894,7 +13540,7 @@ SceneJS._backends.installBackend(
         var matrix;
 
         return SceneJS._utils.createNode(
-                function(data) {
+                function(traversalContext, data) {
 
                     /* Node can be dynamically configured, but only once
                      */
@@ -12920,14 +13566,14 @@ SceneJS._backends.installBackend(
                             }
 
                             if (layerParam.applyFrom) {
-                                if (layerParam.applyFrom != "uv1" &&
+                                if (layerParam.applyFrom != "uv" &&
                                     layerParam.applyFrom != "uv2" &&
                                     layerParam.applyFrom != "normal" &&
                                     layerParam.applyFrom != "geometry") {
 
                                     throw SceneJS.exceptions.InvalidNodeConfigException(
                                             "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                            "should be either 'uv1', 'uv2', 'normal' or 'geometry'");
+                                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
                                 }
                             }
 
@@ -13069,7 +13715,7 @@ SceneJS._backends.installBackend(
 
                         /* Dont apply textures if picking
                          */
-                        SceneJS._utils.visitChildren(cfg, data);
+                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
 
                     } else {
 
@@ -13083,7 +13729,7 @@ SceneJS._backends.installBackend(
                                     matrix: layer.createMatrix(data)
                                 });
                             }
-                            SceneJS._utils.visitChildren(cfg, data);
+                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
                             utils.textureBackend.popLayers(layers.length);
 
                         }
@@ -13195,13 +13841,13 @@ SceneJS.fog = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     var backend = SceneJS._backends.getBackend('fog');
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                       SceneJS._utils.visitChildren(cfg, data);
+                       SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 } else {
                     var f = backend.getFog();
                     backend.setFog(cfg.getParams(data));
-                    SceneJS._utils.visitChildren(cfg, data);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                     backend.setFog(f);
                 }
             });

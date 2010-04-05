@@ -36,7 +36,7 @@ SceneJS.loggingToPage = function() {
     }
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!funcs) {
                     var params = cfg.getParams();                  
 
@@ -63,7 +63,7 @@ SceneJS.loggingToPage = function() {
                 }
                 var prevFuncs = backend.getFuncs();
                 backend.setFuncs(funcs);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setFuncs(prevFuncs);
             });
 };

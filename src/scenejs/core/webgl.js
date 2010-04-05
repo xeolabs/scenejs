@@ -164,8 +164,9 @@ SceneJS._webgl = {
     ProgramAttribute : function(context, program, name, type, size, location, logging) {
         // logging.debug("Program attribute found in shader: " + name);
         this.bindFloatArrayBuffer = function(buffer) {
-            context.enableVertexAttribArray(location);
             buffer.bind();
+            context.enableVertexAttribArray(location);
+
             context.vertexAttribPointer(location, buffer.itemSize, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
         };
 
@@ -341,7 +342,7 @@ SceneJS._webgl = {
         };
 
         this.unbind = function() {
-            context.useProgram(null);
+            //     context.useProgram(0);
         };
 
         this.destroy = function() {

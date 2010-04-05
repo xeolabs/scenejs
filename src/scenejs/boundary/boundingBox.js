@@ -19,7 +19,7 @@
         var states = [];
 
         return SceneJS._utils.createNode(
-                function(data) {
+                function(traversalContext, data) {
 
                     if (!cfg.fixed || !(box || objectCoords)) {
                         var params = cfg.getParams(data);
@@ -94,12 +94,12 @@
                                     for (var i = levels.length - 1; i >= 0; i--) {
                                         if (levels[i] <= size) {
                                             var state = states[i];
-                                            SceneJS._utils.visitChild(cfg, i, data);
+                                            SceneJS._utils.visitChild(cfg, i, traversalContext, data);
                                             return;
                                         }
                                     }
                                 } else {
-                                    SceneJS._utils.visitChildren(cfg, data);
+                                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
                                 }
                                 break;
 

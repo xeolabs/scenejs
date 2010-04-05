@@ -16,7 +16,7 @@ SceneJS.lookAt = function() {
     var xform;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!mat || !fixed) {
                     var nodeParams = new SceneJS._utils.NodeParams("SceneJS.lookAt", cfg.getParams(data), data);
 
@@ -55,7 +55,7 @@ SceneJS.lookAt = function() {
                     };
                 }
                 backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(superXform);
             });
 };

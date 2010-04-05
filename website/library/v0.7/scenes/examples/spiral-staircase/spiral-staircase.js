@@ -13,9 +13,10 @@
  * sub-nodes. See how its first parameter is a function to generate that scope
  * object. During a scene traversal, SceneJS will loop at that node. In each loop,
  * SceneJS calls the function, sets the scope and traverses the subtree, stopping
- * its loop as soon as the function result is undefined. Our generator causes four
- * loops, where in each one it sets a scope containing different extents for its
- * child viewport node. It stops the loop by not returning anything.
+ * its loop as soon as the function result is undefined. Our generator causes several
+ * loops, where in each loop it sets a scope containing different parameters for
+ * the translation and rotation in its subgraph. It then stops the loop by not
+ * returning anything.
  */
 
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas'}, // node always has a config object

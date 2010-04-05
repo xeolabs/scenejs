@@ -773,8 +773,8 @@ SceneJs.backends.installBackend(
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';
                 }
-                if (geo.vertices) {
-                    ctx.programs.setVar('scene_Vertex', geo.vertices);
+                if (geo.positions) {
+                    ctx.programs.setVar('scene_Vertex', geo.positions);
                 }
                 if (geo.normals) {
                     ctx.programs.setVar('scene_Normal', geo.normals);
@@ -796,17 +796,17 @@ SceneJs.geometry = function() {
 
     var backend = SceneJs.backends.getBackend('geometry');
 
-    var calculateNormals = function(vertices, faces) {
-        var nvecs = new Array(vertices.length);
+    var calculateNormals = function(positions, faces) {
+        var nvecs = new Array(positions.length);
 
         for (var i = 0; i < faces.length; i++) {
             var j0 = faces[i][0];
             var j1 = faces[i][1];
             var j2 = faces[i][2];
 
-            var v1 = $V(vertices[j0]);
-            var v2 = $V(vertices[j1]);
-            var v3 = $V(vertices[j2]);
+            var v1 = $V(positions[j0]);
+            var v2 = $V(positions[j1]);
+            var v3 = $V(positions[j2]);
 
             var va = v2.subtract(v1);
             var vb = v3.subtract(v1);
@@ -822,7 +822,7 @@ SceneJs.geometry = function() {
             nvecs[j2].push(n);
         }
 
-        var normals = new Array(vertices.length);
+        var normals = new Array(positions.length);
 
         // now go through and average out everything
         for (var i = 0; i < nvecs.length; i++) {
@@ -858,9 +858,9 @@ SceneJs.geometry = function() {
         var params = cfg.getParams(scope);
         if (!geo || !cfg.fixed) {
             geo = {
-                vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
+                positions : params.positions && params.positions.length > 0 ? flatten(params.positions, 3) : [],
                 normals: params.normals && params.normals.length > 0 ? params.normals
-                        : flatten(calculateNormals(params.vertices, params.faces), 3),
+                        : flatten(calculateNormals(params.positions, params.faces), 3),
                 colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
                 indices : params.faces && params.faces.length > 0 ? flatten(params.faces, 3) : []
             };
@@ -1608,13 +1608,13 @@ SceneJs.backends.installBackend(SceneJs.shaderBackend({
             }
         },
 
-        scene_Vertex: function(context, findVar, vertices) {
-            if (vertices) {
-                for (var i = 0; i < vertices.length; i++) {
-                    vertices[i] *= 10.0;
+        scene_Vertex: function(context, findVar, positions) {
+            if (positions) {
+                for (var i = 0; i < positions.length; i++) {
+                    positions[i] *= 10.0;
                 }
                 var loc = findVar(context, 'Vertex') ;
-                context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, vertices);
+                context.vertexAttribPointer(loc, 3, context.FLOAT, false, 0, positions);
                 context.enableVertexAttribArray(loc);
             }
 
@@ -1814,8 +1814,8 @@ SceneJs.backends.installBackend(
                 if (!ctx.programs.getActiveProgramId()) {
                     throw 'No shader active';
                 }
-                if (geo.vertices) {
-                    ctx.programs.setVar('scene_Vertex', geo.vertices);
+                if (geo.positions) {
+                    ctx.programs.setVar('scene_Vertex', geo.positions);
                 }
                 if (geo.normals) {
                     ctx.programs.setVar('scene_Normal', geo.normals);
@@ -1837,17 +1837,17 @@ SceneJs.geometry = function() {
 
     var backend = SceneJs.backends.getBackend('geometry');
 
-    var calculateNormals = function(vertices, faces) {
-        var nvecs = new Array(vertices.length);
+    var calculateNormals = function(positions, faces) {
+        var nvecs = new Array(positions.length);
 
         for (var i = 0; i < faces.length; i++) {
             var j0 = faces[i][0];
             var j1 = faces[i][1];
             var j2 = faces[i][2];
 
-            var v1 = $V(vertices[j0]);
-            var v2 = $V(vertices[j1]);
-            var v3 = $V(vertices[j2]);
+            var v1 = $V(positions[j0]);
+            var v2 = $V(positions[j1]);
+            var v3 = $V(positions[j2]);
 
             var va = v2.subtract(v1);
             var vb = v3.subtract(v1);
@@ -1863,7 +1863,7 @@ SceneJs.geometry = function() {
             nvecs[j2].push(n);
         }
 
-        var normals = new Array(vertices.length);
+        var normals = new Array(positions.length);
 
         // now go through and average out everything
         for (var i = 0; i < nvecs.length; i++) {
@@ -1899,9 +1899,9 @@ SceneJs.geometry = function() {
         var params = cfg.getParams(scope);
         if (!geo || !cfg.fixed) {
             geo = {
-                vertices : params.vertices && params.vertices.length > 0 ? flatten(params.vertices, 3) : [],
+                positions : params.positions && params.positions.length > 0 ? flatten(params.positions, 3) : [],
                 normals: params.normals && params.normals.length > 0 ? params.normals
-                        : flatten(calculateNormals(params.vertices, params.faces), 3),
+                        : flatten(calculateNormals(params.positions, params.faces), 3),
                 colors : params.colors && params.indices.length > 0 ? flatten(params.colors, 3) : [],
                 indices : params.faces && params.faces.length > 0 ? flatten(params.faces, 3) : []
             };
@@ -1921,7 +1921,7 @@ SceneJs.utils.ns("SceneJs.objects");
  */
 SceneJs.objects.teapot = function() {
     return SceneJs.geometry({
-        vertices: [
+        positions: [
             [-3.000000, 1.650000, 0.000000],
             [-2.987110, 1.650000, -0.098438],
             [-2.987110, 1.650000, 0.098438],

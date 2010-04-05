@@ -18,7 +18,7 @@ SceneJS.scalarInterpolator = function() {
     var outputValue;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!params) {
                     params = cfg.getParams(data);
 
@@ -176,10 +176,10 @@ SceneJS.scalarInterpolator = function() {
 
                 update();
 
-                var childScope = SceneJS._utils.newScope(data, cfg.fixed);
-                childScope.put(params.output, outputValue);
+                var childData = SceneJS._utils.newScope(data, cfg.fixed);
+                childData.put(params.output, outputValue);
 
-                SceneJS._utils.visitChildren(cfg, childScope);
+                SceneJS._utils.visitChildren(cfg, traversalContext, childData);
             });
 };
 

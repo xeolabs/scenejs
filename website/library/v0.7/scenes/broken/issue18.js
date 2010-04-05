@@ -1,7 +1,7 @@
 /* Issue #18 - http://github.com/xeolabs/scenejs/issues/#issue/18
  *
  * There's supposed to be a green sphere here as well as the tiled floor.
- *
+ * 
  * It appears momentarily, then disappears.
  *
  * This happens in Chrome dev, but not in Minefield.
@@ -100,7 +100,7 @@ var exampleScene = SceneJS.scene({
                                                             shine:          6.0
                                                         },
 
-
+                                                            
                                                             //=====================================================
                                                             // Disappearing green sphere
                                                             //=====================================================
@@ -220,6 +220,7 @@ window.render = function() {
 /* Continue animation
  */
 var pInterval = setInterval("window.render()", 10);
+
 
 
 

@@ -303,8 +303,13 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
                 argStr += ', ';
             }
             var objectName;
+            try {
             if (arg !== null) {
                 objectName = arg[objectNameProperty];
+            }
+            } catch (e) {
+                alert(functionName);
+                throw e;
             }
             var webGLArray = asWebGLArray(arg);
             if (objectName != undefined ) {

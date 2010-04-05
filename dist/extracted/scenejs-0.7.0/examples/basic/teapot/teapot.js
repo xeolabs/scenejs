@@ -25,7 +25,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                 SceneJS.renderer({
                     clear : { depth : true, color : true},
                     viewport:{ x : 1, y : 1, width: 600, height: 600},
-                    clearColor: { r:0.0, g: 0.0, b: 0.0 }
+                    clearColor: { r:0.0, g: 0.0, b: 0.0 },
+                    enableTexture2D: true
                 },
 
                     /* Perspective transformation
@@ -114,7 +115,32 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                                 },
 
                                                                     /* Teapot's geometry
-                                                                     */
+                                                                     */     SceneJS.texture({
+
+                                                            /* A texture can have multiple layers, each applying an
+                                                             * image to a different material reflection component.
+                                                             * This layer applies the Zod image to the diffuse
+                                                             * component, with animated scaling.
+                                                             */
+                                                            layers: [
+                                                                {
+                                                                    uri:"http://scenejs.org/library/textures/misc/general-zod.jpg",
+                                                                    minFilter: "linear",
+                                                                    magFilter: "linear",
+                                                                    wrapS: "repeat",
+                                                                    wrapT: "repeat",
+                                                                    isDepth: false,
+                                                                    depthMode:"luminance",
+                                                                    depthCompareMode: "compareRToTexture",
+                                                                    depthCompareFunc: "lequal",
+                                                                    flipY: false,
+                                                                    width: 1,
+                                                                    height: 1,
+                                                                    internalFormat:"lequal",
+                                                                    sourceFormat:"alpha",
+                                                                    sourceType: "unsignedByte",
+                                                                    applyTo:"baseColor"}]},
+                                                                          SceneJS.objects.sphere()),
                                                                         SceneJS.objects.teapot()
                                                                         )
                                                                 )

@@ -34,6 +34,7 @@
  * demonstrated in this example.
  */
 
+
 var exampleScene = SceneJS.scene({
     canvasId: 'theCanvas',
 
@@ -46,10 +47,11 @@ var exampleScene = SceneJS.scene({
                 SceneJS.renderer({
                     clearColor : { r:0, g:0, b:0.0, a: 1 },
                     viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                    clear : { depth : true, color : true}
+                    clear : { depth : true, color : true},
+                    enableTexture2D: true
                 },
 
-                        SceneJS.perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0
+                        SceneJS.perspective({ fovy : 25.0, aspect : 1.0, near : 0.10, far : 3000.0
                         },
                                 SceneJS.lookAt({
                                     eye : { x: 0.0, y: 20.0, z: -20},
@@ -94,11 +96,15 @@ var exampleScene = SceneJS.scene({
 
                                             /** Load the asset
                                              */
-                                                SceneJS.load({
-
-                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                "examples/orange-teapot/orangeteapot.js"
-                                                })
+                                                  SceneJS.load({
+                                                uri:"http://scenejs.org/library/v0.7/assets/backgrounds/starry-sky/starry-sky.js"
+                                            }),
+                                                SceneJS.objects.teapot()
+//                                                SceneJS.load({
+//
+//                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
+//                                                                "examples/orange-teapot/orange-teapot.js"
+//                                                })
 
                                                 )
                                         )
@@ -111,16 +117,9 @@ var exampleScene = SceneJS.scene({
  * Scene rendering loop and process query stuff follows
  *---------------------------------------------------------------------*/
 
+
 var pInterval;
 
-function handleError(e) {
-    if (e.message) {
-        alert(e.message);
-    } else {
-        alert(e);
-    }
-    throw e;
-}
 
 /* Our periodic render function. This will stop the render interval when the count of
  * scene processes is zero.
@@ -141,21 +140,16 @@ window.doit = function() {
          * subsequent render. Scene processes don't magically stop between renders,
          * you have to do a render to given them the opportunity to stop.
          */
-        try {
-            exampleScene.render();
-        } catch (e) {
-            handleError(e);
-        }
+        //        try {
+        exampleScene.render();
+        //        } catch (e) {
+        //            clearInterval(pInterval);
+        //            throw e;
+        //        }
     }
 }
 
-/* This initial render will trigger the load, starting one scene process
- */
-try {
-    exampleScene.render();
-} catch (e) {
-    handleError(e);
-}
+exampleScene.render();
 
 /* Keep rendering until load complete, ie. no scene processes running
  */

@@ -20,7 +20,7 @@
             var mat;
             var xform;
             return SceneJS._utils.createNode(
-                    function(data) {
+                    function(traversalContext, data) {
                         if (memoLevel == NO_MEMO) {
                             var params = cfg.getParams(data);
                             mat = createMatrix(params);
@@ -41,7 +41,7 @@
                             }
                         }
                         backend.setTransform(xform);
-                        SceneJS._utils.visitChildren(cfg, data);
+                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
                         backend.setTransform(superXform);
                     });
         };

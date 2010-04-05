@@ -66,7 +66,7 @@ SceneJS.withPlugin = function() {
                         backend.assetLoaded(process);  // Finish loading - kill process
                         process = null;
                         state = STATE_ASSET_ATTACHED;
-                        SceneJS._utils.visitChildren(cfg, data);
+                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
                         break;
 
                     case STATE_INITIAL:

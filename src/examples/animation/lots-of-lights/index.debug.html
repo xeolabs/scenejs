@@ -2,9 +2,11 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>SceneJS Example - Interpolated rotation of a teapot</title>
+    <title>SceneJS Example - Parameterised Scene Asset</title>
 </head>
-<body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
+<body margin=20px>
+<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Basic First Example
+</h1>
 <table>
     <tr>
         <td valign="top">
@@ -14,7 +16,18 @@
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
-        <td>
+        <td valign="top">
+            <h3>Source code</h3>
+            <ul>
+                <li><a href="teapot.js">This example</a></li>
+            </ul>
+
+            <h3>Description</h3>
+
+            <p><span>This is a really simple scene to demonstrate the general SceneJS idea. A scene basically renders images to
+one or more WebGL canvas elements in the browser page. The <a href="teapot.js">source code</a> has lots of comments that will tell you how this example works.<p><span>
+            <h3>Scene logging output</h3>
+
             <div id="logging"></div>
         </td>
     </tr>
@@ -58,6 +71,15 @@
 
 <script type="application/x-javascript" src="../../../scenejs/load/loadBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/load/load.js"></script>
+
+<!-- Picking -->
+
+<script type="application/x-javascript" src="../../../scenejs/pick/pickBackend.js"></script>
+
+<!-- Third-party lib : WebGL Trace -->
+
+<script type="application/x-javascript" src="../../../scenejs/core/webgl-trace.js"></script>
+
 
 <!-- Scene -->
 
@@ -106,8 +128,8 @@
 <!-- Viewing transforms -->
 
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/viewLocalityBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/transformation/view/stationary.js"></script>
 
 <!-- Lighting -->
 
@@ -135,7 +157,6 @@
 <!-- Axis-aligned bounding boxes -->
 
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumBackend.js"></script>
-<script type="application/x-javascript" src="../../../scenejs/boundary/viewLocalityBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
 
 
@@ -145,6 +166,6 @@
 <script type="application/x-javascript" src="../../../scenejs/fog/fogBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
 
-<script type="application/x-javascript" src="lots-of-lights.js"></script>
+<script type="application/x-javascript" src="moving-lights.js"></script>
 </body>
 </html>

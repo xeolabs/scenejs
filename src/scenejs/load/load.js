@@ -36,19 +36,22 @@ SceneJS.load = function() {
     }
 
     function visitSubgraph(params, data) {
+        var traversalContext = {
+            appendix : cfg.children
+        };
         if (params) { // Parameters for asset - supply in a new child data
-            var childScope = SceneJS._utils.newScope(data, cfg.fixed);
+            var childData = SceneJS._utils.newScope(data, cfg.fixed);
             for (var key in params.params) {
-                childScope.put(key, params.params[key]);
+                childData.put(key, params.params[key]);
             }
-            assetNode.func.call(this, childScope);
+            assetNode.func.call(this, traversalContext,  childData);
         } else {
-            assetNode.func.call(this, data);
+            assetNode.func.call(this, traversalContext, data);
         }
     }
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
 
                 if (!params) {
                     params = cfg.getParams(data);
@@ -99,12 +102,9 @@ SceneJS.load = function() {
                                     logging.getLogger().error(
                                             "SceneJS.load failed - " + msg + " - uri: " + params.uri);
                                 });
-
-                        SceneJS._utils.visitChildren(cfg, data);
                         break;
 
                     case STATE_ERROR:
-                        SceneJS._utils.visitChildren(cfg, data);
                         break;
                 }
             });

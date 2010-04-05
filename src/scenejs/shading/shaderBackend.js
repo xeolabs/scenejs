@@ -31,7 +31,6 @@ SceneJS._backends.installBackend(
             var activeProgram = null;               // Currently active program
             var lights = [];                        // Current lighting state
             var material = {};                      // Current material state
-            var namedItem;                          // Current named item
             var fog = null;                         // Current fog
             var textureLayers = [];                 // Texture layers are pushed/popped to this as they occur
             var sceneHash;                          // Current hash of collective scene state pertenant to shaders
@@ -77,6 +76,12 @@ SceneJS._backends.installBackend(
                         canvas = null;
                         activeProgram = null;
                         sceneHash = null;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.NAME_EXPORTED,
+                    function(item) {
+                        activeProgram.setUniform("uColor", item.color);
                     });
 
             ctx.events.onEvent(
@@ -134,10 +139,14 @@ SceneJS._backends.installBackend(
                             activeProgram.setUniform("uLightColor" + i, light.color);
                             activeProgram.setUniform("uLightDiffuse" + i, light.diffuse);
 
-                            activeProgram.setUniform("uLightPos" + i, light.pos);
-                            activeProgram.setUniform("uLightSpotDir" + i, light.spotDir);
-
+                            if (light.type == "dir") {
+                                activeProgram.setUniform("uLightDir" + i, light.dir);
+                            }
+                            if (light.type == "point") {
+                                activeProgram.setUniform("uLightPos" + i, light.pos);
+                            }
                             if (light.type == "spot") {
+                                activeProgram.setUniform("uLightSpotDir" + i, light.spotDir);
                                 activeProgram.setUniform("uLightSpotCosCutOff" + i, light.spotCosCutOff);
                                 activeProgram.setUniform("uLightSpotExp" + i, light.spotExponent);
                             }
@@ -223,13 +232,6 @@ SceneJS._backends.installBackend(
                         activateProgram();
                     });
 
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.NAME_UPDATED,
-                    function(n) {
-                        namedItem = n;
-                    });
-
             ctx.memory.registerEvictor(
                     function() {
                         var earliest = time;
@@ -275,8 +277,8 @@ SceneJS._backends.installBackend(
 
                     if (!programs[sceneHash]) {
                         ctx.logging.info("Creating shader: '" + sceneHash + "'");
-                        var vertexShaderSrc = composeRenderingVertexShader();
-                        var fragmentShaderSrc = composeRenderingFragmentShader();
+                        var vertexShaderSrc = composeVertexShader();
+                        var fragmentShaderSrc = composeFragmentShader();
                         ctx.memory.allocate(
                                 "shader",
                                 function() {
@@ -314,49 +316,60 @@ SceneJS._backends.installBackend(
                     ";"
                 ];
 
-                /* Textures
-                 */
-                if (textureLayers.length > 0) {
-                    val.push("tex/");
-                    for (var i = 0; i < textureLayers.length; i++) {
-                        var layer = textureLayers[i];
-                        val.push(layer.params.applyFrom);
-                        val.push("/");
-                        val.push(layer.params.applyTo);
-                        val.push("/");
-                        val.push(layer.params.blendMode);
-                        val.push("/");
-                        if (layer.params.matrix) {
-                            val.push("/anim");
-                        }
-                    }
-                    val.push(";");
-                }
+                if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
 
-                /* Lighting
-                 */
-                if (lights.length > 0) {
-                    val.push("light/");
-                    for (var i = 0; i < lights.length; i++) {
-                        var light = lights[i];
-                        val.push(light.type);
-                        val.push("/");
-                        if (light.specular) {
-                            val.push("spec/");
-                        }
-                        if (light.diffuse) {
-                            val.push("diff/");
-                        }
-                    }
-                    val.push(";");
-                }
+                    /* Trivial hash for picking mode shader
+                     */
+                    val.push("picking;");
+                } else {
 
-                /* Fog
-                 */
-                if (fog && fog.mode != "disabled") {
-                    val.push("fog/");
-                    val.push(fog.mode);
-                    val.push(";");
+                    /* Complex hash for rendering mode shader
+                     */
+
+                    /* Textures
+                     */
+                    if (textureLayers.length > 0) {
+                        val.push("tex/");
+                        for (var i = 0; i < textureLayers.length; i++) {
+                            var layer = textureLayers[i];
+                            val.push(layer.params.applyFrom);
+                            val.push("/");
+                            val.push(layer.params.applyTo);
+                            val.push("/");
+                            val.push(layer.params.blendMode);
+                            val.push("/");
+                            if (layer.params.matrix) {
+                                val.push("/anim");
+                            }
+                        }
+                        val.push(";");
+                    }
+
+                    /* Lighting
+                     */
+                    if (lights.length > 0) {
+                        val.push("light/");
+                        for (var i = 0; i < lights.length; i++) {
+                            var light = lights[i];
+                            val.push(light.type);
+                            val.push("/");
+                            if (light.specular) {
+                                val.push("spec/");
+                            }
+                            if (light.diffuse) {
+                                val.push("diff/");
+                            }
+                        }
+                        val.push(";");
+                    }
+
+                    /* Fog
+                     */
+                    if (fog && fog.mode != "disabled") {
+                        val.push("fog/");
+                        val.push(fog.mode);
+                        val.push(";");
+                    }
                 }
                 sceneHash = val.join("");
             }
@@ -368,6 +381,16 @@ SceneJS._backends.installBackend(
                     src2.push(i + padding + ": " + src[i]);
                 }
                 return src2.join("<br/>");
+            }
+
+            function composeVertexShader() {
+                return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
+                       composeRenderingVertexShader() : composePickingVertexShader();
+            }
+
+            function composeFragmentShader() {
+                return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
+                       composeRenderingFragmentShader() : composePickingFragmentShader();
             }
 
             /**
@@ -389,12 +412,19 @@ SceneJS._backends.installBackend(
              * Composes a fragment shader script for rendering mode in current scene state
              */
             function composePickingFragmentShader() {
-                return [
+                var g = parseFloat(Math.round((10 + 1) / 256) / 256);
+                var r = parseFloat((10 - g * 256 + 1) / 256);
+                var src = [
                     "uniform vec3 uColor;",
                     "void main(void) {",
-                    "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
+
+                    "gl_FragColor = vec4(" + (r.toFixed(17)) + ", " + (g.toFixed(17)) + ",1.0,1.0);",
+
+                    //      "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
                     "}"
                 ].join("\n");
+
+                return src;
             }
 
             /**
@@ -407,12 +437,12 @@ SceneJS._backends.installBackend(
              */
             function composeRenderingVertexShader() {
 
-                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D;
+                var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
 
                 var src = ["\n"];
                 src.push("attribute vec3 aVertex;");                // World
                 src.push("attribute vec3 aNormal;");                // World
-                if (texturing) {
+                if (haveTextures) {
                     src.push("attribute vec2 aTextureCoord;");      // World
                 }
                 src.push("uniform mat4 uMMatrix;");               // Model
@@ -422,14 +452,24 @@ SceneJS._backends.installBackend(
                 src.push("uniform mat4 uPMatrix;");               // Projection
 
                 for (var i = 0; i < lights.length; i++) {
-                    src.push("uniform vec3 uLightPos" + i + ";");
+                    var light = lights[i];
+                    if (light.type == "dir") {
+                        src.push("uniform vec3 uLightDir" + i + ";");
+                    }
+                    if (light.type == "point") {
+                        src.push("uniform vec3 uLightPos" + i + ";");
+                    }
+                    if (light.type == "spot") {
+                        src.push("uniform vec3 uLightPos" + i + ";");
+                    }
                 }
                 src.push("varying vec4 vViewVertex;");
                 src.push("varying vec3 vNormal;");
                 src.push("varying vec3 vEyeVec;");
-                if (texturing) {
+                if (haveTextures) {
                     src.push("varying vec2 vTextureCoord;");
                 }
+
                 for (var i = 0; i < lights.length; i++) {
                     src.push("varying vec3 vLightVec" + i + ";");
                     src.push("varying float vLightDist" + i + ";");
@@ -437,26 +477,29 @@ SceneJS._backends.installBackend(
                 src.push("void main(void) {");
                 src.push("  vec4 tmpVNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
                 src.push("  vNormal = normalize(tmpVNormal.xyz);");                                 // View-space normal
-                src.push("  vViewVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+                src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+                src.push("  vViewVertex = tmpVertex;");
                 src.push("  gl_Position = uPMatrix * vViewVertex;");
 
                 src.push("  vec3 tmpVec;");
                 for (var i = 0; i < lights.length; i++) {
                     var light = lights[i];
                     if (light.type == "dir") {
-                        src.push("tmpVec = uLightPos" + i + ";");
-                    } else {
-                        src.push("tmpVec = (uLightPos" + i + ".xyz - vViewVertex.xyz);");
+                        src.push("tmpVec = -uLightDir" + i + ";");
+                    }
+                    if (light.type == "point") {
+                        src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
+                        src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
                     }
                     src.push("vLightVec" + i + " = tmpVec;");                   // Vector from light to vertex
-                    src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+
                 }
-                src.push("vEyeVec = normalize(vViewVertex.xyz);");
-                if (texturing) {
+                src.push("vEyeVec = normalize(-vViewVertex.xyz);");
+                if (haveTextures) {
                     src.push("vTextureCoord = aTextureCoord;");
                 }
                 src.push("}");
-              //   ctx.logging.info(getShaderLoggingSource(src));
+                ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
@@ -466,8 +509,8 @@ SceneJS._backends.installBackend(
              */
             function composeRenderingFragmentShader() {
 
-                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D;
-                var lighting = (lights.length > 0);
+                var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
+                var haveLights = (lights.length > 0);
                 var tangent = false;
 
                 var src = ["\n"];
@@ -478,7 +521,7 @@ SceneJS._backends.installBackend(
                 src.push("varying vec3 vNormal;");                  // View-space normal
                 src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
 
-                if (texturing) {
+                if (haveTextures) {
                     src.push("varying vec2 vTextureCoord;");
 
                     //texture uniforms
@@ -501,7 +544,7 @@ SceneJS._backends.installBackend(
 
                 /* Light and lighting-dependent material uniforms
                  */
-                if (lighting) {
+                if (haveLights) {
 
                     src.push("uniform vec3  uMaterialSpecularColor;");
                     src.push("uniform float uMaterialSpecular;");
@@ -550,7 +593,7 @@ SceneJS._backends.installBackend(
 
                 src.push("  vec4    normalmap = vec4(vNormal,0.0);");
 
-                if (lighting) {
+                if (haveLights) {
                     src.push("  float   specular=uMaterialSpecular;");
                     src.push("  vec3    specularColor=uMaterialSpecularColor;");
                     src.push("  float   shine=uMaterialShine;");
@@ -568,7 +611,7 @@ SceneJS._backends.installBackend(
                  * TEXTURING
                  * ===================================================================================================*/
 
-                if (texturing) {
+                if (haveTextures) {
 
                     /* Get texturePos from image
                      */
@@ -611,23 +654,23 @@ SceneJS._backends.installBackend(
                  * LIGHTING
                  * ===================================================================================================*/
 
-                if (lighting) {
+                src.push("  vec3    lightValue      = uAmbient;");
+                src.push("  vec3    specularValue   = vec3(0.0,0.0,0.0);");
+
+                if (haveLights) {
                     src.push("  vec3    lightVec;");
                     src.push("  float   dotN;");
                     src.push("  float   spotFactor;");
                     src.push("  float   pf;");
-                    src.push("  vec3    lightValue      = uAmbient;");
-                    src.push("  vec3    specularValue   = vec3(0.0,0.0,0.0);");
-
 
                     for (var i = 0; i < lights.length; i++) {
                         var light = lights[i];
-                        src.push("lightVec = normalize(-vLightVec" + i + ");");
+                        src.push("lightVec = normalize(vLightVec" + i + ");");
 
                         /* Point Light
                          */
                         if (light.type == "point") {
-                            src.push("dotN = max(dot(vNormal, -lightVec), 0.0);");
+                            src.push("dotN = max(dot(vNormal,lightVec),0.0);");
 
                             src.push("if (dotN > 0.0) {");
 
@@ -639,18 +682,18 @@ SceneJS._backends.installBackend(
                             if (light.diffuse) {
                                 src.push("  lightValue += dotN *  uLightColor" + i + " * attenuation;");
                             }
-                            src.push("}");
 
                             if (light.specular) {
                                 src.push("specularValue += attenuation * specularColor * uLightColor" + i +
-                                         " * specular  * pow(max(dot(reflect(lightVec, vNormal), vEyeVec),0.0), shine);");
+                                         " * specular  * pow(max(dot(reflect(-lightVec, vNormal), vEyeVec),0.0), shine);");
                             }
+                            src.push("}");
                         }
 
                         /* Directional Light
                          */
                         if (light.type == "dir") {
-                            src.push("dotN=max(dot(vNormal,-lightVec),0.0);");
+                            src.push("dotN = max(dot(vNormal,lightVec),0.0);");
                             if (light.diffuse) {
                                 src.push("lightValue += dotN * uLightColor" + i + ";");
                             }
@@ -691,7 +734,9 @@ SceneJS._backends.installBackend(
                     }
                 }
 
-                src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * lightValue.rgb, alpha);");
+                src.push("if (emit>0.0) lightValue = vec3(1.0, 1.0, 1.0);");
+
+                src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb, alpha);");
 
                 if (fog && fog.mode != "disabled") {
                     src.push("float fogFact=1.0;");
@@ -704,15 +749,9 @@ SceneJS._backends.installBackend(
                 } else {
                     src.push("gl_FragColor = fragColor;");
                 }
-
                 src.push("}");
 
-                //    ctx.logging.info(getShaderLoggingSource(src));
+                ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
-
-
-        }
-
-        )
-        ;
+        });

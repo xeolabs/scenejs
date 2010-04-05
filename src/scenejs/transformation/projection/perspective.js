@@ -8,7 +8,7 @@ SceneJS.perspective = function() {
     var transform;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!transform || !cfg.fixed) {
                     var params = cfg.getParams(data);
                     var tempMat = SceneJS._math.perspectiveMatrix4(
@@ -23,7 +23,7 @@ SceneJS.perspective = function() {
                 }
                 var prevTransform = backend.getTransform();
                 backend.setTransform(transform);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setTransform(prevTransform);
             });
 };

@@ -2,7 +2,16 @@
 <head>
     <title>SceneJS Development</title>
     <link href="css/style.css" rel="stylesheet" type="text/css"/>
-
+    <style type="text/css">
+        #retaggr_cc_badge_zeb8430d2fae4a8f8b1f100c0c26f6fb {
+            color: Green !important;
+            width: 380px !important;
+            border: none !important;
+            padding-top: 0px !important;
+            padding-left: 0px !important;
+            margin-left: 0px !important;
+        }
+    </style>
 </head>
 <body style="padding: 20px;">
 <div id="container">
@@ -69,20 +78,50 @@
 
 <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
 <script type="text/javascript">
-    var a2a_linkname = "SceneJS Features";
+    var a2a_linkname = "SceneJS Development";
     var a2a_linkurl = window.location;
     var a2a_onclick = 1;</script>
-<script src="./lib/ga/gatag.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+    var uservoiceOptions = {
+        /* required */
+        key: 'scenejs',
+        host: 'scenejs.uservoice.com',
+        forum: '38232',
+        showTab: true,
+        /* optional */
+        alignment: 'left',
+        background_color:'#f00',
+        text_color: 'white',
+        hover_color: '#06C',
+        lang: 'en'
+    };
+
+    function _loadUserVoice() {
+        var s = document.createElement('script');
+        s.setAttribute('type', 'text/javascript');
+        s.setAttribute('src', ("https:" == document.location.protocol ? "https://" : "http://") + "cdn.uservoice.com/javascripts/widgets/tab.js");
+        document.getElementsByTagName('head')[0].appendChild(s);
+    }
+    _loadSuper = window.onload;
+    window.onload = (typeof window.onload != 'function') ? _loadUserVoice : function() {
+        _loadSuper();
+        _loadUserVoice();
+    };
+</script>
+
+
 <script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
 <script type="text/javascript">
     try {
-        var pageTracker = _gat._getTracker("UA-8036359-2");
-        pageTracker._setDomainName(".scenejs.com");
+        var pageTracker = _gat._getTracker("UA-8036359-3");
         pageTracker._trackPageview();
     } catch(err) {
     }</script>
+
 </body>
 </html>

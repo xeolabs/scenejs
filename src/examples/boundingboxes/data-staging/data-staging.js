@@ -58,235 +58,247 @@ with (SceneJS) {
                                                 up : { y: 1.0 }
                                             },
 
-                                                /* Sky sphere
-                                                 */
-                                                    withData({
-                                                        radius: 5000
-                                                    },
-                                                            load({
-                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                    "backgrounds/sphere/starrySky.js"
-                                                            })),
 
                                                 /* Lighting
                                                  */
                                                     lights({
                                                         sources: [
                                                             {
+                                                                type:                   "dir",
+                                                                color:                  { r: .8, g: 0.8, b: 0.8 },
+                                                                diffuse:                true,
+                                                                specular:               false,
+                                                                pos:                    { x: 100.0, y: 4.0, z: -100.0 },
+                                                                constantAttenuation:    1.0,
+                                                                quadraticAttenuation:   0.0,
+                                                                linearAttenuation:      0.0
+                                                            }
+                                                            ,
+                                                            {
                                                                 type:                   "point",
-                                                                diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-                                                                specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                                                pos:                    { x: 100.0, y: 0.0, z: -100.0 },
+                                                                color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                                diffuse:                true,
+                                                                specular:               true,
+                                                                pos:                    { x: 100.0, y: -100.0, z: -100.0 },
                                                                 constantAttenuation:    1.0,
                                                                 quadraticAttenuation:   0.0,
                                                                 linearAttenuation:      0.0
                                                             },
                                                             {
                                                                 type:                   "point",
-                                                                diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
-                                                                specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                                                pos:                    { x: -20.0, y: 50.0, z: 0.0 },
-                                                                constantAttenuation:    1.0,
-                                                                quadraticAttenuation:   0.0,
-                                                                linearAttenuation:      0.0
-                                                            },
-                                                            {
-                                                                type:                   "point",
-                                                                diffuse:                { r: 0.6, g: 0.6, b: 0.6 },
-                                                                specular:               { r: 0.9, g: 0.9, b: 0.9 },
-                                                                pos:                    { x: 50.0, y: 100.0, z: 0.0 },
+                                                                color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                                diffuse:                true,
+                                                                specular:               true,
+                                                                pos:                    { x: -1000.0, y: -1000.0, z: 0.0 },
                                                                 constantAttenuation:    1.0,
                                                                 quadraticAttenuation:   0.0,
                                                                 linearAttenuation:      0.0
                                                             }
                                                         ]}
                                                             ,
-
-
-                                                        /* Tiled floor
+                                                        /* Sky sphere
                                                          */
-                                                            load({
-                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                    "examples/tiled-floor/tiled-floor.js"
-                                                            }),
-
-
-                                                        /* And why not throw in Mars, just for fun
-                                                         */
-                                                            translate({x:100,y:40, z:100},
-                                                                    scale({x:20,y:-20, z:20},
-                                                                            load({
-                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                    "examples/planets/mars/mars.js"
-                                                                            }))),
-
-                                                        /* Our spiral staircase, wrapped with some material colour
-                                                         */
-                                                            material({
-                                                                ambient:   { r: 0.5, g: 0.5, b: 0.5 },
-                                                                diffuse:   { r: 0.6, g: 0.6, b: 0.6 },
-                                                                specular:  { r: 1, g: 1, b: 1 },
-                                                                emission: { r: 0.02, g: 0.02, b: 0.2 },
-                                                                shininess: 60.0
+                                                            withData({
+                                                                radius: 1000
                                                             },
+                                                                //                                                            load({
+                                                                //                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                //                                                                    "backgrounds/sphere/starry-sky.js"
+                                                                //                                                            })
 
-                                                                // Why does this break stuff??
-                                                                //
-                                                                // Investigate ASAP
 
-                                                                //                                                                    translate({x:-50, y:50 },
-                                                                //                                                                            scale({x:20,y:20,z:20},
-                                                                //                                                                                    texture({ uri: "http://scenejs.org/library/textures/stars/gigapixel-milky-way.gif", applyTo: "emission" },
-                                                                //                                                                                            objects.sphere()))),
-                                                                    translate({x: 100, y:20, z: 0 },
-                                                                            SceneJS.scale({
-                                                                                x: 20,
-                                                                                y: 20,
-                                                                                z: 20
 
-                                                                            },
-                                                                                    //SceneJS.text({ text : "Say a word of Zen", font: "Arial", size: "1em" }),
-                                                                                    SceneJS.texture({
-                                                                                        layers: [
-                                                                                            {
-                                                                                                uri:"general-zod.jpg",
-                                                                                                wrapS: "repeat",
-                                                                                                wrapT: "repeat",
-                                                                                                flipY: false,
-
-                                                                                                rotate : (function() {
-                                                                                                    var _x = 0;
-                                                                                                    return function(data) {
-                                                                                                        if (_x > 360.0) _x = 0;
-                                                                                                        _x += 1;
-                                                                                                        return { z: _x };
-                                                                                                    };
-                                                                                                })(),
-
-                                                                                                translate : (function() {
-                                                                                                    var _x = 0;
-                                                                                                    return function(data) {
-                                                                                                        if (_x > 1.0) _x = 0;
-                                                                                                        _x += .01;
-                                                                                                        return { x: _x };
-                                                                                                    };
-                                                                                                })(),
-
-                                                                                                scale : (function() {
-                                                                                                    var _x = 0;
-                                                                                                    return function(data) {
-                                                                                                        if (_x > 10.0) _x = 0;
-                                                                                                        _x += .01;
-                                                                                                        return { x: _x, y: _x };
-                                                                                                    };
-                                                                                                })(),
-
-                                                                                                applyTo:"emission"
-                                                                                            }
-                                                                                        ]},
-                                                                                            SceneJS.material({
-
-                                                                                                diffuse: { r: .0, g: .0, b: .0 },
-                                                                                                emission: { r: 1., g: 1., b: 1. }
-                                                                                            },
-                                                                                                    SceneJS.objects.cube()
-                                                                                                    )))),
-
-                                                                /* Bounding box - roughly fitted to staircase
+                                                                /* Our spiral staircase, wrapped with some material colour
                                                                  */
-                                                                    boundingBox({
-                                                                        xmin: -20,
-                                                                        ymin: -20,
-                                                                        zmin: -20,
-                                                                        xmax:  20,
-                                                                        ymax:  20,
-                                                                        zmax:  20,
-
-                                                                        /* We'll do level-of-detail selection with this
-                                                                         * boundingBox - five representations at
-                                                                         * different sizes
-                                                                         */
-                                                                        levels: [
-                                                                            10,     // Level 1
-                                                                            200,    // Level 2
-                                                                            400,    // Level 3
-                                                                            500,    // Level 4
-                                                                            600     // Level 5
-                                                                        ]
+                                                                    material({
+                                                                        baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                                        specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                                        specular:       0.9,
+                                                                        shine:          6.0
                                                                     },
 
-                                                                        /* Level 1 - a cube to at least show a dot on the horizon
+                                                                        /* Tiled floor
                                                                          */
-                                                                            objects.cube(),
+                                                                            load({
+                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                                    "examples/tiled-floor/tiled-floor.js"
+                                                                            }),
 
-                                                                        /* Level 2 - staircase with 12 very chunky steps
-                                                                         * and no texture
+                                                                        /* And why not throw in Mars, just for fun
                                                                          */
-                                                                            withData({
-                                                                                stepWidth:7,
-                                                                                stepHeight:2.4,
-                                                                                stepDepth:3,
-                                                                                stepSpacing:6,
-                                                                                innerRadius:10,
-                                                                                numSteps:12,
-                                                                                stepAngle:80 },
+                                                                            translate({x:100,y:40, z:100},
+                                                                                    scale({x:20,y:-20, z:20},
+                                                                                            load({
+                                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                                                    "examples/planets/mars/mars.js"
+                                                                                            }))),
 
-                                                                                    load({
-                                                                                        uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                            "examples/spiral-staircase/spiral-staircase.js"
-                                                                                    })),
 
-                                                                        /* Level 3 - more detail; staircase with 24 chunky
-                                                                         *  steps and no texture
+                                                                        // Why does this break stuff??
+                                                                        //
+                                                                        // Investigate ASAP
+
+                                                                            translate({x:-50, y:50 },
+                                                                                    scale({x:20,y:20,z:20},
+                                                                                           // texture({ uri: "http://scenejs.org/library/textures/stars/gigapixel-milky-way.gif", applyTo: "emission" },
+                                                                                                    objects.sphere())
+                                                                                            //)
+                                                                                    ),
+                                                                            translate({x: 100, y:20, z: 0 },
+                                                                                    SceneJS.scale({
+                                                                                        x: 20,
+                                                                                        y: 20,
+                                                                                        z: 20
+
+                                                                                    },
+                                                                                        //SceneJS.text({ text : "Say a word of Zen", font: "Arial", size: "1em" }),
+                                                                                            SceneJS.texture({
+                                                                                                layers: [
+                                                                                                    {
+                                                                                                        uri:"general-zod.jpg",
+                                                                                                        wrapS: "repeat",
+                                                                                                        wrapT: "repeat",
+                                                                                                        flipY: false,
+
+                                                                                                        rotate : (function() {
+                                                                                                            var _x = 0;
+                                                                                                            return function(data) {
+                                                                                                                if (_x > 360.0) _x = 0;
+                                                                                                                _x += 1;
+                                                                                                                return { z: _x };
+                                                                                                            };
+                                                                                                        })(),
+
+                                                                                                        translate : (function() {
+                                                                                                            var _x = 0;
+                                                                                                            return function(data) {
+                                                                                                                if (_x > 1.0) _x = 0;
+                                                                                                                _x += .01;
+                                                                                                                return { x: _x };
+                                                                                                            };
+                                                                                                        })(),
+
+                                                                                                        scale : (function() {
+                                                                                                            var _x = 0;
+                                                                                                            return function(data) {
+                                                                                                                if (_x > 10.0) _x = 0;
+                                                                                                                _x += .01;
+                                                                                                                return { x: _x, y: _x };
+                                                                                                            };
+                                                                                                        })(),
+
+                                                                                                        applyTo:"baseColor"
+                                                                                                    }
+                                                                                                ]},
+                                                                                                    SceneJS.scale({x:15.0,y:15.0, z:15.0}, SceneJS.objects.sphere())
+                                                                                                    ,
+
+                                                                                                    SceneJS.material({
+
+                                                                                                        baseColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                                                                                        specularColor: { r: 1., g: 1., b: 1. },
+                                                                                                        specular:1.0,
+                                                                                                        shine:1
+                                                                                                    },
+                                                                                                            SceneJS.objects.cube()
+                                                                                                            )))),
+
+                                                                        /* Bounding box - roughly fitted to staircase
                                                                          */
-                                                                            withData({
-                                                                                stepWidth:7,
-                                                                                stepHeight:1.2,
-                                                                                stepDepth:3,
-                                                                                stepSpacing:3,
-                                                                                innerRadius:10,
-                                                                                numSteps:24,       // Half the number of steps, less coarse
-                                                                                stepAngle:40 },
+                                                                            boundingBox({
+                                                                                xmin: -20,
+                                                                                ymin: -20,
+                                                                                zmin: -20,
+                                                                                xmax:  20,
+                                                                                ymax:  20,
+                                                                                zmax:  20,
 
-                                                                                    load({
-                                                                                        uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                            "examples/spiral-staircase/spiral-staircase.js"
-                                                                                    })),
+                                                                                /* We'll do level-of-detail selection with this
+                                                                                 * boundingBox - five representations at
+                                                                                 * different sizes
+                                                                                 */
+                                                                                levels: [
+                                                                                    10,     // Level 1
+                                                                                    200,    // Level 2
+                                                                                    400,    // Level 3
+                                                                                    500,    // Level 4
+                                                                                    600     // Level 5
+                                                                                ]
+                                                                            },
 
-                                                                        /* Level 4 - yet more detail; staircase with 48 fine
-                                                                         * steps and no texture
-                                                                         */
-                                                                            withData({
-                                                                                stepWidth:7,
-                                                                                stepHeight:0.6,
-                                                                                stepDepth:3,
-                                                                                stepSpacing:1.5,
-                                                                                innerRadius:10,
-                                                                                numSteps:48,
-                                                                                stepAngle:20 },
+                                                                                /* Level 1 - a cube to at least show a dot on the horizon
+                                                                                 */
+                                                                                    objects.cube(),
 
-                                                                                    load({
-                                                                                        uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                            "examples/spiral-staircase/spiral-staircase.js"
-                                                                                    })),
+                                                                                /* Level 2 - staircase with 12 very chunky steps
+                                                                                 * and no texture
+                                                                                 */
+                                                                                    withData({
+                                                                                        stepWidth:7,
+                                                                                        stepHeight:2.4,
+                                                                                        stepDepth:3,
+                                                                                        stepSpacing:6,
+                                                                                        innerRadius:10,
+                                                                                        numSteps:12,
+                                                                                        stepAngle:80 },
 
-                                                                        /* Level 5 - maximum detail; textured staircase with
-                                                                         * 48 fine steps
-                                                                         */
-                                                                            withData({
-                                                                                stepTexture: "marble",
-                                                                                stepWidth:7,
-                                                                                stepHeight:0.6,
-                                                                                stepDepth:3,
-                                                                                stepSpacing:1.5,
-                                                                                innerRadius:10,
-                                                                                numSteps:48,
-                                                                                stepAngle:20 },
+                                                                                            load({
+                                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                                                    "examples/spiral-staircase/spiral-staircase.js"
+                                                                                            })),
 
-                                                                                    load({
-                                                                                        uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                            "examples/spiral-staircase/spiral-staircase.js"
-                                                                                    }))
+                                                                                /* Level 3 - more detail; staircase with 24 chunky
+                                                                                 *  steps and no texture
+                                                                                 */
+                                                                                    withData({
+                                                                                        stepWidth:7,
+                                                                                        stepHeight:1.2,
+                                                                                        stepDepth:3,
+                                                                                        stepSpacing:3,
+                                                                                        innerRadius:10,
+                                                                                        numSteps:24,       // Half the number of steps, less coarse
+                                                                                        stepAngle:40 },
+
+                                                                                            load({
+                                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                                                    "examples/spiral-staircase/spiral-staircase.js"
+                                                                                            })),
+
+                                                                                /* Level 4 - yet more detail; staircase with 48 fine
+                                                                                 * steps and no texture
+                                                                                 */
+                                                                                    withData({
+                                                                                        stepWidth:7,
+                                                                                        stepHeight:0.6,
+                                                                                        stepDepth:3,
+                                                                                        stepSpacing:1.5,
+                                                                                        innerRadius:10,
+                                                                                        numSteps:48,
+                                                                                        stepAngle:20 },
+
+                                                                                            load({
+                                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                                                    "examples/spiral-staircase/spiral-staircase.js"
+                                                                                            })),
+
+                                                                                /* Level 5 - maximum detail; textured staircase with
+                                                                                 * 48 fine steps
+                                                                                 */
+                                                                                    withData({
+                                                                                        stepTexture: "marble",
+                                                                                        stepWidth:7,
+                                                                                        stepHeight:0.6,
+                                                                                        stepDepth:3,
+                                                                                        stepSpacing:1.5,
+                                                                                        innerRadius:10,
+                                                                                        numSteps:48,
+                                                                                        stepAngle:20 },
+
+                                                                                            load({
+                                                                                                uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                                                    "examples/spiral-staircase/spiral-staircase.js"
+                                                                                            }))
+                                                                                    )
                                                                             )
                                                                     )
                                                             )
@@ -379,11 +391,13 @@ with (SceneJS) {
             eye.z += moveVec[2] * speed;
         }
         exampleScene.render({ eye : eye, look: { x: eye.x + moveVec[0], y: eye.y, z : eye.z + moveVec[2] }});
+
     };
+
 
     /* Continue animation
      */
-    var pInterval = setInterval("window.render()", 10);
+    var pInterval = setInterval("window.render()", 2000);
 
 
 }

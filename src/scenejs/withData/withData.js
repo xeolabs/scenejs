@@ -7,7 +7,7 @@ SceneJS.withData = function() {
     var childScope;
 
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 if (!childScope || !cfg.fixed || !data.isfixed()) { // memoize data if config and data are constant
                     childScope = SceneJS._utils.newScope(data, cfg.fixed);
                     var params = cfg.getParams(data);
@@ -17,7 +17,7 @@ SceneJS.withData = function() {
                         }
                     }
                 }
-                SceneJS._utils.visitChildren(cfg, childScope);
+                SceneJS._utils.visitChildren(cfg, traversalContext, childScope);
             });
 };
 

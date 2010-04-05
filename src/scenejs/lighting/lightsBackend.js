@@ -73,11 +73,18 @@ SceneJS._backends.installBackend(
                     });
 
             function vectorToArray(v, fallback) {
-                return v ? [ v.x || 0, v.y || 0, -v.z || 0] : fallback;    // TODO: Hack to negate vertex X and Y
+                return v ? [ v.x || 0, v.y || 0, v.z || 0] : fallback;
+            }
+
+            function pointToArray(p, fallback) {
+                return p ? [ p.x || 0, p.y || 0, p.z || 0, p.w || 1] : fallback;
             }
 
             function colourToArray(v, fallback) {
-                return v ? [ v.r || fallback[0], v.g || fallback[1], v.b || fallback[2]] : fallback;
+                return v ? [
+                    v.r == undefined ? fallback[0] : v.r,
+                    v.g == undefined ? fallback[1] : v.g,
+                    v.b == undefined ? fallback[2] : v.b] : fallback;
             }
 
             /* Creates a view-space light
@@ -95,14 +102,20 @@ SceneJS._backends.installBackend(
 
                     color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
 
-                    diffuse : light.diffuse,                    
+                    diffuse : light.diffuse,
                     specular : light.specular,
 
-                    pos : SceneJS._math.transformPoint3(
+                    dir : light.type == "dir" ? SceneJS._math.transformVector3(
+                            viewMat,
+                            SceneJS._math.transformVector3(
+                                    modelMat,
+                                    vectorToArray(light.dir, [ 0,  0,  1.0]))) : null,
+
+                    pos : light.type == "point" ? SceneJS._math.transformPoint3(
                             viewMat,
                             SceneJS._math.transformPoint3(
                                     modelMat,
-                                    vectorToArray(light.pos, [ 0,  0,  1.0]))),
+                                    pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))) : null,
 
                     spotDir: SceneJS._math.transformVector3(
                             viewMat,
@@ -110,48 +123,12 @@ SceneJS._backends.installBackend(
                                     modelMat,
                                     vectorToArray(light.spotDir, [ 0,  0,  -1.0]))),
 
-                    spotExponent: light.spotExponent == undefined ?  1.0 : light.spotExponent,
-                    spotCosCutOff: light.spotCosCutOff == undefined ?  20.0 : light.spotCosCutOff,
+                    spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
+                    spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
 
                     constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
                     linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
                     quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-                };
-            }
-
-              /* Transforms light by view and model matrices
-             */
-            function createLightOLD(light) {
-                if (light.type &&
-                    (light.type != "spot"
-                            && light.type != "dir"
-                            && light.type != "point")) {
-                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.light node has a light of unsupported type - should be 'spot', 'direction' or 'point'");
-                }
-                return {
-                    type: light.type || "point",
-                    ambient: colourToArray(light.ambient, [ 0.2, 0.2, 0.2 ]),
-                    diffuse: colourToArray(light.diffuse, [ 1.0, 1.0, 1.0 ]),
-                    specular: colourToArray(light.specular, [ 1.0, 1.0, 1.0 ]),
-
-                    pos : SceneJS._math.transformPoint3(
-                            viewMat,
-                            SceneJS._math.transformPoint3(
-                                    modelMat,
-                                    vectorToArray(light.pos, [ 0,  0,  1.0]))),
-                    spotDir: SceneJS._math.transformVector3(
-                            viewMat,
-                            SceneJS._math.transformVector3(
-                                    modelMat,
-                                    vectorToArray(light.spotDir, [ 0,  0,  -1.0]))),
-
-                    spotExponent: light.spotExponent || 0.0,
-                    spotCosCutOff: light.spotCosCutOff || 20.0,
-
-                    constantAttenuation: light.constantAttenuation || 1.0,
-                    linearAttenuation: light.linearAttenuation || 0.0,
-                    quadraticAttenuation: light.quadraticAttenuation || 0.0
                 };
             }
 

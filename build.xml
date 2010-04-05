@@ -45,6 +45,10 @@
              compression="gzip"/>
 
         <zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
+
+        <!-- Write version data to website -->
+        <echo file="website/data/version.js" append="false">{ version: "${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}" }
+        </echo>
     </target>
 
     <!-- Create compressed javascript lib -->
@@ -107,6 +111,14 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/load/loadBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
+
+            <!-- Picking -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickBackend.js"/>
+
+            <!-- WebGL Trace -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
 
             <!-- Scene -->
 

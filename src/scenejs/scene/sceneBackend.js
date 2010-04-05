@@ -76,7 +76,13 @@ SceneJS._backends.installBackend(
                 var contextNames = SceneJS._webgl.contextNames;
                 for (var i = 0; (!context) && i < contextNames.length; i++) {
                     try {
+
                         context = canvas.getContext(contextNames[i]);
+
+
+//                                                alert("WebGL Trace enabled");
+//                                                context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
+//                                                context.setTracing(true);
                     } catch (e) {
 
                     }

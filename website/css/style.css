@@ -369,7 +369,7 @@ ul.site-tabs li.ui-state-active a {
     padding-left: 40px;
     text-align: left;
     margin: 0 auto;
-    width: 300px;
+    width: 320px;
     height: auto;
 }
 
@@ -411,6 +411,14 @@ ul.site-tabs li.ui-state-active a {
     color: #006633 !important;
     font-size: 1.6em;
     line-height: 1.4em;
+    font-weight: bold;
+}
+
+#home-download p.status {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    color: #009900 !important;
+    font-size: 1.0em;
+    line-height: 1.1em;
     font-weight: bold;
 }
 
@@ -1274,14 +1282,14 @@ button.regular, .buttons a.regular {
     float: left;
     text-align: left;
     margin: 0 auto;
-    width: 500px;
+    width: 400px;
     height: auto;
 
 }
 
 #dev-table #col2 {
     float: right;
-    padding-left: 120px;
+    padding-left: 40px;
     text-align: right;
     margin: 0 auto;
     width: auto;

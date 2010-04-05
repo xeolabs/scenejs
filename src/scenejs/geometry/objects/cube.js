@@ -21,7 +21,7 @@ SceneJS.objects.cube = function() {
     var y = params.ySize || 1;
     var z = params.zSize || 1;
 
-    /* A geometry node is normally configured with arrays of vertices, normals, indices etc., but can instead be
+    /* A geometry node is normally configured with arrays of positions, normals, indices etc., but can instead be
      * configured with a "create" callback, as demonstrated here, that returns an object containing those arrays.
      *
      * Every geometry must get a type that globally identifies it within SceneJS. In this case, the
@@ -37,7 +37,7 @@ SceneJS.objects.cube = function() {
         /* Callback to create sphere geometry
          */
         create: function() {
-            var vertices = [
+            var positions = [
                 x, y, z,
                 -x, y, z,
                 -x,-y, z,
@@ -101,7 +101,7 @@ SceneJS.objects.cube = function() {
                 0, 0,1
             ];    // v4-v7-v6-v5 back
 
-            var texCoords = [
+            var uv = [
                 x, y,
                 0, y,
                 0, 0,
@@ -155,9 +155,9 @@ SceneJS.objects.cube = function() {
 
             return {
                 primitive : "triangles",
-                vertices : vertices,
+                positions : positions,
                 normals: normals,
-                texCoords : texCoords,
+                uv : uv,
                 indices : indices,
                 colors:[]
             };

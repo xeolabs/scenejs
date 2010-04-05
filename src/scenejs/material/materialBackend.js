@@ -48,22 +48,12 @@ SceneJS._backends.installBackend(
                 return {
                     baseColor: colour4ToArray(m.baseColor, [ 0.2,  0.2,  0.2, 0.0]),       // IE. diffuse colour
                     specularColor: colour3ToArray(m.specularColor, [ 0.8,  0.8,  0.8]),
-                    specular: m.specular,
+                    specular: m.specular || 0.0,
                     shine: m.shine || 0.0,
                     reflect: m.reflect || 0.0,
                     alpha: (m.alpha == undefined) ? 1.0 : m.alpha,
-                    emit: m.alpha || 0.0,
+                    emit: m.emit || 0.0,
                     blendMode: m.blendMode || "multiply"
-                };
-            }
-
-            function _createMaterialOLD(m) {
-                return {
-                    ambient: colourToArray(m.ambient, [ 0.2,  0.2,  0.2]),
-                    diffuse: colourToArray(m.diffuse, [ 0.8,  0.8,  0.8]),
-                    specular: colourToArray(m.specular, [ 0.0,  0.0,  0.0]),
-                    shininess: m.shininess || 0,
-                    emission: colourToArray(m.emission, [ 0.0,  0.0,  0.0])
                 };
             }
 

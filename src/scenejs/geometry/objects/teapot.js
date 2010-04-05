@@ -5,7 +5,7 @@ SceneJS._utils.ns("SceneJS.objects");
  */
 SceneJS.objects.teapot = function() {
 
-    var vertices = [
+    var positions = [
         [-3.000000, 1.650000, 0.000000],
         [-2.987110, 1.650000, -0.098438],
         [-2.987110, 1.650000, 0.098438],
@@ -5739,17 +5739,17 @@ SceneJS.objects.teapot = function() {
         [1401,1422,1418]
     ];
 
-    var calculateNormals = function(vertices, indices) {
-        var nvecs = new Array(vertices.length);
+    var calculateNormals = function(positions, indices) {
+        var nvecs = new Array(positions.length);
 
         for (var i = 0; i < indices.length; i++) {
             var j0 = indices[i][0];
             var j1 = indices[i][1];
             var j2 = indices[i][2];
 
-            var v1 = vertices[j0];
-            var v2 = vertices[j1];
-            var v3 = vertices[j2];
+            var v1 = positions[j0];
+            var v2 = positions[j1];
+            var v3 = positions[j2];
 
             var va = SceneJS._math.subVec4(v2, v1);
             var vb = SceneJS._math.subVec4(v3, v1);
@@ -5765,7 +5765,7 @@ SceneJS.objects.teapot = function() {
             nvecs[j2].push(n);
         }
 
-        var normals = new Array(vertices.length);
+        var normals = new Array(positions.length);
 
         // now go through and average out everything
         for (var i = 0; i < nvecs.length; i++) {
@@ -5797,9 +5797,9 @@ SceneJS.objects.teapot = function() {
     return SceneJS.geometry({
         type:"teapot",
         primitive:"triangles",
-        vertices: flatten(vertices, 3),
+        positions: flatten(positions, 3),
         indices:flatten(indices, 3),
-        normals:flatten(calculateNormals(vertices, indices), 3)
+        normals:flatten(calculateNormals(positions, indices), 3)
     });
 };
 

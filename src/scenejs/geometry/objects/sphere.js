@@ -20,7 +20,7 @@ SceneJS.objects.sphere = function() {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 
-    /* A geometry node is normally configured with arrays of vertices, normals, indices etc., but can instead be
+    /* A geometry node is normally configured with arrays of positions, normals, indices etc., but can instead be
      * configured with a "create" callback, as demonstrated here, that returns an object containing those arrays.
      *
      * Every geometry must get a type that globally identifies it within SceneJS. In this case, the
@@ -39,9 +39,9 @@ SceneJS.objects.sphere = function() {
          */
         create: function() {
             var radius = 1;
-            var vertices = [];
+            var positions = [];
             var normals = [];
-            var texCoords = [];
+            var uv = [];
             for (var sliceNum = 0; sliceNum <= slices; sliceNum++) {
                 var theta = sliceNum * Math.PI / slices;
                 var sinTheta = Math.sin(theta);
@@ -61,11 +61,11 @@ SceneJS.objects.sphere = function() {
                     normals.push(-x);
                     normals.push(-y);
                     normals.push(-z);
-                    texCoords.push(u);
-                    texCoords.push(v);
-                    vertices.push(radius * x);
-                    vertices.push(radius * y);
-                    vertices.push(radius * z);
+                    uv.push(u);
+                    uv.push(v);
+                    positions.push(radius * x);
+                    positions.push(radius * y);
+                    positions.push(radius * z);
                 }
             }
 
@@ -86,9 +86,9 @@ SceneJS.objects.sphere = function() {
 
             return {
                 primitive : "triangles",
-                vertices : vertices,
+                positions : positions,
                 normals: normals,
-                texCoords : texCoords,
+                uv : uv,
                 indices : indices,
                 colors:[]
             };

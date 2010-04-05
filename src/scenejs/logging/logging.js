@@ -5,7 +5,7 @@ SceneJS.logging = function() {
     var backend = SceneJS._backends.getBackend('logging');
     var funcs;
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 var prevFuncs = backend.getFuncs();
                 if (!funcs || !cfg.fixed) {
                     funcs = cfg.getParams(data);
@@ -16,7 +16,7 @@ SceneJS.logging = function() {
                     funcs.info = funcs.info || p.info;
                 }
                 backend.setFuncs(funcs);
-                SceneJS._utils.visitChildren(cfg, data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 backend.setFuncs(prevFuncs);
             });
 };
