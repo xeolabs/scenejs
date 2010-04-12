@@ -29,7 +29,7 @@ SceneJS._backends.installBackend(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
                         transform = {
-                            matrix : SceneJS._math.identityMat4(),
+                            matrix : SceneJS_math_identityMat4(),
                             fixed: true
                         };
                         dirty = true;
@@ -52,8 +52,8 @@ SceneJS._backends.installBackend(
 
                             if (!transform.normalMatrixAsArray) {
                                 transform.normalMatrixAsArray = new WebGLFloatArray(
-                                        SceneJS._math.transposeMat4(
-                                                SceneJS._math.inverseMat4(transform.matrix)));
+                                        SceneJS_math_transposeMat4(
+                                                SceneJS_math_inverseMat4(transform.matrix)));
                             }
 
                             ctx.events.fireEvent(

@@ -7,10 +7,10 @@
  */
 SceneJS.load = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    if (!cfg.fixed) {
-        throw new SceneJS.exceptions.UnsupportedOperationException
-                ("Dynamic configuration of SceneJS.load nodes is not supported");
-    }
+//    if (!cfg.fixed) {
+//        throw new SceneJS.exceptions.UnsupportedOperationException
+//                ("Dynamic configuration of SceneJS.load nodes is not supported");
+//    }
     var params;
 
     var backend = SceneJS._backends.getBackend("load");

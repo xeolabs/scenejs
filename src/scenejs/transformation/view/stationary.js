@@ -12,9 +12,9 @@ SceneJS.stationary = function() {
                 if (lookAt) {
                     if (!xform || !superXform.fixed) {
                         xform = {
-                            matrix: SceneJS._math.mulMat4(
+                            matrix: SceneJS_math_mulMat4(
                                     superXform.matrix,
-                                    SceneJS._math.translationMat4c(
+                                    SceneJS_math_translationMat4c(
                                             lookAt.eye.x,
                                             lookAt.eye.y,
                                             lookAt.eye.z)),

@@ -46,8 +46,8 @@ SceneJS._backends.installBackend(
 
             function _createMaterial(m) {
                 return {
-                    baseColor: colour4ToArray(m.baseColor, [ 0.2,  0.2,  0.2, 0.0]),       // IE. diffuse colour
-                    specularColor: colour3ToArray(m.specularColor, [ 0.8,  0.8,  0.8]),
+                    baseColor: colour3ToArray(m.baseColor, [ 0.0,  0.0,  0.0]),       // IE. diffuse colour
+                    specularColor: colour3ToArray(m.specularColor, [ 0.0,  0.0,  0.0]),
                     specular: m.specular || 0.0,
                     shine: m.shine || 0.0,
                     reflect: m.reflect || 0.0,

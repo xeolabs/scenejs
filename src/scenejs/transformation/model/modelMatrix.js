@@ -22,14 +22,14 @@ SceneJS.modellingMatrix = function() {
             function(traversalContext, data) {
                 if (memoLevel == NO_MEMO) {
                     var params = cfg.getParams(data);
-                    mat = params.elements || SceneJS._math.identityMat4();
+                    mat = params.elements || SceneJS_math_identityMat4();
                     if (cfg.fixed) {
                         memoLevel = FIXED_CONFIG;
                     }
                 }
                 var superXform = backend.getTransform();
                 if (memoLevel < FIXED_MODEL_SPACE) {
-                    var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                     xform = {
                         localMatrix: mat,
                         matrix: tempMat,

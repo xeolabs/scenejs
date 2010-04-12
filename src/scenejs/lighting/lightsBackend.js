@@ -32,7 +32,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        modelMat = viewMat = SceneJS._math.identityMat4();
+                        modelMat = viewMat = SceneJS_math_identityMat4();
                         lightStack = [];
                         dirty = true;
                     });
@@ -90,46 +90,71 @@ SceneJS._backends.installBackend(
             /* Creates a view-space light
              */
             function createLight(light) {
-                if (light.type &&
-                    (light.type != "spot"
-                            && light.type != "dir"
-                            && light.type != "point")) {
-                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.light node has a light of unsupported type - should be 'spot', 'direction' or 'point'");
+                if (light.type) {
+                    if (light.type != "dir"
+                            && light.type != "point") {
+                        throw new SceneJS.exceptions.InvalidNodeConfigException(
+                                "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'");
+                    }
+                } else {
+                    light.type = light.type || "point";
                 }
-                return {
-                    type: light.type || "point",
 
-                    color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                if (light.type == "point") {
+                    return {
+                        type: light.type,
+                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                        diffuse : light.diffuse,
+                        specular : light.specular,
+                        pos : SceneJS_math_transformPoint3(
+                                viewMat,
+                                SceneJS_math_transformPoint3(
+                                        modelMat,
+                                        pointToArray(light.pos, [ 0,  0, 1.0, 1.0]))),
+                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
+                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
+                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
+                    };
+                }
 
-                    diffuse : light.diffuse,
-                    specular : light.specular,
+                if (light.type == "dir") {
+                    return {
+                        type: light.type,
+                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                        diffuse : light.diffuse,
+                        specular : light.specular,
+                        dir : SceneJS_math_transformVector3(
+                                viewMat,
+                                SceneJS_math_transformVector3(
+                                        modelMat,
+                                        vectorToArray(light.dir, [ 0,  0,  1.0])))
+                    };
+                }
 
-                    dir : light.type == "dir" ? SceneJS._math.transformVector3(
-                            viewMat,
-                            SceneJS._math.transformVector3(
-                                    modelMat,
-                                    vectorToArray(light.dir, [ 0,  0,  1.0]))) : null,
-
-                    pos : light.type == "point" ? SceneJS._math.transformPoint3(
-                            viewMat,
-                            SceneJS._math.transformPoint3(
-                                    modelMat,
-                                    pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))) : null,
-
-                    spotDir: SceneJS._math.transformVector3(
-                            viewMat,
-                            SceneJS._math.transformVector3(
-                                    modelMat,
-                                    vectorToArray(light.spotDir, [ 0,  0,  -1.0]))),
-
-                    spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
-                    spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
-
-                    constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-                    linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-                    quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-                };
+//                if (light.type == "spot") {
+//                    return {
+//                        type: light.type,
+//                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+//                        diffuse : light.diffuse,
+//                        specular : light.specular,
+//                        pos : SceneJS_math_transformPoint3(
+//                                viewMat,
+//                                SceneJS_math_transformPoint3(
+//                                        modelMat,
+//                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
+//
+//                        dir : SceneJS_math_transformVector3(
+//                                viewMat,
+//                                SceneJS_math_transformVector3(
+//                                        modelMat,
+//                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
+//                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
+//                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
+//                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
+//                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
+//                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
+//                    };
+//                }
             }
 
             /* Node-facing API

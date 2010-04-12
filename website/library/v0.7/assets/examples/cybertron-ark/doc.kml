@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<kml xmlns='http://earth.google.com/kml/2.1'>
+<Folder>
+    <name>The_Ark</name>
+    <description><![CDATA[Created with <a href="http://sketchup.google.com/">Google SketchUp 6.4.112</a>]]></description>
+    <DocumentSource>SketchUp</DocumentSource>
+<visibility>1</visibility>
+<LookAt>
+<heading>30.173</heading>
+<tilt>60.7811</tilt>
+<latitude>39.98341011354673</latitude>
+<longitude>-105.3064075834068</longitude>
+<range>7115.052431215862</range>
+<altitude>3807.581401768339</altitude>
+</LookAt>
+<Folder>
+<name>Tour</name>
+<Placemark>
+<name>Scene 1</name>
+<visibility>1</visibility>
+<LookAt>
+<heading>30.173</heading>
+<tilt>60.7811</tilt>
+<latitude>39.98341011354673</latitude>
+<longitude>-105.3064075834068</longitude>
+<range>7115.052431215862</range>
+<altitude>3807.581401768339</altitude>
+</LookAt>
+</Placemark>
+<Placemark>
+<name>Scene 2</name>
+<visibility>1</visibility>
+<LookAt>
+<heading>205.676</heading>
+<tilt>71.851</tilt>
+<latitude>40.06457445357258</latitude>
+<longitude>-105.2621188208962</longitude>
+<range>9319.119454008755</range>
+<altitude>3003.663914045499</altitude>
+</LookAt>
+</Placemark>
+<Placemark>
+<name>Scene 3</name>
+<visibility>1</visibility>
+<LookAt>
+<heading>148.335</heading>
+<tilt>72.153</tilt>
+<latitude>40.06171025203313</latitude>
+<longitude>-105.3246431685317</longitude>
+<range>2462.466102142406</range>
+<altitude>780.0091292541773</altitude>
+</LookAt>
+</Placemark>
+<Placemark>
+<name>Scene 4</name>
+<visibility>1</visibility>
+<LookAt>
+<heading>26.1821</heading>
+<tilt>83.9891</tilt>
+<latitude>40.00495900274031</latitude>
+<longitude>-105.2868288775903</longitude>
+<range>17127.52739642121</range>
+<altitude>1800.150581993664</altitude>
+</LookAt>
+</Placemark>
+<Placemark>
+<name>Scene 5</name>
+<visibility>1</visibility>
+<LookAt>
+<heading>220.888</heading>
+<tilt>77.931</tilt>
+<latitude>40.01478902245093</latitude>
+<longitude>-105.2770689372737</longitude>
+<range>8491.346325360353</range>
+<altitude>1802.148554248791</altitude>
+</LookAt>
+</Placemark>
+<Placemark>
+<name>Scene 6</name>
+<visibility>1</visibility>
+<LookAt>
+<heading>209.567</heading>
+<tilt>73.8847</tilt>
+<latitude>40.03107432060354</latitude>
+<longitude>-105.2747620075684</longitude>
+<range>6881.92348947507</range>
+<altitude>1962.122132862472</altitude>
+</LookAt>
+</Placemark>
+<Placemark>
+<name>Scene 7</name>
+<visibility>1</visibility>
+<LookAt>
+<heading>179.505</heading>
+<tilt>85.8032</tilt>
+<latitude>40.05673334246284</latitude>
+<longitude>-105.2836324291642</longitude>
+<range>19668.42499621403</range>
+<altitude>1441.96264404169</altitude>
+</LookAt>
+</Placemark>
+</Folder>
+  <Placemark>
+    <name>Model</name>
+    <description><![CDATA[]]></description>
+    <Style id='default'>
+    </Style>
+    <Model>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <Location>
+            <longitude>-105.283000000000</longitude>
+            <latitude>40.017000000000</latitude>
+            <altitude>0.000000000000</altitude>
+        </Location>
+        <Orientation>
+            <heading>0</heading>
+            <tilt>0</tilt>
+            <roll>0</roll>
+        </Orientation>
+        <Scale>
+            <x>1.0</x>
+            <y>1.0</y>
+            <z>1.0</z>
+        </Scale>
+        <Link>
+            <href>models/The_Ark.dae</href>
+        </Link>
+    </Model>
+  </Placemark></Folder>
+</kml>

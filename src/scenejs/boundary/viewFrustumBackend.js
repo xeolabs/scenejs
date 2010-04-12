@@ -27,7 +27,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        projMat = viewMat = SceneJS._math.identityMat4();
+                        projMat = viewMat = SceneJS_math_identityMat4();
                         viewport = [0,0,1,1];
                         frustum = null;
                     });
@@ -55,7 +55,7 @@ SceneJS._backends.installBackend(
 
             var getFrustum = function() {
                 if (!frustum) {
-                    frustum = new SceneJS._math.Frustum(viewMat, projMat, viewport);
+                    frustum = new SceneJS_math_Frustum(viewMat, projMat, viewport);
                 }
                 return frustum;
             };

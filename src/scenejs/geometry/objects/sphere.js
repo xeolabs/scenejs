@@ -89,8 +89,7 @@ SceneJS.objects.sphere = function() {
                 positions : positions,
                 normals: normals,
                 uv : uv,
-                indices : indices,
-                colors:[]
+                indices : indices
             };
         }
     });

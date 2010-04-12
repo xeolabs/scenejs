@@ -89,7 +89,7 @@ SceneJS._backends.installBackend(
                  * a closure, IE. not return it.
                  */
                 allocate: function(description, tryAllocate) {
-                    ctx.logging.debug("Allocating memory for: " + description);
+                   // ctx.logging.debug("Allocating memory for: " + description);
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException
                                 ("No canvas active - failed to allocate shader memory");
@@ -109,6 +109,7 @@ SceneJS._backends.installBackend(
                             return; // No errors, must have worked
                         } catch (e) {
                             if (context.getError() != context.OUT_OF_MEMORY) {
+                                ctx.logging.error(e.message || e);
                                 throw e; // We only handle out-of-memory error here
                             }
                             if (++tries > maxTries || !evict()) { // Too many tries or no cacher wants to evict

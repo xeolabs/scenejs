@@ -395,7 +395,7 @@
                         primitive: "triangles",
                         vertices: outputData.VERTEX,
                         normals: outputData.NORMAL,
-                        uv : outputData.TEXCOORD0 || [],
+                        texCoords : outputData.TEXCOORD0 || [],
                         indices: faces
                     });
                 }

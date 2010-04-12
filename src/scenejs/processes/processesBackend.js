@@ -54,9 +54,9 @@ SceneJS._backends.installBackend(
                                     group.numProcesses--;
                                 } else {
                                     var elapsed = time - process.timeStarted;
-                                    if (elapsed > process.timeout) {
+                                    if (elapsed > (process.timeout * 1000)) {
                                         ctx.logging.warn("Process timed out after " +
-                                                         (process.timeout / 1000) +
+                                                         process.timeoutSecs +
                                                          " seconds: " + process.description);
                                         process.destroyed = true;
                                         processes[pid] = undefined;
@@ -101,7 +101,7 @@ SceneJS._backends.installBackend(
                  *
                  * createProcess({
                  *      description: "loading texture image",
-                 *      timeout: 30000,                         // 30 Seconds
+                 *      timeoutSecs: 30,                         // 30 Seconds
                  *      onTimeout(function() {
                  *              alert("arrrg!!");
                  *          });
@@ -121,12 +121,12 @@ SceneJS._backends.installBackend(
                                 timeStarted : time,
                                 timeRunning: 0,
                                 description : cfg.description || "",
-                                timeout : cfg.timeout || 30000, // Thirty second default timout
+                                timeoutSecs : cfg.timeoutSecs || 30, // Thirty second default timout
                                 onTimeout : cfg.onTimeout
                             };
                             group.processes[pid] = process;
                             group.numProcesses++;
-                            ctx.logging.debug("Created process: " + cfg.description);
+                          //  ctx.logging.debug("Created process: " + cfg.description);
                             return process;
                         }
                     }
@@ -139,7 +139,7 @@ SceneJS._backends.installBackend(
                 destroyProcess: function(process) {
                     if (process) {
                         process.destroyed = true;
-                        ctx.logging.debug("Destroyed process: " + process.description);
+                     //   ctx.logging.debug("Destroyed process: " + process.description);
                     }
                 },
 
@@ -166,8 +166,8 @@ SceneJS._backends.installBackend(
                  *          timeStarted :   65765765765765,             // System time in milliseconds
                  *          timeRunning:    876870,                     // Elapsed time in milliseconds
                  *          description :   "loading texture image",
-                 *          timeout :       30000,                      // Timeout in milliseconds
-                 *          onTimeout :     <function>                  // Function that will fire on timeout
+                 *          timeoutSecs :       30,                      // Timeout in milliseconds
+                 *          onTimeout :     <function>                  // Function that will fire on timeoutSecs
                  */
                 getProcesses : function(sceneId) {
                     var group = groups[sceneId];

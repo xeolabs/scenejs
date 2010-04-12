@@ -76,7 +76,7 @@ SceneJS._backends.installBackend(
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Null SceneJS.renderer node config: \"" + name + "\"");
                 }
-                var result = SceneJS._webgl.enumMap[name];
+                var result = SceneJS_webgl_enumMap[name];
                 if (!result) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");

@@ -107,10 +107,15 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/processes/processesBackend.js"/>
 
-            <!-- Load -->
+            <!-- Load SceneJS format -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/load/loadBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
+
+               <!-- Load COLLADA -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/colladaParser.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/loadCollada.js"/>
 
             <!-- Picking -->
 
@@ -227,117 +232,7 @@
         </delete>
 
         <mkdir dir="${EXTRACTED_DIST_DIR}"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
-
-
-        <!--<copy file="${SRC_DIR}/examples/basic/teapot/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/basic/teapot/index.html"/>-->
-
-        <!-- Examples -->
-
-        <!-- Basic -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/basic"/>
-
-        <!-- Teapot -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/basic/teapot"/>
-        <copy file="src/examples/basic/teapot/teapot.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/basic/teapot/teapot.js"/>
-
-        <!-- Animation -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation"/>
-
-        <!-- Interpolated teapot -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation"/>
-        <copy file="src/examples/animation/interpolated-rotation/interpolated-rotation.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/interpolated-rotation.js"/>
-
-        <!-- Teapot cloud -->
-
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cloud"/>
-        <copy file="src/examples/animation/teapot-cloud/teapot-cloud.js"
-              tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cloud/teapot-cloud.js"/>
-
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough"/>-->
-        <!--<copy file="${SRC_DIR}/examples/animation/teapot-cluster-flythrough/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/index.html"/>-->
-        <!--<copy file="src/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/teapot-cluster-flythrough/teapot-cluster-flythrough.js"/>-->
-
-        <!-- Generation -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation"/>-->
-
-        <!-- Multiple teapots -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots"/>-->
-        <!--<copy file="${SRC_DIR}/examples/generation/multiple-teapots/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/index.html"/>-->
-        <!--<copy file="src/examples/generation/multiple-teapots/multiple-teapots.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-teapots/multiple-teapots.js"/>-->
-
-        <!-- Multiple viewports -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports"/>-->
-        <!--<copy file="${SRC_DIR}/examples/generation/multiple-viewports/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/index.html"/>-->
-        <!--<copy file="src/examples/generation/multiple-viewports/multiple-viewports.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-viewports/multiple-viewports.js"/>-->
-
-        <!-- Spiral staircase -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase"/>-->
-        <!--<copy file="${SRC_DIR}/examples/generation/spiral-staircase/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/index.html"/>-->
-        <!--<copy file="src/examples/generation/spiral-staircase/spiral-staircase.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/spiral-staircase/spiral-staircase.js"/>-->
-
-        <!--<copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>-->
-        <!--<copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>-->
-
-        <!-- Multiple canvases -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases"/>-->
-        <!--<copy file="${SRC_DIR}/examples/generation/multiple-canvases/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/index.html"/>-->
-        <!--<copy file="src/examples/generation/multiple-canvases/multiple-canvases.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/generation/multiple-canvases/multiple-canvases.js"/>-->
-
-        <!-- Scalar inpterpolator -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation"/>-->
-        <!--<copy file="${SRC_DIR}/examples/animation/interpolated-rotation/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/index.html"/>-->
-        <!--<copy file="src/examples/animation/interpolated-rotation/interpolated-rotation.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/animation/interpolated-rotation/interpolated-rotation.js"/>-->
-
-        <!-- Assets -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset"/>-->
-        <!--<copy file="${SRC_DIR}/examples/assets/js-teapot-asset/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/index.html"/>-->
-        <!--<copy file="src/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/assets/js-teapot-asset/js-teapot-asset-demo.js"/>-->
-
-        <!-- Texturing -->
-
-        <!--<mkdir dir="${EXTRACTED_DIST_DIR}/examples/textures/general-zod"/>-->
-        <!--<copy file="${SRC_DIR}/examples/textures/general-zod/index.html"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/index.html"/>-->
-        <!--<copy file="src/examples/textures/general-zod/general-zod.js"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.js"/>-->
-        <!--<copy file="src/examples/textures/general-zod/general-zod.jpg"-->
-        <!--tofile="${EXTRACTED_DIST_DIR}/examples/textures/general-zod/general-zod.jpg"/>-->
-
-        <!-- License and readme -->
-
-        <!--<copy file="licenses/MIT_LICENSE.txt" tofile="${EXTRACTED_DIST_DIR}/license.txt"/>-->
-        <!--<copy file="${basedir}/README.txt" tofile="${EXTRACTED_DIST_DIR}/README.txt"/>-->
+        <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>       
     </target>
 
 </project>

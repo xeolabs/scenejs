@@ -95,7 +95,7 @@ SceneJS._backends.installBackend(
              * where canvas not found and geometry was implicitly destroyed
              */
             function destroyGeometry(geo) {
-                ctx.logging.debug("Destroying geometry : '" + geo.type + "'");
+                //  ctx.logging.debug("Destroying geometry : '" + geo.type + "'");
                 if (geo.geoId == currentBoundGeo) {
                     currentBoundGeo = null;
                 }
@@ -109,8 +109,11 @@ SceneJS._backends.installBackend(
                     if (geo.normalBuf) {
                         geo.indexBuf.destroy();
                     }
-                    if (geo.texCoordBuf) {
-                        geo.texCoordBuf.destroy();
+                    if (geo.uvBuf) {
+                        geo.uvBuf.destroy();
+                    }
+                    if (geo.uvBuf2) {
+                        geo.uvBuf2.destroy();
                     }
                 }
                 geometries[geo.geoId] = null;
@@ -157,7 +160,7 @@ SceneJS._backends.installBackend(
                 ctx.memory.allocate(
                         description,
                         function() {
-                            buf = new SceneJS._webgl.ArrayBuffer
+                            buf = new SceneJS_webgl_ArrayBuffer
                                     (context, type, values, numItems, itemSize, usage);
                         });
                 return buf;
@@ -211,11 +214,11 @@ SceneJS._backends.installBackend(
                  * @param data Contains positions, normals, indexes etc.
                  */
                 createGeometry : function(type, data) {
-//                    if (!type) {
-//                        type = "g" + nextTypeId++;
-//                    }
-//
-                    ctx.logging.debug("Creating geometry: '" + type + "'");
+                    //                    if (!type) {
+                    //                        type = "g" + nextTypeId++;
+                    //                    }
+                    //
+                    //   ctx.logging.debug("Creating geometry: '" + type + "'");
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
@@ -232,7 +235,8 @@ SceneJS._backends.installBackend(
 
                     var vertexBuf;
                     var normalBuf;
-                    var texCoordBuf;
+                    var uvBuf;
+                    var uvBuf2;
                     var indexBuf;
 
                     try { // TODO: Modify usage flags in accordance with how often geometry is evicted
@@ -244,8 +248,13 @@ SceneJS._backends.installBackend(
                                 new WebGLFloatArray(data.normals), data.normals.length, 3, usage);
 
                         if (data.uv) {
-                            texCoordBuf = createArrayBuffer("geometry texture buffer", context, context.ARRAY_BUFFER,
+                            uvBuf = createArrayBuffer("geometry UV buffer", context, context.ARRAY_BUFFER,
                                     new WebGLFloatArray(data.uv), data.uv.length, 2, usage);
+                        }
+
+                        if (data.uv2) {
+                            uvBuf2 = createArrayBuffer("geometry UV2 buffer", context, context.ARRAY_BUFFER,
+                                    new WebGLFloatArray(data.uv2), data.uv2.length, 2, usage);
                         }
 
                         indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
@@ -262,7 +271,8 @@ SceneJS._backends.installBackend(
                             vertexBuf : vertexBuf,
                             normalBuf : normalBuf,
                             indexBuf : indexBuf,
-                            texCoordBuf: texCoordBuf
+                            uvBuf: uvBuf,
+                            uvBuf2: uvBuf2
                         };
 
                         geometries[geoId] = geo;
@@ -277,8 +287,11 @@ SceneJS._backends.installBackend(
                         if (normalBuf) {
                             normalBuf.destroy();
                         }
-                        if (texCoordBuf) {
-                            texCoordBuf.destroy();
+                        if (uvBuf) {
+                            uvBuf.destroy();
+                        }
+                        if (uvBuf2) {
+                            uvBuf2.destroy();
                         }
                         if (indexBuf) {
                             indexBuf.destroy();
@@ -297,9 +310,11 @@ SceneJS._backends.installBackend(
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
 
-                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE);
-
                     var geo = geometries[geoId];
+
+                    ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_UPDATED, geo);
+
+                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE); 
 
                     geo.lastUsed = time;
 

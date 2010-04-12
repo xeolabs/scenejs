@@ -33,7 +33,7 @@ SceneJS.lookAt = function() {
                                 ("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                     }
 
-                    mat = SceneJS._math.lookAtMat4c(
+                    mat = SceneJS_math_lookAtMat4c(
                             eye.x, eye.y, eye.z,
                             look.x, look.y, look.z,
                             up.x, up.y, up.z);
@@ -43,7 +43,7 @@ SceneJS.lookAt = function() {
 
                 var superXform = backend.getTransform();
                 if (!xform || !superXform.fixed || !fixed) {
-                    var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                     xform = {
                         matrix: tempMat,
                         lookAt : {

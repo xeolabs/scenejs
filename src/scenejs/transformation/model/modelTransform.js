@@ -30,7 +30,7 @@
                         }
                         var superXform = backend.getTransform();
                         if (memoLevel < FIXED_SPACE) {
-                            var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                            var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                             xform = {
                                 localMatrix: mat,
                                 matrix: tempMat,
@@ -57,19 +57,19 @@
                 if (params.x + params.y + params.z == 0) {
                     throw new SceneJS.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
                 }
-                return SceneJS._math.rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
+                return SceneJS_math_rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
             });
 
     defineNode("scale",
             "model-transform",
             function(params) {
-                return SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
+                return SceneJS_math_scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
             });
 
     defineNode("translate",
             "model-transform",
             function(params) {
-                return SceneJS._math.translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
+                return SceneJS_math_translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
             });
 
     var cloneVec = function(v) {
@@ -90,7 +90,7 @@
                     throw new SceneJS.exceptions.InvalidLookAtConfigException
                             ("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                 }
-                return SceneJS._math.lookAtMat4c(
+                return SceneJS_math_lookAtMat4c(
                         params.eye.x, params.eye.y, params.eye.z,
                         params.look.x, params.look.y, params.look.z,
                         params.up.x, params.up.y, params.up.z);

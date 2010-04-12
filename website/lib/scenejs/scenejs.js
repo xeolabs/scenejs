@@ -1,5 +1,5 @@
 var SceneJS = {
-    version: '0.7.0'
+    version: '0.7.2'
 };
 
 (function() {
@@ -488,1456 +488,1453 @@ SceneJS._utils.ns("SceneJS");
 
 /** Private math utilities.
  */
-SceneJS._math = {
 
-    divVec3:function(u, v) {
-        return [u[0] / v[0], u[1] / v[1], u[2] / v[2]];
-    },
+function SceneJS_math_divVec3(u, v) {
+    return [u[0] / v[0], u[1] / v[1], u[2] / v[2]];
+}
 
-    negateVector4: function(v) {
-        return [-v[0],-v[1],-v[2],-v[3]];
-    },
+function SceneJS_math_negateVector4(v) {
+    return [-v[0],-v[1],-v[2],-v[3]];
+}
 
-    addVec4: function (u, v) {
-        return [u[0] + v[0],u[1] + v[1],u[2] + v[2],u[3] + v[3]];
-    },
+function SceneJS_math_addVec4(u, v) {
+    return [u[0] + v[0],u[1] + v[1],u[2] + v[2],u[3] + v[3]];
+}
 
-    addVec4s: function (v, s) {
-        return [v[0] + s,v[1] + s,v[2] + s,v[3] + s];
-    },
+function SceneJS_math_addVec4s(v, s) {
+    return [v[0] + s,v[1] + s,v[2] + s,v[3] + s];
+}
 
-    addScalarVec4: function(s, v) {
-        return SceneJS._math.addVec4s(v, s)
-    },
+function SceneJS_math_addScalarVec4(s, v) {
+    return SceneJS_math_addVec4s(v, s)
+}
 
-    subVec4: function(u, v) {
-        return [u[0] - v[0],u[1] - v[1],u[2] - v[2],u[3] - v[3]];
-    },
+function SceneJS_math_subVec4(u, v) {
+    return [u[0] - v[0],u[1] - v[1],u[2] - v[2],u[3] - v[3]];
+}
 
-    subVec3: function(u, v) {
-        return [u[0] - v[0],u[1] - v[1],u[2] - v[2]];
-    },
+function SceneJS_math_subVec3(u, v) {
+    return [u[0] - v[0],u[1] - v[1],u[2] - v[2]];
+}
 
-    subVec4Scalar: function(v, s) {
-        return [v[0] - s,v[1] - s,v[2] - s,v[3] - s];
-    },
+function SceneJS_math_subVec4Scalar(v, s) {
+    return [v[0] - s,v[1] - s,v[2] - s,v[3] - s];
+}
 
-    subScalarVec4: function(v, s) {
-        return [s - v[0],s - v[1],s - v[2],s - v[3]];
-    },
+function SceneJS_math_subScalarVec4(v, s) {
+    return [s - v[0],s - v[1],s - v[2],s - v[3]];
+}
 
-    mulVec4: function(u, v) {
-        return [u[0] * v[0],u[1] * v[1],u[2] * v[2],u[3] * v[3]];
-    },
+function SceneJS_math_mulVec4(u, v) {
+    return [u[0] * v[0],u[1] * v[1],u[2] * v[2],u[3] * v[3]];
+}
 
-    mulVec4Scalar:function(v, s) {
-        return [v[0] * s,v[1] * s,v[2] * s,v[3] * s];
-    },
+function SceneJS_math_mulVec4Scalar(v, s) {
+    return [v[0] * s,v[1] * s,v[2] * s,v[3] * s];
+}
 
-    divVec4:function(u, v) {
-        return [u[0] / v[0],u[1] / v[1],u[2] / v[2],u[3] / v[3]];
-    },
+function SceneJS_math_divVec4(u, v) {
+    return [u[0] / v[0],u[1] / v[1],u[2] / v[2],u[3] / v[3]];
+}
 
-    divScalarVec3:function(s, v) {
-        return [s / v[0], s / v[1], s / v[2]];
-    },
-
-
-    divVec3s:function(v, s) {
-        return [v[0] / s, v[1] / s, v[2] / s];
-    },
-
-    divVec4s:function(v, s) {
-        return [v[0] / s,v[1] / s,v[2] / s,v[3] / s];
-    },
-
-    divScalarVec4:function(s, v) {
-        return [s / v[0],s / v[1],s / v[2],s / v[3]];
-    },
+function SceneJS_math_divScalarVec3(s, v) {
+    return [s / v[0], s / v[1], s / v[2]];
+}
 
 
-    dotVector4:function(u, v) {
-        return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3]);
-    },
+function SceneJS_math_divVec3s(v, s) {
+    return [v[0] / s, v[1] / s, v[2] / s];
+}
 
-    cross3Vec4:function(u, v) {
-        return [u[1] * v[2] - u[2] * v[1],u[2] * v[0] - u[0] * v[2],u[0] * v[1] - u[1] * v[0],0.0];
-    },
+function SceneJS_math_divVec4s(v, s) {
+    return [v[0] / s,v[1] / s,v[2] / s,v[3] / s];
+}
 
-    sqLenVec4:function(v) {
-        return SceneJS._math.dotVector4(v, v);
-    },
+function SceneJS_math_divScalarVec4(s, v) {
+    return [s / v[0],s / v[1],s / v[2],s / v[3]];
+}
 
-    lenVec4:function(v) {
-        return Math.sqrt(SceneJS._math.sqLenVec4(v));
-    },
 
-    dotVector3:function(u, v) {
-        return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2]);
-    },
+function SceneJS_math_dotVector4(u, v) {
+    return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3]);
+}
 
-    sqLenVec3:function(v) {
-        return SceneJS._math.dotVector3(v, v);
-    },
+function SceneJS_math_cross3Vec4(u, v) {
+    return [u[1] * v[2] - u[2] * v[1],u[2] * v[0] - u[0] * v[2],u[0] * v[1] - u[1] * v[0],0.0];
+}
 
-    lenVec3:function(v) {
-        return Math.sqrt(SceneJS._math.sqLenVec3(v));
-    },
+function SceneJS_math_sqLenVec4(v) {
+    return SceneJS_math_dotVector4(v, v);
+}
 
-    rcpVec3 : function(v) {
-        return SceneJS._math.divScalarVec3(1.0, v);
-    },
+function SceneJS_math_lenVec4(v) {
+    return Math.sqrt(SceneJS_math_sqLenVec4(v));
+}
 
-    normalizeVec4:function(v) {
-        var f = 1.0 / SceneJS._math.lenVec4(v);
-        return SceneJS._math.mulVec4Scalar(v, f);
-    },
+function SceneJS_math_dotVector3(u, v) {
+    return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2]);
+}
 
-    mat4:function() {
-        return new Array(16);
-    },
+function SceneJS_math_sqLenVec3(v) {
+    return SceneJS_math_dotVector3(v, v);
+}
 
-    dupMat4:function(m) {
-        return m.slice(0, 16);
-    },
+function SceneJS_math_lenVec3(v) {
+    return Math.sqrt(SceneJS_math_sqLenVec3(v));
+}
 
-    getCellMat4:function(m, row, col) {
-        return m[row + col * 4];
-    },
+function SceneJS_math_rcpVec3(v) {
+    return SceneJS_math_divScalarVec3(1.0, v);
+}
 
-    setCellMat4:function(m, row, col, s) {
-        m[row + col * 4] = s;
-    },
+function SceneJS_math_normalizeVec4(v) {
+    var f = 1.0 / SceneJS_math_lenVec4(v);
+    return SceneJS_math_mulVec4Scalar(v, f);
+}
 
-    getRowMat4:function(m, r) {
-        return [m[r + 0], m[r + 4], m[r + 8], m[r + 12]];
-    },
+function SceneJS_math_mat4() {
+    return new Array(16);
+}
 
-    setRowMat4:function(m, r, v) {
-        m[r + 0] = v[0];
-        m[r + 4] = v[1];
-        m[r + 8] = v[2];
-        m[r + 12] = v[3];
-    },
+function SceneJS_math_dupMat4(m) {
+    return m.slice(0, 16);
+}
 
-    setRowMat4c:function(m, r, x, y, z, w) {
-        SceneJS._math.setRowMat4(m, r, [x,y,z,w]);
-    },
+function SceneJS_math_getCellMat4(m, row, col) {
+    return m[row + col * 4];
+}
 
-    setRowMat4s:function(m, r, s) {
-        SceneJS._math.setRowMat4c(m, r, s, s, s, s);
-    },
+function SceneJS_math_setCellMat4(m, row, col, s) {
+    m[row + col * 4] = s;
+}
 
-    getColMat4:function(m, c) {
-        var i = c * 4;
-        return [m[i + 0], m[i + 1],m[i + 2],m[i + 3]];
-    },
+function SceneJS_math_getRowMat4(m, r) {
+    return [m[r + 0], m[r + 4], m[r + 8], m[r + 12]];
+}
 
-    setColMat4v:function(m, c, v) {
-        var i = c * 4;
-        m[i + 0] = v[0];
-        m[i + 1] = v[1];
-        m[i + 2] = v[2];
-        m[i + 3] = v[3];
-    },
+function SceneJS_math_setRowMat4(m, r, v) {
+    m[r + 0] = v[0];
+    m[r + 4] = v[1];
+    m[r + 8] = v[2];
+    m[r + 12] = v[3];
+}
 
-    setColMat4c:function(m, c, x, y, z, w) {
-        SceneJS._math.setColMat4v(m, c, [x,y,z,w]);
-    },
+function SceneJS_math_setRowMat4c(m, r, x, y, z, w) {
+    SceneJS_math_setRowMat4(m, r, [x,y,z,w]);
+}
 
-    setColMat4Scalar:function(m, c, s) {
-        SceneJS._math.setColMat4c(m, c, s, s, s, s);
-    },
+function SceneJS_math_setRowMat4s(m, r, s) {
+    SceneJS_math_setRowMat4c(m, r, s, s, s, s);
+}
 
-    mat4To3:function(m) {
-        return [
-            m[0],m[1],m[2],
-            m[4],m[5],m[6],
-            m[8],m[9],m[10]
-        ];
-    },
+function SceneJS_math_getColMat4(m, c) {
+    var i = c * 4;
+    return [m[i + 0], m[i + 1],m[i + 2],m[i + 3]];
+}
 
-    m4s:function(s) {
-        return [
-            s,s,s,s,
-            s,s,s,s,
-            s,s,s,s,
-            s,s,s,s
-        ];
-    },
+function SceneJS_math_setColMat4v(m, c, v) {
+    var i = c * 4;
+    m[i + 0] = v[0];
+    m[i + 1] = v[1];
+    m[i + 2] = v[2];
+    m[i + 3] = v[3];
+}
 
-    setMat4ToZeroes:function() {
-        return SceneJS._math.m4s(0.0);
-    },
+function SceneJS_math_setColMat4c(m, c, x, y, z, w) {
+    SceneJS_math_setColMat4v(m, c, [x,y,z,w]);
+}
 
-    setMat4ToOnes:function() {
-        return SceneJS._math.m4s(1.0);
-    },
+function SceneJS_math_setColMat4Scalar(m, c, s) {
+    SceneJS_math_setColMat4c(m, c, s, s, s, s);
+}
 
-    diagonalMat4v:function(v) {
-        return [
-            v[0], 0.0, 0.0, 0.0,
-            0.0,v[1], 0.0, 0.0,
-            0.0, 0.0, v[2],0.0,
-            0.0, 0.0, 0.0, v[3]
-        ];
-    },
+function SceneJS_math_mat4To3(m) {
+    return [
+        m[0],m[1],m[2],
+        m[4],m[5],m[6],
+        m[8],m[9],m[10]
+    ];
+}
 
-    diagonalMat4c:function(x, y, z, w) {
-        return SceneJS._math.diagonalMat4v([x,y,z,w]);
-    },
+function SceneJS_math_m4s(s) {
+    return [
+        s,s,s,s,
+        s,s,s,s,
+        s,s,s,s,
+        s,s,s,s
+    ];
+}
 
-    diagonalMat4s:function(s) {
-        return SceneJS._math.diagonalMat4c(s, s, s, s);
-    },
+function SceneJS_math_setMat4ToZeroes() {
+    return SceneJS_math_m4s(0.0);
+}
 
-    identityMat4:function() {
-        return SceneJS._math.diagonalMat4s(1.0);
-    },
+function SceneJS_math_setMat4ToOnes() {
+    return SceneJS_math_m4s(1.0);
+}
 
-    isIdentityMat4:function(m) {
-        var i = 0;
-        var j = 0;
-        var s = 0.0;
-        for (i = 0; i < 4; ++i) {
-            for (j = 0; j < 4; ++j) {
-                s = m[i + j * 4];
-                if ((i == j)) {
-                    if (s != 1.0) {
-                        return false;
-                    }
+function SceneJS_math_diagonalMat4v(v) {
+    return [
+        v[0], 0.0, 0.0, 0.0,
+        0.0,v[1], 0.0, 0.0,
+        0.0, 0.0, v[2],0.0,
+        0.0, 0.0, 0.0, v[3]
+    ];
+}
+
+function SceneJS_math_diagonalMat4c(x, y, z, w) {
+    return SceneJS_math_diagonalMat4v([x,y,z,w]);
+}
+
+function SceneJS_math_diagonalMat4s(s) {
+    return SceneJS_math_diagonalMat4c(s, s, s, s);
+}
+
+function SceneJS_math_identityMat4() {
+    return SceneJS_math_diagonalMat4s(1.0);
+}
+
+function SceneJS_math_isIdentityMat4(m) {
+    var i = 0;
+    var j = 0;
+    var s = 0.0;
+    for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 4; ++j) {
+            s = m[i + j * 4];
+            if ((i == j)) {
+                if (s != 1.0) {
+                    return false;
                 }
-                else {
-                    if (s != 0.0) {
-                        return false;
-                    }
+            }
+            else {
+                if (s != 0.0) {
+                    return false;
                 }
             }
         }
-        return true;
-    },
-
-    negateMat4:function(m) {
-        var r = new SceneJS._math.mat4();
-        for (var i = 0; i < 16; ++i) {
-            r[i] = -m[i];
-        }
-        return r;
-    },
-
-    addMat4:function(a, b) {
-        var r = new SceneJS._math.mat4();
-        for (var i = 0; i < 16; ++i) {
-            r[i] = a[i] + b[i];
-        }
-        return r;
-    },
-
-    addMat4Scalar:function(m, s) {
-        var r = new SceneJS._math.mat4();
-        for (var i = 0; i < 16; ++i) {
-            r[i] = m[i] + s;
-        }
-        return r;
-    },
-
-    addScalarMat4:function(s, m) {
-        return SceneJS._math.addMat4Scalar(m, s);
-    },
-
-    subMat4:function(a, b) {
-        var r = new SceneJS._math.mat4();
-        for (var i = 0; i < 16; ++i) {
-            r[i] = a[i] - b[i];
-        }
-        return r;
-    },
-
-    subMat4Scalar:function(m, s) {
-        var r = new SceneJS._math.mat4();
-        for (var i = 0; i < 16; ++i) {
-            r[i] = m[i] - s;
-        }
-        return r;
-    },
-
-    subScalarMat4:function(s, m) {
-        var r = new SceneJS._math.mat4();
-        for (var i = 0; i < 16; ++i) {
-            r[i] = s - m[i];
-        }
-        return r;
-    },
-
-    mulMat4:function(a, b) {
-        var r = new SceneJS._math.mat4();
-        var i = 0;
-        var j = 0;
-        var k = 0;
-        var s = 0.0;
-        for (i = 0; i < 4; ++i) {
-            for (j = 0; j < 4; ++j) {
-                s = 0.0;
-                for (k = 0; k < 4; ++k) {
-                    s += a[i + k * 4] * b[k + j * 4];
-                }
-                r[i + j * 4] = s;
-            }
-        }
-        return r;
-    },
-
-    mulMat4s:function(m, s)
-    {
-        var r = new SceneJS._math.mat4();
-        for (var i = 0; i < 16; ++i) {
-            r[i] = m[i] * s;
-        }
-        return r;
-    },
-
-    mulMat4v4:function(m, v) {
-        return [
-            m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12] * v[3],
-            m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13] * v[3],
-            m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14] * v[3],
-            m[3] * v[0] + m[7] * v[1] + m[11] * v[2] + m[15] * v[3]
-        ];
-    },
-
-    transposeMat4:function(m) {
-        var r = new SceneJS._math.mat4();
-        var i = 0;
-        var j = 0;
-        for (i = 0; i < 4; ++i) {
-            for (j = 0; j < 4; ++j) {
-                r[i + j * 4] = m[i * 4 + j];
-            }
-        }
-        return r;
-    },
-
-    determinantMat4:function(m) {
-        var f = SceneJS._math.getCellMat4;
-        return (
-                f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 0) + f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 0) +
-                f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 1) + f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 1) +
-                f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 1) + f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 1) +
-                f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 2) - f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 2) - f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 2) + f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 2) +
-                f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 2) - f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 3) + f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 3) +
-                f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 3) - f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 3) - f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 3) + f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 3)
-                );
-    },
-
-    inverseMat4:function(m) {
-        var t = new SceneJS._math.mat4();
-
-        var f = SceneJS._math.getCellMat4;
-
-        t[0] = f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 1) - f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 1) + f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 2) - f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 2) - f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 3) + f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 3);
-        t[1] = f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 0) - f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 2) + f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 2) + f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 3) - f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 3);
-        t[2] = f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 0) + f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 1) - f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 1) - f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 3) + f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 3);
-        t[3] = f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 0) - f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 0) - f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 1) + f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 1) + f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 2) - f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 2);
-
-        t[4] = f(m, 0, 3) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 2) * f(m, 2, 3) * f(m, 3, 1) - f(m, 0, 3) * f(m, 2, 1) * f(m, 3, 2) + f(m, 0, 1) * f(m, 2, 3) * f(m, 3, 2) + f(m, 0, 2) * f(m, 2, 1) * f(m, 3, 3) - f(m, 0, 1) * f(m, 2, 2) * f(m, 3, 3);
-        t[5] = f(m, 0, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 2, 2) * f(m, 3, 0) + f(m, 0, 3) * f(m, 2, 0) * f(m, 3, 2) - f(m, 0, 0) * f(m, 2, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 2, 0) * f(m, 3, 3) + f(m, 0, 0) * f(m, 2, 2) * f(m, 3, 3);
-        t[6] = f(m, 0, 3) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 2, 0) * f(m, 3, 1) + f(m, 0, 0) * f(m, 2, 3) * f(m, 3, 1) + f(m, 0, 1) * f(m, 2, 0) * f(m, 3, 3) - f(m, 0, 0) * f(m, 2, 1) * f(m, 3, 3);
-        t[7] = f(m, 0, 1) * f(m, 2, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 2, 1) * f(m, 3, 0) + f(m, 0, 2) * f(m, 2, 0) * f(m, 3, 1) - f(m, 0, 0) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 1) * f(m, 2, 0) * f(m, 3, 2) + f(m, 0, 0) * f(m, 2, 1) * f(m, 3, 2);
-
-        t[8] = f(m, 0, 2) * f(m, 1, 3) * f(m, 3, 1) - f(m, 0, 3) * f(m, 1, 2) * f(m, 3, 1) + f(m, 0, 3) * f(m, 1, 1) * f(m, 3, 2) - f(m, 0, 1) * f(m, 1, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 1, 1) * f(m, 3, 3) + f(m, 0, 1) * f(m, 1, 2) * f(m, 3, 3);
-        t[9] = f(m, 0, 3) * f(m, 1, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 0) * f(m, 3, 2) + f(m, 0, 0) * f(m, 1, 3) * f(m, 3, 2) + f(m, 0, 2) * f(m, 1, 0) * f(m, 3, 3) - f(m, 0, 0) * f(m, 1, 2) * f(m, 3, 3);
-        t[10] = f(m, 0, 1) * f(m, 1, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 1) * f(m, 3, 0) + f(m, 0, 3) * f(m, 1, 0) * f(m, 3, 1) - f(m, 0, 0) * f(m, 1, 3) * f(m, 3, 1) - f(m, 0, 1) * f(m, 1, 0) * f(m, 3, 3) + f(m, 0, 0) * f(m, 1, 1) * f(m, 3, 3);
-        t[11] = f(m, 0, 2) * f(m, 1, 1) * f(m, 3, 0) - f(m, 0, 1) * f(m, 1, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 0) * f(m, 3, 1) + f(m, 0, 0) * f(m, 1, 2) * f(m, 3, 1) + f(m, 0, 1) * f(m, 1, 0) * f(m, 3, 2) - f(m, 0, 0) * f(m, 1, 1) * f(m, 3, 2);
-
-        t[12] = f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 1) - f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 1) - f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 2) + f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 2) + f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 3) - f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 3);
-        t[13] = f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 0) - f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 0) + f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 2) - f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 2) - f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 3) + f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 3);
-        t[14] = f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 0) - f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 0) - f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 1) + f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 1) + f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 3) - f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 3);
-        t[15] = f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 0) - f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 0) + f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 1) - f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 1) - f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 2) + f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 2);
-
-        var s = 1.0 / SceneJS._math.determinantMat4(m);
-        return SceneJS._math.mulMat4s(t, s);
-    },
-
-    traceMat4:function(m) {
-        return (m[0] + m[5] + m[10] + m[15]);
-    },
-
-    translationMat4v:function(v) {
-        var m = SceneJS._math.identityMat4();
-        m[12] = v[0];
-        m[13] = v[1];
-        m[14] = v[2];
-        return m;
-    },
-
-    translationMat4c:function(x, y, z) {
-        return SceneJS._math.translationMat4v([x,y,z]);
-    },
-
-    translationMat4s:function(s) {
-        return SceneJS._math.translationMat4c(s, s, s);
-    },
-
-    rotationMat4v:function(anglerad, axis) {
-        var ax = SceneJS._math.normalizeVec4([axis[0],axis[1],axis[2],0.0]);
-        var s = Math.sin(anglerad);
-        var c = Math.cos(anglerad);
-        var q = 1.0 - c;
-
-        var x = ax[0];
-        var y = ax[1];
-        var z = ax[2];
-
-        var xx,yy,zz,xy,yz,zx,xs,ys,zs;
-
-        xx = x * x;
-        yy = y * y;
-        zz = z * z;
-        xy = x * y;
-        yz = y * z;
-        zx = z * x;
-        xs = x * s;
-        ys = y * s;
-        zs = z * s;
-
-        var m = new SceneJS._math.mat4();
-
-        m[0] = (q * xx) + c;
-        m[1] = (q * xy) + zs;
-        m[2] = (q * zx) - ys;
-        m[3] = 0.0;
-
-        m[4] = (q * xy) - zs;
-        m[5] = (q * yy) + c;
-        m[6] = (q * yz) + xs;
-        m[7] = 0.0;
-
-        m[8] = (q * zx) + ys;
-        m[9] = (q * yz) - xs;
-        m[10] = (q * zz) + c;
-        m[11] = 0.0;
-
-        m[12] = 0.0;
-        m[13] = 0.0;
-        m[14] = 0.0;
-        m[15] = 1.0;
-
-        return m;
-    },
-
-    rotationMat4c:function(anglerad, x, y, z) {
-        return SceneJS._math.rotationMat4v(anglerad, [x,y,z]);
-    },
-
-    scalingMat4v:function(v) {
-        var m = SceneJS._math.identityMat4();
-        m[0] = v[0];
-        m[5] = v[1];
-        m[10] = v[2];
-        return m;
-    },
-
-    scalingMat4c:function(x, y, z) {
-        return SceneJS._math.scalingMat4v([x,y,z]);
-    },
-
-    scalingMat4s:function(s) {
-        return SceneJS._math.scalingMat4c(s, s, s);
-    },
-
-    lookAtMat4v:function(pos, target, up) {
-        var pos4 = [pos[0],pos[1],pos[2],0.0];
-        var target4 = [target[0],target[1],target[2],0.0];
-        var up4 = [up[0],up[1],up[2],0.0];
-
-        var v = SceneJS._math.normalizeVec4(SceneJS._math.subVec4(target4, pos4));
-        var u = SceneJS._math.normalizeVec4(up4);
-        var s = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(v, u));
-
-        u = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(s, v));
-
-        var m = new SceneJS._math.mat4();
-
-        m[0] = s[0];
-        m[1] = u[0];
-        m[2] = -v[0];
-        m[3] = 0.0;
-
-        m[4] = s[1];
-        m[5] = u[1];
-        m[6] = -v[1];
-        m[7] = 0.0;
-
-        m[8] = s[2];
-        m[9] = u[2];
-        m[10] = -v[2];
-        m[11] = 0.0;
-
-        m[12] = 0.0;
-        m[13] = 0.0;
-        m[14] = 0.0;
-        m[15] = 1.0;
-
-        m = SceneJS._math.mulMat4(m, SceneJS._math.translationMat4v(SceneJS._math.negateVector4(pos4)));
-
-        return m;
-    },
-
-    lookAtMat4c:function(posx, posy, posz, targetx, targety, targetz, upx, upy, upz) {
-        return SceneJS._math.lookAtMat4v([posx,posy,posz], [targetx,targety,targetz], [upx,upy,upz]);
-    },
-
-    orthoMat4v:function(omin, omax) {
-        var omin4 = [omin[0],omin[1],omin[2],0.0];
-        var omax4 = [omax[0],omax[1],omax[2],0.0];
-        var vsum = SceneJS._math.addVec4(omax4, omin4);
-        var vdif = SceneJS._math.subVec4(omax4, omin4);
-
-        var m = new SceneJS._math.mat4();
-
-        m[0] = 2.0 / vdif[0];
-        m[1] = 0.0;
-        m[2] = 0.0;
-        m[3] = 0.0;
-
-        m[4] = 0.0;
-        m[5] = 2.0 / vdif[1];
-        m[6] = 0.0;
-        m[7] = 0.0;
-
-        m[8] = 0.0;
-        m[9] = 0.0;
-        m[10] = -2.0 / vdif[2];
-        m[11] = 0.0;
-
-        m[12] = -vsum[0] / vdif[0];
-        m[13] = -vsum[1] / vdif[1];
-        m[14] = -vsum[2] / vdif[2];
-        m[15] = 1.0;
-
-        return m;
-    },
-
-    orthoMat4c:function(left, right, bottom, top, znear, zfar) {
-        return SceneJS._math.orthoMat4v([left,bottom,znear], [right,top,zfar]);
-    },
-
-    frustumMat4v:function(fmin, fmax) {
-        var fmin4 = [fmin[0],fmin[1],fmin[2],0.0];
-        var fmax4 = [fmax[0],fmax[1],fmax[2],0.0];
-        var vsum = SceneJS._math.addVec4(fmax4, fmin4);
-        var vdif = SceneJS._math.subVec4(fmax4, fmin4);
-        var t = 2.0 * fmin4[2];
-
-        var m = new SceneJS._math.mat4();
-
-        m[0] = t / vdif[0];
-        m[1] = 0.0;
-        m[2] = 0.0;
-        m[3] = 0.0;
-
-        m[4] = 0.0;
-        m[5] = t / vdif[1];
-        m[6] = 0.0;
-        m[7] = 0.0;
-
-        m[8] = vsum[0] / vdif[0];
-        m[9] = vsum[1] / vdif[1];
-        m[10] = -vsum[2] / vdif[2];
-        m[11] = -1.0;
-
-        m[12] = 0.0;
-        m[13] = 0.0;
-        m[14] = -t * fmax4[2] / vdif[2];
-        m[15] = 0.0;
-
-        return m;
-    },
-
-    frustumMatrix4:function(left, right, bottom, top, znear, zfar) {
-        var fmin4 = [left,right,bottom,0.0];
-        var fmax4 = [top,znear,zfar,0.0];
-        var vsum = SceneJS._math.addVec4(fmax4, fmin4);
-        var vdif = SceneJS._math.subVec4(fmax4, fmin4);
-        var t = 2.0 * fmin4[2];
-
-        var m = new SceneJS._math.mat4();
-
-        m[0] = t / vdif[0];
-        m[1] = 0.0;
-        m[2] = 0.0;
-        m[3] = 0.0;
-
-        m[4] = 0.0;
-        m[5] = t / vdif[1];
-        m[6] = 0.0;
-        m[7] = 0.0;
-
-        m[8] = vsum[0] / vdif[0];
-        m[9] = vsum[1] / vdif[1];
-        m[10] = -vsum[2] / vdif[2];
-        m[11] = -1.0;
-
-        m[12] = 0.0;
-        m[13] = 0.0;
-        m[14] = -t * fmax4[2] / vdif[2];
-        m[15] = 0.0;
-
-        return m;
-    },
-
-    perspectiveMatrix4:function(fovyrad, aspectratio, znear, zfar) {
-        var pmin = new Array(4);
-        var pmax = new Array(4);
-
-        pmin[2] = znear;
-        pmax[2] = zfar;
-
-        pmax[1] = pmin[2] * Math.tan(fovyrad / 2.0);
-        pmin[1] = -pmax[1];
-
-        pmax[0] = pmax[1] * aspectratio;
-        pmin[0] = -pmax[0];
-
-        return SceneJS._math.frustumMat4v(pmin, pmax);
-    },
-
-    transformPoint3:function(m, p) {
-        return [
-            (m[0] * p[0]) + (m[4] * p[1]) + (m[8] * p[2]) + m[12],
-            (m[1] * p[0]) + (m[5] * p[1]) + (m[9] * p[2]) + m[13],
-            (m[2] * p[0]) + (m[6] * p[1]) + (m[10] * p[2]) + m[14],
-            (m[3] * p[0]) + (m[7] * p[1]) + (m[11] * p[2]) + m[15]
-        ];
-    },
-
-    transformPoints3:function(m, points) {
-        var result = new Array(points.length);
-        var len = points.length;
-        for (var i = 0; i < len; i++) {
-            result[i] = SceneJS._math.transformPoint3(m, points[i]);
-        }
-        return result;
-    },
-
-    transformVector3:function(m, v) {
-        return [
-            (m[0] * v[0]) + (m[4] * v[1]) + (m[8] * v[2]),
-            (m[1] * v[0]) + (m[5] * v[1]) + (m[9] * v[2]),
-            (m[2] * v[0]) + (m[6] * v[1]) + (m[10] * v[2])
-        ];
-    },
-
-    projectVec4:function(v) {
-        var f = 1.0 / v[3];
-        return [v[0] * f, v[1] * f, v[2] * f, 1.0];
-    },
-
-
-    Plane3 : function(normal, offset, normalize) {
-        this.normal = [0.0, 0.0, 1.0 ];
-        this.offset = 0.0;
-        if (normal && offset) {
-            this.normal[0] = normal[0];
-            this.normal[1] = normal[1];
-            this.normal[2] = normal[2];
-            this.offset = offset;
-
-            if (normalize) {
-                var s = Math.sqrt(
-                        this.normal[0] * this.normal[0] +
-                        this.normal[1] * this.normal[1] +
-                        this.normal[2] * this.normal[2]
-                        );
-                if (s > 0.0) {
-                    s = 1.0 / s;
-                    this.normal[0] *= s;
-                    this.normal[1] *= s;
-                    this.normal[2] *= s;
-                    this.offset *= s;
-                }
-            }
-        }
-    },
-
-    MAX_DOUBLE: 1000000000000.0,
-    MIN_DOUBLE: -1000000000000.0,
-
-    Box3: function(min, max) {
-        this.min = min || [ SceneJS._math.MAX_DOUBLE,SceneJS._math.MAX_DOUBLE,SceneJS._math.MAX_DOUBLE ];
-        this.max = max || [ SceneJS._math.MIN_DOUBLE,SceneJS._math.MIN_DOUBLE,SceneJS._math.MIN_DOUBLE ];
-
-        this.init = function(min, max) {
-            for (var i = 0; i < 3; ++i) {
-                this.min[i] = min[i];
-                this.max[i] = max[i];
-            }
-            return this;
-        };
-
-        this.fromPoints = function(points) {
-            var points2 = [];
-            for (var i = 0; i < points.length; i++) {
-                points2.push([points[i][0] / points[i][3], points[i][1] / points[i][3], points[i][2] / points[i][3]]);
-            }
-            points = points2;
-            for (var i = 0; i < points.length; i++) {
-                var v = points[i];
-                for (var j = 0; j < 3; j++) {
-                    if (v[j] < this.min[j]) {
-                        this.min[j] = v[j];
-                    }
-                    if (v[j] > this.max[j]) {
-                        this.max[j] = v[j];
-                    }
-                }
-            }
-            return this;
-        };
-
-        this.isEmpty = function() {
-            return (
-                    (this.min[0] >= this.max[0])
-                            && (this.min[1] >= this.max[1])
-                            && (this.min[2] >= this.max[2])
-                    );
-        };
-
-        this.getCenter = function() {
-            return [
-                (this.max[0] + this.min[0]) / 2.0,
-                (this.max[1] + this.min[1]) / 2.0,
-                (this.max[2] + this.min[2]) / 2.0
-            ];
-        };
-
-        this.getSize = function() {
-            return [
-                (this.max[0] - this.min[0]),
-                (this.max[1] - this.min[1]),
-                (this.max[2] - this.min[2])
-            ];
-        };
-
-        this.getFacesAreas = function() {
-            var s = this.size;
-            return [
-                (s[1] * s[2]),
-                (s[0] * s[2]),
-                (s[0] * s[1])
-            ];
-        };
-
-        this.getSurfaceArea = function() {
-            var a = this.getFacesAreas();
-            return ((a[0] + a[1] + a[2]) * 2.0);
-        };
-
-        this.getVolume = function() {
-            var s = this.size;
-            return (s[0] * s[1] * s[2]);
-        };
-
-        this.getOffset = function(half_delta) {
-            for (var i = 0; i < 3; ++i) {
-                this.min[i] -= half_delta;
-                this.max[i] += half_delta;
-            }
-            return this;
-        };
-    },
-
-    AxisBox3 : function(min, max) {
-        this.verts = [
-            [min[0], min[1], min[2]],
-            [max[0], min[1], min[2]],
-            [max[0], max[1], min[2]],
-            [min[0], max[1], min[2]],
-
-            [min[0], min[1], max[2]],
-            [max[0], min[1], max[2]],
-            [max[0], max[1], max[2]],
-            [min[0], max[1], max[2]]
-        ];
-
-        this.toBox3 = function() {
-            var box = new SceneJS._math.Box3();
-            for (var i = 0; i < 8; i++) {
-                var v = this.verts[i];
-                for (var j = 0; j < 3; j++) {
-                    if (v[j] < box.min[j]) {
-                        box.min[j] = v[j];
-                    }
-                    if (v[j] > box.max[j]) {
-                        box.max[j] = v[j];
-                    }
-                }
-            }
-        };
-    },
-
-    Sphere3 : function(center, radius) {
-        this.center = [center[0], center[1], center[2] ];
-        this.radius = radius;
-
-        this.isEmpty = function() {
-            return (this.radius == 0.0);
-        };
-
-        this.surfaceArea = function() {
-            return (4.0 * Math.PI * this.radius * this.radius);
-        };
-
-        this.getVolume = function() {
-            return ((4.0 / 3.0) * Math.PI * this.radius * this.radius * this.radius);
-        };
-    },
-
-    FrustumPlane: function (nx, ny, nz, offset) {
-        var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
-        this.normal = [nx * s, ny * s, nz * s];
-        this.offset = offset * s;
-        this.testVertex = [
-            (this.normal[0] >= 0.0) ? (1) : (0),
-            (this.normal[1] >= 0.0) ? (1) : (0),
-            (this.normal[2] >= 0.0) ? (1) : (0)];
-    },
-
-    OUTSIDE_FRUSTUM : 3,
-    INTERSECT_FRUSTUM : 4,
-    INSIDE_FRUSTUM : 5,
-
-    Frustum : function(viewMatrix, projectionMatrix, viewport) {
-        var math = SceneJS._math;
-        var m = math.mulMat4(projectionMatrix, viewMatrix);
-        var q = [ m[3], m[7], m[11] ];
-        var planes = [
-            new math.FrustumPlane(q[ 0] - m[ 0], q[ 1] - m[ 4], q[ 2] - m[ 8], m[15] - m[12]),
-            new math.FrustumPlane(q[ 0] + m[ 0], q[ 1] + m[ 4], q[ 2] + m[ 8], m[15] + m[12]),
-            new math.FrustumPlane(q[ 0] - m[ 1], q[ 1] - m[ 5], q[ 2] - m[ 9], m[15] - m[13]),
-            new math.FrustumPlane(q[ 0] + m[ 1], q[ 1] + m[ 5], q[ 2] + m[ 9], m[15] + m[13]),
-            new math.FrustumPlane(q[ 0] - m[ 2], q[ 1] - m[ 6], q[ 2] - m[10], m[15] - m[14]),
-            new math.FrustumPlane(q[ 0] + m[ 2], q[ 1] + m[ 6], q[ 2] + m[10], m[15] + m[14])
-        ];
-
-        /* Resources for LOD         
-         */
-        var rotVec = [
-            math.getColMat4(viewMatrix, 0),
-            math.getColMat4(viewMatrix, 1),
-            math.getColMat4(viewMatrix, 2)
-        ];
-
-        var scaleVec = [
-            math.lenVec4(rotVec[0]),
-            math.lenVec4(rotVec[1]),
-            math.lenVec4(rotVec[2])
-        ];
-
-        var scaleVecRcp = math.rcpVec3(scaleVec);
-        var sMat = math.scalingMat4v(scaleVec);
-        var sMatInv = math.scalingMat4v(scaleVecRcp);
-
-        rotVec[0] = math.mulVec4Scalar(rotVec[0], scaleVecRcp[0]);
-        rotVec[1] = math.mulVec4Scalar(rotVec[1], scaleVecRcp[1]);
-        rotVec[2] = math.mulVec4Scalar(rotVec[2], scaleVecRcp[2]);
-
-        var rotMatInverse = math.identityMat4();
-
-        math.setRowMat4(rotMatInverse, 0, rotVec[0]);
-        math.setRowMat4(rotMatInverse, 1, rotVec[1]);
-        math.setRowMat4(rotMatInverse, 2, rotVec[2]);
-
-        this.matrix = math.mulMat4(projectionMatrix, viewMatrix);
-        this.billboardMatrix = math.mulMat4(sMatInv, math.mulMat4(rotMatInverse, sMat));
-        this.viewport = viewport.slice(0, 4);
-
-        this.textAxisBoxIntersection = function(box) {
-            var ret = SceneJS._math.INSIDE_FRUSTUM;
-            var bminmax = [ box.min, box.max ];
-            var plane = null;
-            for (var i = 0; i < 6; ++i) {
-                plane = planes[i];
-                if (((plane.normal[0] * bminmax[plane.testVertex[0]][0]) +
-                     (plane.normal[1] * bminmax[plane.testVertex[1]][1]) +
-                     (plane.normal[2] * bminmax[plane.testVertex[2]][2]) +
-                     (plane.offset)) < 0.0) {
-                    return SceneJS._math.OUTSIDE_FRUSTUM;
-                }
-
-                if (((plane.normal[0] * bminmax[1 - plane.testVertex[0]][0]) +
-                     (plane.normal[1] * bminmax[1 - plane.testVertex[1]][1]) +
-                     (plane.normal[2] * bminmax[1 - plane.testVertex[2]][2]) +
-                     (plane.offset)) < 0.0) {
-                    ret = SceneJS._math.INTERSECT_FRUSTUM;
-                }
-            }
-            return ret;
-        };
-
-
-        this.getProjectedSize = function(box) {
-            var diagVec = math.subVec3(box.max, box.min);
-
-            var diagSize = math.lenVec3(diagVec);
-
-            var size = Math.abs(diagSize);
-
-            var p0 = [
-                (box.min[0] + box.max[0]) * 0.5,
-                (box.min[1] + box.max[1]) * 0.5,
-                (box.min[2] + box.max[2]) * 0.5,
-                0.0];
-
-            var halfSize = size * 0.5;
-            var p1 = [ -halfSize, 0.0, 0.0, 1.0 ];
-            var p2 = [  halfSize, 0.0, 0.0, 1.0 ];
-
-            p1 = math.mulMat4v4(this.billboardMatrix, p1);
-            p1 = math.addVec4(p1, p0);
-            p1 = math.projectVec4(math.mulMat4v4(this.matrix, p1));
-
-            p2 = math.mulMat4v4(this.billboardMatrix, p2);
-            p2 = math.addVec4(p2, p0);
-            p2 = math.projectVec4(math.mulMat4v4(this.matrix, p2));
-
-            return viewport[2] * Math.abs(p2[0] - p1[0]);
-        };
-
     }
-};
+    return true;
+}
+
+function SceneJS_math_negateMat4(m) {
+    var r = SceneJS_math_mat4();
+    for (var i = 0; i < 16; ++i) {
+        r[i] = -m[i];
+    }
+    return r;
+}
+
+function SceneJS_math_addMat4(a, b) {
+    var r = SceneJS_math_mat4();
+    for (var i = 0; i < 16; ++i) {
+        r[i] = a[i] + b[i];
+    }
+    return r;
+}
+
+function SceneJS_math_addMat4Scalar(m, s) {
+    var r = SceneJS_math_mat4();
+    for (var i = 0; i < 16; ++i) {
+        r[i] = m[i] + s;
+    }
+    return r;
+}
+
+function SceneJS_math_addScalarMat4(s, m) {
+    return SceneJS_math_addMat4Scalar(m, s);
+}
+
+function SceneJS_math_subMat4(a, b) {
+    var r = SceneJS_math_mat4();
+    for (var i = 0; i < 16; ++i) {
+        r[i] = a[i] - b[i];
+    }
+    return r;
+}
+
+function SceneJS_math_subMat4Scalar(m, s) {
+    var r = SceneJS_math_mat4();
+    for (var i = 0; i < 16; ++i) {
+        r[i] = m[i] - s;
+    }
+    return r;
+}
+
+function SceneJS_math_subScalarMat4(s, m) {
+    var r = SceneJS_math_mat4();
+    for (var i = 0; i < 16; ++i) {
+        r[i] = s - m[i];
+    }
+    return r;
+}
+
+function SceneJS_math_mulMat4(a, b) {
+    var r = SceneJS_math_mat4();
+    var i = 0;
+    var j = 0;
+    var k = 0;
+    var s = 0.0;
+    for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 4; ++j) {
+            s = 0.0;
+            for (k = 0; k < 4; ++k) {
+                s += a[i + k * 4] * b[k + j * 4];
+            }
+            r[i + j * 4] = s;
+        }
+    }
+    return r;
+}
+
+function SceneJS_math_mulMat4s(m, s)
+{
+    var r = SceneJS_math_mat4();
+    for (var i = 0; i < 16; ++i) {
+        r[i] = m[i] * s;
+    }
+    return r;
+}
+
+function SceneJS_math_mulMat4v4(m, v) {
+    return [
+        m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12] * v[3],
+        m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13] * v[3],
+        m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14] * v[3],
+        m[3] * v[0] + m[7] * v[1] + m[11] * v[2] + m[15] * v[3]
+    ];
+}
+
+function SceneJS_math_transposeMat4(m) {
+    var r = SceneJS_math_mat4();
+    var i = 0;
+    var j = 0;
+    for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 4; ++j) {
+            r[i + j * 4] = m[i * 4 + j];
+        }
+    }
+    return r;
+}
+
+function SceneJS_math_determinantMat4(m) {
+    var f = SceneJS_math_getCellMat4;
+    return (
+            f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 0) + f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 0) +
+            f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 1) + f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 1) +
+            f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 1) + f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 1) +
+            f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 2) - f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 2) - f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 2) + f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 2) +
+            f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 2) - f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 3) + f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 3) +
+            f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 3) - f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 3) - f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 3) + f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 3)
+            );
+}
+
+function SceneJS_math_inverseMat4(m) {
+    var t = SceneJS_math_mat4();
+
+    var f = SceneJS_math_getCellMat4;
+
+    t[0] = f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 1) - f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 1) + f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 2) - f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 2) - f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 3) + f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 3);
+    t[1] = f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 0) - f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 2) + f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 2) + f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 3) - f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 3);
+    t[2] = f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 0) + f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 1) - f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 1) - f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 3) + f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 3);
+    t[3] = f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 0) - f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 0) - f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 1) + f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 1) + f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 2) - f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 2);
+
+    t[4] = f(m, 0, 3) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 2) * f(m, 2, 3) * f(m, 3, 1) - f(m, 0, 3) * f(m, 2, 1) * f(m, 3, 2) + f(m, 0, 1) * f(m, 2, 3) * f(m, 3, 2) + f(m, 0, 2) * f(m, 2, 1) * f(m, 3, 3) - f(m, 0, 1) * f(m, 2, 2) * f(m, 3, 3);
+    t[5] = f(m, 0, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 2, 2) * f(m, 3, 0) + f(m, 0, 3) * f(m, 2, 0) * f(m, 3, 2) - f(m, 0, 0) * f(m, 2, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 2, 0) * f(m, 3, 3) + f(m, 0, 0) * f(m, 2, 2) * f(m, 3, 3);
+    t[6] = f(m, 0, 3) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 2, 0) * f(m, 3, 1) + f(m, 0, 0) * f(m, 2, 3) * f(m, 3, 1) + f(m, 0, 1) * f(m, 2, 0) * f(m, 3, 3) - f(m, 0, 0) * f(m, 2, 1) * f(m, 3, 3);
+    t[7] = f(m, 0, 1) * f(m, 2, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 2, 1) * f(m, 3, 0) + f(m, 0, 2) * f(m, 2, 0) * f(m, 3, 1) - f(m, 0, 0) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 1) * f(m, 2, 0) * f(m, 3, 2) + f(m, 0, 0) * f(m, 2, 1) * f(m, 3, 2);
+
+    t[8] = f(m, 0, 2) * f(m, 1, 3) * f(m, 3, 1) - f(m, 0, 3) * f(m, 1, 2) * f(m, 3, 1) + f(m, 0, 3) * f(m, 1, 1) * f(m, 3, 2) - f(m, 0, 1) * f(m, 1, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 1, 1) * f(m, 3, 3) + f(m, 0, 1) * f(m, 1, 2) * f(m, 3, 3);
+    t[9] = f(m, 0, 3) * f(m, 1, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 0) * f(m, 3, 2) + f(m, 0, 0) * f(m, 1, 3) * f(m, 3, 2) + f(m, 0, 2) * f(m, 1, 0) * f(m, 3, 3) - f(m, 0, 0) * f(m, 1, 2) * f(m, 3, 3);
+    t[10] = f(m, 0, 1) * f(m, 1, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 1) * f(m, 3, 0) + f(m, 0, 3) * f(m, 1, 0) * f(m, 3, 1) - f(m, 0, 0) * f(m, 1, 3) * f(m, 3, 1) - f(m, 0, 1) * f(m, 1, 0) * f(m, 3, 3) + f(m, 0, 0) * f(m, 1, 1) * f(m, 3, 3);
+    t[11] = f(m, 0, 2) * f(m, 1, 1) * f(m, 3, 0) - f(m, 0, 1) * f(m, 1, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 0) * f(m, 3, 1) + f(m, 0, 0) * f(m, 1, 2) * f(m, 3, 1) + f(m, 0, 1) * f(m, 1, 0) * f(m, 3, 2) - f(m, 0, 0) * f(m, 1, 1) * f(m, 3, 2);
+
+    t[12] = f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 1) - f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 1) - f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 2) + f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 2) + f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 3) - f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 3);
+    t[13] = f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 0) - f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 0) + f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 2) - f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 2) - f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 3) + f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 3);
+    t[14] = f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 0) - f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 0) - f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 1) + f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 1) + f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 3) - f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 3);
+    t[15] = f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 0) - f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 0) + f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 1) - f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 1) - f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 2) + f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 2);
+
+    var s = 1.0 / SceneJS_math_determinantMat4(m);
+    return SceneJS_math_mulMat4s(t, s);
+}
+
+function SceneJS_math_traceMat4(m) {
+    return (m[0] + m[5] + m[10] + m[15]);
+}
+
+function SceneJS_math_translationMat4v(v) {
+    var m = SceneJS_math_identityMat4();
+    m[12] = v[0];
+    m[13] = v[1];
+    m[14] = v[2];
+    return m;
+}
+
+function SceneJS_math_translationMat4c(x, y, z) {
+    return SceneJS_math_translationMat4v([x,y,z]);
+}
+
+function SceneJS_math_translationMat4s(s) {
+    return SceneJS_math_translationMat4c(s, s, s);
+}
+
+function SceneJS_math_rotationMat4v(anglerad, axis) {
+    var ax = SceneJS_math_normalizeVec4([axis[0],axis[1],axis[2],0.0]);
+    var s = Math.sin(anglerad);
+    var c = Math.cos(anglerad);
+    var q = 1.0 - c;
+
+    var x = ax[0];
+    var y = ax[1];
+    var z = ax[2];
+
+    var xx,yy,zz,xy,yz,zx,xs,ys,zs;
+
+    xx = x * x;
+    yy = y * y;
+    zz = z * z;
+    xy = x * y;
+    yz = y * z;
+    zx = z * x;
+    xs = x * s;
+    ys = y * s;
+    zs = z * s;
+
+    var m = SceneJS_math_mat4();
+
+    m[0] = (q * xx) + c;
+    m[1] = (q * xy) + zs;
+    m[2] = (q * zx) - ys;
+    m[3] = 0.0;
+
+    m[4] = (q * xy) - zs;
+    m[5] = (q * yy) + c;
+    m[6] = (q * yz) + xs;
+    m[7] = 0.0;
+
+    m[8] = (q * zx) + ys;
+    m[9] = (q * yz) - xs;
+    m[10] = (q * zz) + c;
+    m[11] = 0.0;
+
+    m[12] = 0.0;
+    m[13] = 0.0;
+    m[14] = 0.0;
+    m[15] = 1.0;
+
+    return m;
+}
+
+function SceneJS_math_rotationMat4c(anglerad, x, y, z) {
+    return SceneJS_math_rotationMat4v(anglerad, [x,y,z]);
+}
+
+function SceneJS_math_scalingMat4v(v) {
+    var m = SceneJS_math_identityMat4();
+    m[0] = v[0];
+    m[5] = v[1];
+    m[10] = v[2];
+    return m;
+}
+
+function SceneJS_math_scalingMat4c(x, y, z) {
+    return SceneJS_math_scalingMat4v([x,y,z]);
+}
+
+function SceneJS_math_scalingMat4s(s) {
+    return SceneJS_math_scalingMat4c(s, s, s);
+}
+
+function SceneJS_math_lookAtMat4v(pos, target, up) {
+    var pos4 = [pos[0],pos[1],pos[2],0.0];
+    var target4 = [target[0],target[1],target[2],0.0];
+    var up4 = [up[0],up[1],up[2],0.0];
+
+    var v = SceneJS_math_normalizeVec4(SceneJS_math_subVec4(target4, pos4));
+    var u = SceneJS_math_normalizeVec4(up4);
+    var s = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(v, u));
+
+    u = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(s, v));
+
+    var m = SceneJS_math_mat4();
+
+    m[0] = s[0];
+    m[1] = u[0];
+    m[2] = -v[0];
+    m[3] = 0.0;
+
+    m[4] = s[1];
+    m[5] = u[1];
+    m[6] = -v[1];
+    m[7] = 0.0;
+
+    m[8] = s[2];
+    m[9] = u[2];
+    m[10] = -v[2];
+    m[11] = 0.0;
+
+    m[12] = 0.0;
+    m[13] = 0.0;
+    m[14] = 0.0;
+    m[15] = 1.0;
+
+    m = SceneJS_math_mulMat4(m, SceneJS_math_translationMat4v(SceneJS_math_negateVector4(pos4)));
+
+    return m;
+}
+
+function SceneJS_math_lookAtMat4c(posx, posy, posz, targetx, targety, targetz, upx, upy, upz) {
+    return SceneJS_math_lookAtMat4v([posx,posy,posz], [targetx,targety,targetz], [upx,upy,upz]);
+}
+
+function SceneJS_math_orthoMat4v(omin, omax) {
+    var omin4 = [omin[0],omin[1],omin[2],0.0];
+    var omax4 = [omax[0],omax[1],omax[2],0.0];
+    var vsum = SceneJS_math_addVec4(omax4, omin4);
+    var vdif = SceneJS_math_subVec4(omax4, omin4);
+
+    var m = SceneJS_math_mat4();
+
+    m[0] = 2.0 / vdif[0];
+    m[1] = 0.0;
+    m[2] = 0.0;
+    m[3] = 0.0;
+
+    m[4] = 0.0;
+    m[5] = 2.0 / vdif[1];
+    m[6] = 0.0;
+    m[7] = 0.0;
+
+    m[8] = 0.0;
+    m[9] = 0.0;
+    m[10] = -2.0 / vdif[2];
+    m[11] = 0.0;
+
+    m[12] = -vsum[0] / vdif[0];
+    m[13] = -vsum[1] / vdif[1];
+    m[14] = -vsum[2] / vdif[2];
+    m[15] = 1.0;
+
+    return m;
+}
+
+function SceneJS_math_orthoMat4c(left, right, bottom, top, znear, zfar) {
+    return SceneJS_math_orthoMat4v([left,bottom,znear], [right,top,zfar]);
+}
+
+function SceneJS_math_frustumMat4v(fmin, fmax) {
+    var fmin4 = [fmin[0],fmin[1],fmin[2],0.0];
+    var fmax4 = [fmax[0],fmax[1],fmax[2],0.0];
+    var vsum = SceneJS_math_addVec4(fmax4, fmin4);
+    var vdif = SceneJS_math_subVec4(fmax4, fmin4);
+    var t = 2.0 * fmin4[2];
+
+    var m = SceneJS_math_mat4();
+
+    m[0] = t / vdif[0];
+    m[1] = 0.0;
+    m[2] = 0.0;
+    m[3] = 0.0;
+
+    m[4] = 0.0;
+    m[5] = t / vdif[1];
+    m[6] = 0.0;
+    m[7] = 0.0;
+
+    m[8] = vsum[0] / vdif[0];
+    m[9] = vsum[1] / vdif[1];
+    m[10] = -vsum[2] / vdif[2];
+    m[11] = -1.0;
+
+    m[12] = 0.0;
+    m[13] = 0.0;
+    m[14] = -t * fmax4[2] / vdif[2];
+    m[15] = 0.0;
+
+    return m;
+}
+
+function SceneJS_math_frustumMatrix4(left, right, bottom, top, znear, zfar) {
+    var fmin4 = [left,right,bottom,0.0];
+    var fmax4 = [top,znear,zfar,0.0];
+    var vsum = SceneJS_math_addVec4(fmax4, fmin4);
+    var vdif = SceneJS_math_subVec4(fmax4, fmin4);
+    var t = 2.0 * fmin4[2];
+
+    var m = SceneJS_math_mat4();
+
+    m[0] = t / vdif[0];
+    m[1] = 0.0;
+    m[2] = 0.0;
+    m[3] = 0.0;
+
+    m[4] = 0.0;
+    m[5] = t / vdif[1];
+    m[6] = 0.0;
+    m[7] = 0.0;
+
+    m[8] = vsum[0] / vdif[0];
+    m[9] = vsum[1] / vdif[1];
+    m[10] = -vsum[2] / vdif[2];
+    m[11] = -1.0;
+
+    m[12] = 0.0;
+    m[13] = 0.0;
+    m[14] = -t * fmax4[2] / vdif[2];
+    m[15] = 0.0;
+
+    return m;
+}
+
+function SceneJS_math_perspectiveMatrix4(fovyrad, aspectratio, znear, zfar) {
+    var pmin = new Array(4);
+    var pmax = new Array(4);
+
+    pmin[2] = znear;
+    pmax[2] = zfar;
+
+    pmax[1] = pmin[2] * Math.tan(fovyrad / 2.0);
+    pmin[1] = -pmax[1];
+
+    pmax[0] = pmax[1] * aspectratio;
+    pmin[0] = -pmax[0];
+
+    return SceneJS_math_frustumMat4v(pmin, pmax);
+}
+
+function SceneJS_math_transformPoint3(m, p) {
+    return [
+        (m[0] * p[0]) + (m[4] * p[1]) + (m[8] * p[2]) + m[12],
+        (m[1] * p[0]) + (m[5] * p[1]) + (m[9] * p[2]) + m[13],
+        (m[2] * p[0]) + (m[6] * p[1]) + (m[10] * p[2]) + m[14],
+        (m[3] * p[0]) + (m[7] * p[1]) + (m[11] * p[2]) + m[15]
+    ];
+}
+
+function SceneJS_math_transformPoints3(m, points) {
+    var result = new Array(points.length);
+    var len = points.length;
+    for (var i = 0; i < len; i++) {
+        result[i] = SceneJS_math_transformPoint3(m, points[i]);
+    }
+    return result;
+}
+
+function SceneJS_math_transformVector3(m, v) {
+    return [
+        (m[0] * v[0]) + (m[4] * v[1]) + (m[8] * v[2]),
+        (m[1] * v[0]) + (m[5] * v[1]) + (m[9] * v[2]),
+        (m[2] * v[0]) + (m[6] * v[1]) + (m[10] * v[2])
+    ];
+}
+
+function SceneJS_math_projectVec4(v) {
+    var f = 1.0 / v[3];
+    return [v[0] * f, v[1] * f, v[2] * f, 1.0];
+}
+
+
+function SceneJS_math_Plane3(normal, offset, normalize) {
+    this.normal = [0.0, 0.0, 1.0 ];
+    this.offset = 0.0;
+    if (normal && offset) {
+        this.normal[0] = normal[0];
+        this.normal[1] = normal[1];
+        this.normal[2] = normal[2];
+        this.offset = offset;
+
+        if (normalize) {
+            var s = Math.sqrt(
+                    this.normal[0] * this.normal[0] +
+                    this.normal[1] * this.normal[1] +
+                    this.normal[2] * this.normal[2]
+                    );
+            if (s > 0.0) {
+                s = 1.0 / s;
+                this.normal[0] *= s;
+                this.normal[1] *= s;
+                this.normal[2] *= s;
+                this.offset *= s;
+            }
+        }
+    }
+}
+
+const SceneJS_math_MAX_DOUBLE = 1000000000000.0;
+const SceneJS_math_MIN_DOUBLE = -1000000000000.0;
+
+function SceneJS_math_Box3(min, max) {
+    this.min = min || [ SceneJS_math_MAX_DOUBLE,SceneJS_math_MAX_DOUBLE,SceneJS_math_MAX_DOUBLE ];
+    this.max = max || [ SceneJS_math_MIN_DOUBLE,SceneJS_math_MIN_DOUBLE,SceneJS_math_MIN_DOUBLE ];
+
+    this.init = function(min, max) {
+        for (var i = 0; i < 3; ++i) {
+            this.min[i] = min[i];
+            this.max[i] = max[i];
+        }
+        return this;
+    };
+
+    this.fromPoints = function(points) {
+        var points2 = [];
+        for (var i = 0; i < points.length; i++) {
+            points2.push([points[i][0] / points[i][3], points[i][1] / points[i][3], points[i][2] / points[i][3]]);
+        }
+        points = points2;
+        for (var i = 0; i < points.length; i++) {
+            var v = points[i];
+            for (var j = 0; j < 3; j++) {
+                if (v[j] < this.min[j]) {
+                    this.min[j] = v[j];
+                }
+                if (v[j] > this.max[j]) {
+                    this.max[j] = v[j];
+                }
+            }
+        }
+        return this;
+    };
+
+    this.isEmpty = function() {
+        return (
+                (this.min[0] >= this.max[0])
+                        && (this.min[1] >= this.max[1])
+                        && (this.min[2] >= this.max[2])
+                );
+    };
+
+    this.getCenter = function() {
+        return [
+            (this.max[0] + this.min[0]) / 2.0,
+            (this.max[1] + this.min[1]) / 2.0,
+            (this.max[2] + this.min[2]) / 2.0
+        ];
+    };
+
+    this.getSize = function() {
+        return [
+            (this.max[0] - this.min[0]),
+            (this.max[1] - this.min[1]),
+            (this.max[2] - this.min[2])
+        ];
+    };
+
+    this.getFacesAreas = function() {
+        var s = this.size;
+        return [
+            (s[1] * s[2]),
+            (s[0] * s[2]),
+            (s[0] * s[1])
+        ];
+    };
+
+    this.getSurfaceArea = function() {
+        var a = this.getFacesAreas();
+        return ((a[0] + a[1] + a[2]) * 2.0);
+    };
+
+    this.getVolume = function() {
+        var s = this.size;
+        return (s[0] * s[1] * s[2]);
+    };
+
+    this.getOffset = function(half_delta) {
+        for (var i = 0; i < 3; ++i) {
+            this.min[i] -= half_delta;
+            this.max[i] += half_delta;
+        }
+        return this;
+    };
+}
+
+function SceneJS_math_AxisBox3(min, max) {
+    this.verts = [
+        [min[0], min[1], min[2]],
+        [max[0], min[1], min[2]],
+        [max[0], max[1], min[2]],
+        [min[0], max[1], min[2]],
+
+        [min[0], min[1], max[2]],
+        [max[0], min[1], max[2]],
+        [max[0], max[1], max[2]],
+        [min[0], max[1], max[2]]
+    ];
+
+    this.toBox3 = function() {
+        var box = new SceneJS_math_Box3();
+        for (var i = 0; i < 8; i++) {
+            var v = this.verts[i];
+            for (var j = 0; j < 3; j++) {
+                if (v[j] < box.min[j]) {
+                    box.min[j] = v[j];
+                }
+                if (v[j] > box.max[j]) {
+                    box.max[j] = v[j];
+                }
+            }
+        }
+    };
+}
+
+function SceneJS_math_Sphere3(center, radius) {
+    this.center = [center[0], center[1], center[2] ];
+    this.radius = radius;
+
+    this.isEmpty = function() {
+        return (this.radius == 0.0);
+    };
+
+    this.surfaceArea = function() {
+        return (4.0 * Math.PI * this.radius * this.radius);
+    };
+
+    this.getVolume = function() {
+        return ((4.0 / 3.0) * Math.PI * this.radius * this.radius * this.radius);
+    };
+}
+
+function SceneJS_math_FrustumPlane(nx, ny, nz, offset) {
+    var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
+    this.normal = [nx * s, ny * s, nz * s];
+    this.offset = offset * s;
+    this.testVertex = [
+        (this.normal[0] >= 0.0) ? (1) : (0),
+        (this.normal[1] >= 0.0) ? (1) : (0),
+        (this.normal[2] >= 0.0) ? (1) : (0)];
+}
+
+const SceneJS_math_OUTSIDE_FRUSTUM = 3;
+const SceneJS_math_INTERSECT_FRUSTUM = 4;
+const SceneJS_math_INSIDE_FRUSTUM = 5;
+
+function SceneJS_math_Frustum(viewMatrix, projectionMatrix, viewport) {
+    var m = SceneJS_math_mulMat4(projectionMatrix, viewMatrix);
+    var q = [ m[3], m[7], m[11] ];
+    var planes = [
+        new SceneJS_math_FrustumPlane(q[ 0] - m[ 0], q[ 1] - m[ 4], q[ 2] - m[ 8], m[15] - m[12]),
+        new SceneJS_math_FrustumPlane(q[ 0] + m[ 0], q[ 1] + m[ 4], q[ 2] + m[ 8], m[15] + m[12]),
+        new SceneJS_math_FrustumPlane(q[ 0] - m[ 1], q[ 1] - m[ 5], q[ 2] - m[ 9], m[15] - m[13]),
+        new SceneJS_math_FrustumPlane(q[ 0] + m[ 1], q[ 1] + m[ 5], q[ 2] + m[ 9], m[15] + m[13]),
+        new SceneJS_math_FrustumPlane(q[ 0] - m[ 2], q[ 1] - m[ 6], q[ 2] - m[10], m[15] - m[14]),
+        new SceneJS_math_FrustumPlane(q[ 0] + m[ 2], q[ 1] + m[ 6], q[ 2] + m[10], m[15] + m[14])
+    ];
+
+    /* Resources for LOD
+     */
+    var rotVec = [
+        SceneJS_math_getColMat4(viewMatrix, 0),
+        SceneJS_math_getColMat4(viewMatrix, 1),
+        SceneJS_math_getColMat4(viewMatrix, 2)
+    ];
+
+    var scaleVec = [
+        SceneJS_math_lenVec4(rotVec[0]),
+        SceneJS_math_lenVec4(rotVec[1]),
+        SceneJS_math_lenVec4(rotVec[2])
+    ];
+
+    var scaleVecRcp = SceneJS_math_rcpVec3(scaleVec);
+    var sMat = SceneJS_math_scalingMat4v(scaleVec);
+    var sMatInv = SceneJS_math_scalingMat4v(scaleVecRcp);
+
+    rotVec[0] = SceneJS_math_mulVec4Scalar(rotVec[0], scaleVecRcp[0]);
+    rotVec[1] = SceneJS_math_mulVec4Scalar(rotVec[1], scaleVecRcp[1]);
+    rotVec[2] = SceneJS_math_mulVec4Scalar(rotVec[2], scaleVecRcp[2]);
+
+    var rotMatInverse = SceneJS_math_identityMat4();
+
+    SceneJS_math_setRowMat4(rotMatInverse, 0, rotVec[0]);
+    SceneJS_math_setRowMat4(rotMatInverse, 1, rotVec[1]);
+    SceneJS_math_setRowMat4(rotMatInverse, 2, rotVec[2]);
+
+    this.matrix = SceneJS_math_mulMat4(projectionMatrix, viewMatrix);
+    this.billboardMatrix = SceneJS_math_mulMat4(sMatInv, SceneJS_math_mulMat4(rotMatInverse, sMat));
+    this.viewport = viewport.slice(0, 4);
+
+    this.textAxisBoxIntersection = function(box) {
+        var ret = SceneJS_math_INSIDE_FRUSTUM;
+        var bminmax = [ box.min, box.max ];
+        var plane = null;
+        for (var i = 0; i < 6; ++i) {
+            plane = planes[i];
+            if (((plane.normal[0] * bminmax[plane.testVertex[0]][0]) +
+                 (plane.normal[1] * bminmax[plane.testVertex[1]][1]) +
+                 (plane.normal[2] * bminmax[plane.testVertex[2]][2]) +
+                 (plane.offset)) < 0.0) {
+                return SceneJS_math_OUTSIDE_FRUSTUM;
+            }
+
+            if (((plane.normal[0] * bminmax[1 - plane.testVertex[0]][0]) +
+                 (plane.normal[1] * bminmax[1 - plane.testVertex[1]][1]) +
+                 (plane.normal[2] * bminmax[1 - plane.testVertex[2]][2]) +
+                 (plane.offset)) < 0.0) {
+                ret = SceneJS_math_INTERSECT_FRUSTUM;
+            }
+        }
+        return ret;
+    };
+
+
+    this.getProjectedSize = function(box) {
+        var diagVec = SceneJS_math_subVec3(box.max, box.min);
+
+        var diagSize = SceneJS_math_lenVec3(diagVec);
+
+        var size = Math.abs(diagSize);
+
+        var p0 = [
+            (box.min[0] + box.max[0]) * 0.5,
+            (box.min[1] + box.max[1]) * 0.5,
+            (box.min[2] + box.max[2]) * 0.5,
+            0.0];
+
+        var halfSize = size * 0.5;
+        var p1 = [ -halfSize, 0.0, 0.0, 1.0 ];
+        var p2 = [  halfSize, 0.0, 0.0, 1.0 ];
+
+        p1 = SceneJS_math_mulMat4v4(this.billboardMatrix, p1);
+        p1 = SceneJS_math_addVec4(p1, p0);
+        p1 = SceneJS_math_projectVec4(SceneJS_math_mulMat4v4(this.matrix, p1));
+
+        p2 = SceneJS_math_mulMat4v4(this.billboardMatrix, p2);
+        p2 = SceneJS_math_addVec4(p2, p0);
+        p2 = SceneJS_math_projectVec4(SceneJS_math_mulMat4v4(this.matrix, p2));
+
+        return viewport[2] * Math.abs(p2[0] - p1[0]);
+    };
+}
+
 
 
 /** Private WebGL support classes
  */
-SceneJS._webgl = {
 
-    /** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
-     */
-    DEFAULT_CANVAS_ID : "_scenejs-default-canvas",
 
-    /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
-     */
-    DEFAULT_LOGGING_ID : "_scenejs-default-logging",
+/** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
+ */
+const SceneJS_webgl_DEFAULT_CANVAS_ID = "_scenejs-default-canvas";
 
-    /** IDs of supported WebGL canvas contexts
-     */
-    contextNames : ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"],
+/** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
+ */
+const SceneJS_webgl_DEFAULT_LOGGING_ID = "_scenejs-default-logging";
 
-    /** Maps SceneJS node parameter names to WebGL enum names
-     */
-    enumMap : {
-        funcAdd: "FUNC_ADD",
-        funcSubtract: "FUNC_SUBTRACT",
-        funcReverseSubtract: "FUNC_REVERSE_SUBTRACT",
-        zero : "ZERO",
-        one : "ONE",
-        srcColor:"SRC_COLOR",
-        oneMinusSrcColor:"ONE_MINUS_SRC_COLOR",
-        dstColor:"DST_COLOR",
-        oneMinusDstColor:"ONE_MINUS_DST_COLOR",
-        srcAlpha:"SRC_ALPHA",
-        oneMinusSrcAlpha:"ONE_MINUS_SRC_ALPHA",
-        dstAlpha:"DST_ALPHA",
-        oneMinusDstAlpha:"ONE_MINUS_DST_ALPHA",
-        contantColor:"CONSTANT_COLOR",
-        oneMinusConstantColor:"ONE_MINUS_CONSTANT_COLOR",
-        constantAlpha:"CONSTANT_ALPHA",
-        oneMinusConstantAlpha:"ONE_MINUS_CONSTANT_ALPHA",
-        srcAlphaSaturate:"SRC_ALPHA_SATURATE",
-        front: "FRONT",
-        back: "BACK",
-        frontAndBack: "FRONT_AND_BACK",
-        never:"NEVER",
-        less:"LESS",
-        equal:"EQUAL",
-        lequal:"LEQUAL",
-        greater:"GREATER",
-        notequal:"NOTEQUAL",
-        gequal:"GEQUAL",
-        always:"ALWAYS",
-        cw:"CW",
-        ccw:"CCW",
-        linear: "LINEAR",
-        nearest: "NEAREST",
-        linearMipMapNearest : "LINEAR_MIPMAP_NEAREST",
-        nearestMipMapNearest : "NEAREST_MIPMAP_NEAREST",
-        nearestMipMapLinear: "NEAREST_MIPMAP_LINEAR",
-        linearMipMapLinear: "LINEAR_MIPMAP_LINEAR",
-        repeat: "REPEAT",
-        clampToEdge: "CLAMP_TO_EDGE",
-        mirroredRepeat: "MIRRORED_REPEAT",
-        alpha:"ALPHA",
-        rgb:"RGB",
-        rgba:"RGBA",
-        luminance:"LUMINANCE",
-        luminanceAlpha:"LUMINANCE_ALPHA",
-        textureBinding2D:"TEXTURE_BINDING_2D",
-        textureBindingCubeMap:"TEXTURE_BINDING_CUBE_MAP",
-        compareRToTexture:"COMPARE_R_TO_TEXTURE", // Hardware Shadowing Z-depth,
-        unsignedByte: "UNSIGNED_BYTE"
-    },
+/** IDs of supported WebGL canvas contexts
+ */
+const SceneJS_webgl_contextNames = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
 
-    fogModes: {
-        EXP: 0,
-        EXP2: 1,
-        LINEAR: 2
-    },
+/** Maps SceneJS node parameter names to WebGL enum names
+ */
+const SceneJS_webgl_enumMap = {
+    funcAdd: "FUNC_ADD",
+    funcSubtract: "FUNC_SUBTRACT",
+    funcReverseSubtract: "FUNC_REVERSE_SUBTRACT",
+    zero : "ZERO",
+    one : "ONE",
+    srcColor:"SRC_COLOR",
+    oneMinusSrcColor:"ONE_MINUS_SRC_COLOR",
+    dstColor:"DST_COLOR",
+    oneMinusDstColor:"ONE_MINUS_DST_COLOR",
+    srcAlpha:"SRC_ALPHA",
+    oneMinusSrcAlpha:"ONE_MINUS_SRC_ALPHA",
+    dstAlpha:"DST_ALPHA",
+    oneMinusDstAlpha:"ONE_MINUS_DST_ALPHA",
+    contantColor:"CONSTANT_COLOR",
+    oneMinusConstantColor:"ONE_MINUS_CONSTANT_COLOR",
+    constantAlpha:"CONSTANT_ALPHA",
+    oneMinusConstantAlpha:"ONE_MINUS_CONSTANT_ALPHA",
+    srcAlphaSaturate:"SRC_ALPHA_SATURATE",
+    front: "FRONT",
+    back: "BACK",
+    frontAndBack: "FRONT_AND_BACK",
+    never:"NEVER",
+    less:"LESS",
+    equal:"EQUAL",
+    lequal:"LEQUAL",
+    greater:"GREATER",
+    notequal:"NOTEQUAL",
+    gequal:"GEQUAL",
+    always:"ALWAYS",
+    cw:"CW",
+    ccw:"CCW",
+    linear: "LINEAR",
+    nearest: "NEAREST",
+    linearMipMapNearest : "LINEAR_MIPMAP_NEAREST",
+    nearestMipMapNearest : "NEAREST_MIPMAP_NEAREST",
+    nearestMipMapLinear: "NEAREST_MIPMAP_LINEAR",
+    linearMipMapLinear: "LINEAR_MIPMAP_LINEAR",
+    repeat: "REPEAT",
+    clampToEdge: "CLAMP_TO_EDGE",
+    mirroredRepeat: "MIRRORED_REPEAT",
+    alpha:"ALPHA",
+    rgb:"RGB",
+    rgba:"RGBA",
+    luminance:"LUMINANCE",
+    luminanceAlpha:"LUMINANCE_ALPHA",
+    textureBinding2D:"TEXTURE_BINDING_2D",
+    textureBindingCubeMap:"TEXTURE_BINDING_CUBE_MAP",
+    compareRToTexture:"COMPARE_R_TO_TEXTURE", // Hardware Shadowing Z-depth,
+    unsignedByte: "UNSIGNED_BYTE"
+};
 
-    ProgramUniform : function(context, program, name, type, size, location, logging) {
-        //  logging.debug("Program uniform found in shader: " + name);
-        var func = null;
-        if (type == context.BOOL) {
-            func = function (v) {
-                context.uniform1i(location, v);
-            };
-        } else if (type == context.BOOL_VEC2) {
-            func = function (v) {
-                context.uniform2iv(location, v);
-            };
-        } else if (type == context.BOOL_VEC3) {
-            func = function (v) {
-                context.uniform3iv(location, v);
-            };
-        } else if (type == context.BOOL_VEC4) {
-            func = function (v) {
-                context.uniform4iv(location, v);
-            };
-        } else if (type == context.INT) {
-            func = function (v) {
-                context.uniform1iv(location, v);
-            };
-        } else if (type == context.INT_VEC2) {
-            func = function (v) {
-                context.uniform2iv(location, v);
-            };
-        } else if (type == context.INT_VEC3) {
-            func = function (v) {
-                context.uniform3iv(location, v);
-            };
-        } else if (type == context.INT_VEC4) {
-            func = function (v) {
-                context.uniform4iv(location, v);
-            };
-        } else if (type == context.FLOAT) {
-            func = function (v) {
-                context.uniform1f(location, v);
-            };
-        } else if (type == context.FLOAT_VEC2) {
-            func = function (v) {
-                context.uniform2fv(location, v);
-            };
-        } else if (type == context.FLOAT_VEC3) {
-            func = function (v) {
-                context.uniform3fv(location, v);
-            };
-        } else if (type == context.FLOAT_VEC4) {
-            func = function (v) {
-                context.uniform4fv(location, v);
-            };
-        } else if (type == context.FLOAT_MAT2) {
-            func = function (v) {
-                context.uniformMatrix2fv(location, context.FALSE, v);
-            };
-        } else if (type == context.FLOAT_MAT3) {
-            func = function (v) {
-                context.uniformMatrix3fv(location, context.FALSE, v);
-            };
-        } else if (type == context.FLOAT_MAT4) {
-            func = function (v) {
-                context.uniformMatrix4fv(location, context.FALSE, v);
-            };
-        } else {
-            throw "Unsupported shader uniform type: " + type;
-        }
+const SceneJS_webgl_fogModes = {
+    EXP: 0,
+    EXP2: 1,
+    LINEAR: 2
+};
 
-        this.setValue = function(v) {
-            //   alert("setValue " + name + " = " + v);
-            func(v);
+function SceneJS_webgl_ProgramUniform(context, program, name, type, size, location, logging) {
+    //  logging.debug("Program uniform found in shader: " + name);
+    var func = null;
+    if (type == context.BOOL) {
+        func = function (v) {
+            context.uniform1i(location, v);
         };
-
-        this.getValue = function() {
-            return context.getUniform(program, location);
+    } else if (type == context.BOOL_VEC2) {
+        func = function (v) {
+            context.uniform2iv(location, v);
         };
-    },
-
-    ProgramSampler : function(context, program, name, type, size, location, logging) {
-        //  logging.debug("Program sampler found in shader: " + name);
-        this.bindTexture = function(texture, unit) {
-            texture.bind(unit);
-            context.uniform1i(location, unit);
+    } else if (type == context.BOOL_VEC3) {
+        func = function (v) {
+            context.uniform3iv(location, v);
         };
-    },
-
-    /** An attribute within a shader
-     */
-    ProgramAttribute : function(context, program, name, type, size, location, logging) {
-        // logging.debug("Program attribute found in shader: " + name);
-        this.bindFloatArrayBuffer = function(buffer) {
-            buffer.bind();
-            context.enableVertexAttribArray(location);
-
-            context.vertexAttribPointer(location, buffer.itemSize, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
+    } else if (type == context.BOOL_VEC4) {
+        func = function (v) {
+            context.uniform4iv(location, v);
         };
+    } else if (type == context.INT) {
+        func = function (v) {
+            context.uniform1iv(location, v);
+        };
+    } else if (type == context.INT_VEC2) {
+        func = function (v) {
+            context.uniform2iv(location, v);
+        };
+    } else if (type == context.INT_VEC3) {
+        func = function (v) {
+            context.uniform3iv(location, v);
+        };
+    } else if (type == context.INT_VEC4) {
+        func = function (v) {
+            context.uniform4iv(location, v);
+        };
+    } else if (type == context.FLOAT) {
+        func = function (v) {
+            context.uniform1f(location, v);
+        };
+    } else if (type == context.FLOAT_VEC2) {
+        func = function (v) {
+            context.uniform2fv(location, v);
+        };
+    } else if (type == context.FLOAT_VEC3) {
+        func = function (v) {
+            context.uniform3fv(location, v);
+        };
+    } else if (type == context.FLOAT_VEC4) {
+        func = function (v) {
+            context.uniform4fv(location, v);
+        };
+    } else if (type == context.FLOAT_MAT2) {
+        func = function (v) {
+            context.uniformMatrix2fv(location, context.FALSE, v);
+        };
+    } else if (type == context.FLOAT_MAT3) {
+        func = function (v) {
+            context.uniformMatrix3fv(location, context.FALSE, v);
+        };
+    } else if (type == context.FLOAT_MAT4) {
+        func = function (v) {
+            context.uniformMatrix4fv(location, context.FALSE, v);
+        };
+    } else {
+        throw "Unsupported shader uniform type: " + type;
+    }
 
-    },
+    this.setValue = function(v) {
+        //   alert("setValue " + name + " = " + v);
+        func(v);
+    };
 
-    /**
-     * A vertex/fragment shader in a program
-     *
-     * @param context WebGL context
-     * @param gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
-     * @param source Source code for shader
-     * @param logging Shader will write logging's debug channel as it compiles
+    this.getValue = function() {
+        return context.getUniform(program, location);
+    };
+}
+
+function SceneJS_webgl_ProgramSampler(context, program, name, type, size, location, logging) {
+    //  logging.debug("Program sampler found in shader: " + name);
+    this.bindTexture = function(texture, unit) {
+        texture.bind(unit);
+        context.uniform1i(location, unit);
+    };
+}
+
+/** An attribute within a shader
+ */
+function SceneJS_webgl_ProgramAttribute(context, program, name, type, size, location, logging) {
+    // logging.debug("Program attribute found in shader: " + name);
+    this.bindFloatArrayBuffer = function(buffer) {
+        buffer.bind();
+        context.enableVertexAttribArray(location);
+
+        context.vertexAttribPointer(location, buffer.itemSize, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
+    };
+
+}
+
+/**
+ * A vertex/fragment shader in a program
+ *
+ * @param context WebGL context
+ * @param gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
+ * @param source Source code for shader
+ * @param logging Shader will write logging's debug channel as it compiles
+ */
+function SceneJS_webgl_Shader(context, type, source, logging) {
+    this.handle = context.createShader(type);
+
+    //  logging.debug("Creating " + ((type == context.VERTEX_SHADER) ? "vertex" : "fragment") + " shader");
+    this.valid = true;
+
+    context.shaderSource(this.handle, source);
+    context.compileShader(this.handle);
+
+    if (context.getShaderParameter(this.handle, context.COMPILE_STATUS) != 0) {
+        //    logging.debug("Shader compile succeeded:" + context.getShaderInfoLog(this.handle));
+    }
+    else {
+        this.valid = false;
+        logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
+    }
+    if (!this.valid) {
+        throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
+    }
+}
+
+
+/**
+ * A program on an active WebGL context
+ *
+ * @param hash SceneJS-managed ID for program
+ * @param lastUsed Time program was lst activated, for LRU cache eviction
+ * @param context WebGL context
+ * @param vertexSources Source codes for vertex shaders
+ * @param fragmentSources Source codes for fragment shaders
+ * @param logging Program and shaders will write to logging's debug channel as they compile and link
+ */
+function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentSources, logging) {
+    this.hash = hash;
+    this.lastUsed = lastUsed;
+
+    /* Create shaders from sources
      */
-    Shader : function(context, type, source, logging) {
-        this.handle = context.createShader(type);
+    var shaders = [];
+    for (var i = 0; i < vertexSources.length; i++) {
+        shaders.push(new SceneJS_webgl_Shader(context, context.VERTEX_SHADER, vertexSources[i], logging));
+    }
+    for (var i = 0; i < fragmentSources.length; i++) {
+        shaders.push(new SceneJS_webgl_Shader(context, context.FRAGMENT_SHADER, fragmentSources[i], logging));
+    }
 
-        logging.debug("Creating " + ((type == context.VERTEX_SHADER) ? "vertex" : "fragment") + " shader");
-        this.valid = true;
-
-        context.shaderSource(this.handle, source);
-        context.compileShader(this.handle);
-
-        if (context.getShaderParameter(this.handle, context.COMPILE_STATUS) != 0) {
-            logging.debug("Shader compile succeeded:" + context.getShaderInfoLog(this.handle));
-        }
-        else {
-            this.valid = false;
-            logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
-        }
-        if (!this.valid) {
-            throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
-        }
-    },
-
-
-    /**
-     * A program on an active WebGL context
-     *
-     * @param hash SceneJS-managed ID for program
-     * @param lastUsed Time program was lst activated, for LRU cache eviction
-     * @param context WebGL context
-     * @param vertexSources Source codes for vertex shaders
-     * @param fragmentSources Source codes for fragment shaders
-     * @param logging Program and shaders will write to logging's debug channel as they compile and link
+    /* Create program, attach shaders, link and validate program
      */
-    Program : function(hash, lastUsed, context, vertexSources, fragmentSources, logging) {
-        this.hash = hash;
-        this.lastUsed = lastUsed;
+    var handle = context.createProgram();
 
-        /* Create shaders from sources
-         */
-        var shaders = [];
-        for (var i = 0; i < vertexSources.length; i++) {
-            shaders.push(new SceneJS._webgl.Shader(context, context.VERTEX_SHADER, vertexSources[i], logging));
+    for (var i = 0; i < shaders.length; i++) {
+        var shader = shaders[i];
+        if (shader.valid) {
+            context.attachShader(handle, shader.handle);
         }
-        for (var i = 0; i < fragmentSources.length; i++) {
-            shaders.push(new SceneJS._webgl.Shader(context, context.FRAGMENT_SHADER, fragmentSources[i], logging));
-        }
+    }
+    context.linkProgram(handle);
+    context.validateProgram(handle);
 
-        /* Create program, attach shaders, link and validate program
-         */
-        var handle = context.createProgram();
+    this.valid = true;
+    this.valid = this.valid && (context.getProgramParameter(handle, context.LINK_STATUS) != 0);
+    this.valid = this.valid && (context.getProgramParameter(handle, context.VALIDATE_STATUS) != 0);
 
-        for (var i = 0; i < shaders.length; i++) {
-            var shader = shaders[i];
-            if (shader.valid) {
-                context.attachShader(handle, shader.handle);
-            }
-        }
-        context.linkProgram(handle);
-        context.validateProgram(handle);
+    //     logging.debug("Creating shader program: '" + hash + "'");
+    if (this.valid) {
+        //  logging.debug("Program link succeeded: " + context.getProgramInfoLog(handle));
+    }
+    else {
+        logging.debug("Program link failed: " + context.getProgramInfoLog(handle));
+    }
 
-        this.valid = true;
-        this.valid = this.valid && (context.getProgramParameter(handle, context.LINK_STATUS) != 0);
-        this.valid = this.valid && (context.getProgramParameter(handle, context.VALIDATE_STATUS) != 0);
+    if (!this.valid) {
+        throw new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link");
+    }
 
-        logging.debug("Creating shader program: '" + hash + "'");
-        if (this.valid) {
-            logging.debug("Program link succeeded: " + context.getProgramInfoLog(handle));
-        }
-        else {
-            logging.debug("Program link failed: " + context.getProgramInfoLog(handle));
-        }
+    /* Discover active uniforms and samplers
+     */
+    var uniforms = {};
+    var samplers = {};
 
-        if (!this.valid) {
-            throw new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link");
-        }
+    var numUniforms = context.getProgramParameter(handle, context.ACTIVE_UNIFORMS);
 
-        /* Discover active uniforms and samplers
-         */
-        var uniforms = {};
-        var samplers = {};
+    for (var i = 0; i < numUniforms; ++i) {
+        var u = context.getActiveUniform(handle, i);
+        if (u) {
+            var location = context.getUniformLocation(handle, u.name);
+            if ((u.type == context.SAMPLER_2D) || (u.type == context.SAMPLER_CUBE) || (u.type == 35682)) {
 
-        var numUniforms = context.getProgramParameter(handle, context.ACTIVE_UNIFORMS);
-
-        for (var i = 0; i < numUniforms; ++i) {
-            var u = context.getActiveUniform(handle, i);
-            if (u) {
-                var location = context.getUniformLocation(handle, u.name);
-                if ((u.type == context.SAMPLER_2D) || (u.type == context.SAMPLER_CUBE) || (u.type == 35682)) {
-
-                    samplers[u.name] = new SceneJS._webgl.ProgramSampler(
-                            context,
-                            handle,
-                            u.name,
-                            u.type,
-                            u.size,
-                            location,
-                            logging);
-                } else {
-                    uniforms[u.name] = new SceneJS._webgl.ProgramUniform(
-                            context,
-                            handle,
-                            u.name,
-                            u.type,
-                            u.size,
-                            location,
-                            logging);
-                }
-            }
-        }
-
-        /* Discover attributes
-         */
-        var attributes = {};
-
-        var numAttribs = context.getProgramParameter(handle, context.ACTIVE_ATTRIBUTES);
-        for (var i = 0; i < numAttribs; i++) {
-            var a = context.getActiveAttrib(handle, i);
-            if (a) {
-                var location = context.getAttribLocation(handle, a.name);
-                attributes[a.name] = new SceneJS._webgl.ProgramAttribute(
+                samplers[u.name] = new SceneJS_webgl_ProgramSampler(
                         context,
                         handle,
-                        a.name,
-                        a.type,
-                        a.size,
+                        u.name,
+                        u.type,
+                        u.size,
+                        location,
+                        logging);
+            } else {
+                uniforms[u.name] = new SceneJS_webgl_ProgramUniform(
+                        context,
+                        handle,
+                        u.name,
+                        u.type,
+                        u.size,
                         location,
                         logging);
             }
         }
+    }
 
-        this.bind = function() {
-            context.useProgram(handle);
-        };
+    /* Discover attributes
+     */
+    var attributes = {};
+
+    var numAttribs = context.getProgramParameter(handle, context.ACTIVE_ATTRIBUTES);
+    for (var i = 0; i < numAttribs; i++) {
+        var a = context.getActiveAttrib(handle, i);
+        if (a) {
+            var location = context.getAttribLocation(handle, a.name);
+            attributes[a.name] = new SceneJS_webgl_ProgramAttribute(
+                    context,
+                    handle,
+                    a.name,
+                    a.type,
+                    a.size,
+                    location,
+                    logging);
+        }
+    }
+
+    this.bind = function() {
+        context.useProgram(handle);
+    };
 
 
-        this.setUniform = function(name, value) {
-            var u = uniforms[name];
-            if (u) {
-                u.setValue(value);
-            } else {
-                //    logging.warn("Shader uniform load failed - uniform not found in shader : " + name);
+    this.setUniform = function(name, value) {
+        var u = uniforms[name];
+        if (u) {
+            u.setValue(value);
+        } else {
+            //    logging.warn("Shader uniform load failed - uniform not found in shader : " + name);
+        }
+    };
+
+    this.bindFloatArrayBuffer = function(name, buffer) {
+        var attr = attributes[name];
+        if (attr) {
+            attr.bindFloatArrayBuffer(buffer);
+        } else {
+            //  logging.warn("Shader attribute bind failed - attribute not found in shader : " + name);
+        }
+    };
+
+    this.bindTexture = function(name, texture, unit) {
+        var sampler = samplers[name];
+        if (sampler) {
+            sampler.bindTexture(texture, unit);
+        } else {
+            //  logging.warn("Sampler not found: " + name);
+        }
+    };
+
+    this.unbind = function() {
+        //     context.useProgram(0);
+    };
+
+    this.destroy = function() {
+        if (this.valid) {
+            //   logging.debug("Destroying shader program: '" + hash + "'");
+            context.deleteProgram(handle);
+            for (var s in shaders) {
+                context.deleteShader(shaders[s].handle);
             }
-        };
+            attributes = null;
+            uniforms = null;
+            samplers = null;
+            this.valid = false;
+        }
+    };
+}
 
-        this.bindFloatArrayBuffer = function(name, buffer) {
-            var attr = attributes[name];
-            if (attr) {
-                attr.bindFloatArrayBuffer(buffer);
-            } else {
-                //  logging.warn("Shader attribute bind failed - attribute not found in shader : " + name);
+function SceneJS_webgl_Texture2D(context, cfg) {
+    //  cfg.logging.debug("Creating texture: '" + cfg.textureId + "'");
+    this.canvas = cfg.canvas;
+    this.textureId = cfg.textureId;
+    this.handle = context.createTexture();
+    this.target = context.TEXTURE_2D;
+    this.minFilter = cfg.minFilter;
+    this.magFilter = cfg.magFilter;
+    this.wrapS = cfg.wrapS;
+    this.wrapT = cfg.wrapT;
+
+    context.bindTexture(this.target, this.handle);
+
+    if (cfg.image) {
+
+        /* Texture from image
+         */
+        context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
+
+        this.format = context.RGBA;
+        this.width = cfg.image.width;
+        this.height = cfg.image.height;
+        this.isDepth = false;
+        this.depthMode = 0;
+        this.depthCompareMode = 0;
+        this.depthCompareFunc = 0;
+
+    } else {
+
+        /* Texture from data
+         */
+        if (!cfg.texels) {
+            if (cfg.sourceType == context.FLOAT) {
+                cfg.texels = new WebGLFloatArray(cfg.width * cfg.height * 4);
             }
-        };
-
-        this.bindTexture = function(name, texture, unit) {
-            var sampler = samplers[name];
-            if (sampler) {
-                sampler.bindTexture(texture, unit);
-            } else {
-                //  logging.warn("Sampler not found: " + name);
+            else {
+                cfg.texels = new WebGLUnsignedByteArray(cfg.width * cfg.height * 4);
             }
-        };
+        }
 
-        this.unbind = function() {
-            //     context.useProgram(0);
-        };
+        context.texImage2D(context.TEXTURE_2D, 0, cfg.internalFormat, cfg.width, cfg.height, 0, cfg.sourceFormat, cfg.sourceType, cfg.texels);
 
-        this.destroy = function() {
-            if (this.valid) {
-                logging.debug("Destroying shader program: '" + hash + "'");
-                context.deleteProgram(handle);
-                for (var s in shaders) {
-                    context.deleteShader(shaders[s].handle);
-                }
-                attributes = null;
-                uniforms = null;
-                samplers = null;
-                this.valid = false;
+        if (cfg.isDepth) {
+            if (cfg.depthMode) {
+                context.texParameteri(context.TEXTURE_2D, context.DEPTH_TEXTURE_MODE, cfg.depthMode);
             }
-        };
-    },
+            if (cfg.depthCompareMode) {
+                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_MODE, cfg.depthCompareMode);
+            }
+            if (cfg.depthCompareFunc) {
+                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_FUNC, cfg.depthCompareFunc);
+            }
+        }
 
-    Texture2D : function(context, cfg) {
-        cfg.logging.debug("Creating texture: '" + cfg.textureId + "'");
-        this.canvas = cfg.canvas;
-        this.textureId = cfg.textureId;
-        this.handle = context.createTexture();
-        this.target = context.TEXTURE_2D;
-        this.minFilter = cfg.minFilter;
-        this.magFilter = cfg.magFilter;
-        this.wrapS = cfg.wrapS;
-        this.wrapT = cfg.wrapT;
+        this.format = cfg.internalFormat;
+        this.width = cfg.width;
+        this.height = cfg.height;
+        this.isDepth = cfg.isDepth;
+        this.depthMode = cfg.depthMode;
+        this.depthCompareMode = cfg.depthCompareMode;
+        this.depthCompareFunc = cfg.depthCompareFunc;
+    }
 
+    if (cfg.minFilter) {
+        context.texParameteri(// Filtered technique when scaling texture down
+                context.TEXTURE_2D,
+                context.TEXTURE_MIN_FILTER,
+                cfg.minFilter);
+    }
+
+    if (cfg.magFilter) {
+        context.texParameteri(// Filtering technique when scaling texture up
+                context.TEXTURE_2D,
+                context.TEXTURE_MAG_FILTER,
+                cfg.magFilter);
+    }
+    if (cfg.wrapS) {
+        context.texParameteri(
+                context.TEXTURE_2D,
+                context.TEXTURE_WRAP_S,
+                cfg.wrapS);
+    }
+
+    if (cfg.wrapT) {
+        context.texParameteri(
+                context.TEXTURE_2D,
+                context.TEXTURE_WRAP_T,
+                cfg.wrapT);
+    }
+
+    /* Generate MIP map if required
+     */
+    if (cfg.minFilter == context.NEAREST_MIPMAP_NEAREST ||
+        cfg.minFilter == context.LINEAR_MIPMAP_NEAREST ||
+        cfg.minFilter == context.NEAREST_MIPMAP_LINEAR ||
+        cfg.minFilter == context.LINEAR_MIPMAP_LINEAR) {
+
+        context.generateMipmap(context.TEXTURE_2D);
+    }
+
+    context.bindTexture(this.target, null);
+
+    //        gl.activeTexture(gl.TEXTURE0);
+    //  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
+    //  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
+
+    this.bind = function(unit) {
+        context.activeTexture(context["TEXTURE" + unit]);
         context.bindTexture(this.target, this.handle);
 
-        if (cfg.image) {
+    };
 
-            /* Texture from image
-             */
-            context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
-
-            this.format = context.RGBA;
-            this.width = cfg.image.width;
-            this.height = cfg.image.height;
-            this.isDepth = false;
-            this.depthMode = 0;
-            this.depthCompareMode = 0;
-            this.depthCompareFunc = 0;
-
-        } else {
-
-            /* Texture from data
-             */
-            if (!cfg.texels) {
-                if (cfg.sourceType == context.FLOAT) {
-                    cfg.texels = new WebGLFloatArray(cfg.width * cfg.height * 4);
-                }
-                else {
-                    cfg.texels = new WebGLUnsignedByteArray(cfg.width * cfg.height * 4);
-                }
-            }
-
-            context.texImage2D(context.TEXTURE_2D, 0, cfg.internalFormat, cfg.width, cfg.height, 0, cfg.sourceFormat, cfg.sourceType, cfg.texels);
-
-            if (cfg.isDepth) {
-                if (cfg.depthMode) {
-                    context.texParameteri(context.TEXTURE_2D, context.DEPTH_TEXTURE_MODE, cfg.depthMode);
-                }
-                if (cfg.depthCompareMode) {
-                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_MODE, cfg.depthCompareMode);
-                }
-                if (cfg.depthCompareFunc) {
-                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_FUNC, cfg.depthCompareFunc);
-                }
-            }
-
-            this.format = cfg.internalFormat;
-            this.width = cfg.width;
-            this.height = cfg.height;
-            this.isDepth = cfg.isDepth;
-            this.depthMode = cfg.depthMode;
-            this.depthCompareMode = cfg.depthCompareMode;
-            this.depthCompareFunc = cfg.depthCompareFunc;
-        }
-
-        if (cfg.minFilter) {
-            context.texParameteri(// Filtered technique when scaling texture down
-                    context.TEXTURE_2D,
-                    context.TEXTURE_MIN_FILTER,
-                    cfg.minFilter);
-        }
-
-        if (cfg.magFilter) {
-            context.texParameteri(// Filtering technique when scaling texture up
-                    context.TEXTURE_2D,
-                    context.TEXTURE_MAG_FILTER,
-                    cfg.magFilter);
-        }
-        if (cfg.wrapS) {
-            context.texParameteri(
-                    context.TEXTURE_2D,
-                    context.TEXTURE_WRAP_S,
-                    cfg.wrapS);
-        }
-
-        if (cfg.wrapT) {
-            context.texParameteri(
-                    context.TEXTURE_2D,
-                    context.TEXTURE_WRAP_T,
-                    cfg.wrapT);
-        }
-
-        /* Generate MIP map if required
-         */
-        if (cfg.minFilter == context.NEAREST_MIPMAP_NEAREST ||
-            cfg.minFilter == context.LINEAR_MIPMAP_NEAREST ||
-            cfg.minFilter == context.NEAREST_MIPMAP_LINEAR ||
-            cfg.minFilter == context.LINEAR_MIPMAP_LINEAR) {
-
-            context.generateMipmap(context.TEXTURE_2D);
-        }
-
+    this.unbind = function(unit) {
+        context.activeTexture(context["TEXTURE" + unit]);
         context.bindTexture(this.target, null);
+    };
 
-        //        gl.activeTexture(gl.TEXTURE0);
-        //  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
-        //  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
+    this.generateMipmap = function() {
+        context.generateMipmap(context.TEXTURE_2D);
+    };
 
-        this.bind = function(unit) {
-            context.activeTexture(context["TEXTURE" + unit]);
-            context.bindTexture(this.target, this.handle);
+    this.destroy = function() {
+        if (this.handle) {
+            // cfg.logging.debug("Destroying texture");
+            context.deleteTexture(this.handle);
+            this.handle = null;
+        }
+    };
+}
 
-        };
+/** Buffer for vertices and indices
+ *
+ * @param context  WebGL context
+ * @param type     Eg. ARRAY_BUFFER, ELEMENT_ARRAY_BUFFER
+ * @param values   WebGL array wrapper
+ * @param numItems Count of items in array wrapper
+ * @param itemSize Size of each item
+ * @param usage    Eg. STATIC_DRAW
+ */
+function SceneJS_webgl_ArrayBuffer(context, type, values, numItems, itemSize, usage) {
+    this.handle = context.createBuffer();
+    context.bindBuffer(type, this.handle);
+    context.bufferData(type, values, usage);
+    context.bindBuffer(type, null);
 
-        this.unbind = function(unit) {
-            context.activeTexture(context["TEXTURE" + unit]);
-            context.bindTexture(this.target, null);
-        };
+    this.type = type;
+    this.numItems = numItems;
+    this.itemSize = itemSize;
 
-        this.generateMipmap = function() {
-            context.generateMipmap(context.TEXTURE_2D);
-        };
-
-        this.destroy = function() {
-            if (this.handle) {
-                cfg.logging.debug("Destroying texture");
-                context.deleteTexture(this.handle);
-                this.handle = null;
-            }
-        };
-    },
-
-    /** Buffer for vertices and indices
-     *
-     * @param context  WebGL context
-     * @param type     Eg. ARRAY_BUFFER, ELEMENT_ARRAY_BUFFER
-     * @param values   WebGL array wrapper
-     * @param numItems Count of items in array wrapper
-     * @param itemSize Size of each item
-     * @param usage    Eg. STATIC_DRAW
-     */
-    ArrayBuffer : function(context, type, values, numItems, itemSize, usage) {
-        this.handle = context.createBuffer();
+    this.bind = function() {
         context.bindBuffer(type, this.handle);
-        context.bufferData(type, values, usage);
+    };
+
+    this.unbind = function() {
         context.bindBuffer(type, null);
+    };
 
-        this.type = type;
-        this.numItems = numItems;
-        this.itemSize = itemSize;
+    this.destroy = function() {
+        context.deleteBuffer(this.handle);
+    };
+}
 
-        this.bind = function() {
-            context.bindBuffer(type, this.handle);
-        };
-
-        this.unbind = function() {
-            context.bindBuffer(type, null);
-        };
-
-        this.destroy = function() {
-            context.deleteBuffer(this.handle);
-        };
-    }
-};
 /** Basic scene graph node, generally used as a group node.
  */
 SceneJS.node = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
     return SceneJS._utils.createNode(
-            function(data) {
+            function(traversalContext, data) {
                 var params = cfg.getParams();
                 var childScope = SceneJS._utils.newScope(data, false);
                 if (params) {
@@ -1945,7 +1942,7 @@ SceneJS.node = function() {
                         childScope.put(key, params[key]);
                     }
                 }
-                SceneJS._utils.visitChildren(cfg, childScope || data);
+                SceneJS._utils.visitChildren(cfg, traversalContext, childScope || data);
             });
 };
 /**
@@ -2418,22 +2415,22 @@ SceneJS.loggingToPage = function() {
     function findElement(elementId) {
         var element;
         if (!elementId) {
-            elementId = SceneJS._webgl.DEFAULT_LOGGING_ID;
+            elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
             element = document.getElementById(elementId);
             if (!element) {
                 throw new SceneJS.exceptions.PageLoggingElementNotFoundException
                         ("SceneJs.loggingToPage config 'elementId' omitted and no default element found with ID '"
-                                + SceneJS._webgl.DEFAULT_LOGGING_ID + "'");
+                                + SceneJS_webgl_DEFAULT_LOGGING_ID + "'");
             }
         } else {
             element = document.getElementById(elementId);
             if (!element) {
-                elementId = SceneJS._webgl.DEFAULT_LOGGING_ID;
+                elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
                 element = document.getElementById(elementId);
                 if (!element) {
                     throw new SceneJS.exceptions.PageLoggingElementNotFoundException
                             ("SceneJs.loggingToPage config 'elementId' does not match any elements in page and no " +
-                             "default element found with ID '" + SceneJS._webgl.DEFAULT_LOGGING_ID + "'");
+                             "default element found with ID '" + SceneJS_webgl_DEFAULT_LOGGING_ID + "'");
                 }
             }
         }
@@ -2528,9 +2525,9 @@ SceneJS._backends.installBackend(
                                     group.numProcesses--;
                                 } else {
                                     var elapsed = time - process.timeStarted;
-                                    if (elapsed > process.timeout) {
+                                    if (elapsed > (process.timeout * 1000)) {
                                         ctx.logging.warn("Process timed out after " +
-                                                         (process.timeout / 1000) +
+                                                         process.timeoutSecs +
                                                          " seconds: " + process.description);
                                         process.destroyed = true;
                                         processes[pid] = undefined;
@@ -2575,7 +2572,7 @@ SceneJS._backends.installBackend(
                  *
                  * createProcess({
                  *      description: "loading texture image",
-                 *      timeout: 30000,                         // 30 Seconds
+                 *      timeoutSecs: 30,                         // 30 Seconds
                  *      onTimeout(function() {
                  *              alert("arrrg!!");
                  *          });
@@ -2595,12 +2592,12 @@ SceneJS._backends.installBackend(
                                 timeStarted : time,
                                 timeRunning: 0,
                                 description : cfg.description || "",
-                                timeout : cfg.timeout || 30000, // Thirty second default timout
+                                timeoutSecs : cfg.timeoutSecs || 30, // Thirty second default timout
                                 onTimeout : cfg.onTimeout
                             };
                             group.processes[pid] = process;
                             group.numProcesses++;
-                            ctx.logging.debug("Created process: " + cfg.description);
+                          //  ctx.logging.debug("Created process: " + cfg.description);
                             return process;
                         }
                     }
@@ -2613,7 +2610,7 @@ SceneJS._backends.installBackend(
                 destroyProcess: function(process) {
                     if (process) {
                         process.destroyed = true;
-                        ctx.logging.debug("Destroyed process: " + process.description);
+                     //   ctx.logging.debug("Destroyed process: " + process.description);
                     }
                 },
 
@@ -2640,8 +2637,8 @@ SceneJS._backends.installBackend(
                  *          timeStarted :   65765765765765,             // System time in milliseconds
                  *          timeRunning:    876870,                     // Elapsed time in milliseconds
                  *          description :   "loading texture image",
-                 *          timeout :       30000,                      // Timeout in milliseconds
-                 *          onTimeout :     <function>                  // Function that will fire on timeout
+                 *          timeoutSecs :       30,                      // Timeout in milliseconds
+                 *          onTimeout :     <function>                  // Function that will fire on timeoutSecs
                  */
                 getProcesses : function(sceneId) {
                     var group = groups[sceneId];
@@ -2738,6 +2735,8 @@ SceneJS._backends.installBackend(
                                 }
                             }
                         });
+
+                
             }
 
             return { // Node-facing API
@@ -2786,7 +2785,8 @@ SceneJS._backends.installBackend(
                                     ", uri: " + uri);
                             onTimeout();
                         },
-                        description:"asset load: proxy = " + proxyUri + ", uri = " + uri
+                        description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
+                        timeoutSecs: 180 // 180 seconds - Big timeout to allow files to parse
                     });
                     var callbackName = "callback" + process.id; // Process ID is globally unique
                     _loadAsset(
@@ -2818,10 +2818,10 @@ SceneJS._backends.installBackend(
  */
 SceneJS.load = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    if (!cfg.fixed) {
-        throw new SceneJS.exceptions.UnsupportedOperationException
-                ("Dynamic configuration of SceneJS.load nodes is not supported");
-    }
+//    if (!cfg.fixed) {
+//        throw new SceneJS.exceptions.UnsupportedOperationException
+//                ("Dynamic configuration of SceneJS.load nodes is not supported");
+//    }
     var params;
 
     var backend = SceneJS._backends.getBackend("load");
@@ -2919,6 +2919,728 @@ SceneJS.load = function() {
                         break;
                 }
             });
+};
+/**
+ * Parses a COLLADA files into a SceneJS nodes.
+ *
+ * This is an experimental parser constructed using techniques poached from other examples out there, most notably
+ * that of GLGE, which you can find at http://github.com/supereggbert/GLGE
+ *
+ * Parsing large Collada documents client-side is not encouraged however, and is not likely to be seriously
+ * supported by SceneJS.
+ *
+ * The recommended way to load Collada is to use SceneJS.assets.scenejs nodes to pull SceneJS fragments from a
+ * server-side proxy that parses Collada.
+ */
+SceneJS._utils.__ColladaParser = (function() {
+    var logger;
+    var xmlDoc; // Holds DOM parsed from XML string
+    var uri;    // URI at which Collada document resides
+    var dirURI; // Path to directory containing the Collada document
+    var idMap = {}; // Maps every DOM element by ID
+    var sources = {};
+
+    /** Frees scratch memory
+     */
+    function cleanup() {
+        xmlDoc = null;
+        idMap = {};
+        sources = {};
+    }
+
+    /**
+     * Parses the given XML string into the xmlDoc
+     */
+    function loadDoc(xml) {
+        if (window.DOMParser) {
+            var parser = new DOMParser();
+            xmlDoc = parser.parseFromString(xml, "text/xml");
+        }
+        else { // Internet Explorer
+            xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+            xmlDoc.async = "false";
+            xmlDoc.loadXML(xml);
+        }
+    }
+
+    /**
+     * Finds every element in the xmlDoc and maps the by IDs into the idMap
+     */
+    function buildIdMap() {
+        idMap = {};
+        var elements = xmlDoc.getElementsByTagName("*");
+        var id;
+        for (var i = elements.length - 1; i >= 0; i--) {
+            id = elements[i].getAttribute("id");
+            if (id != "") {
+                idMap[id] = elements[i];
+            }
+        }
+    }
+
+    /**
+     * Parses the xmlDoc, optionally constrained to the subtree identified by rootId
+     */
+    function parseDoc(rootId) {
+        if (rootId) {
+            //  logger.info("Parsing Collada asset '" + rootId + "'");
+            var root = idMap[rootId];
+            if (root) {
+                return parseNode(root);
+            } else {
+                throw new SceneJS.exceptions.ColladaRootNotFoundException(
+                        "SceneJS.assets.collada root not found in COLLADA document: '" + rootId + "'");
+            }
+        } else {
+            logger.info("Parsing Collada scene. Asset: " + rootId ? "'" + rootId + "'" : "default");
+            var scene = xmlDoc.getElementsByTagName("scene");
+            if (scene.length > 0) {
+                return parseNode(scene[0]);
+            } else {
+                throw new SceneJS.exceptions.ColladaRootRequiredException(
+                        "SceneJS.assets.collada root needs to be specified for COLLADA document: " + uri);
+            }
+        }
+    }
+
+    function parseArray(node) {
+        var result = [];
+        var prev = "";
+        var child = node.firstChild;
+        var currArray;
+        while (child) {
+            currArray = (prev + child.nodeValue).replace(/\s+/g, " ").replace(/^\s+/g, "").split(" ");
+            child = child.nextSibling;
+            if (currArray[0] == "") {
+                currArray.unshift();
+            }
+            if (child) {
+                prev = currArray.pop();
+            }
+            for (var i = 0; i < currArray.length; i++) {
+                result.push(currArray[i]);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the data for either a <vertices> or a <source>
+     *
+     * A <source> declares a data repository that provides values according
+     * to the semantics of an <input> element that refers to it.
+     */
+    function getSource(id) {
+        var source = sources[id];
+        if (source) {
+            return source;
+        }
+        var element = idMap[id];
+        if (element.tagName == "vertices") {
+
+            /* Recurse to child <source> element
+             */
+            source = getSource(
+                    element
+                            .getElementsByTagName("input")[0]
+                            .getAttribute("source")
+                            .substr(1));
+        } else {
+
+            /* Element is a <source>
+             */
+            var accessor = element
+                    .getElementsByTagName("technique_common")[0]
+                    .getElementsByTagName("accessor")[0];
+
+            var stride = parseInt(accessor.getAttribute("stride"));         // Number of values per unit
+            var offset = parseInt(accessor.getAttribute("offset")) || 0;    // Index of first value
+            var count = parseInt(accessor.getAttribute("count"));           // Number of units
+
+            /* Create mask that indicates what data types are in the
+             * source - int, float, Name, bool and IDREF.
+             *
+             * The number and type of the <param> elements define the
+             * output of the <accessor>. Parameters are bound to values
+             * in the order in which both are specified. A <param> wtihout
+             * a name attribute indicates that the value is not part of the
+             * input.
+             */
+            var params = accessor.getElementsByTagName("param");
+            var typeMask = [];
+            for (var i = 0; i < params.length; i++) {
+                if (params[i].hasAttribute("name")) {
+                    typeMask.push(true);
+                } else {
+                    typeMask.push(false);
+                }
+            }
+
+            source = {
+                array:parseArray(idMap[accessor.getAttribute("source").substr(1)]),
+                stride:stride,
+                offset:offset,
+                count:count,
+                typeMask: typeMask
+            };
+        }
+        sources[id] = source;
+        return source;
+    }
+
+    function getMaxOffset(inputs) {
+        var maxOffset = 0;
+        for (var n = 0; n < inputs.length; n++) {
+            var offset = inputs[n].getAttribute("offset");
+            if (offset > maxOffset) {
+                maxOffset = offset;
+            }
+        }
+        return maxOffset;
+    }
+
+    function getTrianglesFromPolyList(polyList) {
+        var i, j, k;
+        var inputs = polyList.getElementsByTagName("input");
+        var maxOffset = getMaxOffset(inputs);
+        var vcount = parseArray(polyList.getElementsByTagName("vcount")[0]);
+        var faces = parseArray(polyList.getElementsByTagName("p")[0]);
+        var triangles = [];
+        var base = 0;
+        for (i = 0; i < vcount.length; i++) {
+            for (j = 0; j < vcount[i] - 2; j++) { // For each vertex
+                for (k = 0; k <= maxOffset; k++) { // A
+                    triangles.push(faces[base + k]);
+                }
+                for (k = 0; k <= maxOffset; k++) { // B
+                    triangles.push(faces[base + (maxOffset + 1) * (j + 1) + k]);
+                }
+                for (k = 0; k <= maxOffset; k++) { // C
+                    triangles.push(faces[base + (maxOffset + 1) * (j + 2) + k]);
+                }
+            }
+            base = base + (maxOffset + 1) * vcount[i];
+        }
+        return triangles;
+    }
+
+    /** Extracts list of triangles from the given <mesh>, merged from both the
+     * <triangles> and <polylist> child nodes of the <mesh>.
+     */
+    function getTrianglesList(geometryNode) {
+        var trianglesList = [];
+        var meshNode = geometryNode.getElementsByTagName("mesh")[0];
+
+        /* Extract <polylist> children
+         */
+        var polyLists = meshNode.getElementsByTagName("polylist");
+        for (var i = 0; i < polyLists.length; i++) {
+            var polyList = polyLists[i];
+            polyList.getElementsByTagName("p")[0].data = getTrianglesFromPolyList(polyList);
+            trianglesList.push(polyList);
+        }
+
+        var tris = meshNode.getElementsByTagName("triangles");
+        for (i = 0; i < tris.length; i++) {
+            //  logger.info("Parsing &lt;triangle&gt; " + i);
+            trianglesList.push(tris[i]);
+        }
+        return trianglesList;
+    }
+
+    var x = 0;
+
+    /** Parses a <geometry> and returns an array containing a SceneJS.geometry node for
+     * each <mesh> child
+     *
+     * @param id
+     */
+    function getGeometriesData(geometryNode) {
+        var geometriesData = [];
+        var trianglesList = getTrianglesList(geometryNode);
+
+        for (it = 0; it < trianglesList.length; it++) {
+            // logger.info("Parsing &lt;triangle&gt; " + it);
+            var triangle = trianglesList [it];
+            var inputs = triangle.getElementsByTagName("input");
+            var inputArray = [];
+            var outputData = {};
+
+            for (var n = 0; n < inputs.length; n++) {
+                // logger.info("Parsing &lt;input&gt; " + n);
+                inputs[n].data = getSource(inputs[n].getAttribute("source").substr(1));
+                var group = inputs[n].getAttribute("semantic");
+                if (group == "TEXCOORD") {
+                    //   logger.info("Parsing TEXCOORD" + i);
+                    group = group + inputs[n].getAttribute("set") || 0;
+                }
+                inputs[n].group = group;
+                inputArray[inputs[n].getAttribute("offset")] = inputs[n];
+                outputData[group] = [];
+            }
+
+            //   logger.info("Parsing &lt;face&gt;s..");
+            var faces;
+            if (triangle.getElementsByTagName("p")[0].data) {
+                faces = triangle.getElementsByTagName("p")[0].data;
+            }
+            else {
+                faces = parseArray(triangle.getElementsByTagName("p")[0]);
+            }
+
+            //  logger.info("Parsed &lt;face&gt; count =  " + faces.length);
+
+            for (var i = 0; i < faces.length; i = i + inputArray.length) {
+                for (var n = 0; n < inputArray.length; n++) {
+                    var group = inputArray[n].group;
+                    var pCount = 0;
+                    for (var j = 0; j < inputArray[n].data.stride; j++) {
+                        if (inputArray[n].data.typeMask[j]) {
+                            outputData[group].push(
+                                    inputArray[n].data.array[faces[i + n]
+                                            * inputArray[n].data.stride + j
+                                            + inputArray[n].data.offset]);
+                            pCount++;
+                        }
+                    }
+
+                    /* 1D
+                     */
+                    if (group == "VERTEX" && pCount == 1) {
+                        outputData[group].push(0);
+                    }
+
+                    /* 2D
+                     */
+                    if (group == "VERTEX" && pCount == 2) {
+                        outputData[group].push(0);
+                    }
+
+                    /* 2D textures
+                     */
+                    if (group == "TEXCOORD0" && pCount == 3) {
+                        outputData[group].pop();
+                    }
+                    if (group == "TEXCOORD1" && pCount == 3) {
+                        outputData[group].pop();
+                    }
+                }
+            }
+
+            faces = [];
+            for (n = 0; n < outputData.VERTEX.length / 3; n++) {
+                faces.push(n);
+            }
+
+
+            geometriesData.push({
+                materialName : triangle.getAttribute("material"),
+                positions: outputData.VERTEX,
+                normals: outputData.NORMAL,
+                uv : outputData.TEXCOORD0,
+                uv2 : outputData.TEXCOORD1,
+                indices: faces
+            });
+        }
+        return geometriesData;
+    }
+
+    /**
+     * Returns profile/newparam[sid="<sid>"]/sampler2D[0]/source[0].nodeValue
+     */
+    function getSamplerSource(profile, sid) {
+        var params = profile.getElementsByTagName("newparam");
+        for (var i = 0; i < params.length; i++) {
+            if (params[i].getAttribute("sid") == sid) {
+                return params[i]
+                        .getElementsByTagName("sampler2D")[0]
+                        .getElementsByTagName("source")[0]
+                        .firstChild
+                        .nodeValue;
+            }
+        }
+        throw new SceneJS.exceptions.ColladaParseException
+                ("Element expected: "
+                        + profile.tagName
+                        + "/newparam[sid == '"
+                        + sid + "']/sampler2D[0]/source[0]");
+    }
+
+    /**
+     * Returns profile/newparam[sid="<sid>"]/surface[0]/init_from[0].nodeValue
+     */
+    function getImageId(profile, sid) {
+        var newparams = profile.getElementsByTagName("newparam");
+        for (var i = 0; i < newparams.length; i++) {
+            if (newparams[i].getAttribute("sid") == sid) {
+                var surface = newparams[i].getElementsByTagName("surface")[0];
+                return surface
+                        .getElementsByTagName("init_from")[0]
+                        .firstChild
+                        .nodeValue;
+            }
+        }
+        throw new SceneJS.exceptions.ColladaParseException
+                ("Element expected: "
+                        + profile.tagName
+                        + "/newparam[sid == '"
+                        + sid + "']/surface[0]/init_from[0]");
+    }
+
+    function getTextureData(profileCommon, texture, applyTo) {
+        var source = getSamplerSource(profileCommon, texture.getAttribute("texture"));
+        var imageId = getImageId(profileCommon, source);
+        var image = idMap[imageId];
+        var imageFileName = image.getElementsByTagName("init_from")[0].firstChild.nodeValue;
+        var blendMode = texture.getElementsByTagName("blend_mode")[0];
+        return {
+            uri : dirURI + imageFileName,
+            applyTo: applyTo,
+            blendMode: (blendMode == "MULTIPLY") ? "multiply" : "add"
+        };
+    }
+
+    function getDiffuseMaterialData(profileCommon, technique, materialData) {
+        var diffuse = technique.getElementsByTagName("diffuse");
+        if (diffuse.length > 0) {
+            var child = diffuse[0].firstChild;
+            do{
+                switch (child.tagName) {
+                    case "color":
+                        var color = child.firstChild.nodeValue.split(" ");
+                        materialData.baseColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]) };
+                        break;
+
+                    case "texture":
+                        materialData.texturesData.push(
+                                getTextureData(profileCommon, child, "baseColor"));
+                        break;
+                }
+            } while (child = child.nextSibling);
+        }
+    }
+
+    function getSpecularColorMaterialData(profileCommon, technique, materialData) {
+        var specular = technique.getElementsByTagName("specular");
+        if (specular.length > 0) {
+            var child = specular[0].firstChild;
+            do{
+                switch (child.tagName) {
+                    case "color":
+                        var color = child.firstChild.nodeValue.split(" ");
+                        materialData.specularColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]),a: 1 };
+                        break;
+
+                    case "texture":
+                        materialData.texturesData.push(
+                                getTextureData(profileCommon, child, "specularColor"));
+                        break;
+                }
+            } while (child = child.nextSibling);
+        }
+    }
+
+    function getShininessMaterialData(profileCommon, technique, materialData) {
+        var shininess = technique.getElementsByTagName("shininess");
+        if (shininess.length > 0) {
+            var child = shininess[0].firstChild;
+            do{
+                switch (child.tagName) {
+                    case "float":
+                        materialData.shine = parseFloat(child.firstChild.nodeValue);
+                        break;
+
+                    case "texture":
+                        materialData.texturesData.push(
+                                getTextureData(profileCommon, child, "shine"));
+
+                        break;
+                }
+            } while (child = child.nextSibling);
+        }
+    }
+
+    function getBumpMapMaterialData(profileCommon, technique, materialData) {
+        var bump = technique.getElementsByTagName("bump");
+        if (bump.length > 0) {
+            var child = bump[0].firstChild;
+            do{
+                switch (child.tagName) {
+                    case "texture":
+                        logger.warn("Collada bump mapping not supported yet");
+                        break;
+                }
+            } while (child = child.nextSibling);
+        }
+    }
+
+    function getMaterialData(id) {
+        var materialNode = idMap[id];
+        var effectId = materialNode
+                .getElementsByTagName("instance_effect")[0]
+                .getAttribute("url")
+                .substr(1);
+        var effect = idMap[effectId];
+        var profileCommon = effect.getElementsByTagName("profile_COMMON")[0];
+        var technique = profileCommon.getElementsByTagName("technique")[0];
+        var materialData = {
+            texturesData : []
+        };
+        getDiffuseMaterialData(profileCommon, technique, materialData);
+        getSpecularColorMaterialData(profileCommon, technique, materialData);
+        getShininessMaterialData(profileCommon, technique, materialData);
+        getBumpMapMaterialData(profileCommon, technique, materialData);
+        return materialData;
+    }
+
+    function getMaterialsData(instanceGeometryNode) {
+        var materialsData = {};
+        var materials = instanceGeometryNode.getElementsByTagName("instance_material");
+        var material;
+        var materialId;
+        var symbolId;
+        for (var i = 0; i < materials.length; i++) {
+            material = materials[i];
+            materialId = material.getAttribute("target").substr(1);
+            symbolId = material.getAttribute("symbol");
+            materialsData[symbolId] = getMaterialData(materialId);
+        }
+        return materialsData;
+    }
+
+    function parseInstanceGeometry(instanceGeometryNode) {
+        var geometryNode = idMap[instanceGeometryNode.getAttribute("url").substr(1)];
+        var geometriesData = getGeometriesData(geometryNode);
+        var materialsData = getMaterialsData(instanceGeometryNode);
+
+        var geometries = [];
+
+        for (var i = 0; i < geometriesData.length; i++) {
+
+            var geoData = geometriesData[i];
+
+
+
+            var sceneNode = SceneJS.geometry({
+                type: "xxx" + x++,
+                primitive: "triangles",
+                positions: geoData.positions,
+                normals: geoData.normals,
+                uv : geoData.uv,
+                uv2 : geoData.uv2,
+                indices: geoData.indices
+            });
+
+            if (geoData.materialName) {
+                var materialData = materialsData[geoData.materialName];
+
+                /* Wrap in SceneJS.material
+                 */
+                sceneNode = SceneJS.material({
+                    baseColor: materialData.baseColor,
+                    specularColor: materialData.specularColor ,
+                    shine: 10.0,
+                    specular: 1
+                }, sceneNode);
+
+
+                /* Wrap in SceneJS.texture
+                 */
+                var textureLayers = materialData.texturesData;
+                if (textureLayers.length > 0) {
+                    var layers = [];
+                    for (var j = 0; j < textureLayers.length; j++) {
+                        layers.push({
+                            uri : textureLayers[j].uri,
+                            applyTo: textureLayers[j].applyTo,
+                            flipY : false,
+                            blendMode: textureLayers[j].blendMode,
+
+                            wrapS: "repeat",
+                            wrapT: "repeat" ,
+                             minFilter: "linearMipMapLinear",
+                    magFilter: "linear"
+                        });
+                    }
+                    sceneNode = SceneJS.texture({
+                        layers: layers
+                    }, sceneNode);
+                }
+            }
+            geometries.push(sceneNode);
+        }
+
+
+        /* Group SceneJS.geometries in a SceneJS.node
+         */
+        return SceneJS.node.apply(this, geometries);
+    }
+
+    function parseMatrix(node) {
+        var data = parseArray(node);
+        // logger.info("Parsing matrix (" + data.length + "): [" + data.join(", ") + "]");
+        return data;
+    }
+
+    function parseTranslate(node) {
+        var data = parseArray(node);
+        var x = data[0];
+        var y = data[1];
+        var z = data[2];
+        return SceneJS_math_translationMat4v(data);
+    }
+
+    function parseRotate(node) {
+        var data = parseArray(node);
+        var x = data[0];
+        var y = data[1];
+        var z = data[2];
+        var angle = data[3];
+        return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
+    }
+
+    /**
+     * Returns a SceneJS node created from the given DOM node.
+     *
+     * We're loading only geometry, transforms and material for SceneJS assets, ignoring nodes like cameras and lights.
+     */
+    function parseNode(node, level) {
+        level = level || 0;
+        logger.setIndent(level);
+        level++;
+
+        /* Builds params for our scene node
+         */
+        var sceneNodeParams = [];
+
+        /* Matrix created from any transforms found
+         */
+        var matrix = SceneJS_math_identityMat4();
+
+        var child = node.firstChild;
+
+        do{
+            /* Traverse child nodes
+             */
+            switch (child.tagName) {
+
+                case "node":
+                    sceneNodeParams.push(parseNode(child, level + 1));
+                    break;
+
+                case "matrix":
+                    var array = parseMatrix(child);
+
+                    /* Convert row-major to SceneJS column-major
+                     */
+                    matrix = [
+                        array[0],array[4],array[8],array[12],
+                        array[1],array[5],array[9],array[13],
+                        array[2],array[6],array[10],array[14],
+                        array[3],array[7],array[11],array[15]];
+                    break;
+
+                case "translate":
+                    matrix = matrix
+                            ? SceneJS_math_mulMat4(matrix, parseTranslate(child))
+                            : parseTranslate(child);
+                    break;
+
+                case "rotate":
+                    matrix = matrix
+                            ? SceneJS_math_mulMat4(matrix, parseRotate(child))
+                            : parseRotate(child);
+                    break;
+
+                case "instance_node":
+                    // logger.info("Parsing Collada instance_node");
+                    sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)], level));
+                    break;
+
+                case "instance_visual_scene":
+
+                    /* Root node of the new SceneJS subtree
+                     */
+
+                    var visualSceneNode = idMap[child.getAttribute("url").substr(1)];
+
+                    /* Recurse to visual_scene node
+                     */
+                    sceneNodeParams.push(parseNode(visualSceneNode, level));
+                    break;
+
+                case "instance_geometry":
+
+                    sceneNodeParams.push(parseInstanceGeometry(child));
+                    break;
+            }
+        } while (child = child.nextSibling);
+
+        if (matrix) {
+            sceneNodeParams.unshift({
+                elements: matrix });
+            return SceneJS.modellingMatrix.apply(this, sceneNodeParams);
+        } else {
+            return SceneJS.node.apply(this, sceneNodeParams);
+        }
+
+
+    }
+
+    return {
+        /**
+         *
+         * @param _logger Logger to output progress with
+         * @param _uri Path to the Collada document (used for texture image paths etc)
+         * @param xml Collada document string
+         * @param rootId Optional ID of particular asset we want from Collada document
+         */
+        parse : function(_logger, _uri, xml, rootId) {
+            logger = _logger;
+            uri = _uri;
+            dirURI = _uri.substring(0, _uri.lastIndexOf("/") + 1);
+
+            loadDoc(xml);
+            buildIdMap();
+            var node = parseDoc(rootId);
+            cleanup();
+
+            return node;
+        }
+    };
+})();
+SceneJS.loadCollada = function() {
+
+    var cfg = SceneJS._utils.getNodeConfig(arguments || [
+        {}
+    ]);
+
+    var params = cfg.getParams();
+    if (!params.uri) {
+        throw new SceneJS.exceptions.NodeConfigExpectedException
+                ("Mandatory SceneJS.assets.collada parameter missing: uri");
+    }
+
+
+    var logging = SceneJS._backends.getBackend("logging");
+
+    return SceneJS.load({
+        
+        uri: params.uri,
+
+        serverParams: {
+            format: "xml"
+        },
+
+        parser: function(xml, onError) {
+            return SceneJS._utils.__ColladaParser.parse(
+                    logging.getLogger(),
+                    params.uri, // Used in paths to texture images
+                    xml,
+                    params.node);       // Optional cherry-picked asset in Collada file
+        }
+    });
+
 };
 /* Backend that manages picking
  *
@@ -3531,45 +4253,45 @@ SceneJS._backends.installBackend(
              *  sets some default state on the context, then returns
              *  canvas, canvas ID and context wrapped up in an object.
              *
-             * If canvasId is null, will fall back on SceneJS._webgl.DEFAULT_CANVAS_ID
+             * If canvasId is null, will fall back on SceneJS_webgl_DEFAULT_CANVAS_ID
              */
             var findCanvas = function(canvasId) {
                 var canvas;
                 if (!canvasId) {
                     ctx.logging.info("SceneJS.scene config 'canvasId' omitted - looking for default canvas with ID '"
-                            + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
-                    canvasId = SceneJS._webgl.DEFAULT_CANVAS_ID;
+                            + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
+                    canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
                     canvas = document.getElementById(canvasId);
                     if (!canvas) {
                         throw new SceneJS.exceptions.CanvasNotFoundException
                                 ("SceneJs.scene config 'canvasId' omitted and could not find default canvas with ID '"
-                                        + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                                        + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
                     }
                 } else {
                     canvas = document.getElementById(canvasId);
                     if (!canvas) {
                         ctx.logging.info("SceneJS.scene config 'canvasId' unresolved - looking for default canvas with " +
-                                         "ID '" + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
-                        canvasId = SceneJS._webgl.DEFAULT_CANVAS_ID;
+                                         "ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
+                        canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
                         canvas = document.getElementById(canvasId);
                         if (!canvas) {
                             throw new SceneJS.exceptions.CanvasNotFoundException
                                     ("SceneJs.scene config 'canvasId' does not match any elements in the page and no " +
-                                     "default canvas found with ID '" + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                                     "default canvas found with ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
                         }
                     }
                 }
                 var context;
-                var contextNames = SceneJS._webgl.contextNames;
+                var contextNames = SceneJS_webgl_contextNames;
                 for (var i = 0; (!context) && i < contextNames.length; i++) {
                     try {
 
                         context = canvas.getContext(contextNames[i]);
 
-
-//                                                alert("WebGL Trace enabled");
-//                                                context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
-//                                                context.setTracing(true);
+                        //
+                        //                                                alert("WebGL Trace enabled");
+                        //                                                context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
+                        //                                                context.setTracing(true);
                     } catch (e) {
 
                     }
@@ -4046,7 +4768,7 @@ SceneJS._backends.installBackend(
                  * a closure, IE. not return it.
                  */
                 allocate: function(description, tryAllocate) {
-                    ctx.logging.debug("Allocating memory for: " + description);
+                   // ctx.logging.debug("Allocating memory for: " + description);
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException
                                 ("No canvas active - failed to allocate shader memory");
@@ -4066,6 +4788,7 @@ SceneJS._backends.installBackend(
                             return; // No errors, must have worked
                         } catch (e) {
                             if (context.getError() != context.OUT_OF_MEMORY) {
+                                ctx.logging.error(e.message || e);
                                 throw e; // We only handle out-of-memory error here
                             }
                             if (++tries > maxTries || !evict()) { // Too many tries or no cacher wants to evict
@@ -4107,15 +4830,34 @@ SceneJS._backends.installBackend(
         function(ctx) {
 
             var time = (new Date()).getTime();      // For LRU caching
+
+            /* Resources contributing to shader
+             */
             var canvas;                             // Currently active canvas
             var rendererState;                      // WebGL settings state
-            var programs = {};                      // Program cache
-            var activeProgram = null;               // Currently active program
             var lights = [];                        // Current lighting state
             var material = {};                      // Current material state
             var fog = null;                         // Current fog
             var textureLayers = [];                 // Texture layers are pushed/popped to this as they occur
-            var sceneHash;                          // Current hash of collective scene state pertenant to shaders
+            var geometry = null;                    // Current geometry
+
+            /* Hash codes identifying states of contributing resources
+             */
+            var rendererHash = "";
+            var fogHash = "";
+            var lightsHash = "";
+            var textureHash = "";
+            var geometryHash = "";
+
+            /* Shader programs
+             */
+            var programs = {};                      // Program cache
+            var activeProgram = null;               // Currently active program
+
+            /* Combined hash from those of contributing resources, to identify shaders
+             */
+            var sceneHash;
+
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.TIME_UPDATED,
@@ -4141,7 +4883,11 @@ SceneJS._backends.installBackend(
                         lights = [];
                         material = {};
                         textureLayers = [];
+
                         sceneHash = null;
+                        fogHash = "";
+                        lightsHash = "";
+                        textureHash = "";
                     });
 
             ctx.events.onEvent(
@@ -4161,16 +4907,11 @@ SceneJS._backends.installBackend(
                     });
 
             ctx.events.onEvent(
-                    SceneJS._eventTypes.NAME_EXPORTED,
-                    function(item) {
-                        activeProgram.setUniform("uColor", item.color);
-                    });
-
-            ctx.events.onEvent(
                     SceneJS._eventTypes.RENDERER_UPDATED,
                     function(_rendererState) {
                         rendererState = _rendererState;  // Canvas change will be signified by a CANVAS_UPDATED
                         sceneHash = null;
+                        rendererHash = rendererState.enableTexture2D ? "t" : "f";
                     });
 
             ctx.events.onEvent(
@@ -4191,6 +4932,23 @@ SceneJS._backends.installBackend(
                     function(stack) {
                         textureLayers = stack;
                         sceneHash = null;
+
+                        /* Build texture hash
+                         */
+                        var hash = [];
+                        for (var i = 0; i < stack.length; i++) {
+                            var layer = textureLayers[i];
+                            hash.push("/");
+                            hash.push(layer.params.applyFrom);
+                            hash.push("/");
+                            hash.push(layer.params.applyTo);
+                            hash.push("/");
+                            hash.push(layer.params.blendMode);
+                            if (layer.params.matrix) {
+                                hash.push("/anim");
+                            }
+                        }
+                        textureHash = hash.join("");
                     });
 
             ctx.events.onEvent(
@@ -4210,6 +4968,21 @@ SceneJS._backends.installBackend(
                     function(l) {
                         lights = l;
                         sceneHash = null;
+
+                        /* Build lights hash
+                         */
+                        var hash = [];
+                        for (var i = 0; i < lights.length; i++) {
+                            var light = lights[i];
+                            hash.push(light.type);
+                            if (light.specular) {
+                                hash.push("s");
+                            }
+                            if (light.diffuse) {
+                                hash.push("d");
+                            }
+                        }
+                        lightsHash = hash.join("");
                     });
 
             ctx.events.onEvent(
@@ -4221,10 +4994,15 @@ SceneJS._backends.installBackend(
                             activeProgram.setUniform("uLightColor" + i, light.color);
                             activeProgram.setUniform("uLightDiffuse" + i, light.diffuse);
 
-                            activeProgram.setUniform("uLightPos" + i, light.pos);
-                            activeProgram.setUniform("uLightSpotDir" + i, light.spotDir);
-
+                            if (light.type == "dir") {
+                                activeProgram.setUniform("uLightDir" + i, light.dir);
+                            }
+                            if (light.type == "point") {
+                                activeProgram.setUniform("uLightPos" + i, light.pos);
+                            }
                             if (light.type == "spot") {
+                                activeProgram.setUniform("uLightPos" + i, light.pos);
+                                activeProgram.setUniform("uLightDir" + i, light.dir);
                                 activeProgram.setUniform("uLightSpotCosCutOff" + i, light.spotCosCutOff);
                                 activeProgram.setUniform("uLightSpotExp" + i, light.spotExponent);
                             }
@@ -4263,6 +5041,7 @@ SceneJS._backends.installBackend(
                     function(f) {
                         fog = f;
                         sceneHash = null;
+                        fogHash = fog ? fog.mode : "";
                     });
 
             ctx.events.onEvent(
@@ -4277,8 +5056,10 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.MODEL_TRANSFORM_EXPORTED,
                     function(transform) {
+
                         activeProgram.setUniform("uMMatrix", transform.matrixAsArray);
                         activeProgram.setUniform("uMNMatrix", transform.normalMatrixAsArray);
+
                     });
 
             ctx.events.onEvent(
@@ -4295,12 +5076,28 @@ SceneJS._backends.installBackend(
                     });
 
             ctx.events.onEvent(
+                    SceneJS._eventTypes.GEOMETRY_UPDATED,
+                    function(geo) {
+                        var hash = [];
+                        geometry = geo;
+                        sceneHash = null;
+                        geometryHash = ([
+                            geometry.uvBuf ? "t" : "f",
+                            geometry.uvBuf2 ? "t" : "f"]).join("");
+                    });
+
+            ctx.events.onEvent(
                     SceneJS._eventTypes.GEOMETRY_EXPORTED,
                     function(geo) {
                         activeProgram.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
                         activeProgram.bindFloatArrayBuffer("aNormal", geo.normalBuf);
-                        if (geo.texCoordBuf && textureLayers.length > 0 && rendererState.enableTexture2D) {
-                            activeProgram.bindFloatArrayBuffer("aTextureCoord", geo.texCoordBuf);
+                        if (textureLayers.length > 0 && rendererState.enableTexture2D) {
+                            if (geo.uvBuf) {
+                                activeProgram.bindFloatArrayBuffer("aUVCoord", geo.uvBuf);
+                            }
+                            if (geo.uvBuf2) {
+                                activeProgram.bindFloatArrayBuffer("aUVCoord2", geo.uvBuf2);
+                            }
                         }
                     });
 
@@ -4328,7 +5125,7 @@ SceneJS._backends.installBackend(
                             }
                         }
                         if (programToEvict) { // Delete LRU program's shaders and deregister program
-                            ctx.logging.info("Evicting shader: " + hash);
+                            //  ctx.logging.info("Evicting shader: " + hash);
                             programToEvict.destroy();
                             programs[programToEvict.hash] = null;
                             return true;
@@ -4361,7 +5158,7 @@ SceneJS._backends.installBackend(
                                 "shader",
                                 function() {
                                     try {
-                                        programs[sceneHash] = new SceneJS._webgl.Program(
+                                        programs[sceneHash] = new SceneJS_webgl_Program(
                                                 sceneHash,
                                                 time,
                                                 canvas.context,
@@ -4386,70 +5183,17 @@ SceneJS._backends.installBackend(
                 ctx.events.fireEvent(SceneJS._eventTypes.SHADER_RENDERING);
             }
 
-            /** Generates a shader hash code from current rendering state.
+            /**
+             * Generates a shader hash code from current rendering state.
+             *
+             * TODO: use mask
              */
             function generateHash() {
-                var val = [
-                    canvas.canvasId,
-                    ";"
-                ];
-
                 if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-
-                    /* Trivial hash for picking mode shader
-                     */
-                    val.push("picking;");
+                    sceneHash = ([canvas.canvasId, "picking"]).join(";");
                 } else {
-
-                    /* Complex hash for rendering mode shader
-                     */
-
-                    /* Textures
-                     */
-                    if (textureLayers.length > 0) {
-                        val.push("tex/");
-                        for (var i = 0; i < textureLayers.length; i++) {
-                            var layer = textureLayers[i];
-                            val.push(layer.params.applyFrom);
-                            val.push("/");
-                            val.push(layer.params.applyTo);
-                            val.push("/");
-                            val.push(layer.params.blendMode);
-                            val.push("/");
-                            if (layer.params.matrix) {
-                                val.push("/anim");
-                            }
-                        }
-                        val.push(";");
-                    }
-
-                    /* Lighting
-                     */
-                    if (lights.length > 0) {
-                        val.push("light/");
-                        for (var i = 0; i < lights.length; i++) {
-                            var light = lights[i];
-                            val.push(light.type);
-                            val.push("/");
-                            if (light.specular) {
-                                val.push("spec/");
-                            }
-                            if (light.diffuse) {
-                                val.push("diff/");
-                            }
-                        }
-                        val.push(";");
-                    }
-
-                    /* Fog
-                     */
-                    if (fog && fog.mode != "disabled") {
-                        val.push("fog/");
-                        val.push(fog.mode);
-                        val.push(";");
-                    }
+                    sceneHash = ([canvas.canvasId, rendererHash, fogHash, lightsHash, textureHash, geometryHash]).join(";");
                 }
-                sceneHash = val.join("");
             }
 
             function getShaderLoggingSource(src) {
@@ -4490,38 +5234,33 @@ SceneJS._backends.installBackend(
              * Composes a fragment shader script for rendering mode in current scene state
              */
             function composePickingFragmentShader() {
-                var g=parseFloat(Math.round((10+1)/256)/256);
-                var r=parseFloat((10-g*256+1)/256);
+                var g = parseFloat(Math.round((10 + 1) / 256) / 256);
+                var r = parseFloat((10 - g * 256 + 1) / 256);
                 var src = [
                     "uniform vec3 uColor;",
                     "void main(void) {",
 
-                "gl_FragColor = vec4("+(r.toFixed(17))+", "+(g.toFixed(17))+",1.0,1.0);",
+                    "gl_FragColor = vec4(" + (r.toFixed(17)) + ", " + (g.toFixed(17)) + ",1.0,1.0);",
 
-              //      "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
+                    //      "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
                     "}"
                 ].join("\n");
-    
+
                 return src;
             }
 
-            /**
-             * Composes a vertex shader script for rendering mode in current scene state
-             *
-             *      Vertex in view-space
-             *      Normal in view-space
-             *      Direction of each light position from view-space vertex
-             *      Direction of vertex from eye position
-             */
             function composeRenderingVertexShader() {
-
                 var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
-
                 var src = ["\n"];
                 src.push("attribute vec3 aVertex;");                // World
                 src.push("attribute vec3 aNormal;");                // World
                 if (haveTextures) {
-                    src.push("attribute vec2 aTextureCoord;");      // World
+                    if (geometry.uvBuf) {
+                        src.push("attribute vec2 aUVCoord;");      // World
+                    }
+                    if (geometry.uvBuf2) {
+                        src.push("attribute vec2 aUVCoord2;");      // World
+                    }
                 }
                 src.push("uniform mat4 uMMatrix;");               // Model
                 src.push("uniform mat4 uMNMatrix;");              // Model Normal
@@ -4530,14 +5269,29 @@ SceneJS._backends.installBackend(
                 src.push("uniform mat4 uPMatrix;");               // Projection
 
                 for (var i = 0; i < lights.length; i++) {
-                    src.push("uniform vec3 uLightPos" + i + ";");
+                    var light = lights[i];
+                    if (light.type == "dir") {
+                        src.push("uniform vec3 uLightDir" + i + ";");
+                    }
+                    if (light.type == "point") {
+                        src.push("uniform vec4 uLightPos" + i + ";");
+                    }
+                    if (light.type == "spot") {
+                        src.push("uniform vec4 uLightPos" + i + ";");
+                    }
                 }
                 src.push("varying vec4 vViewVertex;");
                 src.push("varying vec3 vNormal;");
                 src.push("varying vec3 vEyeVec;");
                 if (haveTextures) {
-                    src.push("varying vec2 vTextureCoord;");
+                    if (geometry.uvBuf) {
+                        src.push("varying vec2 vUVCoord;");
+                    }
+                    if (geometry.uvBuf2) {
+                        src.push("varying vec2 vUVCoord2;");
+                    }
                 }
+
                 for (var i = 0; i < lights.length; i++) {
                     src.push("varying vec3 vLightVec" + i + ";");
                     src.push("varying float vLightDist" + i + ";");
@@ -4545,51 +5299,62 @@ SceneJS._backends.installBackend(
                 src.push("void main(void) {");
                 src.push("  vec4 tmpVNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
                 src.push("  vNormal = normalize(tmpVNormal.xyz);");                                 // View-space normal
-                src.push("  vViewVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+                src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+                src.push("  vViewVertex = tmpVertex;");
                 src.push("  gl_Position = uPMatrix * vViewVertex;");
 
                 src.push("  vec3 tmpVec;");
                 for (var i = 0; i < lights.length; i++) {
                     var light = lights[i];
                     if (light.type == "dir") {
-                        src.push("tmpVec = uLightPos" + i + ";");
-                    } else {
-                        src.push("tmpVec = (uLightPos" + i + ".xyz - vViewVertex.xyz);");
+                        src.push("tmpVec = -uLightDir" + i + ";");
+                    }
+                    if (light.type == "point") {
+                        src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
+                        src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+                    }
+                    if (light.type == "spot") {
+                        src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
+                        src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+
                     }
                     src.push("vLightVec" + i + " = tmpVec;");                   // Vector from light to vertex
-                    src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+
                 }
-                src.push("vEyeVec = normalize(vViewVertex.xyz);");
+                src.push("vEyeVec = normalize(-vViewVertex.xyz);");
                 if (haveTextures) {
-                    src.push("vTextureCoord = aTextureCoord;");
+                    if (geometry.uvBuf) {
+                        src.push("vUVCoord = aUVCoord;");
+                    }
+                    if (geometry.uvBuf2) {
+                        src.push("vUVCoord2 = aUVCoord2;");
+                    }
                 }
                 src.push("}");
-                //   ctx.logging.info(getShaderLoggingSource(src));
+                //ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
 
-            /**
-             * Generates a fragment shader script for rendering mode in current scene state
-             */
             function composeRenderingFragmentShader() {
 
                 var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
                 var haveLights = (lights.length > 0);
-                var tangent = false;
 
                 var src = ["\n"];
-
-                // ------------ Inputs ----------------------------------------------
 
                 src.push("varying vec4 vViewVertex;");              // View-space vertex
                 src.push("varying vec3 vNormal;");                  // View-space normal
                 src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
 
                 if (haveTextures) {
-                    src.push("varying vec2 vTextureCoord;");
+                    if (geometry.uvBuf) {
+                        src.push("varying vec2 vUVCoord;");
+                    }
+                    if (geometry.uvBuf2) {
+                        src.push("varying vec2 vUVCoord2;");
+                    }
 
-                    //texture uniforms
                     for (var i = 0; i < textureLayers.length; i++) {
                         var layer = textureLayers[i];
                         src.push("uniform sampler2D uSampler" + i + ";");
@@ -4599,40 +5364,34 @@ SceneJS._backends.installBackend(
                     }
                 }
 
-                src.push("uniform vec3 uAmbient;");                         // Scene ambient colour - taken from clear colour
-
-                /* Light-independent material uniforms
-                 */
-                src.push("uniform vec4 uMaterialBaseColor;");
+                src.push("uniform vec3  uAmbient;");                         // Scene ambient colour - taken from clear colour
+                src.push("uniform vec3  uMaterialBaseColor;");
                 src.push("uniform float uMaterialEmit;");
                 src.push("uniform float uMaterialAlpha;");
 
-                /* Light and lighting-dependent material uniforms
-                 */
                 if (haveLights) {
-
                     src.push("uniform vec3  uMaterialSpecularColor;");
                     src.push("uniform float uMaterialSpecular;");
                     src.push("uniform float uMaterialShine;");
 
                     for (var i = 0; i < lights.length; i++) {
                         var light = lights[i];
-
                         src.push("uniform vec3  uLightColor" + i + ";");
-                        src.push("uniform vec3  uLightPos" + i + ";");
-                        src.push("uniform vec3  uLightSpotDir" + i + ";");
-
+                        if (light.type == "point") {
+                            src.push("uniform vec4   uLightPos" + i + ";");
+                        }
+                        if (light.type == "dir") {
+                            src.push("uniform vec3   uLightDir" + i + ";");
+                        }
                         if (light.type == "spot") {
+                            src.push("uniform vec4   uLightPos" + i + ";");
+                            src.push("uniform vec3   uLightDir" + i + ";");
                             src.push("uniform float  uLightSpotCosCutOff" + i + ";");
                             src.push("uniform float  uLightSpotExp" + i + ";");
                         }
-
                         src.push("uniform vec3  uLightAttenuation" + i + ";");
-
-                        // Computed by vertex shader:
-
-                        src.push("varying vec3   vLightVec" + i + ";");         // Vector from light to vertex
-                        src.push("varying float  vLightDist" + i + ";");        // Distance from light to vertex
+                        src.push("varying vec3  vLightVec" + i + ";");         // Vector from light to vertex
+                        src.push("varying float vLightDist" + i + ";");        // Distance from light to vertex
                     }
                 }
 
@@ -4646,13 +5405,8 @@ SceneJS._backends.installBackend(
                 }
 
                 src.push("void main(void) {");
-
                 src.push("  vec3    ambientValue=uAmbient;");
-
-                /* Initial values for colours and coefficients that will be modulated by
-                 * by the application of texture layers and lighting
-                 */
-                src.push("  vec4    color   = uMaterialBaseColor;");
+                src.push("  vec3    color   = uMaterialBaseColor;");
                 src.push("  float   emit    = uMaterialEmit;");
                 src.push("  float   alpha   = uMaterialAlpha;");
 
@@ -4662,39 +5416,44 @@ SceneJS._backends.installBackend(
                     src.push("  float   specular=uMaterialSpecular;");
                     src.push("  vec3    specularColor=uMaterialSpecularColor;");
                     src.push("  float   shine=uMaterialShine;");
-
-
                     src.push("  float   attenuation = 1.0;");
                 }
 
-                src.push("  float   mask=1.0;");
-
-                src.push("  vec4    texturePos;");
-                src.push("  vec2    textureCoord=vec2(0.0,0.0);");
-
-                /* ====================================================================================================
-                 * TEXTURING
-                 * ===================================================================================================*/
-
                 if (haveTextures) {
-
-                    /* Get texturePos from image
-                     */
+                    src.push("  vec4    texturePos;");
+                    src.push("  vec2    textureCoord=vec2(0.0,0.0);");
 
                     for (var i = 0; i < textureLayers.length; i++) {
                         var layer = textureLayers[i];
 
-                        /* Get texture coord from specified source
+                        /* Texture input
                          */
                         if (layer.params.applyFrom == "normal") {
-                            src.push("texturePos=vec4(vNormal.xyz, 1.0);");
+                            if (geometry.normalBuf) {
+                                src.push("texturePos=vec4(vNormal.xyz, 1.0);");
+                            } else {
+                                ctx.logging.warn("Texture layer applyFrom='normal' but geometry has no normal vectors");
+                                continue;
+                            }
+                        }
+                        if (layer.params.applyFrom == "uv") {
+                            if (geometry.uvBuf) {
+                                src.push("texturePos = vec4(vUVCoord.s, vUVCoord.t, 1.0, 1.0);");
+                            } else {
+                                ctx.logging.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
+                                continue;
+                            }
+                        }
+                        if (layer.params.applyFrom == "uv2") {
+                            if (geometry.uvBuf2) {
+                                src.push("texturePos = vec4(vUVCoord2.s, vUVCoord2.t, 1.0, 1.0);");
+                            } else {
+                                ctx.logging.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
+                                continue;
+                            }
                         }
 
-                        if (layer.params.applyFrom == "geometry") {
-                            src.push("texturePos = vec4(vTextureCoord.s, vTextureCoord.t, 1.0, 1.0);");
-                        }
-
-                        /* Transform texture coord
+                        /* Texture matrix
                          */
                         if (layer.params.matrixAsArray) {
                             src.push("textureCoord=(uLayer" + i + "Matrix * texturePos).xy;");
@@ -4702,25 +5461,20 @@ SceneJS._backends.installBackend(
                             src.push("textureCoord=texturePos.xy;");
                         }
 
-                        /* Apply the layer
+                        /* Texture output
                          */
-
                         if (layer.params.applyTo == "baseColor") {
                             if (layer.params.blendMode == "multiply") {
-                                src.push("color  = color * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
+                                src.push("color  = color * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                             } else {
-                                src.push("color  = color + texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y));");
+                                src.push("color  = color + texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                             }
                         }
                     }
-
                 }
-                /* ====================================================================================================
-                 * LIGHTING
-                 * ===================================================================================================*/
 
                 src.push("  vec3    lightValue      = uAmbient;");
-                src.push("  vec3    specularValue   = vec3(0.0,0.0,0.0);");
+                src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
 
                 if (haveLights) {
                     src.push("  vec3    lightVec;");
@@ -4730,35 +5484,31 @@ SceneJS._backends.installBackend(
 
                     for (var i = 0; i < lights.length; i++) {
                         var light = lights[i];
-                        src.push("lightVec = normalize(-vLightVec" + i + ");");
+                        src.push("lightVec = normalize(vLightVec" + i + ");");
 
                         /* Point Light
                          */
                         if (light.type == "point") {
-                            src.push("dotN = max(dot(vNormal, -lightVec), 0.0);");
-
+                            src.push("dotN = max(dot(vNormal,lightVec),0.0);");
                             src.push("if (dotN > 0.0) {");
-
                             src.push("  attenuation = 1.0 / (" +
                                      "  uLightAttenuation" + i + "[0] + " +
                                      "  uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
                                      "  uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
-
                             if (light.diffuse) {
                                 src.push("  lightValue += dotN *  uLightColor" + i + " * attenuation;");
                             }
-                            src.push("}");
-
                             if (light.specular) {
                                 src.push("specularValue += attenuation * specularColor * uLightColor" + i +
                                          " * specular  * pow(max(dot(reflect(lightVec, vNormal), vEyeVec),0.0), shine);");
                             }
+                            src.push("}");
                         }
 
                         /* Directional Light
                          */
                         if (light.type == "dir") {
-                            src.push("dotN=max(dot(vNormal,-lightVec),0.0);");
+                            src.push("dotN = max(dot(vNormal,lightVec),0.0);");
                             if (light.diffuse) {
                                 src.push("lightValue += dotN * uLightColor" + i + ";");
                             }
@@ -4768,28 +5518,26 @@ SceneJS._backends.installBackend(
                             }
                         }
 
-
                         /* Spot light
                          */
                         if (light.type == "spot") {
-                            src.push("spotFactor = dot(-lightVec,-normalize(uLightSpotDir" + i + "));");
-                            src.push("if (spotFactor > uLightSpotCosCutOff" + i + ") {");
+                            src.push("spotFactor = max(dot(normalize(uLightDir" + i + "), lightVec));");
+                            src.push("if ( spotFactor > 20) {");
                             src.push("  spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
-
-                            src.push("  dotN = max(dot(vNormal,-normalize(lightVec)),0.0);");
-
+                            src.push("  dotN = max(dot(vNormal,normalize(lightVec)),0.0);");
                             src.push("      if(dotN>0.0){");
 
-                            src.push("          attenuation = spotFactor / (" +
-                                     "uLightAttenuation" + i + "[0] + " +
-                                     "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
-                                     "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");\n");
+                            //                            src.push("          attenuation = spotFactor / (" +
+                            //                                     "uLightAttenuation" + i + "[0] + " +
+                            //                                     "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
+                            //                                     "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
+                            src.push("          attenuation = 1;");
 
                             if (light.diffuse) {
-                                src.push("lightValue += dotN * uLightColor" + i + ";");
+                                src.push("lightValue +=  dotN * uLightColor" + i + " * attenuation;");
                             }
                             if (lights[i].specular) {
-                                src.push("specularValue += specularColor * uLightColor" + i +
+                                src.push("specularValue += attenuation * specularColor * uLightColor" + i +
                                          " * specular  * pow(max(dot(reflect(normalize(lightVec), vNormal),normalize(vEyeVec)),0.0), shine);");
                             }
 
@@ -4798,9 +5546,12 @@ SceneJS._backends.installBackend(
                         }
                     }
                 }
+                src.push("if (emit>0.0) lightValue = vec3(1.0, 1.0, 1.0);");
 
-                src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * lightValue.rgb, alpha);");
+                src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb, alpha);");
 
+                /* Fog
+                 */
                 if (fog && fog.mode != "disabled") {
                     src.push("float fogFact=1.0;");
                     if (fog.mode == "exp") {
@@ -4813,9 +5564,10 @@ SceneJS._backends.installBackend(
                     src.push("gl_FragColor = fragColor;");
                 }
 
+                //  src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
                 src.push("}");
 
-                //    ctx.logging.info(getShaderLoggingSource(src));
+                //  ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
         });
@@ -4897,7 +5649,7 @@ SceneJS._backends.installBackend(
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Null SceneJS.renderer node config: \"" + name + "\"");
                 }
-                var result = SceneJS._webgl.enumMap[name];
+                var result = SceneJS_webgl_enumMap[name];
                 if (!result) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
@@ -5349,7 +6101,7 @@ SceneJS._backends.installBackend(
              * where canvas not found and geometry was implicitly destroyed
              */
             function destroyGeometry(geo) {
-                ctx.logging.debug("Destroying geometry : '" + geo.type + "'");
+                //  ctx.logging.debug("Destroying geometry : '" + geo.type + "'");
                 if (geo.geoId == currentBoundGeo) {
                     currentBoundGeo = null;
                 }
@@ -5363,8 +6115,11 @@ SceneJS._backends.installBackend(
                     if (geo.normalBuf) {
                         geo.indexBuf.destroy();
                     }
-                    if (geo.texCoordBuf) {
-                        geo.texCoordBuf.destroy();
+                    if (geo.uvBuf) {
+                        geo.uvBuf.destroy();
+                    }
+                    if (geo.uvBuf2) {
+                        geo.uvBuf2.destroy();
                     }
                 }
                 geometries[geo.geoId] = null;
@@ -5411,7 +6166,7 @@ SceneJS._backends.installBackend(
                 ctx.memory.allocate(
                         description,
                         function() {
-                            buf = new SceneJS._webgl.ArrayBuffer
+                            buf = new SceneJS_webgl_ArrayBuffer
                                     (context, type, values, numItems, itemSize, usage);
                         });
                 return buf;
@@ -5465,11 +6220,11 @@ SceneJS._backends.installBackend(
                  * @param data Contains positions, normals, indexes etc.
                  */
                 createGeometry : function(type, data) {
-//                    if (!type) {
-//                        type = "g" + nextTypeId++;
-//                    }
-//
-                    ctx.logging.debug("Creating geometry: '" + type + "'");
+                    //                    if (!type) {
+                    //                        type = "g" + nextTypeId++;
+                    //                    }
+                    //
+                    //   ctx.logging.debug("Creating geometry: '" + type + "'");
                     if (!canvas) {
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
@@ -5486,7 +6241,8 @@ SceneJS._backends.installBackend(
 
                     var vertexBuf;
                     var normalBuf;
-                    var texCoordBuf;
+                    var uvBuf;
+                    var uvBuf2;
                     var indexBuf;
 
                     try { // TODO: Modify usage flags in accordance with how often geometry is evicted
@@ -5498,8 +6254,13 @@ SceneJS._backends.installBackend(
                                 new WebGLFloatArray(data.normals), data.normals.length, 3, usage);
 
                         if (data.uv) {
-                            texCoordBuf = createArrayBuffer("geometry texture buffer", context, context.ARRAY_BUFFER,
+                            uvBuf = createArrayBuffer("geometry UV buffer", context, context.ARRAY_BUFFER,
                                     new WebGLFloatArray(data.uv), data.uv.length, 2, usage);
+                        }
+
+                        if (data.uv2) {
+                            uvBuf2 = createArrayBuffer("geometry UV2 buffer", context, context.ARRAY_BUFFER,
+                                    new WebGLFloatArray(data.uv2), data.uv2.length, 2, usage);
                         }
 
                         indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
@@ -5516,7 +6277,8 @@ SceneJS._backends.installBackend(
                             vertexBuf : vertexBuf,
                             normalBuf : normalBuf,
                             indexBuf : indexBuf,
-                            texCoordBuf: texCoordBuf
+                            uvBuf: uvBuf,
+                            uvBuf2: uvBuf2
                         };
 
                         geometries[geoId] = geo;
@@ -5531,8 +6293,11 @@ SceneJS._backends.installBackend(
                         if (normalBuf) {
                             normalBuf.destroy();
                         }
-                        if (texCoordBuf) {
-                            texCoordBuf.destroy();
+                        if (uvBuf) {
+                            uvBuf.destroy();
+                        }
+                        if (uvBuf2) {
+                            uvBuf2.destroy();
                         }
                         if (indexBuf) {
                             indexBuf.destroy();
@@ -5551,9 +6316,11 @@ SceneJS._backends.installBackend(
                         throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
                     }
 
-                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE);
-
                     var geo = geometries[geoId];
+
+                    ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_UPDATED, geo);
+
+                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE); 
 
                     geo.lastUsed = time;
 
@@ -5614,10 +6381,10 @@ SceneJS._utils.ns("SceneJS.geometry");
             var v2 = positions[j1];
             var v3 = positions[j2];
 
-            var va = SceneJS._math.subVec4(v2, v1);
-            var vb = SceneJS._math.subVec4(v3, v1);
+            var va = SceneJS_math_subVec4(v2, v1);
+            var vb = SceneJS_math_subVec4(v3, v1);
 
-            var n = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(va, vb));
+            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(va, vb));
 
             if (!nvecs[j0]) nvecs[j0] = [];
             if (!nvecs[j1]) nvecs[j1] = [];
@@ -11456,10 +12223,10 @@ SceneJS.objects.teapot = function() {
             var v2 = positions[j1];
             var v3 = positions[j2];
 
-            var va = SceneJS._math.subVec4(v2, v1);
-            var vb = SceneJS._math.subVec4(v3, v1);
+            var va = SceneJS_math_subVec4(v2, v1);
+            var vb = SceneJS_math_subVec4(v3, v1);
 
-            var n = SceneJS._math.normalizeVec4(SceneJS._math.cross3Vec4(va, vb));
+            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(va, vb));
 
             if (!nvecs[j0]) nvecs[j0] = [];
             if (!nvecs[j1]) nvecs[j1] = [];
@@ -11770,8 +12537,7 @@ SceneJS.objects.sphere = function() {
                 positions : positions,
                 normals: normals,
                 uv : uv,
-                indices : indices,
-                colors:[]
+                indices : indices
             };
         }
     });
@@ -11807,7 +12573,7 @@ SceneJS._backends.installBackend(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
                         transform = {
-                            matrix : SceneJS._math.identityMat4(),
+                            matrix : SceneJS_math_identityMat4(),
                             fixed: true,
                             identity : true
                         };
@@ -11832,8 +12598,8 @@ SceneJS._backends.installBackend(
 
                             if (!transform.normalMatrixAsArray) {
                                 transform.normalMatrixAsArray = new WebGLFloatArray(
-                                        SceneJS._math.transposeMat4(
-                                                SceneJS._math.inverseMat4(transform.matrix)));
+                                        SceneJS_math_transposeMat4(
+                                                SceneJS_math_inverseMat4(transform.matrix)));
                             }
 
                             ctx.events.fireEvent(
@@ -11896,14 +12662,14 @@ SceneJS.rotate = function() {
                     if (params.x + params.y + params.z == 0) {
                         throw new SceneJS.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
                     }
-                    mat = SceneJS._math.rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
+                    mat = SceneJS_math_rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
                     if (cfg.fixed) {
                         memoLevel = FIXED_CONFIG;
                     }
                 }
                 var superXform = backend.getTransform();
                 if (memoLevel < FIXED_MODEL_SPACE) {
-                    var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                     xform = {
                         localMatrix: mat,
                         matrix: tempMat,
@@ -11942,11 +12708,11 @@ SceneJS.rotate = function() {
                 function(traversalContext, data) {
                     if (memoLevel == NO_MEMO) {
                         var params = cfg.getParams(data);
-                        mat = SceneJS._math.translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
+                        mat = SceneJS_math_translationMat4v([params.x || 0, params.y || 0, params.z || 0]);
                     }
                     var superXform = backend.getTransform();
                     if (memoLevel < FIXED_MODEL_SPACE) {
-                        var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                         xform = {
                             localMatrix: mat,
                             matrix: tempMat,
@@ -11985,14 +12751,14 @@ SceneJS.rotate = function() {
                 function(traversalContext, data) {
                     if (memoLevel == NO_MEMO) {   
                         var params = cfg.getParams(data);
-                        mat = SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
+                        mat = SceneJS_math_scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
                         if (cfg.fixed) {
                             memoLevel = FIXED_CONFIG;
                         }
                     }
                     var superXform = backend.getTransform();
                     if (memoLevel < FIXED_MODEL_SPACE) {
-                        var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                         xform = {
                             localMatrix: mat,
                             matrix: tempMat,
@@ -12032,14 +12798,14 @@ SceneJS.modellingMatrix = function() {
             function(traversalContext, data) {
                 if (memoLevel == NO_MEMO) {
                     var params = cfg.getParams(data);
-                    mat = params.elements || SceneJS._math.identityMat4();
+                    mat = params.elements || SceneJS_math_identityMat4();
                     if (cfg.fixed) {
                         memoLevel = FIXED_CONFIG;
                     }
                 }
                 var superXform = backend.getTransform();
                 if (memoLevel < FIXED_MODEL_SPACE) {
-                    var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                     xform = {
                         localMatrix: mat,
                         matrix: tempMat,
@@ -12084,7 +12850,7 @@ SceneJS._backends.installBackend(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
                         transform = {
-                            matrix : SceneJS._math.identityMat4(),
+                            matrix : SceneJS_math_identityMat4(),
                             fixed: true
                         };
                         dirty = true;
@@ -12146,7 +12912,7 @@ SceneJS.perspective = function() {
             function(traversalContext, data) {
                 if (!transform || !cfg.fixed) {
                     var params = cfg.getParams(data);
-                    var tempMat = SceneJS._math.perspectiveMatrix4(
+                    var tempMat = SceneJS_math_perspectiveMatrix4(
                             (params.fovy || 60.0) * Math.PI / 180.0,
                             params.aspect || 1.0,
                             params.near || 0.1,
@@ -12182,7 +12948,7 @@ SceneJS.ortho = function() {
                         near: params.near || 0.1,
                         far: params.far || 100.0
                     };
-                    var tempMat = SceneJS._math.orthoMat4c(
+                    var tempMat = SceneJS_math_orthoMat4c(
                             volume.left,
                             volume.right,
                             volume.bottom,
@@ -12219,7 +12985,7 @@ SceneJS.frustum = function() {
                         zmin: params.near || 0.1,
                         zmax: params.far || 100.0
                     };
-                    var tempMat = SceneJS._math.frustumMatrix4(
+                    var tempMat = SceneJS_math_frustumMatrix4(
                             volume.xmin,
                             volume.xmax,
                             volume.ymin,
@@ -12268,7 +13034,7 @@ SceneJS._backends.installBackend(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
                         transform = {
-                            matrix : SceneJS._math.identityMat4(),
+                            matrix : SceneJS_math_identityMat4(),
                             fixed: true
                         };
                         dirty = true;
@@ -12291,8 +13057,8 @@ SceneJS._backends.installBackend(
 
                             if (!transform.normalMatrixAsArray) {
                                 transform.normalMatrixAsArray = new WebGLFloatArray(
-                                        SceneJS._math.transposeMat4(
-                                                SceneJS._math.inverseMat4(transform.matrix)));
+                                        SceneJS_math_transposeMat4(
+                                                SceneJS_math_inverseMat4(transform.matrix)));
                             }
 
                             ctx.events.fireEvent(
@@ -12361,7 +13127,7 @@ SceneJS.lookAt = function() {
                                 ("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
                     }
 
-                    mat = SceneJS._math.lookAtMat4c(
+                    mat = SceneJS_math_lookAtMat4c(
                             eye.x, eye.y, eye.z,
                             look.x, look.y, look.z,
                             up.x, up.y, up.z);
@@ -12371,7 +13137,7 @@ SceneJS.lookAt = function() {
 
                 var superXform = backend.getTransform();
                 if (!xform || !superXform.fixed || !fixed) {
-                    var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                     xform = {
                         matrix: tempMat,
                         lookAt : {
@@ -12401,9 +13167,9 @@ SceneJS.stationary = function() {
                 if (lookAt) {
                     if (!xform || !superXform.fixed) {
                         xform = {
-                            matrix: SceneJS._math.mulMat4(
+                            matrix: SceneJS_math_mulMat4(
                                     superXform.matrix,
-                                    SceneJS._math.translationMat4c(
+                                    SceneJS_math_translationMat4c(
                                             lookAt.eye.x,
                                             lookAt.eye.y,
                                             lookAt.eye.z)),
@@ -12454,7 +13220,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        modelMat = viewMat = SceneJS._math.identityMat4();
+                        modelMat = viewMat = SceneJS_math_identityMat4();
                         lightStack = [];
                         dirty = true;
                     });
@@ -12495,51 +13261,89 @@ SceneJS._backends.installBackend(
                     });
 
             function vectorToArray(v, fallback) {
-                return v ? [ v.x || 0, v.y || 0, -v.z || 0] : fallback;    // TODO: Hack to negate vertex X and Y
+                return v ? [ v.x || 0, v.y || 0, v.z || 0] : fallback;
+            }
+
+            function pointToArray(p, fallback) {
+                return p ? [ p.x || 0, p.y || 0, p.z || 0, p.w || 1] : fallback;
             }
 
             function colourToArray(v, fallback) {
-                return v ? [ v.r || fallback[0], v.g || fallback[1], v.b || fallback[2]] : fallback;
+                return v ? [
+                    v.r == undefined ? fallback[0] : v.r,
+                    v.g == undefined ? fallback[1] : v.g,
+                    v.b == undefined ? fallback[2] : v.b] : fallback;
             }
 
             /* Creates a view-space light
              */
             function createLight(light) {
-                if (light.type &&
-                    (light.type != "spot"
-                            && light.type != "dir"
-                            && light.type != "point")) {
-                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.light node has a light of unsupported type - should be 'spot', 'direction' or 'point'");
+                if (light.type) {
+                    if (light.type != "dir"
+                            && light.type != "point") {
+                        throw new SceneJS.exceptions.InvalidNodeConfigException(
+                                "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'");
+                    }
+                } else {
+                    light.type = light.type || "point";
                 }
-                return {
-                    type: light.type || "point",
 
-                    color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                if (light.type == "point") {
+                    return {
+                        type: light.type,
+                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                        diffuse : light.diffuse,
+                        specular : light.specular,
+                        pos : SceneJS_math_transformPoint3(
+                                viewMat,
+                                SceneJS_math_transformPoint3(
+                                        modelMat,
+                                        pointToArray(light.pos, [ 0,  0, 1.0, 1.0]))),
+                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
+                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
+                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
+                    };
+                }
 
-                    diffuse : light.diffuse,                    
-                    specular : light.specular,
+                if (light.type == "dir") {
+                    return {
+                        type: light.type,
+                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                        diffuse : light.diffuse,
+                        specular : light.specular,
+                        dir : SceneJS_math_transformVector3(
+                                viewMat,
+                                SceneJS_math_transformVector3(
+                                        modelMat,
+                                        vectorToArray(light.dir, [ 0,  0,  1.0])))
+                    };
+                }
 
-                    pos : SceneJS._math.transformVector3(
-                            viewMat,
-                            SceneJS._math.transformVector3(
-                                    modelMat,
-                                    vectorToArray(light.pos, [ 0,  0,  1.0]))),
-
-                    spotDir: SceneJS._math.transformVector3(
-                            viewMat,
-                            SceneJS._math.transformVector3(
-                                    modelMat,
-                                    vectorToArray(light.spotDir, [ 0,  0,  -1.0]))),
-
-                    spotExponent: light.spotExponent == undefined ?  1.0 : light.spotExponent,
-                    spotCosCutOff: light.spotCosCutOff == undefined ?  20.0 : light.spotCosCutOff,
-
-                    constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-                    linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-                    quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-                };
-            }           
+//                if (light.type == "spot") {
+//                    return {
+//                        type: light.type,
+//                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+//                        diffuse : light.diffuse,
+//                        specular : light.specular,
+//                        pos : SceneJS_math_transformPoint3(
+//                                viewMat,
+//                                SceneJS_math_transformPoint3(
+//                                        modelMat,
+//                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
+//
+//                        dir : SceneJS_math_transformVector3(
+//                                viewMat,
+//                                SceneJS_math_transformVector3(
+//                                        modelMat,
+//                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
+//                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
+//                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
+//                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
+//                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
+//                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
+//                    };
+//                }
+            }
 
             /* Node-facing API
              */
@@ -12637,13 +13441,13 @@ SceneJS._backends.installBackend(
 
             function _createMaterial(m) {
                 return {
-                    baseColor: colour4ToArray(m.baseColor, [ 0.2,  0.2,  0.2, 0.0]),       // IE. diffuse colour
-                    specularColor: colour3ToArray(m.specularColor, [ 0.8,  0.8,  0.8]),
+                    baseColor: colour3ToArray(m.baseColor, [ 0.0,  0.0,  0.0]),       // IE. diffuse colour
+                    specularColor: colour3ToArray(m.specularColor, [ 0.0,  0.0,  0.0]),
                     specular: m.specular || 0.0,
                     shine: m.shine || 0.0,
                     reflect: m.reflect || 0.0,
                     alpha: (m.alpha == undefined) ? 1.0 : m.alpha,
-                    emit: m.alpha || 0.0,
+                    emit: m.emit || 0.0,
                     blendMode: m.blendMode || "multiply"
                 };
             }
@@ -13000,7 +13804,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        projMat = viewMat = SceneJS._math.identityMat4();
+                        projMat = viewMat = SceneJS_math_identityMat4();
                         viewport = [0,0,1,1];
                         frustum = null;
                     });
@@ -13028,7 +13832,7 @@ SceneJS._backends.installBackend(
 
             var getFrustum = function() {
                 if (!frustum) {
-                    frustum = new SceneJS._math.Frustum(viewMat, projMat, viewport);
+                    frustum = new SceneJS_math_Frustum(viewMat, projMat, viewport);
                 }
                 return frustum;
             };
@@ -13071,7 +13875,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        viewMat = SceneJS._math.identityMat4();
+                        viewMat = SceneJS_math_identityMat4();
                         sphere = null;
                     });
 
@@ -13084,7 +13888,7 @@ SceneJS._backends.installBackend(
 
             var getSphere = function() {
                 if (!sphere) {
-                    //frustum = new SceneJS._math.Frustum(viewMat, projMat, viewport);
+                    //frustum = new SceneJS_math_Frustum(viewMat, projMat, viewport);
                 }
                 return sphere;
             };
@@ -13168,8 +13972,8 @@ SceneJS._backends.installBackend(
 
                     if (objectCoords) {
                         var modelTransform = modelTransformBackend.getTransform();
-                        box = new SceneJS._math.Box3().fromPoints(
-                                SceneJS._math.transformPoints3(
+                        box = new SceneJS_math_Box3().fromPoints(
+                                SceneJS_math_transformPoints3(
                                         modelTransform.matrix,
                                         objectCoords)
                                 );
@@ -13185,9 +13989,9 @@ SceneJS._backends.installBackend(
                         var result = backend.testAxisBoxIntersection(box);
 
                         switch (result) {
-                            case SceneJS._math.INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                            case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
 
-                            case SceneJS._math.INSIDE_FRUSTUM:
+                            case SceneJS_math_INSIDE_FRUSTUM:
 
                                 if (levels) { // Level-of-detail mode
 
@@ -13204,7 +14008,7 @@ SceneJS._backends.installBackend(
                                 }
                                 break;
 
-                            case SceneJS._math.OUTSIDE_FRUSTUM:
+                            case SceneJS_math_OUTSIDE_FRUSTUM:
                                 break;
                         }
                     }
@@ -13364,7 +14168,7 @@ SceneJS._backends.installBackend(
                 if (value == undefined) {
                     return defaultVal;
                 }
-                var glName = SceneJS._webgl.enumMap[value];
+                var glName = SceneJS_webgl_enumMap[value];
                 if (glName == undefined) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
@@ -13440,7 +14244,7 @@ SceneJS._backends.installBackend(
                     ctx.memory.allocate(
                             "texture '" + textureId + "'",
                             function() {
-                                textures[textureId] = new SceneJS._webgl.Texture2D(context, {
+                                textures[textureId] = new SceneJS_webgl_Texture2D(context, {
                                     textureId : textureId,
                                     canvas: canvas,
                                     image : image,
@@ -13503,24 +14307,24 @@ SceneJS._backends.installBackend(
             var matrix = null;
             var t;
             if (translate) {
-                matrix = SceneJS._math.translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
+                matrix = SceneJS_math_translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
             }
             if (scale) {
-                t = SceneJS._math.scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
-                matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
+                matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
             }
             if (rotate) {
                 if (rotate.x) {
-                    t = SceneJS._math.rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
-                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                    t = SceneJS_math_rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
+                    matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
                 }
                 if (rotate.y) {
-                    t = SceneJS._math.rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
-                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                    t = SceneJS_math_rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
+                    matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
                 }
                 if (rotate.z) {
-                    t = SceneJS._math.rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
-                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                    t = SceneJS_math_rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
+                    matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
                 }
             }
             return matrix;
@@ -13611,11 +14415,9 @@ SceneJS._backends.installBackend(
                                         return matrix;
                                     };
                                 })(),
-                                applyFrom: layerParam.applyFrom || "geometry",
+                                applyFrom: layerParam.applyFrom || "uv",
                                 applyTo: layerParam.applyTo || "baseColor",
                                 blendMode: layerParam.blendMode || "multiply"
-                                //matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
-
                             });
                         }
                     }

@@ -74,6 +74,8 @@ SceneJS._backends.installBackend(
                                 }
                             }
                         });
+
+                
             }
 
             return { // Node-facing API
@@ -122,7 +124,8 @@ SceneJS._backends.installBackend(
                                     ", uri: " + uri);
                             onTimeout();
                         },
-                        description:"asset load: proxy = " + proxyUri + ", uri = " + uri
+                        description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
+                        timeoutSecs: 180 // 180 seconds - Big timeout to allow files to parse
                     });
                     var callbackName = "callback" + process.id; // Process ID is globally unique
                     _loadAsset(

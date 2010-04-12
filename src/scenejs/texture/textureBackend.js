@@ -151,7 +151,7 @@ SceneJS._backends.installBackend(
                 if (value == undefined) {
                     return defaultVal;
                 }
-                var glName = SceneJS._webgl.enumMap[value];
+                var glName = SceneJS_webgl_enumMap[value];
                 if (glName == undefined) {
                     throw new SceneJS.exceptions.InvalidNodeConfigException(
                             "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
@@ -227,7 +227,7 @@ SceneJS._backends.installBackend(
                     ctx.memory.allocate(
                             "texture '" + textureId + "'",
                             function() {
-                                textures[textureId] = new SceneJS._webgl.Texture2D(context, {
+                                textures[textureId] = new SceneJS_webgl_Texture2D(context, {
                                     textureId : textureId,
                                     canvas: canvas,
                                     image : image,

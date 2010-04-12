@@ -21,14 +21,14 @@
                 function(traversalContext, data) {
                     if (memoLevel == NO_MEMO) {   
                         var params = cfg.getParams(data);
-                        mat = SceneJS._math.scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
+                        mat = SceneJS_math_scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
                         if (cfg.fixed) {
                             memoLevel = FIXED_CONFIG;
                         }
                     }
                     var superXform = backend.getTransform();
                     if (memoLevel < FIXED_MODEL_SPACE) {
-                        var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                         xform = {
                             localMatrix: mat,
                             matrix: tempMat,

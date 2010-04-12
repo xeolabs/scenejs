@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
     <asset>
         <contributor>
@@ -340,7 +339,7 @@ limitations under the License.
                 </instance_geometry>
                 <node id="prop" name="prop">
                     <translate sid="translate">0 0 5.40413</translate>
-                    <rotate sid="rotateZ">0 0 1 125</rotate>
+                    <rotate sid="rotateZ">0 0 1 15</rotate>
                     <rotate sid="rotateY">0 1 0 0</rotate>
                     <rotate sid="rotateX">1 0 0 0</rotate>
                     <instance_geometry url="#propShape-lib">
@@ -373,3 +372,4 @@ limitations under the License.
         <instance_visual_scene url="#VisualSceneNode"/>
     </scene>
 </COLLADA>
+

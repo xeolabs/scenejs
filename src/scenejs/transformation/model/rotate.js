@@ -29,14 +29,14 @@ SceneJS.rotate = function() {
                     if (params.x + params.y + params.z == 0) {
                         throw new SceneJS.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
                     }
-                    mat = SceneJS._math.rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
+                    mat = SceneJS_math_rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
                     if (cfg.fixed) {
                         memoLevel = FIXED_CONFIG;
                     }
                 }
                 var superXform = backend.getTransform();
                 if (memoLevel < FIXED_MODEL_SPACE) {
-                    var tempMat = SceneJS._math.mulMat4(superXform.matrix, mat);
+                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                     xform = {
                         localMatrix: mat,
                         matrix: tempMat,

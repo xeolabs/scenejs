@@ -332,9 +332,9 @@ ul.site-tabs li.ui-state-active a {
 
 #home-table {
 
-    height: 1500px;
+    height: 1600px;
 
-    overflow: auto; /*padding-top: 20px;*/
+
     margin: 0 auto;
 
 }
@@ -367,9 +367,10 @@ ul.site-tabs li.ui-state-active a {
 #home-table #col2 {
     float: left;
     padding-left: 40px;
+padding-right:0px;
     text-align: left;
     margin: 0 auto;
-    width: 320px;
+    width: 310px;
     height: auto;
 }
 
@@ -418,6 +419,14 @@ ul.site-tabs li.ui-state-active a {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     color: #009900 !important;
     font-size: 1.0em;
+    line-height: 1.1em;
+    font-weight: bold;
+}
+
+#home-download p.new-features {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    color: #440000 !important;
+    font-size: 1.2em;
     line-height: 1.1em;
     font-weight: bold;
 }

@@ -13,22 +13,22 @@ SceneJS.loggingToPage = function() {
     function findElement(elementId) {
         var element;
         if (!elementId) {
-            elementId = SceneJS._webgl.DEFAULT_LOGGING_ID;
+            elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
             element = document.getElementById(elementId);
             if (!element) {
                 throw new SceneJS.exceptions.PageLoggingElementNotFoundException
                         ("SceneJs.loggingToPage config 'elementId' omitted and no default element found with ID '"
-                                + SceneJS._webgl.DEFAULT_LOGGING_ID + "'");
+                                + SceneJS_webgl_DEFAULT_LOGGING_ID + "'");
             }
         } else {
             element = document.getElementById(elementId);
             if (!element) {
-                elementId = SceneJS._webgl.DEFAULT_LOGGING_ID;
+                elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
                 element = document.getElementById(elementId);
                 if (!element) {
                     throw new SceneJS.exceptions.PageLoggingElementNotFoundException
                             ("SceneJs.loggingToPage config 'elementId' does not match any elements in page and no " +
-                             "default element found with ID '" + SceneJS._webgl.DEFAULT_LOGGING_ID + "'");
+                             "default element found with ID '" + SceneJS_webgl_DEFAULT_LOGGING_ID + "'");
                 }
             }
         }

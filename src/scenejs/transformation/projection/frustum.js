@@ -17,7 +17,7 @@ SceneJS.frustum = function() {
                         zmin: params.near || 0.1,
                         zmax: params.far || 100.0
                     };
-                    var tempMat = SceneJS._math.frustumMatrix4(
+                    var tempMat = SceneJS_math_frustumMatrix4(
                             volume.xmin,
                             volume.xmax,
                             volume.ymin,

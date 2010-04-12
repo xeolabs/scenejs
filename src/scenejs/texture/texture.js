@@ -9,24 +9,24 @@
             var matrix = null;
             var t;
             if (translate) {
-                matrix = SceneJS._math.translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
+                matrix = SceneJS_math_translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
             }
             if (scale) {
-                t = SceneJS._math.scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
-                matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
+                matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
             }
             if (rotate) {
                 if (rotate.x) {
-                    t = SceneJS._math.rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
-                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                    t = SceneJS_math_rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
+                    matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
                 }
                 if (rotate.y) {
-                    t = SceneJS._math.rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
-                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                    t = SceneJS_math_rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
+                    matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
                 }
                 if (rotate.z) {
-                    t = SceneJS._math.rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
-                    matrix = matrix ? SceneJS._math.mulMat4(matrix, t) : t;
+                    t = SceneJS_math_rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
+                    matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
                 }
             }
             return matrix;
@@ -117,11 +117,9 @@
                                         return matrix;
                                     };
                                 })(),
-                                applyFrom: layerParam.applyFrom || "geometry",
+                                applyFrom: layerParam.applyFrom || "uv",
                                 applyTo: layerParam.applyTo || "baseColor",
                                 blendMode: layerParam.blendMode || "multiply"
-                                //matrix: utils.getMatrix(layerParam.translate, layerParam.rotate, layerParam.scale)
-
                             });
                         }
                     }

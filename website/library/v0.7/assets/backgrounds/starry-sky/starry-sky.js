@@ -51,7 +51,7 @@ SceneJS.stationary(
                                                     var angle = 0;
                                                     return function(data) {
                                                         var timeElapsed = new Date().getTime() - timeStarted;
-                                                        angle = (timeElapsed * 0.001);
+                                                        angle = (timeElapsed * 0.01);
                                                         if (angle > 360.0) {
                                                             angle = 0;
                                                         }

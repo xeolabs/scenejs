@@ -11,7 +11,7 @@ SceneJS.perspective = function() {
             function(traversalContext, data) {
                 if (!transform || !cfg.fixed) {
                     var params = cfg.getParams(data);
-                    var tempMat = SceneJS._math.perspectiveMatrix4(
+                    var tempMat = SceneJS_math_perspectiveMatrix4(
                             (params.fovy || 60.0) * Math.PI / 180.0,
                             params.aspect || 1.0,
                             params.near || 0.1,

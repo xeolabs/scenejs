@@ -44,64 +44,57 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                     sources: [
                                                         {
                                                             type:                   "dir",
-                                                            color:                  { r: .8, g: 0.8, b: 0.8 },
-                                                            diffuse:                true,
-                                                            specular:               false,
-                                                            pos:                    { x: 100.0, y: 4.0, z: -100.0 },
-                                                            constantAttenuation:    1.0,
-                                                            quadraticAttenuation:   0.0,
-                                                            linearAttenuation:      0.0
-                                                        }
-                                                        ,
-                                                        {
-                                                            type:                   "point",
-                                                            color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                                                             diffuse:                true,
                                                             specular:               true,
-                                                            pos:                    { x: 100.0, y: -100.0, z: -100.0 },
-                                                            constantAttenuation:    1.0,
-                                                            quadraticAttenuation:   0.0,
-                                                            linearAttenuation:      0.0
+                                                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
                                                         },
                                                         {
-                                                            type:                   "point",
-                                                            color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                            type:                   "dir",
+                                                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
                                                             diffuse:                true,
                                                             specular:               true,
-                                                            pos:                    { x: -1000.0, y: -1000.0, z: 0.0 },
-                                                            constantAttenuation:    1.0,
-                                                            quadraticAttenuation:   0.0,
-                                                            linearAttenuation:      0.0
+                                                            dir:                    { x: 2.0, y: 1.0, z: 0.0 }
                                                         }
-                                                    ]},
-                                                        SceneJS.material({
-                                                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                            specular:       0.9,
-                                                            shine:          6.0
-                                                        },
-                                                                SceneJS.generator(
-                                                                        (function() {
-                                                                            var elems = [];
-                                                                            for (var i = 0; i < 300; i++) {
-                                                                                elems.push({
-                                                                                    x: (50 * Math.random()) - 25.0,
-                                                                                    y: (50 * Math.random()) - 25.0,
-                                                                                    z: (800 * Math.random()) - 250.0
-                                                                                });
-                                                                            }
-                                                                            var j = 0;
-                                                                            return function() {
-                                                                                if (i < elems.length) {
-                                                                                    return { param: elems[i++] };
-                                                                                } else {
-                                                                                    i = 0;
-                                                                                }
-                                                                            };
-                                                                        })(),
 
-                                                                        SceneJS.translate(function(scope) {
-                                                                            return scope.get("param");
+                                                    ]},
+
+                                                        SceneJS.generator(
+                                                                (function() {
+                                                                    var elems = [];
+                                                                    for (var i = 0; i < 300; i++) {
+                                                                        elems.push({
+                                                                            baseColor: {
+                                                                                r:  Math.random() + 0.5,
+                                                                                g: Math.random() + 0.5,
+                                                                                b: Math.random() + 0.5
+                                                                            },
+                                                                            pos: {x: (50 * Math.random()) - 25.0,
+                                                                                y: (50 * Math.random()) - 25.0,
+                                                                                z: (800 * Math.random()) - 250.0
+                                                                            }
+
+                                                                        });
+                                                                    }
+                                                                    var j = 0;
+                                                                    return function() {
+                                                                        if (i < elems.length) {
+                                                                            return { param: elems[i++] };
+                                                                        } else {
+                                                                            i = 0;
+                                                                        }
+                                                                    };
+                                                                })(),
+                                                                SceneJS.material(function(data) {
+                                                                    return {
+                                                                        baseColor:      data.get("param").baseColor,
+                                                                        specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                                        specular:       20.9,
+                                                                        shine:          100.0
+                                                                    };
+                                                                },
+                                                                        SceneJS.translate(function(data) {
+                                                                            return data.get("param").pos;
                                                                         },
                                                                                 SceneJS.scale({ x:2, y:2, z:2 },
                                                                                         SceneJS.objects.teapot())

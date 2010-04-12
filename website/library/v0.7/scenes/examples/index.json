@@ -21,6 +21,16 @@
             file: "custom-geometry/custom-geometry.js"
         },
         {
+            title: "Directional Lighting",
+            description: "Using the SceneJS.light node to define a directional light.",
+            file: "moving-dir-light/moving-dir-light.js"
+        },
+        {
+            title: "Point Lighting",
+            description: "Using the SceneJS.light node to define a point light.",
+            file: "moving-point-light/moving-point-light.js"
+        },
+        {
             title: "Animated Texture Transformation",
             description: "Almost anything can be animated in SceneJS, including the position, scale and rotation of the texture mapped onto the cube in this example.",
             file: "animated-texture/animated-texture.js"
@@ -29,6 +39,11 @@
             title: "Procedural Generation of a Spiral Staircase",
             description: "All kinds of things in SceneJS can be algorithmically generated. This example demonstrates the generation of a winding staircase model using an interative function.",
             file: "spiral-staircase/spiral-staircase.js"
+        },
+	{
+            title: "COLLADA Import Demo - Driveable Tron Tank",
+            description: "Demonstrates construction of an interactive scene constructed from a group of assets loaded from a COLLADA file.",
+            file: "tron-tank/tron-tank.js"
         },
         {
             title: "Teapot Cloud with Fog",
@@ -39,11 +54,6 @@
             title: "Level-of-Detail Staircase",
             description: "Warning - this might stress your browser out! Use a nice fast one, like Chromium. This example demonstrates level-of-detail coupled with cross-domain, parameterised content loading.",
             file: "lod-staircase-with-tiles/lod-staircase-with-tiles.js"
-        },
-        {
-            title: "Planetarium",
-            description: "Demonstrates remote asset loading",
-            file: "planetarium/planetarium.js"
         }
     ]
 }

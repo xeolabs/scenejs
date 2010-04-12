@@ -23,7 +23,7 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        viewMat = SceneJS._math.identityMat4();
+                        viewMat = SceneJS_math_identityMat4();
                         sphere = null;
                     });
 
@@ -36,7 +36,7 @@ SceneJS._backends.installBackend(
 
             var getSphere = function() {
                 if (!sphere) {
-                    //frustum = new SceneJS._math.Frustum(viewMat, projMat, viewport);
+                    //frustum = new SceneJS_math_Frustum(viewMat, projMat, viewport);
                 }
                 return sphere;
             };

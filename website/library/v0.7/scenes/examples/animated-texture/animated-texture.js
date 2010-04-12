@@ -39,31 +39,31 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                             sources: [
                                                 {
                                                     type:                   "dir",
-                                                    color:                  { r: .8, g: 0.8, b: 0.8 },
+                                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
                                                     diffuse:                true,
-                                                    specular:               false,
-                                                    pos:                    { x: -100.0, y: 4.0, z: -100.0 },
-                                                    constantAttenuation:    1.0,
+                                                    specular:               true,
+                                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 },
+                                                    constantAttenuation:    0.0,
+                                                    quadraticAttenuation:   0.0,
+                                                    linearAttenuation:      0.0
+                                                }          ,
+                                                {
+                                                    type:                   "dir",
+                                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                                                    diffuse:                true,
+                                                    specular:               true,
+                                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 },
+                                                    constantAttenuation:    1.5,
                                                     quadraticAttenuation:   0.0,
                                                     linearAttenuation:      0.0
                                                 },
                                                 {
                                                     type:                   "dir",
-                                                    color:                  { r: 0.6, g: 0.6, b: 0.6 },
+                                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
                                                     diffuse:                true,
                                                     specular:               true,
-                                                    pos:                    { x: 100.0, y: -100.0, z: -100.0 },
-                                                    constantAttenuation:    1.0,
-                                                    quadraticAttenuation:   0.0,
-                                                    linearAttenuation:      0.0
-                                                },
-                                                {
-                                                    type:                   "dir",
-                                                    color:                  { r: 0.6, g: 0.6, b: 0.6 },
-                                                    diffuse:                true,
-                                                    specular:               true,
-                                                    pos:                    { x: -1000.0, y: -1000.0, z: -100.0 },
-                                                    constantAttenuation:    1.0,
+                                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 },
+                                                    constantAttenuation:    1.5,
                                                     quadraticAttenuation:   0.0,
                                                     linearAttenuation:      0.0
                                                 }

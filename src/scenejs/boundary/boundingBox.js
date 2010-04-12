@@ -67,8 +67,8 @@
 
                     if (objectCoords) {
                         var modelTransform = modelTransformBackend.getTransform();
-                        box = new SceneJS._math.Box3().fromPoints(
-                                SceneJS._math.transformPoints3(
+                        box = new SceneJS_math_Box3().fromPoints(
+                                SceneJS_math_transformPoints3(
                                         modelTransform.matrix,
                                         objectCoords)
                                 );
@@ -84,9 +84,9 @@
                         var result = backend.testAxisBoxIntersection(box);
 
                         switch (result) {
-                            case SceneJS._math.INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                            case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
 
-                            case SceneJS._math.INSIDE_FRUSTUM:
+                            case SceneJS_math_INSIDE_FRUSTUM:
 
                                 if (levels) { // Level-of-detail mode
 
@@ -103,7 +103,7 @@
                                 }
                                 break;
 
-                            case SceneJS._math.OUTSIDE_FRUSTUM:
+                            case SceneJS_math_OUTSIDE_FRUSTUM:
                                 break;
                         }
                     }

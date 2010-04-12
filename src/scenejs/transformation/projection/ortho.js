@@ -17,7 +17,7 @@ SceneJS.ortho = function() {
                         near: params.near || 0.1,
                         far: params.far || 100.0
                     };
-                    var tempMat = SceneJS._math.orthoMat4c(
+                    var tempMat = SceneJS_math_orthoMat4c(
                             volume.left,
                             volume.right,
                             volume.bottom,

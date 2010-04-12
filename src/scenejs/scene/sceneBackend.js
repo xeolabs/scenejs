@@ -44,45 +44,45 @@ SceneJS._backends.installBackend(
              *  sets some default state on the context, then returns
              *  canvas, canvas ID and context wrapped up in an object.
              *
-             * If canvasId is null, will fall back on SceneJS._webgl.DEFAULT_CANVAS_ID
+             * If canvasId is null, will fall back on SceneJS_webgl_DEFAULT_CANVAS_ID
              */
             var findCanvas = function(canvasId) {
                 var canvas;
                 if (!canvasId) {
                     ctx.logging.info("SceneJS.scene config 'canvasId' omitted - looking for default canvas with ID '"
-                            + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
-                    canvasId = SceneJS._webgl.DEFAULT_CANVAS_ID;
+                            + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
+                    canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
                     canvas = document.getElementById(canvasId);
                     if (!canvas) {
                         throw new SceneJS.exceptions.CanvasNotFoundException
                                 ("SceneJs.scene config 'canvasId' omitted and could not find default canvas with ID '"
-                                        + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                                        + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
                     }
                 } else {
                     canvas = document.getElementById(canvasId);
                     if (!canvas) {
                         ctx.logging.info("SceneJS.scene config 'canvasId' unresolved - looking for default canvas with " +
-                                         "ID '" + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
-                        canvasId = SceneJS._webgl.DEFAULT_CANVAS_ID;
+                                         "ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
+                        canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
                         canvas = document.getElementById(canvasId);
                         if (!canvas) {
                             throw new SceneJS.exceptions.CanvasNotFoundException
                                     ("SceneJs.scene config 'canvasId' does not match any elements in the page and no " +
-                                     "default canvas found with ID '" + SceneJS._webgl.DEFAULT_CANVAS_ID + "'");
+                                     "default canvas found with ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
                         }
                     }
                 }
                 var context;
-                var contextNames = SceneJS._webgl.contextNames;
+                var contextNames = SceneJS_webgl_contextNames;
                 for (var i = 0; (!context) && i < contextNames.length; i++) {
                     try {
 
                         context = canvas.getContext(contextNames[i]);
 
-
-//                                                alert("WebGL Trace enabled");
-//                                                context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
-//                                                context.setTracing(true);
+                        //
+                        //                                                alert("WebGL Trace enabled");
+                        //                                                context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
+                        //                                                context.setTracing(true);
                     } catch (e) {
 
                     }
