@@ -237,7 +237,7 @@ SceneJS._utils.__ColladaParser = (function() {
         var geometriesData = [];
         var trianglesList = getTrianglesList(geometryNode);
 
-        for (it = 0; it < trianglesList.length; it++) {
+        for (var it = 0; it < trianglesList.length; it++) {
             // logger.info("Parsing &lt;triangle&gt; " + it);
             var triangle = trianglesList [it];
             var inputs = triangle.getElementsByTagName("input");
