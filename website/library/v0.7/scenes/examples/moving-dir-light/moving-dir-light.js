@@ -10,111 +10,101 @@
  */
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
-        SceneJS.loggingToPage({ elementId: "logging" },
+        SceneJS.perspective({  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
 
-                SceneJS.renderer({
-                    clear : { depth : true, color : true},
-                    viewport:{ x : 1, y : 1, width: 600, height: 600},
-                    clearColor: { r:0.0, g: 0.0, b: 0.0 },
-                    enableTexture2D: true
+                SceneJS.lookAt({
+                    eye : { x: 0.0, y: 10.0, z: -35 },
+                    look : { y:1.0 },
+                    up : { y: 1.0 }
                 },
-                        SceneJS.perspective({  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
 
-                                SceneJS.lookAt({
-                                    eye : { x: 0.0, y: 10.0, z: -35 },
-                                    look : { y:1.0 },
-                                    up : { y: 1.0 }
+                    /*---------------------------------------------------------------------------------
+                     * Our animated light source, which takes it's direction from the lightDir
+                     * property injected into the scene's render method
+                     * -------------------------------------------------------------------------------*/
+
+                        SceneJS.lights(
+                                function(data) {  // Dynamic config function
+                                    return {
+                                        sources: [
+                                            {
+                                                type: "dir",
+
+                                                /* Colour of our light
+                                                 */
+                                                color: { r: 1.0, g: 1.0, b: 0.0 },
+
+                                                /* Our light will contribute to both the quantities of
+                                                 * specular and diffuse light that will hit our teapot.
+                                                 */
+                                                diffuse: true,
+                                                specular: true,
+
+                                                /* The directional light's direction, a vector from the
+                                                 * origin of this coordinate system (which is in this
+                                                 * case the view coordinate system, since our light is
+                                                 * not within any no modelling transform nodes).
+                                                 *
+                                                 * The direction vector is calculated by mouse handlers and
+                                                 * injected into the scene's render method.
+                                                 */
+                                                dir: data.get("lightDir")
+
+                                                /* Note the absence of attenuation properties;
+                                                 * unlike a point light, a directional light has no
+                                                 * position, and is therefore not subject to attenuation
+                                                 * since it is at an infinite distance.
+                                                 */
+                                            }
+                                        ]};
                                 },
 
-                                    /*---------------------------------------------------------------------------------
-                                     * Our animated light source, which takes it's direction from the lightDir
-                                     * property injected into the scene's render method
-                                     * -------------------------------------------------------------------------------*/
+                            /*--------------------------------------------------------------------------
+                             * Teapot, rotated and scaled into position within model-space, coloured
+                             * with some material properties
+                             * ------------------------------------------------------------------------*/
 
-                                        SceneJS.lights(
-                                                function(data) {  // Dynamic config function
-                                                    return {
-                                                        sources: [
-                                                            {
-                                                                type: "dir",
-
-                                                                /* Colour of our light
-                                                                 */
-                                                                color: { r: 1.0, g: 1.0, b: 0.0 },
-
-                                                                /* Our light will contribute to both the quantities of
-                                                                 * specular and diffuse light that will hit our teapot.
-                                                                 */
-                                                                diffuse: true,
-                                                                specular: true,
-
-                                                                /* The directional light's direction, a vector from the
-                                                                 * origin of this coordinate system (which is in this
-                                                                 * case the view coordinate system, since our light is
-                                                                 * not within any no modelling transform nodes).
-                                                                 *
-                                                                 * The direction vector is calculated by mouse handlers and
-                                                                 * injected into the scene's render method.
-                                                                 */
-                                                                dir: data.get("lightDir")
-
-                                                                /* Note the absence of attenuation properties;
-                                                                 * unlike a point light, a directional light has no
-                                                                 * position, and is therefore not subject to attenuation
-                                                                 * since it is at an infinite distance.
-                                                                 */
-                                                            }
-                                                        ]};
+                                SceneJS.rotate({
+                                    angle: -20, x : 1.0
+                                },
+                                        SceneJS.rotate({
+                                            angle: 30.0, y : 1.0
+                                        },
+                                                SceneJS.scale({
+                                                    x: 1, y: 1, z: 1
                                                 },
 
-                                            /*--------------------------------------------------------------------------
-                                             * Teapot, rotated and scaled into position within model-space, coloured
-                                             * with some material properties
-                                             * ------------------------------------------------------------------------*/
-
-                                                SceneJS.rotate({
-                                                    angle: -20, x : 1.0
-                                                },
-                                                        SceneJS.rotate({
-                                                            angle: 30.0, y : 1.0
+                                                        SceneJS.material({
+                                                            baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+                                                            emit:           0.0,
+                                                            specular:       0.9,
+                                                            shine:          6.0
                                                         },
-                                                                SceneJS.scale({
-                                                                    x: 1, y: 1, z: 1
-                                                                },
-
-                                                                        SceneJS.material({
-                                                                            baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
-                                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
-                                                                            emit:           0.0,
-                                                                            specular:       0.9,
-                                                                            shine:          6.0
-                                                                        },
-                                                                                SceneJS.objects.teapot()
-                                                                                ))
-                                                                )
-                                                        )
-                                                ),
-
-                                    /*---------------------------------------------------------------------------------
-                                     * This is just a sphere that indicates the light's direction - not the focus
-                                     * of this example
-                                     * -------------------------------------------------------------------------------*/
-
-                                        SceneJS.translate(
-                                                function(data) {
-                                                    return data.get("lightDir");
-                                                },
-                                                SceneJS.material({
-                                                    baseColor:      { r: .6, g: .6, b: 0.6 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    emit: 0.5,
-                                                    specular:       0.9,
-                                                    shine:          6.0
-                                                },
-                                                        SceneJS.scale({x:0.3, y: 0.3, z: 0.3 },
-                                                                SceneJS.objects.sphere())))
+                                                                SceneJS.objects.teapot()
+                                                                ))
+                                                )
                                         )
-                                )
+                                ),
+
+                    /*---------------------------------------------------------------------------------
+                     * This is just a sphere that indicates the light's direction - not the focus
+                     * of this example
+                     * -------------------------------------------------------------------------------*/
+
+                        SceneJS.translate(
+                                function(data) {
+                                    return data.get("lightDir");
+                                },
+                                SceneJS.material({
+                                    baseColor:      { r: .6, g: .6, b: 0.6 },
+                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                    emit: 0.5,
+                                    specular:       0.9,
+                                    shine:          6.0
+                                },
+                                        SceneJS.scale({x:0.3, y: 0.3, z: 0.3 },
+                                                SceneJS.objects.sphere())))
                         )
                 )
         );

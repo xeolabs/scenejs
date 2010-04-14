@@ -2,14 +2,13 @@
  * Scaling modelling transform node
  */
 (function() {
+    var backend = SceneJS._backends.getBackend('model-transform');    
 
     /* Memoization levels
      */
     const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
     const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
     const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
-
-    var backend = SceneJS._backends.getBackend('model-transform');
 
     SceneJS.scale = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);

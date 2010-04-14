@@ -2,7 +2,7 @@
  * Backend for projection nodes, creates context that holds the current
  * scene projection state
  */
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'viewprojection';

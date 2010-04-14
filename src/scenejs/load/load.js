@@ -7,14 +7,12 @@
  */
 SceneJS.load = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-//    if (!cfg.fixed) {
-//        throw new SceneJS.exceptions.UnsupportedOperationException
-//                ("Dynamic configuration of SceneJS.load nodes is not supported");
-//    }
+
     var params;
 
     var backend = SceneJS._backends.getBackend("load");
     var logging = SceneJS._backends.getBackend("logging");
+    var errorBackend = SceneJS._backends.getBackend("error");
     var process = null;
     var assetNode;
 
@@ -44,7 +42,7 @@ SceneJS.load = function() {
             for (var key in params.params) {
                 childData.put(key, params.params[key]);
             }
-            assetNode.func.call(this, traversalContext,  childData);
+            assetNode.func.call(this, traversalContext, childData);
         } else {
             assetNode.func.call(this, traversalContext, data);
         }
@@ -56,9 +54,9 @@ SceneJS.load = function() {
                 if (!params) {
                     params = cfg.getParams(data);
                     if (!params.uri) {
-                        throw new SceneJS.exceptions.NodeConfigExpectedException
-                                ("Mandatory SceneJS.load parameter missing: uri");
-                    }                 
+                        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                ("Scene definiton error - mandatory SceneJS.load parameter missing: uri"));
+                    }
                 }
 
                 if (state == STATE_ATTACHED) {
@@ -95,12 +93,14 @@ SceneJS.load = function() {
                                     state = STATE_LOADED;
                                 },
                                 function() { // onTimeout
-                                    state = STATE_ERROR;                                 
+                                    state = STATE_ERROR;
+                                    errorBackend.error(
+                                            new SceneJS.exceptions.AssetLoadTimeoutException(
+                                                    "SceneJS.load timed out - uri: " + params.uri));
                                 },
                                 function(msg) { // onError - backend has killed process
                                     state = STATE_ERROR;
-                                    logging.getLogger().error(
-                                            "SceneJS.load failed - " + msg + " - uri: " + params.uri);
+                                    errorBackend.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
                                 });
                         break;
 

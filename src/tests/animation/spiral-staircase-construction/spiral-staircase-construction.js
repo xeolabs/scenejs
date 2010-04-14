@@ -17,7 +17,7 @@
  * loops, where in each one it sets a scope containing different extents for its
  * child viewport node. It stops the loop by not returning anything.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({

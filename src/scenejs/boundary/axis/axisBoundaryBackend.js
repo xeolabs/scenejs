@@ -3,7 +3,7 @@
  * and test for its intersection with the view volume.
  */
 
-SceneJs.backends.installBackend(
+SceneJS._backends.installBackend(
         new (function() {
 
             this.type = 'axis-boundary';

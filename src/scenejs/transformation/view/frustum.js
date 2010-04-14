@@ -3,9 +3,9 @@
  */
 
 (function() {
-    SceneJs.frustum = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
-        var backend = SceneJs.backends.getBackend('viewprojection');
+    SceneJS.frustum = function() {
+        var cfg = SceneJS.utils.getNodeConfig(arguments);
+        var backend = SceneJS._backends.getBackend('viewprojection');
         var transform;
         return function(scope) {
             if (!transform || cfg.fixed) {    // Memoize matrix if node config is constant
@@ -34,7 +34,7 @@
             }
             var prevTransform = backend.getTransform();
             backend.setTransform(transform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS.utils.visitChildren(cfg, scope);
             backend.setTransform(prevTransform);
         };
     };

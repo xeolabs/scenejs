@@ -27,196 +27,181 @@ var exampleScene = SceneJS.scene({
      */
     proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
 
-    /* Write logging output to a DIV element in the page
+    /* Perspective transformation
      */
-        SceneJS.loggingToPage({ elementId: "logging" },
+        SceneJS.perspective({  fovy : 45.0, aspect : 1.0, near : 0.10, far : 7000.0 },
 
-            /* A renderer node clears the depth and colour buffers and sets GL modes
+            /* Fog, nice and thick, just for fun
              */
-                SceneJS.renderer({
-                    clear : { depth : true, color : true},
-                    viewport:{ x : 1, y : 1, width: 600, height: 600},
-                    clearColor: { r:0.5, g: 0.5, b: 0.5 },
-                    enableTexture2D:true
+                SceneJS.fog({
+                    mode:"linear",
+                    color:{r:.50, g:.50,b:.50},
+                    start: 0,
+                    end:600  ,
+                    density:300.0
                 },
 
-                    /* Perspective transformation
+                    /* View transform - takes viewing parameters through the data passed
+                     * into this scene as it is rendered. Those parameters are generated
+                     * in mouse handlers outside the scene graph - see below.
                      */
-                        SceneJS.perspective({  fovy : 45.0, aspect : 1.0, near : 0.10, far : 7000.0 },
+                        SceneJS.lookAt({
 
-                            /* Fog, nice and thick, just for fun
+                            eye : function(data) {
+                                return data.get("eye");
+                            },
+
+                            look : function(data) {
+                                return data.get("look");
+                            },
+
+                            up : { y: 1.0 }
+                        },
+
+                            /* A starry sky for fun!
                              */
-                                SceneJS.fog({
-                                    mode:"linear",
-                                    color:{r:.50, g:.50,b:.50},
-                                    start: 0,
-                                    end:600  ,
-                                    density:300.0
-                                },
+                                SceneJS.load({
+                                    uri:"http://scenejs.org/library/v0.7/assets/backgrounds/starry-sky/starry-sky.js"
+                                }),
 
-                                    /* View transform - takes viewing parameters through the data passed
-                                     * into this scene as it is rendered. Those parameters are generated
-                                     * in mouse handlers outside the scene graph - see below.
+                            /* Lighting
+                             */
+                                SceneJS.lights({
+                                    sources: [
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                                        },
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 2.0, y: 1.0, z: 0.0 }
+                                        }
+                                    ]},
+
+                                    /* Tiled floor asset from the SceneJS library
                                      */
-                                        SceneJS.lookAt({
+                                        SceneJS.load({
+                                            uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                "examples/tiled-floor/tiled-floor.js"
+                                        }),
 
-                                            eye : function(data) {
-                                                return data.get("eye");
-                                            },
-
-                                            look : function(data) {
-                                                return data.get("look");
-                                            },
-
-                                            up : { y: 1.0 }
+                                    /* Our spiral staircase, wrapped with some material colour
+                                     */
+                                        SceneJS.material({
+                                            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                            specular:       0.9,
+                                            shine:          6.0
                                         },
 
-                                            /* A starry sky for fun!
+                                            /* Bounding box - roughly fitted to staircase
                                              */
-                                                SceneJS.load({
-                                                    uri:"http://scenejs.org/library/v0.7/assets/backgrounds/starry-sky/starry-sky.js"
-                                                }),
+                                                SceneJS.boundingBox({
+                                                    xmin: -20,
+                                                    ymin: -20,
+                                                    zmin: -20,
+                                                    xmax:  20,
+                                                    ymax:  20,
+                                                    zmax:  20,
 
-                                            /* Lighting
-                                             */
-                                                SceneJS.lights({
-                                                    sources: [
-                                                        {
-                                                            type:                   "dir",
-                                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                                            diffuse:                true,
-                                                            specular:               true,
-                                                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                                        },
-                                                        {
-                                                            type:                   "dir",
-                                                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
-                                                            diffuse:                true,
-                                                            specular:               true,
-                                                            dir:                    { x: 2.0, y: 1.0, z: 0.0 }
-                                                        }
-                                                    ]},
-
-                                                    /* Tiled floor asset from the SceneJS library
+                                                    /* We'll do level-of-detail selection with this
+                                                     * boundingBox - five representations at
+                                                     * different sizes:
                                                      */
-                                                        SceneJS.load({
-                                                            uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                "examples/tiled-floor/tiled-floor.js"
-                                                        }),
+                                                    levels: [
+                                                        10,     // Level 1
+                                                        200,    // Level 2
+                                                        400,    // Level 3
+                                                        500,    // Level 4
+                                                        600     // Level 5
+                                                    ]
+                                                },
 
-                                                    /* Our spiral staircase, wrapped with some material colour
+                                                    /* And here are the child nodes:
                                                      */
-                                                        SceneJS.material({
-                                                            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                                            specular:       0.9,
-                                                            shine:          6.0
-                                                        },
 
-                                                            /* Bounding box - roughly fitted to staircase
-                                                             */
-                                                                SceneJS.boundingBox({
-                                                                    xmin: -20,
-                                                                    ymin: -20,
-                                                                    zmin: -20,
-                                                                    xmax:  20,
-                                                                    ymax:  20,
-                                                                    zmax:  20,
+                                                    /* Level 1 - a cube to at least show a dot on the horizon
+                                                     */
+                                                        SceneJS.objects.cube(),
 
-                                                                    /* We'll do level-of-detail selection with this
-                                                                     * boundingBox - five representations at
-                                                                     * different sizes:
-                                                                     */
-                                                                    levels: [
-                                                                        10,     // Level 1
-                                                                        200,    // Level 2
-                                                                        400,    // Level 3
-                                                                        500,    // Level 4
-                                                                        600     // Level 5
-                                                                    ]
-                                                                },
+                                                    /* Level 2 - staircase with 12 very chunky steps
+                                                     * and no texture - a parameterised asset from the
+                                                     * SceneJS library:
+                                                     */
+                                                        SceneJS.withData({
+                                                            stepWidth:7,
+                                                            stepHeight:2.4,
+                                                            stepDepth:3,
+                                                            stepSpacing:6,
+                                                            innerRadius:10,
+                                                            numSteps:12,
+                                                            stepAngle:80 },
 
-                                                                    /* And here are the child nodes:
-                                                                     */
+                                                                SceneJS.load({
+                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                })),
 
-                                                                    /* Level 1 - a cube to at least show a dot on the horizon
-                                                                     */
-                                                                        SceneJS.objects.cube(),
+                                                    /* Level 3 - more detail; staircase with 24 chunky
+                                                     *  steps and no texture - the same parameterised asset
+                                                     * from the SceneJS library, with different parameters:
+                                                     */
+                                                        SceneJS.withData({
+                                                            stepWidth:7,
+                                                            stepHeight:1.2,
+                                                            stepDepth:3,
+                                                            stepSpacing:3,
+                                                            innerRadius:10,
+                                                            numSteps:24,       // Half the number of steps, less coarse
+                                                            stepAngle:40 },
 
-                                                                    /* Level 2 - staircase with 12 very chunky steps
-                                                                     * and no texture - a parameterised asset from the
-                                                                     * SceneJS library:
-                                                                     */
-                                                                        SceneJS.withData({
-                                                                            stepWidth:7,
-                                                                            stepHeight:2.4,
-                                                                            stepDepth:3,
-                                                                            stepSpacing:6,
-                                                                            innerRadius:10,
-                                                                            numSteps:12,
-                                                                            stepAngle:80 },
+                                                                SceneJS.load({
+                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                })),
 
-                                                                                SceneJS.load({
-                                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                        "examples/spiral-staircase/spiral-staircase.js"
-                                                                                })),
+                                                    /* Level 4 - yet more detail; staircase with 48 fine
+                                                     * steps and no texture - the asset again, with different
+                                                     * parameters:
+                                                     */
+                                                        SceneJS.withData({
+                                                            stepWidth:7,
+                                                            stepHeight:0.6,
+                                                            stepDepth:3,
+                                                            stepSpacing:1.5,
+                                                            innerRadius:10,
+                                                            numSteps:48,
+                                                            stepAngle:20 },
 
-                                                                    /* Level 3 - more detail; staircase with 24 chunky
-                                                                     *  steps and no texture - the same parameterised asset
-                                                                     * from the SceneJS library, with different parameters:
-                                                                     */
-                                                                        SceneJS.withData({
-                                                                            stepWidth:7,
-                                                                            stepHeight:1.2,
-                                                                            stepDepth:3,
-                                                                            stepSpacing:3,
-                                                                            innerRadius:10,
-                                                                            numSteps:24,       // Half the number of steps, less coarse
-                                                                            stepAngle:40 },
+                                                                SceneJS.load({
+                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                })),
 
-                                                                                SceneJS.load({
-                                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                        "examples/spiral-staircase/spiral-staircase.js"
-                                                                                })),
+                                                    /* Level 5 - maximum detail; textured staircase with
+                                                     * 48 fine steps - that asset again, this time with a
+                                                     * texture parameter:
+                                                     */
+                                                        SceneJS.withData({
+                                                            stepTexture: "marble",
+                                                            stepWidth:7,
+                                                            stepHeight:0.6,
+                                                            stepDepth:3,
+                                                            stepSpacing:1.5,
+                                                            innerRadius:10,
+                                                            numSteps:48,
+                                                            stepAngle:20 },
 
-                                                                    /* Level 4 - yet more detail; staircase with 48 fine
-                                                                     * steps and no texture - the asset again, with different
-                                                                     * parameters:
-                                                                     */
-                                                                        SceneJS.withData({
-                                                                            stepWidth:7,
-                                                                            stepHeight:0.6,
-                                                                            stepDepth:3,
-                                                                            stepSpacing:1.5,
-                                                                            innerRadius:10,
-                                                                            numSteps:48,
-                                                                            stepAngle:20 },
-
-                                                                                SceneJS.load({
-                                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                        "examples/spiral-staircase/spiral-staircase.js"
-                                                                                })),
-
-                                                                    /* Level 5 - maximum detail; textured staircase with
-                                                                     * 48 fine steps - that asset again, this time with a
-                                                                     * texture parameter:
-                                                                     */
-                                                                        SceneJS.withData({
-                                                                            stepTexture: "marble",
-                                                                            stepWidth:7,
-                                                                            stepHeight:0.6,
-                                                                            stepDepth:3,
-                                                                            stepSpacing:1.5,
-                                                                            innerRadius:10,
-                                                                            numSteps:48,
-                                                                            stepAngle:20 },
-
-                                                                                SceneJS.load({
-                                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                                        "examples/spiral-staircase/spiral-staircase.js"
-                                                                                }))
-                                                                        )
-                                                                )
+                                                                SceneJS.load({
+                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                }))
                                                         )
                                                 )
                                         )

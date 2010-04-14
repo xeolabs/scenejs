@@ -95,7 +95,7 @@ SceneJS._backends.installBackend(
 
                 pushName : function(name) {
                     if (!canvas) {
-                        throw "No canvas active";
+                        ctx.error.fatalError("No canvas active");
                     }
                     nameStack.push(name);
                     namePath = nameStack.join("/");

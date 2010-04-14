@@ -89,8 +89,27 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
                     function(params) {
-                        activeSceneId = params.sceneId;
-                        funcs = null;
+                        activeSceneId = params.sceneId;                        
+
+                        var element = document.getElementById(SceneJS_webgl_DEFAULT_LOGGING_ID);
+                        if (element) {
+                            funcs = {
+                                warn : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
+                                },
+                                error : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
+                                },
+                                debug : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
+                                },
+                                info : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
+                                }
+                            };
+                        } else {
+                            funcs = null;
+                        }
                     });
 
             ctx.events.onEvent(

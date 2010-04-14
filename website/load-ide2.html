@@ -1,0 +1,280 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>SceneJS Live</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="lib/site/utils.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery.jtemplates.js">
+    </script>
+    <style type="text/css">
+        #ide-title {
+            width: 400px;
+            padding: 5px;
+            outline: none;
+            height: 36px;
+        }
+
+        #ide-url {
+            width: 400px;
+            padding: 5px;
+            outline: none;
+            height: 36px;
+        }
+
+        .focusField {
+            border: solid 2px #73A6FF;
+            background: #EFF5FF;
+            color: #000;
+        }
+
+        .idleField {
+            background: #EEE;
+            color: #6F6F6F;
+            border: solid 2px #DFDFDF;
+        }
+
+        .formLayout {
+
+            background-color: #ffffff;
+            border: solid 1px #a1a1a1;
+            padding: 20px;
+            padding-bottom: 15px;
+            width: 550px;
+            height: 200px;
+            margin: 0 auto;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .formLayout label, .formLayout input, .formLayout .button {
+            display: block;
+            width: 120px;
+            float: left;
+            margin-bottom: 10px;
+        }
+
+        .formLayout label {
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        #open-ide {
+        /*height:50px;*/
+        /*background: rgb(255,255,255) url("images/run-it.jpg") no-repeat;*/
+        /*margin-top: 15px;*/
+        /**/
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            width: 100px;
+            height: 40px;
+            border-style: solid;
+        }
+
+        br {
+            clear: left;
+        }
+
+        .formLayout .notes {
+            width: 250px;
+            text-align: left;
+            padding-top: 20px;
+            padding-left: 140px;
+        }
+
+        .formLayout ul {
+            padding-left: 20px;
+        }
+
+
+    </style>
+</head>
+<body style="padding: 20px;">
+<div id="container">
+    <div id="header">
+        <h1><a href="index.html">SceneJS</a> &gt; IDE</h1>
+
+        <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
+                src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
+                alt="Share/Bookmark"/></a>
+        <script type="text/javascript">
+            var a2a_linkname = "SceneJS Gallery";
+            var a2a_linkurl = window.location;
+            var a2a_onclick = 1;</script>
+        <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+    </div>
+
+
+    <div id="content">
+
+        <div id="load-ide-table">
+            <div id="col1">
+                <h1>Gallery</h1>
+
+                <div id="examples"></div>
+            </div>
+
+            <div id="col2">
+
+
+                <h1>Share your SceneJS example!</h1>
+
+                <p class="intro">Run it in an IDE session that you can bookmark and share.</p>
+
+
+                <div class="formLayout">
+                    <label>Title</label>
+                    <input name="title" id="ide-title" value="Hello, Teapot!" type="text"/>
+                    <br/>
+                    <label>File URL:</label>
+                    <input name="url" id="ide-url"
+                           value="http://scenejs.org/library/v0.7/scenes/examples/hello-teapot/hello-teapot.js"
+                           type="text"/>
+
+                    <br/>
+                    <label></label>
+
+                    <div class="buttons">
+                        <button id="run-button" type="submit" class="positive" name="save">
+                            <!--<img src="images/apply2.png" alt=""/>-->
+                            Run!
+                        </button>
+                    </div>
+                    <br/>
+
+                    <div class="notes">
+                        <p><i>The IDE will also load these<br/>libraries for your convenience:</i></p>
+                        <ul>
+                            <li><a target="other" href="http://sylvester.jcoglan.com">Sylvester Matrix Library
+                                V0.1.3</a>
+                            </li>
+                            <li><a target="other" href="http://jquery.com/">jQuery V1.3.2</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://xeolabs.com">Xeolabs</a></p>
+</div>
+
+<script type="text/javascript">
+    function bla() {
+    }
+
+    function showExamples() {
+        $.ajax({
+            type: 'GET',
+            url: '../library/v0.7/scenes/examples/index.json',
+            dataType: 'json',
+            success: function(json) {
+                $("#examples").setTemplateURL("templates/ide-examples2.html");
+                $("#examples").processTemplate(json);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        /* Title
+         */
+
+        var titleField = $("#ide-title");
+        var defaultTitle = titleField.val();
+        titleField.addClass("idleField");
+        titleField.focus(function() {
+            $(this).removeClass("idleField").addClass("focusField");
+            if (this.value == this.defaultValue) {
+                this.value = '';
+            }
+            if (this.value != this.defaultValue) {
+                this.select();
+            }
+        });
+        titleField.blur(function() {
+            $(this).removeClass("focusField").addClass("idleField");
+            if ($.trim(this.value) == "") {
+                titleField.val(defaultTitle);
+            } else {
+
+            }
+        });
+
+        /* Scene definition file location
+         */
+
+        var fileUrlField = $("#ide-url");
+        var defaultFileUrl = fileUrlField.val();
+        fileUrlField.addClass("idleField");
+        fileUrlField.focus(function() {
+            $(this).removeClass("idleField").addClass("focusField");
+
+            if (this.value == this.defaultValue) {
+                this.value = '';
+            }
+            if (this.value != this.defaultValue) {
+                this.select();
+            }
+        });
+        fileUrlField.blur(function() {
+            $(this).removeClass("focusField").addClass("idleField");
+            if ($.trim(this.value) == "") {
+                fileUrlField.val(defaultFileUrl);
+            } else {
+
+            }
+        });
+
+        $('#run-button').click(function() {
+            var fileUrl = fileUrlField.val().trim();
+            var title = titleField.val().trim();
+            var redirectUrl = "ide.html?url=" + fileUrl + "&title=" + title;
+            $(location).attr("href", redirectUrl);
+        });
+        showExamples();
+
+    });
+</script>
+<script type="text/javascript">
+    var uservoiceOptions = {
+        /* required */
+        key: 'scenejs',
+        host: 'scenejs.uservoice.com',
+        forum: '38232',
+        showTab: true,
+        /* optional */
+        alignment: 'left',
+        background_color:'#f00',
+        text_color: 'white',
+        hover_color: '#06C',
+        lang: 'en'
+    };
+
+    function _loadUserVoice() {
+        var s = document.createElement('script');
+        s.setAttribute('type', 'text/javascript');
+        s.setAttribute('src', ("https:" == document.location.protocol ? "https://" : "http://") + "cdn.uservoice.com/javascripts/widgets/tab.js");
+        document.getElementsByTagName('head')[0].appendChild(s);
+    }
+    _loadSuper = window.onload;
+    window.onload = (typeof window.onload != 'function') ? _loadUserVoice : function() {
+        _loadSuper();
+        _loadUserVoice();
+    };
+</script>
+
+
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-8036359-3");
+        pageTracker._trackPageview();
+    } catch(err) {
+    }</script>
+</body>
+</html>

@@ -4,6 +4,8 @@ var SceneJS = {
 
 (function() {
 
+
+
     /** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
      */
     //    SceneJS.require = function(url) {
@@ -215,8 +217,8 @@ var SceneJS = {
 
                     }
                 } else {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException
-                            ('Invalid node parameters - config should be first, IE. node(config, node, node,...)');
+                    errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException
+                            ("Invalid node parameters - config should be first, IE. node(config, node, node,...)"));
                 }
             }
             if (!result.getParams) {
@@ -240,8 +242,9 @@ var SceneJS = {
                     return param;
                 }
                 if (mandatory) {
-                    throw SceneJS.exceptions.NodeConfigExpectedException(
-                            nodeName + " property expected: \"" + name + "\"");
+                    SceneJS._backends.getBackend("error").fatalError(
+                            SceneJS.exceptions.NodeConfigExpectedException(
+                                    nodeName + " property expected: \"" + name + "\""));
                 }
                 else {
                     return null;
@@ -271,15 +274,15 @@ var SceneJS = {
          *
          * Wrapping SceneJS.someNode and augmenting the parameters argument with a new member, "myNewParam":
          *
-         *      SceneJs.myNewNode = function() {
-         *          var extendedArgs = SceneJs._utils.extendNodeArgs(arguments, { myNewParam : "new param value" });
-         *          return SceneJs.someNode.apply(this, extendedArgs);
+         *      SceneJS.myNewNode = function() {
+         *          var extendedArgs = SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" });
+         *          return SceneJS.someNode.apply(this, extendedArgs);
          *      };
          *
          * If the parameters argument already has a "myNewParam" then this won't replace it, unless you force it's
          * replacement with an override flag like this:
          *
-         *      var extendedArgs =  SceneJs._utils.extendNodeArgs(arguments, { myNewParam : "new param value" }, true);
+         *      var extendedArgs =  SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" }, true);
          *
          * @param args The JavaScript Arguments passed to the scene node function
          * @param cfg Each member of these is attached to the config object extracted from the arguments, overriding any member already there
@@ -345,7 +348,7 @@ var SceneJS = {
                         }, data);
                     }
                 } else {
-                    
+
                     /* Leaf node - if on right fringe of tree then
                      * render appended nodes
                      */

@@ -93,8 +93,8 @@ SceneJS._backends.installBackend(
                 if (light.type) {
                     if (light.type != "dir"
                             && light.type != "point") {
-                        throw new SceneJS.exceptions.InvalidNodeConfigException(
-                                "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'");
+                        ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                                "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'"));
                     }
                 } else {
                     light.type = light.type || "point";
@@ -104,8 +104,8 @@ SceneJS._backends.installBackend(
                     return {
                         type: light.type,
                         color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                        diffuse : light.diffuse,
-                        specular : light.specular,
+                        diffuse : light.diffuse == undefined ? true : light.diffuse,
+                        specular : light.specular == undefined ? true : light.specular,
                         pos : SceneJS_math_transformPoint3(
                                 viewMat,
                                 SceneJS_math_transformPoint3(
@@ -121,8 +121,8 @@ SceneJS._backends.installBackend(
                     return {
                         type: light.type,
                         color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                        diffuse : light.diffuse,
-                        specular : light.specular,
+                        diffuse : light.diffuse == undefined ? true : light.diffuse,
+                        specular : light.specular == undefined ? true : light.specular,
                         dir : SceneJS_math_transformVector3(
                                 viewMat,
                                 SceneJS_math_transformVector3(
@@ -131,30 +131,30 @@ SceneJS._backends.installBackend(
                     };
                 }
 
-//                if (light.type == "spot") {
-//                    return {
-//                        type: light.type,
-//                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-//                        diffuse : light.diffuse,
-//                        specular : light.specular,
-//                        pos : SceneJS_math_transformPoint3(
-//                                viewMat,
-//                                SceneJS_math_transformPoint3(
-//                                        modelMat,
-//                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
-//
-//                        dir : SceneJS_math_transformVector3(
-//                                viewMat,
-//                                SceneJS_math_transformVector3(
-//                                        modelMat,
-//                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
-//                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
-//                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
-//                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-//                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-//                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-//                    };
-//                }
+                //                if (light.type == "spot") {
+                //                    return {
+                //                        type: light.type,
+                //                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                //                        diffuse : light.diffuse,
+                //                        specular : light.specular,
+                //                        pos : SceneJS_math_transformPoint3(
+                //                                viewMat,
+                //                                SceneJS_math_transformPoint3(
+                //                                        modelMat,
+                //                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
+                //
+                //                        dir : SceneJS_math_transformVector3(
+                //                                viewMat,
+                //                                SceneJS_math_transformVector3(
+                //                                        modelMat,
+                //                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
+                //                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
+                //                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
+                //                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
+                //                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
+                //                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
+                //                    };
+                //                }
             }
 
             /* Node-facing API

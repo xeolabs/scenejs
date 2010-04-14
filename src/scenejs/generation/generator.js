@@ -13,24 +13,28 @@
  * For example, inability to memoize will cascade downwards through  modelling transform node hierarchies since they
  * will have to re-multiply matrices by dynamic parent modelling transforms etc.
  */
-SceneJS.generator = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
-    return SceneJS._utils.createNode(
-            function(traversalContext, data) {
-                if (cfg.fixed) {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException
-                            ('SceneJS.generator node must be configured with a function');
-                }
-                var params = cfg.getParams(data);
-                while (params) {
-                    var childData = SceneJS._utils.newScope(data);
-                    for (var key in params) {
-                        childData.put(key, params[key]);
+(function() {
+    var errorBackend = SceneJS._backends.getBackend("error");
+    SceneJS.generator = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        return SceneJS._utils.createNode(
+                function(traversalContext, data) {
+                    if (cfg.fixed) {
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.InvalidNodeConfigException
+                                        ('SceneJS.generator node must be configured with a function'));
                     }
-                    SceneJS._utils.visitChildren(cfg, traversalContext, childData);
-                    params = cfg.getParams(data);
-                }
-            });
-};
+                    var params = cfg.getParams(data);
+                    while (params) {
+                        var childData = SceneJS._utils.newScope(data);
+                        for (var key in params) {
+                            childData.put(key, params[key]);
+                        }
+                        SceneJS._utils.visitChildren(cfg, traversalContext, childData);
+                        params = cfg.getParams(data);
+                    }
+                });
+    };
+})();
 
 

@@ -134,5 +134,20 @@ SceneJS.exceptions.PickWithoutRenderedException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJS.exceptions.DataExpectedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.ImageLoadFailedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.AssetLoadTimeoutException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 

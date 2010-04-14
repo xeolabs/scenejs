@@ -1,6 +1,17 @@
 {
     examples:[
         {
+            title: "COLLADA Import Demo - Driveable Tron Tank",
+            description: "Demonstrates construction of an interactive scene constructed from a group of assets loaded from a COLLADA file.",
+            file: "tron-tank/tron-tank.js"
+        },
+        {
+            title: "COLLADA Import Test - Seymour Plane",
+            description: "Tests import of COLLADA's core Phong shading elements using one of the official test models from Collada.org.",
+            file: "seymour-plane/seymour-plane.js"
+        },
+          
+        {
             title: "Intro Example: Hello, Teapot!",
             description: "Basic example - the OpenGL teapot, demonstrating scene syntax, point lighting, material colours, mouse interaction, perspective, view and modelling transforms",
             file: "hello-teapot/hello-teapot.js"
@@ -16,7 +27,7 @@
             file: "teapot-asset/teapot-asset.js"
         },
         {
-            title: "How to Define Geometry",
+            title: "Geometry Definition",
             description: "Describes how to use the SceneJS.geometry node to create your own geometry, in this case a cube with texture.",
             file: "custom-geometry/custom-geometry.js"
         },
@@ -31,7 +42,12 @@
             file: "moving-point-light/moving-point-light.js"
         },
         {
-            title: "Animated Texture Transformation",
+            title: "Tweaking WebGL State with SceneJS.renderer Nodes",
+            description: "The SceneJS.renderer node allows you to tweak WebGL state for portions of your scene graph. Use it to explicitly configure things such as the current viewport extents, scissoring, enable/disable shading, backface culling, and so on.",
+            file: "renderer-node/renderer-node.js"
+        },
+        {
+            title: "Animated Texture",
             description: "Almost anything can be animated in SceneJS, including the position, scale and rotation of the texture mapped onto the cube in this example.",
             file: "animated-texture/animated-texture.js"
         },
@@ -39,11 +55,6 @@
             title: "Procedural Generation of a Spiral Staircase",
             description: "All kinds of things in SceneJS can be algorithmically generated. This example demonstrates the generation of a winding staircase model using an interative function.",
             file: "spiral-staircase/spiral-staircase.js"
-        },
-	{
-            title: "COLLADA Import Demo - Driveable Tron Tank",
-            description: "Demonstrates construction of an interactive scene constructed from a group of assets loaded from a COLLADA file.",
-            file: "tron-tank/tron-tank.js"
         },
         {
             title: "Teapot Cloud with Fog",

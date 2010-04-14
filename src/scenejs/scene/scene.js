@@ -6,6 +6,7 @@
 
 (function() {
 
+    var eventsBackend = SceneJS._backends.getBackend('events');
     var sceneBackend = SceneJS._backends.getBackend('scene');
     var loadBackend = SceneJS._backends.getBackend('load');
     var processesBackend = SceneJS._backends.getBackend('processes');
@@ -21,10 +22,12 @@
             throw SceneJS._backends.getStatus().error;
         }
 
+        /* Collect scene params
+         */
         var cfg = SceneJS._utils.getNodeConfig(arguments);
         if (!cfg.fixed) {
             throw new SceneJS.exceptions.UnsupportedOperationException
-                    ("Dynamic configuration of SceneJS.scene nodes is not supported");
+                    ("Dynamic configuration of SceneJS.scene node is not supported");
         }
         var params = cfg.getParams();
 
@@ -52,24 +55,29 @@
              * that were set on the config.
              */
             render : function(paramOverrides) {
-                if (sceneId) {
-                    sceneBackend.activateScene(sceneId);
-                    var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
-                    if (paramOverrides) {        // Override with traversal params
-                        for (var key in paramOverrides) {
-                            data.put(key, paramOverrides[key]);
+                try {
+                    if (sceneId) {
+                        sceneBackend.activateScene(sceneId);
+                        var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
+                        if (paramOverrides) {        // Override with traversal params
+                            for (var key in paramOverrides) {
+                                data.put(key, paramOverrides[key]);
+                            }
                         }
-                    }
-                    if (params.proxy) {
-                        loadBackend.setProxy(params.proxy);
-                    }
-                    var traversalContext = {
+                        if (params.proxy) {
+                            loadBackend.setProxy(params.proxy);
+                        }
+                        var traversalContext = {
 
-                    };
-                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    loadBackend.setProxy(null);
-                    sceneBackend.deactivateScene();
-                    lastRenderedData = data;
+                        };
+                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                        loadBackend.setProxy(null);
+                        sceneBackend.deactivateScene();
+                        lastRenderedData = data;
+                    }
+                } catch (e) {
+                    alert(e.message || e);
+                    throw e;
                 }
             },
 
@@ -156,6 +164,91 @@
              * A RESET command will be fired after the last one is destroyed.
              */
             temp.pop().destroy();
+        }
+    };
+
+    SceneJS.onEvent = function(name, func) {
+        switch (name) {
+
+            case "error" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.ERROR,
+                    function(params) {
+                        func({
+                            exception: params.exception,
+                            fatal: params.fatal
+                        });
+                    });
+                break;
+
+            case "scene-created" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_CREATED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+            case "scene-activated" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+            case "canvas-activated" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+                    function(params) {
+                        func({
+                            canvas: params.canvas
+                        });
+                    });
+                break;
+
+            case "process-created" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.PROCESS_CREATED,
+                    function(params) {
+                        func(params);
+                    });
+                break;
+
+            case "process-timed-out" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.PROCESS_TIMED_OUT,
+                    function(params) {
+                        func(params);
+                    });
+                break;
+
+            case "process-killed" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.PROCESS_KILLED,
+                    function(params) {
+                        func(params);
+                    });
+                break;
+
+            case "scene-deactivated" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_DEACTIVATED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+            case "scene-destroyed" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_DESTROYED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+
+            default:
+                throw "SceneJS.onEvent - this event type not supported: '" + name + "'";
         }
     };
 })();

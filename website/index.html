@@ -37,37 +37,36 @@
                     canvas element.</p>
 
                 <h3>General Syntax</h3>
-                <img src="./images/teapot-example1.jpg" alt="Teapot Image" style="margin-left:15px;" align="right"/>
+                <a href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/seymour-plane/seymour-plane.js&title=COLLADA%20Import%20Test%20-%20Seymour%20Plane"><img src="./images/seymour-plane.jpg" alt="COLLADA Test Image" style="margin-left:15px;" align="right"/></a>
 
-                <p><span>Below is a simple example that renders the venerable OpenGL teapot shown to the right.</span>
+                <p><span>Below is a simple example that loads a COLLADA model and renders the airplane shown to the right.</span>
                 </p>
 
-                <p><span>To render the teapot,
-                SceneJS will traverse the scene in depth-first order. Each node is a function that will set some scene
+                <p><span>To render the airplane, SceneJS will traverse the scene in depth-first order. Each node is a function that will set some scene
                     state on entry, then un-set it again before exit. In this graph, the <b>scene</b> node activates a WebGL
                     Canvas element, a <b>perspective</b> defines the projection, a <b>lookAt</b> defines the camera, <b>lights</b>
-                    defines a light source, <b>rotate</b> tilts the model space, <b>material</b> sets some colours, and <b>objects.teapot</b>
-                    draws our teapot.</span>
+                    defines a light source, <b>rotate</b> nodes orient the model space, then a <b>loadCollada</b> loads and renders
+                    our airplane.</span>
                 </p>
 
-                <p><span>Note how node declarations generally have a configuration object followed by zero or more children:</span>
+                <p><span>Note how node parameters are generally a configuration object followed by zero or more children:</span>
                 </p>
 
                 <p><span><b>node({ foo: "bar" }, node( .. ), node( .. ) ... )</b></span></p>
 
                 <p>
-                    <span>For brevity, the configuration objects need only specify values where defaults are overridden.</span>
+                    <span>For brevity, parameters are given only to override defaults.</span>
                 </p>
                 <br/>
 
-                <script src="http://gist.github.com/338433.js?file=scenejs-intro-scene.js"></script>
+                <script src="http://gist.github.com/364292.js?file=scenejs-intro-example-2.js"></script>
 
-                <p><span>Take a closer look at that <b>rotate</b> node. See how it takes a function which creates its
-                    configuration object? You can do that when you want a node's configuration to be evaluated
-                    dynamically at traversal-time. The function takes an immutable <b>data</b> object, which is SceneJS's
-                mechanism for passing variables down into a scene graph. Using the <b>angle</b> property on that data, the
-                    function creates a configuration that specifies a rotation about the X-axis. See also how we inject
-                    that angle when we render the scene.</span></p>
+                <p><span>Take a closer look at those <b>rotate</b> nodes. See how they can optionally take a function
+                    which feeds them their parameters? You can do that for any node to dynamically evaluate parameters for
+                    them at traversal-time. The functions take an immutable <b>data</b> object, which is SceneJS's
+                mechanism for passing variables down into scene graphs.</span></p><p><span> Using the <b>yaw</b> and <b>pitch</b> properties on
+                    that data object, our functions create configurations that specify rotations about the X and Y axis.
+                    See also how we inject those angles when we render the scene.</span></p>
                 <br/>
 
                 <p><span>To really get an idea of what SceneJS can do, take a look at the <b><a
@@ -82,6 +81,7 @@
 
                 <div id="home-download">
                     <p class="title">Download V0.7.2</p>
+
                     <p class="status">Beta release, now with COLLADA import</p>
 
                     <ul>
@@ -133,7 +133,13 @@
 
                 <div id="home-dev" class="home-menu-item">
                     <a class="title" href="dev.html">Development</a>
-
+                    <ul>
+                        <li><a href="">Contact</a></li>
+                        <li><a href="">Feedback</a></li>
+                        <li><a href="">FaceBook Group</a></li>
+                        <li><a href="">Google Group</a></li>
+                        <li><a href="">Sourcecode</a></li>
+                    </ul>
                     <p class="copy">Browse the source code, log an issue, see what's happening</p>
                 </div>
 

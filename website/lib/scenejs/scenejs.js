@@ -2335,8 +2335,27 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
                     function(params) {
-                        activeSceneId = params.sceneId;
-                        funcs = null;
+                        activeSceneId = params.sceneId;                        
+
+                        var element = document.getElementById(SceneJS_webgl_DEFAULT_LOGGING_ID);
+                        if (element) {
+                            funcs = {
+                                warn : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
+                                },
+                                error : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
+                                },
+                                debug : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
+                                },
+                                info : function log(msg) {
+                                    element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
+                                }
+                            };
+                        } else {
+                            funcs = null;
+                        }
                     });
 
             ctx.events.onEvent(
@@ -2444,21 +2463,17 @@ SceneJS.loggingToPage = function() {
 
                     var element = findElement(params.elementId);
 
-                    function log(msg) {
-                        element.innerHTML = "<p>" + msg + "</p>";
-                    }
-
                     funcs = {
-                        warn : function log(msg) {
+                        warn : function (msg) {
                             element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
                         },
-                        error : function log(msg) {
+                        error : function (msg) {
                             element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
                         },
-                        debug : function log(msg) {
+                        debug : function (msg) {
                             element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
                         },
-                        info : function log(msg) {
+                        info : function (msg) {
                             element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
                         }
                     };
@@ -2607,7 +2622,7 @@ SceneJS._backends.installBackend(
                  * Destroys the given process, which is the object returned by the previous call to createProcess.
                  * Does not care if no scene is active, or if the process no longer exists or is dead.
                  */
-                destroyProcess: function(process) {
+                killProcess: function(process) {
                     if (process) {
                         process.destroyed = true;
                      //   ctx.logging.debug("Destroyed process: " + process.description);
@@ -2796,7 +2811,7 @@ SceneJS._backends.installBackend(
                             parser,
                             onSuccess,
                             function(msg) {  // onError
-                                ctx.processes.destroyProcess(process);
+                                ctx.processes.killProcess(process);
                                 onError(msg);
                             });
                     return process;
@@ -2805,7 +2820,7 @@ SceneJS._backends.installBackend(
                 /** Notifies backend that load has completed; backend then kills the process.
                  */
                 assetLoaded : function(process) {
-                    ctx.processes.destroyProcess(process);
+                    ctx.processes.killProcess(process);
                 }
             };
         });
@@ -3159,7 +3174,7 @@ SceneJS._utils.__ColladaParser = (function() {
         var geometriesData = [];
         var trianglesList = getTrianglesList(geometryNode);
 
-        for (it = 0; it < trianglesList.length; it++) {
+        for (var it = 0; it < trianglesList.length; it++) {
             // logger.info("Parsing &lt;triangle&gt; " + it);
             var triangle = trianglesList [it];
             var inputs = triangle.getElementsByTagName("input");
@@ -5585,62 +5600,6 @@ SceneJS._backends.installBackend(
             var currentProps;   // Current map of set WebGL modes and states
             var loaded;         // True when current state exported
 
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        canvas = null;
-                        currentProps = {
-                            clearColor: {r: 0, g : 0, b : 0, a: 1.0},
-                            clearDepth: 1.0,
-                            enableDepthTest:true,
-                            enableCullFace: false,
-                            enableTexture2D: false,
-                            depthRange: { zNear: 0, zFar: 1},
-                            enableScissorTest: false,
-                            viewport: {} // will default to canvas extents
-                        };
-                        stateStack = [
-                            {
-                                props: currentProps,
-                                restore : null          // WebGL properties to set for reverting to previous state
-                            }
-                        ];
-                        loaded = false;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(c) {
-                        canvas = c;
-                        loaded = false;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        loaded = false;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        loaded = false;
-                    });
-
-            /* WebGL state is exported on demand to construct shaders as required
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (!loaded) {
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.RENDERER_EXPORTED,
-                                    currentProps);
-                            loaded = true;
-                        }
-                    });
-
-
             /**
              * Maps renderer node properties to WebGL context enums
              */
@@ -5661,7 +5620,6 @@ SceneJS._backends.installBackend(
                 }
                 return value;
             };
-           
 
 
             /**
@@ -5785,7 +5743,7 @@ SceneJS._backends.installBackend(
 
                 depthFunc: function(context, func) {
                     func = glEnum(context, func);
-                    context.depthFunc(glEnum(context, func));
+                    context.depthFunc(func);
                     currentProps.depthFunc = func;
                 },
 
@@ -5938,6 +5896,61 @@ SceneJS._backends.installBackend(
                 }
                 throw "Internal error - renderer backend stateStack underflow!";
             };
+
+            /* Activate initial defaults
+             */
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+                    function(c) {
+                        canvas = c;
+                        currentProps = {
+                            clear: { depth : true, color : true},
+                            clearColor: {r: 0, g : 0, b : 0 },
+                            clearDepth: 1.0,
+                            enableDepthTest:true,
+                            enableCullFace: false,
+                            enableTexture2D: true,
+                            depthRange: { zNear: 0, zFar: 1},
+                            enableScissorTest: false,
+                            viewport:{ x : 1, y : 1, width: c.canvas.width, height: canvas.canvas.height}
+                        };
+                        stateStack = [
+                            {
+                                props: currentProps,
+                                restore : null          // WebGL properties to set for reverting to previous state
+                            }
+                        ];
+                        loaded = false;
+
+                        setProperties(canvas.context, currentProps);
+
+                        ctx.events.fireEvent(
+                                SceneJS._eventTypes.RENDERER_UPDATED,
+                                currentProps);
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_ACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_DEACTIVATED,
+                    function() {
+                        loaded = false;
+                    });
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SHADER_RENDERING,
+                    function() {
+                        if (!loaded) {
+                            ctx.events.fireEvent(
+                                    SceneJS._eventTypes.RENDERER_EXPORTED,
+                                    currentProps);
+                            loaded = true;
+                        }
+                    });
 
             return {// Node-facing API
 
@@ -14213,11 +14226,11 @@ SceneJS._backends.installBackend(
                         onSuccess(image);
                     };
                     image.onerror = function() {
-                        ctx.processes.destroyProcess(process);
+                        ctx.processes.killProcess(process);
                         onError();
                     };
                     image.onabort = function() {
-                        ctx.processes.destroyProcess(process);
+                        ctx.processes.killProcess(process);
                         onAbort();
                     };
                     image.src = uri;  // Starts image load
@@ -14228,7 +14241,7 @@ SceneJS._backends.installBackend(
                  * Kills texture image load process.
                  */
                 imageLoaded : function(process) {
-                    ctx.processes.destroyProcess(process);
+                    ctx.processes.killProcess(process);
                 },
 
                 /**

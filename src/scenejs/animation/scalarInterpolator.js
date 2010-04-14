@@ -3,11 +3,8 @@
  * interpolated within the configured keyframe sequence.
  */
 SceneJS.scalarInterpolator = function() {
+    var errorBackend = SceneJS._backends.getBackend("error");
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-
-    if (!cfg.fixed) { // Can't dynamically configure an interpolator - TODO: would that be useful?
-        throw new SceneJS.exceptions.UnsupportedOperationException("Dynamic configuration of interpolators is not supported");
-    }
 
     var NOT_FOUND = 0;
     var BEFORE_FIRST = 1;
@@ -25,24 +22,36 @@ SceneJS.scalarInterpolator = function() {
                     // Validate
 
                     if (!params.input) {
-                        throw 'scalarInterpolator input parameter missing';
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.scalarInterpolator property missing: input"));
                     }
 
                     if (!params.output) {
-                        throw 'scalarInterpolator output parameter missing';
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.scalarInterpolator property missing: output"));
                     }
 
                     if (params.keys) {
                         if (!params.values) {
-                            throw 'scalarInterpolator keys supplied but no values - must supply a value for each key';
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidNodeConfigException(
+                                            "SceneJS.scalarInterpolator configuration incomplete: " +
+                                            "keys supplied but no values - must supply a value for each key"));
                         }
                     } else if (params.values) {
-                        throw 'scalarInterpolator values supplied but no keys - must supply a key for each value';
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.scalarInterpolator configuration incomplete: " +
+                                                                                  "values supplied but no keys - must supply a key for each value"));
                     }
 
                     for (var i = 1; i < params.keys.length; i++) {
                         if (params.keys[i - 1] >= params.keys[i]) {
-                            throw 'two invalid scalarInterpolator keys found (' + i - 1 + ' and ' + i + ') - key list should contain distinct values in ascending order';
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.scalarInterpolator configuration invalid: " +
+                                                                                      "two invalid keys found ("
+                                            + i - 1 + " and " + i + ") - key list should contain distinct values in ascending order"));
                         }
                     }
 
@@ -57,13 +66,19 @@ SceneJS.scalarInterpolator = function() {
                             break;
                         case 'cubic':
                             if (params.keys.length < 4) {
-                                throw 'Minimum of four keyframes required for cubic scalarInterpolation - only '
-                                        + params.keys.length
-                                        + ' are specified';
+                                errorBackend.fatalError(
+                                        new SceneJS.exceptions.InvalidNodeConfigException(
+                                                "SceneJS.scalarInterpolator configuration invalid: minimum of four keyframes " +
+                                                "required for cubic - only "
+                                                        + params.keys.length
+                                                        + " are specified"));
                             }
                             break;
                         default:
-                            throw 'scalarInterpolator type not supported - only "linear", "cosine", "cubic" and "constant" are supported';
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidNodeConfigException(
+                                            "SceneJS.scalarInterpolator configuration invalid:  type not supported - " +
+                                            "only 'linear', 'cosine', 'cubic' and 'constant' are supported"));
                         /*
 
 
@@ -76,7 +91,9 @@ SceneJS.scalarInterpolator = function() {
                 var key = data.get(params.input);
 
                 if (!key && key != 0) {
-                    throw "scalarInterpolator failed to find input on data";
+                    errorBackend.fatalError(
+                            new SceneJS.exceptions.DataExpectedException(
+                                    "SceneJS.scalarInterpolator failed to find input on data: '" + params.input + "'"));
                 }
 
                 var key1 = 0;
@@ -153,7 +170,8 @@ SceneJS.scalarInterpolator = function() {
                         case 'constant':
                             return constantInterpolate(k);
                         default:
-                            throw 'internal error - interpolation type not switched: "' + params.type + "'";
+                            errorBackend.fatalError("SceneJS.scalarInterpolator internal error - interpolation type not switched: '"
+                                    + params.type + "'");
                     }
                 };
 

@@ -3,9 +3,12 @@
  */
 (function() {
 
-    SceneJs.ortho = function() {
-        var cfg = SceneJs.utils.getNodeConfig(arguments);
-        var backend = SceneJs.backends.getBackend('viewprojection');
+    SceneJS.ortho = function() {
+        var cfg = SceneJS.utils.getNodeConfig(arguments);
+        var backend = SceneJS._backends
+            return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
+        };
+.getBackend('viewprojection');
         var transform;
         return function(scope) {
             if (!transform || !cfg.fixed) {
@@ -34,7 +37,7 @@
             }
             var prevTransform = backend.getTransform();
             backend.setTransform(transform);
-            SceneJs.utils.visitChildren(cfg, scope);
+            SceneJS.utils.visitChildren(cfg, scope);
             backend.setTransform(prevTransform);
         };
     };

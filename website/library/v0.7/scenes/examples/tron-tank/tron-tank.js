@@ -22,176 +22,161 @@ var exampleScene = SceneJS.scene({
      */
     proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
 
-    /* Write logging output to a DIV element in the page
+    /* Perspective transformation
      */
-        SceneJS.loggingToPage({ elementId: "logging" },
+        SceneJS.perspective({  fovy : 40.0, aspect : 1.0, near : 0.10, far : 7000.0 },
 
-            /* A renderer node clears the depth and colour buffers and sets GL modes
+            /* Some fog for fun
              */
-                SceneJS.renderer({
-                    clear : { depth : true, color : true},
-                    viewport:{ x : 1, y : 1, width: 600, height: 600},
-                    clearColor: { r:0.5, g: 0.5, b: 0.5 },
-                    enableTexture2D:true
+                SceneJS.fog({
+                    mode:"linear",
+                    color:{r:.50, g:.50,b:.50},
+                    start: 0,
+                    end:300  ,
+                    density:300.0
                 },
 
-                    /* Perspective transformation
+                    /* View transform - takes viewing parameters through the data passed
+                     * into this scene as it is rendered. Those parameters are generated
+                     * in mouse handlers outside the scene graph - see below.
                      */
-                        SceneJS.perspective({  fovy : 40.0, aspect : 1.0, near : 0.10, far : 7000.0 },
+                        SceneJS.lookAt({
 
-                            /* Some fog for fun
+                            eye : function(data) {
+                                return data.get("eye");
+                            },
+
+                            look : function(data) {
+                                return data.get("look");
+                            },
+
+                            up : { x: 0, y: 1, z: .0 }
+                        },
+                            /* Lighting
                              */
-                                SceneJS.fog({
-                                    mode:"linear",
-                                    color:{r:.50, g:.50,b:.50},
-                                    start: 0,
-                                    end:300  ,
-                                    density:300.0
-                                },
+                                SceneJS.lights({
+                                    sources: [
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 1.0, b: 0.5 },
+                                            // Yellowish
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 0.0, y: -1, z: -1.0 }
+                                        } ,
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 1.0, y: .5, z: -1.0  }
+                                        } ,
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: -1.0, y: .5, z: 1.0  }
+                                        }
+                                    ]},
 
-                                    /* View transform - takes viewing parameters through the data passed
-                                     * into this scene as it is rendered. Those parameters are generated
-                                     * in mouse handlers outside the scene graph - see below.
+                                    /* The Tron Tank - this is composed of three assets loaded from the same
+                                     * COLLADA file: "Tank", "Gun" and "Pilot1" (the red chevron
+                                     * symbol on he tank's bonnet). The assets are each wrapped in modelling
+                                     * transforms to position and orient them within the scene. Some of the
+                                     * transforms are dynamically configured with positions and angles that
+                                     * are  injected into the scene when rendered, which is generated
+                                     * from mouse input.
+                                     *
                                      */
-                                        SceneJS.lookAt({
+                                        SceneJS.translate(
+                                                function(data) {
+                                                    return {
+                                                        x: data.get("tron.tank.pos.x") || 0,
+                                                        y: data.get("tron.tank.pos.y") || 5,
+                                                        z: data.get("tron.tank.pos.z") || 0
+                                                    };
+                                                },
 
-                                            eye : function(data) {
-                                                return data.get("eye");
-                                            },
+                                                SceneJS.rotate(
+                                                        function(data) {
+                                                            return {y: 1, angle: data.get("tron.tank.yaw") + 180 || 180 };
+                                                        },
+                                                        SceneJS.translate({ x:8, y: -5,z: 10},
+                                                                SceneJS.rotate({x: 1, angle: 270 },
+                                                                        SceneJS.scale({x:.1, y: .1, z: .1},
 
-                                            look : function(data) {
-                                                return data.get("look");
-                                            },
+                                                                            /* Tank body asset
+                                                                             */
+                                                                                SceneJS.loadCollada({
+                                                                                    uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
+                                                                                    node:"Tank"
+                                                                                }),
+                                                                                SceneJS.translate({x:-50, y: 160, z: 5},
+                                                                                        SceneJS.loadCollada({
+                                                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
+                                                                                            node:"Pilot1"
+                                                                                        })),
 
-                                            up : { x: 0, y: 1, z: .0 }
-                                        },
-                                            /* Lighting
-                                             */
-                                                SceneJS.lights({
-                                                    sources: [
-                                                        {
-                                                            type:                   "dir",
-                                                            color:                  { r: 1.0, g: 1.0, b: 0.5 },
-                                                            // Yellowish
-                                                            diffuse:                true,
-                                                            specular:               true,
-                                                            dir:                    { x: 0.0, y: -1, z: -1.0 }
-                                                        } ,
-                                                        {
-                                                            type:                   "dir",
-                                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                                            diffuse:                true,
-                                                            specular:               true,
-                                                            dir:                    { x: 1.0, y: .5, z: -1.0  }
-                                                        } ,
-                                                        {
-                                                            type:                   "dir",
-                                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                                            diffuse:                true,
-                                                            specular:               true,
-                                                            dir:                    { x: -1.0, y: .5, z: 1.0  }
-                                                        }
-                                                    ]},
+                                                                            /* Gun asset
+                                                                             */
+                                                                                SceneJS.translate({x:-57, y: 63, z: 0},
+                                                                                        SceneJS.rotate(
+                                                                                                function(data) {
+                                                                                                    return {z:1, angle: data.get("tron.tank.gun.yaw") || 0};
+                                                                                                },
+                                                                                                SceneJS.translate({x:39.0, y: -76.5, z: 52},
 
-                                                    /* The Tron Tank - this is composed of three assets loaded from the same
-                                                     * COLLADA file: "Tank", "Gun" and "Pilot1" (the red chevron
-                                                     * symbol on he tank's bonnet). The assets are each wrapped in modelling
-                                                     * transforms to position and orient them within the scene. Some of the
-                                                     * transforms are dynamically configured with positions and angles that
-                                                     * are  injected into the scene when rendered, which is generated
-                                                     * from mouse input.
-                                                     *
-                                                     */
-                                                        SceneJS.translate(
-                                                                function(data) {
-                                                                    return {
-                                                                        x: data.get("tron.tank.pos.x") || 0,
-                                                                        y: data.get("tron.tank.pos.y") || 5,
-                                                                        z: data.get("tron.tank.pos.z") || 0
-                                                                    };
-                                                                },
-
-                                                                SceneJS.rotate(
-                                                                        function(data) {
-                                                                            return {y: 1, angle: data.get("tron.tank.yaw") + 180 || 180 };
-                                                                        },
-                                                                        SceneJS.translate({ x:8, y: -5,z: 10},
-                                                                                SceneJS.rotate({x: 1, angle: 270 },
-                                                                                        SceneJS.scale({x:.1, y: .1, z: .1},
-
-                                                                                            /* Tank body asset
-                                                                                             */
-                                                                                                SceneJS.loadCollada({
-                                                                                                    uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
-                                                                                                    node:"Tank"
-                                                                                                }),
-                                                                                                SceneJS.translate({x:-50, y: 160, z: 5},
                                                                                                         SceneJS.loadCollada({
                                                                                                             uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
-                                                                                                            node:"Pilot1"
-                                                                                                        })),
-
-                                                                                            /* Gun asset
-                                                                                             */
-                                                                                                SceneJS.translate({x:-57, y: 63, z: 0},
-                                                                                                        SceneJS.rotate(
-                                                                                                                function(data) {
-                                                                                                                    return {z:1, angle: data.get("tron.tank.gun.yaw") || 0};
-                                                                                                                },
-                                                                                                                SceneJS.translate({x:39.0, y: -76.5, z: 52},
-
-                                                                                                                        SceneJS.loadCollada({
-                                                                                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
-                                                                                                                            node:"Gun"
-                                                                                                                        }))
-                                                                                                                )
-                                                                                                        )
+                                                                                                            node:"Gun"
+                                                                                                        }))
                                                                                                 )
                                                                                         )
                                                                                 )
                                                                         )
-                                                                ),
-
-                                                    /* Tiled floor, loaded from the SceneJS asset library
-                                                     */
-                                                        SceneJS.load({
-                                                            uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                "examples/grid-floor/grid-floor.js"
-                                                        }),
-
-                                                    /* Canyon walls, a bunch of cubes
-                                                     */
-                                                        SceneJS.material({
-                                                            baseColor:      { r: 0.5, g: 0.5, b: 0.5 },
-                                                            specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
-                                                            specular:       10.9,
-                                                            shine:          20.0
-                                                        },
-                                                                SceneJS.translate({ x: -75, y: 0, z: 0},
-                                                                        SceneJS.rotate({y: 1, angle: 6 },
-                                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
-
-                                                                SceneJS.translate({ x: 80, y: 0, z: 0},
-                                                                        SceneJS.rotate({y: 1, angle: 0 },
-                                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
-
-                                                                SceneJS.translate({ x: -80, y: 0, z: 80},
-                                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
-
-                                                                SceneJS.translate({ x: 80, y: 0, z: 40},
-                                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
-
-                                                                SceneJS.translate({ x: 120, y: 0, z: 140},
-                                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
-
-                                                                SceneJS.translate({ x: -60, y: 0, z: 160},
-                                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50})))
                                                                 )
                                                         )
+                                                ),
+
+                                    /* Tiled floor, loaded from the SceneJS asset library
+                                     */
+                                        SceneJS.load({
+                                            uri:"http://scenejs.org/library/v0.7/assets/" +
+                                                "examples/grid-floor/grid-floor.js"
+                                        }),
+
+                                    /* Canyon walls, a bunch of cubes
+                                     */
+                                        SceneJS.material({
+                                            baseColor:      { r: 0.5, g: 0.5, b: 0.5 },
+                                            specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
+                                            specular:       10.9,
+                                            shine:          20.0
+                                        },
+                                                SceneJS.translate({ x: -75, y: 0, z: 0},
+                                                        SceneJS.rotate({y: 1, angle: 6 },
+                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+
+                                                SceneJS.translate({ x: 80, y: 0, z: 0},
+                                                        SceneJS.rotate({y: 1, angle: 0 },
+                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+
+                                                SceneJS.translate({ x: -80, y: 0, z: 80},
+                                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+
+                                                SceneJS.translate({ x: 80, y: 0, z: 40},
+                                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+
+                                                SceneJS.translate({ x: 120, y: 0, z: 140},
+                                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+
+                                                SceneJS.translate({ x: -60, y: 0, z: 160},
+                                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50})))
                                                 )
                                         )
                                 )
@@ -307,7 +292,7 @@ window.render = function() {
 
         moveVec = tankYawMat.multiply($V(moveVec)).elements;
 
-          var trailVec = [0,0, -1 - (pitch * 0.02)];
+        var trailVec = [0,0, -1 - (pitch * 0.02)];
 
         var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1,0,0]));
         var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0,1,0]));

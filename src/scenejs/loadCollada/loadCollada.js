@@ -4,17 +4,17 @@ SceneJS.loadCollada = function() {
         {}
     ]);
 
+    var errorBackend = SceneJS._backends.getBackend("error");
+    var colladaBackend = SceneJS._backends.getBackend("collada");
+
     var params = cfg.getParams();
     if (!params.uri) {
-        throw new SceneJS.exceptions.NodeConfigExpectedException
-                ("Mandatory SceneJS.assets.collada parameter missing: uri");
+        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                ("Mandatory SceneJS.assets.collada parameter missing: uri"));
     }
 
-
-    var logging = SceneJS._backends.getBackend("logging");
-
     return SceneJS.load({
-        
+
         uri: params.uri,
 
         serverParams: {
@@ -22,11 +22,10 @@ SceneJS.loadCollada = function() {
         },
 
         parser: function(xml, onError) {
-            return SceneJS._utils.__ColladaParser.parse(
-                    logging.getLogger(),
+            return colladaBackend.parse(
                     params.uri, // Used in paths to texture images
                     xml,
-                    params.node);       // Optional cherry-picked asset in Collada file
+                    params.node);   // Optional cherry-picked asset in Collada file
         }
     });
 

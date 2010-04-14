@@ -92,7 +92,7 @@ SceneJS._backends.installBackend(
                  */
                 pick: function(x, y) {
                     if (!canvas) {
-                        throw "No canvas active";
+                        ctx.error.fatalError("No canvas active");
                     }
                     activatePicking();
                     pickX = x;

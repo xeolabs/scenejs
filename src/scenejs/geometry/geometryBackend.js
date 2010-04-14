@@ -28,6 +28,7 @@
  * the canvas switches, shader deactivates or scene deactivates. While the ID is non-null, the corresponding geometry
  * cannot be evicted from the cache.
  */
+
 SceneJS._backends.installBackend(
 
         "geometry",
@@ -186,11 +187,11 @@ SceneJS._backends.installBackend(
                     case "triangle-fan":
                         return context.TRIANGLE_FAN;
                     default:
-                        throw new SceneJS.exceptions.InvalidGeometryConfigException(
-                                "Unsupported geometry primitive: '" +
+                        ctx.error.fatalError(new SceneJS.exceptions.InvalidGeometryConfigException(
+                                "SceneJS.geometry primitive unsupported: '" +
                                 type +
                                 "' - supported types are: 'points', 'lines', 'line-loop', " +
-                                "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
+                                "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'"));
                 }
             }
 
@@ -201,7 +202,7 @@ SceneJS._backends.installBackend(
                  */
                 findGeometry : function(type) {
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                     }
                     var geoId = canvas.canvasId + ":" + type;
                     return (geometries[geoId]) ? geoId : null;
@@ -224,7 +225,9 @@ SceneJS._backends.installBackend(
                     }
 
                     if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
-                        throw new SceneJS.exceptions.NodeConfigExpectedException("Geometry node parameter expected : primitive");
+                        ctx.error.fatalError(
+                                new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.geometry node property expected : primitive"));
                     }
 
                     var geoId = canvas.canvasId + ":" + type;
@@ -307,14 +310,14 @@ SceneJS._backends.installBackend(
                  */
                 drawGeometry : function(geoId) {
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                        ctx.error.fatalError(SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                     }
 
                     var geo = geometries[geoId];
 
                     ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_UPDATED, geo);
 
-                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE); 
+                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE);
 
                     geo.lastUsed = time;
 
@@ -343,7 +346,7 @@ SceneJS._backends.installBackend(
                     context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                     context.flush();
 
-                    /* Don't need to unbind buffers - only one is bound at a time anyway                    
+                    /* Don't need to unbind buffers - only one is bound at a time anyway
                      */
 
                     /* Destroy one-off geometry

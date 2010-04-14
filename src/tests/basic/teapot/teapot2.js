@@ -20,7 +20,7 @@
  * Lots of wicked scene features are not demonstrated here, such as animation, multiple canvases, advanced shaders
  * and so on. I'll show you those in later examples.
  */
-with (SceneJs) {
+with (SceneJS) {
     scene({
         config: {
             angle: 45

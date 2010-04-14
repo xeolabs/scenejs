@@ -330,7 +330,7 @@ SceneJS._backends.installBackend(
 
             function activateProgram() {
                 if (!canvas) {
-                    throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                    ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                 }
 
                 if (!sceneHash) {
@@ -365,7 +365,7 @@ SceneJS._backends.installBackend(
                                         ctx.logging.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
                                         ctx.logging.debug("Fragment shader:");
                                         ctx.logging.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-                                        throw e;
+                                        ctx.error.fatalError(e);
                                     }
                                 });
                     }

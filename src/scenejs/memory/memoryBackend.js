@@ -68,8 +68,8 @@ SceneJS._backends.installBackend(
 
             function outOfMemory(description) {
                 ctx.logging.error("Memory allocation failed");
-                throw new SceneJS.exceptions.OutOfVRAMException(
-                        "Out of memory - failed to allocate memory for " + description);
+                ctx.error.fatalError(new SceneJS.exceptions.OutOfVRAMException(
+                        "Out of memory - failed to allocate memory for " + description));
             }
 
             ctx.memory = {
@@ -89,10 +89,10 @@ SceneJS._backends.installBackend(
                  * a closure, IE. not return it.
                  */
                 allocate: function(description, tryAllocate) {
-                   // ctx.logging.debug("Allocating memory for: " + description);
+                    // ctx.logging.debug("Allocating memory for: " + description);
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException
-                                ("No canvas active - failed to allocate shader memory");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException
+                                ("No canvas active - failed to allocate shader memory"));
                     }
                     var maxTries = 10; // TODO: Heuristic for this? Does this really need be greater than one?
                     var context = canvas.context;

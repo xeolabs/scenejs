@@ -3,6 +3,7 @@
  */
 (function() {
 
+    var errorBackend = SceneJS._backends.getBackend("error");
     var backend = SceneJS._backends.getBackend("view-frustum");
     var localityBackend = SceneJS._backends.getBackend("view-locality");
     var modelTransformBackend = SceneJS._backends.getBackend("model-transform");
@@ -25,8 +26,8 @@
                         var params = cfg.getParams(data);
 
                         if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
-                            throw new SceneJS.exceptions.NodeConfigExpectedException
-                                    ("Mandatory boundingBox parameter missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax");
+                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                    ("SceneJS.boundingBox mandatory property missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax"));
                         }
 
                         var modelTransform = modelTransformBackend.getTransform();
@@ -50,14 +51,14 @@
                         }
                         if (params.levels) {
                             if (params.levels.length != cfg.children.length) {
-                                throw new SceneJS.exceptions.NodeConfigExpectedException
-                                        ("boundingBox levels parameter should have a value for each child node");
+                                errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                        ("SceneJS.boundingBox levels property should have a value for each child node"));
                             }
 
                             for (var i = 1; i < params.levels.length; i++) {
                                 if (params.levels[i - 1] >= params.levels[i]) {
-                                    throw new SceneJS.exceptions.NodeConfigExpectedException
-                                            ("boundingBox levels parameter should be an ascending list of unique values");
+                                    errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                            ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
                                 }
                                 states.push(STAGE_REMOTE);
                             }

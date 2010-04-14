@@ -27,8 +27,8 @@ SceneJS._backends.installBackend(
                             && f.mode != "exp"
                             && f.mode != "exp2"
                             && f.mode != "linear")) {
-                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'");
+                    ctx.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'"));
                 }
                 if (f.mode == "disabled") {
                     return {

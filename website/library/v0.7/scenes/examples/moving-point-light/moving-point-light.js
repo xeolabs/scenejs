@@ -7,115 +7,105 @@
  */
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
-        SceneJS.loggingToPage({ elementId: "logging" },
+        SceneJS.perspective({  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
 
-                SceneJS.renderer({
-                    clear : { depth : true, color : true},
-                    viewport:{ x : 1, y : 1, width: 600, height: 600},
-                    clearColor: { r:0.0, g: 0.0, b: 0.0 },
-                    enableTexture2D: true
+                SceneJS.lookAt({
+                    eye : { x: 0.0, y: 10.0, z: -35 },
+                    look : { y:1.0 },
+                    up : { y: 1.0 }
                 },
-                        SceneJS.perspective({  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
 
-                                SceneJS.lookAt({
-                                    eye : { x: 0.0, y: 10.0, z: -35 },
-                                    look : { y:1.0 },
-                                    up : { y: 1.0 }
+                    /*---------------------------------------------------------------------------------
+                     * Our animated light source, which takes it's position from the lightPos
+                     * property injected into the scene's render method
+                     * -------------------------------------------------------------------------------*/
+
+                        SceneJS.lights(
+                                function(data) {  // Dynamic config function
+                                    return {
+                                        sources: [
+                                            {
+                                                type: "point",
+
+                                                /* Our light source's colour
+                                                 */
+                                                color: { r: 1.0, g: 1.0, b: 0.0 },
+
+                                                /* Our light will contribute to both the quantities of
+                                                 * specular and diffuse light that will hit our teapot.
+                                                 */
+                                                diffuse: true,
+                                                specular: true,
+
+                                                /* The point light's position within this coordinate
+                                                 * system, which is in this case view-space.
+                                                 *
+                                                 * You can also transform lights within modelling
+                                                 * transform nodes (rotate, transform, scale etc).
+                                                 *
+                                                 * The position is calculated by mouse handlers and
+                                                 * injected into the scene's render method.
+                                                 */
+                                                pos: data.get("lightPos"),
+
+                                                /* Since our light has a position, it therefore has
+                                                 * a distance over which its intensity can attenuate.
+                                                 * Consult any OpenGL book for how to use these factors,
+                                                 * or just tweak them right here to see what happens!
+                                                 */
+                                                constantAttenuation: 1.0,
+                                                quadraticAttenuation: 0.0,
+                                                linearAttenuation: 0.0
+                                            }
+                                        ]};
                                 },
 
-                                    /*---------------------------------------------------------------------------------
-                                     * Our animated light source, which takes it's position from the lightPos
-                                     * property injected into the scene's render method
-                                     * -------------------------------------------------------------------------------*/
+                            /*--------------------------------------------------------------------------
+                             * Teapot, rotated and scaled into position within model-space, coloured
+                             * with some material properties
+                             * ------------------------------------------------------------------------*/
 
-                                        SceneJS.lights(
-                                                function(data) {  // Dynamic config function
-                                                    return {
-                                                        sources: [
-                                                            {
-                                                                type: "point",
-
-                                                                /* Our light source's colour
-                                                                 */
-                                                                color: { r: 1.0, g: 1.0, b: 0.0 },
-
-                                                                /* Our light will contribute to both the quantities of
-                                                                 * specular and diffuse light that will hit our teapot.
-                                                                 */
-                                                                diffuse: true,
-                                                                specular: true,
-
-                                                                /* The point light's position within this coordinate
-                                                                 * system, which is in this case view-space.
-                                                                 *
-                                                                 * You can also transform lights within modelling
-                                                                 * transform nodes (rotate, transform, scale etc).
-                                                                 *
-                                                                 * The position is calculated by mouse handlers and
-                                                                 * injected into the scene's render method.
-                                                                 */
-                                                                pos: data.get("lightPos"),
-
-                                                                /* Since our light has a position, it therefore has
-                                                                 * a distance over which its intensity can attenuate.
-                                                                 * Consult any OpenGL book for how to use these factors,
-                                                                 * or just tweak them right here to see what happens!
-                                                                 */
-                                                                constantAttenuation: 1.0,
-                                                                quadraticAttenuation: 0.0,
-                                                                linearAttenuation: 0.0
-                                                            }
-                                                        ]};
+                                SceneJS.rotate({
+                                    angle: -20, x : 1.0
+                                },
+                                        SceneJS.rotate({
+                                            angle: 30.0, y : 1.0
+                                        },
+                                                SceneJS.scale({
+                                                    x: 1, y: 1, z: 1
                                                 },
 
-                                            /*--------------------------------------------------------------------------
-                                             * Teapot, rotated and scaled into position within model-space, coloured
-                                             * with some material properties
-                                             * ------------------------------------------------------------------------*/
-
-                                                SceneJS.rotate({
-                                                    angle: -20, x : 1.0
-                                                },
-                                                        SceneJS.rotate({
-                                                            angle: 30.0, y : 1.0
+                                                        SceneJS.material({
+                                                            baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+                                                            emit:           0.0,
+                                                            specular:       0.9,
+                                                            shine:          6.0
                                                         },
-                                                                SceneJS.scale({
-                                                                    x: 1, y: 1, z: 1
-                                                                },
-
-                                                                        SceneJS.material({
-                                                                            baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
-                                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
-                                                                            emit:           0.0,
-                                                                            specular:       0.9,
-                                                                            shine:          6.0
-                                                                        },
-                                                                                SceneJS.objects.teapot()
-                                                                                ))
-                                                                )
-                                                        )
-                                                ),
-
-                                    /*---------------------------------------------------------------------------------
-                                     * This is just a sphere that marks the light's position - not the focus
-                                     * of this example
-                                     * -------------------------------------------------------------------------------*/
-
-                                        SceneJS.translate(
-                                                function(data) {
-                                                    return data.get("lightPos");
-                                                },
-                                                SceneJS.material({
-                                                    baseColor:      { r: .6, g: .6, b: 0.6 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    emit: 0.5,
-                                                    specular:       0.9,
-                                                    shine:          6.0
-                                                },
-                                                        SceneJS.scale({x:0.3, y: 0.3, z: 0.3 },
-                                                                SceneJS.objects.sphere())))
+                                                                SceneJS.objects.teapot()
+                                                                ))
+                                                )
                                         )
-                                )
+                                ),
+
+                    /*---------------------------------------------------------------------------------
+                     * This is just a sphere that marks the light's position - not the focus
+                     * of this example
+                     * -------------------------------------------------------------------------------*/
+
+                        SceneJS.translate(
+                                function(data) {
+                                    return data.get("lightPos");
+                                },
+                                SceneJS.material({
+                                    baseColor:      { r: .6, g: .6, b: 0.6 },
+                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                    emit: 0.5,
+                                    specular:       0.9,
+                                    shine:          6.0
+                                },
+                                        SceneJS.scale({x:0.3, y: 0.3, z: 0.3 },
+                                                SceneJS.objects.sphere())))
                         )
                 )
         );

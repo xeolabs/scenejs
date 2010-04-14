@@ -1,10 +1,11 @@
 /** Axis-aligned bounding box
  *
  */
-SceneJs.axisBoundary = function() {
-    var cfg = SceneJs.utils.getNodeConfig(arguments);
+SceneJS.axisBoundary = function() {
+    var cfg = SceneJS.utils.getNodeConfig(arguments);
 
-    var backend = SceneJs.backends.getBackend('axis-boundary');
+    var errorBackend = SceneJS._backends.getBackend("error");
+    var backend = SceneJS._backends.getBackend('axis-boundary');
     var objectCoords;
     var modelCoords;
 
@@ -16,8 +17,8 @@ SceneJs.axisBoundary = function() {
             /* First version - mandatory manual configuration
              */
             if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
-                throw new SceneJs.exceptions.NodeConfigExpectedException
-                        ("Mandatory boundingBox parameter missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax");
+               errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                    ("SceneJS.axisBoundary propertyr missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax"));
             }
 
             /* Create local object-space coordinates
@@ -53,8 +54,8 @@ SceneJs.axisBoundary = function() {
 
             case SceneJS_math_INSIDE_FRUSTUM:
 
-                SceneJs.utils.visitChildren(cfg, scope);
-                    SceneJs.numTeapots++;
+                SceneJS.utils.visitChildren(cfg, scope);
+                    SceneJS.numTeapots++;
                 break;
 
             case SceneJS_math_OUTSIDE_FRUSTUM:

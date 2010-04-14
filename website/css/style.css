@@ -724,6 +724,40 @@ padding-right:0px;
     text-align: center;
 }
 
+#load-ide-table {
+    float: left;
+    height: 1500px;
+    width: 100%;
+    overflow: auto; /*padding-top: 20px;*/
+    margin: 0 auto;
+    padding-top: 50px;
+}
+
+#load-ide-table h1 {
+    padding-top: 5px;
+    padding-bottom: 20px;
+
+}
+
+#load-ide-table #col1 {
+    float: left;
+    text-align: left;
+    margin: 0 auto;
+    width: 400px;
+    height: auto;
+
+}
+
+#load-ide-table #col2 {
+    float: left;
+    padding-left: 40px;
+    text-align: right;
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+    padding-right: 0px;
+}
+
 #ide-examples-table {
     overflow: auto;
     height: auto;
@@ -750,6 +784,24 @@ padding-right:0px;
     height: auto;
     width: 300px;
 }
+
+#ide-examples-table2 {
+    overflow: auto;
+    height: auto;
+    margin-top: 10px;
+    margin-bottom: 40px;
+
+}
+
+#ide-examples-table2 .row {
+    margin-bottom: 20px;
+    padding: 0;
+    float: left;
+    width: 100%;
+    overflow: auto; /*padding-top: 20px;*/
+    border-top: #aaaaaa 1px solid;
+}
+
 
 #load-ide h1 {
     padding-top: 50px;

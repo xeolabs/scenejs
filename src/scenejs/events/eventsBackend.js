@@ -17,6 +17,8 @@
  * a zero value like these ones.
  */
 SceneJS._eventTypes = {
+    ERROR : 0,
+
     INIT : 0,                           // SceneJS framework initialised
     RESET : 0,                          // SceneJS framework reset
 
@@ -53,10 +55,10 @@ SceneJS._eventTypes = {
     MATERIAL_EXPORTED : 0,
 
     TEXTURES_UPDATED : 0,              // Texture activated after a texture node visited
-    TEXTURES_EXPORTED : 0,    
+    TEXTURES_EXPORTED : 0,
 
     SHADER_ACTIVATE : 0,
-    
+
     SHADER_ACTIVATED : 0,
     SHADER_RENDERING : 0,
     SHADER_DEACTIVATED : 0 ,
@@ -64,9 +66,12 @@ SceneJS._eventTypes = {
     FOG_UPDATED: 0,
     FOG_EXPORTED: 0,
 
-    NAME_UPDATED: 0 ,
+    NAME_UPDATED: 0,
 
-    MOUSE_DOWN: 0
+    PROCESS_CREATED: 0,
+    PROCESS_KILLED: 0,
+    PROCESS_TIMED_OUT: 0
+
 };
 
 SceneJS._backends.installBackend(
@@ -84,53 +89,61 @@ SceneJS._backends.installBackend(
             }
             var events = new Array(nevents);
 
-
-            /* Interface on backend context
+            /**
+             * Registers a handler for the given event
+             *
+             * The handler can be registered with an optional priority number which specifies the order it is
+             * called among the other handler already registered for the event.
+             *
+             * So, with n being the number of commands registered for the given event:
+             *
+             * (priority <= 0)      - command will be the first called
+             * (priority >= n)      - command will be the last called
+             * (0 < priority < n)   - command will be called at the order given by the priority
+             *
+             * @param type Event type - one of the values in SceneJS._eventTypes
+             * @param command - Handler function that will accept whatever parameter object accompanies the event
+             * @param priority - Optional priority number (see above)
              */
-            ctx.events = {
-
-                /**
-                 * Registers a handler for the given event
-                 *
-                 * The handler can be registered with an optional priority number which specifies the order it is
-                 * called among the other handler already registered for the event.
-                 *
-                 * So, with n being the number of commands registered for the given event:
-                 *
-                 * (priority <= 0)      - command will be the first called
-                 * (priority >= n)      - command will be the last called
-                 * (0 < priority < n)   - command will be called at the order given by the priority
-                 *
-                 * @param type Event type - one of the values in SceneJS._eventTypes
-                 * @param command - Handler function that will accept whatever parameter object accompanies the event
-                 * @param priority - Optional priority number (see above)
-                 */
-                onEvent: function(type, command, priority) {
-                    var list = events[type];
-                    if (!list) {
-                        list = [];
-                        events[type] = list;
-                    }
-                    var handler = {
-                        command: command,
-                        priority : (priority == undefined) ? list.length : priority
-                    };
-                    for (var i = 0; i < list.length; i++) {
-                        if (list[i].priority > handler.priority) {
-                            list.splice(i, 0, handler);
-                            return;
-                        }
-                    }
-                    list.push(handler);
-                },
-
-                fireEvent: function(type, params) {
-                    var list = events[type];
-                    if (list) {
-                        for (var i = 0; i < list.length; i++) {
-                            list[i].command(params || {});
-                        }
+            function onEvent(type, command, priority) {
+                var list = events[type];
+                if (!list) {
+                    list = [];
+                    events[type] = list;
+                }
+                var handler = {
+                    command: command,
+                    priority : (priority == undefined) ? list.length : priority
+                };
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].priority > handler.priority) {
+                        list.splice(i, 0, handler);
+                        return;
                     }
                 }
+                list.push(handler);
+            }
+
+            function fireEvent(type, params) {
+                var list = events[type];
+                if (list) {
+                    for (var i = 0; i < list.length; i++) {
+                        list[i].command(params || {});
+                    }
+                }
+            }
+
+            /* Backend-facing API
+             */
+            ctx.events = {
+                onEvent : onEvent,
+                fireEvent : fireEvent
+            };
+
+            /* Node-facing API            
+             */
+            return {
+                onEvent : onEvent,
+                fireEvent : fireEvent
             };
         });

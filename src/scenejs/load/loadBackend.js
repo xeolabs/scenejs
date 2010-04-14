@@ -75,7 +75,7 @@ SceneJS._backends.installBackend(
                             }
                         });
 
-                
+
             }
 
             return { // Node-facing API
@@ -112,8 +112,8 @@ SceneJS._backends.installBackend(
                  */
                 loadAsset : function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
                     if (!proxyUri) {
-                        throw new SceneJS.exceptions.ProxyNotSpecifiedException
-                                ("SceneJS.load node expects you to provide a 'proxy' configuration on the SceneJS.scene root node");
+                        ctx.error.fatalError(new SceneJS.exceptions.ProxyNotSpecifiedException
+                                ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
                     }
                     ctx.logging.debug("Loading asset from " + uri);
                     var process = ctx.processes.createProcess({
@@ -125,7 +125,7 @@ SceneJS._backends.installBackend(
                             onTimeout();
                         },
                         description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
-                        timeoutSecs: 180 // 180 seconds - Big timeout to allow files to parse
+                        timeoutSecs: 10 // Big timeout to allow files to parse
                     });
                     var callbackName = "callback" + process.id; // Process ID is globally unique
                     _loadAsset(
@@ -135,7 +135,7 @@ SceneJS._backends.installBackend(
                             parser,
                             onSuccess,
                             function(msg) {  // onError
-                                ctx.processes.destroyProcess(process);
+                                ctx.processes.killProcess(process);
                                 onError(msg);
                             });
                     return process;
@@ -144,7 +144,7 @@ SceneJS._backends.installBackend(
                 /** Notifies backend that load has completed; backend then kills the process.
                  */
                 assetLoaded : function(process) {
-                    ctx.processes.destroyProcess(process);
+                    ctx.processes.killProcess(process);
                 }
             };
         });

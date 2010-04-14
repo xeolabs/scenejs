@@ -153,8 +153,8 @@ SceneJS._backends.installBackend(
                 }
                 var glName = SceneJS_webgl_enumMap[value];
                 if (glName == undefined) {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
+                    ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                            "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'"));
                 }
                 var glValue = context[glName];
                 //                if (!glValue) {
@@ -189,18 +189,19 @@ SceneJS._backends.installBackend(
                  */
                 loadImage : function(uri, onSuccess, onError, onAbort) {
                     var process = ctx.processes.createProcess({
-                        description:"Texture image load: " + uri
+                        description:"Texture image load: " + uri ,
+                        onTimeout: onError
                     });
                     var image = new Image();
                     image.onload = function() {
                         onSuccess(image);
                     };
                     image.onerror = function() {
-                        ctx.processes.destroyProcess(process);
+                        ctx.processes.killProcess(process);
                         onError();
                     };
                     image.onabort = function() {
-                        ctx.processes.destroyProcess(process);
+                        ctx.processes.killProcess(process);
                         onAbort();
                     };
                     image.src = uri;  // Starts image load
@@ -211,7 +212,7 @@ SceneJS._backends.installBackend(
                  * Kills texture image load process.
                  */
                 imageLoaded : function(process) {
-                    ctx.processes.destroyProcess(process);
+                    ctx.processes.killProcess(process);
                 },
 
                 /**
@@ -219,7 +220,7 @@ SceneJS._backends.installBackend(
                  */
                 createTexture : function(image, cfg) {
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                     }
                     var context = canvas.context;
                     var textureId = SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
@@ -255,11 +256,11 @@ SceneJS._backends.installBackend(
 
                 pushLayer : function(texture, params) {
                     if (!textures[texture.textureId]) {
-                        throw "No such texture loaded \"" + texture.textureId + "\"";
+                        ctx.error.fatalError("No such texture loaded \"" + texture.textureId + "\"");
                     }
                     texture.lastUsed = time;
 
-                    if (params.matrix && !params.matrixAsArray) { 
+                    if (params.matrix && !params.matrixAsArray) {
                         params.matrixAsArray = new WebGLFloatArray(params.matrix);
                     }
                     layerStack.push({

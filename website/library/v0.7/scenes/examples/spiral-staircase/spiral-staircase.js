@@ -21,94 +21,90 @@
 
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas'}, // node always has a config object
 
-        SceneJS.loggingToPage({ elementId: "logging" },
+        SceneJS.perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
+        },
 
-                SceneJS.renderer({
-
-                    clearColor : { r:0, g:0, b:0.0, a: 1 },
-                    viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
-                    clear : { depth : true, color : true}
+                SceneJS.lookAt({
+                    eye : { x: 0.0, y: 30.0, z: -20.0},
+                    look : { x : 0.0, y : 15.0, z : 0 },
+                    up : { x: 0.0, y: 1.0, z: 0.0 }
                 },
-                        SceneJS.perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
-                        },
-                                SceneJS.lookAt({
-                                    eye : { x: 0.0, y: 30.0, z: -20.0},
-                                    look : { x : 0.0, y : 15.0, z : 0 },
-                                    up : { x: 0.0, y: 1.0, z: 0.0 }
-                                },
-                                        SceneJS.lights({
-                                            sources: [
-                                                {
-                                                    type:                   "dir",
-                                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                                    diffuse:                true,
-                                                    specular:               true,
-                                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                                },
-                                                {
-                                                    type:                   "dir",
-                                                    color:                  { r: 0.8, g: 0.8, b: 0.8 },
-                                                    diffuse:                true,
-                                                    specular:               true,
-                                                    dir:                    { x: 2.0, y: 1.0, z: 0.0 }
-                                                }
-                                            ]},
-                                                SceneJS.material({
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:       0.9,
-                                                    shine:          6.0
-                                                },
-                                                        SceneJS.rotate(function(data) {
-                                                            return {
-                                                                angle: data.get('pitch'), x : 1.0
-                                                            };
-                                                        },
-                                                                SceneJS.rotate(function(data) {
-                                                                    return {
-                                                                        angle: data.get('yaw'), y : 1.0
-                                                                    };
-                                                                },
-                                                                    /**
-                                                                     * Generate a sequence of Y-axis rotations
-                                                                     */
-                                                                        SceneJS.generator((function() {
-                                                                            var angle = 0;
-                                                                            var height = -10;
-                                                                            return function() {
-                                                                                angle += 15.0;
-                                                                                height += 1.0;
-                                                                                if (angle <= 560.0) {
-                                                                                    return { angle: angle, height: height };
 
-                                                                                } else {  // Reset the generator
-                                                                                    angle = 0;
-                                                                                    height = -10;
-                                                                                }
-                                                                            };
-                                                                        })(),
-                                                                                SceneJS.rotate(function(data) {
-                                                                                    return { angle : data.get("angle"), y: 1.0 };
-                                                                                },
-                                                                                        SceneJS.translate(function(data) {
-                                                                                            return { x: 5.0, y : data.get("height") };
-                                                                                        },
-                                                                                            /** Slab for step
-                                                                                             */
-                                                                                                SceneJS.scale({x: 3.0, y: 0.2, z: 1.0},
-                                                                                                        SceneJS.objects.cube()
-                                                                                                        )
-                                                                                                ) // rotate
-                                                                                        ) // translate
-                                                                                ) // generator
-                                                                        ) // rotate yaw
-                                                                ) // rotate pitch
-                                                        ) // material
-                                                ) // lookAt
-                                        ) // frustum
-                                ) // lights
-                        ) // renderer
-                ) // logging
+                        SceneJS.lights({
+                            sources: [
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                                },
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 2.0, y: 1.0, z: 0.0 }
+                                }
+                            ]},
+
+                                SceneJS.material({
+                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                    specular:       0.9,
+                                    shine:          6.0
+                                },
+
+                                        SceneJS.rotate(function(data) {
+                                            return {
+                                                angle: data.get('pitch'), x : 1.0
+                                            };
+                                        },
+
+                                                SceneJS.rotate(function(data) {
+                                                    return {
+                                                        angle: data.get('yaw'), y : 1.0
+                                                    };
+                                                },
+
+                                                    /**
+                                                     * Generate a sequence of Y-axis rotations
+                                                     */
+                                                        SceneJS.generator((function() {
+                                                            var angle = 0;
+                                                            var height = -10;
+                                                            return function() {
+                                                                angle += 15.0;
+                                                                height += 1.0;
+                                                                if (angle <= 560.0) {
+                                                                    return { angle: angle, height: height };
+
+                                                                } else {  // Reset the generator
+                                                                    angle = 0;
+                                                                    height = -10;
+                                                                }
+                                                            };
+                                                        })(),
+                                                                SceneJS.rotate(function(data) {
+                                                                    return { angle : data.get("angle"), y: 1.0 };
+                                                                },
+                                                                        SceneJS.translate(function(data) {
+                                                                            return { x: 5.0, y : data.get("height") };
+                                                                        },
+                                                                            /** Slab for step
+                                                                             */
+                                                                                SceneJS.scale({x: 3.0, y: 0.2, z: 1.0},
+                                                                                        SceneJS.objects.cube()
+                                                                                        )
+                                                                                ) // rotate
+                                                                        ) // translate
+                                                                ) // generator
+                                                        ) // rotate yaw
+                                                ) // rotate pitch
+                                        ) // material
+                                ) // lookAt
+                        ) // frustum
+                ) // lights                      
         ); // scene
 
 var yaw = 0;

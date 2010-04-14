@@ -93,6 +93,10 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsBackend.js"/>
 
+            <!-- Error handling -->
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsBackend.js"/>
+
             <!-- Time -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/time/timeBackend.js"/>
@@ -112,7 +116,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/load/loadBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
 
-               <!-- Load COLLADA -->
+            <!-- Load COLLADA -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/colladaParser.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/loadCollada.js"/>
@@ -232,7 +236,7 @@
         </delete>
 
         <mkdir dir="${EXTRACTED_DIST_DIR}"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>       
+        <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
     </target>
 
 </project>

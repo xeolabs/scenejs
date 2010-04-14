@@ -4,6 +4,7 @@ SceneJS._utils.ns("SceneJS.geometry");
  * An element of geometry
  */
 (function() {
+    var errorBackend = SceneJS._backends.getBackend("error");
 
     var calculateNormals = function(positions, indices) {
         var nvecs = new Array(positions.length);
@@ -67,8 +68,8 @@ SceneJS._utils.ns("SceneJS.geometry");
                     if (!params) {
                         params = cfg.getParams(data);
                         if (!params.type) { // Identifies VBO's on canvas
-                            throw new SceneJS.exceptions.NodeConfigExpectedException
-                                    ("Geometry node parameter expected : type");
+                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                    ("Geometry node parameter expected : type"));
                         }
                         type = SceneJS._utils.getParam(params.type, data);
                         if (params.create instanceof Function) {
@@ -104,5 +105,4 @@ SceneJS._utils.ns("SceneJS.geometry");
                     SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 });
     };
-
 })();

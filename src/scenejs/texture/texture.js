@@ -1,7 +1,9 @@
 (function() {
 
+
     var utils = SceneJS.__texture = {   // Just one object in closure
 
+        errorBackend : SceneJS._backends.getBackend("error"),
         textureBackend : SceneJS._backends.getBackend("texture"),
         loggingBackend : SceneJS._backends.getBackend("logging"),
 
@@ -77,9 +79,10 @@
                                     layerParam.applyFrom != "normal" &&
                                     layerParam.applyFrom != "geometry") {
 
-                                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                                            "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+                                    utils.errorBackend.fatalError(
+                                            new SceneJS.exceptions.InvalidNodeConfigException(
+                                                    "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
+                                                    "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
                                 }
                             }
 
@@ -87,9 +90,10 @@
                                 if (layerParam.applyTo != "baseColor" && // Colour map
                                     layerParam.applyTo != "diffuseColor") {
 
-                                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                                            "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
-                                            "should be either 'baseColor', 'diffuseColor'");
+                                    utils.errorBackend.fatalError(
+                                            new SceneJS.exceptions.InvalidNodeConfigException(
+                                                    "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
+                                                    "should be either 'baseColor', 'diffuseColor'"));
                                 }
                             }
 
@@ -175,9 +179,12 @@
                                         /* General error, probably a 404
                                          */
                                             function() {
-                                                utils.loggingBackend.getLogger().error("SceneJS.texture image load failed: "
-                                                        + _layer.creationParams.uri);
                                                 _layer.state = utils.STATE_ERROR;
+                                                var message = "SceneJS.texture image load failed: "
+                                                        + _layer.creationParams.uri;
+                                                utils.loggingBackend.getLogger().warn(message);
+                                                utils.errorBackend.error(
+                                                        new SceneJS.exceptions.ImageLoadFailedException(message));
                                             },
 
                                         /* Load aborted - eg. user stopped browser

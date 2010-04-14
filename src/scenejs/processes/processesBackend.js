@@ -54,10 +54,24 @@ SceneJS._backends.installBackend(
                                     group.numProcesses--;
                                 } else {
                                     var elapsed = time - process.timeStarted;
-                                    if (elapsed > (process.timeout * 1000)) {
+                                    if (elapsed > (process.timeoutSecs * 1000)) {
+
                                         ctx.logging.warn("Process timed out after " +
                                                          process.timeoutSecs +
                                                          " seconds: " + process.description);
+
+                                        /* Process timed out - notify listeners
+                                         */
+                                        ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_TIMED_OUT, {
+                                            sceneId: activeSceneId,
+                                            process: {
+                                                id: process.id,
+                                                timeStarted : process.timeStarted,
+                                                description: process.description,
+                                                timeoutSecs: process.timeoutSecs
+                                            }
+                                        });
+
                                         process.destroyed = true;
                                         processes[pid] = undefined;
                                         group.numProcesses--;
@@ -108,13 +122,16 @@ SceneJS._backends.installBackend(
                  */
                 createProcess: function(cfg) {
                     if (!activeSceneId) {
-                        throw new SceneJS.exceptions.NoSceneActiveException("No scene active - can't create process");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoSceneActiveException("No scene active - can't create process"));
                     }
                     var group = groups[activeSceneId];
                     var i = 0;
                     while (true) {
                         var pid = activeSceneId + i++;
                         if (!group.processes[pid]) {
+
+                            /* Register process
+                             */
                             var process = {
                                 sceneId: activeSceneId,
                                 id: pid,
@@ -126,7 +143,19 @@ SceneJS._backends.installBackend(
                             };
                             group.processes[pid] = process;
                             group.numProcesses++;
-                          //  ctx.logging.debug("Created process: " + cfg.description);
+
+                            /* Notify listeners
+                             */
+                            ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_CREATED, {
+                                sceneId: activeSceneId,
+                                process: {
+                                    id: process.id,
+                                    timeStarted : process.timeStarted,
+                                    description: process.description,
+                                    timeoutSecs: process.timeoutSecs
+                                }
+                            });
+
                             return process;
                         }
                     }
@@ -136,10 +165,21 @@ SceneJS._backends.installBackend(
                  * Destroys the given process, which is the object returned by the previous call to createProcess.
                  * Does not care if no scene is active, or if the process no longer exists or is dead.
                  */
-                destroyProcess: function(process) {
+                killProcess: function(process) {
                     if (process) {
                         process.destroyed = true;
-                     //   ctx.logging.debug("Destroyed process: " + process.description);
+
+                        /* Notify listeners
+                             */
+                            ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_KILLED, {
+                                sceneId: activeSceneId,
+                                process: {
+                                    id: process.id,
+                                    timeStarted : process.timeStarted,
+                                    description: process.description,
+                                    timeoutSecs: process.timeoutSecs
+                                }
+                            });
                     }
                 },
 

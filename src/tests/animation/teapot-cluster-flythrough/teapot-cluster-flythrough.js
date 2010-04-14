@@ -14,7 +14,7 @@
  * value for the eye's location on the Z-axis, which is read by the
  * lookat node.
  */
-with (SceneJs) {
+with (SceneJS) {
     var exampleScene = scene({}, // node always has a config object
 
             renderer({
@@ -115,9 +115,9 @@ with (SceneJs) {
 
         zpos += 10.0;
         try {
-                 SceneJs.numTeapots=0;
+                 SceneJS.numTeapots=0;
             exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookat node's 'look' to equal its 'at'
-            alert(SceneJs.numTeapots);
+            alert(SceneJS.numTeapots);
         } catch (e) {
             clearInterval(p);
             handleError(e);
@@ -128,7 +128,7 @@ with (SceneJs) {
      * Chrome seemed to absorb them in setInterval!
      */
   //  try {
-     SceneJs.numTeapots=0;
+     SceneJS.numTeapots=0;
         exampleScene.render({z:zpos});
 
         /* Continue animation
