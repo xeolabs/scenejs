@@ -45,7 +45,7 @@ SceneJS._backends.installBackend(
 
             /** Loads asset and caches it against uri
              */
-            function _loadAsset(uri, serverParams, callbackName, parser, onSuccess, onError) {
+            function _loadAsset(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {                
                 var url = [proxyUri, "?callback=", callbackName , "&uri=" + uri];
                 for (var param in serverParams) { // TODO: memoize string portion that contains params
                     url.push("&", param, "=", serverParams[param]);
@@ -64,8 +64,9 @@ SceneJS._backends.installBackend(
                                 if (!assetNode) {
                                     onError("asset node's parser returned null result");
                                 } else {
-                                    assets[uri] = {
-                                        uri: uri, // Asset idenitifed by URI
+                                    assets[assetId] = {
+                                        assetId: assetId,
+                                        uri: uri,
                                         node: assetNode,
                                         lastUsed: time
                                     };
@@ -87,8 +88,8 @@ SceneJS._backends.installBackend(
                 /** Atempts to get currently-loaded asset, which may have been evicted, in which case
                  * node should then just call loadAsset to re-load it.
                  */
-                getAsset : function(uri) {
-                    var asset = assets[uri];
+                getAsset : function(assetId) {
+                    var asset = assets[assetId];
                     if (asset) {
                         asset.lastUsed = time;
                         return asset.node;
@@ -104,13 +105,14 @@ SceneJS._backends.installBackend(
                  * JSON does not handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
                  *
                  * @uri Location of asset
+                 * @assetId Unique ID for asset
                  * @serverParams Request parameters for proxy
                  * @parser Processes asset data on load
                  * @onSuccess Callback through which processed asset data is returned
                  * @onTimeout Callback invoked when no response from proxy
                  * @onError Callback invoked when error reported by proxy
                  */
-                loadAsset : function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
+                loadAsset : function(uri, assetId, serverParams, parser, onSuccess, onTimeout, onError) {
                     if (!proxyUri) {
                         ctx.error.fatalError(new SceneJS.exceptions.ProxyNotSpecifiedException
                                 ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
@@ -125,11 +127,12 @@ SceneJS._backends.installBackend(
                             onTimeout();
                         },
                         description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
-                        timeoutSecs: 10 // Big timeout to allow files to parse
+                        timeoutSecs: 180 // Big timeout to allow files to parse
                     });
                     var callbackName = "callback" + process.id; // Process ID is globally unique
                     _loadAsset(
                             uri,
+                            assetId,
                             serverParams,
                             callbackName,
                             parser,

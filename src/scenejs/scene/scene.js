@@ -55,29 +55,24 @@
              * that were set on the config.
              */
             render : function(paramOverrides) {
-                try {
-                    if (sceneId) {
-                        sceneBackend.activateScene(sceneId);
-                        var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
-                        if (paramOverrides) {        // Override with traversal params
-                            for (var key in paramOverrides) {
-                                data.put(key, paramOverrides[key]);
-                            }
+                if (sceneId) {
+                    sceneBackend.activateScene(sceneId);
+                    var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
+                    if (paramOverrides) {        // Override with traversal params
+                        for (var key in paramOverrides) {
+                            data.put(key, paramOverrides[key]);
                         }
-                        if (params.proxy) {
-                            loadBackend.setProxy(params.proxy);
-                        }
-                        var traversalContext = {
-
-                        };
-                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                        loadBackend.setProxy(null);
-                        sceneBackend.deactivateScene();
-                        lastRenderedData = data;
                     }
-                } catch (e) {
-                    alert(e.message || e);
-                    throw e;
+                    if (params.proxy) {
+                        loadBackend.setProxy(params.proxy);
+                    }
+                    var traversalContext = {
+
+                    };
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                    loadBackend.setProxy(null);
+                    sceneBackend.deactivateScene();
+                    lastRenderedData = data;
                 }
             },
 
@@ -97,7 +92,7 @@
                             throw new SceneJS.exceptions.PickWithoutRenderedException
                                     ("Scene not rendered - need to render before picking");
                         }
-                        sceneBackend.activateScene(sceneId);
+                        sceneBackend.activateScene(sceneId);  // Also activates canvas
                         pickBackend.pick(canvasX, canvasY);
                         if (params.proxy) {
                             loadBackend.setProxy(params.proxy);
@@ -131,7 +126,7 @@
              */
             destroy : function() {
                 if (sceneId) {
-                    sceneBackend.deregisterScene(sceneId); // Last one fires RESET command
+                    sceneBackend.destroyScene(sceneId); // Last one fires RESET command
                     sceneId = null;
                 }
             },
@@ -145,7 +140,7 @@
 
         /* Register scene - fires a SCENE_CREATED event
          */
-        sceneId = sceneBackend.registerScene(_scene, params);
+        sceneId = sceneBackend.createScene(_scene, params);
 
         return _scene;
     };
@@ -177,6 +172,13 @@
                             exception: params.exception,
                             fatal: params.fatal
                         });
+                    });
+                break;
+
+            case "reset" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.RESET,
+                    function() {
+                        func();
                     });
                 break;
 

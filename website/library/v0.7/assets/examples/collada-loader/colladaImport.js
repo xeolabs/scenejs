@@ -628,19 +628,29 @@
              * Returns a SceneJS node created from the given DOM node. We're importing only
              * geometry, transforms and material for SceneJS assets, ignoring nodes like cameras and lights.
              */
-            function parseNode(node, level) {
-                level = level || 0;
-                logger.setIndent(level);
-                level++;
+            function parseNode(node) {
+
+                /* Parameter list for SceneJS node result
+                 */
                 var sceneNodeParams = [];
+
+                /* Iterates over children of given node
+                 */
                 var child = node.firstChild;
-                var data;
-                var matrix = SceneJS._math.identityMat4();
+
+                /* Matrix for current view/modelling space. Whichever space this is for is decided when
+                 * an actual entity, like a geometry or camera, is finally parsed. That will then be
+                 * wrapped by this matrix if not null.
+                 */
+                var matrix = null;
+
+                /* Iterate child nodes
+                 */
                 do{
                     switch (child.tagName) {
+
                         case "node":
-                            logger.info("Parsing Collada node");
-                            sceneNodeParams.push(parseNode(child, level + 1));
+                            sceneNodeParams.push(parseNode(child));
                             break;
 
                         case "matrix":
@@ -662,31 +672,22 @@
                             break;
 
                         case "instance_node":
-                            logger.info("Parsing Collada instance_node");
-                            sceneNodeParams.push(
-                                    parseNode(idMap[child.getAttribute("url").substr(1)]), level);
+                            sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
                             break;
 
                         case "instance_visual_scene":
-
-                            /* Root node of the new SceneJS subtree
-                             */
-                            logger.info("Parsing Collada instance_visual_scene");
-                            var visualSceneNode = idMap[child.getAttribute("url").substr(1)];
-                            sceneNodeParams.push(parseNode(visualSceneNode, level));
+                            sceneNodeParams.push(idMap[child.getAttribute("url").substr(1)]);
                             break;
 
                         case "instance_geometry":
-                            logger.info("Parsing Collada instance_geometry");
-                            sceneNodeParams.push(
-                                    parseInstanceGeometry(child));
+                            sceneNodeParams.push(parseInstanceGeometry(child));
                             break;
                     }
                 } while (child = child.nextSibling);
-                logger.setIndent(level);
+
                 if (matrix) {
                     sceneNodeParams.unshift({ elements: matrix });
-                    return SceneJS.modellingMatrix.apply(this, sceneNodeParams);
+                    return SceneJS.modelMatrix.apply(this, sceneNodeParams);
                 } else {
                     return SceneJS.node.apply(this, sceneNodeParams);
                 }

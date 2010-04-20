@@ -15,13 +15,24 @@ SceneJS._backends.installBackend(
             var dirURI; // Path to directory containing the Collada document
             var idMap = {}; // Maps every DOM element by ID
             var sources = {};
+            var modes = {};
+            var complexity = {};
 
-            /** Frees scratch memory
+            /**
+             * Holds any data parsed from camera node, if requested, to create view a projection
+             * transform nodes with which to wrap the result subgraph with just before returning it
+             * from this parser.
              */
-            function cleanup() {
+            var cameraData = {};
+
+            /** Resets parser state
+             */
+            function reset() {
                 xmlDoc = null;
                 idMap = {};
                 sources = {};
+                cameraData = null;
+                modes = {};
             }
 
             /**
@@ -79,7 +90,7 @@ SceneJS._backends.installBackend(
                 }
             }
 
-            function parseArray(node) {
+            function parseFloatArray(node) {
                 var result = [];
                 var prev = "";
                 var child = node.firstChild;
@@ -94,11 +105,12 @@ SceneJS._backends.installBackend(
                         prev = currArray.pop();
                     }
                     for (var i = 0; i < currArray.length; i++) {
-                        result.push(currArray[i]);
+                        result.push(parseFloat(currArray[i]));
                     }
                 }
                 return result;
             }
+
 
             /**
              * Returns the data for either a <vertices> or a <source>
@@ -153,7 +165,7 @@ SceneJS._backends.installBackend(
                     }
 
                     source = {
-                        array:parseArray(idMap[accessor.getAttribute("source").substr(1)]),
+                        array:parseFloatArray(idMap[accessor.getAttribute("source").substr(1)]),
                         stride:stride,
                         offset:offset,
                         count:count,
@@ -179,8 +191,8 @@ SceneJS._backends.installBackend(
                 var i, j, k;
                 var inputs = polyList.getElementsByTagName("input");
                 var maxOffset = getMaxOffset(inputs);
-                var vcount = parseArray(polyList.getElementsByTagName("vcount")[0]);
-                var faces = parseArray(polyList.getElementsByTagName("p")[0]);
+                var vcount = parseFloatArray(polyList.getElementsByTagName("vcount")[0]);
+                var faces = parseFloatArray(polyList.getElementsByTagName("p")[0]);         // TODO: parseInt
                 var triangles = [];
                 var base = 0;
                 for (i = 0; i < vcount.length; i++) {
@@ -223,7 +235,6 @@ SceneJS._backends.installBackend(
                 return trianglesList;
             }
 
-            var x = 0;
 
             /** Parses a <geometry> and returns an array containing a SceneJS.geometry node for
              * each <mesh> child
@@ -256,9 +267,8 @@ SceneJS._backends.installBackend(
                         faces = triangle.getElementsByTagName("p")[0].data;
                     }
                     else {
-                        faces = parseArray(triangle.getElementsByTagName("p")[0]);
+                        faces = parseFloatArray(triangle.getElementsByTagName("p")[0]);
                     }
-
 
                     for (var i = 0; i < faces.length; i = i + inputArray.length) {
                         for (var n = 0; n < inputArray.length; n++) {
@@ -267,9 +277,9 @@ SceneJS._backends.installBackend(
                             for (var j = 0; j < inputArray[n].data.stride; j++) {
                                 if (inputArray[n].data.typeMask[j]) {
                                     outputData[group].push(
-                                            inputArray[n].data.array[faces[i + n]
+                                            parseFloat(inputArray[n].data.array[faces[i + n]
                                                     * inputArray[n].data.stride + j
-                                                    + inputArray[n].data.offset]);
+                                                    + inputArray[n].data.offset]));
                                     pCount++;
                                 }
                             }
@@ -302,7 +312,6 @@ SceneJS._backends.installBackend(
                         faces.push(n);
                     }
 
-
                     geometriesData.push({
                         materialName : triangle.getAttribute("material"),
                         positions: outputData.VERTEX,
@@ -331,10 +340,10 @@ SceneJS._backends.installBackend(
                 }
                 ctx.error.fatalError(
                         new SceneJS.exceptions.ColladaParseException
-                        ("COLLADA element expected: "
-                                + profile.tagName
-                                + "/newparam[sid == '"
-                                + sid + "']/sampler2D[0]/source[0]"));
+                                ("COLLADA element expected: "
+                                        + profile.tagName
+                                        + "/newparam[sid == '"
+                                        + sid + "']/sampler2D[0]/source[0]"));
             }
 
             /**
@@ -479,20 +488,81 @@ SceneJS._backends.installBackend(
                 return materialsData;
             }
 
+
+            function wrapWithBoundingBox(e, child) {
+                if (modes.showBoundingBoxes) {
+                    return SceneJS.boundingBox(e, SceneJS.renderer({
+                        lineWidth:2,
+                        enableTexture2D: false
+                    }, SceneJS.material({baseColor: { r: 1, g: 0, b: 0 }},
+                            SceneJS.geometry({
+                                primitive: "lines",
+                                positions : [
+                                    e.xmax, e.ymax, e.zmax,
+                                    e.xmax, e.ymin, e.zmax,
+                                    e.xmin, e.ymin, e.zmax,
+                                    e.xmin, e.ymax, e.zmax,
+                                    e.xmax, e.ymax, e.zmin,
+                                    e.xmax, e.ymin, e.zmin,
+                                    e.xmin, e.ymin, e.zmin,
+                                    e.xmin, e.ymax, e.zmin
+                                ],
+                                indices : [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1,5, 2, 6,3,7 ]
+                            }))), child);
+                } else {
+                    return SceneJS.boundingBox(e, child);
+                }
+            }
+
+            function newExtents() {
+                const hugeNum = 9999999; // TODO: Guarantee this is max
+                return {
+                    xmin : hugeNum, ymin : hugeNum, zmin : hugeNum,
+                    xmax : -hugeNum, ymax : -hugeNum, zmax : -hugeNum
+                };
+            }
+
+
+            function expandExtentsByPositions(e, positions) {
+                for (var i = 0; i < positions.length - 2; i += 3) {
+                    var x = positions[i];
+                    var y = positions[i + 1];
+                    var z = positions[i + 2];
+                    if (x < e.xmin) e.xmin = x;
+                    if (y < e.ymin) e.ymin = y;
+                    if (z < e.zmin) e.zmin = z;
+                    if (x > e.xmax) e.xmax = x;
+                    if (y > e.ymax) e.ymax = y;
+                    if (z > e.zmax) e.zmax = z;
+                }
+                return e;
+            }
+
+            function expandExtentsByExtents(e, e2) {
+                if (e2.xmin < e.xmin) e.xmin = e2.xmin;
+                if (e2.ymin < e.ymin) e.ymin = e2.ymin;
+                if (e2.zmin < e.zmin) e.zmin = e2.zmin;
+                if (e2.xmax > e.xmax) e.xmax = e2.xmax;
+                if (e2.ymax > e.ymax) e.ymax = e2.ymax;
+                if (e2.zmax > e.zmax) e.zmax = e2.zmax;
+                return e;
+            }
+
             function parseInstanceGeometry(instanceGeometryNode) {
-                var geometryNode = idMap[instanceGeometryNode.getAttribute("url").substr(1)];
+                var geoUrl = instanceGeometryNode.getAttribute("url").substr(1);
+                var geometryNode = idMap[geoUrl];
                 var geometriesData = getGeometriesData(geometryNode);
                 var materialsData = getMaterialsData(instanceGeometryNode);
 
-                var geometries = [];
+                var nodeArgList = []; // Args for SceneJS node result
+
+                var extents = newExtents();
 
                 for (var i = 0; i < geometriesData.length; i++) {
-
                     var geoData = geometriesData[i];
-
-
+                    var geoType = uri + ":" + geoUrl + i;
                     var sceneNode = SceneJS.geometry({
-                        type: "xxx" + x++,
+                        type: geoType,
                         primitive: "triangles",
                         positions: geoData.positions,
                         normals: geoData.normals,
@@ -514,7 +584,6 @@ SceneJS._backends.installBackend(
                                 specular: 1
                             }, sceneNode);
 
-
                             /* Wrap in SceneJS.texture
                              */
                             var textureLayers = materialData.texturesData;
@@ -533,53 +602,174 @@ SceneJS._backends.installBackend(
                                         magFilter: "linear"
                                     });
                                 }
-                                sceneNode = SceneJS.texture({
-                                    layers: layers
-                                }, sceneNode);
+                                sceneNode = SceneJS.texture({ layers: layers }, sceneNode);
                             }
                         }
                     }
-                    geometries.push(sceneNode);
+                    nodeArgList.push(wrapWithBoundingBox(
+                            expandExtentsByPositions(newExtents(), geoData.positions),
+                            sceneNode));
                 }
-
-
-                /* Group SceneJS.geometries in a SceneJS.node
-                 */
-                return SceneJS.node.apply(this, geometries);
+                return SceneJS.node.apply(this,nodeArgList);
             }
 
             function parseMatrix(node) {
-                var data = parseArray(node);
+                var data = parseFloatArray(node);
                 return data;
             }
 
             function parseTranslate(node) {
-                var data = parseArray(node);
+                var data = parseFloatArray(node);
                 var x = data[0];
                 var y = data[1];
                 var z = data[2];
+                ctx.logging.warn("translate - x: " + x + ", y: " + y + ", z: " + z);
                 return SceneJS_math_translationMat4v(data);
             }
 
             function parseRotate(node) {
-                var data = parseArray(node);
+                var data = parseFloatArray(node);
                 var x = data[0];
                 var y = data[1];
                 var z = data[2];
                 var angle = data[3];
+                ctx.logging.warn("rotate - x: " + x + ", y: " + y + ", z: " + z + ", angle: " + angle);
                 return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
             }
 
+            /** Parses data from camera node
+             */
+            function parseCameraOptics(camera) {
+                var optics = camera.getElementsByTagName("optics")[0];
+                var techniqueCommon = optics.getElementsByTagName("technique_common")[0];
+                var perspective = techniqueCommon.getElementsByTagName("perspective")[0];
+
+                var opticsData = {};
+
+                if (perspective) {
+                    var yfov = perspective.getElementsByTagName("yfov")[0];
+                    var aspectRatio = perspective.getElementsByTagName("aspect_ratio")[0];
+                    var znear = perspective.getElementsByTagName("znear")[0];
+                    var zfar = perspective.getElementsByTagName("zfar")[0];
+
+                    opticsData = {
+                        perspective: {
+                            fovy: yfov ? parseFloat(yfov.textContent) : 60.0,
+                            aspect: aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0,
+                            near: znear ? parseFloat(znear.textContent) : 0.1,
+                            far: zfar ? parseFloat(zfar.textContent) : 10000.0
+                        }
+                    };
+
+                    ctx.logging.info("fovy = " + opticsData.perspective.fovy);
+                    ctx.logging.info("aspect = " + opticsData.perspective.aspect);
+                    ctx.logging.info("near = " + opticsData.perspective.near);
+                    ctx.logging.info("far = " + opticsData.perspective.far);
+
+                    return opticsData;
+
+                } else {
+                    var orthographic = techniqueCommon.getElementsByTagName("orthographic")[0];
+                    if (orthographic) {
+
+                        opticsData = {
+                            orthographic: {
+                                left: -1,
+                                right: 1,
+                                bottom: -1,
+                                top: 1,
+                                near: .1,
+                                far: 10000
+                            }
+                        };
+
+                        var xmag = perspective.getElementsByTagName("xmag")[0];
+                        var ymag = perspective.getElementsByTagName("ymag")[0];
+                        var aspectRatio = perspective.getElementsByTagName("aspect_ratio")[0];
+                        var znear = perspective.getElementsByTagName("znear")[0];
+                        var zfar = perspective.getElementsByTagName("zfar")[0];
+
+                        var xmagVal;
+                        var ymagVal;
+                        var aspect;
+                        var near = znear ? parseFloat(znear.textContent) : 0.1;
+                        var far = zfar ? parseFloat(zfar.textContent) : 10000.0;
+
+                        if (xmag && ymag) { // Ignore aspect
+
+                            xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
+                            ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
+                            opticsData = {
+                                orthographic: {
+                                    left: -xmagVal,
+                                    right: xmagVal,
+                                    bottom: -ymagVal,
+                                    top: ymagVal,
+                                    near: near,
+                                    far: far
+                                }
+                            };
+
+
+                        } else if (xmag) {
+                            xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
+                            aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
+                            opticsData = {
+                                orthographic: {
+                                    left: -xmagVal,
+                                    right: xmagVal,
+                                    bottom: -xmagVal * aspect,
+                                    top: xmagVal * aspect,
+                                    near: near,
+                                    far: far
+                                }
+                            };
+
+                        } else if (ymag) {
+                            ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
+                            aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
+                            opticsData = {
+                                orthographic: {
+                                    left: -ymagVal * aspect,
+                                    right: ymagVal * aspect,
+                                    bottom: -ymagVal,
+                                    top: ymagVal,
+                                    near: near,
+                                    far: far
+                                }
+                            };
+                        } else {
+                            ctx.logging.warn("camera.technique_common.optics.orthographic - insufficient data found, falling back on defaults");
+                        }
+
+                        ctx.logging.info("left = " + opticsData.orthographic.left);
+                        ctx.logging.info("right = " + opticsData.orthographic.right);
+                        ctx.logging.info("bottom = " + opticsData.orthographic.bottom);
+                        ctx.logging.info("top = " + opticsData.orthographic.top);
+                        ctx.logging.info("near = " + opticsData.orthographic.near);
+                        ctx.logging.info("far = " + opticsData.orthographic.far);
+
+                    } else {
+                        ctx.logging.warn("camera.technique_common.optics - neither perspective nor perspective found");
+                    }
+                }
+
+                return opticsData;
+            }
+
+
             /**
              * Returns a SceneJS node created from the given DOM node.
-             *
-             * We're loading only geometry, transforms and material for SceneJS assets, ignoring nodes like cameras and lights.
              */
             function parseNode(node) {
 
                 /* Builds params for our scene node
                  */
                 var sceneNodeParams = [];
+
+                /* Camera optics data from any camera elements found
+                 */
+                var cameraOpticsData = null;
 
                 /* Matrix created from any transforms found
                  */
@@ -593,10 +783,12 @@ SceneJS._backends.installBackend(
                     switch (child.tagName) {
 
                         case "node":
+                            ctx.logging.info("node");
                             sceneNodeParams.push(parseNode(child));
                             break;
 
                         case "matrix":
+                            ctx.logging.info("matrix");
                             var array = parseMatrix(child);
 
                             /* Convert row-major to SceneJS column-major
@@ -608,49 +800,64 @@ SceneJS._backends.installBackend(
                                 array[3],array[7],array[11],array[15]];
                             break;
 
+
                         case "translate":
+                            ctx.logging.info("translate");
                             matrix = matrix
                                     ? SceneJS_math_mulMat4(matrix, parseTranslate(child))
                                     : parseTranslate(child);
                             break;
 
                         case "rotate":
+                            ctx.logging.info("rotate");
                             matrix = matrix
                                     ? SceneJS_math_mulMat4(matrix, parseRotate(child))
                                     : parseRotate(child);
                             break;
 
                         case "instance_node":
-
+                            ctx.logging.info("instance_node");
                             sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
                             break;
 
                         case "instance_visual_scene":
-
-                            /* Root node of the new SceneJS subtree
-                             */
-
-                            var visualSceneNode = idMap[child.getAttribute("url").substr(1)];
-
-                            /* Recurse to visual_scene node
-                             */
-                            sceneNodeParams.push(parseNode(visualSceneNode));
+                            ctx.logging.info("instance_visual_scene");
+                            sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
                             break;
 
                         case "instance_geometry":
-
+                            ctx.logging.info("instance_geometry");
                             sceneNodeParams.push(parseInstanceGeometry(child));
+                            break;
+
+                        case "instance_camera":
+                            ctx.logging.info("instance_camera");
+                            cameraOpticsData = parseCameraOptics(idMap[child.getAttribute("url").substr(1)]);
                             break;
                     }
                 } while (child = child.nextSibling);
 
-                if (matrix) {
-                    sceneNodeParams.unshift({
-                        elements: matrix });
-                    return SceneJS.modellingMatrix.apply(this, sceneNodeParams);
+                var sceneNode = SceneJS.node.apply(this, sceneNodeParams);
+
+                if (cameraOpticsData) {
+
+                    /* Save camera data for wrapping asset subgraph with when we're done parsing
+                     */
+                    cameraData = {
+                        opticsData : cameraOpticsData,
+                        matrix : matrix
+                    };
+
                 } else {
-                    return SceneJS.node.apply(this, sceneNodeParams);
+
+                    /* Modelling transform
+                     */
+                    if (matrix) {
+                        sceneNode = SceneJS.modelMatrix({ elements: matrix }, sceneNode);
+                    }
                 }
+
+                return sceneNode;
             }
 
             return {
@@ -660,16 +867,46 @@ SceneJS._backends.installBackend(
                  * @param xml Collada document string
                  * @param rootId Optional ID of particular asset we want from Collada document
                  */
-                parse : function(_uri, xml, rootId) {
+                parse : function(_uri, xml, rootId, _modes) {
+
+                    reset();
+
                     uri = _uri;
                     dirURI = _uri.substring(0, _uri.lastIndexOf("/") + 1);
+                    modes = _modes;
 
                     loadDoc(xml);
                     buildIdMap();
                     var node = parseDoc(rootId);
-                    cleanup();
+
+                    if (modes.loadCamera && cameraData) {
+
+                        /* Camera was parsed -
+                         */
+
+                        /* Wrap result with view transform:
+                         */
+                        if (cameraData.matrix) {
+                            node = SceneJS.viewMatrix({ elements: cameraData.matrix }, node);
+                        }
+
+                        /* Wrap again with projection transform:
+                         */
+                        if (cameraData.opticsData.perspective) {
+                            node = SceneJS.perspective(cameraData.opticsData.perspective, node);
+
+                        } else if (cameraData.opticsData.orthographic) {
+                            node = SceneJS.ortho(cameraData.opticsData.orthographic, node);
+                        }
+                    }
+
+                    if (modes.loadLights && lightsData) {
+                    }
+
+                    reset();
 
                     return node;
                 }
             };
-        });
+        })
+        ;

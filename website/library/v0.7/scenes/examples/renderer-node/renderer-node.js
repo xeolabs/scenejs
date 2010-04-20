@@ -268,7 +268,6 @@ var exampleScene = SceneJS.scene({
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
-var pInterval;
 
 var yaw = -45;
 var pitch = 25;
@@ -298,7 +297,6 @@ function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
-        exampleScene.render({yaw: yaw, pitch: pitch});
         lastX = event.clientX;
         lastY = event.clientY;
     }
@@ -308,17 +306,22 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-exampleScene.render({yaw: yaw, pitch: pitch});
-
 window.render = function() {
-    try {
-        exampleScene.render({yaw: yaw, pitch: pitch});
-    } catch (e) {
-        clearInterval(pInterval);
-        throw e;
-    }
+    exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
-/* Continue animation
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
  */
-pInterval = setInterval("window.render()", 10);
+var pInterval;
+
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
+

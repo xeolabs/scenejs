@@ -89,27 +89,32 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                 )
         ); // scene
 
-var pInterval;
 var alpha = 0;
 
-window.doit = function() {
+window.render = function() {
     if (alpha > 1) {
         clearInterval(pInterval);
         exampleScene.destroy();
     } else {
         alpha += 0.002;
-
         exampleScene.render({"alpha":alpha});
     }
-}
+};
 
-/* Hack to get any scene definition exceptions up front.
- * Chrome seemed to absorb them in setInterval!
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
  */
-exampleScene.render({ "alpha":alpha });
+var pInterval;
 
-/* Continue animation
- */
-pInterval = setInterval("window.doit()", 10);
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {          
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
+
 
 

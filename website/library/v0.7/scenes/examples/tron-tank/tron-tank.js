@@ -271,7 +271,6 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 
-var pInterval;
 
 window.render = function() {
     try {
@@ -340,5 +339,18 @@ window.render = function() {
     }
 };
 
-pInterval = setInterval("window.render()", 10);
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
+ */
+var pInterval;
+
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
 

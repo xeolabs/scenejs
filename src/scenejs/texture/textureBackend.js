@@ -189,8 +189,8 @@ SceneJS._backends.installBackend(
                  */
                 loadImage : function(uri, onSuccess, onError, onAbort) {
                     var process = ctx.processes.createProcess({
-                        description:"Texture image load: " + uri ,
-                        onTimeout: onError
+                        description:"Texture image load: " + uri,
+                        timeoutSecs: -1  
                     });
                     var image = new Image();
                     image.onload = function() {
@@ -250,7 +250,7 @@ SceneJS._backends.installBackend(
                                     logging: ctx.logging
                                 });
                             });
-
+                          ctx.logging.info("texture created: '" + textureId + "'");
                     return textures[textureId];
                 },
 

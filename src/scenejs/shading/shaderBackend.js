@@ -277,6 +277,7 @@ SceneJS._backends.installBackend(
                         geometry = geo;
                         sceneHash = null;
                         geometryHash = ([
+                            geometry.normalBuf ? "t" : "f",
                             geometry.uvBuf ? "t" : "f",
                             geometry.uvBuf2 ? "t" : "f"]).join("");
                     });
@@ -284,8 +285,12 @@ SceneJS._backends.installBackend(
             ctx.events.onEvent(
                     SceneJS._eventTypes.GEOMETRY_EXPORTED,
                     function(geo) {
-                        activeProgram.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
-                        activeProgram.bindFloatArrayBuffer("aNormal", geo.normalBuf);
+                        if (geo.vertexBuf) {
+                            activeProgram.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
+                        }
+                        if (geo.normalBuf) {
+                            activeProgram.bindFloatArrayBuffer("aNormal", geo.normalBuf);
+                        }
                         if (textureLayers.length > 0 && rendererState.enableTexture2D) {
                             if (geo.uvBuf) {
                                 activeProgram.bindFloatArrayBuffer("aUVCoord", geo.uvBuf);
@@ -360,6 +365,7 @@ SceneJS._backends.installBackend(
                                                 [vertexShaderSrc],
                                                 [fragmentShaderSrc],
                                                 ctx.logging);
+                                        ctx.logging.info("OK - Created shader: '" + sceneHash + "'");
                                     } catch (e) {
                                         ctx.logging.debug("Vertex shader:");
                                         ctx.logging.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
@@ -380,8 +386,6 @@ SceneJS._backends.installBackend(
 
             /**
              * Generates a shader hash code from current rendering state.
-             *
-             * TODO: use mask
              */
             function generateHash() {
                 if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
@@ -389,6 +393,7 @@ SceneJS._backends.installBackend(
                 } else {
                     sceneHash = ([canvas.canvasId, rendererHash, fogHash, lightsHash, textureHash, geometryHash]).join(";");
                 }
+                //      ctx.logging.debug("Scene shading hash:" + sceneHash);
             }
 
             function getShaderLoggingSource(src) {
@@ -445,40 +450,53 @@ SceneJS._backends.installBackend(
             }
 
             function composeRenderingVertexShader() {
-                var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
+
+                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
+                var lighting = (lights.length > 0 && geometry.normalBuf);
+
                 var src = ["\n"];
-                src.push("attribute vec3 aVertex;");                // World
-                src.push("attribute vec3 aNormal;");                // World
-                if (haveTextures) {
+                src.push("attribute vec3 aVertex;");                // World coordinates
+
+                if (lighting) {
+                    src.push("attribute vec3 aNormal;");            // Normal vectors
+                    src.push("uniform mat4 uMNMatrix;");            // Model normal matrix
+                    src.push("uniform mat4 uVNMatrix;");            // View normal matrix
+
+                    src.push("varying vec3 vNormal;");              // Output view normal vector
+                    src.push("varying vec3 vEyeVec;");              // Output view eye vector
+
+                    for (var i = 0; i < lights.length; i++) {
+                        var light = lights[i];
+                        if (light.type == "dir") {
+                            src.push("uniform vec3 uLightDir" + i + ";");
+                        }
+                        if (light.type == "point") {
+                            src.push("uniform vec4 uLightPos" + i + ";");
+                        }
+                        if (light.type == "spot") {
+                            src.push("uniform vec4 uLightPos" + i + ";");
+                        }
+
+                        src.push("varying vec3 vLightVec" + i + ";");
+                        src.push("varying float vLightDist" + i + ";");
+                    }
+                }
+
+                if (texturing) {
                     if (geometry.uvBuf) {
-                        src.push("attribute vec2 aUVCoord;");      // World
+                        src.push("attribute vec2 aUVCoord;");      // UV coords
                     }
                     if (geometry.uvBuf2) {
-                        src.push("attribute vec2 aUVCoord2;");      // World
+                        src.push("attribute vec2 aUVCoord2;");     // UV2 coords
                     }
                 }
-                src.push("uniform mat4 uMMatrix;");               // Model
-                src.push("uniform mat4 uMNMatrix;");              // Model Normal
-                src.push("uniform mat4 uVMatrix;");               // View
-                src.push("uniform mat4 uVNMatrix;");              // View Normal
-                src.push("uniform mat4 uPMatrix;");               // Projection
+                src.push("uniform mat4 uMMatrix;");                // Model matrix
+                src.push("uniform mat4 uVMatrix;");                // View matrix
+                src.push("uniform mat4 uPMatrix;");                 // Projection matrix
 
-                for (var i = 0; i < lights.length; i++) {
-                    var light = lights[i];
-                    if (light.type == "dir") {
-                        src.push("uniform vec3 uLightDir" + i + ";");
-                    }
-                    if (light.type == "point") {
-                        src.push("uniform vec4 uLightPos" + i + ";");
-                    }
-                    if (light.type == "spot") {
-                        src.push("uniform vec4 uLightPos" + i + ";");
-                    }
-                }
                 src.push("varying vec4 vViewVertex;");
-                src.push("varying vec3 vNormal;");
-                src.push("varying vec3 vEyeVec;");
-                if (haveTextures) {
+
+                if (texturing) {
                     if (geometry.uvBuf) {
                         src.push("varying vec2 vUVCoord;");
                     }
@@ -487,37 +505,39 @@ SceneJS._backends.installBackend(
                     }
                 }
 
-                for (var i = 0; i < lights.length; i++) {
-                    src.push("varying vec3 vLightVec" + i + ";");
-                    src.push("varying float vLightDist" + i + ";");
-                }
                 src.push("void main(void) {");
-                src.push("  vec4 tmpVNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
-                src.push("  vNormal = normalize(tmpVNormal.xyz);");                                 // View-space normal
+                if (lighting) {
+                    src.push("  vec4 tmpVNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
+                    src.push("  vNormal = normalize(tmpVNormal.xyz);");
+                }
                 src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
                 src.push("  vViewVertex = tmpVertex;");
                 src.push("  gl_Position = uPMatrix * vViewVertex;");
 
                 src.push("  vec3 tmpVec;");
-                for (var i = 0; i < lights.length; i++) {
-                    var light = lights[i];
-                    if (light.type == "dir") {
-                        src.push("tmpVec = -uLightDir" + i + ";");
-                    }
-                    if (light.type == "point") {
-                        src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
-                        src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
-                    }
-                    if (light.type == "spot") {
-                        src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
-                        src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+
+                if (lighting) {
+                    for (var i = 0; i < lights.length; i++) {
+                        var light = lights[i];
+                        if (light.type == "dir") {
+                            src.push("tmpVec = -uLightDir" + i + ";");
+                        }
+                        if (light.type == "point") {
+                            src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
+                            src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+                        }
+                        if (light.type == "spot") {
+                            src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
+                            src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
+
+                        }
+                        src.push("vLightVec" + i + " = tmpVec;");                   // Vector from light to vertex
 
                     }
-                    src.push("vLightVec" + i + " = tmpVec;");                   // Vector from light to vertex
-
+                    src.push("vEyeVec = normalize(-vViewVertex.xyz);");
                 }
-                src.push("vEyeVec = normalize(-vViewVertex.xyz);");
-                if (haveTextures) {
+
+                if (texturing) {
                     if (geometry.uvBuf) {
                         src.push("vUVCoord = aUVCoord;");
                     }
@@ -526,23 +546,20 @@ SceneJS._backends.installBackend(
                     }
                 }
                 src.push("}");
-                //ctx.logging.info(getShaderLoggingSource(src));
+             //   ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
 
             function composeRenderingFragmentShader() {
-
-                var haveTextures = textureLayers.length > 0 && rendererState.enableTexture2D;
-                var haveLights = (lights.length > 0);
+                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
+                var lighting = (lights.length > 0 && geometry.normalBuf);
 
                 var src = ["\n"];
 
                 src.push("varying vec4 vViewVertex;");              // View-space vertex
-                src.push("varying vec3 vNormal;");                  // View-space normal
-                src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
 
-                if (haveTextures) {
+                if (texturing) {
                     if (geometry.uvBuf) {
                         src.push("varying vec2 vUVCoord;");
                     }
@@ -559,12 +576,16 @@ SceneJS._backends.installBackend(
                     }
                 }
 
-                src.push("uniform vec3  uAmbient;");                         // Scene ambient colour - taken from clear colour
                 src.push("uniform vec3  uMaterialBaseColor;");
-                src.push("uniform float uMaterialEmit;");
                 src.push("uniform float uMaterialAlpha;");
 
-                if (haveLights) {
+                if (lighting) {
+                    src.push("varying vec3 vNormal;");                  // View-space normal
+                    src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
+
+                    src.push("uniform vec3  uAmbient;");                         // Scene ambient colour - taken from clear colour
+                    src.push("uniform float uMaterialEmit;");
+
                     src.push("uniform vec3  uMaterialSpecularColor;");
                     src.push("uniform float uMaterialSpecular;");
                     src.push("uniform float uMaterialShine;");
@@ -600,21 +621,21 @@ SceneJS._backends.installBackend(
                 }
 
                 src.push("void main(void) {");
-                src.push("  vec3    ambientValue=uAmbient;");
                 src.push("  vec3    color   = uMaterialBaseColor;");
-                src.push("  float   emit    = uMaterialEmit;");
                 src.push("  float   alpha   = uMaterialAlpha;");
 
-                src.push("  vec4    normalmap = vec4(vNormal,0.0);");
+                if (lighting) {
+                    src.push("  vec3    ambientValue=uAmbient;");
+                    src.push("  float   emit    = uMaterialEmit;");
 
-                if (haveLights) {
+                    src.push("  vec4    normalmap = vec4(vNormal,0.0);");
                     src.push("  float   specular=uMaterialSpecular;");
                     src.push("  vec3    specularColor=uMaterialSpecularColor;");
                     src.push("  float   shine=uMaterialShine;");
                     src.push("  float   attenuation = 1.0;");
                 }
 
-                if (haveTextures) {
+                if (texturing) {
                     src.push("  vec4    texturePos;");
                     src.push("  vec2    textureCoord=vec2(0.0,0.0);");
 
@@ -623,7 +644,7 @@ SceneJS._backends.installBackend(
 
                         /* Texture input
                          */
-                        if (layer.params.applyFrom == "normal") {
+                        if (layer.params.applyFrom == "normal" && lighting) {
                             if (geometry.normalBuf) {
                                 src.push("texturePos=vec4(vNormal.xyz, 1.0);");
                             } else {
@@ -668,10 +689,10 @@ SceneJS._backends.installBackend(
                     }
                 }
 
-                src.push("  vec3    lightValue      = uAmbient;");
-                src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
+                if (lighting) {
+                    src.push("  vec3    lightValue      = uAmbient;");
+                    src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
 
-                if (haveLights) {
                     src.push("  vec3    lightVec;");
                     src.push("  float   dotN;");
                     src.push("  float   spotFactor;");
@@ -740,10 +761,14 @@ SceneJS._backends.installBackend(
                             src.push("}");
                         }
                     }
-                }
-                src.push("if (emit>0.0) lightValue = vec3(1.0, 1.0, 1.0);");
+                    src.push("if (emit>0.0) lightValue = vec3(1.0, 1.0, 1.0);");
+                    src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb, alpha);");
+                } else {
 
-                src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb, alpha);");
+                    /* No lighting
+                     */
+                    src.push("vec4 fragColor = vec4(color.rgb, alpha);");
+                }
 
                 /* Fog
                  */
@@ -759,10 +784,10 @@ SceneJS._backends.installBackend(
                     src.push("gl_FragColor = fragColor;");
                 }
 
-                //  src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+                //    src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
                 src.push("}");
 
-                //  ctx.logging.info(getShaderLoggingSource(src));
+           //     ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
         });

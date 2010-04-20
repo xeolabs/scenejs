@@ -18,6 +18,7 @@ SceneJS.perspective = function() {
                             params.far || 400.0);
 
                     transform = {
+                        type: "perspective",
                         matrix:tempMat
                     };
                 }

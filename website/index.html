@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>SceneJS - Scene Graph Library for WebGL</title>
+    <title>SceneJS - WebGL Scene Graph Library</title>
     <link href="css/style.css" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="lib/jquery/jquery-1.3.2.min.js">
     </script>
@@ -14,6 +14,8 @@
             pageTracker._trackPageview();
         } catch(err) {
         }</script>
+    <script type="text/javascript" src="lib/jquery/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery.jtemplates.js"></script>
 </head>
 <body style="padding: 20px;">
 
@@ -30,14 +32,17 @@
             <div id="col1">
                 <h1>Succinct and expressive<br/> scene definition for WebGL</h1>
 
-                <p class="intro"><b>SceneJS</b> is a JavaScript framework by <a href="dev.html">Lindsay Kay</a> that
+                <p class="intro"><b>SceneJS</b> is a JavaScript framework by <a
+                        href="http://www.retaggr.com/page/LindsayStanleyKay">Lindsay Kay</a> that
                     provides a functional API through which
                     you can easily create interactive 3D scenes on the <a
-                            href="http://en.wikipedia.org/wiki/WebGL">WebGL</a>
+                            target="other" href="http://en.wikipedia.org/wiki/WebGL">WebGL</a>
                     canvas element.</p>
 
                 <h3>General Syntax</h3>
-                <a href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/seymour-plane/seymour-plane.js&title=COLLADA%20Import%20Test%20-%20Seymour%20Plane"><img src="./images/seymour-plane.jpg" alt="COLLADA Test Image" style="margin-left:15px;" align="right"/></a>
+                <a href="http://www.scenejs.org/ide.html?url=http://scenejs.org/library/v0.7/scenes/examples/seymour-plane/seymour-plane.js&title=COLLADA%20Import%20Test%20-%20Seymour%20Plane"><img
+                        src="./images/seymour-plane.jpg" alt="COLLADA Test Image" style="margin-left:15px;"
+                        align="right"/></a>
 
                 <p><span>Below is a simple example that loads a COLLADA model and renders the airplane shown to the right.</span>
                 </p>
@@ -64,7 +69,9 @@
                 <p><span>Take a closer look at those <b>rotate</b> nodes. See how they can optionally take a function
                     which feeds them their parameters? You can do that for any node to dynamically evaluate parameters for
                     them at traversal-time. The functions take an immutable <b>data</b> object, which is SceneJS's
-                mechanism for passing variables down into scene graphs.</span></p><p><span> Using the <b>yaw</b> and <b>pitch</b> properties on
+                mechanism for passing variables down into scene graphs.</span></p>
+
+                <p><span> Using the <b>yaw</b> and <b>pitch</b> properties on
                     that data object, our functions create configurations that specify rotations about the X and Y axis.
                     See also how we inject those angles when we render the scene.</span></p>
                 <br/>
@@ -82,8 +89,6 @@
                 <div id="home-download">
                     <p class="title">Download V0.7.2</p>
 
-                    <p class="status">Beta release, now with COLLADA import</p>
-
                     <ul>
                         <li>
                             <p class="copy"><a href="lib/scenejs/scenejs.min.js"
@@ -96,58 +101,51 @@
                             </p>
                         </li>
                         <li>
-                            <p class="copy">Please read the <a
-                                    href="http://docs.google.com/View?id=dhgqr476_35dpwzv7fv">release
+                            <p class="copy">Please read the <a target="other"
+                                                               href="http://docs.google.com/View?id=dhgqr476_39cjhbjqcg">release
                                 notes</a></p>
                         </li>
                     </ul>
                 </div>
-                <div id="home-features" class="home-menu-item">
-                    <a class="title" href="features.html">Features</a>
-
-                    <p class="copy">What can SceneJS do?</p>
+                <div id="home-learn" class="home-menu-item">
+                    <p class="title">Learn More</p>
+                    <ul>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a target="other"
+                               href="http://learningscenejs.wordpress.com/2010/03/21/welcome/">Tutorials</a></li>
+                    </ul>
                 </div>
-                <div id="home-tutorials" class="home-menu-item">
-                    <a target="other" class="title" href="http://learningscenejs.wordpress.com/2010/03/21/welcome/">Tutorials</a>
-
-                    <p class="copy">Learn how to use SceneJS at <a href="http://learningscenejs.org/">learningscenejs.org</a>
-                    </p>
-                </div>
-                <!--<div id="home-plugins" class="home-menu-item">-->
-                <!--<a class="title" href="plugins.html">Plugins</a>-->
-
-                <!--<p class="copy">Extra bits</p>-->
-                <!--</div>-->
-                <div id="home-playroom" class="home-menu-item">
-                    <a class="title" href="load-ide.html">Online IDE</a>
-
-                    <p class="copy">Run a scene in the online IDE - load your own and share a link</p>
-                </div>
-                <div id="home-facebook" class="home-menu-item">
-                    <a target="other" class="title" href="http://www.facebook.com/group.php?gid=350488973712">Facebook
-                        Group</a>
-
-                    <p class="copy">Join the group and stay in touch</p>
+                <div id="home-community" class="home-menu-item">
+                    <p class="title">Community</p>
+                    <ul>
+                        <li><a target="other" href="http://www.retaggr.com/page/LindsayStanleyKay">Contact</a></li>
+                        <li><a target="other" href="http://www.facebook.com/group.php?gid=350488973712">FaceBook
+                            Group</a></li>
+                        <li><a target="other" href="http://groups.google.co.nz/group/scenejs?lnk=gcimh">Google Group</a>
+                        </li>
+                        <li><a target="other" href="http://www.youtube.com/user/xeolabs">YouTube Channel</a></li>
+                    </ul>
                 </div>
 
+                <div id="home-examples" class="home-menu-item">
+                    <a href="load-ide.html"><p class="title">Live Examples</p></a>
+
+                    <div id="ide-examples"></div>
+                    <p class="copy"><span><a href="load-ide.html">...more &gt;&gt;</a></span></p>
+                </div>
 
                 <div id="home-dev" class="home-menu-item">
-                    <a class="title" href="dev.html">Development</a>
+                    <p class="title">Development</p>
                     <ul>
-                        <li><a href="">Contact</a></li>
-                        <li><a href="">Feedback</a></li>
-                        <li><a href="">FaceBook Group</a></li>
-                        <li><a href="">Google Group</a></li>
-                        <li><a href="">Sourcecode</a></li>
+                        <li><a target="other" href="https://xeolabs.lighthouseapp.com/projects/50643-scenejs/tickets">Issue
+                            Tracker</a></li>
+                        <li><a target="other" href="http://github.com/xeolabs/scenejs">Sourcecode</a></li>
+                        <li><a target="other" href="http://github.com/xeolabs/scenejs/tree/master/licenses">Licenses</a>
+                        </li>
+
                     </ul>
-                    <p class="copy">Browse the source code, log an issue, see what's happening</p>
                 </div>
 
-                <!--<div id="home-assets" class="home-menu-item">-->
-                <!--<a class="title" href="#assets-open">Assets</a>-->
-
-                <!--<p class="copy">Try out the new live asset load feature</p>-->
-                <!--</div>-->
 
             </div>
         </div>
@@ -155,6 +153,7 @@
 </div>
 <div id="footer"><p>All content is copyright (C) 2009 Lindsay Kay, <a href="http://www.xeolabs.com">Xeolabs</a></p>
 </div>
+
 <script type="text/javascript">
     var a2a_linkname = "SceneJS.org";
     var a2a_linkurl = window.location;
@@ -189,6 +188,32 @@
     };
 </script>
 
+
+<script type="text/javascript">
+    function showIdeExamples() {
+        $.ajax({
+            type: 'GET',
+            url: '../library/v0.7/scenes/examples/index.json',
+            dataType: 'json',
+            success: function(json) {
+                var examples = [];
+                var len = json.examples.length;
+                if (len > 5) {
+                    len = 5;
+                }
+                for (var i = 0; i < len; i++) {
+                    examples.push(json.examples[i]);
+                }
+                $("#ide-examples").setTemplateURL("templates/index-ide-examples.html");
+                $("#ide-examples").processTemplate({ examples: examples });
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        showIdeExamples();
+    });
+</script>
 
 </body>
 </html>

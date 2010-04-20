@@ -79,10 +79,10 @@ SceneJS._backends.installBackend(
 
                         context = canvas.getContext(contextNames[i]);
 
-                        //
-                        //                                                alert("WebGL Trace enabled");
-                        //                                                context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
-                        //                                                context.setTracing(true);
+
+//                                                                        alert("WebGL Trace enabled");
+//                                                                        context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
+//                                                                        context.setTracing(true);
                     } catch (e) {
 
                     }
@@ -111,9 +111,9 @@ SceneJS._backends.installBackend(
 
             return { // Node-facing API
 
-                /** Registers a scene and returns the ID under which it is registered
+                /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
                  */
-                registerScene : function(scene, params) {
+                createScene : function(scene, params) {
                     if (!initialised) {
                         ctx.logging.info("SceneJS V" + SceneJS.version + " initialised");
                         ctx.events.fireEvent(SceneJS._eventTypes.INIT);
@@ -133,7 +133,7 @@ SceneJS._backends.installBackend(
 
                 /** Deregisters scene
                  */
-                deregisterScene :function(sceneId) {
+                destroyScene :function(sceneId) {
                     scenes[sceneId] = null;
                     nScenes--;
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_DESTROYED, {sceneId : sceneId });

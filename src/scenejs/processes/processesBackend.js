@@ -54,7 +54,7 @@ SceneJS._backends.installBackend(
                                     group.numProcesses--;
                                 } else {
                                     var elapsed = time - process.timeStarted;
-                                    if (elapsed > (process.timeoutSecs * 1000)) {
+                                    if ((process.timeoutSecs > -1) && (elapsed > (process.timeoutSecs * 1000))) {
 
                                         ctx.logging.warn("Process timed out after " +
                                                          process.timeoutSecs +

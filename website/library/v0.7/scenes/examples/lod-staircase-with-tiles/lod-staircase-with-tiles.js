@@ -298,9 +298,21 @@ window.render = function() {
     exampleScene.render({ eye : eye, look: { x: eye.x + moveVec[0], y: eye.y, z : eye.z + moveVec[2] }});
 };
 
-/* Continue animation
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
  */
-var pInterval = setInterval("window.render()", 10);
+var pInterval;
+
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
+
 
 
 

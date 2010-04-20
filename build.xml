@@ -118,7 +118,7 @@
 
             <!-- Load COLLADA -->
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/colladaParser.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/colladaBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/loadCollada.js"/>
 
             <!-- Picking -->
@@ -174,6 +174,7 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewTransformBackend.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/lookAt.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewMatrix.js"/>
 
             <!-- Stationary view space -->
 

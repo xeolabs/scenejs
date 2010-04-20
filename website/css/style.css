@@ -49,18 +49,21 @@ body {
 }
 
 a {
-    text-decoration: none;
     color: #1170A3 !important;
+    text-decoration: none;
+    border-bottom: 1px dotted #ccccff;
 }
 
 a:visited {
-    text-decoration: none;
     color: #1170A3 !important;
+    text-decoration: none;
+    border-bottom: 1px dotted #ccccff;
 }
 
 a:hover {
-    text-decoration: none;
     color: maroon !important;
+    text-decoration: none;
+    border-bottom: 1px solid #9999ff;
 }
 
 a img {
@@ -253,7 +256,7 @@ ul.site-tabs li.ui-state-active a {
 
 #content p {
     color: #444444 !important;
-    padding-bottom: 8px;
+    padding-bottom: 5px;
     font-size: 0.8em;
 }
 
@@ -273,19 +276,6 @@ ul.site-tabs li.ui-state-active a {
     border: 1px solid lightgray;
 }
 
-#content a {
-    color: blue;
-    text-decoration: none;
-}
-
-#content a:hover {
-    color: maroon;
-}
-
-#content a.active {
-    color: blue;
-}
-
 #content p em {
     float: right;
     padding: 0 28% 0 0;
@@ -301,7 +291,6 @@ ul.site-tabs li.ui-state-active a {
 #content ul li {
     line-height: 1.4em;
     color: #444444 !important;
-    font-size: 0.8em;
 }
 
 #content p.intro {
@@ -333,7 +322,6 @@ ul.site-tabs li.ui-state-active a {
 #home-table {
 
     height: 1600px;
-
 
     margin: 0 auto;
 
@@ -367,7 +355,7 @@ ul.site-tabs li.ui-state-active a {
 #home-table #col2 {
     float: left;
     padding-left: 40px;
-padding-right:0px;
+    padding-right: 0px;
     text-align: left;
     margin: 0 auto;
     width: 310px;
@@ -384,16 +372,18 @@ padding-right:0px;
     margin-bottom: 5px;
 }
 
-#home-table  #col2  .home-menu-item a.title {
+#home-table  #col2  .home-menu-item p.title {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.4em;
-    line-height: 1.4em;
+    font-size: 1.4em; /*line-height: 1.4em;*/
     font-weight: bold;
+    padding-bottom: 10px;
+    color: #666666 !important;
+
 }
 
 #home-table  #col2  .home-menu-item .copy {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 1.0em;
+    font-size: 1em;
     font-weight: normal;
     line-height: 1.4em;
     color: #444444;
@@ -438,20 +428,26 @@ padding-right:0px;
 }
 
 #home-download li {
-    font-size: 1.2em !important;
-    line-height: 0.8em !important;
+    font-size: 1.1em !important;
+    line-height: 0.6em !important;
 }
 
-#home-table  #col2  #home-features {
-    background: url(../images/registry.png) no-repeat scroll 15px 0px;
+#home-table  #col2  #home-learn {
+    background: url(../images/tutorial-icon.png) no-repeat scroll 15px 0px;
 }
 
-#home-table  #col2  #home-playroom {
+#home-table  #col2  #home-examples {
     background: url(../images/demo-icon-large.png) no-repeat scroll 15px 0px;
 }
 
-#home-table  #col2  #home-tutorials {
-    background: url(../images/tutorial-icon.png) no-repeat scroll 15px 0px;
+#home-table  #col2 #home-examples ul li {
+    line-height: 1.4em;
+    color: #444444 !important;
+    margin-bottom: 10px;
+}
+
+#home-table  #col2  #home-community {
+    background: url(../images/registry.png) no-repeat scroll 15px 0px;
 }
 
 #home-table  #col2  #home-facebook {
@@ -571,12 +567,12 @@ padding-right:0px;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 1.0em;
     font-weight: normal;
-    line-height:1.4em;
+    line-height: 1.4em;
 }
 
 #features-table p {
 /*padding-left : 40 px;*/
-    /*padding-left: 0px;*/
+/*padding-left: 0px;*/
 }
 
 #features-table p.demo {
@@ -628,7 +624,7 @@ padding-right:0px;
 }
 
 /*#features-table  #col3 p {*/
-    /*padding-left: 0px;*/
+/*padding-left: 0px;*/
 /*}*/
 
 #features-table  #col3 .home-menu-item {
@@ -653,31 +649,31 @@ padding-right:0px;
 }
 
 /*#features-table  #col3  #home-download {*/
-    /*background: url(../images/import1.png) no-repeat scroll 15px 5px;*/
+/*background: url(../images/import1.png) no-repeat scroll 15px 5px;*/
 /*}*/
 
 /*#features-table  #col3  #home-plugins {*/
-    /*background: url(../images/registry.png) no-repeat scroll 15px 5px;*/
+/*background: url(../images/registry.png) no-repeat scroll 15px 5px;*/
 /*}*/
 
-/*#features-table  #col3  #home-playroom {*/
-    /*background: url(../images/registry.png) no-repeat scroll 15px 5px;*/
+/*#features-table  #col3  #home-examples {*/
+/*background: url(../images/registry.png) no-repeat scroll 15px 5px;*/
 /*}*/
 
-/*#features-table  #col3  #home-tutorials {*/
-    /*background: url(../images/blogger_logo.gif) no-repeat scroll 15px 5px;*/
+/*#features-table  #col3  #home-community {*/
+/*background: url(../images/blogger_logo.gif) no-repeat scroll 15px 5px;*/
 /*}*/
 
 /*#features-table  #col3  #home-facebook {*/
-    /*background: url(../images/facebook50.png) no-repeat scroll 15px 5px;*/
+/*background: url(../images/facebook50.png) no-repeat scroll 15px 5px;*/
 /*}*/
 
 /*#features-table  #col3  #home-dev {*/
-    /*background: url(../images/gears.png) no-repeat scroll 15px 5px;*/
+/*background: url(../images/gears.png) no-repeat scroll 15px 5px;*/
 /*}*/
 
 /*#features-table  #col3  #home-assets {*/
-    /*background: url(../images/server_client_exchange.png) no-repeat scroll 15px 5px;*/
+/*background: url(../images/server_client_exchange.png) no-repeat scroll 15px 5px;*/
 /*}*/
 
 /* ----------------------------------------------------- */
@@ -743,7 +739,7 @@ padding-right:0px;
     float: left;
     text-align: left;
     margin: 0 auto;
-    width: 400px;
+    width: 450px;
     height: auto;
 
 }
@@ -751,11 +747,15 @@ padding-right:0px;
 #load-ide-table #col2 {
     float: left;
     padding-left: 40px;
-    text-align: right;
+    text-align: center;
     margin: 0 auto;
     width: auto;
     height: auto;
     padding-right: 0px;
+}
+
+#load-ide-table p.intro {    
+    padding-bottom: 0px;
 }
 
 #ide-examples-table {
@@ -772,7 +772,7 @@ padding-right:0px;
     float: left;
     width: 100%;
     overflow: auto; /*padding-top: 20px;*/
-    border-top: #aaaaaa 1px solid;
+
 }
 
 #ide-examples-table .col1 {
@@ -784,24 +784,6 @@ padding-right:0px;
     height: auto;
     width: 300px;
 }
-
-#ide-examples-table2 {
-    overflow: auto;
-    height: auto;
-    margin-top: 10px;
-    margin-bottom: 40px;
-
-}
-
-#ide-examples-table2 .row {
-    margin-bottom: 20px;
-    padding: 0;
-    float: left;
-    width: 100%;
-    overflow: auto; /*padding-top: 20px;*/
-    border-top: #aaaaaa 1px solid;
-}
-
 
 #load-ide h1 {
     padding-top: 50px;
@@ -820,6 +802,7 @@ padding-right:0px;
 #ide-examples-table p.title {
     font-size: 1.0em;
     line-height: 1.1em;
+    font-weight: bold;
 }
 
 #ide-examples-table .col2 {

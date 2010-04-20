@@ -11,34 +11,6 @@
  the invocation of the "render" function near the bottom of this example, which passes them in.
 
  */
-
-//SceneJS.onEvent("error", function(e) {
-//    alert(e.message || e);
-//});
-//
-//SceneJS.onEvent("process-created", function(params) {
-//    alert("Process created:" + params.process.description);
-//});
-//
-//SceneJS.onEvent("process-timed-out", function(params) {
-//    alert("Process timed out:" + params.process.description);
-//});
-//
-//SceneJS.onEvent("process-killed", function(params) {
-//    alert("Process killed:" + params.process.description);
-//});
-//
-//SceneJS.onEvent("error", function(params) {
-//    var exception = params.exception;
-//    var message = exception.message;
-//    if (message != undefined) {
-//        alert("Error: " + message);
-//    } else {
-//        alert("Error: " + exception);
-//    }
-//});
-
-
 var exampleScene = SceneJS.scene({
 
     /* Bind to a WebGL canvas:
@@ -48,7 +20,7 @@ var exampleScene = SceneJS.scene({
     /* URL of the proxy server which will mediate the
      * cross-domain load of our airplane COLLADA model
      */
-    proxy:"http://scenejs.org/cgi-bin/jsonp_pryoxy.pl" },
+    proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
 
     /* Perspective transform:
      */
@@ -61,7 +33,7 @@ var exampleScene = SceneJS.scene({
             /* Viewing transform:
              */
                 SceneJS.lookAt({
-                    eye : { x: -1.0, y: 0.0, z: 15 },
+                    eye : { x: -1.0, y: 0.0, z: 25 },
                     look : { x: -1.0, y: 0, z: 0 },
                     up : { y: 1.0 }
                 },
@@ -107,7 +79,8 @@ var exampleScene = SceneJS.scene({
                                                 SceneJS.loadCollada({
                                                     uri: "http://www.scenejs.org/library/v0.7/assets/" +
                                                          "examples/seymourplane_triangulate/" +
-                                                         "seymourplane_triangulate.dae"
+                                                         "seymourplane_triangulate.dae",
+                                                    showBoundingBoxes: true
                                                 }))
                                         )
                                 )
@@ -121,8 +94,8 @@ var exampleScene = SceneJS.scene({
  *---------------------------------------------------------------------*/
 var pInterval;
 
-var yaw = -45;
-var pitch = 25;
+var yaw = 305;
+var pitch = 10;
 var lastX;
 var lastY;
 var dragging = false;
@@ -149,7 +122,6 @@ function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
-        exampleScene.render({yaw: yaw, pitch: pitch});
         lastX = event.clientX;
         lastY = event.clientY;
     }
@@ -159,20 +131,21 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
+//var i = 0;
 window.render = function() {
+    //    if (i++ > 10) {
+    //           window.clearInterval(pInterval);
+    //    }
     exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
-SceneJS.onEvent("error", function(params) {
-    clearInterval(pInterval);
-    var exception = params.exception;
-    var message = exception.message;
-    if (message != undefined) {
-        alert("Error: " + message);
-    } else {
-        alert("Error: " + exception);
-    }
-    throw exception;
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+
+SceneJS.onEvent("error", function(e) {
+    alert(e.exception.message)
 });
 
 pInterval = setInterval("window.render()", 10);

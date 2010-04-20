@@ -804,6 +804,40 @@ function SceneJS_math_Sphere3(center, radius) {
     };
 }
 
+/** Creates billboard matrix from given view matrix
+ */
+function SceneJS_math_billboardMat(viewMatrix) {
+    var rotVec = [
+        SceneJS_math_getColMat4(viewMatrix, 0),
+        SceneJS_math_getColMat4(viewMatrix, 1),
+        SceneJS_math_getColMat4(viewMatrix, 2)
+    ];
+
+    var scaleVec = [
+        SceneJS_math_lenVec4(rotVec[0]),
+        SceneJS_math_lenVec4(rotVec[1]),
+        SceneJS_math_lenVec4(rotVec[2])
+    ];
+
+    var scaleVecRcp = SceneJS_math_rcpVec3(scaleVec);
+    var sMat = SceneJS_math_scalingMat4v(scaleVec);
+    var sMatInv = SceneJS_math_scalingMat4v(scaleVecRcp);
+
+    rotVec[0] = SceneJS_math_mulVec4Scalar(rotVec[0], scaleVecRcp[0]);
+    rotVec[1] = SceneJS_math_mulVec4Scalar(rotVec[1], scaleVecRcp[1]);
+    rotVec[2] = SceneJS_math_mulVec4Scalar(rotVec[2], scaleVecRcp[2]);
+
+    var rotMatInverse = SceneJS_math_identityMat4();
+
+    SceneJS_math_setRowMat4(rotMatInverse, 0, rotVec[0]);
+    SceneJS_math_setRowMat4(rotMatInverse, 1, rotVec[1]);
+    SceneJS_math_setRowMat4(rotMatInverse, 2, rotVec[2]);
+
+    return SceneJS_math_mulMat4(rotMatInverse, sMat);
+   // return SceneJS_math_mulMat4(sMat, SceneJS_math_mulMat4(rotMatInverse, sMat));
+    //return SceneJS_math_mulMat4(sMatInv, SceneJS_math_mulMat4(rotMatInverse, sMat));
+}
+
 function SceneJS_math_FrustumPlane(nx, ny, nz, offset) {
     var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
     this.normal = [nx * s, ny * s, nz * s];

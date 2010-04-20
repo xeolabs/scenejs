@@ -373,7 +373,24 @@ window.render = function() {
     exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
-var pInterval = setInterval("window.render()", 10);
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
+ */
+var pInterval;
+
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
+
+
+
+
 
 
 

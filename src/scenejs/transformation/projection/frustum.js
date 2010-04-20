@@ -26,6 +26,7 @@ SceneJS.frustum = function() {
                             volume.zmax
                             );
                     transform = {
+                        type: "frustum",
                         matrix: tempMat
                     };
                 }

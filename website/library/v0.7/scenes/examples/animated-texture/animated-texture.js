@@ -51,7 +51,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                     dir:                    { x: -1.0, y: 0.0, z: -1.0 }
                                 }
                             ]},
-                                
+
                                 SceneJS.material({
                                     baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                                     specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
@@ -212,4 +212,3 @@ window.render = function() {
 };
 
 var pInterval = setInterval("window.render()", 10);
-

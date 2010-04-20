@@ -10,9 +10,9 @@ SceneJS._utils.ns("SceneJS.geometry");
         var nvecs = new Array(positions.length);
 
         for (var i = 0; i < indices.length; i++) {
-            var j0 = indices[i+0];
-            var j1 = indices[i+1];
-            var j2 = indices[i+2];
+            var j0 = indices[i + 0];
+            var j1 = indices[i + 1];
+            var j2 = indices[i + 2];
 
             var v1 = positions[j0];
             var v2 = positions[j1];
@@ -67,11 +67,11 @@ SceneJS._utils.ns("SceneJS.geometry");
                      */
                     if (!params) {
                         params = cfg.getParams(data);
-                        if (!params.type) { // Identifies VBO's on canvas
-                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                                    ("Geometry node parameter expected : type"));
-                        }
-                        type = SceneJS._utils.getParam(params.type, data);
+//                        if (!params.type) { // Identifies VBO's on canvas
+//                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+//                                    ("Geometry node parameter expected : type"));
+//                        }
+//                        type = SceneJS._utils.getParam(params.type, data);
                         if (params.create instanceof Function) {
 
                             /* Create must not be a dynamic config function!
@@ -89,19 +89,28 @@ SceneJS._utils.ns("SceneJS.geometry");
                         }
                     }
 
-                    /* Backend may have evicted the geometry, so we may have to re-create it
+                    /* Check geometry not evicted
                      */
-                    var geoId = geometryBackend.findGeometry(type);
+                    if (type) {                         
+                        if (!geometryBackend.testGeometryExists(type)) {
+                            type = null;
+                        };
+                    }
 
-                    if (!geoId) {
+                    /* type is null if geometry evicted or not yet defined
+                     */
+                    if (!type) {
                         if (create) {
-                            geoId = geometryBackend.createGeometry(type, create()); // Lazy-create geometry through callback
+
+                            /* Type generated if null
+                             */
+                            type = geometryBackend.createGeometry(params.type, create()); // Lazy-create geometry through callback
                         } else {
-                            geoId = geometryBackend.createGeometry(type, geo);
+                            type = geometryBackend.createGeometry(params.type, geo);
                         }
                     }
 
-                    geometryBackend.drawGeometry(geoId);
+                    geometryBackend.drawGeometry(type);
                     SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 });
     };

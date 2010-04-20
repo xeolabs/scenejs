@@ -4,6 +4,8 @@ var SceneJS = {
 
 (function() {
 
+
+
     /** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
      */
     //    SceneJS.require = function(url) {
@@ -215,8 +217,8 @@ var SceneJS = {
 
                     }
                 } else {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException
-                            ('Invalid node parameters - config should be first, IE. node(config, node, node,...)');
+                    errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException
+                            ("Invalid node parameters - config should be first, IE. node(config, node, node,...)"));
                 }
             }
             if (!result.getParams) {
@@ -240,8 +242,9 @@ var SceneJS = {
                     return param;
                 }
                 if (mandatory) {
-                    throw SceneJS.exceptions.NodeConfigExpectedException(
-                            nodeName + " property expected: \"" + name + "\"");
+                    SceneJS._backends.getBackend("error").fatalError(
+                            SceneJS.exceptions.NodeConfigExpectedException(
+                                    nodeName + " property expected: \"" + name + "\""));
                 }
                 else {
                     return null;
@@ -271,15 +274,15 @@ var SceneJS = {
          *
          * Wrapping SceneJS.someNode and augmenting the parameters argument with a new member, "myNewParam":
          *
-         *      SceneJs.myNewNode = function() {
-         *          var extendedArgs = SceneJs._utils.extendNodeArgs(arguments, { myNewParam : "new param value" });
-         *          return SceneJs.someNode.apply(this, extendedArgs);
+         *      SceneJS.myNewNode = function() {
+         *          var extendedArgs = SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" });
+         *          return SceneJS.someNode.apply(this, extendedArgs);
          *      };
          *
          * If the parameters argument already has a "myNewParam" then this won't replace it, unless you force it's
          * replacement with an override flag like this:
          *
-         *      var extendedArgs =  SceneJs._utils.extendNodeArgs(arguments, { myNewParam : "new param value" }, true);
+         *      var extendedArgs =  SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" }, true);
          *
          * @param args The JavaScript Arguments passed to the scene node function
          * @param cfg Each member of these is attached to the config object extracted from the arguments, overriding any member already there
@@ -345,7 +348,7 @@ var SceneJS = {
                         }, data);
                     }
                 } else {
-                    
+
                     /* Leaf node - if on right fringe of tree then
                      * render appended nodes
                      */
@@ -1292,6 +1295,40 @@ function SceneJS_math_Sphere3(center, radius) {
     };
 }
 
+/** Creates billboard matrix from given view matrix
+ */
+function SceneJS_math_billboardMat(viewMatrix) {
+    var rotVec = [
+        SceneJS_math_getColMat4(viewMatrix, 0),
+        SceneJS_math_getColMat4(viewMatrix, 1),
+        SceneJS_math_getColMat4(viewMatrix, 2)
+    ];
+
+    var scaleVec = [
+        SceneJS_math_lenVec4(rotVec[0]),
+        SceneJS_math_lenVec4(rotVec[1]),
+        SceneJS_math_lenVec4(rotVec[2])
+    ];
+
+    var scaleVecRcp = SceneJS_math_rcpVec3(scaleVec);
+    var sMat = SceneJS_math_scalingMat4v(scaleVec);
+    var sMatInv = SceneJS_math_scalingMat4v(scaleVecRcp);
+
+    rotVec[0] = SceneJS_math_mulVec4Scalar(rotVec[0], scaleVecRcp[0]);
+    rotVec[1] = SceneJS_math_mulVec4Scalar(rotVec[1], scaleVecRcp[1]);
+    rotVec[2] = SceneJS_math_mulVec4Scalar(rotVec[2], scaleVecRcp[2]);
+
+    var rotMatInverse = SceneJS_math_identityMat4();
+
+    SceneJS_math_setRowMat4(rotMatInverse, 0, rotVec[0]);
+    SceneJS_math_setRowMat4(rotMatInverse, 1, rotVec[1]);
+    SceneJS_math_setRowMat4(rotMatInverse, 2, rotVec[2]);
+
+    return SceneJS_math_mulMat4(rotMatInverse, sMat);
+   // return SceneJS_math_mulMat4(sMat, SceneJS_math_mulMat4(rotMatInverse, sMat));
+    //return SceneJS_math_mulMat4(sMatInv, SceneJS_math_mulMat4(rotMatInverse, sMat));
+}
+
 function SceneJS_math_FrustumPlane(nx, ny, nz, offset) {
     var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
     this.normal = [nx * s, ny * s, nz * s];
@@ -1604,7 +1641,8 @@ function SceneJS_webgl_Shader(context, type, source, logging) {
         logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
     }
     if (!this.valid) {
-        throw new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile");
+        SceneJS._backends.getBackend("error").fatalError(
+                new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile"));
     }
 }
 
@@ -1659,7 +1697,8 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
     }
 
     if (!this.valid) {
-        throw new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link");
+        SceneJS._backends.getBackend("error").fatalError(
+                new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link"));
     }
 
     /* Discover active uniforms and samplers
@@ -2081,6 +2120,21 @@ SceneJS.exceptions.PickWithoutRenderedException = function(msg, cause) {
     this.cause = cause;
 };
 
+SceneJS.exceptions.DataExpectedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.ImageLoadFailedException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+SceneJS.exceptions.AssetLoadTimeoutException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 
 /**
@@ -2102,6 +2156,8 @@ SceneJS.exceptions.PickWithoutRenderedException = function(msg, cause) {
  * a zero value like these ones.
  */
 SceneJS._eventTypes = {
+    ERROR : 0,
+
     INIT : 0,                           // SceneJS framework initialised
     RESET : 0,                          // SceneJS framework reset
 
@@ -2138,10 +2194,10 @@ SceneJS._eventTypes = {
     MATERIAL_EXPORTED : 0,
 
     TEXTURES_UPDATED : 0,              // Texture activated after a texture node visited
-    TEXTURES_EXPORTED : 0,    
+    TEXTURES_EXPORTED : 0,
 
     SHADER_ACTIVATE : 0,
-    
+
     SHADER_ACTIVATED : 0,
     SHADER_RENDERING : 0,
     SHADER_DEACTIVATED : 0 ,
@@ -2149,9 +2205,12 @@ SceneJS._eventTypes = {
     FOG_UPDATED: 0,
     FOG_EXPORTED: 0,
 
-    NAME_UPDATED: 0 ,
+    NAME_UPDATED: 0,
 
-    MOUSE_DOWN: 0
+    PROCESS_CREATED: 0,
+    PROCESS_KILLED: 0,
+    PROCESS_TIMED_OUT: 0
+
 };
 
 SceneJS._backends.installBackend(
@@ -2169,54 +2228,105 @@ SceneJS._backends.installBackend(
             }
             var events = new Array(nevents);
 
-
-            /* Interface on backend context
+            /**
+             * Registers a handler for the given event
+             *
+             * The handler can be registered with an optional priority number which specifies the order it is
+             * called among the other handler already registered for the event.
+             *
+             * So, with n being the number of commands registered for the given event:
+             *
+             * (priority <= 0)      - command will be the first called
+             * (priority >= n)      - command will be the last called
+             * (0 < priority < n)   - command will be called at the order given by the priority
+             *
+             * @param type Event type - one of the values in SceneJS._eventTypes
+             * @param command - Handler function that will accept whatever parameter object accompanies the event
+             * @param priority - Optional priority number (see above)
              */
-            ctx.events = {
-
-                /**
-                 * Registers a handler for the given event
-                 *
-                 * The handler can be registered with an optional priority number which specifies the order it is
-                 * called among the other handler already registered for the event.
-                 *
-                 * So, with n being the number of commands registered for the given event:
-                 *
-                 * (priority <= 0)      - command will be the first called
-                 * (priority >= n)      - command will be the last called
-                 * (0 < priority < n)   - command will be called at the order given by the priority
-                 *
-                 * @param type Event type - one of the values in SceneJS._eventTypes
-                 * @param command - Handler function that will accept whatever parameter object accompanies the event
-                 * @param priority - Optional priority number (see above)
-                 */
-                onEvent: function(type, command, priority) {
-                    var list = events[type];
-                    if (!list) {
-                        list = [];
-                        events[type] = list;
-                    }
-                    var handler = {
-                        command: command,
-                        priority : (priority == undefined) ? list.length : priority
-                    };
-                    for (var i = 0; i < list.length; i++) {
-                        if (list[i].priority > handler.priority) {
-                            list.splice(i, 0, handler);
-                            return;
-                        }
-                    }
-                    list.push(handler);
-                },
-
-                fireEvent: function(type, params) {
-                    var list = events[type];
-                    if (list) {
-                        for (var i = 0; i < list.length; i++) {
-                            list[i].command(params || {});
-                        }
+            function onEvent(type, command, priority) {
+                var list = events[type];
+                if (!list) {
+                    list = [];
+                    events[type] = list;
+                }
+                var handler = {
+                    command: command,
+                    priority : (priority == undefined) ? list.length : priority
+                };
+                for (var i = 0; i < list.length; i++) {
+                    if (list[i].priority > handler.priority) {
+                        list.splice(i, 0, handler);
+                        return;
                     }
                 }
+                list.push(handler);
+            }
+
+            function fireEvent(type, params) {
+                var list = events[type];
+                if (list) {
+                    for (var i = 0; i < list.length; i++) {
+                        list[i].command(params || {});
+                    }
+                }
+            }
+
+            /* Backend-facing API
+             */
+            ctx.events = {
+                onEvent : onEvent,
+                fireEvent : fireEvent
+            };
+
+            /* Node-facing API            
+             */
+            return {
+                onEvent : onEvent,
+                fireEvent : fireEvent
+            };
+        });
+/**
+ * Backend module that provides single point through which exceptions may be raised
+ */
+SceneJS._backends.installBackend(
+
+        "error",
+
+        function(ctx) {
+
+            ctx.events.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function() {
+                        time = (new Date()).getTime();
+                        ctx.events.fireEvent(SceneJS._eventTypes.TIME_UPDATED, time);
+                    });
+
+            function fatalError(e) {
+                ctx.events.fireEvent(SceneJS._eventTypes.ERROR,
+                {
+                    exception: e,
+                    fatal: true
+                });
+                throw e;
+            }
+
+            function error(e) {
+                ctx.events.fireEvent(SceneJS._eventTypes.ERROR,
+                {
+                    exception: e,
+                    fatal: false
+                });
+            }
+
+            ctx.error = { // Backend-facing API
+                fatalError : fatalError,
+                error : error
+            };
+
+            return {
+                fatalError : fatalError,
+                error : error
             };
         });
 /**
@@ -2419,71 +2529,71 @@ SceneJS.logging = function() {
 
 
 
-SceneJS.loggingToPage = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+(function() {
+    var errorBackend = SceneJS._backends.getBackend("error");
 
-    if (!cfg.fixed) {
-        throw new SceneJS.exceptions.UnsupportedOperationException
-                ("Dynamic configuration of loggingToPage nodes is not supported");
-    }
+    SceneJS.loggingToPage = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var backend = SceneJS._backends.getBackend('logging');
-    var funcs;
+        var backend = SceneJS._backends.getBackend('logging');
+        var funcs;
 
 
-    function findElement(elementId) {
-        var element;
-        if (!elementId) {
-            elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
-            element = document.getElementById(elementId);
-            if (!element) {
-                throw new SceneJS.exceptions.PageLoggingElementNotFoundException
-                        ("SceneJs.loggingToPage config 'elementId' omitted and no default element found with ID '"
-                                + SceneJS_webgl_DEFAULT_LOGGING_ID + "'");
-            }
-        } else {
-            element = document.getElementById(elementId);
-            if (!element) {
+        function findElement(elementId) {
+            var element;
+            if (!elementId) {
                 elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
                 element = document.getElementById(elementId);
                 if (!element) {
-                    throw new SceneJS.exceptions.PageLoggingElementNotFoundException
-                            ("SceneJs.loggingToPage config 'elementId' does not match any elements in page and no " +
-                             "default element found with ID '" + SceneJS_webgl_DEFAULT_LOGGING_ID + "'");
+                    errorBackend.fatalError(new SceneJS.exceptions.PageLoggingElementNotFoundException
+                            ("SceneJS.loggingToPage config 'elementId' omitted and no default element found with ID '"
+                                    + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
+                }
+            } else {
+                element = document.getElementById(elementId);
+                if (!element) {
+                    elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
+                    element = document.getElementById(elementId);
+                    if (!element) {
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.PageLoggingElementNotFoundException
+                                        ("SceneJS.loggingToPage config 'elementId' does not match any elements in page and no " +
+                                         "default element found with ID '" + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
+                    }
                 }
             }
+            return element;
         }
-        return element;
-    }
 
-    return SceneJS._utils.createNode(
-            function(traversalContext, data) {
-                if (!funcs) {
-                    var params = cfg.getParams();                  
+        return SceneJS._utils.createNode(
+                function(traversalContext, data) {
+                    if (!funcs) {
+                        var params = cfg.getParams();
 
-                    var element = findElement(params.elementId);
+                        var element = findElement(params.elementId);
 
-                    funcs = {
-                        warn : function (msg) {
-                            element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
-                        },
-                        error : function (msg) {
-                            element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
-                        },
-                        debug : function (msg) {
-                            element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
-                        },
-                        info : function (msg) {
-                            element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
-                        }
-                    };
-                }
-                var prevFuncs = backend.getFuncs();
-                backend.setFuncs(funcs);
-                SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                backend.setFuncs(prevFuncs);
-            });
-};
+                        funcs = {
+                            warn : function (msg) {
+                                element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
+                            },
+                            error : function (msg) {
+                                element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
+                            },
+                            debug : function (msg) {
+                                element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
+                            },
+                            info : function (msg) {
+                                element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
+                            }
+                        };
+                    }
+                    var prevFuncs = backend.getFuncs();
+                    backend.setFuncs(funcs);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                    backend.setFuncs(prevFuncs);
+                });
+    };
+})();
 /**
  * Backend module for asynchronous process management.
  *
@@ -2540,10 +2650,24 @@ SceneJS._backends.installBackend(
                                     group.numProcesses--;
                                 } else {
                                     var elapsed = time - process.timeStarted;
-                                    if (elapsed > (process.timeout * 1000)) {
+                                    if (elapsed > (process.timeoutSecs * 1000)) {
+
                                         ctx.logging.warn("Process timed out after " +
                                                          process.timeoutSecs +
                                                          " seconds: " + process.description);
+
+                                        /* Process timed out - notify listeners
+                                         */
+                                        ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_TIMED_OUT, {
+                                            sceneId: activeSceneId,
+                                            process: {
+                                                id: process.id,
+                                                timeStarted : process.timeStarted,
+                                                description: process.description,
+                                                timeoutSecs: process.timeoutSecs
+                                            }
+                                        });
+
                                         process.destroyed = true;
                                         processes[pid] = undefined;
                                         group.numProcesses--;
@@ -2594,13 +2718,16 @@ SceneJS._backends.installBackend(
                  */
                 createProcess: function(cfg) {
                     if (!activeSceneId) {
-                        throw new SceneJS.exceptions.NoSceneActiveException("No scene active - can't create process");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoSceneActiveException("No scene active - can't create process"));
                     }
                     var group = groups[activeSceneId];
                     var i = 0;
                     while (true) {
                         var pid = activeSceneId + i++;
                         if (!group.processes[pid]) {
+
+                            /* Register process
+                             */
                             var process = {
                                 sceneId: activeSceneId,
                                 id: pid,
@@ -2612,7 +2739,19 @@ SceneJS._backends.installBackend(
                             };
                             group.processes[pid] = process;
                             group.numProcesses++;
-                          //  ctx.logging.debug("Created process: " + cfg.description);
+
+                            /* Notify listeners
+                             */
+                            ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_CREATED, {
+                                sceneId: activeSceneId,
+                                process: {
+                                    id: process.id,
+                                    timeStarted : process.timeStarted,
+                                    description: process.description,
+                                    timeoutSecs: process.timeoutSecs
+                                }
+                            });
+
                             return process;
                         }
                     }
@@ -2625,7 +2764,18 @@ SceneJS._backends.installBackend(
                 killProcess: function(process) {
                     if (process) {
                         process.destroyed = true;
-                     //   ctx.logging.debug("Destroyed process: " + process.description);
+
+                        /* Notify listeners
+                             */
+                            ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_KILLED, {
+                                sceneId: activeSceneId,
+                                process: {
+                                    id: process.id,
+                                    timeStarted : process.timeStarted,
+                                    description: process.description,
+                                    timeoutSecs: process.timeoutSecs
+                                }
+                            });
                     }
                 },
 
@@ -2751,7 +2901,7 @@ SceneJS._backends.installBackend(
                             }
                         });
 
-                
+
             }
 
             return { // Node-facing API
@@ -2788,8 +2938,8 @@ SceneJS._backends.installBackend(
                  */
                 loadAsset : function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
                     if (!proxyUri) {
-                        throw new SceneJS.exceptions.ProxyNotSpecifiedException
-                                ("SceneJS.load node expects you to provide a 'proxy' configuration on the SceneJS.scene root node");
+                        ctx.error.fatalError(new SceneJS.exceptions.ProxyNotSpecifiedException
+                                ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
                     }
                     ctx.logging.debug("Loading asset from " + uri);
                     var process = ctx.processes.createProcess({
@@ -2801,7 +2951,7 @@ SceneJS._backends.installBackend(
                             onTimeout();
                         },
                         description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
-                        timeoutSecs: 180 // 180 seconds - Big timeout to allow files to parse
+                        timeoutSecs: 180 // Big timeout to allow files to parse
                     });
                     var callbackName = "callback" + process.id; // Process ID is globally unique
                     _loadAsset(
@@ -2833,14 +2983,12 @@ SceneJS._backends.installBackend(
  */
 SceneJS.load = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-//    if (!cfg.fixed) {
-//        throw new SceneJS.exceptions.UnsupportedOperationException
-//                ("Dynamic configuration of SceneJS.load nodes is not supported");
-//    }
+
     var params;
 
     var backend = SceneJS._backends.getBackend("load");
     var logging = SceneJS._backends.getBackend("logging");
+    var errorBackend = SceneJS._backends.getBackend("error");
     var process = null;
     var assetNode;
 
@@ -2870,7 +3018,7 @@ SceneJS.load = function() {
             for (var key in params.params) {
                 childData.put(key, params.params[key]);
             }
-            assetNode.func.call(this, traversalContext,  childData);
+            assetNode.func.call(this, traversalContext, childData);
         } else {
             assetNode.func.call(this, traversalContext, data);
         }
@@ -2882,9 +3030,9 @@ SceneJS.load = function() {
                 if (!params) {
                     params = cfg.getParams(data);
                     if (!params.uri) {
-                        throw new SceneJS.exceptions.NodeConfigExpectedException
-                                ("Mandatory SceneJS.load parameter missing: uri");
-                    }                 
+                        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                ("Scene definiton error - mandatory SceneJS.load parameter missing: uri"));
+                    }
                 }
 
                 if (state == STATE_ATTACHED) {
@@ -2921,12 +3069,14 @@ SceneJS.load = function() {
                                     state = STATE_LOADED;
                                 },
                                 function() { // onTimeout
-                                    state = STATE_ERROR;                                 
+                                    state = STATE_ERROR;
+                                    errorBackend.error(
+                                            new SceneJS.exceptions.AssetLoadTimeoutException(
+                                                    "SceneJS.load timed out - uri: " + params.uri));
                                 },
                                 function(msg) { // onError - backend has killed process
                                     state = STATE_ERROR;
-                                    logging.getLogger().error(
-                                            "SceneJS.load failed - " + msg + " - uri: " + params.uri);
+                                    errorBackend.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
                                 });
                         break;
 
@@ -2936,711 +3086,697 @@ SceneJS.load = function() {
             });
 };
 /**
- * Parses a COLLADA files into a SceneJS nodes.
+ * Backend that parses a COLLADA files into a SceneJS nodes.
  *
  * This is an experimental parser constructed using techniques poached from other examples out there, most notably
  * that of GLGE, which you can find at http://github.com/supereggbert/GLGE
  *
- * Parsing large Collada documents client-side is not encouraged however, and is not likely to be seriously
- * supported by SceneJS.
- *
- * The recommended way to load Collada is to use SceneJS.assets.scenejs nodes to pull SceneJS fragments from a
- * server-side proxy that parses Collada.
  */
-SceneJS._utils.__ColladaParser = (function() {
-    var logger;
-    var xmlDoc; // Holds DOM parsed from XML string
-    var uri;    // URI at which Collada document resides
-    var dirURI; // Path to directory containing the Collada document
-    var idMap = {}; // Maps every DOM element by ID
-    var sources = {};
+SceneJS._backends.installBackend(
 
-    /** Frees scratch memory
-     */
-    function cleanup() {
-        xmlDoc = null;
-        idMap = {};
-        sources = {};
-    }
+        "collada",
 
-    /**
-     * Parses the given XML string into the xmlDoc
-     */
-    function loadDoc(xml) {
-        if (window.DOMParser) {
-            var parser = new DOMParser();
-            xmlDoc = parser.parseFromString(xml, "text/xml");
-        }
-        else { // Internet Explorer
-            xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-            xmlDoc.async = "false";
-            xmlDoc.loadXML(xml);
-        }
-    }
+        function(ctx) {
+            var xmlDoc; // Holds DOM parsed from XML string
+            var uri;    // URI at which Collada document resides
+            var dirURI; // Path to directory containing the Collada document
+            var idMap = {}; // Maps every DOM element by ID
+            var sources = {};
 
-    /**
-     * Finds every element in the xmlDoc and maps the by IDs into the idMap
-     */
-    function buildIdMap() {
-        idMap = {};
-        var elements = xmlDoc.getElementsByTagName("*");
-        var id;
-        for (var i = elements.length - 1; i >= 0; i--) {
-            id = elements[i].getAttribute("id");
-            if (id != "") {
-                idMap[id] = elements[i];
-            }
-        }
-    }
-
-    /**
-     * Parses the xmlDoc, optionally constrained to the subtree identified by rootId
-     */
-    function parseDoc(rootId) {
-        if (rootId) {
-            //  logger.info("Parsing Collada asset '" + rootId + "'");
-            var root = idMap[rootId];
-            if (root) {
-                return parseNode(root);
-            } else {
-                throw new SceneJS.exceptions.ColladaRootNotFoundException(
-                        "SceneJS.assets.collada root not found in COLLADA document: '" + rootId + "'");
-            }
-        } else {
-            logger.info("Parsing Collada scene. Asset: " + rootId ? "'" + rootId + "'" : "default");
-            var scene = xmlDoc.getElementsByTagName("scene");
-            if (scene.length > 0) {
-                return parseNode(scene[0]);
-            } else {
-                throw new SceneJS.exceptions.ColladaRootRequiredException(
-                        "SceneJS.assets.collada root needs to be specified for COLLADA document: " + uri);
-            }
-        }
-    }
-
-    function parseArray(node) {
-        var result = [];
-        var prev = "";
-        var child = node.firstChild;
-        var currArray;
-        while (child) {
-            currArray = (prev + child.nodeValue).replace(/\s+/g, " ").replace(/^\s+/g, "").split(" ");
-            child = child.nextSibling;
-            if (currArray[0] == "") {
-                currArray.unshift();
-            }
-            if (child) {
-                prev = currArray.pop();
-            }
-            for (var i = 0; i < currArray.length; i++) {
-                result.push(currArray[i]);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns the data for either a <vertices> or a <source>
-     *
-     * A <source> declares a data repository that provides values according
-     * to the semantics of an <input> element that refers to it.
-     */
-    function getSource(id) {
-        var source = sources[id];
-        if (source) {
-            return source;
-        }
-        var element = idMap[id];
-        if (element.tagName == "vertices") {
-
-            /* Recurse to child <source> element
+            /** Frees scratch memory
              */
-            source = getSource(
-                    element
-                            .getElementsByTagName("input")[0]
-                            .getAttribute("source")
-                            .substr(1));
-        } else {
+            function cleanup() {
+                xmlDoc = null;
+                idMap = {};
+                sources = {};
+            }
 
-            /* Element is a <source>
+            /**
+             * Parses the given XML string into the xmlDoc
              */
-            var accessor = element
-                    .getElementsByTagName("technique_common")[0]
-                    .getElementsByTagName("accessor")[0];
+            function loadDoc(xml) {
+                if (window.DOMParser) {
+                    var parser = new DOMParser();
+                    xmlDoc = parser.parseFromString(xml, "text/xml");
+                }
+                else { // Internet Explorer
+                    xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+                    xmlDoc.async = "false";
+                    xmlDoc.loadXML(xml);
+                }
+            }
 
-            var stride = parseInt(accessor.getAttribute("stride"));         // Number of values per unit
-            var offset = parseInt(accessor.getAttribute("offset")) || 0;    // Index of first value
-            var count = parseInt(accessor.getAttribute("count"));           // Number of units
-
-            /* Create mask that indicates what data types are in the
-             * source - int, float, Name, bool and IDREF.
-             *
-             * The number and type of the <param> elements define the
-             * output of the <accessor>. Parameters are bound to values
-             * in the order in which both are specified. A <param> wtihout
-             * a name attribute indicates that the value is not part of the
-             * input.
+            /**
+             * Finds every element in the xmlDoc and maps the by IDs into the idMap
              */
-            var params = accessor.getElementsByTagName("param");
-            var typeMask = [];
-            for (var i = 0; i < params.length; i++) {
-                if (params[i].hasAttribute("name")) {
-                    typeMask.push(true);
+            function buildIdMap() {
+                idMap = {};
+                var elements = xmlDoc.getElementsByTagName("*");
+                var id;
+                for (var i = elements.length - 1; i >= 0; i--) {
+                    id = elements[i].getAttribute("id");
+                    if (id != "") {
+                        idMap[id] = elements[i];
+                    }
+                }
+            }
+
+            /**
+             * Parses the xmlDoc, optionally constrained to the subtree identified by rootId
+             */
+            function parseDoc(rootId) {
+                if (rootId) {
+                    ctx.logging.info("Parsing Collada asset '" + rootId + "'");
+                    var root = idMap[rootId];
+                    if (root) {
+                        return parseNode(root);
+                    } else {
+                        ctx.error.error(new SceneJS.exceptions.ColladaRootNotFoundException(
+                                "SceneJS.assets.collada root not found in COLLADA document: '" + rootId + "'"));
+                    }
                 } else {
-                    typeMask.push(false);
+                    ctx.logging.info("Parsing Collada scene. Asset: " + rootId ? "'" + rootId + "'" : "default");
+                    var scene = xmlDoc.getElementsByTagName("scene");
+                    if (scene.length > 0) {
+                        return parseNode(scene[0]);
+                    } else {
+                        ctx.error.error(new SceneJS.exceptions.ColladaRootRequiredException(
+                                "SceneJS.assets.collada root needs to be specified for COLLADA document: " + uri));
+                    }
                 }
             }
 
-            source = {
-                array:parseArray(idMap[accessor.getAttribute("source").substr(1)]),
-                stride:stride,
-                offset:offset,
-                count:count,
-                typeMask: typeMask
-            };
-        }
-        sources[id] = source;
-        return source;
-    }
-
-    function getMaxOffset(inputs) {
-        var maxOffset = 0;
-        for (var n = 0; n < inputs.length; n++) {
-            var offset = inputs[n].getAttribute("offset");
-            if (offset > maxOffset) {
-                maxOffset = offset;
-            }
-        }
-        return maxOffset;
-    }
-
-    function getTrianglesFromPolyList(polyList) {
-        var i, j, k;
-        var inputs = polyList.getElementsByTagName("input");
-        var maxOffset = getMaxOffset(inputs);
-        var vcount = parseArray(polyList.getElementsByTagName("vcount")[0]);
-        var faces = parseArray(polyList.getElementsByTagName("p")[0]);
-        var triangles = [];
-        var base = 0;
-        for (i = 0; i < vcount.length; i++) {
-            for (j = 0; j < vcount[i] - 2; j++) { // For each vertex
-                for (k = 0; k <= maxOffset; k++) { // A
-                    triangles.push(faces[base + k]);
+            function parseArray(node) {
+                var result = [];
+                var prev = "";
+                var child = node.firstChild;
+                var currArray;
+                while (child) {
+                    currArray = (prev + child.nodeValue).replace(/\s+/g, " ").replace(/^\s+/g, "").split(" ");
+                    child = child.nextSibling;
+                    if (currArray[0] == "") {
+                        currArray.unshift();
+                    }
+                    if (child) {
+                        prev = currArray.pop();
+                    }
+                    for (var i = 0; i < currArray.length; i++) {
+                        result.push(currArray[i]);
+                    }
                 }
-                for (k = 0; k <= maxOffset; k++) { // B
-                    triangles.push(faces[base + (maxOffset + 1) * (j + 1) + k]);
+                return result;
+            }
+
+            /**
+             * Returns the data for either a <vertices> or a <source>
+             *
+             * A <source> declares a data repository that provides values according
+             * to the semantics of an <input> element that refers to it.
+             */
+            function getSource(id) {
+                var source = sources[id];
+                if (source) {
+                    return source;
                 }
-                for (k = 0; k <= maxOffset; k++) { // C
-                    triangles.push(faces[base + (maxOffset + 1) * (j + 2) + k]);
-                }
-            }
-            base = base + (maxOffset + 1) * vcount[i];
-        }
-        return triangles;
-    }
+                var element = idMap[id];
+                if (element.tagName == "vertices") {
 
-    /** Extracts list of triangles from the given <mesh>, merged from both the
-     * <triangles> and <polylist> child nodes of the <mesh>.
-     */
-    function getTrianglesList(geometryNode) {
-        var trianglesList = [];
-        var meshNode = geometryNode.getElementsByTagName("mesh")[0];
+                    /* Recurse to child <source> element
+                     */
+                    source = getSource(
+                            element
+                                    .getElementsByTagName("input")[0]
+                                    .getAttribute("source")
+                                    .substr(1));
+                } else {
 
-        /* Extract <polylist> children
-         */
-        var polyLists = meshNode.getElementsByTagName("polylist");
-        for (var i = 0; i < polyLists.length; i++) {
-            var polyList = polyLists[i];
-            polyList.getElementsByTagName("p")[0].data = getTrianglesFromPolyList(polyList);
-            trianglesList.push(polyList);
-        }
+                    /* Element is a <source>
+                     */
+                    var accessor = element
+                            .getElementsByTagName("technique_common")[0]
+                            .getElementsByTagName("accessor")[0];
 
-        var tris = meshNode.getElementsByTagName("triangles");
-        for (i = 0; i < tris.length; i++) {
-            //  logger.info("Parsing &lt;triangle&gt; " + i);
-            trianglesList.push(tris[i]);
-        }
-        return trianglesList;
-    }
+                    var stride = parseInt(accessor.getAttribute("stride"));         // Number of values per unit
+                    var offset = parseInt(accessor.getAttribute("offset")) || 0;    // Index of first value
+                    var count = parseInt(accessor.getAttribute("count"));           // Number of units
 
-    var x = 0;
-
-    /** Parses a <geometry> and returns an array containing a SceneJS.geometry node for
-     * each <mesh> child
-     *
-     * @param id
-     */
-    function getGeometriesData(geometryNode) {
-        var geometriesData = [];
-        var trianglesList = getTrianglesList(geometryNode);
-
-        for (var it = 0; it < trianglesList.length; it++) {
-            // logger.info("Parsing &lt;triangle&gt; " + it);
-            var triangle = trianglesList [it];
-            var inputs = triangle.getElementsByTagName("input");
-            var inputArray = [];
-            var outputData = {};
-
-            for (var n = 0; n < inputs.length; n++) {
-                // logger.info("Parsing &lt;input&gt; " + n);
-                inputs[n].data = getSource(inputs[n].getAttribute("source").substr(1));
-                var group = inputs[n].getAttribute("semantic");
-                if (group == "TEXCOORD") {
-                    //   logger.info("Parsing TEXCOORD" + i);
-                    group = group + inputs[n].getAttribute("set") || 0;
-                }
-                inputs[n].group = group;
-                inputArray[inputs[n].getAttribute("offset")] = inputs[n];
-                outputData[group] = [];
-            }
-
-            //   logger.info("Parsing &lt;face&gt;s..");
-            var faces;
-            if (triangle.getElementsByTagName("p")[0].data) {
-                faces = triangle.getElementsByTagName("p")[0].data;
-            }
-            else {
-                faces = parseArray(triangle.getElementsByTagName("p")[0]);
-            }
-
-            //  logger.info("Parsed &lt;face&gt; count =  " + faces.length);
-
-            for (var i = 0; i < faces.length; i = i + inputArray.length) {
-                for (var n = 0; n < inputArray.length; n++) {
-                    var group = inputArray[n].group;
-                    var pCount = 0;
-                    for (var j = 0; j < inputArray[n].data.stride; j++) {
-                        if (inputArray[n].data.typeMask[j]) {
-                            outputData[group].push(
-                                    inputArray[n].data.array[faces[i + n]
-                                            * inputArray[n].data.stride + j
-                                            + inputArray[n].data.offset]);
-                            pCount++;
+                    /* Create mask that indicates what data types are in the
+                     * source - int, float, Name, bool and IDREF.
+                     *
+                     * The number and type of the <param> elements define the
+                     * output of the <accessor>. Parameters are bound to values
+                     * in the order in which both are specified. A <param> wtihout
+                     * a name attribute indicates that the value is not part of the
+                     * input.
+                     */
+                    var params = accessor.getElementsByTagName("param");
+                    var typeMask = [];
+                    for (var i = 0; i < params.length; i++) {
+                        if (params[i].hasAttribute("name")) {
+                            typeMask.push(true);
+                        } else {
+                            typeMask.push(false);
                         }
                     }
 
-                    /* 1D
-                     */
-                    if (group == "VERTEX" && pCount == 1) {
-                        outputData[group].push(0);
-                    }
-
-                    /* 2D
-                     */
-                    if (group == "VERTEX" && pCount == 2) {
-                        outputData[group].push(0);
-                    }
-
-                    /* 2D textures
-                     */
-                    if (group == "TEXCOORD0" && pCount == 3) {
-                        outputData[group].pop();
-                    }
-                    if (group == "TEXCOORD1" && pCount == 3) {
-                        outputData[group].pop();
-                    }
+                    source = {
+                        array:parseArray(idMap[accessor.getAttribute("source").substr(1)]),
+                        stride:stride,
+                        offset:offset,
+                        count:count,
+                        typeMask: typeMask
+                    };
                 }
+                sources[id] = source;
+                return source;
             }
 
-            faces = [];
-            for (n = 0; n < outputData.VERTEX.length / 3; n++) {
-                faces.push(n);
-            }
-
-
-            geometriesData.push({
-                materialName : triangle.getAttribute("material"),
-                positions: outputData.VERTEX,
-                normals: outputData.NORMAL,
-                uv : outputData.TEXCOORD0,
-                uv2 : outputData.TEXCOORD1,
-                indices: faces
-            });
-        }
-        return geometriesData;
-    }
-
-    /**
-     * Returns profile/newparam[sid="<sid>"]/sampler2D[0]/source[0].nodeValue
-     */
-    function getSamplerSource(profile, sid) {
-        var params = profile.getElementsByTagName("newparam");
-        for (var i = 0; i < params.length; i++) {
-            if (params[i].getAttribute("sid") == sid) {
-                return params[i]
-                        .getElementsByTagName("sampler2D")[0]
-                        .getElementsByTagName("source")[0]
-                        .firstChild
-                        .nodeValue;
-            }
-        }
-        throw new SceneJS.exceptions.ColladaParseException
-                ("Element expected: "
-                        + profile.tagName
-                        + "/newparam[sid == '"
-                        + sid + "']/sampler2D[0]/source[0]");
-    }
-
-    /**
-     * Returns profile/newparam[sid="<sid>"]/surface[0]/init_from[0].nodeValue
-     */
-    function getImageId(profile, sid) {
-        var newparams = profile.getElementsByTagName("newparam");
-        for (var i = 0; i < newparams.length; i++) {
-            if (newparams[i].getAttribute("sid") == sid) {
-                var surface = newparams[i].getElementsByTagName("surface")[0];
-                return surface
-                        .getElementsByTagName("init_from")[0]
-                        .firstChild
-                        .nodeValue;
-            }
-        }
-        throw new SceneJS.exceptions.ColladaParseException
-                ("Element expected: "
-                        + profile.tagName
-                        + "/newparam[sid == '"
-                        + sid + "']/surface[0]/init_from[0]");
-    }
-
-    function getTextureData(profileCommon, texture, applyTo) {
-        var source = getSamplerSource(profileCommon, texture.getAttribute("texture"));
-        var imageId = getImageId(profileCommon, source);
-        var image = idMap[imageId];
-        var imageFileName = image.getElementsByTagName("init_from")[0].firstChild.nodeValue;
-        var blendMode = texture.getElementsByTagName("blend_mode")[0];
-        return {
-            uri : dirURI + imageFileName,
-            applyTo: applyTo,
-            blendMode: (blendMode == "MULTIPLY") ? "multiply" : "add"
-        };
-    }
-
-    function getDiffuseMaterialData(profileCommon, technique, materialData) {
-        var diffuse = technique.getElementsByTagName("diffuse");
-        if (diffuse.length > 0) {
-            var child = diffuse[0].firstChild;
-            do{
-                switch (child.tagName) {
-                    case "color":
-                        var color = child.firstChild.nodeValue.split(" ");
-                        materialData.baseColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]) };
-                        break;
-
-                    case "texture":
-                        materialData.texturesData.push(
-                                getTextureData(profileCommon, child, "baseColor"));
-                        break;
-                }
-            } while (child = child.nextSibling);
-        }
-    }
-
-    function getSpecularColorMaterialData(profileCommon, technique, materialData) {
-        var specular = technique.getElementsByTagName("specular");
-        if (specular.length > 0) {
-            var child = specular[0].firstChild;
-            do{
-                switch (child.tagName) {
-                    case "color":
-                        var color = child.firstChild.nodeValue.split(" ");
-                        materialData.specularColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]),a: 1 };
-                        break;
-
-                    case "texture":
-                        materialData.texturesData.push(
-                                getTextureData(profileCommon, child, "specularColor"));
-                        break;
-                }
-            } while (child = child.nextSibling);
-        }
-    }
-
-    function getShininessMaterialData(profileCommon, technique, materialData) {
-        var shininess = technique.getElementsByTagName("shininess");
-        if (shininess.length > 0) {
-            var child = shininess[0].firstChild;
-            do{
-                switch (child.tagName) {
-                    case "float":
-                        materialData.shine = parseFloat(child.firstChild.nodeValue);
-                        break;
-
-                    case "texture":
-                        materialData.texturesData.push(
-                                getTextureData(profileCommon, child, "shine"));
-
-                        break;
-                }
-            } while (child = child.nextSibling);
-        }
-    }
-
-    function getBumpMapMaterialData(profileCommon, technique, materialData) {
-        var bump = technique.getElementsByTagName("bump");
-        if (bump.length > 0) {
-            var child = bump[0].firstChild;
-            do{
-                switch (child.tagName) {
-                    case "texture":
-                        logger.warn("Collada bump mapping not supported yet");
-                        break;
-                }
-            } while (child = child.nextSibling);
-        }
-    }
-
-    function getMaterialData(id) {
-        var materialNode = idMap[id];
-        var effectId = materialNode
-                .getElementsByTagName("instance_effect")[0]
-                .getAttribute("url")
-                .substr(1);
-        var effect = idMap[effectId];
-        var profileCommon = effect.getElementsByTagName("profile_COMMON")[0];
-        var technique = profileCommon.getElementsByTagName("technique")[0];
-        var materialData = {
-            texturesData : []
-        };
-        getDiffuseMaterialData(profileCommon, technique, materialData);
-        getSpecularColorMaterialData(profileCommon, technique, materialData);
-        getShininessMaterialData(profileCommon, technique, materialData);
-        getBumpMapMaterialData(profileCommon, technique, materialData);
-        return materialData;
-    }
-
-    function getMaterialsData(instanceGeometryNode) {
-        var materialsData = {};
-        var materials = instanceGeometryNode.getElementsByTagName("instance_material");
-        var material;
-        var materialId;
-        var symbolId;
-        for (var i = 0; i < materials.length; i++) {
-            material = materials[i];
-            materialId = material.getAttribute("target").substr(1);
-            symbolId = material.getAttribute("symbol");
-            materialsData[symbolId] = getMaterialData(materialId);
-        }
-        return materialsData;
-    }
-
-    function parseInstanceGeometry(instanceGeometryNode) {
-        var geometryNode = idMap[instanceGeometryNode.getAttribute("url").substr(1)];
-        var geometriesData = getGeometriesData(geometryNode);
-        var materialsData = getMaterialsData(instanceGeometryNode);
-
-        var geometries = [];
-
-        for (var i = 0; i < geometriesData.length; i++) {
-
-            var geoData = geometriesData[i];
-
-
-
-            var sceneNode = SceneJS.geometry({
-                type: "xxx" + x++,
-                primitive: "triangles",
-                positions: geoData.positions,
-                normals: geoData.normals,
-                uv : geoData.uv,
-                uv2 : geoData.uv2,
-                indices: geoData.indices
-            });
-
-            if (geoData.materialName) {
-                var materialData = materialsData[geoData.materialName];
-
-                /* Wrap in SceneJS.material
-                 */
-                sceneNode = SceneJS.material({
-                    baseColor: materialData.baseColor,
-                    specularColor: materialData.specularColor ,
-                    shine: 10.0,
-                    specular: 1
-                }, sceneNode);
-
-
-                /* Wrap in SceneJS.texture
-                 */
-                var textureLayers = materialData.texturesData;
-                if (textureLayers.length > 0) {
-                    var layers = [];
-                    for (var j = 0; j < textureLayers.length; j++) {
-                        layers.push({
-                            uri : textureLayers[j].uri,
-                            applyTo: textureLayers[j].applyTo,
-                            flipY : false,
-                            blendMode: textureLayers[j].blendMode,
-
-                            wrapS: "repeat",
-                            wrapT: "repeat" ,
-                             minFilter: "linearMipMapLinear",
-                    magFilter: "linear"
-                        });
+            function getMaxOffset(inputs) {
+                var maxOffset = 0;
+                for (var n = 0; n < inputs.length; n++) {
+                    var offset = inputs[n].getAttribute("offset");
+                    if (offset > maxOffset) {
+                        maxOffset = offset;
                     }
-                    sceneNode = SceneJS.texture({
-                        layers: layers
-                    }, sceneNode);
                 }
+                return maxOffset;
             }
-            geometries.push(sceneNode);
-        }
 
+            function getTrianglesFromPolyList(polyList) {
+                var i, j, k;
+                var inputs = polyList.getElementsByTagName("input");
+                var maxOffset = getMaxOffset(inputs);
+                var vcount = parseArray(polyList.getElementsByTagName("vcount")[0]);
+                var faces = parseArray(polyList.getElementsByTagName("p")[0]);
+                var triangles = [];
+                var base = 0;
+                for (i = 0; i < vcount.length; i++) {
+                    for (j = 0; j < vcount[i] - 2; j++) { // For each vertex
+                        for (k = 0; k <= maxOffset; k++) { // A
+                            triangles.push(faces[base + k]);
+                        }
+                        for (k = 0; k <= maxOffset; k++) { // B
+                            triangles.push(faces[base + (maxOffset + 1) * (j + 1) + k]);
+                        }
+                        for (k = 0; k <= maxOffset; k++) { // C
+                            triangles.push(faces[base + (maxOffset + 1) * (j + 2) + k]);
+                        }
+                    }
+                    base = base + (maxOffset + 1) * vcount[i];
+                }
+                return triangles;
+            }
 
-        /* Group SceneJS.geometries in a SceneJS.node
-         */
-        return SceneJS.node.apply(this, geometries);
-    }
-
-    function parseMatrix(node) {
-        var data = parseArray(node);
-        // logger.info("Parsing matrix (" + data.length + "): [" + data.join(", ") + "]");
-        return data;
-    }
-
-    function parseTranslate(node) {
-        var data = parseArray(node);
-        var x = data[0];
-        var y = data[1];
-        var z = data[2];
-        return SceneJS_math_translationMat4v(data);
-    }
-
-    function parseRotate(node) {
-        var data = parseArray(node);
-        var x = data[0];
-        var y = data[1];
-        var z = data[2];
-        var angle = data[3];
-        return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
-    }
-
-    /**
-     * Returns a SceneJS node created from the given DOM node.
-     *
-     * We're loading only geometry, transforms and material for SceneJS assets, ignoring nodes like cameras and lights.
-     */
-    function parseNode(node, level) {
-        level = level || 0;
-        logger.setIndent(level);
-        level++;
-
-        /* Builds params for our scene node
-         */
-        var sceneNodeParams = [];
-
-        /* Matrix created from any transforms found
-         */
-        var matrix = SceneJS_math_identityMat4();
-
-        var child = node.firstChild;
-
-        do{
-            /* Traverse child nodes
+            /** Extracts list of triangles from the given <mesh>, merged from both the
+             * <triangles> and <polylist> child nodes of the <mesh>.
              */
-            switch (child.tagName) {
+            function getTrianglesList(geometryNode) {
+                var trianglesList = [];
+                var meshNode = geometryNode.getElementsByTagName("mesh")[0];
 
-                case "node":
-                    sceneNodeParams.push(parseNode(child, level + 1));
-                    break;
+                /* Extract <polylist> children
+                 */
+                var polyLists = meshNode.getElementsByTagName("polylist");
+                for (var i = 0; i < polyLists.length; i++) {
+                    var polyList = polyLists[i];
+                    polyList.getElementsByTagName("p")[0].data = getTrianglesFromPolyList(polyList);
+                    trianglesList.push(polyList);
+                }
 
-                case "matrix":
-                    var array = parseMatrix(child);
-
-                    /* Convert row-major to SceneJS column-major
-                     */
-                    matrix = [
-                        array[0],array[4],array[8],array[12],
-                        array[1],array[5],array[9],array[13],
-                        array[2],array[6],array[10],array[14],
-                        array[3],array[7],array[11],array[15]];
-                    break;
-
-                case "translate":
-                    matrix = matrix
-                            ? SceneJS_math_mulMat4(matrix, parseTranslate(child))
-                            : parseTranslate(child);
-                    break;
-
-                case "rotate":
-                    matrix = matrix
-                            ? SceneJS_math_mulMat4(matrix, parseRotate(child))
-                            : parseRotate(child);
-                    break;
-
-                case "instance_node":
-                    // logger.info("Parsing Collada instance_node");
-                    sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)], level));
-                    break;
-
-                case "instance_visual_scene":
-
-                    /* Root node of the new SceneJS subtree
-                     */
-
-                    var visualSceneNode = idMap[child.getAttribute("url").substr(1)];
-
-                    /* Recurse to visual_scene node
-                     */
-                    sceneNodeParams.push(parseNode(visualSceneNode, level));
-                    break;
-
-                case "instance_geometry":
-
-                    sceneNodeParams.push(parseInstanceGeometry(child));
-                    break;
+                var tris = meshNode.getElementsByTagName("triangles");
+                for (i = 0; i < tris.length; i++) {
+                    trianglesList.push(tris[i]);
+                }
+                return trianglesList;
             }
-        } while (child = child.nextSibling);
 
-        if (matrix) {
-            sceneNodeParams.unshift({
-                elements: matrix });
-            return SceneJS.modellingMatrix.apply(this, sceneNodeParams);
-        } else {
-            return SceneJS.node.apply(this, sceneNodeParams);
-        }
+            var x = 0;
+
+            /** Parses a <geometry> and returns an array containing a SceneJS.geometry node for
+             * each <mesh> child
+             *
+             * @param id
+             */
+            function getGeometriesData(geometryNode) {
+                var geometriesData = [];
+                var trianglesList = getTrianglesList(geometryNode);
+
+                for (var it = 0; it < trianglesList.length; it++) {
+                    var triangle = trianglesList [it];
+                    var inputs = triangle.getElementsByTagName("input");
+                    var inputArray = [];
+                    var outputData = {};
+
+                    for (var n = 0; n < inputs.length; n++) {
+                        inputs[n].data = getSource(inputs[n].getAttribute("source").substr(1));
+                        var group = inputs[n].getAttribute("semantic");
+                        if (group == "TEXCOORD") {
+                            group = group + inputs[n].getAttribute("set") || 0;
+                        }
+                        inputs[n].group = group;
+                        inputArray[inputs[n].getAttribute("offset")] = inputs[n];
+                        outputData[group] = [];
+                    }
+
+                    var faces;
+                    if (triangle.getElementsByTagName("p")[0].data) {
+                        faces = triangle.getElementsByTagName("p")[0].data;
+                    }
+                    else {
+                        faces = parseArray(triangle.getElementsByTagName("p")[0]);
+                    }
 
 
-    }
+                    for (var i = 0; i < faces.length; i = i + inputArray.length) {
+                        for (var n = 0; n < inputArray.length; n++) {
+                            var group = inputArray[n].group;
+                            var pCount = 0;
+                            for (var j = 0; j < inputArray[n].data.stride; j++) {
+                                if (inputArray[n].data.typeMask[j]) {
+                                    outputData[group].push(
+                                            inputArray[n].data.array[faces[i + n]
+                                                    * inputArray[n].data.stride + j
+                                                    + inputArray[n].data.offset]);
+                                    pCount++;
+                                }
+                            }
 
-    return {
-        /**
-         *
-         * @param _logger Logger to output progress with
-         * @param _uri Path to the Collada document (used for texture image paths etc)
-         * @param xml Collada document string
-         * @param rootId Optional ID of particular asset we want from Collada document
-         */
-        parse : function(_logger, _uri, xml, rootId) {
-            logger = _logger;
-            uri = _uri;
-            dirURI = _uri.substring(0, _uri.lastIndexOf("/") + 1);
+                            /* 1D
+                             */
+                            if (group == "VERTEX" && pCount == 1) {
+                                outputData[group].push(0);
+                            }
 
-            loadDoc(xml);
-            buildIdMap();
-            var node = parseDoc(rootId);
-            cleanup();
+                            /* 2D
+                             */
+                            if (group == "VERTEX" && pCount == 2) {
+                                outputData[group].push(0);
+                            }
 
-            return node;
-        }
-    };
-})();
+                            /* 2D textures
+                             */
+                            if (group == "TEXCOORD0" && pCount == 3) {
+                                outputData[group].pop();
+                            }
+                            if (group == "TEXCOORD1" && pCount == 3) {
+                                outputData[group].pop();
+                            }
+                        }
+                    }
+
+                    faces = [];
+                    for (n = 0; n < outputData.VERTEX.length / 3; n++) {
+                        faces.push(n);
+                    }
+
+
+                    geometriesData.push({
+                        materialName : triangle.getAttribute("material"),
+                        positions: outputData.VERTEX,
+                        normals: outputData.NORMAL,
+                        uv : outputData.TEXCOORD0,
+                        uv2 : outputData.TEXCOORD1,
+                        indices: faces
+                    });
+                }
+                return geometriesData;
+            }
+
+            /**
+             * Returns profile/newparam[sid="<sid>"]/sampler2D[0]/source[0].nodeValue
+             */
+            function getSamplerSource(profile, sid) {
+                var params = profile.getElementsByTagName("newparam");
+                for (var i = 0; i < params.length; i++) {
+                    if (params[i].getAttribute("sid") == sid) {
+                        return params[i]
+                                .getElementsByTagName("sampler2D")[0]
+                                .getElementsByTagName("source")[0]
+                                .firstChild
+                                .nodeValue;
+                    }
+                }
+                ctx.error.fatalError(
+                        new SceneJS.exceptions.ColladaParseException
+                        ("COLLADA element expected: "
+                                + profile.tagName
+                                + "/newparam[sid == '"
+                                + sid + "']/sampler2D[0]/source[0]"));
+            }
+
+            /**
+             * Returns profile/newparam[sid="<sid>"]/surface[0]/init_from[0].nodeValue
+             */
+            function getImageId(profile, sid) {
+                var newparams = profile.getElementsByTagName("newparam");
+                for (var i = 0; i < newparams.length; i++) {
+                    if (newparams[i].getAttribute("sid") == sid) {
+                        var surface = newparams[i].getElementsByTagName("surface")[0];
+                        return surface
+                                .getElementsByTagName("init_from")[0]
+                                .firstChild
+                                .nodeValue;
+                    }
+                }
+                ctx.error.fatalError(new SceneJS.exceptions.ColladaParseException
+                        ("COLLADA element expected: "
+                                + profile.tagName
+                                + "/newparam[sid == '"
+                                + sid + "']/surface[0]/init_from[0]"));
+            }
+
+            function getTextureData(profileCommon, texture, applyTo) {
+                var source = getSamplerSource(profileCommon, texture.getAttribute("texture"));
+                var imageId = getImageId(profileCommon, source);
+                var image = idMap[imageId];
+                var imageFileName = image.getElementsByTagName("init_from")[0].firstChild.nodeValue;
+                var blendMode = texture.getElementsByTagName("blend_mode")[0];
+                return {
+                    uri : dirURI + imageFileName,
+                    applyTo: applyTo,
+                    blendMode: (blendMode == "MULTIPLY") ? "multiply" : "add"
+                };
+            }
+
+            function getDiffuseMaterialData(profileCommon, technique, materialData) {
+                var diffuse = technique.getElementsByTagName("diffuse");
+                if (diffuse.length > 0) {
+                    var child = diffuse[0].firstChild;
+                    do{
+                        switch (child.tagName) {
+                            case "color":
+                                var color = child.firstChild.nodeValue.split(" ");
+                                materialData.baseColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]) };
+                                break;
+
+                            case "texture":
+                                materialData.texturesData.push(
+                                        getTextureData(profileCommon, child, "baseColor"));
+                                break;
+                        }
+                    } while (child = child.nextSibling);
+                }
+            }
+
+            function getSpecularColorMaterialData(profileCommon, technique, materialData) {
+                var specular = technique.getElementsByTagName("specular");
+                if (specular.length > 0) {
+                    var child = specular[0].firstChild;
+                    do{
+                        switch (child.tagName) {
+                            case "color":
+                                var color = child.firstChild.nodeValue.split(" ");
+                                materialData.specularColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]),a: 1 };
+                                break;
+
+                            case "texture":
+                                materialData.texturesData.push(
+                                        getTextureData(profileCommon, child, "specularColor"));
+                                break;
+                        }
+                    } while (child = child.nextSibling);
+                }
+            }
+
+            function getShininessMaterialData(profileCommon, technique, materialData) {
+                var shininess = technique.getElementsByTagName("shininess");
+                if (shininess.length > 0) {
+                    var child = shininess[0].firstChild;
+                    do{
+                        switch (child.tagName) {
+                            case "float":
+                                materialData.shine = parseFloat(child.firstChild.nodeValue);
+                                break;
+
+                            case "texture":
+                                materialData.texturesData.push(
+                                        getTextureData(profileCommon, child, "shine"));
+
+                                break;
+                        }
+                    } while (child = child.nextSibling);
+                }
+            }
+
+            function getBumpMapMaterialData(profileCommon, technique, materialData) {
+                var bump = technique.getElementsByTagName("bump");
+                if (bump.length > 0) {
+                    var child = bump[0].firstChild;
+                    do{
+                        switch (child.tagName) {
+                            case "texture":
+                                ctx.logging.warn("Collada bump mapping not supported yet");
+                                break;
+                        }
+                    } while (child = child.nextSibling);
+                }
+            }
+
+            function getMaterialData(id) {
+                var materialNode = idMap[id];
+                var effectId = materialNode
+                        .getElementsByTagName("instance_effect")[0]
+                        .getAttribute("url")
+                        .substr(1);
+                var effect = idMap[effectId];
+                var profileCommon = effect.getElementsByTagName("profile_COMMON")[0];
+                var technique = profileCommon.getElementsByTagName("technique")[0];
+                var materialData = {
+                    texturesData : []
+                };
+                getDiffuseMaterialData(profileCommon, technique, materialData);
+                getSpecularColorMaterialData(profileCommon, technique, materialData);
+                getShininessMaterialData(profileCommon, technique, materialData);
+                getBumpMapMaterialData(profileCommon, technique, materialData);
+                return materialData;
+            }
+
+            function getMaterialsData(instanceGeometryNode) {
+                var materialsData = {};
+                var materials = instanceGeometryNode.getElementsByTagName("instance_material");
+                var material;
+                var materialId;
+                var symbolId;
+                for (var i = 0; i < materials.length; i++) {
+                    material = materials[i];
+                    materialId = material.getAttribute("target").substr(1);
+                    symbolId = material.getAttribute("symbol");
+                    materialsData[symbolId] = getMaterialData(materialId);
+                }
+                return materialsData;
+            }
+
+            function parseInstanceGeometry(instanceGeometryNode) {
+                var geometryNode = idMap[instanceGeometryNode.getAttribute("url").substr(1)];
+                var geometriesData = getGeometriesData(geometryNode);
+                var materialsData = getMaterialsData(instanceGeometryNode);
+
+                var geometries = [];
+
+                for (var i = 0; i < geometriesData.length; i++) {
+
+                    var geoData = geometriesData[i];
+
+
+                    var sceneNode = SceneJS.geometry({
+                        type: "xxx" + x++,
+                        primitive: "triangles",
+                        positions: geoData.positions,
+                        normals: geoData.normals,
+                        uv : geoData.uv,
+                        uv2 : geoData.uv2,
+                        indices: geoData.indices
+                    });
+
+                    if (geoData.materialName) {
+                        var materialData = materialsData[geoData.materialName];
+
+                        /* Wrap in SceneJS.material
+                         */
+                        if (materialData) {
+                            sceneNode = SceneJS.material({
+                                baseColor: materialData.baseColor,
+                                specularColor: materialData.specularColor ,
+                                shine: 10.0,
+                                specular: 1
+                            }, sceneNode);
+
+
+                            /* Wrap in SceneJS.texture
+                             */
+                            var textureLayers = materialData.texturesData;
+                            if (textureLayers.length > 0) {
+                                var layers = [];
+                                for (var j = 0; j < textureLayers.length; j++) {
+                                    layers.push({
+                                        uri : textureLayers[j].uri,
+                                        applyTo: textureLayers[j].applyTo,
+                                        flipY : false,
+                                        blendMode: textureLayers[j].blendMode,
+
+                                        wrapS: "repeat",
+                                        wrapT: "repeat" ,
+                                        minFilter: "linearMipMapLinear",
+                                        magFilter: "linear"
+                                    });
+                                }
+                                sceneNode = SceneJS.texture({
+                                    layers: layers
+                                }, sceneNode);
+                            }
+                        }
+                    }
+                    geometries.push(sceneNode);
+                }
+
+
+                /* Group SceneJS.geometries in a SceneJS.node
+                 */
+                return SceneJS.node.apply(this, geometries);
+            }
+
+            function parseMatrix(node) {
+                var data = parseArray(node);
+                return data;
+            }
+
+            function parseTranslate(node) {
+                var data = parseArray(node);
+                var x = data[0];
+                var y = data[1];
+                var z = data[2];
+                return SceneJS_math_translationMat4v(data);
+            }
+
+            function parseRotate(node) {
+                var data = parseArray(node);
+                var x = data[0];
+                var y = data[1];
+                var z = data[2];
+                var angle = data[3];
+                return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
+            }
+
+            /**
+             * Returns a SceneJS node created from the given DOM node.
+             *
+             * We're loading only geometry, transforms and material for SceneJS assets, ignoring nodes like cameras and lights.
+             */
+            function parseNode(node) {
+
+                /* Builds params for our scene node
+                 */
+                var sceneNodeParams = [];
+
+                /* Matrix created from any transforms found
+                 */
+                var matrix = SceneJS_math_identityMat4();
+
+                var child = node.firstChild;
+
+                do{
+                    /* Traverse child nodes
+                     */
+                    switch (child.tagName) {
+
+                        case "node":
+                            sceneNodeParams.push(parseNode(child));
+                            break;
+
+                        case "matrix":
+                            var array = parseMatrix(child);
+
+                            /* Convert row-major to SceneJS column-major
+                             */
+                            matrix = [
+                                array[0],array[4],array[8],array[12],
+                                array[1],array[5],array[9],array[13],
+                                array[2],array[6],array[10],array[14],
+                                array[3],array[7],array[11],array[15]];
+                            break;
+
+                        case "translate":
+                            matrix = matrix
+                                    ? SceneJS_math_mulMat4(matrix, parseTranslate(child))
+                                    : parseTranslate(child);
+                            break;
+
+                        case "rotate":
+                            matrix = matrix
+                                    ? SceneJS_math_mulMat4(matrix, parseRotate(child))
+                                    : parseRotate(child);
+                            break;
+
+                        case "instance_node":
+
+                            sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
+                            break;
+
+                        case "instance_visual_scene":
+
+                            /* Root node of the new SceneJS subtree
+                             */
+
+                            var visualSceneNode = idMap[child.getAttribute("url").substr(1)];
+
+                            /* Recurse to visual_scene node
+                             */
+                            sceneNodeParams.push(parseNode(visualSceneNode));
+                            break;
+
+                        case "instance_geometry":
+
+                            sceneNodeParams.push(parseInstanceGeometry(child));
+                            break;
+                    }
+                } while (child = child.nextSibling);
+
+                if (matrix) {
+                    sceneNodeParams.unshift({
+                        elements: matrix });
+                    return SceneJS.modelMatrix.apply(this, sceneNodeParams);
+                } else {
+                    return SceneJS.node.apply(this, sceneNodeParams);
+                }
+            }
+
+            return {
+
+                /**
+                 * @param _uri Path to the Collada document (used for texture image paths etc)
+                 * @param xml Collada document string
+                 * @param rootId Optional ID of particular asset we want from Collada document
+                 */
+                parse : function(_uri, xml, rootId) {
+                    uri = _uri;
+                    dirURI = _uri.substring(0, _uri.lastIndexOf("/") + 1);
+
+                    loadDoc(xml);
+                    buildIdMap();
+                    var node = parseDoc(rootId);
+                    cleanup();
+
+                    return node;
+                }
+            };
+        });
 SceneJS.loadCollada = function() {
 
     var cfg = SceneJS._utils.getNodeConfig(arguments || [
         {}
     ]);
 
+    var errorBackend = SceneJS._backends.getBackend("error");
+    var colladaBackend = SceneJS._backends.getBackend("collada");
+
     var params = cfg.getParams();
     if (!params.uri) {
-        throw new SceneJS.exceptions.NodeConfigExpectedException
-                ("Mandatory SceneJS.assets.collada parameter missing: uri");
+        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                ("Mandatory SceneJS.assets.collada parameter missing: uri"));
     }
 
-
-    var logging = SceneJS._backends.getBackend("logging");
-
     return SceneJS.load({
-        
+
         uri: params.uri,
 
         serverParams: {
@@ -3648,11 +3784,10 @@ SceneJS.loadCollada = function() {
         },
 
         parser: function(xml, onError) {
-            return SceneJS._utils.__ColladaParser.parse(
-                    logging.getLogger(),
+            return colladaBackend.parse(
                     params.uri, // Used in paths to texture images
                     xml,
-                    params.node);       // Optional cherry-picked asset in Collada file
+                    params.node);   // Optional cherry-picked asset in Collada file
         }
     });
 
@@ -3668,39 +3803,65 @@ SceneJS._backends.installBackend(
         "pick",
 
         function(ctx) {
+
+            var pickInfo = [];          // Entry for each scene
+            var currentPickInfo;        // Entry for current active scene
+
             var pickX;
             var pickY;
             var canvas;
-            var pickBuffers;
 
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        pickBuffers = {};
-                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        canvas = null;
-                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(c) {
-                        canvas = c;
-//                        if (!pickBuffers[canvas.id]) {
-//                            createPickBuffer();
+//            ctx.events.onEvent(
+//                    SceneJS._eventTypes.RESET,
+//                    function() {
+//                        pickInfo = [];
+//                        currentPickInfo = null;
+//                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+//                    });
+//
+//            ctx.events.onEvent(
+//                    SceneJS._eventTypes.SCENE_CREATED,
+//                    function(params) {
+//                        pickInfo[params.sceneId] = {
+//                            sceneId: params.sceneId
+//                        };
+//                    });
+//
+//            ctx.events.onEvent(
+//                    SceneJS._eventTypes.SCENE_ACTIVATED,
+//                    function(params) {
+//                        currentPickInfo = pickInfo[params.sceneId];
+//                    });
+//
+//            ctx.events.onEvent(
+//                    SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED,
+//                    function(transform) {
+//                        currentPickInfo.projectionTransform = transform;
+//                    });
+//
+//            ctx.events.onEvent(
+//                    SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
+//                    function(transform) {
+//                        currentPickInfo.viewTransform = transform;
+//                    });
+//
+//            ctx.events.onEvent(
+//                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+//                    function(c) {
+//                        canvas = c;
+//                        if (!currentPickInfo.pickBuffer) {
+//                            currentPickInfo.pickBuffer = createPickBuffer();
 //                        }
-                    });
+//                    });
+//
+//            ctx.events.onEvent(
+//                    SceneJS._eventTypes.SCENE_DESTROYED,
+//                    function(params) {
+//                        pickInfo[params.sceneId] = null;
+//                    });
 
-            function createPickBuffer() {
+            function createPickBuffer() { // TODO: Dont assume allocation succeeds!
                 var context = canvas.context;
-
-                /* Create pick buffer
-                 */
                 var pickBuffer = {
                     frameBuffer : context.createFramebuffer(),
                     renderBuffer : context.createRenderbuffer(),
@@ -3711,7 +3872,7 @@ SceneJS._backends.installBackend(
                     context.texImage2D(
                             context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, null);
                 } catch (e) {
-                    var texture = new WebcontextUnsignedByteArray(3);
+                    var texture = new WebUnsignedByteArray(3);
                     context.texImage2D(
                             context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, texture);
                 }
@@ -3724,22 +3885,85 @@ SceneJS._backends.installBackend(
                 context.framebufferRenderbuffer(
                         context.FRAMEBUFFER, context.DEPTH_ATTACHMENT, context.RENDERBUFFER, pickBuffer.renderBuffer);
                 context.bindFramebuffer(context.FRAMEBUFFER, null);
-
-                pickBuffers[canvas.id] = pickBuffer;
+                return pickBuffer;
             }
 
             function activatePicking() {
                 var context = canvas.context;
                 var pickBuffer = pickBuffers[canvas.id];
+
                 context.bindFramebuffer(context.FRAMEBUFFER, pickBuffer.frameBuffer);
-                context.viewport(0, 0, 800, 600);
+                context.viewport(0, 0, 1, 1);
                 context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
                 context.disable(context.BLEND);
+
                 SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
             }
 
+            function pick(x, y) {
+
+                var viewTransform = currentPickInfo.viewTransform;
+                var projTransform = currentPickInfo.viewTransform;
+
+                var origViewMatrix = viewTransform.matrix;
+                var origProjMatrix = projTransform.matrix;
+
+                /* Get camera space coordinates                
+                 */
+                var xcoord = -( ( ( 2 * x ) / canvas.canvas.width ) - 1 ) / SceneJS_math_getCellMat4(viewTransform.matrix, 1, 1);
+                var ycoord = ( ( ( 2 * y ) / canvas.canvas.height ) - 1 ) / SceneJS_math_getCellMat4(projTransform.matrix, 2, 2);
+                var zcoord = 1;
+
+                if (projTransform.type == "perspective") {
+                    var coord = SceneJS_math_transformPoint3(
+                            SceneJS_math_inverseMat4(viewTransform.matrix),
+                            [xcoord,ycoord,zcoord,0]);
+
+                    var cameraPos = viewTransform.lookAt.eye;
+
+                    var zvec = coord.toUnitVector();
+                    var xvec = (new GLGE.Vec([0,0,1])).cross(zvec).toUnitVector();
+                    var yvec = zvec.cross(xvec).toUnitVector();
+                    this.camera.matrix = new GLGE.Mat([xvec.e(1), yvec.e(1), zvec.e(1), cameraPos.x,
+                        xvec.e(2), yvec.e(2), zvec.e(2), cameraPos.y,
+                        xvec.e(3), yvec.e(3), zvec.e(3), cameraPos.z,
+                        0, 0, 0, 1]).inverse();
+                }
+                if (this.camera.type == GLGE.C_ORTHO) {
+                    this.camera.matrix = this.camera.matrix.inv().x(GLGE.translateMatrix(-xcoord, -ycoord, 0)).inv();
+                }
+                this.camera.pMatrix = GLGE.makeOrtho(-0.0001, 0.0001, -0.0001, 0.0001, this.camera.near, this.camera.far);
+                //render for picking
+                var gl = this.renderer.gl;
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.framePickBuffer);
+                gl.viewport(0, 0, 1, 1);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                this.renderer.gl.disable(this.renderer.gl.BLEND);
+
+                for (var i = 0; i < this.objects.length; i++) {
+                    this.objects[i].GLRender(this.renderer.gl, GLGE.RENDER_PICK);
+                }
+                var data = gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE);
+                //TODO: firefox hack :-( remove when fixed!
+                if (data.data) data = data.data;
+                var index = data[0] + data[1] * 256;
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                gl.viewport(0, 0, this.renderer.canvas.width, this.renderer.canvas.height);
+
+                //revert the view matrix
+                this.camera.matrix = origmatrix;
+                this.camera.pMatrix = origpmatrix;
+
+                if (index > 0) {
+                    return this.objects[index - 1];
+                } else {
+                    return false;
+                }
+
+            }
+
             function deactivatePicking() {
-                canvas.context.bindFramebuffer(context.FRAMEBUFFER, null);
+                canvas.context.bindFramebuffer(canvas.context.FRAMEBUFFER, null);
                 SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
             }
 
@@ -3750,38 +3974,27 @@ SceneJS._backends.installBackend(
                 /** Begin picking at given coordinates, switch to picking mode
                  */
                 pick: function(x, y) {
-                    if (!canvas) {
-                        throw "No canvas active";
-                    }
-                    activatePicking();
-                    pickX = x;
-                    pickY = y;
+//                    activatePicking();
+//                    pickX = x;
+//                    pickY = y;
                 },
 
                 /** Get name path to whatever was picked, unbind pick buffers, switch back to rendering mode
                  */
                 getPicked: function() {
-                    if (!pickBuffer) {
-                        //         throw "No pick buffer created";
-                    }
-                    var context = canvas.context;
-
-                    /* Read colour of picked pixel
-                     */
-                    var data = context.readPixels(pickX, pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
-                    if (data.data) {
-                        data = data.data; // TODO: hack for firefox
-                    }
-
-                    ctx.logging.info(pickX + ", " + pickY + ": " + data[0] + ", " + data[1] + "," + data[2]);
-
-                    var id = data[0] + data[1] * 256;
-                    //     alert(id);
-
-                    deactivatePicking();
-
-
-                    return id;
+//                    var context = canvas.context;
+//
+//                    var data = context.readPixels(pickX, pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
+//                    if (data.data) {
+//                        data = data.data; // TODO: hack for firefox
+//                    }
+//
+//                    ctx.logging.info(pickX + ", " + pickY + ": " + data[0] + ", " + data[1] + "," + data[2]);
+//
+//                    var id = data[0] + data[1] * 256;
+//
+//                    deactivatePicking();
+//                    return id;
                 }
             };
         });
@@ -4278,9 +4491,9 @@ SceneJS._backends.installBackend(
                     canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
                     canvas = document.getElementById(canvasId);
                     if (!canvas) {
-                        throw new SceneJS.exceptions.CanvasNotFoundException
-                                ("SceneJs.scene config 'canvasId' omitted and could not find default canvas with ID '"
-                                        + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
+                        ctx.error.fatalError(new SceneJS.exceptions.CanvasNotFoundException
+                                ("SceneJS.scene config 'canvasId' omitted and could not find default canvas with ID '"
+                                        + SceneJS_webgl_DEFAULT_CANVAS_ID + "'"));
                     }
                 } else {
                     canvas = document.getElementById(canvasId);
@@ -4290,9 +4503,9 @@ SceneJS._backends.installBackend(
                         canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
                         canvas = document.getElementById(canvasId);
                         if (!canvas) {
-                            throw new SceneJS.exceptions.CanvasNotFoundException
-                                    ("SceneJs.scene config 'canvasId' does not match any elements in the page and no " +
-                                     "default canvas found with ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
+                            ctx.error.fatalError(new SceneJS.exceptions.CanvasNotFoundException
+                                    ("SceneJS.scene config 'canvasId' does not match any elements in the page and no " +
+                                     "default canvas found with ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'"));
                         }
                     }
                 }
@@ -4312,10 +4525,10 @@ SceneJS._backends.installBackend(
                     }
                 }
                 if (!context) {
-                    throw new SceneJS.exceptions.WebGLNotSupportedException
+                    ctx.error.fatalError(new SceneJS.exceptions.WebGLNotSupportedException
                             ('Canvas document element with ID \''
                                     + canvasId
-                                    + '\' failed to provide a supported WebGL context');
+                                    + '\' failed to provide a supported WebGL context'));
                 }
                 context.clearColor(0.0, 0.0, 0.0, 1.0);
                 context.clearDepth(1.0);
@@ -4331,108 +4544,13 @@ SceneJS._backends.installBackend(
                 };
             };
 
-            function createPickBuffer(context) {
-                var buffer = {
-                    frameBuffer : context.createFramebuffer(),
-                    renderBuffer : context.createRenderbuffer(),
-                    texture : context.createTexture()
-                };
-                context.bindTexture(context.TEXTURE_2D, buffer.texture);
-                try { // Null may be OK with some browsers - thanks Paul
-                    context.texImage2D(
-                            context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, null);
-                } catch (e) {
-                    var texture = new WebcontextUnsignedByteArray(3);
-                    context.texImage2D(
-                            context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, texture);
-                }
-                context.bindFramebuffer(context.FRAMEBUFFER, buffer.frameBuffer);
-                context.bindRenderbuffer(context.RENDERBUFFER, buffer.renderBuffer);
-                context.renderbufferStorage(context.RENDERBUFFER, context.DEPTH_COMPONENT, 1, 1);
-                context.bindRenderbuffer(context.RENDERBUFFER, null);
-                context.framebufferTexture2D(
-                        context.FRAMEBUFFER, context.COLOR_ATTACHMENT0, context.TEXTURE_2D, buffer.texture, 0);
-                context.framebufferRenderbuffer(
-                        context.FRAMEBUFFER, context.DEPTH_ATTACHMENT, context.RENDERBUFFER, buffer.renderBuffer);
-                context.bindFramebuffer(context.FRAMEBUFFER, null);
-                return buffer;
-            }
-
-            function activatePickBuffer(context, buffer) {
-                context.bindFramebuffer(context.FRAMEBUFFER, buffer.framePickBuffer);
-                context.viewport(0, 0, 1, 1);
-                context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-                context.disable(context.BLEND);
-            }
-
-            function getPick(context, buffer) {
-                var data = context.readPixels(0, 0, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
-                if (data.data) {
-                    data = data.data; // TODO: hack for firefox
-                }
-                var id = data[0] + data[1] * 256;
-                context.bindFramebuffer(context.FRAMEBUFFER, null);
-                return id;
-            }
-
-            function pick(x, y) {
-                //get camera space coords
-                var origmatrix = this.camera.matrix;
-                var origpmatrix = this.camera.pMatrix;
-                xcoord = -( ( ( 2 * x ) / this.renderer.canvas.width ) - 1 ) / this.camera.pMatrix.e(1, 1);
-                ycoord = ( ( ( 2 * y ) / this.renderer.canvas.height ) - 1 ) / this.camera.pMatrix.e(2, 2);
-                zcoord = 1;
-                if (this.camera.type == GLGE.C_PERSPECTIVE) {
-                    var coord = [xcoord,ycoord,zcoord,0];
-                    coord = this.camera.matrix.inverse().x(coord);
-                    var cameraPos = this.camera.getPosition();
-                    var zvec = coord.toUnitVector();
-                    var xvec = (new GLGE.Vec([0,0,1])).cross(zvec).toUnitVector();
-                    var yvec = zvec.cross(xvec).toUnitVector();
-                    this.camera.matrix = new GLGE.Mat([xvec.e(1), yvec.e(1), zvec.e(1), cameraPos.x,
-                        xvec.e(2), yvec.e(2), zvec.e(2), cameraPos.y,
-                        xvec.e(3), yvec.e(3), zvec.e(3), cameraPos.z,
-                        0, 0, 0, 1]).inverse();
-                }
-                if (this.camera.type == GLGE.C_ORTHO) {
-                    this.camera.matrix = this.camera.matrix.inv().x(GLGE.translateMatrix(-xcoord, -ycoord, 0)).inv();
-                }
-                this.camera.pMatrix = GLGE.makeOrtho(-0.0001, 0.0001, -0.0001, 0.0001, this.camera.near, this.camera.far);
-                //render for picking
-                var gl = this.renderer.gl;
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.framePickBuffer);
-                gl.viewport(0, 0, 1, 1);
-                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                this.renderer.gl.disable(this.renderer.gl.BLEND);
-
-                for (var i = 0; i < this.objects.length; i++) {
-                    this.objects[i].GLRender(this.renderer.gl, GLGE.RENDER_PICK);
-                }
-                var data = gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE);
-                //TODO: firefox hack :-( remove when fixed!
-                if (data.data) data = data.data;
-                var index = data[0] + data[1] * 256;
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                gl.viewport(0, 0, this.renderer.canvas.width, this.renderer.canvas.height);
-
-                //revert the view matrix
-                this.camera.matrix = origmatrix;
-                this.camera.pMatrix = origpmatrix;
-
-                if (index > 0) {
-                    return this.objects[index - 1];
-                } else {
-                    return false;
-                }
-
-            }
-
+           
 
             return { // Node-facing API
 
-                /** Registers a scene and returns the ID under which it is registered
+                /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
                  */
-                registerScene : function(scene, params) {
+                createScene : function(scene, params) {
                     if (!initialised) {
                         ctx.logging.info("SceneJS V" + SceneJS.version + " initialised");
                         ctx.events.fireEvent(SceneJS._eventTypes.INIT);
@@ -4452,7 +4570,7 @@ SceneJS._backends.installBackend(
 
                 /** Deregisters scene
                  */
-                deregisterScene :function(sceneId) {
+                destroyScene :function(sceneId) {
                     scenes[sceneId] = null;
                     nScenes--;
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_DESTROYED, {sceneId : sceneId });
@@ -4472,7 +4590,7 @@ SceneJS._backends.installBackend(
                 activateScene : function(sceneId) {
                     var scene = scenes[sceneId];
                     if (!scene) {
-                        throw "Scene not defined: '" + sceneId + "'";
+                        ctx.error.fatalError("Scene not defined: '" + sceneId + "'");
                     }
                     activeSceneId = sceneId;
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED, { sceneId: sceneId });
@@ -4484,7 +4602,7 @@ SceneJS._backends.installBackend(
                 getSceneCanvas : function(sceneId) {
                     var scene = scenes[sceneId];
                     if (!scene) {
-                        throw "Scene not defined: '" + sceneId + "'";
+                        ctx.error.fatalError("Scene not defined: '" + sceneId + "'");
                     }
                     return scene.canvas.canvas;
                 },
@@ -4516,13 +4634,13 @@ SceneJS._backends.installBackend(
                  */
                 deactivateScene : function() {
                     if (!activeSceneId) {
-                        throw "Internal error: no scene active";
+                        ctx.error.fatalError("Internal error: no scene active");
                     }
                     var sceneId = activeSceneId;
                     activeSceneId = null;
                     var scene = scenes[sceneId];
                     if (!scene) {
-                        throw "Scene not defined: '" + sceneId + "'";
+                        ctx.error.fatalError("Scene not defined: '" + sceneId + "'");
                     }
                     ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_DEACTIVATED, scene.canvas);
                     ctx.events.fireEvent(SceneJS._eventTypes.SCENE_DEACTIVATED, {sceneId : sceneId });
@@ -4539,6 +4657,7 @@ SceneJS._backends.installBackend(
 
 (function() {
 
+    var eventsBackend = SceneJS._backends.getBackend('events');
     var sceneBackend = SceneJS._backends.getBackend('scene');
     var loadBackend = SceneJS._backends.getBackend('load');
     var processesBackend = SceneJS._backends.getBackend('processes');
@@ -4554,10 +4673,12 @@ SceneJS._backends.installBackend(
             throw SceneJS._backends.getStatus().error;
         }
 
+        /* Collect scene params
+         */
         var cfg = SceneJS._utils.getNodeConfig(arguments);
         if (!cfg.fixed) {
             throw new SceneJS.exceptions.UnsupportedOperationException
-                    ("Dynamic configuration of SceneJS.scene nodes is not supported");
+                    ("Dynamic configuration of SceneJS.scene node is not supported");
         }
         var params = cfg.getParams();
 
@@ -4622,7 +4743,7 @@ SceneJS._backends.installBackend(
                             throw new SceneJS.exceptions.PickWithoutRenderedException
                                     ("Scene not rendered - need to render before picking");
                         }
-                        sceneBackend.activateScene(sceneId);
+                        sceneBackend.activateScene(sceneId);  // Also activates canvas
                         pickBackend.pick(canvasX, canvasY);
                         if (params.proxy) {
                             loadBackend.setProxy(params.proxy);
@@ -4656,7 +4777,7 @@ SceneJS._backends.installBackend(
              */
             destroy : function() {
                 if (sceneId) {
-                    sceneBackend.deregisterScene(sceneId); // Last one fires RESET command
+                    sceneBackend.destroyScene(sceneId); // Last one fires RESET command
                     sceneId = null;
                 }
             },
@@ -4670,7 +4791,7 @@ SceneJS._backends.installBackend(
 
         /* Register scene - fires a SCENE_CREATED event
          */
-        sceneId = sceneBackend.registerScene(_scene, params);
+        sceneId = sceneBackend.createScene(_scene, params);
 
         return _scene;
     };
@@ -4689,6 +4810,98 @@ SceneJS._backends.installBackend(
              * A RESET command will be fired after the last one is destroyed.
              */
             temp.pop().destroy();
+        }
+    };
+
+    SceneJS.onEvent = function(name, func) {
+        switch (name) {
+
+            case "error" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.ERROR,
+                    function(params) {
+                        func({
+                            exception: params.exception,
+                            fatal: params.fatal
+                        });
+                    });
+                break;
+
+            case "reset" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.RESET,
+                    function() {
+                        func();
+                    });
+                break;
+
+            case "scene-created" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_CREATED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+            case "scene-activated" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_ACTIVATED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+            case "canvas-activated" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.CANVAS_ACTIVATED,
+                    function(params) {
+                        func({
+                            canvas: params.canvas
+                        });
+                    });
+                break;
+
+            case "process-created" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.PROCESS_CREATED,
+                    function(params) {
+                        func(params);
+                    });
+                break;
+
+            case "process-timed-out" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.PROCESS_TIMED_OUT,
+                    function(params) {
+                        func(params);
+                    });
+                break;
+
+            case "process-killed" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.PROCESS_KILLED,
+                    function(params) {
+                        func(params);
+                    });
+                break;
+
+            case "scene-deactivated" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_DEACTIVATED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+            case "scene-destroyed" : eventsBackend.onEvent(
+                    SceneJS._eventTypes.SCENE_DESTROYED,
+                    function(params) {
+                        func({
+                            sceneId : params.sceneId
+                        });
+                    });
+                break;
+
+
+            default:
+                throw "SceneJS.onEvent - this event type not supported: '" + name + "'";
         }
     };
 })();
@@ -4762,8 +4975,8 @@ SceneJS._backends.installBackend(
 
             function outOfMemory(description) {
                 ctx.logging.error("Memory allocation failed");
-                throw new SceneJS.exceptions.OutOfVRAMException(
-                        "Out of memory - failed to allocate memory for " + description);
+                ctx.error.fatalError(new SceneJS.exceptions.OutOfVRAMException(
+                        "Out of memory - failed to allocate memory for " + description));
             }
 
             ctx.memory = {
@@ -4783,10 +4996,10 @@ SceneJS._backends.installBackend(
                  * a closure, IE. not return it.
                  */
                 allocate: function(description, tryAllocate) {
-                   // ctx.logging.debug("Allocating memory for: " + description);
+                    // ctx.logging.debug("Allocating memory for: " + description);
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException
-                                ("No canvas active - failed to allocate shader memory");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException
+                                ("No canvas active - failed to allocate shader memory"));
                     }
                     var maxTries = 10; // TODO: Heuristic for this? Does this really need be greater than one?
                     var context = canvas.context;
@@ -5150,7 +5363,7 @@ SceneJS._backends.installBackend(
 
             function activateProgram() {
                 if (!canvas) {
-                    throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                    ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                 }
 
                 if (!sceneHash) {
@@ -5185,7 +5398,7 @@ SceneJS._backends.installBackend(
                                         ctx.logging.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
                                         ctx.logging.debug("Fragment shader:");
                                         ctx.logging.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-                                        throw e;
+                                        ctx.error.fatalError(e);
                                     }
                                 });
                     }
@@ -5346,7 +5559,7 @@ SceneJS._backends.installBackend(
                     }
                 }
                 src.push("}");
-                //ctx.logging.info(getShaderLoggingSource(src));
+              //  ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
 
@@ -5579,10 +5792,10 @@ SceneJS._backends.installBackend(
                     src.push("gl_FragColor = fragColor;");
                 }
 
-                //  src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+              //    src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
                 src.push("}");
 
-                //  ctx.logging.info(getShaderLoggingSource(src));
+            //     ctx.logging.info(getShaderLoggingSource(src));
                 return src.join("\n");
             }
         });
@@ -5605,18 +5818,18 @@ SceneJS._backends.installBackend(
              */
             var glEnum = function(context, name) {
                 if (!name) {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Null SceneJS.renderer node config: \"" + name + "\"");
+                    ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                            "Null SceneJS.renderer node config: \"" + name + "\""));
                 }
                 var result = SceneJS_webgl_enumMap[name];
                 if (!result) {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
+                    ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                            "Unrecognised SceneJS.renderer node config value: \"" + name + "\""));
                 }
                 var value = context[result];
                 if (!value) {
-                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
-                            "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
+                    ctx.error.fatalError(new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+                            "This browser's WebGL does not support renderer node config value: \"" + name + "\""));
                 }
                 return value;
             };
@@ -5894,7 +6107,7 @@ SceneJS._backends.installBackend(
                         return state.props[name];
                     }
                 }
-                throw "Internal error - renderer backend stateStack underflow!";
+                ctx.error.fatalError("Internal error - renderer backend stateStack underflow!");
             };
 
             /* Activate initial defaults
@@ -5905,7 +6118,7 @@ SceneJS._backends.installBackend(
                         canvas = c;
                         currentProps = {
                             clear: { depth : true, color : true},
-                            clearColor: {r: 0, g : 0, b : 0 },
+                          //  clearColor: {r: 0, g : 0, b : 0 },
                             clearDepth: 1.0,
                             enableDepthTest:true,
                             enableCullFace: false,
@@ -6047,6 +6260,7 @@ SceneJS.renderer = function() {
  * the canvas switches, shader deactivates or scene deactivates. While the ID is non-null, the corresponding geometry
  * cannot be evicted from the cache.
  */
+
 SceneJS._backends.installBackend(
 
         "geometry",
@@ -6205,11 +6419,11 @@ SceneJS._backends.installBackend(
                     case "triangle-fan":
                         return context.TRIANGLE_FAN;
                     default:
-                        throw new SceneJS.exceptions.InvalidGeometryConfigException(
-                                "Unsupported geometry primitive: '" +
+                        ctx.error.fatalError(new SceneJS.exceptions.InvalidGeometryConfigException(
+                                "SceneJS.geometry primitive unsupported: '" +
                                 type +
                                 "' - supported types are: 'points', 'lines', 'line-loop', " +
-                                "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
+                                "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'"));
                 }
             }
 
@@ -6220,7 +6434,7 @@ SceneJS._backends.installBackend(
                  */
                 findGeometry : function(type) {
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                     }
                     var geoId = canvas.canvasId + ":" + type;
                     return (geometries[geoId]) ? geoId : null;
@@ -6243,7 +6457,9 @@ SceneJS._backends.installBackend(
                     }
 
                     if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
-                        throw new SceneJS.exceptions.NodeConfigExpectedException("Geometry node parameter expected : primitive");
+                        ctx.error.fatalError(
+                                new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.geometry node property expected : primitive"));
                     }
 
                     var geoId = canvas.canvasId + ":" + type;
@@ -6326,14 +6542,14 @@ SceneJS._backends.installBackend(
                  */
                 drawGeometry : function(geoId) {
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                        ctx.error.fatalError(SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                     }
 
                     var geo = geometries[geoId];
 
                     ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_UPDATED, geo);
 
-                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE); 
+                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE);
 
                     geo.lastUsed = time;
 
@@ -6362,7 +6578,7 @@ SceneJS._backends.installBackend(
                     context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
                     context.flush();
 
-                    /* Don't need to unbind buffers - only one is bound at a time anyway                    
+                    /* Don't need to unbind buffers - only one is bound at a time anyway
                      */
 
                     /* Destroy one-off geometry
@@ -6381,6 +6597,7 @@ SceneJS._utils.ns("SceneJS.geometry");
  * An element of geometry
  */
 (function() {
+    var errorBackend = SceneJS._backends.getBackend("error");
 
     var calculateNormals = function(positions, indices) {
         var nvecs = new Array(positions.length);
@@ -6444,8 +6661,8 @@ SceneJS._utils.ns("SceneJS.geometry");
                     if (!params) {
                         params = cfg.getParams(data);
                         if (!params.type) { // Identifies VBO's on canvas
-                            throw new SceneJS.exceptions.NodeConfigExpectedException
-                                    ("Geometry node parameter expected : type");
+                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                    ("Geometry node parameter expected : type"));
                         }
                         type = SceneJS._utils.getParam(params.type, data);
                         if (params.create instanceof Function) {
@@ -6481,7 +6698,6 @@ SceneJS._utils.ns("SceneJS.geometry");
                     SceneJS._utils.visitChildren(cfg, traversalContext, data);
                 });
     };
-
 })();
 SceneJS._utils.ns("SceneJS.objects");
 
@@ -12305,7 +12521,7 @@ SceneJS.objects.cube = function() {
         {}
     ]);
 
-    /* Dynamic config OK, but only applies first time - good for assets    
+    /* Dynamic config OK, but only applies first time - good for assets
      */
     var params = cfg.getParams();
 
@@ -12649,54 +12865,59 @@ SceneJS._backends.installBackend(
  * higher nodes.
  */
 
-SceneJS.rotate = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
-
-    /* Memoization levels
-     */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
-
+(function() {
     var backend = SceneJS._backends.getBackend('model-transform');
+    var errorBackend = SceneJS._backends.getBackend('error');
 
-    var memoLevel = NO_MEMO;
-    var mat;
-    var xform;
+    SceneJS.rotate = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    return SceneJS._utils.createNode(
-            function(traversalContext, data) {
-                if (memoLevel == NO_MEMO) {
-                    var params = cfg.getParams(data);
-                    params.angle = params.angle || 0;
-                    params.x = params.x || 0;
-                    params.y = params.y || 0;
-                    params.z = params.z || 0;
-                    if (params.x + params.y + params.z == 0) {
-                        throw new SceneJS.exceptions.IllegalRotateConfigException('Rotate vector is zero - at least one of x,y and z must be non-zero');
+        /* Memoization levels
+         */
+        const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
+        const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
+        const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
+
+        var memoLevel = NO_MEMO;
+        var mat;
+        var xform;
+
+        return SceneJS._utils.createNode(
+                function(traversalContext, data) {
+                    if (memoLevel == NO_MEMO) {
+                        var params = cfg.getParams(data);
+                        params.angle = params.angle || 0;
+                        params.x = params.x || 0;
+                        params.y = params.y || 0;
+                        params.z = params.z || 0;
+                        if (params.x + params.y + params.z == 0) {
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.IllegalRotateConfigException(
+                                            "SceneJS.rotate vector is zero - at least one of properties x,y and z must be non-zero"));
+                        }
+                        mat = SceneJS_math_rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
+                        if (cfg.fixed) {
+                            memoLevel = FIXED_CONFIG;
+                        }
                     }
-                    mat = SceneJS_math_rotationMat4v(params.angle * Math.PI / 180.0, [params.x, params.y, params.z]);
-                    if (cfg.fixed) {
-                        memoLevel = FIXED_CONFIG;
+                    var superXform = backend.getTransform();
+                    if (memoLevel < FIXED_MODEL_SPACE) {
+                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
+                        xform = {
+                            localMatrix: mat,
+                            matrix: tempMat,
+                            fixed: superXform.fixed && cfg.fixed
+                        };
+                        if (memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
+                            memoLevel = FIXED_MODEL_SPACE;
+                        }
                     }
-                }
-                var superXform = backend.getTransform();
-                if (memoLevel < FIXED_MODEL_SPACE) {
-                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
-                    xform = {
-                        localMatrix: mat,
-                        matrix: tempMat,
-                        fixed: superXform.fixed && cfg.fixed
-                    };
-                    if (memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
-                        memoLevel = FIXED_MODEL_SPACE;
-                    }
-                }
-                backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                backend.setTransform(superXform);
-            });
-};
+                    backend.setTransform(xform);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                    backend.setTransform(superXform);
+                });
+    };
+})();
 /**
  * Sets a translation modelling transformation on the current shader. The transform will be cumulative with transforms at
  * higher nodes.
@@ -12745,14 +12966,13 @@ SceneJS.rotate = function() {
  * Scaling modelling transform node
  */
 (function() {
+    var backend = SceneJS._backends.getBackend('model-transform');    
 
     /* Memoization levels
      */
     const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
     const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
     const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
-
-    var backend = SceneJS._backends.getBackend('model-transform');
 
     SceneJS.scale = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
@@ -12792,7 +13012,7 @@ SceneJS.rotate = function() {
  * will be cumulative with transforms at higher nodes.
  */
 
-SceneJS.modellingMatrix = function() {
+SceneJS.modelMatrix = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     /* Memoization levels
@@ -12932,6 +13152,7 @@ SceneJS.perspective = function() {
                             params.far || 400.0);
 
                     transform = {
+                        type: "perspective",
                         matrix:tempMat
                     };
                 }
@@ -12970,6 +13191,7 @@ SceneJS.ortho = function() {
                             volume.far
                             );
                     transform = {
+                        type: "ortho",
                         matrix: tempMat
                     };
                 }
@@ -13007,6 +13229,7 @@ SceneJS.frustum = function() {
                             volume.zmax
                             );
                     transform = {
+                        type: "frustum",
                         matrix: tempMat
                     };
                 }
@@ -13109,63 +13332,68 @@ SceneJS._backends.installBackend(
  * Scene node that constructs a 'lookAt' view transformation matrix and sets it on the current shader.
  */
 
-SceneJS.lookAt = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
-
+(function() {
     var backend = SceneJS._backends.getBackend('view-transform');
+    var errorBackend = SceneJS._backends.getBackend('error');
 
     var cloneVec = function(v) {
         return { x : v.x || 0, y : v.y || 0, z : v.z || 0 };
     };
 
-    var mat;
-    var fixed = cfg.fixed;
-    var xform;
+    SceneJS.lookAt = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    return SceneJS._utils.createNode(
-            function(traversalContext, data) {
-                if (!mat || !fixed) {
-                    var nodeParams = new SceneJS._utils.NodeParams("SceneJS.lookAt", cfg.getParams(data), data);
+        var mat;
+        var fixed = cfg.fixed;
+        var xform;
 
-                    var eye = cloneVec(nodeParams.getParam("eye", data, true), { x: 0.0, y: 0.0, z: 0.0 });
-                    var look = cloneVec(nodeParams.getParam("look", data, false), { x: 0.0, y: 0.0, z: 0.0 });
-                    var up = cloneVec(nodeParams.getParam("up", data, false), { x: 0.0, y: 1.0, z: 0.0 });
+        return SceneJS._utils.createNode(
+                function(traversalContext, data) {
+                    if (!mat || !fixed) {
+                        var nodeParams = new SceneJS._utils.NodeParams("SceneJS.lookAt", cfg.getParams(data), data);
 
-                    if (eye.x == look.x && eye.y == look.y && eye.z == look.z) {
-                        throw new SceneJS.exceptions.InvalidLookAtConfigException
-                                ("Invald lookAt parameters: eye and look cannot be identical");
+                        var eye = cloneVec(nodeParams.getParam("eye", data, true), { x: 0.0, y: 0.0, z: 0.0 });
+                        var look = cloneVec(nodeParams.getParam("look", data, false), { x: 0.0, y: 0.0, z: 0.0 });
+                        var up = cloneVec(nodeParams.getParam("up", data, false), { x: 0.0, y: 1.0, z: 0.0 });
+
+                        if (eye.x == look.x && eye.y == look.y && eye.z == look.z) {
+                            throw new SceneJS.exceptions.InvalidLookAtConfigException
+                                    ("Invald lookAt parameters: eye and look cannot be identical");
+                        }
+                        if (up.x == 0 && up.y == 0 && up.z == 0) {
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidLookAtConfigException
+                                            ("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero"));
+                        }
+
+                        mat = SceneJS_math_lookAtMat4c(
+                                eye.x, eye.y, eye.z,
+                                look.x, look.y, look.z,
+                                up.x, up.y, up.z);
+
+                        fixed = cfg.fixed && nodeParams.fixed;
                     }
-                    if (up.x == 0 && up.y == 0 && up.z == 0) {
-                        throw new SceneJS.exceptions.InvalidLookAtConfigException
-                                ("Invald lookAt parameters: up vector cannot be of zero length, ie. all elements zero");
+
+                    var superXform = backend.getTransform();
+                    if (!xform || !superXform.fixed || !fixed) {
+                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
+                        xform = {
+                            type: "lookat",
+                            matrix: tempMat,
+                            lookAt : {
+                                eye: eye,
+                                look: look,
+                                up: up
+                            },
+                            fixed: superXform.fixed && fixed
+                        };
                     }
-
-                    mat = SceneJS_math_lookAtMat4c(
-                            eye.x, eye.y, eye.z,
-                            look.x, look.y, look.z,
-                            up.x, up.y, up.z);
-
-                    fixed = cfg.fixed && nodeParams.fixed;
-                }
-
-                var superXform = backend.getTransform();
-                if (!xform || !superXform.fixed || !fixed) {
-                    var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
-                    xform = {
-                        matrix: tempMat,
-                        lookAt : {
-                            eye: eye,
-                            look: look,
-                            up: up
-                        },
-                        fixed: superXform.fixed && fixed
-                    };
-                }
-                backend.setTransform(xform);
-                SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                backend.setTransform(superXform);
-            });
-};
+                    backend.setTransform(xform);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                    backend.setTransform(superXform);
+                });
+    };
+})()
 /**
 
  */
@@ -13294,8 +13522,8 @@ SceneJS._backends.installBackend(
                 if (light.type) {
                     if (light.type != "dir"
                             && light.type != "point") {
-                        throw new SceneJS.exceptions.InvalidNodeConfigException(
-                                "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'");
+                        ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                                "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'"));
                     }
                 } else {
                     light.type = light.type || "point";
@@ -13305,8 +13533,8 @@ SceneJS._backends.installBackend(
                     return {
                         type: light.type,
                         color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                        diffuse : light.diffuse,
-                        specular : light.specular,
+                        diffuse : light.diffuse == undefined ? true : light.diffuse,
+                        specular : light.specular == undefined ? true : light.specular,
                         pos : SceneJS_math_transformPoint3(
                                 viewMat,
                                 SceneJS_math_transformPoint3(
@@ -13322,8 +13550,8 @@ SceneJS._backends.installBackend(
                     return {
                         type: light.type,
                         color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                        diffuse : light.diffuse,
-                        specular : light.specular,
+                        diffuse : light.diffuse == undefined ? true : light.diffuse,
+                        specular : light.specular == undefined ? true : light.specular,
                         dir : SceneJS_math_transformVector3(
                                 viewMat,
                                 SceneJS_math_transformVector3(
@@ -13332,30 +13560,30 @@ SceneJS._backends.installBackend(
                     };
                 }
 
-//                if (light.type == "spot") {
-//                    return {
-//                        type: light.type,
-//                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-//                        diffuse : light.diffuse,
-//                        specular : light.specular,
-//                        pos : SceneJS_math_transformPoint3(
-//                                viewMat,
-//                                SceneJS_math_transformPoint3(
-//                                        modelMat,
-//                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
-//
-//                        dir : SceneJS_math_transformVector3(
-//                                viewMat,
-//                                SceneJS_math_transformVector3(
-//                                        modelMat,
-//                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
-//                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
-//                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
-//                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-//                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-//                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-//                    };
-//                }
+                //                if (light.type == "spot") {
+                //                    return {
+                //                        type: light.type,
+                //                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
+                //                        diffuse : light.diffuse,
+                //                        specular : light.specular,
+                //                        pos : SceneJS_math_transformPoint3(
+                //                                viewMat,
+                //                                SceneJS_math_transformPoint3(
+                //                                        modelMat,
+                //                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
+                //
+                //                        dir : SceneJS_math_transformVector3(
+                //                                viewMat,
+                //                                SceneJS_math_transformVector3(
+                //                                        modelMat,
+                //                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
+                //                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
+                //                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
+                //                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
+                //                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
+                //                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
+                //                    };
+                //                }
             }
 
             /* Node-facing API
@@ -13545,11 +13773,8 @@ SceneJS.material = function() {
  * interpolated within the configured keyframe sequence.
  */
 SceneJS.scalarInterpolator = function() {
+    var errorBackend = SceneJS._backends.getBackend("error");
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-
-    if (!cfg.fixed) { // Can't dynamically configure an interpolator - TODO: would that be useful?
-        throw new SceneJS.exceptions.UnsupportedOperationException("Dynamic configuration of interpolators is not supported");
-    }
 
     var NOT_FOUND = 0;
     var BEFORE_FIRST = 1;
@@ -13567,24 +13792,36 @@ SceneJS.scalarInterpolator = function() {
                     // Validate
 
                     if (!params.input) {
-                        throw 'scalarInterpolator input parameter missing';
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.scalarInterpolator property missing: input"));
                     }
 
                     if (!params.output) {
-                        throw 'scalarInterpolator output parameter missing';
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.NodeConfigExpectedException(
+                                        "SceneJS.scalarInterpolator property missing: output"));
                     }
 
                     if (params.keys) {
                         if (!params.values) {
-                            throw 'scalarInterpolator keys supplied but no values - must supply a value for each key';
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidNodeConfigException(
+                                            "SceneJS.scalarInterpolator configuration incomplete: " +
+                                            "keys supplied but no values - must supply a value for each key"));
                         }
                     } else if (params.values) {
-                        throw 'scalarInterpolator values supplied but no keys - must supply a key for each value';
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.scalarInterpolator configuration incomplete: " +
+                                                                                  "values supplied but no keys - must supply a key for each value"));
                     }
 
                     for (var i = 1; i < params.keys.length; i++) {
                         if (params.keys[i - 1] >= params.keys[i]) {
-                            throw 'two invalid scalarInterpolator keys found (' + i - 1 + ' and ' + i + ') - key list should contain distinct values in ascending order';
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.scalarInterpolator configuration invalid: " +
+                                                                                      "two invalid keys found ("
+                                            + i - 1 + " and " + i + ") - key list should contain distinct values in ascending order"));
                         }
                     }
 
@@ -13599,13 +13836,19 @@ SceneJS.scalarInterpolator = function() {
                             break;
                         case 'cubic':
                             if (params.keys.length < 4) {
-                                throw 'Minimum of four keyframes required for cubic scalarInterpolation - only '
-                                        + params.keys.length
-                                        + ' are specified';
+                                errorBackend.fatalError(
+                                        new SceneJS.exceptions.InvalidNodeConfigException(
+                                                "SceneJS.scalarInterpolator configuration invalid: minimum of four keyframes " +
+                                                "required for cubic - only "
+                                                        + params.keys.length
+                                                        + " are specified"));
                             }
                             break;
                         default:
-                            throw 'scalarInterpolator type not supported - only "linear", "cosine", "cubic" and "constant" are supported';
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidNodeConfigException(
+                                            "SceneJS.scalarInterpolator configuration invalid:  type not supported - " +
+                                            "only 'linear', 'cosine', 'cubic' and 'constant' are supported"));
                         /*
 
 
@@ -13618,7 +13861,9 @@ SceneJS.scalarInterpolator = function() {
                 var key = data.get(params.input);
 
                 if (!key && key != 0) {
-                    throw "scalarInterpolator failed to find input on data";
+                    errorBackend.fatalError(
+                            new SceneJS.exceptions.DataExpectedException(
+                                    "SceneJS.scalarInterpolator failed to find input on data: '" + params.input + "'"));
                 }
 
                 var key1 = 0;
@@ -13695,7 +13940,8 @@ SceneJS.scalarInterpolator = function() {
                         case 'constant':
                             return constantInterpolate(k);
                         default:
-                            throw 'internal error - interpolation type not switched: "' + params.type + "'";
+                            errorBackend.fatalError("SceneJS.scalarInterpolator internal error - interpolation type not switched: '"
+                                    + params.type + "'");
                     }
                 };
 
@@ -13767,25 +14013,29 @@ SceneJS.withData = function() {
  * For example, inability to memoize will cascade downwards through  modelling transform node hierarchies since they
  * will have to re-multiply matrices by dynamic parent modelling transforms etc.
  */
-SceneJS.generator = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
-    return SceneJS._utils.createNode(
-            function(traversalContext, data) {
-                if (cfg.fixed) {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException
-                            ('SceneJS.generator node must be configured with a function');
-                }
-                var params = cfg.getParams(data);
-                while (params) {
-                    var childData = SceneJS._utils.newScope(data);
-                    for (var key in params) {
-                        childData.put(key, params[key]);
+(function() {
+    var errorBackend = SceneJS._backends.getBackend("error");
+    SceneJS.generator = function() {
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        return SceneJS._utils.createNode(
+                function(traversalContext, data) {
+                    if (cfg.fixed) {
+                        errorBackend.fatalError(
+                                new SceneJS.exceptions.InvalidNodeConfigException
+                                        ('SceneJS.generator node must be configured with a function'));
                     }
-                    SceneJS._utils.visitChildren(cfg, traversalContext, childData);
-                    params = cfg.getParams(data);
-                }
-            });
-};
+                    var params = cfg.getParams(data);
+                    while (params) {
+                        var childData = SceneJS._utils.newScope(data);
+                        for (var key in params) {
+                            childData.put(key, params[key]);
+                        }
+                        SceneJS._utils.visitChildren(cfg, traversalContext, childData);
+                        params = cfg.getParams(data);
+                    }
+                });
+    };
+})();
 
 
 /**
@@ -13921,6 +14171,7 @@ SceneJS._backends.installBackend(
  */
 (function() {
 
+    var errorBackend = SceneJS._backends.getBackend("error");
     var backend = SceneJS._backends.getBackend("view-frustum");
     var localityBackend = SceneJS._backends.getBackend("view-locality");
     var modelTransformBackend = SceneJS._backends.getBackend("model-transform");
@@ -13943,8 +14194,8 @@ SceneJS._backends.installBackend(
                         var params = cfg.getParams(data);
 
                         if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
-                            throw new SceneJS.exceptions.NodeConfigExpectedException
-                                    ("Mandatory boundingBox parameter missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax");
+                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                    ("SceneJS.boundingBox mandatory property missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax"));
                         }
 
                         var modelTransform = modelTransformBackend.getTransform();
@@ -13968,14 +14219,14 @@ SceneJS._backends.installBackend(
                         }
                         if (params.levels) {
                             if (params.levels.length != cfg.children.length) {
-                                throw new SceneJS.exceptions.NodeConfigExpectedException
-                                        ("boundingBox levels parameter should have a value for each child node");
+                                errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                        ("SceneJS.boundingBox levels property should have a value for each child node"));
                             }
 
                             for (var i = 1; i < params.levels.length; i++) {
                                 if (params.levels[i - 1] >= params.levels[i]) {
-                                    throw new SceneJS.exceptions.NodeConfigExpectedException
-                                            ("boundingBox levels parameter should be an ascending list of unique values");
+                                    errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                            ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
                                 }
                                 states.push(STAGE_REMOTE);
                             }
@@ -14183,8 +14434,8 @@ SceneJS._backends.installBackend(
                 }
                 var glName = SceneJS_webgl_enumMap[value];
                 if (glName == undefined) {
-                    throw new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
+                    ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                            "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'"));
                 }
                 var glValue = context[glName];
                 //                if (!glValue) {
@@ -14219,7 +14470,8 @@ SceneJS._backends.installBackend(
                  */
                 loadImage : function(uri, onSuccess, onError, onAbort) {
                     var process = ctx.processes.createProcess({
-                        description:"Texture image load: " + uri
+                        description:"Texture image load: " + uri ,
+                        onTimeout: onError
                     });
                     var image = new Image();
                     image.onload = function() {
@@ -14249,7 +14501,7 @@ SceneJS._backends.installBackend(
                  */
                 createTexture : function(image, cfg) {
                     if (!canvas) {
-                        throw new SceneJS.exceptions.NoCanvasActiveException("No canvas active");
+                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                     }
                     var context = canvas.context;
                     var textureId = SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
@@ -14285,11 +14537,11 @@ SceneJS._backends.installBackend(
 
                 pushLayer : function(texture, params) {
                     if (!textures[texture.textureId]) {
-                        throw "No such texture loaded \"" + texture.textureId + "\"";
+                        ctx.error.fatalError("No such texture loaded \"" + texture.textureId + "\"");
                     }
                     texture.lastUsed = time;
 
-                    if (params.matrix && !params.matrixAsArray) { 
+                    if (params.matrix && !params.matrixAsArray) {
                         params.matrixAsArray = new WebGLFloatArray(params.matrix);
                     }
                     layerStack.push({
@@ -14311,8 +14563,10 @@ SceneJS._backends.installBackend(
         });
 (function() {
 
+
     var utils = SceneJS.__texture = {   // Just one object in closure
 
+        errorBackend : SceneJS._backends.getBackend("error"),
         textureBackend : SceneJS._backends.getBackend("texture"),
         loggingBackend : SceneJS._backends.getBackend("logging"),
 
@@ -14388,9 +14642,10 @@ SceneJS._backends.installBackend(
                                     layerParam.applyFrom != "normal" &&
                                     layerParam.applyFrom != "geometry") {
 
-                                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                                            "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+                                    utils.errorBackend.fatalError(
+                                            new SceneJS.exceptions.InvalidNodeConfigException(
+                                                    "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
+                                                    "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
                                 }
                             }
 
@@ -14398,9 +14653,10 @@ SceneJS._backends.installBackend(
                                 if (layerParam.applyTo != "baseColor" && // Colour map
                                     layerParam.applyTo != "diffuseColor") {
 
-                                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                                            "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
-                                            "should be either 'baseColor', 'diffuseColor'");
+                                    utils.errorBackend.fatalError(
+                                            new SceneJS.exceptions.InvalidNodeConfigException(
+                                                    "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
+                                                    "should be either 'baseColor', 'diffuseColor'"));
                                 }
                             }
 
@@ -14466,6 +14722,10 @@ SceneJS._backends.installBackend(
                                 (function(_layer) {
                                     _layer.state = utils.STATE_IMAGE_LOADING;
 
+                                    /* Logging each image load slows things down a lot
+                                     */
+                                    // utils.loggingBackend.getLogger().info("SceneJS.texture image loading: "
+                                    //  + _layer.creationParams.uri);
 
                                     _layer.process = utils.textureBackend.loadImage(// Process killed automatically on error or abort
                                             _layer.creationParams.uri,
@@ -14486,9 +14746,16 @@ SceneJS._backends.installBackend(
                                         /* General error, probably a 404
                                          */
                                             function() {
-                                                utils.loggingBackend.getLogger().error("SceneJS.texture image load failed: "
-                                                        + _layer.creationParams.uri);
                                                 _layer.state = utils.STATE_ERROR;
+                                                var message = "SceneJS.texture image load failed: "
+                                                        + _layer.creationParams.uri;
+                                                utils.loggingBackend.getLogger().warn(message);
+
+                                                /* Currently recovering from failed texture load
+                                                 */
+
+                                                // utils.errorBackend.error(
+                                                //       new SceneJS.exceptions.ImageLoadFailedException(message));
                                             },
 
                                         /* Load aborted - eg. user stopped browser
@@ -14534,7 +14801,7 @@ SceneJS._backends.installBackend(
 
                     } else {
 
-                        if (countLayersReady == layers.length) {
+                        if ((!params.waitForTextures) || (countLayersReady == layers.length)) {
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
                                 utils.textureBackend.pushLayer(layer.texture, {
@@ -14582,8 +14849,8 @@ SceneJS._backends.installBackend(
                             && f.mode != "exp"
                             && f.mode != "exp2"
                             && f.mode != "linear")) {
-                    throw SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'");
+                    ctx.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'"));
                 }
                 if (f.mode == "disabled") {
                     return {

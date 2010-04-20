@@ -5,38 +5,18 @@
     <title>SceneJS Example - Parameterised Scene Asset</title>
 </head>
 <body margin=20px>
-<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Basic First Example
-</h1>
-<table>
-    <tr>
-        <td valign="top">
-            <canvas id="theCanvas" width="600" height="600">
+
+            <canvas id="theCanvas" width="1800" height="900">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                     &lt;canvas&gt; feature.</p>
             </canvas>
-        </td>
-        <td valign="top">
-            <h3>Source code</h3>
-            <ul>
-                <li><a href="teapot.js">This example</a></li>
-            </ul>
 
-            <h3>Description</h3>
-
-            <p><span>This is a really simple scene to demonstrate the general SceneJS idea. A scene basically renders images to
-one or more WebGL canvas elements in the browser page. The <a href="teapot.js">source code</a> has lots of comments that will tell you how this example works.<p><span>
-            <h3>Scene logging output</h3>
-
-            <div id="logging"></div>
-        </td>
-    </tr>
-</table>
+            <span id="status"></span> <br/>
+                <div id="_scenejs-default-logging"></div>
 
 
-
-<script type="application/x-javascript" src="sylvester.js"></script>
-
+<script type="text/javascript" src="sylvester.js"></script>
 <!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
@@ -52,6 +32,10 @@ one or more WebGL canvas elements in the browser page. The <a href="teapot.js">s
 <!-- Events -->
 
 <script type="application/x-javascript" src="../../../scenejs/events/eventsBackend.js"></script>
+
+<!-- Errors -->
+
+<script type="application/x-javascript" src="../../../scenejs/errors/errorsBackend.js"></script>
 
 <!-- Time -->
 
@@ -117,6 +101,7 @@ one or more WebGL canvas elements in the browser page. The <a href="teapot.js">s
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/modelMatrix.js"></script>
 
 <!-- Projection transforms -->
 
@@ -130,6 +115,7 @@ one or more WebGL canvas elements in the browser page. The <a href="teapot.js">s
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewLocalityBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
+            <script type="application/x-javascript" src="../../../scenejs/transformation/view/stationary.js"></script>
 
 <!-- Lighting -->
 
@@ -166,6 +152,8 @@ one or more WebGL canvas elements in the browser page. The <a href="teapot.js">s
 <script type="application/x-javascript" src="../../../scenejs/fog/fogBackend.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
 
-<script type="application/x-javascript" src="moving-dir-light.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaBackend.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
+<script type="application/x-javascript" src="courtyard-house.js"></script>
 </body>
 </html>

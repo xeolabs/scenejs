@@ -93,8 +93,8 @@ var exampleScene = SceneJS.scene({
  *---------------------------------------------------------------------*/
 var pInterval;
 
-var yaw = -45;
-var pitch = 25;
+var yaw = 305;
+var pitch = 10;
 var lastX;
 var lastY;
 var dragging = false;
@@ -121,7 +121,6 @@ function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
-        exampleScene.render({yaw: yaw, pitch: pitch});
         lastX = event.clientX;
         lastY = event.clientY;
     }
@@ -132,14 +131,15 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
-    try {
-        exampleScene.render({yaw: yaw, pitch: pitch});
-    } catch (e) {
-        clearInterval(pInterval);
-        throw e;
-    }
+    exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
-/* Continue animation
- */
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
 pInterval = setInterval("window.render()", 10);

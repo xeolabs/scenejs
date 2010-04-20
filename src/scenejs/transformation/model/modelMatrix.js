@@ -1,9 +1,8 @@
 /**
- * Sets a modelling matrix on the current shader. The matrix should be a 1D array of sixteen elements and
- * will be cumulative with transforms at higher nodes.
+ * Node that defines a modelling transform matrix for its subgraph.
  */
 
-SceneJS.modellingMatrix = function() {
+SceneJS.modelMatrix = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     /* Memoization levels

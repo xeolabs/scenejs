@@ -159,6 +159,10 @@
                                 (function(_layer) {
                                     _layer.state = utils.STATE_IMAGE_LOADING;
 
+                                    /* Logging each image load slows things down a lot
+                                     */
+                                    // utils.loggingBackend.getLogger().info("SceneJS.texture image loading: "
+                                    //  + _layer.creationParams.uri);
 
                                     _layer.process = utils.textureBackend.loadImage(// Process killed automatically on error or abort
                                             _layer.creationParams.uri,
@@ -183,8 +187,12 @@
                                                 var message = "SceneJS.texture image load failed: "
                                                         + _layer.creationParams.uri;
                                                 utils.loggingBackend.getLogger().warn(message);
-                                                utils.errorBackend.error(
-                                                        new SceneJS.exceptions.ImageLoadFailedException(message));
+
+                                                /* Currently recovering from failed texture load
+                                                 */
+
+                                                // utils.errorBackend.error(
+                                                //       new SceneJS.exceptions.ImageLoadFailedException(message));
                                             },
 
                                         /* Load aborted - eg. user stopped browser
@@ -230,19 +238,27 @@
 
                     } else {
 
-                        if (countLayersReady == layers.length) {
+                        /** Render either all layers or none - saves on generating/destroying shaders                          
+                         */
+                        if ((countLayersReady == layers.length)) {
+                            var countPushed = 0;
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
-                                utils.textureBackend.pushLayer(layer.texture, {
-                                    applyFrom : layer.applyFrom,
-                                    applyTo : layer.applyTo,
-                                    blendMode : layer.blendMode,
-                                    matrix: layer.createMatrix(data)
-                                });
+                                if (layer.texture) {
+                                    utils.textureBackend.pushLayer(layer.texture, {
+                                        applyFrom : layer.applyFrom,
+                                        applyTo : layer.applyTo,
+                                        blendMode : layer.blendMode,
+                                        matrix: layer.createMatrix(data)
+                                    });
+                                    countPushed++;
+                                }
                             }
                             SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                            utils.textureBackend.popLayers(layers.length);
+                            utils.textureBackend.popLayers(countPushed);
 
+                        } else if (!params.waitForTextures) {
+                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
                         }
                     }
                 }

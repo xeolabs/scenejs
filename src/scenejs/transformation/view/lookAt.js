@@ -3,7 +3,7 @@
  */
 
 (function() {
-    var backend = SceneJS._backends.getBackend('model-transform');
+    var backend = SceneJS._backends.getBackend('view-transform');
     var errorBackend = SceneJS._backends.getBackend('error');
 
     var cloneVec = function(v) {
@@ -48,6 +48,7 @@
                     if (!xform || !superXform.fixed || !fixed) {
                         var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
                         xform = {
+                            type: "lookat",
                             matrix: tempMat,
                             lookAt : {
                                 eye: eye,

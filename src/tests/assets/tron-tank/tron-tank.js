@@ -298,7 +298,7 @@ canvas.addEventListener('mousewheel', mouseWheel, true);
 var pInterval;
 
 window.render = function() {
-    try {
+  
         pitch += pitchInc;
 
         if (pitch < 1) {
@@ -358,10 +358,7 @@ window.render = function() {
         } else if (trailYaw < tankYaw) {
             trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
         }
-    } catch (e) {
-        clearInterval(pInterval);
-        throw e;
-    }
+
 };
 
 pInterval = setInterval("window.render()", 10);

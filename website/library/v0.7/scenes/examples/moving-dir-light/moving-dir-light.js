@@ -156,6 +156,18 @@ window.render = function() {
     exampleScene.render({ lightDir: {x: dir[0], y: dir[1], z: dir[2] }});
 };
 
-window.render(); // Just to get exceptions
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
+ */
+var pInterval;
 
-var pInterval = setInterval("window.render()", 10);
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
+

@@ -217,7 +217,7 @@ var SceneJS = {
 
                     }
                 } else {
-                    errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException
+                    SceneJS._backends.getBackend("error").fatalError(new SceneJS.exceptions.InvalidNodeConfigException
                             ("Invalid node parameters - config should be first, IE. node(config, node, node,...)"));
                 }
             }

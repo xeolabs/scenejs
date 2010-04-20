@@ -48,6 +48,9 @@ SceneJS._backends.installBackend(
             var glModeSetters = {
 
                 enableBlend: function(context, flag) {
+                    if (flag == null || flag == undefined) {
+                        flag = false;
+                    }
                     context.enable(context.BLEND, flag);
                     currentProps.enableBlend = flag;
                 },
@@ -64,42 +67,51 @@ SceneJS._backends.installBackend(
                 },
 
                 blendEquation: function(context, eqn) {
-                    context.blendEquation(context, eqn);
+                    eqn = eqn || "func_add";
+                    context.blendEquation(context, glEnum(context, eqn));
                     currentProps.blendEquation = eqn;
                 },
 
                 /** Sets the RGB blend equation and the alpha blend equation separately
                  */
                 blendEquationSeparate: function(context, eqn) {
+                    eqn = eqn || {};
                     eqn = {
-                        rgb : glEnum(context, eqn.rgb || "func_add"),
-                        alpha : glEnum(context, eqn.alpha || "func_add")
+                        rgb : eqn.rgb || "func_add",
+                        alpha : eqn.alpha || "func_add"
                     };
-                    context.blendEquation(eqn.rgb, eqn.alpha);
+                    context.blendEquation(glEnum(context, eqn.rgb), glEnum(context, eqn.alpha));
                     currentProps.blendEquationSeperate = eqn;
                 },
 
                 blendFunc: function(context, funcs) {
+                    blendFunc = blendFunc || {};
                     funcs = {
-                        sfactor : glEnum(context, funcs.sfactor || "one"),
-                        dfactor : glEnum(context, funcs.dfactor || "zero")
+                        sfactor : funcs.sfactor || "one",
+                        dfactor : funcs.dfactor || "zero"
                     };
-                    context.blendFunc(funcs.sfactor, funcs.dfactor);
+                    context.blendFunc(glEnum(context, funcs.sfactor || "one"), glEnum(context, funcs.dfactor || "zero"));
                     currentProps.blendFunc = funcs;
                 },
 
                 blendFuncSeparate: function(context, func) {
+                    func = func || {};
                     func = {
-                        srcRGB : glEnum(context, func.srcRGB || "zero"),
-                        dstRGB : glEnum(context, func.dstRGB || "zero"),
-                        srcAlpha : glEnum(context, func.srcAlpha || "zero"),
-                        dstAlpha :  glEnum(context, func.dstAlpha || "zero")
+                        srcRGB : func.srcRGB || "zero",
+                        dstRGB : func.dstRGB || "zero",
+                        srcAlpha : func.srcAlpha || "zero",
+                        dstAlpha :  func.dstAlpha || "zero"
                     };
-                    context.blendFuncSeparate(func.srcRGB, func.dstRGB, func.srcAlpha, func.dstAlpha);
+                    context.blendFuncSeparate(
+                            glEnum(context, func.srcRGB || "zero"),
+                            glEnum(context, func.dstRGB || "zero"),
+                            glEnum(context, func.srcAlpha || "zero"),
+                            glEnum(context, func.dstAlpha || "zero"));
                     currentProps.blendFuncSeparate = func;
                 },
 
                 clearColor: function(context, color) {
+                    color = color || {};
                     color.r = color.r || 0;
                     color.g = color.g || 0;
                     color.b = color.b || 0;
@@ -109,16 +121,21 @@ SceneJS._backends.installBackend(
                 },
 
                 clearDepth: function(context, depth) {
+                    if (depth == null || depth == undefined) {
+                        depth = 1;
+                    }
                     context.clearDepth(depth);
                     currentProps.clearDepth = depth;
                 },
 
                 clearStencil: function(context, clearValue) {
+                    clearValue = clearValue || 0;
                     context.clearStencil(clearValue);
                     currentProps.clearStencil = clearValue;
                 },
 
                 colorMask: function(context, color) {
+                    color = color || {};
                     color.r = color.r || 0;
                     color.g = color.g || 0;
                     color.b = color.b || 0;
@@ -138,28 +155,33 @@ SceneJS._backends.installBackend(
                 },
 
                 cullFace: function(context, mode) {
-                    mode = glEnum(context, mode);
-                    context.cullFace(mode);
+                    mode = mode || "back";
+                    context.cullFace(glEnum(context, mode));
                     currentProps.cullFace = mode;
                 },
 
                 enableDepthTest: function(context, flag) {
-                    if (flag === false) {
-                        context.disable(context.DEPTH_TEST);
-                    } else {
+                    if (flag == null || flag == undefined) {
                         flag = true;
+                    }
+                    if (flag) {
                         context.enable(context.DEPTH_TEST);
+                    } else {
+                        context.disable(context.DEPTH_TEST);
                     }
                     currentProps.enableDepthTest = flag;
                 },
 
                 depthFunc: function(context, func) {
-                    func = glEnum(context, func);
-                    context.depthFunc(func);
+                    func = func || "less";                    
+                    context.depthFunc(glEnum(context, func));
                     currentProps.depthFunc = func;
                 },
 
                 enableDepthMask: function(context, flag) {
+                    if (flag == null || flag == undefined) {
+                        flag = true;
+                    }
                     context.depthMask(flag);
                     currentProps.enableDepthMask = flag;
                 },
@@ -174,12 +196,13 @@ SceneJS._backends.installBackend(
                 },
 
                 frontFace: function(context, mode) {
-                    mode = glEnum(context, mode);
-                    context.frontFace(mode);
+                    mode = mode || "ccw";
+                    context.frontFace(glEnum(context, mode));
                     currentProps.frontFace = mode;
                 },
 
                 lineWidth: function(context, width) {
+                    width = width || 1;
                     context.lineWidth(width);
                     currentProps.lineWidth = width;
                 },
@@ -220,6 +243,7 @@ SceneJS._backends.installBackend(
                 /** Set viewport on the given context
                  */
                 viewport: function(context, v) {
+                    v = v || {};
                     v = {
                         x : v.x || 1,
                         y : v.y || 1,
@@ -234,6 +258,7 @@ SceneJS._backends.installBackend(
                 /** Sets scissor region on the given context
                  */
                 scissor: function(context, s) {
+                    s = s || {};
                     s = {
                         x : s.x || currentProps.viewport.x,
                         y : s.y || currentProps.viewport.y,
@@ -247,6 +272,7 @@ SceneJS._backends.installBackend(
                 /** Clears buffers on the given context as specified in mask
                  */
                 clear:function(context, mask) {
+                    mask = mask || {};
                     var m;
                     if (mask.color) {
                         m = context.COLOR_BUFFER_BIT;
@@ -302,11 +328,11 @@ SceneJS._backends.installBackend(
             var getSuperProperty = function(name) {
                 for (var i = stateStack.length - 1; i >= 0; i--) {
                     var state = stateStack[i];
-                    if (state.props[name] != null) {
+                    if (!(state.props[name] == undefined)) {
                         return state.props[name];
                     }
                 }
-                ctx.error.fatalError("Internal error - renderer backend stateStack underflow!");
+                return null; // Cause default to be set               
             };
 
             /* Activate initial defaults
@@ -317,7 +343,7 @@ SceneJS._backends.installBackend(
                         canvas = c;
                         currentProps = {
                             clear: { depth : true, color : true},
-                            clearColor: {r: 0, g : 0, b : 0 },
+                            //  clearColor: {r: 0, g : 0, b : 0 },
                             clearDepth: 1.0,
                             enableDepthTest:true,
                             enableCullFace: false,
@@ -375,7 +401,7 @@ SceneJS._backends.installBackend(
                      */
                     var restore = {};
                     for (var name in props) {
-                        if ((!props[name] === undefined)) {
+                        if (!(props[name] == undefined)) {
                             restore[name] = getSuperProperty(name);
                         }
                     }

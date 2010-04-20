@@ -1,0 +1,131 @@
+{
+    categories:[
+        {
+            title:  "Basic Syntax" ,
+            examples: [
+                {
+                    title: "Hello, Teapot!",
+                    description: "Basic example - the OpenGL teapot, demonstrating scene syntax, point lighting, material colours, mouse interaction, perspective, view and modelling transforms",
+                    file: "hello-teapot/hello-teapot.js"
+                }
+            ]
+        },
+        {
+            title: "Distributed Content",
+            examples: [
+                {
+                    title: "COLLADA Tron Tank",
+                    description: "Demonstrates construction of an interactive scene constructed from a group of assets loaded from a COLLADA file.",
+                    file: "tron-tank/tron-tank.js",
+                    featured: true
+                },
+                {
+                    title: "COLLADA Seymour Plane",
+                    description: "Tests import of COLLADA's core Phong shading elements using one of the official test models from Collada.org.",
+                    file: "seymour-plane/seymour-plane.js"
+                },
+                {
+                    title: "COLLADA Achitectural Model",
+                    description: "Scene rendering a 9MB COLLADA architectural model with 146 textures, courtesy of VaST Architecture.",
+                    file: "courtyard-house/courtyard-house.js",
+                    featured: true
+                },
+                {
+                    title: "SceneJS Teapot Example",
+                    description: "SceneJS is supports the composition of scenes from re-usable, parameterised, cross-domain fragments. This example loads our teapot into the scene graph, across the Internet, all the way from the SceneJS library.",
+                    file: "teapot-asset/teapot-asset.js"
+                }
+            ]
+        },
+        {
+            title: "Animation",
+            examples: [
+                {
+                    title: "Interpolated Animation - Pouring Teapot Example",
+                    description: "Animates the teapot using interpolated modelling transformations.",
+                    file: "pouring-teapot/pouring-teapot.js"
+                }
+            ]
+        },
+
+        {
+            title: "Geometry",
+            examples : [
+                {
+                    title: "Custom Geometry Definition - Cube Example",
+                    description: "Describes how to use the SceneJS.geometry node to create your own geometry, in this case a cube with texture.",
+                    file: "custom-geometry/custom-geometry.js"
+                }
+            ]
+        },
+
+        {
+            title: "Material",
+            examples : [
+                {
+                    title: "Animated Texture - Kneel Before Zod!",
+                    description: "Almost anything can be animated in SceneJS, including the position, scale and rotation of the texture mapped onto the cube in this example.",
+                    file: "animated-texture/animated-texture.js",
+                    featured: true
+                }
+            ]
+        },
+
+        {
+            title: "Lighting",
+            examples: [
+                {
+                    title: "Directional Lighting - Draggable Light Source",
+                    description: "Using the SceneJS.light node to define a directional light.",
+                    file: "moving-dir-light/moving-dir-light.js"
+                },
+                {
+                    title: "Point Lighting - Draggable Light Source",
+                    description: "Using the SceneJS.light node to define a point light.",
+                    file: "moving-point-light/moving-point-light.js"
+                }
+            ]
+        },
+        {
+            title: "WebGL Tweaking",
+            examples: [
+                {
+                    title: "Textured Cube Example",
+                    description: "The SceneJS.renderer node allows you to tweak WebGL state for portions of your scene graph. Use it to explicitly configure things such as the current viewport extents, scissoring, enable/disable shading, backface culling, and so on.",
+                    file: "renderer-node/renderer-node.js"
+                }
+            ]
+        },
+        {
+            title: "Procedural Generation" ,
+            examples: [
+                {
+                    title: "A Spiral Staircase",
+                    description: "All kinds of things in SceneJS can be algorithmically generated. This example demonstrates the generation of a winding staircase model using an interative function.",
+                    file: "spiral-staircase/spiral-staircase.js"
+                }
+            ]
+        },
+        {
+            title: "Atmospheric Effects",
+            examples: [
+                {
+                    title: "Teapots in the Mist",
+                    description: "Fog is great for making things look distant. This one demonstrates a cloud of teapots moving to and from the viewpoint, becoming clear then fogged as they go.",
+                    file: "teapot-cloud/teapot-cloud.js"
+                }
+            ]
+        },
+        {
+            title: "Level-of-Detail",
+            examples: [
+                {
+                    title: "Staircase with Detail Levels",
+                    description: "Warning - this might stress your browser out! Use a nice fast one, like Chromium. This example demonstrates level-of-detail coupled with cross-domain, parameterised content loading.",
+                    file: "lod-staircase-with-tiles/lod-staircase-with-tiles.js",
+                    featured: true
+                }
+            ]
+        }
+    ]
+}

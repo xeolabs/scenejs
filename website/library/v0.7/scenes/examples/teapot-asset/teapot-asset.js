@@ -90,52 +90,24 @@ var exampleScene = SceneJS.scene({
  * Scene rendering loop and process query stuff follows
  *---------------------------------------------------------------------*/
 
+/* Our periodic render function.
+ */
+window.render = function() {
+    exampleScene.render();
+};
+
+/* Render loop until error or reset 
+ * (which IDE does whenever you hit that run again button)
+ */
 var pInterval;
 
-function handleError(e) {
-    if (e.message) {
-        alert(e.message);
-    } else {
-        alert(e);
-    }
-    throw e;
-}
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
 
-/* Our periodic render function. This will stop the render interval when the count of
- * scene processes is zero.
- */
-window.doit = function() {
-    if (exampleScene.getNumProcesses() == 0) {
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
 
-        /* No processes running in scene, so load is complete and we'll stop. The previous
-         * render will have drawn the content that was loaded.
-         */
-        exampleScene.destroy();
-        clearInterval(pInterval);
-    } else {
+pInterval = window.setInterval("window.render()", 10);
 
-        /* Otherwise, a process is still running on the scene, so the load
-         * must still be loading. Note that just as scene processes are created
-         * during a scene render, they are also destroyed during another
-         * subsequent render. Scene processes don't magically stop between renders,
-         * you have to do a render to given them the opportunity to stop.
-         */
-        try {
-            exampleScene.render();
-        } catch (e) {
-            handleError(e);
-        }
-    }
-}
-
-/* This initial render will trigger the load, starting one scene process
- */
-try {
-    exampleScene.render();
-} catch (e) {
-    handleError(e);
-}
-
-/* Keep rendering until load complete, ie. no scene processes running
- */
-pInterval = setInterval("window.doit()", 10);

@@ -26,6 +26,7 @@ SceneJS.ortho = function() {
                             volume.far
                             );
                     transform = {
+                        type: "ortho",
                         matrix: tempMat
                     };
                 }

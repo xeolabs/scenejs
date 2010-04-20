@@ -37,6 +37,7 @@ SceneJS._eventTypes = {
 
     VIEWPORT_UPDATED : 0,               // Viewport updated
 
+    GEOMETRY_UPDATED : 0,
     GEOMETRY_EXPORTED : 0,              // Export of geometry for rendering
 
     MODEL_TRANSFORM_UPDATED : 0,        // Model transform matrix updated

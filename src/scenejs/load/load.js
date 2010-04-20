@@ -59,8 +59,9 @@ SceneJS.load = function() {
                     }
                 }
 
+                var assetId = params.id || params.uri;
                 if (state == STATE_ATTACHED) {
-                    if (!backend.getAsset(params.uri)) {
+                    if (!backend.getAsset(assetId)) {
                         state = STATE_INITIAL;
                     }
                 }
@@ -84,6 +85,7 @@ SceneJS.load = function() {
                         state = STATE_LOADING;
                         process = backend.loadAsset(// Process killed automatically on error or abort
                                 params.uri,
+                                assetId,
                                 params.serverParams || {
                                     format: "scenejs"
                                 },

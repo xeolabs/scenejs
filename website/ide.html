@@ -184,13 +184,16 @@ var handleException = function(e) {
 };
 
 function evalScene(text) {
+    restoreCanvas();
+    hideRunButton();
+    $("#_scenejs-default-logging").text("");
+    SceneJS.reset();
+    SceneJS.onEvent("error", function(params) {
+        handleException(params.exception);
+    });
     try {
-        restoreCanvas();
-        hideRunButton();
-        $("#_scenejs-default-logging").text("");
-        SceneJS.reset();
         eval(text);
-    } catch (e) {
+    } catch (e) { // Error event explicitly handled
         handleException(e);
     }
     showRunButton();
@@ -264,6 +267,8 @@ function init(remoteUrl, text) {
 }
 
 $(document).ready(function() {
+
+
     var remoteUrl = jQuery.url.param("url");
     if (!remoteUrl) {
         showErrorOnPath();

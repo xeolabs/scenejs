@@ -25,10 +25,16 @@
                     if (!cfg.fixed || !(box || objectCoords)) {
                         var params = cfg.getParams(data);
 
-                        if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
-                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                                    ("SceneJS.boundingBox mandatory property missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax"));
-                        }
+                        params.xmin = params.xmin || 0;
+                        params.ymin = params.ymin || 0;
+                        params.zmin = params.zmin || 0;
+                        params.xmax = params.xmax || 0;
+                        params.ymax = params.ymax || 0;
+                        params.zmax = params.zmax || 0;
+//                        if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
+//                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+//                                    ("SceneJS.boundingBox mandatory property missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax"));
+//                        }
 
                         var modelTransform = modelTransformBackend.getTransform();
                         if (modelTransform.identity) {  // No model transform
@@ -75,7 +81,7 @@
                                 );
 
                         if (modelTransform.fixed) {
-                            objectCoords = null;
+                            objectCoords = null;    // Ensures we don't recreate axis box next time
                         }
                     }
 
@@ -83,7 +89,7 @@
 
                     if (local) {
                         var result = backend.testAxisBoxIntersection(box);
-
+                           window.countTeapots++;
                         switch (result) {
                             case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
 

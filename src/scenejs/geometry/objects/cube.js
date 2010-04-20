@@ -13,13 +13,19 @@ SceneJS.objects.cube = function() {
         {}
     ]);
 
-    /* Dynamic config OK, but only applies first time - good for assets    
+    /* Dynamic config OK, but only applies first time - good for assets
      */
     var params = cfg.getParams();
 
     var x = params.xSize || 1;
     var y = params.ySize || 1;
     var z = params.zSize || 1;
+
+    var solid = true;
+
+    if (params.solid != undefined) {
+        solid = params.solid;
+    }
 
     /* A geometry node is normally configured with arrays of positions, normals, indices etc., but can instead be
      * configured with a "create" callback, as demonstrated here, that returns an object containing those arrays.
@@ -154,7 +160,7 @@ SceneJS.objects.cube = function() {
             ] ;  // back
 
             return {
-                primitive : "triangles",
+                primitive : solid ? "triangles" : "lines",
                 positions : positions,
                 normals: normals,
                 uv : uv,

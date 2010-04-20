@@ -13,9 +13,19 @@ SceneJS.loadCollada = function() {
                 ("Mandatory SceneJS.assets.collada parameter missing: uri"));
     }
 
+    var modes = {
+        loadCamera: params.loadCamera,
+        loadLights: params.loadLights,
+        showBoundingBoxes : params.showBoundingBoxes
+    };
+
     return SceneJS.load({
 
         uri: params.uri,
+
+        /* Uniquely ID different assets loaded from different nodes of same COLLADA file
+         */
+        id: params.node ? (params.uri + ":" + params.node) : params.uri,
 
         serverParams: {
             format: "xml"
@@ -25,7 +35,9 @@ SceneJS.loadCollada = function() {
             return colladaBackend.parse(
                     params.uri, // Used in paths to texture images
                     xml,
-                    params.node);   // Optional cherry-picked asset in Collada file
+                    params.node, // Optional cherry-picked asset
+                    modes
+                    );
         }
     });
 

@@ -10,11 +10,7 @@
             description: "Tests import of COLLADA's core Phong shading elements using one of the official test models from Collada.org.",
             file: "seymour-plane/seymour-plane.js"
         },
-            {
-            title: "Another COLLADA Test - Bridge of the USS Excelsior",
-            description: "A simple model of the bridge of the Excelsior from the movie Star Trek 3: Search for Spock.",
-            file: "uss-excelsior-bridge/uss-excelsior-bridge.js"
-        },
+          
         {
             title: "Intro Example: Hello, Teapot!",
             description: "Basic example - the OpenGL teapot, demonstrating scene syntax, point lighting, material colours, mouse interaction, perspective, view and modelling transforms",

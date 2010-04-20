@@ -115,7 +115,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                                                             if (factor > 90.0) {
                                                                                 factor = 0;
                                                                             }
-                                                                            factor += data.get("time") * 0.01;
+                                                                            factor += data.get("time") * 0.001;
                                                                             return {
                                                                                 z: factor
                                                                             };
@@ -139,7 +139,7 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas" },
                                                                             if (factor > 10.0) {
                                                                                 factor = 0;
                                                                             }
-                                                                            factor += data.get("time") * 0.001;
+                                                                            factor = data.get("time") * 0.001;
                                                                             return {
                                                                                 x: factor,
                                                                                 y: factor

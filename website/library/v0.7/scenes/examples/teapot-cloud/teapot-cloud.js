@@ -100,13 +100,11 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                 )
         ); 
 
-var pInterval;
 var zpos = -500;
 
-window.doit = function() {
+window.render = function() {
     if (zpos > 1500) {
         clearInterval(pInterval);
-        exampleScene.destroy();
     } else {
         zpos += 2.0;
 
@@ -114,14 +112,20 @@ window.doit = function() {
     }
 };
 
-/* Hack to get any scene definition exceptions up front.
- * Chrome seemed to absorb them in setInterval!
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
  */
-exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)});
+var pInterval;
 
-/* Continue animation
- */
-pInterval = setInterval("window.doit()", 10);
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
 
 
 
