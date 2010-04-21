@@ -230,7 +230,7 @@ SceneJS._backends.installBackend(
                         type = SceneJS._utils.createKeyForMap(currentGeoMap, "type");
                     }
 
-                    ctx.logging.debug("Creating geometry: '" + type + "'");
+                 //   ctx.logging.debug("Creating geometry: '" + type + "'");
 
                     if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
                         ctx.error.fatalError(

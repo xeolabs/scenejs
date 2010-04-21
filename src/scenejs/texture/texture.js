@@ -164,17 +164,14 @@
                                     // utils.loggingBackend.getLogger().info("SceneJS.texture image loading: "
                                     //  + _layer.creationParams.uri);
 
-                                    _layer.process = utils.textureBackend.loadImage(// Process killed automatically on error or abort
+                                     utils.textureBackend.loadImage(
                                             _layer.creationParams.uri,
                                             function(_image) {
 
                                                 /* Image loaded successfully. Note that this callback will
                                                  * be called in the idle period between render traversals (ie. scheduled by a
                                                  * setInterval), so we're not actually visiting this node at this point. We'll
-                                                 * defer creation and application of the texture to the subsequent visit. We'll also defer
-                                                 * killing the load process to then so that we don't suddenly alter the list of
-                                                 * running scene processes during the idle period, when the list is likely to
-                                                 * be queried.
+                                                 * defer creation and application of the texture to the subsequent visit.
                                                  */
                                                 _layer.image = _image;
                                                 _layer.state = utils.STATE_IMAGE_LOADED;
@@ -202,7 +199,9 @@
                                                         + _layer.creationParams.uri);
                                                 _layer.state = utils.STATE_ERROR;
                                             });
-                                })(layer);
+
+
+                                })(layer);                                    
                                 break;
 
                             case utils.STATE_IMAGE_LOADING:
@@ -216,7 +215,6 @@
                                 /* Create this texture layer
                                  */
                                 layer.texture = utils.textureBackend.createTexture(layer.image, layer.creationParams);
-                                utils.textureBackend.imageLoaded(layer.process);
                                 layer.state = utils.STATE_TEXTURE_CREATED;
                                 countLayersReady++;
                                 break;
@@ -238,13 +236,13 @@
 
                     } else {
 
-                        /** Render either all layers or none - saves on generating/destroying shaders                          
+                        /** Render either all layers or none - saves on generating/destroying shaders
                          */
-                        if ((countLayersReady == layers.length)) {
+                      //  if ((countLayersReady == layers.length)) {
                             var countPushed = 0;
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
-                                if (layer.texture) {
+                                if (layer.state == utils.STATE_TEXTURE_CREATED) {
                                     utils.textureBackend.pushLayer(layer.texture, {
                                         applyFrom : layer.applyFrom,
                                         applyTo : layer.applyTo,
@@ -257,11 +255,10 @@
                             SceneJS._utils.visitChildren(cfg, traversalContext, data);
                             utils.textureBackend.popLayers(countPushed);
 
-                        } else if (!params.waitForTextures) {
-                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                        }
+//                        } else {
+//                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
+//                        }
                     }
-                }
-                );
+                });
     };
 })();

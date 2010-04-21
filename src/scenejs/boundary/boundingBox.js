@@ -31,10 +31,10 @@
                         params.xmax = params.xmax || 0;
                         params.ymax = params.ymax || 0;
                         params.zmax = params.zmax || 0;
-//                        if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
-//                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-//                                    ("SceneJS.boundingBox mandatory property missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax"));
-//                        }
+                        //                        if (!params.xmin || !params.ymin || !params.zmin || !params.xmax || !params.ymax || !params.zmax) {
+                        //                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                        //                                    ("SceneJS.boundingBox mandatory property missing: one or more of xmin, ymin, zmin, xmax, ymax or zmax"));
+                        //                        }
 
                         var modelTransform = modelTransformBackend.getTransform();
                         if (modelTransform.identity) {  // No model transform
@@ -85,33 +85,44 @@
                         }
                     }
 
-                    var local = localityBackend.testAxisBoxIntersection(box);
+                    if (localityBackend.testAxisBoxIntersectOuterRadius(box)) {
 
-                    if (local) {
-                        var result = backend.testAxisBoxIntersection(box);
-                           window.countTeapots++;
-                        switch (result) {
-                            case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                        if (localityBackend.testAxisBoxIntersectInnerRadius(box)) {
 
-                            case SceneJS_math_INSIDE_FRUSTUM:
+                            var result = backend.testAxisBoxIntersection(box);
+                            window.countTeapots++;
+                            switch (result) {
+                                case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
 
-                                if (levels) { // Level-of-detail mode
+                                case SceneJS_math_INSIDE_FRUSTUM:
 
-                                    var size = backend.getProjectedSize(box);
-                                    for (var i = levels.length - 1; i >= 0; i--) {
-                                        if (levels[i] <= size) {
-                                            var state = states[i];
-                                            SceneJS._utils.visitChild(cfg, i, traversalContext, data);
-                                            return;
+                                    if (levels) { // Level-of-detail mode
+
+                                        var size = backend.getProjectedSize(box);
+                                        for (var i = levels.length - 1; i >= 0; i--) {
+                                            if (levels[i] <= size) {
+                                                var state = states[i];
+                                                SceneJS._utils.visitChild(cfg, i, traversalContext, data);
+                                                return;
+                                            }
                                         }
+                                    } else {
+                                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
                                     }
-                                } else {
-                                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                                }
-                                break;
+                                    break;
 
-                            case SceneJS_math_OUTSIDE_FRUSTUM:
-                                break;
+                                case SceneJS_math_OUTSIDE_FRUSTUM:
+                                    break;
+                            }
+
+                        } else {
+
+                            /* Allow content staging for subgraph
+                             */
+
+                            // TODO:
+                            
+                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
                         }
                     }
                 });

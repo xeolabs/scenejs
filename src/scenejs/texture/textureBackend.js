@@ -180,40 +180,29 @@ SceneJS._backends.installBackend(
                 },
 
                 /**
-                 * Starts a process to load a texture image.
+                 * Starts load of texture image
                  *
                  * @param uri Image location
-                 * @param onSuccess Callback returns image on success - client node than must kill process with imageLoaded
+                 * @param onSuccess Callback returns image on success
                  * @param onError Callback fired on failure
                  * @param onAbort Callback fired when load aborted, eg. user hits "stop" button in browser
                  */
                 loadImage : function(uri, onSuccess, onError, onAbort) {
-                    var process = ctx.processes.createProcess({
-                        description:"Texture image load: " + uri,
-                        timeoutSecs: -1  
-                    });
                     var image = new Image();
                     image.onload = function() {
                         onSuccess(image);
                     };
                     image.onerror = function() {
-                        ctx.processes.killProcess(process);
                         onError();
                     };
                     image.onabort = function() {
-                        ctx.processes.killProcess(process);
                         onAbort();
                     };
                     image.src = uri;  // Starts image load
-                    return process;
+                    return image;
                 },
 
-                /**
-                 * Kills texture image load process.
-                 */
-                imageLoaded : function(process) {
-                    ctx.processes.killProcess(process);
-                },
+               
 
                 /**
                  * Creates and returns a new texture, or re-uses existing one if possible
@@ -223,7 +212,7 @@ SceneJS._backends.installBackend(
                         ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
                     }
                     var context = canvas.context;
-                    var textureId = SceneJS._utils.createKeyForMap(textures, canvas.canvasId + ":texture");
+                    var textureId = SceneJS._utils.createKeyForMap(textures, "tex");
 
                     ctx.memory.allocate(
                             "texture '" + textureId + "'",
@@ -250,7 +239,7 @@ SceneJS._backends.installBackend(
                                     logging: ctx.logging
                                 });
                             });
-                          ctx.logging.info("texture created: '" + textureId + "'");
+                       //   ctx.logging.info("texture created: '" + textureId + "'");
                     return textures[textureId];
                 },
 

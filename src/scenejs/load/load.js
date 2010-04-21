@@ -13,8 +13,8 @@ SceneJS.load = function() {
     var backend = SceneJS._backends.getBackend("load");
     var logging = SceneJS._backends.getBackend("logging");
     var errorBackend = SceneJS._backends.getBackend("error");
-    var process = null;
     var assetNode;
+    var handle;
 
     const STATE_INITIAL = 0;        // Ready to start load
     const STATE_LOADING = 2;        // Load in progress
@@ -59,9 +59,8 @@ SceneJS.load = function() {
                     }
                 }
 
-                var assetId = params.id || params.uri;
                 if (state == STATE_ATTACHED) {
-                    if (!backend.getAsset(assetId)) {
+                    if (!backend.getAsset(handle)) {
                         state = STATE_INITIAL;
                     }
                 }
@@ -75,17 +74,18 @@ SceneJS.load = function() {
                         break;
 
                     case STATE_LOADED:
-                        backend.assetLoaded(process);  // Finish loading - kill process
-                        process = null;
+                        backend.assetLoaded(handle);  // Finish loading - kill process
                         state = STATE_ATTACHED;
                         visitSubgraph(params.params, data);
                         break;
 
                     case STATE_INITIAL:
                         state = STATE_LOADING;
-                        process = backend.loadAsset(// Process killed automatically on error or abort
-                                params.uri,
-                                assetId,
+
+                        /* Asset not currently loaded or loading - load it
+                         */
+                        handle = backend.loadAsset(// Process killed automatically on error or abort
+                                params.uri,                       
                                 params.serverParams || {
                                     format: "scenejs"
                                 },

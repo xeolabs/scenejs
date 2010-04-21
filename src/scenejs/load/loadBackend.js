@@ -12,7 +12,7 @@ SceneJS._backends.installBackend(
 
             var time = (new Date()).getTime();
             var proxyUri = null;
-            var assets = {};                        // Nodes created by parsers, cached against file name
+            var assets = {};        // Asset content subgraphs for eviction, not reuse
 
             ctx.events.onEvent(
                     SceneJS._eventTypes.TIME_UPDATED,
@@ -45,7 +45,7 @@ SceneJS._backends.installBackend(
 
             /** Loads asset and caches it against uri
              */
-            function _loadAsset(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {                
+            function _loadAsset(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {
                 var url = [proxyUri, "?callback=", callbackName , "&uri=" + uri];
                 for (var param in serverParams) { // TODO: memoize string portion that contains params
                     url.push("&", param, "=", serverParams[param]);
@@ -70,7 +70,6 @@ SceneJS._backends.installBackend(
                                         node: assetNode,
                                         lastUsed: time
                                     };
-
                                     onSuccess(assetNode);
                                 }
                             }
@@ -85,11 +84,10 @@ SceneJS._backends.installBackend(
                     proxyUri = _proxyUri;
                 },
 
-                /** Atempts to get currently-loaded asset, which may have been evicted, in which case
-                 * node should then just call loadAsset to re-load it.
+                /** Attempts to get currently-loaded asset, which may have been evicted
                  */
-                getAsset : function(assetId) {
-                    var asset = assets[assetId];
+                getAsset : function(handle) {
+                    var asset = assets[handle.assetId];
                     if (asset) {
                         asset.lastUsed = time;
                         return asset.node;
@@ -98,26 +96,26 @@ SceneJS._backends.installBackend(
                 },
 
                 /**
-                 * Triggers asynchronous JSONP load of asset and creates new process; callback will fire with new child for the
-                 * client asset node. The asset node will have to then call assetLoaded to notify the backend that the
-                 * asset has loaded and allow backend to kill the process.
+                 * Triggers asynchronous JSONP load of asset, creates new process and handle; callback
+                 * will fire with new child for the  client asset node. The asset node will have to then call assetLoaded
+                 * to notify the backend that the asset has loaded and allow backend to kill the process.
                  *
                  * JSON does not handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
                  *
                  * @uri Location of asset
-                 * @assetId Unique ID for asset
                  * @serverParams Request parameters for proxy
                  * @parser Processes asset data on load
                  * @onSuccess Callback through which processed asset data is returned
                  * @onTimeout Callback invoked when no response from proxy
                  * @onError Callback invoked when error reported by proxy
                  */
-                loadAsset : function(uri, assetId, serverParams, parser, onSuccess, onTimeout, onError) {
+                loadAsset : function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
                     if (!proxyUri) {
                         ctx.error.fatalError(new SceneJS.exceptions.ProxyNotSpecifiedException
                                 ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
                     }
                     ctx.logging.debug("Loading asset from " + uri);
+                    var assetId = SceneJS._utils.createKeyForMap(assets, "asset");
                     var process = ctx.processes.createProcess({
                         onTimeout: function() {  // process killed automatically on timeout
                             ctx.logging.error(
@@ -141,13 +139,17 @@ SceneJS._backends.installBackend(
                                 ctx.processes.killProcess(process);
                                 onError(msg);
                             });
-                    return process;
+                    var handle = {
+                        process: process,
+                        assetId : assetId
+                    };
+                    return handle;
                 },
 
                 /** Notifies backend that load has completed; backend then kills the process.
                  */
-                assetLoaded : function(process) {
-                    ctx.processes.killProcess(process);
+                assetLoaded : function(handle) {
+                    ctx.processes.killProcess(handle.process);
                 }
             };
         });
