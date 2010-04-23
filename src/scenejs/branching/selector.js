@@ -2,7 +2,7 @@
  * Scene node that selects which of its children are active.
  */
 SceneJS.selector = function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
+    var errorBackend = SceneJS._error;
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     return SceneJS._utils.createNode(

@@ -1,5 +1,5 @@
 /**
- * The SceneJS.generator node loops over its children, each time creating a child data for them from the result of its
+ * Scene node that loops over its children, each time creating a child data scope for them from the result of its
  * configuration function, repeating this process until the config function returns nothing.
  *
  * This node type must be configured dynamically therefore, in the SceneJS style, with a configuration function.
@@ -12,9 +12,12 @@
  * is desired in large scenes. The impact will depend on the type of subnode that receives the generated data.
  * For example, inability to memoize will cascade downwards through  modelling transform node hierarchies since they
  * will have to re-multiply matrices by dynamic parent modelling transforms etc.
+ *
+ * @class SceneJS.scalarInterpolator
+ * @extends SceneJS.node
  */
 (function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
+    var errorBackend = SceneJS._error;
     SceneJS.generator = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
 

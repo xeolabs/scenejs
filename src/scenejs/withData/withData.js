@@ -1,5 +1,93 @@
 /**
- * Scene node that creates a child data containing the elements of its configuration.
+ * @class SceneJS.withData
+ * @extends SceneJS.node
+ * <p>Scene node that creates a child data scope containing the elements of its configuration.</p><p>This node provides
+ * a simple yet flexible mechanism for passing data down into a scene graph at runtime.</p>.
+ * <p><b>Example 1 (functionally composed style):</b></p><p>Creating data for a child SceneJS.scale node, which configures itself from the data
+ * with a configuration function:</b></p><pre><code>
+ *
+ *  SceneJS.withData({
+ *         sizeX: 5,
+ *         sizeY: 10,
+ *         sizeZ: 2
+ *      },
+ *      SceneJS.translate({ x: 100 },
+ *
+ *          SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+ *                   return {
+ *                       x: data.get("sizeX"),
+ *                       y: data.get("sizeY"),
+ *                       z: data.get("sizeZ")
+ *                   }
+ *          },
+ *
+ *              SceneJS.objects.cube()
+ *          )
+ *      )
+ *  )
+ *
+ *</code></pre>
+ * <p><b>Example 2 (object composition style):</b></p><pre><code>
+ *
+ *  var wd = SceneJS.withData({
+ *         sizeX: 5,
+ *         sizeY: 10
+ *      });
+ *
+ *  wd.setProperty("sizeZ", 2);
+ *
+ *  var t = SceneJS.translate({ x: 100 });
+ *
+ *  var s = SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+ *           return {
+ *              x: data.get("sizeX"),
+ *              y: data.get("sizeY"),
+ *              z: data.get("sizeZ")
+ *          };
+ *     });
+ *
+ *  var c = SceneJS.objects.cube();
+ *
+ *  wd.addChild(t);
+ *  t.addChild(s);
+ *  s.addChild(c);
+ *
+ * </code></pre>
+ *  <p><b>Example 3 (functionally composed style):</b></p><p>SceneJS.withData nodes can be nested. This example
+ * does the same thing as the previous two, but in this case splits the data into two nested scopes. At runtime, the
+ * scale node will do a little bit more work to get it's x and y properties here, where it will have to hunt one level
+ * up data scope chain to get them.</b></p><pre><code>
+ *
+ *  SceneJS.withData({
+ *         sizeX: 5,
+ *         sizeY: 10
+ *      },
+ *
+ *          SceneJS.withData({
+ *             sizeY: 10
+ *          },
+ *
+ *          SceneJS.translate({ x: 100 },
+ *
+ *              SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+ *                       return {
+ *                           x: data.get("sizeX"),
+ *                           y: data.get("sizeY"),
+ *                           z: data.get("sizeZ")
+ *                       }
+ *                  },
+ *
+ *                  SceneJS.objects.cube()
+ *              )
+ *          )
+ *      )
+ *  )
+ *
+ *</code></pre>
+ * @constructor
+ * Create a new SceneJS.withData
+ * @param {Object} The config object, followed by zero or more child nodes
+ *
  */
 SceneJS.withData = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);

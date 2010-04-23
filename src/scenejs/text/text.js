@@ -1,41 +1,37 @@
-(function() {
+/**
+ * Scene node that defines a string of text.
+ *
+ * @class SceneJS.text
+ * @extends SceneJS.geometry
+ */
+SceneJS.text = function() {
 
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var vectorTextBackend = SceneJS._backends.getBackend('vector-text');
+    var cfg = SceneJS._utils.getNodeConfig(arguments || [
+        {}
+    ]);
 
-    SceneJS.text = function() {
+    var params = cfg.getParams();
 
-        var cfg = SceneJS._utils.getNodeConfig(arguments || [
-            {}
-        ]);
+    if (!params.text) {
+        SceneJS_errorModule.fatalError(
+                new SceneJS.exceptions.NodeConfigExpectedException(
+                        "SceneJS.vectorText property missing: text"));
+    }
 
-        var params = cfg.getParams();
+    return SceneJS.geometry({
 
-        if (!params.text) {
-            errorBackend.fatalError(
-                    new SceneJS.exceptions.NodeConfigExpectedException(
-                            "SceneJS.vectorText property missing: text"));
+        /* Callback to create geometry
+         */
+        create: function() {
+            var geo = SceneJS_vectorTextModule.getGeometry(1, 0, 0, params.text); // Unit size
+            return {
+                primitive : "lines",
+                positions : geo.positions,
+                normals: [],
+                uv : [],
+                indices : geo.indices,
+                colors:[]
+            };
         }
-
-        return SceneJS.geometry({
-
-            /* Callback to create geometry
-             */
-            create: function() {
-                var geo = vectorTextBackend.getGeometry(1, 0, 0, params.text); // Unit size
-                return {
-                    primitive : "lines",
-                    positions : geo.positions,
-                    normals: [
-                  
-                    ],
-                    uv : [],
-                    indices : geo.indices,
-                    colors:[]
-                };
-            }
-        });
-    };
-
-
-})();
+    });
+};

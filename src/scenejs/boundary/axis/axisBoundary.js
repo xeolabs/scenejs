@@ -4,7 +4,7 @@
 SceneJS.axisBoundary = function() {
     var cfg = SceneJS.utils.getNodeConfig(arguments);
 
-    var errorBackend = SceneJS._backends.getBackend("error");
+    var errorBackend = SceneJS._error;
     var backend = SceneJS._backends.getBackend('axis-boundary');
     var objectCoords;
     var modelCoords;

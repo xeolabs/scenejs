@@ -1,27 +1,46 @@
 /**
- * Bounding box node - provides view-frustum culling and level-of-detail selection
+ * @class SceneJS.boundingBox
+ * @extends SceneJS.node
+ * <p>A scene node that defines an axis-aligned box that encloses the spatial extents of its subgraph.</p> <p>You can accelerate
+ * the rendering of your scenes by wrapping its most complex subgraphs with these, which causes SceneJS to only render them
+ * when their boundingBoxes intersect the viewing frustum.</p><p>An example of a cube wrapped with a boundingBox:</p><pre><code>
+ *  //...
+ *
+ *  SceneJS.boundingBox({
+ *        xmin: -3.0, y: -3.0, zmin: -3.0, xmax: 3.0, ymax: 3.0, zmax: 3.0
+ *      },
+ *
+ *     SceneJS.material({
+ *            ambient: { r:0.2, g:0.2, b:0.5 },
+ *            diffuse: { r:0.6, g:0.6, b:0.9 }
+ *         },
+ *
+ *        SceneJS.scale({ x: 3, y: 3, z: 3 },
+ *
+ *            SceneJS.objects.cube()
+ *        )
+ *     )
+ *  )
+ *</code></pre>
+ * @constructor
+ * Create a new SceneJS.boundingBox
+ * @param {Object} The config object, followed by zero or more child nodes
  */
 (function() {
 
-    var errorBackend = SceneJS._backends.getBackend("error");
-    var backend = SceneJS._backends.getBackend("view-frustum");
-    var localityBackend = SceneJS._backends.getBackend("view-locality");
-    var modelTransformBackend = SceneJS._backends.getBackend("model-transform");
-
     SceneJS.boundingBox = function() {
-        var cfg = SceneJS._utils.getNodeConfig(arguments);      
+        var cfg = SceneJS._utils.getNodeConfig(arguments);
 
         return SceneJS._utils.createNode(
                 "boundingBox",
                 cfg.children,
-                
+
                 new (function() {
 
                     const STAGE_REMOTE = 0;
                     const STAGE_SCENE = 1;
                     const STATE_BUFFERED = 2;
 
-                   
                     var objectCoords;
                     var box;
                     var levels;
@@ -97,7 +116,7 @@
                             params.ymax = params.ymax || 0;
                             params.zmax = params.zmax || 0;
 
-                            var modelTransform = modelTransformBackend.getTransform();
+                            var modelTransform = SceneJS_modelTransformModule.getTransform();
                             if (modelTransform.identity) {  // No model transform
                                 box = {
                                     min: [params.xmin, params.ymin, params.zmin],
@@ -118,13 +137,13 @@
                             }
                             if (params.levels) {
                                 if (params.levels.length != cfg.children.length) {
-                                    errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                    SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
                                             ("SceneJS.boundingBox levels property should have a value for each child node"));
                                 }
 
                                 for (var i = 1; i < params.levels.length; i++) {
                                     if (params.levels[i - 1] >= params.levels[i]) {
-                                        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
                                                 ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
                                     }
                                     states.push(STAGE_REMOTE);
@@ -134,7 +153,7 @@
                         }
 
                         if (objectCoords) {
-                            var modelTransform = modelTransformBackend.getTransform();
+                            var modelTransform = SceneJS_modelTransformModule.getTransform();
                             box = new SceneJS_math_Box3().fromPoints(
                                     SceneJS_math_transformPoints3(
                                             modelTransform.matrix,
@@ -146,11 +165,11 @@
                             }
                         }
 
-                        if (localityBackend.testAxisBoxIntersectOuterRadius(box)) {
+                        if (SceneJS._localityModule.testAxisBoxIntersectOuterRadius(box)) {
 
-                            if (localityBackend.testAxisBoxIntersectInnerRadius(box)) {
+                            if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(box)) {
 
-                                var result = backend.testAxisBoxIntersection(box);
+                                var result = SceneJS_frustumModule.testAxisBoxIntersection(box);
                                 window.countTeapots++;
                                 switch (result) {
                                     case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
@@ -159,7 +178,7 @@
 
                                         if (levels) { // Level-of-detail mode
 
-                                            var size = backend.getProjectedSize(box);
+                                            var size = SceneJS_frustumModule.getProjectedSize(box);
                                             for (var i = levels.length - 1; i >= 0; i--) {
                                                 if (levels[i] <= size) {
                                                     var state = states[i];

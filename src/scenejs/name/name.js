@@ -1,11 +1,12 @@
 /**
  * Scene node that specifies a name for the nodes in its subgraph. These may be nested to create hierarchical
  * names, effectively overlaying semantics onto a scene.
+ *
+ * @class SceneJS.name
+ * @extends SceneJS.node
  */
 SceneJS.name = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var nameBackend = SceneJS._backends.getBackend('naming');
 
     return SceneJS._utils.createNode(
             "name",
@@ -22,11 +23,11 @@ SceneJS.name = function() {
                  */
                 this.setName = function(name) {
                     if (!name) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name is undefined"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name is undefined"));
                     }
                     name = name.replace(/^\s+|\s+$/g, ''); // Trim
                     if (name.length == 0) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
                     }
                     _name = name;
                     return this;
@@ -53,9 +54,9 @@ SceneJS.name = function() {
                     if (!cfg.fixed) {
                         this._init(cfg.getParams(data));
                     }
-                    nameBackend.pushName(_name);
+                    SceneJS_nameModule.pushName(_name);
                     this._renderChildren(traversalContext, data);
-                    nameBackend.popName();
+                    SceneJS_nameModule.popName();
                 };
             })());
 };

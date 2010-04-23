@@ -3,7 +3,6 @@
  */
 SceneJS.frustum = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('projection');
 
     return SceneJS._utils.createNode(
             "frustum",
@@ -37,10 +36,10 @@ SceneJS.frustum = function() {
                             matrix: tempMat
                         };
                     }
-                    var prevTransform = backend.getTransform();
-                    backend.setTransform(transform);
+                    var prevTransform = SceneJS_projectionModule.getTransform();
+                    SceneJS_projectionModule.setTransform(transform);
                     this._renderChildren(traversalContext, data);
-                    backend.setTransform(prevTransform);
+                    SceneJS_projectionModule.setTransform(prevTransform);
                 };
             })());
 };

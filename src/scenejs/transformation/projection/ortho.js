@@ -3,7 +3,7 @@
  */
 SceneJS.ortho = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('projection');
+   
     var transform;
 
     return SceneJS._utils.createNode(
@@ -35,10 +35,10 @@ SceneJS.ortho = function() {
                             matrix: tempMat
                         };
                     }
-                    var prevTransform = backend.getTransform();
-                    backend.setTransform(transform);
+                    var prevTransform = SceneJS_projectionModule.getTransform();
+                    SceneJS_projectionModule.setTransform(transform);
                     this._renderChildren(traversalContext, data);
-                    backend.setTransform(prevTransform);
+                    SceneJS_projectionModule.setTransform(prevTransform);
                 };
             })());
 };

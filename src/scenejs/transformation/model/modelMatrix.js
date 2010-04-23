@@ -1,11 +1,11 @@
 /**
- * Node that defines a modelling transform matrix for its subgraph.
+ * Scene node that accumulates a model-space transform for the nodes within its subgraph, accumulated with higher
+ * modelling transform nodes.
+ *
+ * @class SceneJS.rotate
+ * @extends SceneJS.node
  */
-
 SceneJS.modelMatrix = function() {
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
-
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     /* Memoization levels
@@ -25,10 +25,10 @@ SceneJS.modelMatrix = function() {
 
                 this.setElements = function(elements) {
                     if (!elements) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
                     }
                     if (elements.length != 16) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
                     }
                     for (var i = 0; i < 16; i++) {
                         _mat[i] = elements[i];
@@ -64,7 +64,7 @@ SceneJS.modelMatrix = function() {
                             _memoLevel = FIXED_CONFIG;
                         }
                     }
-                    var superXform = modelTransformBackend.getTransform();
+                    var superXform = SceneJS_modelTransformModule.getTransform();
                     if (_memoLevel < FIXED_TRANSFORM) {
                         var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                         _xform = {
@@ -76,9 +76,9 @@ SceneJS.modelMatrix = function() {
                             _memoLevel = FIXED_TRANSFORM;
                         }
                     }
-                    modelTransformBackend.setTransform(_xform);
+                    SceneJS_modelTransformModule.setTransform(_xform);
                      this._renderChildren(traversalContext, data);
-                    modelTransformBackend.setTransform(superXform);
+                    SceneJS_modelTransformModule.setTransform(superXform);
                 };
             })());
 };

@@ -1,9 +1,11 @@
 /**
+ * Scene node that defines a perspective transformation for the nodes within its subgraph.
  *
+ * @class SceneJS.perspective
+ * @extends SceneJS.node
  */
 SceneJS.perspective = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var projectionBackend = SceneJS._backends.getBackend('projection');
 
     /* Memoization levels
      */
@@ -96,10 +98,10 @@ SceneJS.perspective = function() {
                             matrix:tempMat
                         };
                     }
-                    var prevTransform = projectionBackend.getTransform();
-                    projectionBackend.setTransform(_transform);
+                    var prevTransform = SceneJS_projectionModule.getTransform();
+                    SceneJS_projectionModule.setTransform(_transform);
                     SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    projectionBackend.setTransform(prevTransform);
+                    SceneJS_projectionModule.setTransform(prevTransform);
                 };
             })());
 };

@@ -1,10 +1,12 @@
 /**
- * Node that defines a view transform matrix for its subgraph.
+ * Scene node that accumulates a view transform matrix for the nodes within its subgraph, accumulated with higher
+ * view transform nodes.
+ *
+ * @class SceneJS.viewMatrix
+ * @extends SceneJS.node
  */
 SceneJS.viewMatrix = function() {
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var transformBackend = SceneJS._backends.getBackend('view-transform');
-
+    
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     /* Memoization levels
@@ -24,10 +26,10 @@ SceneJS.viewMatrix = function() {
 
                 this.setElements = function(elements) {
                     if (!elements) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
                     }
                     if (elements.length != 16) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
                     }
                     for (var i = 0; i < 16; i++) {
                         _mat[i] = elements[i];
@@ -63,7 +65,7 @@ SceneJS.viewMatrix = function() {
                             _memoLevel = FIXED_CONFIG;
                         }
                     }
-                    var superXform = transformBackend.getTransform();
+                    var superXform = SceneJS_viewTransformModule.getTransform();
                     if (_memoLevel < FIXED_TRANSFORM) {
                         var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                         _xform = {
@@ -75,9 +77,9 @@ SceneJS.viewMatrix = function() {
                             _memoLevel = FIXED_TRANSFORM;
                         }
                     }
-                    transformBackend.setTransform(_xform);
+                    SceneJS_viewTransformModule.setTransform(_xform);
                     this._renderChildren(cfg, traversalContext, data);
-                    transformBackend.setTransform(superXform);
+                    SceneJS_viewTransformModule.setTransform(superXform);
                 };
             })());
 };

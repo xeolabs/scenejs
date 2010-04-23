@@ -5,8 +5,7 @@
 
 SceneJS.frustum = function() {
     var cfg = SceneJS.utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('viewprojection');
-
+    
     return SceneJS._utils.createNode(
             "frustum",
             cfg.children,
@@ -40,10 +39,10 @@ SceneJS.frustum = function() {
                             volume: volume
                         };
                     }
-                    var prevTransform = backend.getTransform();
-                    backend.setTransform(transform);
+                    var prevTransform = SceneJS_projectionModule.getTransform();
+                    SceneJS_projectionModule.setTransform(transform);
                     this._renderChildren(traversalContext, data);
-                    backend.setTransform(prevTransform);
+                    SceneJS_projectionModule.setTransform(prevTransform);
                 };
             })());
 };

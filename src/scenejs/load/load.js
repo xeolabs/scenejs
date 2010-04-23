@@ -1,18 +1,16 @@
-/** Asynchronously loads a subgraph cross-domain. This node is configured with the location of a file
- * that describes the subgraph. When first visited, it will start the load, then finish the load and
- * integrate the subgraph on a future visit.
+/**
+ * Scene node that asynchronously loads its subgraph, cross-domain. This node is configured with the
+ * location of a JavaScript file containing a SceneJS definition of the subgraph. When first visited during scene
+ * traversal, it will begin the load and allow traversal to cintinue at its next sibling node. When on a subsequent
+ * visit its subgraph has been loaded, it will then allow traversal to decsend into that subgraph to render it.
  *
- * Can be configured with child nodes to visit while the load is in progress, which will be replaced by
- * the loaded subgraph.
+ * @class SceneJS.load
+ * @extends SceneJS.node
  */
 SceneJS.load = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     var params;
-
-    var backend = SceneJS._backends.getBackend("load");
-    var logging = SceneJS._backends.getBackend("logging");
-    var errorBackend = SceneJS._backends.getBackend("error");
     var assetNode;
     var handle;
 
@@ -25,7 +23,7 @@ SceneJS.load = function() {
     var state = STATE_INITIAL;
 
     function sceneJSParser(data, onError) {
-        if (!data.___isSceneJSNode) {
+        if (!data._render) {
             onError(data.error || "unknown server error");
             return null;
         } else {
@@ -41,7 +39,7 @@ SceneJS.load = function() {
             var childData = SceneJS._utils.newScope(data, cfg.fixed);
             for (var key in params.params) {
                 childData.put(key, params.params[key]);
-            }            
+            }
             assetNode._render.call(assetNode, traversalContext, childData);
         } else {
             assetNode._render.call(assetNode, traversalContext, data);
@@ -59,13 +57,13 @@ SceneJS.load = function() {
                     if (!params) {
                         params = cfg.getParams(data);
                         if (!params.uri) {
-                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
                                     ("Scene definiton error - mandatory SceneJS.load parameter missing: uri"));
                         }
                     }
 
                     if (state == STATE_ATTACHED) {
-                        if (!backend.getAsset(handle)) {
+                        if (!SceneJS_loadModule.getAsset(handle)) {
                             state = STATE_INITIAL;
                         }
                     }
@@ -79,7 +77,7 @@ SceneJS.load = function() {
                             break;
 
                         case STATE_LOADED:
-                            backend.assetLoaded(handle);  // Finish loading - kill process
+                            SceneJS_loadModule.assetLoaded(handle);  // Finish loading - kill process
                             state = STATE_ATTACHED;
                             visitSubgraph(params.params, data);
                             break;
@@ -89,7 +87,7 @@ SceneJS.load = function() {
 
                             /* Asset not currently loaded or loading - load it
                              */
-                            handle = backend.loadAsset(// Process killed automatically on error or abort
+                            handle = SceneJS_loadModule.loadAsset(// Process killed automatically on error or abort
                                     params.uri,
                                     params.serverParams || {
                                         format: "scenejs"
@@ -101,13 +99,13 @@ SceneJS.load = function() {
                                     },
                                     function() { // onTimeout
                                         state = STATE_ERROR;
-                                        errorBackend.error(
+                                        SceneJS_errorModule.error(
                                                 new SceneJS.exceptions.AssetLoadTimeoutException(
                                                         "SceneJS.load timed out - uri: " + params.uri));
                                     },
-                                    function(msg) { // onError - backend has killed process
+                                    function(msg) { // onError - SceneJS_loadModule has killed process
                                         state = STATE_ERROR;
-                                        errorBackend.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
+                                        SceneJS_errorModule.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
                                     });
                             break;
 

@@ -1,11 +1,12 @@
 /**
- * Scene node that specifies a modelling-space rotation for the nodes in its subgraph.
+ * Scene node that applies a model-space rotation transform to the nodes within its subgraph, accumulated with higher
+ * modelling transform nodes.
+ *
+ * @class SceneJS.scale
+ * @extends SceneJS.node
  */
 SceneJS.rotate = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
-    var errorBackend = SceneJS._backends.getBackend('error');
 
     /* Memoization levels
      */
@@ -54,7 +55,7 @@ SceneJS.rotate = function() {
                     var y = xyz.y || 0;
                     var z = xyz.z || 0;
                     if (x + y + z == 0) {
-                        errorBackend.fatalError(
+                        SceneJS_errorModule.fatalError(
                                 new SceneJS.exceptions.IllegalRotateConfigException(
                                         "SceneJS.rotate vector is zero - at least one of properties x,y and z must be non-zero"));
                     }
@@ -126,7 +127,7 @@ SceneJS.rotate = function() {
                         }
                         _mat = SceneJS_math_rotationMat4v(_angle * Math.PI / 180.0, [_x, _y, _z]);
                     }
-                    var superXform = modelTransformBackend.getTransform();
+                    var superXform = SceneJS_modelTransformModule.getTransform();
                     if (_memoLevel < FIXED_MODEL_SPACE) {
                         var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                         xform = {
@@ -138,9 +139,9 @@ SceneJS.rotate = function() {
                             _memoLevel = FIXED_MODEL_SPACE;
                         }
                     }
-                    modelTransformBackend.setTransform(xform);
+                    SceneJS_modelTransformModule.setTransform(xform);
                     this._renderChildren(traversalContext, data);
-                    modelTransformBackend.setTransform(superXform);
+                    SceneJS_modelTransformModule.setTransform(superXform);
                 };
             })());
 };

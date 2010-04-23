@@ -1,11 +1,12 @@
+/**
+ * Scene node that defines one or more layers of texture to apply to geometry within its subgraph.
+ *
+ * @class SceneJS.texture
+ * @extends SceneJS.node
+ */
 (function() {
 
-
     var utils = SceneJS.__texture = {   // Just one object in closure
-
-        errorBackend : SceneJS._backends.getBackend("error"),
-        textureBackend : SceneJS._backends.getBackend("texture"),
-        loggingBackend : SceneJS._backends.getBackend("logging"),
 
         getMatrix: function(translate, rotate, scale) {
             var matrix = null;
@@ -84,7 +85,7 @@
                                         layerParam.applyFrom != "normal" &&
                                         layerParam.applyFrom != "geometry") {
 
-                                        utils.errorBackend.fatalError(
+                                        SceneJS_errorModule.fatalError(
                                                 new SceneJS.exceptions.InvalidNodeConfigException(
                                                         "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
                                                         "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
@@ -95,7 +96,7 @@
                                     if (layerParam.applyTo != "baseColor" && // Colour map
                                         layerParam.applyTo != "diffuseColor") {
 
-                                        utils.errorBackend.fatalError(
+                                        SceneJS_errorModule.fatalError(
                                                 new SceneJS.exceptions.InvalidNodeConfigException(
                                                         "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
                                                         "should be either 'baseColor', 'diffuseColor'"));
@@ -145,7 +146,7 @@
                              * in which case we'll have to load it again
                              */
                             if (layer.state == utils.STATE_TEXTURE_CREATED) {
-                                if (!utils.textureBackend.textureExists(layer.texture)) {
+                                if (!SceneJS_textureModule.textureExists(layer.texture)) {
                                     layer.state = utils.STATE_INITIAL;
                                 }
                             }
@@ -169,7 +170,7 @@
                                         // utils.loggingBackend.getLogger().info("SceneJS.texture image loading: "
                                         //  + _layer.creationParams.uri);
 
-                                        utils.textureBackend.loadImage(
+                                        SceneJS_textureModule.loadImage(
                                                 _layer.creationParams.uri,
                                                 function(_image) {
 
@@ -188,19 +189,19 @@
                                                     _layer.state = utils.STATE_ERROR;
                                                     var message = "SceneJS.texture image load failed: "
                                                             + _layer.creationParams.uri;
-                                                    utils.loggingBackend.getLogger().warn(message);
+                                                    SceneJS_loggingModule.getLogger().warn(message);
 
                                                     /* Currently recovering from failed texture load
                                                      */
 
-                                                    // utils.errorBackend.error(
+                                                    // SceneJS_errorModule.error(
                                                     //       new SceneJS.exceptions.ImageLoadFailedException(message));
                                                 },
 
                                             /* Load aborted - eg. user stopped browser
                                              */
                                                 function() {
-                                                    utils.loggingBackend.getLogger().warn("SceneJS.texture image load aborted: "
+                                                    SceneJS_loggingModule.getLogger().warn("SceneJS.texture image load aborted: "
                                                             + _layer.creationParams.uri);
                                                     _layer.state = utils.STATE_ERROR;
                                                 });
@@ -219,7 +220,7 @@
 
                                     /* Create this texture layer
                                      */
-                                    layer.texture = utils.textureBackend.createTexture(layer.image, layer.creationParams);
+                                    layer.texture = SceneJS_textureModule.createTexture(layer.image, layer.creationParams);
                                     layer.state = utils.STATE_TEXTURE_CREATED;
                                     countLayersReady++;
                                     break;
@@ -248,7 +249,7 @@
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
                                 if (layer.state == utils.STATE_TEXTURE_CREATED) {
-                                    utils.textureBackend.pushLayer(layer.texture, {
+                                    SceneJS_textureModule.pushLayer(layer.texture, {
                                         applyFrom : layer.applyFrom,
                                         applyTo : layer.applyTo,
                                         blendMode : layer.blendMode,
@@ -258,7 +259,7 @@
                                 }
                             }
                             this._renderChildren(traversalContext, data);
-                            utils.textureBackend.popLayers(countPushed);
+                            SceneJS_textureModule.popLayers(countPushed);
                         }
                     };
                 })());

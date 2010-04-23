@@ -1,8 +1,10 @@
-/** Specifies logging for its sub-nodes
+/** Scene node that routes messages logged by nodes in its subgraph through a given set of logging functions.
+ *
+ * @class SceneJS.logging
+ * @extends SceneJS.node
  */
 SceneJS.logging = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('logging');
     var funcs;
 
     return SceneJS._utils.createNode(
@@ -11,7 +13,7 @@ SceneJS.logging = function() {
 
             new (function() {
                 this._render = function(traversalContext, data) {
-                    var prevFuncs = backend.getFuncs();
+                    var prevFuncs = SceneJS_loggingModule.getFuncs();
                     if (!funcs || !cfg.fixed) {
                         funcs = cfg.getParams(data);
                         var p = prevFuncs || {};
@@ -20,9 +22,9 @@ SceneJS.logging = function() {
                         funcs.debug = funcs.debug || p.debug;
                         funcs.info = funcs.info || p.info;
                     }
-                    backend.setFuncs(funcs);
+                    SceneJS_loggingModule.setFuncs(funcs);
                     this._renderChildren(traversalContext, data);
-                    backend.setFuncs(prevFuncs);
+                    SceneJS_loggingModule.setFuncs(prevFuncs);
                 };
             })());
 };

@@ -1,12 +1,16 @@
+/**
+ * Scene node that routes messages logged by nodes in its subgraph to be written to a DIV element in the HTML document.
+ * If you omit this node in your scene, SceneJS by default will look for a DIV with ID "_scenejs-default-logging" and 
+ * if that is found, will write logging there.
+ *
+ * @class SceneJS.loggingToPage
+ * @extends SceneJS.logging
+ */
 (function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
-
     SceneJS.loggingToPage = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-        var backend = SceneJS._backends.getBackend('logging');
         var funcs;
-
 
         function findElement(elementId) {
             var element;
@@ -14,7 +18,7 @@
                 elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
                 element = document.getElementById(elementId);
                 if (!element) {
-                    errorBackend.fatalError(new SceneJS.exceptions.PageLoggingElementNotFoundException
+                    SceneJS_errorModule.fatalError(new SceneJS.exceptions.PageLoggingElementNotFoundException
                             ("SceneJS.loggingToPage config 'elementId' omitted and no default element found with ID '"
                                     + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
                 }
@@ -24,7 +28,7 @@
                     elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
                     element = document.getElementById(elementId);
                     if (!element) {
-                        errorBackend.fatalError(
+                        SceneJS_errorModule.fatalError(
                                 new SceneJS.exceptions.PageLoggingElementNotFoundException
                                         ("SceneJS.loggingToPage config 'elementId' does not match any elements in page and no " +
                                          "default element found with ID '" + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
@@ -34,33 +38,38 @@
             return element;
         }
 
-        return {
-            _render: function(traversalContext, data) {
-                if (!funcs) {
-                    var params = cfg.getParams();
+        return SceneJS._utils.createNode(
+                "loggingToPage",
+                cfg.children,
 
-                    var element = findElement(params.elementId);
+                new (function() {
 
-                    funcs = {
-                        warn : function (msg) {
-                            element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
-                        },
-                        error : function (msg) {
-                            element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
-                        },
-                        debug : function (msg) {
-                            element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
-                        },
-                        info : function (msg) {
-                            element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
+                    this._render = function(traversalContext, data) {
+                        if (!funcs) {
+                            var params = cfg.getParams();
+
+                            var element = findElement(params.elementId);
+
+                            funcs = {
+                                warn : function (msg) {
+                                    element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
+                                },
+                                error : function (msg) {
+                                    element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
+                                },
+                                debug : function (msg) {
+                                    element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
+                                },
+                                info : function (msg) {
+                                    element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
+                                }
+                            };
                         }
+                        var prevFuncs = SceneJS_loggingModule.getFuncs();
+                        SceneJS_loggingModule.setFuncs(funcs);
+                        this._renderChildren(traversalContext, data);
+                        SceneJS_loggingModule.setFuncs(prevFuncs);
                     };
-                }
-                var prevFuncs = backend.getFuncs();
-                backend.setFuncs(funcs);
-                SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                backend.setFuncs(prevFuncs);
-            }
-        };
+                })());
     };
 })();

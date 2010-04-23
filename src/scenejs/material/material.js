@@ -1,8 +1,54 @@
-/** Sets material properties on the current shader for sub-nodes
+/**
+ * @class SceneJS.material
+ * @extends SceneJS.node
+ * <p>A scene node that defines how light is reflected by the geometry within its subgraph. These may be defined anywhere within
+ * a scene graph and may be nested. When nested, the properties on an inner material node will override
+ * those on outer material nodes for the inner node's subgraph. These nodes are to be defined either above or below
+ * {@link SceneJS.lights} nodes, which provide light for geometry to reflect.</p>
+ * node,
+ * <p><b>Example 1 (functionally composed style):</b></p><p>A cube illuminated by a directional light source and wrapped
+ * with material properties that define how it reflects the light.</b></p><pre><code>
+ * SceneJS.lights({
+ *          sources: [
+ *              {
+ *                  type: "dir",
+ *                  color: { r: 1.0, g: 1.0, b: 0.0 },
+ *                  diffuse: true,
+ *                  specular: true,
+ *                  dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction of light from coordinate space origin
+ *              }
+ *          ]
+ *      },
+ *
+ *      SceneJS.material({
+ *              baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+ *              specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+ *              emit:           0.0,
+ *              specular:       0.9,
+ *              shine:          6.0
+ *          },
+ *
+ *          SceneJS.objects.cube()
+ *     )
+ * )
+ * </pre></code>
+ *
+ * <p><b>Example 2 (object composition style):</b></p><pre><code>
+ *
+ * var m = SceneJS.material();
+ * m.setBaseColor({ r: 0.9, g: 0.2, b: 0.2 });
+ * m.setSpecularColor({ r: 0.9, g: 0.9, b: 0.2 });
+ * m.setEmit(0.0);
+ * m.setSpecular(0.9);
+ * m.setShine(6.0);
+ * </pre></code>
+ *
+ * @constructor
+ * Create a new SceneJS.material
+ * @param {Object} The config object or function, followed by zero or more child nodes
+ *
  */
 SceneJS.material = function() {
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var backend = SceneJS._backends.getBackend('material');
 
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
@@ -98,7 +144,7 @@ SceneJS.material = function() {
 
                 this.setBlendMode = function(mode) {
                     if (mode != "add" && mode != "multiply") {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
                                 "SceneJS.material blendMode of unsupported type: '" + mode + "' - should be 'add' or 'multiply'"));
                     }
                     _material.blendMode = mode;
@@ -146,10 +192,10 @@ SceneJS.material = function() {
                         if (!cfg.fixed) {
                             this._init(cfg.getParams(data));
                         }
-                        var saveMaterial = backend.getMaterial();
-                        backend.setMaterial(_material);
+                        var saveMaterial = SceneJS_materialModule.getMaterial();
+                        SceneJS_materialModule.setMaterial(_material);
                         this._renderChildren(traversalContext, data);
-                        backend.setMaterial(saveMaterial);
+                        SceneJS_materialModule.setMaterial(saveMaterial);
                     }
                 };
             })());

@@ -1,7 +1,13 @@
+/**
+ * Scene node that applies a model-space translation transform to the nodes within its subgraph, accumulated with higher
+ * modelling transform nodes.
+ *
+ * @class SceneJS.translate
+ * @extends SceneJS.node
+ */
 (function() {
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
 
-    /* Memoization levels
+     /* Memoization levels
      */
     const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
     const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
@@ -89,7 +95,7 @@
                             }
                             _mat = SceneJS_math_translationMat4v([_x, _y, _z]);
                         }
-                        var superXform = modelTransformBackend.getTransform();
+                        var superXform = SceneJS_modelTransformModule.getTransform();
                         if (_memoLevel < FIXED_MODEL_SPACE) {
                             var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                             xform = {
@@ -101,9 +107,9 @@
                                 _memoLevel = FIXED_MODEL_SPACE;
                             }
                         }
-                        modelTransformBackend.setTransform(xform);
+                        SceneJS_modelTransformModule.setTransform(xform);
                         this._renderChildren(traversalContext, data);
-                        modelTransformBackend.setTransform(superXform);
+                        SceneJS_modelTransformModule.setTransform(superXform);
                     };
                 })());
     };

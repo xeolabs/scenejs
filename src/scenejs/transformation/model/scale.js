@@ -1,8 +1,11 @@
 /**
- * Scaling modelling transform node
+ * Scene node that applies a model-space scaling transform to the nodes within its subgraph, accumulated with higher
+ * modelling transform nodes.
+ *
+ * @class SceneJS.scale
+ * @extends SceneJS.node
  */
 (function() {
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
 
     /* Memoization levels
      */
@@ -89,7 +92,7 @@
                             }
                             this._mat = SceneJS_math_scalingMat4v([this._x, this._y, this._z]);
                         }
-                        var superXform = modelTransformBackend.getTransform();
+                        var superXform = SceneJS_modelTransformModule.getTransform();
                         if (this._memoLevel < FIXED_MODEL_SPACE) {
                             var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
                             this._xform = {
@@ -101,9 +104,9 @@
                                 this._memoLevel = FIXED_MODEL_SPACE;
                             }
                         }
-                        modelTransformBackend.setTransform(this._xform);
+                        SceneJS_modelTransformModule.setTransform(this._xform);
                         this._renderChildren(traversalContext, data);
-                        modelTransformBackend.setTransform(superXform);
+                        SceneJS_modelTransformModule.setTransform(superXform);
                     };
                 })());
     };

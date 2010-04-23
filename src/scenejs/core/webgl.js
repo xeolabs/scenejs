@@ -197,7 +197,7 @@ function SceneJS_webgl_Shader(context, type, source, logging) {
         logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
     }
     if (!this.valid) {
-        SceneJS._backends.getBackend("error").fatalError(
+        SceneJS_errorModule.fatalError(
                 new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile"));
     }
 }
@@ -253,7 +253,7 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
     }
 
     if (!this.valid) {
-        SceneJS._backends.getBackend("error").fatalError(
+        SceneJS_errorModule.fatalError(
                 new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link"));
     }
 

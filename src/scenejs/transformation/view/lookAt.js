@@ -1,19 +1,19 @@
 /**
- * Scene node that constructs a 'lookAt' view transformation matrix and sets it on the current shader.
+ * Scene node that defines a "look at" viewing transformation for the nodes within its subgraph.
+ *
+ * @class SceneJS.lookAt
+ * @extends SceneJS.node
  */
-
 (function() {
-    var backend = SceneJS._backends.getBackend('view-transform');
-    var errorBackend = SceneJS._backends.getBackend('error');
-
-    /* Memoization levels
-     */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_SPACE = 2;    // Both node config and model-space are fixed
-
     SceneJS.lookAt = function() {
+
         var cfg = SceneJS._utils.getNodeConfig(arguments);
+
+        /* Memoization levels
+         */
+        const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
+        const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
+        const FIXED_SPACE = 2;    // Both node config and model-space are fixed
 
         return SceneJS._utils.createNode(
                 "lookAt",
@@ -74,7 +74,7 @@
                         var y = up.y || 0;
                         var z = up.z || 0;
                         if (x + y + z == 0) {
-                            errorBackend.fatalError(
+                            SceneJS_errorModule.fatalError(
                                     new SceneJS.exceptions.IllegalRotateConfigException(
                                             "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero"));
                         }
@@ -121,7 +121,7 @@
                                     _lookX, _lookY, _lookZ,
                                     _upX, _upY, _upZ);
                         }
-                        var superXform = backend.getTransform();
+                        var superXform = SceneJS_viewTransformModule.getTransform();
                         if (_memoLevel < FIXED_SPACE) {
                             var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                             xform = {
@@ -138,9 +138,9 @@
                                 _memoLevel = FIXED_SPACE;
                             }
                         }
-                        backend.setTransform(xform);
+                        SceneJS_viewTransformModule.setTransform(xform);
                         this._renderChildren(traversalContext, data);
-                        backend.setTransform(superXform);
+                        SceneJS_viewTransformModule.setTransform(superXform);
                     };
                 })());
     };

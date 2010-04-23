@@ -3,7 +3,6 @@
  */
 SceneJS.locality = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('view-locality');   
 
     return SceneJS._utils.createNode(
             "locality",
@@ -50,10 +49,10 @@ SceneJS.locality = function() {
                         _radii.inner = params.inner || 1000;
                         _radii.outer = params.outer || _radii.inner + 500.0;
                     }
-                    var prevRadii = backend.getRadii();
-                    backend.setRadii(_radii);
+                    var prevRadii = SceneJS._localityModule.getRadii();
+                    SceneJS._localityModule.setRadii(_radii);
                     SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    backend.setRadii(prevRadii);
+                    SceneJS._localityModule.setRadii(prevRadii);
                 };
             })());
 };

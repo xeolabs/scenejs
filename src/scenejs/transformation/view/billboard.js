@@ -3,9 +3,7 @@
  */
 SceneJS.billboard = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var vxfBackend = SceneJS._backends.getBackend('view-transform');
-    var mxfBackend = SceneJS._backends.getBackend('model-transform');
-
+    
     return SceneJS._utils.createNode(
             "billboard",
             cfg.children,
@@ -13,8 +11,8 @@ SceneJS.billboard = function() {
             new (function() {
                 this._render = function(traversalContext, data) {
 
-                    var viewXform = vxfBackend.getTransform();
-                    var modelXform = vxfBackend.getTransform();
+                    var viewXform = SceneJS_viewTransformModule.getTransform();
+                    var modelXform = SceneJS_viewTransformModule.getTransform();
 
                     var mat = SceneJS_math_billboardMat(viewXform.matrix);
 
@@ -23,9 +21,9 @@ SceneJS.billboard = function() {
                         matrix: SceneJS_math_mulMat4(modelXform.matrix, mat),
                         fixed: false
                     };
-                    mxfBackend.setTransform(xform);
+                    SceneJS_modelTransformModule.setTransform(xform);
                     this._renderChildren(traversalContext, data);
-                    mxfBackend.setTransform(modelXform);
+                    SceneJS_modelTransformModule.setTransform(modelXform);
                 };
             })());
 };

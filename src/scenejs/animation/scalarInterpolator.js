@@ -1,9 +1,13 @@
 /**
- * Takes a key value from the current scope and creates a child scope containing an output value that is
- * interpolated within the configured keyframe sequence.
+ * Scene node that defines an interpolated animation sequence for a scalar property of a node. Takes a key value
+ * from the current data scope and creates a child scope containing an output value that is interpolated within the
+ * configured keyframe sequence.
+ *
+ * @class SceneJS.scalarInterpolator
+ * @extends SceneJS.node
  */
 SceneJS.scalarInterpolator = function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
+    var errorBackend = SceneJS._error;
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     var NOT_FOUND = 0;
@@ -11,14 +15,15 @@ SceneJS.scalarInterpolator = function() {
     var AFTER_LAST = 2;
     var FOUND = 3;
 
-    var params;
-    var outputValue;
 
     return SceneJS._utils.createNode(
-            "scalarInterpolator",            
+            "scalarInterpolator",
             cfg.children,
 
             new (function() {
+
+                var params;
+                var outputValue;
 
                 this._render = function(traversalContext, data) {
                     if (!params) {
@@ -202,7 +207,7 @@ SceneJS.scalarInterpolator = function() {
                     var childData = SceneJS._utils.newScope(data, cfg.fixed);
                     childData.put(params.output, outputValue);
 
-                     this._renderChildren(traversalContext, childData);
+                    this._renderChildren(traversalContext, childData);
                 };
             })());
 };
