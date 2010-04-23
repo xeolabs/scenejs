@@ -34,32 +34,33 @@
             return element;
         }
 
-        return SceneJS._utils.createNode(
-                function(traversalContext, data) {
-                    if (!funcs) {
-                        var params = cfg.getParams();
+        return {
+            _render: function(traversalContext, data) {
+                if (!funcs) {
+                    var params = cfg.getParams();
 
-                        var element = findElement(params.elementId);
+                    var element = findElement(params.elementId);
 
-                        funcs = {
-                            warn : function (msg) {
-                                element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
-                            },
-                            error : function (msg) {
-                                element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
-                            },
-                            debug : function (msg) {
-                                element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
-                            },
-                            info : function (msg) {
-                                element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
-                            }
-                        };
-                    }
-                    var prevFuncs = backend.getFuncs();
-                    backend.setFuncs(funcs);
-                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    backend.setFuncs(prevFuncs);
-                });
+                    funcs = {
+                        warn : function (msg) {
+                            element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
+                        },
+                        error : function (msg) {
+                            element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
+                        },
+                        debug : function (msg) {
+                            element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
+                        },
+                        info : function (msg) {
+                            element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
+                        }
+                    };
+                }
+                var prevFuncs = backend.getFuncs();
+                backend.setFuncs(funcs);
+                SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                backend.setFuncs(prevFuncs);
+            }
+        };
     };
 })();

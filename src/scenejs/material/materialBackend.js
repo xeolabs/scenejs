@@ -25,42 +25,19 @@ SceneJS._backends.installBackend(
             var material;
             var dirty;
 
-            function colour4ToArray(v, fallback) {
-                return v ?
-                       [
-                           v.r != undefined ? v.r : fallback[0],
-                           v.g != undefined ? v.g : fallback[1],
-                           v.b != undefined ? v.b : fallback[2],
-                           v.a != undefined ? v.a : fallback[3]
-                       ] : fallback;
-            }
-
-            function colour3ToArray(v, fallback) {
-                return v ?
-                       [
-                           v.r != undefined ? v.r : fallback[0],
-                           v.g != undefined ? v.g : fallback[1],
-                           v.b != undefined ? v.b : fallback[2]
-                       ] : fallback;
-            }
-
-            function _createMaterial(m) {
-                return {
-                    baseColor: colour3ToArray(m.baseColor, [ 0.0,  0.0,  0.0]),       // IE. diffuse colour
-                    specularColor: colour3ToArray(m.specularColor, [ 0.0,  0.0,  0.0]),
-                    specular: m.specular || 0.0,
-                    shine: m.shine || 0.0,
-                    reflect: m.reflect || 0.0,
-                    alpha: (m.alpha == undefined) ? 1.0 : m.alpha,
-                    emit: m.emit || 0.0,
-                    blendMode: m.blendMode || "multiply"
-                };
-            }
-
             ctx.events.onEvent(
                     SceneJS._eventTypes.SCENE_ACTIVATED,
                     function() {
-                        material = _createMaterial({});
+                        material = {
+                            baseColor : [ 0.5, 0.5, 0.5 ],
+                            specularColor: [ 0.0,  0.0,  0.0 ],
+                            specular : 0,
+                            shine : 0,
+                            reflect : 0,
+                            alpha : 1.0,
+                            emit : 0.0,
+                            blendMode : "multiply"
+                        };
                         dirty = true;
                     });
 
@@ -92,8 +69,6 @@ SceneJS._backends.installBackend(
             /* Node-facing API
              */
             return {
-
-                createMaterial: _createMaterial,
 
                 setMaterial : function(m) {
                     material = m;

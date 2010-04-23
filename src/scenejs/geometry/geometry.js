@@ -4,114 +4,74 @@ SceneJS._utils.ns("SceneJS.geometry");
  * An element of geometry
  */
 (function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
 
-    var calculateNormals = function(positions, indices) {
-        var nvecs = new Array(positions.length);
-
-        for (var i = 0; i < indices.length; i++) {
-            var j0 = indices[i + 0];
-            var j1 = indices[i + 1];
-            var j2 = indices[i + 2];
-
-            var v1 = positions[j0];
-            var v2 = positions[j1];
-            var v3 = positions[j2];
-
-            var va = SceneJS_math_subVec4(v2, v1);
-            var vb = SceneJS_math_subVec4(v3, v1);
-
-            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(va, vb));
-
-            if (!nvecs[j0]) nvecs[j0] = [];
-            if (!nvecs[j1]) nvecs[j1] = [];
-            if (!nvecs[j2]) nvecs[j2] = [];
-
-            nvecs[j0].push(n);
-            nvecs[j1].push(n);
-            nvecs[j2].push(n);
-        }
-
-        var normals = new Array(positions.length);
-
-        // now go through and average out everything
-        for (var i = 0; i < nvecs.length; i++) {
-            var count = nvecs[i].length;
-            var x = 0;
-            var y = 0;
-            var z = 0;
-            for (var j = 0; j < count; j++) {
-                x += nvecs[i][j][0];
-                y += nvecs[i][j][1];
-                z += nvecs[i][j][2];
-            }
-            normals[i] = [x / count, y / count, z / count];
-        }
-        return normals;
-    };
-
+    /**
+     * Defines an element of geometry within a scene.
+     * The geometry within these node types is not modifiable.
+     * @constructor
+     */
     SceneJS.geometry = function() {
 
         var cfg = SceneJS._utils.getNodeConfig(arguments);
         var geometryBackend = SceneJS._backends.getBackend('geometry');
 
-        var params;
-        var type;
-        var create;
-        var geo = {};
-
         return SceneJS._utils.createNode(
-                function(traversalContext, data) {
+                "geometry",
+                cfg.children,
 
-                    /* Dynamic config only happens first time
-                     */
-                    if (!params) {
-                        params = cfg.getParams(data);
-//                        if (!params.type) { // Identifies VBO's on canvas
-//                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-//                                    ("Geometry node parameter expected : type"));
-//                        }
-//                        type = SceneJS._utils.getParam(params.type, data);
-                        if (params.create instanceof Function) {
+                new (function() {
 
-                            /* Create must not be a dynamic config function!
-                             */
-                            create = params.create;
-                        } else {
-                            geo = {
-                                positions : SceneJS._utils.getParam(params.positions, data) || [],
-                                normals : SceneJS._utils.getParam(params.normals, data) || [],
-                                colors : SceneJS._utils.getParam(params.colors, data) || [],
-                                indices : SceneJS._utils.getParam(params.indices, data) || [],
-                                uv : SceneJS._utils.getParam(params.uv, data) || [],
-                                primitive : SceneJS._utils.getParam(params.primitive, data) || "triangles"
-                            };
+                    var params;
+                    var type;
+                    var create;
+                    var geo = {};
+
+                    this._render = function(traversalContext, data) {
+
+                        /* Dynamic config only happens first time
+                         */
+                        if (!params) {
+                            params = cfg.getParams(data);
+                            if (params.create instanceof Function) {
+
+                                /* Create must not be a dynamic config function!
+                                 */
+                                create = params.create;
+                            } else {
+                                geo = {
+                                    positions : SceneJS._utils.getParam(params.positions, data) || [],
+                                    normals : SceneJS._utils.getParam(params.normals, data) || [],
+                                    colors : SceneJS._utils.getParam(params.colors, data) || [],
+                                    indices : SceneJS._utils.getParam(params.indices, data) || [],
+                                    uv : SceneJS._utils.getParam(params.uv, data) || [],
+                                    primitive : SceneJS._utils.getParam(params.primitive, data) || "triangles"
+                                };
+                            }
                         }
-                    }
 
-                    /* Check geometry not evicted
-                     */
-                    if (type) {                         
-                        if (!geometryBackend.testGeometryExists(type)) {
-                            type = null;
-                        };
-                    }
-
-                    /* type is null if geometry evicted or not yet defined
-                     */
-                    if (!type) {
-                        if (create) {
-
-                            /* Type generated if null
-                             */
-                            type = geometryBackend.createGeometry(params.type, create()); // Lazy-create geometry through callback
-                        } else {
-                            type = geometryBackend.createGeometry(params.type, geo);
+                        /* Check geometry not evicted
+                         */
+                        if (type) {
+                            if (!geometryBackend.testGeometryExists(type)) {
+                                type = null;
+                            }
                         }
-                    }
 
-                    geometryBackend.drawGeometry(type);
-                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                });
+                        /* type is null if geometry evicted or not yet defined
+                         */
+                        if (!type) {
+                            if (create) {
+
+                                /* Type generated if null
+                                 */
+                                type = geometryBackend.createGeometry(params.type, create()); // Lazy-create geometry through callback
+                            } else {
+                                type = geometryBackend.createGeometry(params.type, geo);
+                            }
+                        }
+                        geometryBackend.drawGeometry(type);
+                        this._renderChildren(traversalContext, data);
+                    };
+                })());
     };
 })();

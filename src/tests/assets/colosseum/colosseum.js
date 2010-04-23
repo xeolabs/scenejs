@@ -20,17 +20,12 @@ var exampleScene = SceneJS.scene({
 
         SceneJS.perspective({  fovy : 30.0, aspect : 2.0, near : 0.10, far : 2000.0 },
 
-                SceneJS.lookAt({
-
-                    eye : function(data) {
-                        return data.get("eye");
-                    },
-
-                    look : function(data) {
-                        return data.get("look");
-                    },
-
-                    up : { x: 0, y: 1, z: .0 }
+                SceneJS.lookAt(function(data) {
+                    return {
+                        eye :  data.get("eye"),
+                        look :  data.get("look"),
+                        up : { x: 0, y: 1, z: .0 }
+                    };
                 },
                         SceneJS.renderer({
                             clearColor: {r : 0.6, g: 0.6, b: 0.6 }

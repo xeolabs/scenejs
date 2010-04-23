@@ -9,15 +9,18 @@ SceneJS.renderer = function() {
     var env;
 
     return SceneJS._utils.createNode(
-            function(traversalContext, data) {
-                if (!env || !cfg.fixed) {
-                    var params = cfg.getParams(data);
-                    env = backend.createRendererState(params);
-                }
-                backend.setRendererState(env);
-                SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                backend.restoreRendererState(env);
-            });
+            "renderer",
+            cfg.children,
+
+            new (function() {
+                this._render = function(traversalContext, data) {
+                    if (!env || !cfg.fixed) {
+                        var params = cfg.getParams(data);
+                        env = backend.createRendererState(params);
+                    }
+                    backend.setRendererState(env);
+                    this._renderChildren(traversalContext, data);
+                    backend.restoreRendererState(env);
+                };
+            })());
 };
-
-

@@ -14,6 +14,13 @@
  the bottom of this example, which passes them in.
 
  */
+
+
+SceneJS.onEvent("error", function(e) {
+    window.clearInterval(pInterval);
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
+
 var exampleScene = SceneJS.scene({
 
     /* Bind to a WebGL canvas:
@@ -31,14 +38,14 @@ var exampleScene = SceneJS.scene({
             fovy : 55.0,
             aspect : 2.0,
             near : 0.10,
-            far : 8000.0 },
+            far : 4000.0 },
 
             /* Viewing transform:
              */
                 SceneJS.lookAt(function(data) {
                     return {
                         eye : data.get("eye"),
-                        look : { x: -1.0, y: 0, z: 0 },
+                        look : { x: -1.0, y: 50, z: 0 },
                         up : { y: 1.0 }
                     };
                 },
@@ -64,90 +71,37 @@ var exampleScene = SceneJS.scene({
                                 }
                             ]},
 
-//                                  SceneJS.material({
-//                                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-//                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-//                                            specular:       0.9,
-//                                            shine:          6.0
-//                                        },
-//                                          SceneJS.scale({x: 2200, y: 2200, z: 2200},
-//                                SceneJS.stationary(  SceneJS.objects.sphere()))),
-
                             /* Next, modelling transforms to orient the house.  These particular
                              * transforms are dynamically configured from data injected into the
                              * scene graph when its rendered:
                              */
+                                SceneJS.rotate(function(data) {
+                                    return {
+                                        angle: data.get('pitch'), x : 1.0
+                                    };
+                                },
+                                        SceneJS.rotate(function(data) {
+                                            return {
+                                                angle: data.get('yaw'), y : 1.0
+                                            };
+                                        },
 
-                            /* Load our COLLADA house model, rotating it to align
-                             * with our modelling coordinate system:
-                             */
-                                SceneJS.rotate({x:1,angle:270},
-//                                        SceneJS.material({
-//                                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-//                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-//                                            specular:       0.9,
-//                                            shine:          6.0
-//                                        },
-//                                                SceneJS.generator(
-//                                                        (function() {
-//                                                            var elems = [];
-//                                                            for (var i = 0; i < 10; i++) {
-//                                                                       var x= (400 * Math.random()) - 200.0;
-//                                                                        var y= (400 * Math.random()) - 200.0;
-//                                                                        var z= (400 * Math.random()) - 200.0;
-//
-//                                                                    elems.push({
-//                                                                        x: x,
-//                                                                        y: y,
-//                                                                        z: z
-//                                                                    });
-//
-//                                                            }
-//                                                            var j = 0;
-//                                                            return function() {
-//                                                                if (i < elems.length) {
-//                                                                    return { param: elems[i++] };
-//                                                                } else {
-//                                                                    i = 0;
-//                                                                }
-//                                                            };
-//                                                        })(),
-//
-//                                                        SceneJS.translate(function(data) {
-//                                                            return data.get("param");
-//                                                        },
-//                                                                SceneJS.boundingBox({
-//                                                                    xmin: -3,
-//                                                                    ymin: -3,
-//                                                                    zmin: -3,
-//                                                                    xmax: 3,
-//                                                                    ymax: 3,
-//                                                                    zmax: 3
-//                                                                },
-//                                                                        SceneJS.scale({ x:2, y:2, z:2 },
-//                                                                                SceneJS.objects.teapot())
-//                                                                        )
-//                                                                )
-//                                                        )
-//                                                )
-//
-//                                        )
-                                                                    SceneJS.loadCollada({
-                                                                        uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
-                                                                             "courtyard-house/models/model.dae" ,
-                                                                        showBoundingBoxes: false
-                                                                    })
-////
-//                                          SceneJS.loadCollada({
-//                                                    uri: "http://www.scenejs.org/library/v0.7/assets/examples/cube/cube.dae"
-//                                                })
+                                            /* Load our COLLADA house model, rotating it to align
+                                             * with our modelling coordinate system:
+                                             */
+                                                SceneJS.rotate({x:1,angle:270},
+
+                                                        SceneJS.loadCollada({
+                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
+                                                                 "courtyard-house/models/model.dae"  ,
+                                                            showBoundingBoxes: true
+                                                        }))
+                                                )
                                         )
                                 )
                         )
                 )
-
-        )
-        ;
+        );
 
 
 /*----------------------------------------------------------------------
@@ -162,7 +116,7 @@ var lastX;
 var lastY;
 var dragging = false;
 //var dist = 1000;
-var dist = 0;
+var dist = 1500;
 var speed = 0;
 var eye;
 
@@ -242,7 +196,7 @@ function showFPS(divId) {
 }
 
 function showTeapots(divId) {
-    document.getElementById(divId).innerHTML ="" +  window.countTeapots + ", eye=" + eye[0] + "," + eye[1] + ', ' + eye[2];
+    document.getElementById(divId).innerHTML = "" + window.countTeapots + ", eye=" + eye[0] + "," + eye[1] + ', ' + eye[2];
 }
 
 window.render = function() {
@@ -256,13 +210,13 @@ window.render = function() {
         speed = 0;
         dist = 4000;
     }
-//    if (pitch < 1) {
-//        pitch = 1;
-//    }
-//
-//    if (pitch > 80) {
-//        pitch = 80;
-//    }
+    //    if (pitch < 1) {
+    //        pitch = 1;
+    //    }
+    //
+    //    if (pitch > 80) {
+    //        pitch = 80;
+    //    }
 
     var pitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1,0,0]));
     var yawMat = Matrix.Rotation(yaw * 0.0174532925, $V([0,1,0]));
@@ -277,9 +231,5 @@ window.render = function() {
 
 };
 
-SceneJS.onEvent("error", function(e) {
-    window.clearInterval(pInterval);
-    alert(e.exception.message ? e.exception.message : e.exception);
-});
 
-pInterval = setInterval("window.render()", 10);
+pInterval = setInterval("window.render()", 50);

@@ -31,112 +31,116 @@
         }
         var params = cfg.getParams();
 
-        var lastRenderedData = null; // Saves data from last render for picking traversal
-
         var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
 
         /* Create, register and return the scene graph
          */
-        var _scene = {
+        var _scene = SceneJS._utils.createNode(
+                "scene",
+                cfg.children,
 
-            /** Returns the canvas element that this scene is bound to. When no canvasId was configured, it will be one
-             * that SceneJS selected by default, hence the need to use this method to get the canvas through the scene
-             * node rather than assume its ID.
-             */
-            getCanvas : function() {
-                if (!sceneId) {
-                    return null;
-                }
-                return sceneBackend.getSceneCanvas(sceneId);
-            },
+                new (function() {
 
-            /**
-             * Renders the scene, passing in the given parameters to override any node parameters
-             * that were set on the config.
-             */
-            render : function(paramOverrides) {
-                if (sceneId) {
-                    sceneBackend.activateScene(sceneId);
-                    var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
-                    if (paramOverrides) {        // Override with traversal params
-                        for (var key in paramOverrides) {
-                            data.put(key, paramOverrides[key]);
+                    var lastRenderedData = null; // Saves data from last render for picking traversal
+
+                    /** Returns the canvas element that this scene is bound to. When no canvasId was configured, it will be one
+                     * that SceneJS selected by default, hence the need to use this method to get the canvas through the scene
+                     * node rather than assume its ID.
+                     */
+                    this.getCanvas = function() {
+                        if (!sceneId) {
+                            return null;
                         }
-                    }
-                    if (params.proxy) {
-                        loadBackend.setProxy(params.proxy);
-                    }
-                    var traversalContext = {
-
+                        return sceneBackend.getSceneCanvas(sceneId);
                     };
-                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    loadBackend.setProxy(null);
-                    sceneBackend.deactivateScene();
-                    lastRenderedData = data;
-                }
-            },
 
-            /**
-             * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
-             * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
-             * The scene must have been previously rendered, since this method re-renders it (to a special
-             * pick frame buffer) using parameters retained from the prior render() call.
-             *
-             * @param canvasX
-             * @param canvasY
-             */
-            pick : function(canvasX, canvasY) {
-                if (sceneId) {
-                    try {
-                        if (!lastRenderedData) {
-                            throw new SceneJS.exceptions.PickWithoutRenderedException
-                                    ("Scene not rendered - need to render before picking");
+                    /**
+                     * Renders the scene, passing in the given parameters to override any node parameters
+                     * that were set on the config.
+                     */
+                    this.render = function(paramOverrides) {
+                        if (sceneId) {
+                            sceneBackend.activateScene(sceneId);
+                            var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
+                            if (paramOverrides) {        // Override with traversal params
+                                for (var key in paramOverrides) {
+                                    data.put(key, paramOverrides[key]);
+                                }
+                            }
+                            if (params.proxy) {
+                                loadBackend.setProxy(params.proxy);
+                            }
+                            var traversalContext = {
+
+                            };
+                            this._renderChildren(traversalContext, data);
+                            loadBackend.setProxy(null);
+                            sceneBackend.deactivateScene();
+                            lastRenderedData = data;
                         }
-                        sceneBackend.activateScene(sceneId);  // Also activates canvas
-                        pickBackend.pick(canvasX, canvasY);
-                        if (params.proxy) {
-                            loadBackend.setProxy(params.proxy);
+                    };
+
+                    /**
+                     * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
+                     * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
+                     * The scene must have been previously rendered, since this method re-renders it (to a special
+                     * pick frame buffer) using parameters retained from the prior render() call.
+                     *
+                     * @param canvasX
+                     * @param canvasY
+                     */
+                    this.pick = function(canvasX, canvasY) {
+                        if (sceneId) {
+                            try {
+                                if (!lastRenderedData) {
+                                    throw new SceneJS.exceptions.PickWithoutRenderedException
+                                            ("Scene not rendered - need to render before picking");
+                                }
+                                sceneBackend.activateScene(sceneId);  // Also activates canvas
+                                pickBackend.pick(canvasX, canvasY);
+                                if (params.proxy) {
+                                    loadBackend.setProxy(params.proxy);
+                                }
+                                var traversalContext = {};
+                                this._renderChildren(traversalContext, lastRenderedData);
+                                loadBackend.setProxy(null);
+                                var picked = pickBackend.getPicked();
+                                sceneBackend.deactivateScene();
+                                return picked;
+                            } finally {
+                                SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+                            }
                         }
-                        var traversalContext = {};
-                        SceneJS._utils.visitChildren(cfg, traversalContext, lastRenderedData);
-                        loadBackend.setProxy(null);
-                        var picked = pickBackend.getPicked();
-                        sceneBackend.deactivateScene();
-                        return picked;
-                    } finally {
-                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
-                    }
-                }
-            },
+                    };
 
-            /**
-             * Returns count of active processes. A non-zero count indicates that the scene should be rendered
-             * at least one more time to allow asynchronous processes to complete - since processes are
-             * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
-             * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
-             * a race condition.
-             */
-            getNumProcesses : function() {
-                return (sceneId) ? processesBackend.getNumProcesses(sceneId) : 0;
-            },
+                    /**
+                     * Returns count of active processes. A non-zero count indicates that the scene should be rendered
+                     * at least one more time to allow asynchronous processes to complete - since processes are
+                     * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
+                     * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
+                     * a race condition.
+                     */
+                    this.getNumProcesses = function() {
+                        return (sceneId) ? processesBackend.getNumProcesses(sceneId) : 0;
+                    };
 
-            /** Destroys this scene, after which it cannot be rendered any more. You should destroy
-             * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
-             * resources for it (eg. shaders, VBOs etc) that are no longer in use.
-             */
-            destroy : function() {
-                if (sceneId) {
-                    sceneBackend.destroyScene(sceneId); // Last one fires RESET command
-                    sceneId = null;
-                }
-            },
+                    /** Destroys this scene, after which it cannot be rendered any more. You should destroy
+                     * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
+                     * resources for it (eg. shaders, VBOs etc) that are no longer in use.
+                     */
+                    this.destroy = function() {
+                        if (sceneId) {
+                            sceneBackend.destroyScene(sceneId); // Last one fires RESET command
+                            sceneId = null;
+                        }
+                    };
 
-            /** Returns true if scene active, ie. not destroyed
-             */
-            isActive: function() {
-                return (sceneId != null);
-            }
-        };
+                    /** Returns true if scene active, ie. not destroyed
+                     */
+                    this.isActive = function() {
+                        return (sceneId != null);
+                    };
+                })());
 
         /* Register scene - fires a SCENE_CREATED event
          */

@@ -18,6 +18,7 @@ var SceneJS = {
 
     };
 
+
     /** Private resources
      */
     SceneJS._utils = {
@@ -113,12 +114,12 @@ var SceneJS = {
          *
          *      node(node, node)
          */
-        createNode : function(func) {
-            return {
-                ___isSceneJSNode : true,  // Don't use this name in your node configs!
-                func: func
-            };
-        },
+        //        createNode : function(func) {
+        //            return {
+        //                ___isSceneJSNode : true,  // Don't use this name in your node configs!
+        //                func: func
+        //            };
+        //        },
 
         /**
          * Used within scene node functions to extract parameters and child nodes from arguments.
@@ -194,8 +195,8 @@ var SceneJS = {
             };
             for (var i = 0; i < args.length; i++) {
                 var arg = args[i];
-                if (arg.___isSceneJSNode) {
-                    result.children.push(arg.func);
+                if (arg._render) {
+                    result.children.push(arg);
                 } else if (i == 0) {
                     if (arg instanceof Function) {
                         result.getParams = arg;
@@ -252,6 +253,119 @@ var SceneJS = {
             };
         },
 
+        createNode : function(type, children, proto) {
+            this._parent = null;
+            var _type = type;
+            var _children = children;
+
+            proto.getType = function() {
+                return _type;
+            };
+
+            proto.getNumChildren = function() {
+                return _children.length;
+            };
+
+            proto.getChildren = function() {
+                var list = new Array(_children.length);
+                var len = _children.length;
+                for (var i = 0; i < len; i++) {
+                    list[i] = _children[i];
+                    child._parent = this;
+                }
+                return list;
+            };
+
+            proto.setChildren = function(children) {
+                var temp = new Array(children.length);
+                var len = children.length;
+                var child;
+                for (var i = 0; i < len; i++) {
+                    child = children[i];
+                    if (child._parent) {
+
+                    }
+                    temp[i] = child;
+                }
+                children = temp;
+                return this;
+            };
+
+            proto.getChildAt = function(i) {
+                return _children[i];
+            };
+
+            proto.removeChildAt = function(i) {
+                var r = _children.splice(i, 1);
+                if (r.length > 0) {
+                    r[0]._parent = null;
+                    return r[0];
+                } else {
+                    return null;
+                }
+            };
+
+            proto.addChild = function(node) {
+                if (node._parent != null) {
+                }
+                _children.push(node);
+                node._parent = this;
+                return node;
+            };
+
+            proto.insertChild = function(node, i) {
+                if (node._parent != null) {
+                }
+                if (i == undefined || i <= 0) {
+                    _children.unshift(node);
+                } else if (i >= _children.length) {
+                    _children.push(node);
+                } else {
+                    _children.splice(i, 0, node);
+                }
+                node._parent = this;
+                return node;
+            };
+
+            proto.getParent = function() {
+                return this._parent;
+            };
+
+            proto._renderChildren = function(traversalContext, data) {
+                var child;
+                var len = _children.length;
+                if (len) {
+                    for (var i = 0; i < len; i++) {
+                        child = _children[i];
+                        child._render.call(child, { // Traversal context
+                            appendix : traversalContext.appendix,
+                            insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
+                        }, data);
+                    }
+                } else {
+
+                    /* Leaf node - if on right fringe of tree then
+                     * render appended nodes
+                     */
+                    if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
+                        len = traversalContext.appendix.length;
+                        for (var i = 0; i < len; i++) {
+                            child = traversalContext.appendix[i];
+                            child._render.call(child, { // Traversal context
+                                appendix : null,
+                                insideRightFringe: (i < len - 1)
+                            }, data);
+                        }
+                    }
+                }
+            };
+
+            proto._renderChild = function(index, traversalContext, data) {
+                _children[index]._render(traversalContext, data);
+            };
+
+            return proto;
+        },
 
         getParam : function(param, data, fallback) {
             if (param instanceof Function) {
@@ -294,7 +408,7 @@ var SceneJS = {
             }
             args = Array.prototype.slice.call(args);
             var arg = args[0];
-            if (arg.___isSceneJSNode) {
+            if (arg._render) {
 
                 /* First arg is a scene graph node - push override configs in front of it
                  */
@@ -327,22 +441,25 @@ var SceneJS = {
             return args;
         },
 
-        invokeNode : function(node, args, extraArgs) {
-            if (extraArgs) {
-                return node.apply(this, SceneJS._utils.extendNodeArgs(args, extraArgs));
-            } else {
-                return node.apply(this, args);
-            }
-        },
+        //        invokeNode : function(node, args, extraArgs) {
+        //            if (extraArgs) {
+        //                return node.apply(this, SceneJS._utils.extendNodeArgs(args, extraArgs));
+        //            } else {
+        //                return node.apply(this, args);
+        //            }
+        //        },
 
         /** Visits child nodes in the given node configuration
          */
         visitChildren : function(config, traversalContext, data) {
+            var child;
             if (config.children) {
                 var len = config.children.length;
+
                 if (len) {
                     for (var i = 0; i < len; i++) {
-                        config.children[i]({ // Traversal context
+                        child = config.children[i];
+                        child._render.call(child, { // Traversal context
                             appendix : traversalContext.appendix,
                             insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
                         }, data);
@@ -355,7 +472,8 @@ var SceneJS = {
                     if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
                         len = traversalContext.appendix.length;
                         for (var i = 0; i < len; i++) {
-                            traversalContext.appendix[i]({ // Traversal context
+                            child = traversalContext.appendix[i];
+                            child._render.call(child, { // Traversal context
                                 appendix : null,
                                 insideRightFringe: (i < len - 1)
                             }, data);
@@ -369,7 +487,7 @@ var SceneJS = {
          */
         visitChild : function(config, index, traversalContext, data) {
             if (config.children) {
-                config.children[index](traversalContext, data);
+                config.children[index]._render(traversalContext, data);
             }
         },
 

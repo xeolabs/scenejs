@@ -75,7 +75,6 @@ SceneJS._backends.installBackend(
                         dirty = true;
                     });
 
-
             /* Node-facing API
              */
             return {

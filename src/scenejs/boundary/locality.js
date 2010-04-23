@@ -3,30 +3,58 @@
  */
 SceneJS.locality = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('view-locality');
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var radii;
+    var backend = SceneJS._backends.getBackend('view-locality');   
+
     return SceneJS._utils.createNode(
-            function(traversalContext, data) {
-                if (!radii || !cfg.fixed) {
-                    if (params.innerRadius && params.outerRadius) {
-                        if (params.innerRadius > params.outerRadius) {
-                            errorBackend.fatalError(
-                                    new SceneJS.exceptions.InvalidNodeConfigException(
-                                            "SceneJS.locality innerRadius should not be greater than outerRadius"));
-                        }
+            "locality",
+            cfg.children,
+
+            new (function() {
+
+                var _radii = {
+                    inner : 1000,
+                    outer : 1500
+                };
+
+                this.setInner = function(inner) {
+                    _radii.inner = inner;
+                };
+
+                this.getInner = function() {
+                    return _radii.inner;
+                };
+
+                this.setOuter = function(outer) {
+                    _radii.outer = outer;
+                };
+
+                this.getOuter = function() {
+                    return _radii.outer;
+                };
+
+                this._init = function(params) {
+                    if (params.inner) {
+                        this.setInner(params.inner);
                     }
-                    var inner = params.innerRadius || 1000;
-                    var outer = params.outerRadius || inner + 500.0;
-                    radii = {
-                        inner: inner,
-                        outer: outer
-                    };
+                    if (params.outer) {
+                        this.setOuter(params.outer);
+                    }
+                };
+
+                if (cfg.fixed) {
+                    this._init(cfg.getParams());
                 }
-                var prevRadii = backend.getRadii();
-                backend.setRadii(radii);
-                SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                backend.setRadii(prevRadii);
-            });
+
+                this._render = function(traversalContext, data) {
+                    if (!cfg.fixed) {
+                        _radii.inner = params.inner || 1000;
+                        _radii.outer = params.outer || _radii.inner + 500.0;
+                    }
+                    var prevRadii = backend.getRadii();
+                    backend.setRadii(_radii);
+                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                    backend.setRadii(prevRadii);
+                };
+            })());
 };
 

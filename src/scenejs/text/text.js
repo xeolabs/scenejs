@@ -19,8 +19,6 @@
 
         return SceneJS.geometry({
 
-           // type: "text_xxxx", // TODO: Shorten somehow? Hash?
-
             /* Callback to create geometry
              */
             create: function() {

@@ -2,7 +2,7 @@
  * Scaling modelling transform node
  */
 (function() {
-    var backend = SceneJS._backends.getBackend('model-transform');    
+    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
 
     /* Memoization levels
      */
@@ -12,34 +12,99 @@
 
     SceneJS.scale = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
-        var mat;
-        var xform;
-        var memoLevel = NO_MEMO;
 
         return SceneJS._utils.createNode(
-                function(traversalContext, data) {
-                    if (memoLevel == NO_MEMO) {   
-                        var params = cfg.getParams(data);
-                        mat = SceneJS_math_scalingMat4v([params.x || 1, params.y || 1, params.z || 1]);
-                        if (cfg.fixed) {
-                            memoLevel = FIXED_CONFIG;
-                        }
-                    }
-                    var superXform = backend.getTransform();
-                    if (memoLevel < FIXED_MODEL_SPACE) {
-                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
-                        xform = {
-                            localMatrix: mat,
-                            matrix: tempMat,
-                            fixed: superXform.fixed && cfg.fixed
+                "scale",
+                cfg.children,
+
+                new (function() {
+                    this._memoLevel = NO_MEMO;
+                    this._mat = null;
+                    this._xform = null;
+
+                    this._x = 0;
+                    this._y = 0;
+                    this._z = 1;
+
+                    this.setX = function(x) {
+                        this._x = x;
+                        this._memoLevel = NO_MEMO;
+                        return this;
+                    };
+
+                    this.getX = function() {
+                        return this._x;
+                    };
+
+                    this.setY = function(y) {
+                        this._y = y;
+                        this._memoLevel = NO_MEMO;
+                        return this;
+                    };
+
+                    this.getY = function() {
+                        return this._y;
+                    };
+
+                    this.setZ = function(z) {
+                        this._z = z;
+                        this._memoLevel = NO_MEMO;
+                        return this;
+                    };
+
+                    this.getZ = function() {
+                        return this._z;
+                    };
+
+                    this.setXYZ = function(xyz) {
+                        this._x = xyz.x == undefined ? 1 : xyz.x;
+                        this._y = xyz.y == undefined ? 1 : xyz.y;
+                        this._z = xyz.z == undefined ? 1 : xyz.z;
+                        this._memoLevel = NO_MEMO;
+                        return this;
+                    };
+
+                    this.getXYZ = function() {
+                        return {
+                            x: this._x,
+                            y: this._y,
+                            z: this._z
                         };
-                        if (memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
-                            memoLevel = FIXED_MODEL_SPACE;
-                        }
+                    };
+
+                    this._init = function(params) {
+                        this.setXYZ({x : params.x, y: params.y, z: params.z });
+                    };
+
+                    if (cfg.fixed) {
+                        this._init(cfg.getParams());
                     }
-                    backend.setTransform(xform);
-                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    backend.setTransform(superXform);
-                });
+
+                    this._render = function(traversalContext, data) {
+                        if (this._memoLevel == NO_MEMO) {
+                            if (!cfg.fixed) {
+                                this._init(cfg.getParams(data));
+                            } else {
+                                this._memoLevel = FIXED_CONFIG;
+                            }
+                            this._mat = SceneJS_math_scalingMat4v([this._x, this._y, this._z]);
+                        }
+                        var superXform = modelTransformBackend.getTransform();
+                        if (this._memoLevel < FIXED_MODEL_SPACE) {
+                            var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
+                            this._xform = {
+                                localMatrix: this._mat,
+                                matrix: tempMat,
+                                fixed: superXform.fixed && cfg.fixed
+                            };
+                            if (this._memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
+                                this._memoLevel = FIXED_MODEL_SPACE;
+                            }
+                        }
+                        modelTransformBackend.setTransform(this._xform);
+                        this._renderChildren(traversalContext, data);
+                        modelTransformBackend.setTransform(superXform);
+                    };
+                })());
     };
 })();

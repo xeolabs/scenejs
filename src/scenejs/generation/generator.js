@@ -17,23 +17,29 @@
     var errorBackend = SceneJS._backends.getBackend("error");
     SceneJS.generator = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
+
         return SceneJS._utils.createNode(
-                function(traversalContext, data) {
-                    if (cfg.fixed) {
-                        errorBackend.fatalError(
-                                new SceneJS.exceptions.InvalidNodeConfigException
-                                        ('SceneJS.generator node must be configured with a function'));
-                    }
-                    var params = cfg.getParams(data);
-                    while (params) {
-                        var childData = SceneJS._utils.newScope(data);
-                        for (var key in params) {
-                            childData.put(key, params[key]);
+                "generator",
+                cfg.children,
+
+                new (function() {
+                    this._render = function(traversalContext, data) {
+                        if (cfg.fixed) {
+                            errorBackend.fatalError(
+                                    new SceneJS.exceptions.InvalidNodeConfigException
+                                            ('SceneJS.generator node must be configured with a function'));
                         }
-                        SceneJS._utils.visitChildren(cfg, traversalContext, childData);
-                        params = cfg.getParams(data);
-                    }
-                });
+                        var params = cfg.getParams(data);
+                        while (params) {
+                            var childData = SceneJS._utils.newScope(data);
+                            for (var key in params) {
+                                childData.put(key, params[key]);
+                            }
+                            this._renderChildren(traversalContext, data);
+                            params = cfg.getParams(data);
+                        }
+                    };
+                })());
     };
 })();
 

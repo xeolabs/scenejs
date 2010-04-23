@@ -20,7 +20,6 @@ SceneJS.loadCollada = function() {
     };
 
     return SceneJS.load({
-          bla: params.bla,
         uri: params.uri,
 
         /* Uniquely ID different assets loaded from different nodes of same COLLADA file

@@ -41,73 +41,79 @@ SceneJS.load = function() {
             var childData = SceneJS._utils.newScope(data, cfg.fixed);
             for (var key in params.params) {
                 childData.put(key, params.params[key]);
-            }
-            assetNode.func.call(this, traversalContext, childData);
+            }            
+            assetNode._render.call(assetNode, traversalContext, childData);
         } else {
-            assetNode.func.call(this, traversalContext, data);
+            assetNode._render.call(assetNode, traversalContext, data);
         }
     }
 
     return SceneJS._utils.createNode(
-            function(traversalContext, data) {
+            "load",
+            cfg.children,
 
-                if (!params) {
-                    params = cfg.getParams(data);
-                    if (!params.uri) {
-                        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                                ("Scene definiton error - mandatory SceneJS.load parameter missing: uri"));
+            new (function() {
+
+                this._render = function(traversalContext, data) {
+
+                    if (!params) {
+                        params = cfg.getParams(data);
+                        if (!params.uri) {
+                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                    ("Scene definiton error - mandatory SceneJS.load parameter missing: uri"));
+                        }
                     }
-                }
 
-                if (state == STATE_ATTACHED) {
-                    if (!backend.getAsset(handle)) {
-                        state = STATE_INITIAL;
+                    if (state == STATE_ATTACHED) {
+                        if (!backend.getAsset(handle)) {
+                            state = STATE_INITIAL;
+                        }
                     }
-                }
 
-                switch (state) {
-                    case STATE_ATTACHED:
-                        visitSubgraph(params.params, data);
-                        break;
+                    switch (state) {
+                        case STATE_ATTACHED:
+                            visitSubgraph(params.params, data);
+                            break;
 
-                    case STATE_LOADING:
-                        break;
+                        case STATE_LOADING:
+                            break;
 
-                    case STATE_LOADED:
-                        backend.assetLoaded(handle);  // Finish loading - kill process
-                        state = STATE_ATTACHED;
-                        visitSubgraph(params.params, data);
-                        break;
+                        case STATE_LOADED:
+                            backend.assetLoaded(handle);  // Finish loading - kill process
+                            state = STATE_ATTACHED;
+                            visitSubgraph(params.params, data);
+                            break;
 
-                    case STATE_INITIAL:
-                        state = STATE_LOADING;
+                        case STATE_INITIAL:
+                            state = STATE_LOADING;
 
-                        /* Asset not currently loaded or loading - load it
-                         */
-                        handle = backend.loadAsset(// Process killed automatically on error or abort
-                                params.uri,                       
-                                params.serverParams || {
-                                    format: "scenejs"
-                                },
-                                params.parser || sceneJSParser,
-                                function(asset) { // Success
-                                    assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
-                                    state = STATE_LOADED;
-                                },
-                                function() { // onTimeout
-                                    state = STATE_ERROR;
-                                    errorBackend.error(
-                                            new SceneJS.exceptions.AssetLoadTimeoutException(
-                                                    "SceneJS.load timed out - uri: " + params.uri));
-                                },
-                                function(msg) { // onError - backend has killed process
-                                    state = STATE_ERROR;
-                                    errorBackend.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
-                                });
-                        break;
+                            /* Asset not currently loaded or loading - load it
+                             */
+                            handle = backend.loadAsset(// Process killed automatically on error or abort
+                                    params.uri,
+                                    params.serverParams || {
+                                        format: "scenejs"
+                                    },
+                                    params.parser || sceneJSParser,
+                                    function(asset) { // Success
+                                        assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
+                                        state = STATE_LOADED;
+                                    },
+                                    function() { // onTimeout
+                                        state = STATE_ERROR;
+                                        errorBackend.error(
+                                                new SceneJS.exceptions.AssetLoadTimeoutException(
+                                                        "SceneJS.load timed out - uri: " + params.uri));
+                                    },
+                                    function(msg) { // onError - backend has killed process
+                                        state = STATE_ERROR;
+                                        errorBackend.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
+                                    });
+                            break;
 
-                    case STATE_ERROR:
-                        break;
-                }
-            });
+                        case STATE_ERROR:
+                            break;
+                    }
+                };
+            })());
 };
