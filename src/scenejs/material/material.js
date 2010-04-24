@@ -52,152 +52,157 @@ SceneJS.material = function() {
 
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    return SceneJS._utils.createNode(
-            "material",
-            cfg.children,
+    /* Augment the basic node type
+     */
+    return (function($) {
 
-            new (function() {
-                var _material = {
-                    baseColor : [ 0.0, 0.0, 0.0 ],
-                    specularColor: [ 0.0,  0.0,  0.0 ],
-                    specular : 0,
-                    shine : 0,
-                    reflect : 0,
-                    alpha : 1.0,
-                    emit : 0.0,
-                    blendMode : "multiply"
-                };
+        var _material = {
+            baseColor : [ 0.0, 0.0, 0.0 ],
+            specularColor: [ 0.0,  0.0,  0.0 ],
+            specular : 0,
+            shine : 0,
+            reflect : 0,
+            alpha : 1.0,
+            emit : 0.0,
+            blendMode : "multiply"
+        };
 
-                this.setBaseColor = function(color) {
-                    _material.baseColor = [
-                        color.r != undefined ? color.r : 0.0,
-                        color.g != undefined ? color.g : 0.0,
-                        color.b != undefined ? color.b : 0.0
-                    ];
-                    return this;
-                };
+        $.setBaseColor = function(color) {
+            _material.baseColor = [
+                color.r != undefined ? color.r : 0.0,
+                color.g != undefined ? color.g : 0.0,
+                color.b != undefined ? color.b : 0.0
+            ];
+            return $;
+        };
 
-                this.getBaseColor = function() {
-                    return {
-                        r: _material.baseColor,
-                        g: _material.baseColor,
-                        b: _material.baseColor
-                    };
-                };
+        $.getBaseColor = function() {
+            return {
+                r: _material.baseColor,
+                g: _material.baseColor,
+                b: _material.baseColor
+            };
+        };
 
-                this.setSpecularColor = function(color) {
-                    _material.specularColor = [
-                        color.r != undefined ? color.r : 0.5,
-                        color.g != undefined ? color.g : 0.5,
-                        color.b != undefined ? color.b : 0.5
-                    ];
-                    return this;
-                };
+        $.setSpecularColor = function(color) {
+            _material.specularColor = [
+                color.r != undefined ? color.r : 0.5,
+                color.g != undefined ? color.g : 0.5,
+                color.b != undefined ? color.b : 0.5
+            ];
+            return $;
+        };
 
-                this.getSpecularColor = function() {
-                    return {
-                        r: _material.specularColor[0],
-                        g: _material.specularColor[1],
-                        b: _material.specularColor[2]
-                    };
-                };
+        $.getSpecularColor = function() {
+            return {
+                r: _material.specularColor[0],
+                g: _material.specularColor[1],
+                b: _material.specularColor[2]
+            };
+        };
 
-                this.setSpecular = function(specular) {
-                    _material.specular = specular || 0;
-                };
+        $.setSpecular = function(specular) {
+            _material.specular = specular || 0;
+            return $;
+        };
 
-                this.getSpecular = function() {
-                    return _material.specular;
-                };
+        $.getSpecular = function() {
+            return _material.specular;
+        };
 
-                this.setShine = function(shine) {
-                    _material.shine = shine || 0;
-                };
+        $.setShine = function(shine) {
+            _material.shine = shine || 0;
+            return $;
+        };
 
-                this.getShine = function() {
-                    return _material.shine;
-                };
+        $.getShine = function() {
+            return _material.shine;
+        };
 
-                this.setReflect = function(reflect) {
-                    _material.reflect = reflect || 0;
-                };
+        $.setReflect = function(reflect) {
+            _material.reflect = reflect || 0;
+            return $;
+        };
 
-                this.getReflect = function() {
-                    return _material.reflect;
-                };
+        $.getReflect = function() {
+            return _material.reflect;
+        };
 
-                this.setEmit = function(emit) {
-                    _material.emit = emit || 0;
-                };
+        $.setEmit = function(emit) {
+            _material.emit = emit || 0;
+            return $;
+        };
 
-                this.getEmit = function() {
-                    return _material.emit;
-                };
+        $.getEmit = function() {
+            return _material.emit;
+        };
 
-                this.setAlpha = function(alpha) {
-                    _material.alpha = alpha == undefined ? 1.0 : alpha;
-                };
+        $.setAlpha = function(alpha) {
+            _material.alpha = alpha == undefined ? 1.0 : alpha;
+            return $;
+        };
 
-                this.getAlpha = function() {
-                    return _material.alpha;
-                };
+        $.getAlpha = function() {
+            return _material.alpha;
+        };
 
-                this.setBlendMode = function(mode) {
-                    if (mode != "add" && mode != "multiply") {
-                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                                "SceneJS.material blendMode of unsupported type: '" + mode + "' - should be 'add' or 'multiply'"));
-                    }
-                    _material.blendMode = mode;
-                };
+        $.setBlendMode = function(mode) {
+            if (mode != "add" && mode != "multiply") {
+                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                        "SceneJS.material blendMode of unsupported type: '" + mode + "' - should be 'add' or 'multiply'"));
+            }
+            _material.blendMode = mode;
+            return $;
+        };
 
-                this.getBlendMode = function() {
-                    return _material.blendMode;
-                };
+        $.getBlendMode = function() {
+            return _material.blendMode;
+        };
 
-                this._init = function(params) {
-                    if (params.baseColor) {
-                        this.setBaseColor(params.baseColor);
-                    }
-                    if (params.specularColor) {
-                        this.setSpecularColor(params.specularColor);
-                    }
-                    if (params.specular) {
-                        this.setSpecular(params.specular);
-                    }
-                    if (params.shine) {
-                        this.setShine(params.shine);
-                    }
-                    if (params.reflect) {
-                        this.setReflect(params.reflect);
-                    }
-                    if (params.emit) {
-                        this.setEmit(params.emit);
-                    }
-                    if (params.alpha) {
-                        this.setAlpha(params.alpha);
-                    }
-                    if (params.blendMode) {
-                        this.setAlpha(params.blendMode);
-                    }
-                };
+        function init(params) {
+            if (params.baseColor) {
+                $.setBaseColor(params.baseColor);
+            }
+            if (params.specularColor) {
+                $.setSpecularColor(params.specularColor);
+            }
+            if (params.specular) {
+                $.setSpecular(params.specular);
+            }
+            if (params.shine) {
+                $.setShine(params.shine);
+            }
+            if (params.reflect) {
+                $.setReflect(params.reflect);
+            }
+            if (params.emit) {
+                $.setEmit(params.emit);
+            }
+            if (params.alpha) {
+                $.setAlpha(params.alpha);
+            }
+            if (params.blendMode) {
+                $.setAlpha(params.blendMode);
+            }
+        }
+        
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
 
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
+        $._render = function(traversalContext, data) {
+            if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+                $._renderChildren(traversalContext, data);
+            } else {
+                if (!cfg.fixed) {
+                    init(cfg.getParams(data));
                 }
-
-                this._render = function(traversalContext, data) {
-                    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                        this._renderChildren(traversalContext, data);
-                    } else {
-                        if (!cfg.fixed) {
-                            this._init(cfg.getParams(data));
-                        }
-                        var saveMaterial = SceneJS_materialModule.getMaterial();
-                        SceneJS_materialModule.setMaterial(_material);
-                        this._renderChildren(traversalContext, data);
-                        SceneJS_materialModule.setMaterial(saveMaterial);
-                    }
-                };
-            })());
+                var saveMaterial = SceneJS_materialModule.getMaterial();
+                SceneJS_materialModule.setMaterial(_material);
+                $._renderChildren(traversalContext, data);
+                SceneJS_materialModule.setMaterial(saveMaterial);
+            }
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
-

@@ -8,59 +8,53 @@
 SceneJS.name = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    return SceneJS._utils.createNode(
-            "name",
-            cfg.children,
+    /* Augment the basic node type
+     */
+    return (function($) {
+        var _name = "unnamed";
 
-            new (function() {
+        /**
+         * Sets the name value
+         * @param {string} name The name value
+         * @returns {SceneJS.name} This name node
+         */
+        $.setName = function(name) {
+            if (!name) {
+                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name is undefined"));
+            }
+            name = name.replace(/^\s+|\s+$/g, ''); // Trim
+            if (name.length == 0) {
+                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
+            }
+            _name = name;
+            return this;
+        };
 
-                var _name = "unnamed";
+        /** Returns the name value
+         * @returns The name string
+         */
+        $.getName = function() {
+            return _name;
+        };
 
-                /**
-                 * Sets the name value
-                 * @param {string} name The name value
-                 * @returns {SceneJS.name} This name node
-                 */
-                this.setName = function(name) {
-                    if (!name) {
-                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name is undefined"));
-                    }
-                    name = name.replace(/^\s+|\s+$/g, ''); // Trim
-                    if (name.length == 0) {
-                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
-                    }
-                    _name = name;
-                    return this;
-                };
+        function init(params) {
+            if (params.name) {
+                $.setName(params.name);
+            }
+        };
 
-                /** Returns the name value
-                 * @returns The name string
-                 */
-                this.getName = function() {
-                    return _name;
-                };
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
 
-                this._init = function (params) {
-                    if (params.name) {
-                        this.setName(params.name);
-                    }
-                };
-
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
-                }
-
-                this._render = function(traversalContext, data) {
-                    if (!cfg.fixed) {
-                        this._init(cfg.getParams(data));
-                    }
-                    SceneJS_nameModule.pushName(_name);
-                    this._renderChildren(traversalContext, data);
-                    SceneJS_nameModule.popName();
-                };
-            })());
+        $._render = function(traversalContext, data) {
+            if (!cfg.fixed) {
+                this._init(cfg.getParams(data));
+            }
+            SceneJS_nameModule.pushName(_name);
+            $._renderChildren(traversalContext, data);
+            SceneJS_nameModule.popName();
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
-
-
-
-

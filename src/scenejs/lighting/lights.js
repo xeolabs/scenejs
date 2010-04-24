@@ -56,22 +56,21 @@
 SceneJS.lights = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    return SceneJS._utils.createNode(
-            "lights",
-            cfg.children,
+    /* Augment the basic node type
+     */
+    return (function($) {
 
-            new (function() {
-
-                this._render = function(traversalContext, data) {
-                    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                        this._renderChildren(traversalContext, data);
-                    } else {
-                        var sources = cfg.getParams(data).sources;
-                        SceneJS_lightingModule.pushLights(sources);
-                        this._renderChildren(traversalContext, data);
-                        SceneJS_lightingModule.popLights(sources.length);
-                    }
-                };
-            })());
+        $._render = function(traversalContext, data) {
+            if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+                this._renderChildren(traversalContext, data);
+            } else {
+                var sources = cfg.getParams(data).sources;
+                SceneJS_lightingModule.pushLights(sources);
+                this._renderChildren(traversalContext, data);
+                SceneJS_lightingModule.popLights(sources.length);
+            }
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
 

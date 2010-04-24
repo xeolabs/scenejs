@@ -8,39 +8,39 @@
  * @extends SceneJS.node
  */
 SceneJS.stationary = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
-   
-    return SceneJS._utils.createNode(
-            "stationary",
-            cfg.children,
 
-            new (function() {
+    /* Augment the basic node type
+     */
+    return (function($) {
 
-                var xform;
+        var xform;
 
-                this._render = function(traversalContext, data) {
-                    var superXform = SceneJS_viewTransformModule.getTransform();
-                    var lookAt = superXform.lookAt;
-                    if (lookAt) {
-                        if (!xform || !superXform.fixed) {
-                            xform = {
-                                matrix: SceneJS_math_mulMat4(
-                                        superXform.matrix,
-                                        SceneJS_math_translationMat4c(
-                                                lookAt.eye.x,
-                                                lookAt.eye.y,
-                                                lookAt.eye.z)),
-                                lookAt: lookAt,
-                                fixed: superXform.fixed
-                            };
-                        }
-                        SceneJS_viewTransformModule.setTransform(xform);
-                        this._renderChildren(traversalContext, data);
-                        SceneJS_viewTransformModule.setTransform(superXform);
-                    } else {
-                        this._renderChildren(traversalContext, data);
+        $._render = function(traversalContext, data) {
+            var superXform = SceneJS_viewTransformModule.getTransform();
+            var lookAt = superXform.lookAt;
+            if (lookAt) {
+                if ($._memoLevel == 0) {
+                    xform = {
+                        matrix: SceneJS_math_mulMat4(
+                                superXform.matrix,
+                                SceneJS_math_translationMat4c(
+                                        lookAt.eye.x,
+                                        lookAt.eye.y,
+                                        lookAt.eye.z)),
+                        lookAt: lookAt,
+                        fixed: superXform.fixed
+                    };
+                    if (superXform.fixed) {
+                        $._memoLevel = 1;
                     }
-                };
-            })());
+                }
+                SceneJS_viewTransformModule.setTransform(xform);
+                $._renderChildren(traversalContext, data);
+                SceneJS_viewTransformModule.setTransform(superXform);
+            } else {
+                $._renderChildren(traversalContext, data);
+            }
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
-

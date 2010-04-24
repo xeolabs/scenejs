@@ -38,7 +38,7 @@
  *
  *  var t = SceneJS.translate({ x: 100 });
  *
- *  var s = SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+ *  var s = SceneJS.scale(function(data) {        // Config function receives data
  *           return {
  *              x: data.get("sizeX"),
  *              y: data.get("sizeY"),
@@ -58,22 +58,22 @@
  * scale node will do a little bit more work to get it's x and y properties here, where it will have to hunt one level
  * up data scope chain to get them.</b></p><pre><code>
  *
- *  SceneJS.withData({
+ *  SceneJS.withData({                                // Creates data scope, A
  *         sizeX: 5,
  *         sizeY: 10
  *      },
  *
- *          SceneJS.withData({
+ *      SceneJS.translate({ x: 100 },
+ *
+ *          SceneJS.withData({                        // Creates nested data scope, B
  *             sizeY: 10
  *          },
  *
- *          SceneJS.translate({ x: 100 },
- *
- *              SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+ *              SceneJS.scale(function(data) {
  *                       return {
- *                           x: data.get("sizeX"),
- *                           y: data.get("sizeY"),
- *                           z: data.get("sizeZ")
+ *                           x: data.get("sizeX"),    // Finds data on scope A
+ *                           y: data.get("sizeY"),    // Finds data on scope A
+ *                           z: data.get("sizeZ")     // Finds data on scope B
  *                       }
  *                  },
  *
@@ -92,64 +92,57 @@
 SceneJS.withData = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing matrix
-    const FIXED_DATA = 2;         // Node config is fixed, memoizing matrix
+    /* Augment the basic node type
+     */
+    return (function($) {
+        var _data = {};
+        var _childData;
 
-    return SceneJS._utils.createNode(
-            "withData",
-            cfg.children,
+        $.setProperty = function(key, value) {
+            _data[key] = value;
+            $._memoLevel = 0;
+            return $;
+        };
 
-            new (function() {
-                var _memoLevel = NO_MEMO;
-                var _data = {};
-                var _childData;
+        $.getProperty = function(key) {
+            return data[key];
+        };
 
-                this.setProperty = function(key, value) {
-                    _data[key] = value;
-                    _memoLevel = NO_MEMO;
-                    return this;
-                };
+        $.clearProperties = function() {
+            _data = {};
+            $._memoLevel = 0;
+            return $;
+        };
 
-                this.getProperty = function(key) {
-                    return data[key];
-                };
+        function init(params) {
+            for (var key in params) {
+                _data[key] = params[key];
+            }
+        }
 
-                this.clearProperties = function() {
-                    _data = {};
-                    return this;
-                };
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
 
-                this._init = function(params) {
-                    for (var key in params) {
-                        _data[key] = params[key];
-                    }
-                };
-
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
+        $._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
                 }
-
-                this._render = function(traversalContext, data) {
-                    if (_memoLevel == NO_MEMO) {
-                        if (!cfg.fixed) {
-                            this._init(cfg.getParams(data));
-                        } else {
-                            _memoLevel = FIXED_CONFIG;
-                        }
-                    }
-                    if (_memoLevel < FIXED_DATA) {
-                        _childData = SceneJS._utils.newScope(data, cfg.fixed);
-                        for (var key in _data) {
-                            _childData.put(key, _data[key]);
-                        }
-                        if (_memoLevel == FIXED_CONFIG && data.isfixed()) {
-                            _memoLevel = FIXED_DATA;
-                        }
-                    }
-                    this._renderChildren(traversalContext, _childData);
-                };
-            })());
+            }
+            if ($._memoLevel < 2) {
+                _childData = SceneJS._utils.newScope(data, cfg.fixed);
+                for (var key in _data) {
+                    _childData.put(key, _data[key]);
+                }
+                if ($._memoLevel == 1 && data.isfixed()) {
+                    $._memoLevel = 2;
+                }
+            }
+            $._renderChildren(traversalContext, _childData);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
-
-
