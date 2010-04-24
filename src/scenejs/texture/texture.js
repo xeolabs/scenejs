@@ -1,6 +1,9 @@
 /**
- * Scene node that defines one or more layers of texture to apply to geometry within its subgraph.
- *
+ * <p>Scene node that defines one or more layers of texture to apply to geometry within its subgraph.</p>
+
+ * @constructor
+ * Create a new SceneJS.texture
+ * @param {Object} The config object or function, followed by zero or more child nodes
  * @class SceneJS.texture
  * @extends SceneJS.node
  */
@@ -238,7 +241,7 @@
 
                             /* Dont apply textures if picking
                              */
-                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                            this._renderChildren(traversalContext, data);
 
                         } else {
 

@@ -1,40 +1,69 @@
-with (SceneJS) {
-    var scene = graph({}, // node always has a config object
+SceneJS.geometry({
 
-            canvas({ canvasId: 'theCanvas'},
+    // Optional unique type name; if another geometry already has this, then this geometry will not be created and the
+    // other geometry will be instanced in place of this one
 
-                    viewport({ x : 1, y : 1, width: 600, height: 600},
+    type: "my-geometry",
 
-                            shader({ type: 'simple-shader' },
+    // Primitive type - "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan".
 
-                                    lights({
-                                        sources: [
-                                            {
-                                                pos: { x: 0.0, y: 5.0, z: -50.0 }
-                                            }
-                                        ]},
+    primitive: "triangles",
 
-                                            perspective({ fovy : 60.0, aspect : 1.0, near : 0.1, far : 600.0},
+    // The vertices - eight for our cube, each one spaining three array elements for X,Y and Z
 
-                                                    lookAt({
-                                                        eye : { x: 5.0, y: 5.0, z: -50.0},
-                                                        up : { y: 1.0 }
-                                                    },
+    positions : [
 
-                                                            material({
-                                                                ambient:  { r:0.5, g:0.5, b:0.9 },
-                                                                diffuse:  { r:0.5, g:0.5, b:0.9 },
-                                                                specular: { r:0.5, g:0.5, b:0.9 }},
+        /* Front cube face
+         */
+        5, 5, 5,
+        -5, 5, 5,
+        -5,-5, 5,
+        5,-5, 5,
 
-                                                                    objects.teapot())
-                                                            ) // lookAt
-                                                    ) // frustum
-                                            ) // lights
-                                    ) // shader
-                            ) // viewport
-                    ) // canvas
-            ); // scene
+        //...
+    ],
 
-    scene.render();
-}
+    // Normal vectors, one for each vertex
 
+    normals : [
+
+        /* v0-v1-v2-v3 front
+         */
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        //...
+    ],
+
+    // 2D texture coordinates corresponding to the 3D positions defined above - eight for our cube, each
+    // one spaining two array elements for X and Y
+
+    uv : [
+
+        /* v0-v1-v2-v3 front
+         */
+        5, 5,
+        0, 5,
+        0, 0,
+        5, 0,
+
+        // ...
+    ],
+
+    // Indices - these organise the positions and uv texture coordinates into geometric primitives in accordance
+    // with the "primitive" parameter, in this case a set of three indices for each triangle. Note that each
+    // triangle is specified in counter-clockwise winding order. You can specify them in clockwise order if you
+    // configure the SceneJS.renderer node's frontFace property as "cw", instead of the default "ccw".
+
+    indices : [
+
+        /* Front
+         */
+        0, 1, 2,
+        0, 2, 3,
+
+        // ...
+    ]
+})

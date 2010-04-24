@@ -7,102 +7,94 @@
 SceneJS.perspective = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    /* Memoization levels
+    /* Augment the basic node type
      */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing matrix
+    return (function($) {
+        $._fovy = 60.0;
+        $._aspect = 1.0;
+        $._near = 0.1;
+        $._far = 400.0;
+        $._transform = null;
 
-    return SceneJS._utils.createNode(
-            "perspective",
-            cfg.children,
+        $.setFovY = function(fovy) {
+            $._fovy = fovy;
+            $._memoLevel = 0;
+        };
 
-            new (function() {
-                var _memoLevel = NO_MEMO;
+        $.getFovyY = function() {
+            return $._fovy;
+        };
 
-                var _fovy = 60.0;
-                var _aspect = 1.0;
-                var _near = 0.1;
-                var _far = 400.0;
+        $.setAspect = function(aspect) {
+            $._aspect = aspect;
+            $._memoLevel = 0;
+        };
 
-                var _transform;
+        $.getAspect = function() {
+            return $._aspect;
+        };
 
-                this.setFovY = function(fovy) {
-                    _fovy = fovy;
-                    _memoLevel = NO_MEMO;
-                };
+        $.setNear = function(near) {
+            $._near = near;
+            $._memoLevel = 0;
+        };
 
-                this.getFovyY = function() {
-                    return _fovy;
-                };
+        $.getNear = function() {
+            return $._near;
+        };
 
-                this.setAspect = function(aspect) {
-                    _aspect = aspect;
-                    _memoLevel = NO_MEMO;
-                };
+        $.setFar = function(far) {
+            $._far = far;
+            $._memoLevel = 0;
+        };
 
-                this.getAspect = function() {
-                    return _aspect;
-                };
+        $.getFar = function() {
+            return $._far;
+        };
 
-                this.setNear = function(near) {
-                    _near = near;
-                    _memoLevel = NO_MEMO;
-                };
+        $._init = function(params) {
+            if (params.fovy) {
+                $.setFovY(params.fovy);
+            }
+            if (params.aspect) {
+                $.setAspect(params.aspect);
+            }
+            if (params.near) {
+                $.setNear(params.near);
+            }
+            if (params.far) {
+                $.setFar(params.far);
+            }
+        };
 
-                this.getNear = function() {
-                    return _near;
-                };
+        if (cfg.fixed) {
+            $._init(cfg.getParams());
+        }
 
-                this.setFar = function(far) {
-                    _far = far;
-                    _memoLevel = NO_MEMO;
-                };
-
-                this.getFar = function() {
-                    return _far;
-                };
-
-                this._init = function(params) {
-                    if (params.fovy) {
-                        this.setFovY(params.fovy);
-                    }
-                    if (params.aspect) {
-                        this.setAspect(params.aspect);
-                    }
-                    if (params.near) {
-                        this.setNear(params.near);
-                    }
-                    if (params.far) {
-                        this.setFar(params.far);
-                    }
-                };
-
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
+        // Override
+        $._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    $._init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
                 }
-
-                this._render = function(traversalContext, data) {
-                    if (_memoLevel == NO_MEMO) {
-                        if (!cfg.fixed) {
-                            this._init(cfg.getParams(data));
-                        } else {
-                            _memoLevel = FIXED_CONFIG;
-                        }
-                        var tempMat = SceneJS_math_perspectiveMatrix4(
-                                _fovy * Math.PI / 180.0,
-                                _aspect,
-                                _near,
-                                _far);
-                        _transform = {
-                            type: "perspective",
-                            matrix:tempMat
-                        };
-                    }
-                    var prevTransform = SceneJS_projectionModule.getTransform();
-                    SceneJS_projectionModule.setTransform(_transform);
-                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    SceneJS_projectionModule.setTransform(prevTransform);
+                var tempMat = SceneJS_math_perspectiveMatrix4(
+                        $._fovy * Math.PI / 180.0,
+                        $._aspect,
+                        $._near,
+                        $._far);
+                $._transform = {
+                    type: "perspective",
+                    matrix:tempMat
                 };
-            })());
+            }
+            var prevTransform = SceneJS_projectionModule.getTransform();
+            SceneJS_projectionModule.setTransform($._transform);
+            this._renderChildren(traversalContext, data);
+            SceneJS_projectionModule.setTransform(prevTransform);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
 

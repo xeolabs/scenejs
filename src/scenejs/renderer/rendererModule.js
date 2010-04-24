@@ -53,10 +53,10 @@ var SceneJS_rendererModule = new (function() {
 
         blendColor: function(context, color) {
             color = {
-                r:color.r || 0,
+                r: color.r || 0,
                 g: color.g || 0,
                 b: color.b || 0,
-                a: color.a || 1
+                a: (color.a == undefined || color.a == null) ? 1 : color.a
             };
             context.blendColor(color.r, color.g, color.b, color.a);
             currentProps.blendColor = color;
@@ -111,7 +111,7 @@ var SceneJS_rendererModule = new (function() {
             color.r = color.r || 0;
             color.g = color.g || 0;
             color.b = color.b || 0;
-            color.a = color.a || 1;
+            color.a = (color.a == undefined || color.a == null) ? 1 : color.a;
             context.clearColor(color.r, color.g, color.b, color.a);
             currentProps.clearColor = color;
         },
@@ -135,7 +135,7 @@ var SceneJS_rendererModule = new (function() {
             color.r = color.r || 0;
             color.g = color.g || 0;
             color.b = color.b || 0;
-            color.a = color.a || 1;
+            color.a = (color.a == undefined || color.a == null) ? 1 : color.a;
             context.colorMask(color.r, color.g, color.b, color.a);
             currentProps.colorMask = color;
         },
@@ -286,8 +286,7 @@ var SceneJS_rendererModule = new (function() {
     };
 
     /**
-     * Sets current renderer properties on the given WebGL context. These will then
-     * appear on currentProps.
+     * Sets current renderer properties.
      */
     var setProperties = function(context, props) {
 
@@ -318,6 +317,38 @@ var SceneJS_rendererModule = new (function() {
 
         loaded = false;
     };
+
+    /**
+     * Restores previous renderer properties, except for clear - that's the reason we
+     * have a seperate set and restore semantic - we don't want to keep clearing the buffers
+     */
+    var restoreProperties = function(context, props) {
+
+        /* Set order-insensitive properties (modes)
+         */
+        for (var key in props) {
+            var setter = glModeSetters[key];
+            if (setter) {
+                setter(context, props[key]);
+            }
+        }
+
+        /* Set order-sensitive properties (states)
+         */
+        if (props.viewport) {
+            glStateSetters.viewport(context, props.viewport);
+        }
+        if (props.scissor) {
+            glStateSetters.clear(context, props.scissor);
+        }
+
+        SceneJS_eventModule.fireEvent(
+                SceneJS_eventModule.RENDERER_UPDATED,
+                currentProps);
+
+        loaded = false;
+    };
+
 
     /** Gets value of the given property on the first higher renderer state that has it
      */
@@ -415,11 +446,13 @@ var SceneJS_rendererModule = new (function() {
         setProperties(canvas.context, state.props);
     };
 
-    /** Restores previous WebGL state, if any.
+    /**
+     * Restores previous WebGL state, if any. We do a seperate restore operation because some "properties",
+     * like clear, are actually operations that we don't want to undo, so we don't redo those in a restore.
      */
     this.restoreRendererState = function(state) {
         stateStack.pop();
-        setProperties(canvas.context, state.restore); // Undo property settings
+        restoreProperties(canvas.context, state.restore); // Undo property settings
     };
 
 })();

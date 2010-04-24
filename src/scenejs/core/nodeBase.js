@@ -17,18 +17,6 @@ SceneJS.node = function() {
         // private
         this._children = cfg.children;
 
-        /* Used by many node types to track the level at which they can
-         * memoise internal state. When rendered, a node increments
-         * this each time it discovers that it can cache more state, so that
-         * it knows not to recompute that state when next rendered.
-         * Since internal state is usually dependent on the states of higher
-         * nodes, this is reset whenever the node is attached to a new
-         * parent.
-         *
-         * private
-         */
-        this._memoLevel = 0;
-
         /**
          * Returns the number of child nodes
          * @returns {int} Number of child nodes
@@ -63,7 +51,6 @@ SceneJS.node = function() {
 
                 }
                 temp[i] = child;
-                child._memoLevel = 0;
             }
             this._children = temp;
             return this;
@@ -94,7 +81,6 @@ SceneJS.node = function() {
             }
             this._children.push(node);
             node._parent = this;
-            node._memoLevel = 0;
             return node;
         };
 
@@ -109,7 +95,6 @@ SceneJS.node = function() {
                 this._children.splice(i, 0, node);
             }
             node._parent = this;
-            node._memoLevel = 0;
             return node;
         };
 

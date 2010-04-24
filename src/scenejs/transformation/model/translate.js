@@ -5,112 +5,99 @@
  * @class SceneJS.translate
  * @extends SceneJS.node
  */
-(function() {
+SceneJS.translate = function() {
 
-     /* Memoization levels
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+
+    /* Augment the basic node type
      */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
+    return (function($) {
+        var _mat;
+        var xform;
 
-    SceneJS.translate = function() {
+        var _x = 0;
+        var _y = 0;
+        var _z = 1;
 
-        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        this.setX = function(x) {
+            _x = x;
+            $._memoLevel = 0;
+            return this;
+        };
 
-        return SceneJS._utils.createNode(
+        this.getX = function() {
+            return _x;
+        };
 
-                "translate",
+        this.setY = function(y) {
+            _y = y;
+            $._memoLevel = 0;
+            return this;
+        };
 
-                cfg.children,
+        this.getY = function() {
+            return _y;
+        };
 
-                new (function() {
-                    var _memoLevel = NO_MEMO;
-                    var _mat;
-                    var xform;
+        this.setZ = function(z) {
+            _z = z;
+            $._memoLevel = 0;
+            return this;
+        };
 
-                    var _x = 0;
-                    var _y = 0;
-                    var _z = 1;
+        this.getZ = function() {
+            return _z;
+        };
 
-                    this.setX = function(x) {
-                        _x = x;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
+        this.setXYZ = function(xyz) {
+            _x = xyz.x == undefined ? 1 : xyz.x;
+            _y = xyz.y == undefined ? 1 : xyz.y;
+            _z = xyz.z == undefined ? 1 : xyz.z;
+            $._memoLevel = 0;
+            return this;
+        };
 
-                    this.getX = function() {
-                        return _x;
-                    };
+        this.getXYZ = function() {
+            return {
+                x: _x,
+                y: _y,
+                z: _z
+            };
+        };
 
-                    this.setY = function(y) {
-                        _y = y;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
+        var init = function(params) {
+            this.setXYZ({x : params.x, y: params.y, z: params.z });
+        };
 
-                    this.getY = function() {
-                        return _y;
-                    };
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
 
-                    this.setZ = function(z) {
-                        _z = z;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
-
-                    this.getZ = function() {
-                        return _z;
-                    };
-
-                    this.setXYZ = function(xyz) {
-                        _x = xyz.x == undefined ? 1 : xyz.x;
-                        _y = xyz.y == undefined ? 1 : xyz.y;
-                        _z = xyz.z == undefined ? 1 : xyz.z;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
-
-                    this.getXYZ = function() {
-                        return {
-                            x: _x,
-                            y: _y,
-                            z: _z
-                        };
-                    };
-
-                    this._init = function(params) {
-                        this.setXYZ({x : params.x, y: params.y, z: params.z });
-                    };
-
-                    if (cfg.fixed) {
-                        this._init(cfg.getParams());
-                    }
-
-                    this._render = function(traversalContext, data) {
-                        if (_memoLevel == NO_MEMO) {
-                            if (!cfg.fixed) {
-                                this._init(cfg.getParams(data));
-                            } else {
-                                _memoLevel = FIXED_CONFIG;
-                            }
-                            _mat = SceneJS_math_translationMat4v([_x, _y, _z]);
-                        }
-                        var superXform = SceneJS_modelTransformModule.getTransform();
-                        if (_memoLevel < FIXED_MODEL_SPACE) {
-                            var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
-                            xform = {
-                                localMatrix: _mat,
-                                matrix: tempMat,
-                                fixed: superXform.fixed && cfg.fixed
-                            };
-                            if (_memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
-                                _memoLevel = FIXED_MODEL_SPACE;
-                            }
-                        }
-                        SceneJS_modelTransformModule.setTransform(xform);
-                        this._renderChildren(traversalContext, data);
-                        SceneJS_modelTransformModule.setTransform(superXform);
-                    };
-                })());
-    };
-})();
+        $._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
+                }
+                _mat = SceneJS_math_translationMat4v([_x, _y, _z]);
+            }
+            var superXform = SceneJS_modelTransformModule.getTransform();
+            if ($._memoLevel < 2) {
+                var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
+                xform = {
+                    localMatrix: _mat,
+                    matrix: tempMat,
+                    fixed: superXform.fixed && cfg.fixed
+                };
+                if ($._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+                    $._memoLevel = 2;
+                }
+            }
+            SceneJS_modelTransformModule.setTransform(xform);
+            this._renderChildren(traversalContext, data);
+            SceneJS_modelTransformModule.setTransform(superXform);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
+};

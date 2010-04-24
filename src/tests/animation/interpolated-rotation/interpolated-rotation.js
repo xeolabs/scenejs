@@ -23,7 +23,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
         SceneJS.loggingToPage({ elementId: "logging" },
 
                 SceneJS.renderer({
-                    clearColor : { r:0, g:0, b:0.0, a: 1 },
+                    clearColor : { r:0, g:0, b: 0.0, a: 1 },
                     viewport:{ x : 1, y : 1, width: 600, height: 600}  ,
                     clear : { depth : true, color : true}
                 },
@@ -100,9 +100,9 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                                                 )
                                                                         )
                                                                 )
-                                                        ) // lookAt
-                                                ) // perspective
-                                        ) // lights
+                                                        )
+                                                )
+                                        )
                                 )
                         )
                 )
@@ -111,7 +111,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 var pInterval;
 var alpha = 0;
 
-window.doit = function() {
+window.render = function() {
     if (alpha > 1) {
         clearInterval(pInterval);
         exampleScene.destroy();
@@ -120,15 +120,13 @@ window.doit = function() {
 
         exampleScene.render({"alpha":alpha});
     }
-}
+};
 
-/* Hack to get any scene definition exceptions up front.
- * Chrome seemed to absorb them in setInterval!
- */
-exampleScene.render({ "alpha":alpha });
+SceneJS.onEvent("error", function(e) {
+    window.clearInterval(pInterval);
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
 
-/* Continue animation
- */
-pInterval = setInterval("window.doit()", 10);
+pInterval = setInterval("window.render()", 10);
 
 

@@ -6,7 +6,7 @@
  * those on outer material nodes for the inner node's subgraph. These nodes are to be defined either above or below
  * {@link SceneJS.lights} nodes, which provide light for geometry to reflect.</p>
  * node,
- * <p><b>Example 1 (functionally composed style):</b></p><p>A cube illuminated by a directional light source and wrapped
+ * <p><b>Example 1:</b></p><p>A cube illuminated by a directional light source and wrapped
  * with material properties that define how it reflects the light.</b></p><pre><code>
  * SceneJS.lights({
  *          sources: [

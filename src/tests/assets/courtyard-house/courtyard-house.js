@@ -16,10 +16,7 @@
  */
 
 
-SceneJS.onEvent("error", function(e) {
-    window.clearInterval(pInterval);
-    alert(e.exception.message ? e.exception.message : e.exception);
-});
+
 
 var exampleScene = SceneJS.scene({
 
@@ -231,5 +228,9 @@ window.render = function() {
 
 };
 
+SceneJS.onEvent("error", function(e) {
+    window.clearInterval(pInterval);
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
 
 pInterval = setInterval("window.render()", 50);

@@ -18,7 +18,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
     /* Perspective transformation
      */
-        SceneJS.perspective({  fovy : 25.0, aspect : 1.0, near : 0.10, far : 300.0 },
+        SceneJS.perspective({  fovy : 75.0, aspect : 1.0, near : 0.10, far : 300.0 },
 
             /* Viewing transform specifies eye position, looking
              * at the origin by default

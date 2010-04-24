@@ -16,34 +16,30 @@
  * @class SceneJS.scalarInterpolator
  * @extends SceneJS.node
  */
-(function() {
-    var errorBackend = SceneJS._error;
-    SceneJS.generator = function() {
-        var cfg = SceneJS._utils.getNodeConfig(arguments);
+SceneJS.generator = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    if (cfg.fixed) {
+        SceneJS_errorModule.fatalError(
+                new SceneJS.exceptions.InvalidNodeConfigException
+                        ("SceneJS.generator may only be configured with a function"));
+    }
 
-        return SceneJS._utils.createNode(
-                "generator",
-                cfg.children,
-
-                new (function() {
-                    this._render = function(traversalContext, data) {
-                        if (cfg.fixed) {
-                            errorBackend.fatalError(
-                                    new SceneJS.exceptions.InvalidNodeConfigException
-                                            ('SceneJS.generator node must be configured with a function'));
-                        }
-                        var params = cfg.getParams(data);
-                        while (params) {
-                            var childData = SceneJS._utils.newScope(data);
-                            for (var key in params) {
-                                childData.put(key, params[key]);
-                            }
-                            this._renderChildren(traversalContext, data);
-                            params = cfg.getParams(data);
-                        }
-                    };
-                })());
-    };
-})();
+    /* Augment the basic node type
+     */
+    return (function($) {
+        $._render = function(traversalContext, data) {
+            var params = cfg.getParams(data);
+            while (params) {
+                var childData = SceneJS._utils.newScope(data);
+                for (var key in params) {
+                    childData.put(key, params[key]);
+                }
+                $._renderChildren(traversalContext, childData);
+                params = cfg.getParams(data);
+            }
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
+};
 
 

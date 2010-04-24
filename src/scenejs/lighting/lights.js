@@ -7,7 +7,7 @@
  * while directional only have a vector that describes their direction, where they have no actual location since they
  * are an infinite distance away.</p>
  * <p>Therefore, each of these two light types have slightly different properties, as shown in the exaples below.</p>
- * <p><b>Example 1 (functionally composed style):</b></p><p>A cube illuminated by two light sources, point and directional.
+ * <p><b>Example:</b></p><p>A cube illuminated by two light sources, point and directional.
  * The cube has material properties that define how it reflects the light.</b></p><pre><code>
  * SceneJS.lights({
  *          sources: [
@@ -48,7 +48,6 @@
  *     )
  * )
  * </pre></code>
- *
  * @constructor
  * Create a new SceneJS.lights
  * @param {Object} The config object or function, followed by zero or more child nodes
@@ -56,12 +55,13 @@
  */
 SceneJS.lights = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    
+
     return SceneJS._utils.createNode(
             "lights",
             cfg.children,
 
             new (function() {
+
                 this._render = function(traversalContext, data) {
                     if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
                         this._renderChildren(traversalContext, data);

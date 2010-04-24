@@ -2,606 +2,506 @@ var SceneJS = {
     version: '0.7.2'
 };
 
-(function() {
+
+/** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
+ */
+//    SceneJS.require = function(url) {
+//
+//    };
+
+/** All exceptions thrown by SceneJS
+ */
+SceneJS.exceptions = {
+
+};
 
 
+/** Private resources
+ */
+SceneJS._utils = {
 
-    /** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
+    traversalMode :0x1,
+
+    TRAVERSAL_MODE_RENDER: 0x1,
+    TRAVERSAL_MODE_PICKING:   0x2,
+
+    /** Adds members of o1 to o2 where not already on the latter
+     *
      */
-    //    SceneJS.require = function(url) {
-    //
-    //    };
-
-    /** All exceptions thrown by SceneJS
-     */
-    SceneJS.exceptions = {
-
-    };
-
-
-    /** Private resources
-     */
-    SceneJS._utils = {
-
-        traversalMode :0x1,
-
-        TRAVERSAL_MODE_RENDER: 0x1,
-        TRAVERSAL_MODE_PICKING:   0x2,
-
-        /** Adds members of o1 to o2 where not already on the latter
-         *
-         */
-        applyIf : function(o1, o2) {
-            for (var key in o2) {
-                if (!o1[key]) {
-                    o1[key] = o2[key];
-                }
-            }
-            return o1;
-        },
-
-        apply : function(o1, o2) {
-            for (var key in o2) {
+    applyIf : function(o1, o2) {
+        for (var key in o2) {
+            if (!o1[key]) {
                 o1[key] = o2[key];
             }
-            return o1;
-        },
+        }
+        return o1;
+    },
 
-        /** Converts degrees to radiians
-         */
-        degToRad : function(degrees) {
-            return degrees * Math.PI / 180.0;
-        },
+    apply : function(o1, o2) {
+        for (var key in o2) {
+            o1[key] = o2[key];
+        }
+        return o1;
+    },
 
-        /** Creates a namespace
-         */
-        namespace : function() {
-            var a = arguments, o = null, i, j, d, rt;
-            for (i = 0; i < a.length; ++i) {
-                d = a[i].split(".");
-                rt = d[0];
-                eval('if (typeof ' + rt + ' == "undefined"){' + rt + ' = {};} o = ' + rt + ';');
-                for (j = 1; j < d.length; ++j) {
-                    o[d[j]] = o[d[j]] || {};
-                    o = o[d[j]];
-                }
+    /** Converts degrees to radiians
+     */
+    degToRad : function(degrees) {
+        return degrees * Math.PI / 180.0;
+    },
+
+    /** Creates a namespace
+     */
+    namespace : function() {
+        var a = arguments, o = null, i, j, d, rt;
+        for (i = 0; i < a.length; ++i) {
+            d = a[i].split(".");
+            rt = d[0];
+            eval('if (typeof ' + rt + ' == "undefined"){' + rt + ' = {};} o = ' + rt + ';');
+            for (j = 1; j < d.length; ++j) {
+                o[d[j]] = o[d[j]] || {};
+                o = o[d[j]];
             }
-        },
-        /** Creates a new data data for a scene graph subtree, optionally as a child of a
-         * parent scope. The scope can be flagged as being either fixed or unfixed. The former
-         * type has data that will be constant for the life of the scene graph, while the latter
-         * has data that will vary. So, data derived from the former type may be cached (or 'memoized')
-         * in scene nodes, while the latter type must not be cached.
-         */
-        newScope : function(_parent, _fixed) {
-            var parent = _parent;
-            var data = {};
-            var fixed = _fixed || (_parent ? _parent.isfixed() : false);
+        }
+    },
+    /** Creates a new data data for a scene graph subtree, optionally as a child of a
+     * parent scope. The scope can be flagged as being either fixed or unfixed. The former
+     * type has data that will be constant for the life of the scene graph, while the latter
+     * has data that will vary. So, data derived from the former type may be cached (or 'memoized')
+     * in scene nodes, while the latter type must not be cached.
+     */
+    newScope : function(_parent, _fixed) {
+        var parent = _parent;
+        var data = {};
+        var fixed = _fixed || (_parent ? _parent.isfixed() : false);
 
-            return {
-                put : function(key, value) {
-                    data[key] = value;
-                },
+        return {
+            put : function(key, value) {
+                data[key] = value;
+            },
 
-                /** Gets an element of data from this data or the first one on the parent path that has it
-                 */
-                get : function(key) {
-                    var value = data[key];
-                    if ((value == 0) || value) {
-                        return value;
-                    }
-                    if (!parent) {
-                        return null;
-                    }
-                    return parent.get(key);
-                },
-
-                isfixed : function() {
-                    return fixed;
+            /** Gets an element of data from this data or the first one on the parent path that has it
+             */
+            get : function(key) {
+                var value = data[key];
+                if ((value == 0) || value) {
+                    return value;
                 }
-            };
-        },
-
-        /**
-         * Wraps a node function with a flag that identifies it as such. This allows
-         * getNodeConfig to differentiate between child nodes and config functions
-         * in node parameters, doing away with the need to always supply a config
-         * with every node, ie. instead of:
-         *
-         *      node({}, node, node)
-         *
-         * you can then write this:
-         *
-         *      node(node, node)
-         */
-        //        createNode : function(func) {
-        //            return {
-        //                ___isSceneJSNode : true,  // Don't use this name in your node configs!
-        //                func: func
-        //            };
-        //        },
-
-        /**
-         * Used within scene node functions to extract parameters and child nodes from arguments.
-         *
-         * Here are the four ways you can invoke a scene node function, along with the results extracted from the
-         * arguments in each case by this utility:
-         *
-         * 1. No arguments
-         *
-         *      SceneJS.objects.cube()
-         *
-         *      Result:
-         *
-         *          {
-         *              getParams : function() {
-         *                    return {};
-         *              },
-         *              fixed : true,                   // Parameters will never vary because there are none
-         *              children: []
-         *          }
-         *
-         * 2. Child nodes with no parameters object
-         *
-         *      SceneJS.scene(node, node..)
-         *
-         *      Result:
-         *
-         *          {
-         *              getParams : function() {
-         *                    return {};
-         *              },
-         *              fixed : true,                   // Parameters will never vary because there are none
-         *              children: [ node, node ]
-         *          }
-         *
-         * 3. Parameters object followed by zero or more child nodes
-         *
-         *      SceneJS.rotate({ angle: 45 }, node, node..)
-         *
-         *      Result:
-         *
-         *          {
-         *              getParams : function() {
-         *                    return {
-         *                          angle : 45
-         *                    };
-         *              },
-         *              fixed : true,                   // Paramaters will never vary because they are an object
-         *              children: [ node, node ],
-         *          }
-         *
-         * 4. Dynamic parameterisation function followed by zero or more child nodes
-         *
-         *      SceneJS.rotate(function(data) { return data.get("angle"); }, node, node..)
-         *
-         *      Result:
-         *
-         *          {
-         *              getParams : function(data) {    // Same function passed into the node function above
-         *                    return data.get("angle");
-         *              },
-         *              fixed : false,                   // Params may vary because they are provided through a function
-         *              children: [ node, node ]
-         *          }
-         *
-         * @param args
-         */
-        getNodeConfig : function(args) {
-            args = args || [];
-            var result = {
-                children : [],
-                fixed: true
-            };
-            for (var i = 0; i < args.length; i++) {
-                var arg = args[i];
-                if (arg._render) {
-                    result.children.push(arg);
-                } else if (i == 0) {
-                    if (arg instanceof Function) {
-                        result.getParams = arg;
-                        result.fixed = false; // Configs generated by function - probably variable
-                    } else {
-                        var config = arg;
-
-                        /* Config is dynamic if any property is a function
-                         */
-                        result.fixed = true;  // Config object - may be constant - node may override if config has function
-                        for (var key in arg) {
-                            if (result.fixed && arg[key] instanceof Function) {
-                                result.fixed = false;
-                            }
-                        }
-                        result.getParams = function() {
-                            return config;
-                        };
-
-                    }
-                } else {
-                    SceneJS._backends.getBackend("error").fatalError(new SceneJS.exceptions.InvalidNodeConfigException
-                            ("Invalid node parameters - config should be first, IE. node(config, node, node,...)"));
-                }
-            }
-            if (!result.getParams) {
-                result.getParams = function() {
-                    return {
-                    };
-                };
-            }
-            return result;
-        },
-
-        NodeParams : function(nodeName, params, data) {
-            this.fixed = true;
-            this.getParam = function(name, mandatory) {
-                var param = params[name];
-                if (param instanceof Function) {
-                    this.fixed = false;
-                    param = param(data);
-                }
-                if (param) {
-                    return param;
-                }
-                if (mandatory) {
-                    SceneJS._backends.getBackend("error").fatalError(
-                            SceneJS.exceptions.NodeConfigExpectedException(
-                                    nodeName + " property expected: \"" + name + "\""));
-                }
-                else {
+                if (!parent) {
                     return null;
                 }
-            };
-        },
+                return parent.get(key);
+            },
 
-        createNode : function(type, children, proto) {
-            this._parent = null;
-            var _type = type;
-            var _children = children;
+            isfixed : function() {
+                return fixed;
+            }
+        };
+    },
 
-            proto.getType = function() {
-                return _type;
-            };
+    /**
+     * Wraps a node function with a flag that identifies it as such. This allows
+     * getNodeConfig to differentiate between child nodes and config functions
+     * in node parameters, doing away with the need to always supply a config
+     * with every node, ie. instead of:
+     *
+     *      node({}, node, node)
+     *
+     * you can then write this:
+     *
+     *      node(node, node)
+     */
+    //        createNode : function(func) {
+    //            return {
+    //                ___isSceneJSNode : true,  // Don't use this name in your node configs!
+    //                func: func
+    //            };
+    //        },
 
-            proto.getNumChildren = function() {
-                return _children.length;
-            };
-
-            proto.getChildren = function() {
-                var list = new Array(_children.length);
-                var len = _children.length;
-                for (var i = 0; i < len; i++) {
-                    list[i] = _children[i];
-                    child._parent = this;
-                }
-                return list;
-            };
-
-            proto.setChildren = function(children) {
-                var temp = new Array(children.length);
-                var len = children.length;
-                var child;
-                for (var i = 0; i < len; i++) {
-                    child = children[i];
-                    if (child._parent) {
-
-                    }
-                    temp[i] = child;
-                }
-                children = temp;
-                return this;
-            };
-
-            proto.getChildAt = function(i) {
-                return _children[i];
-            };
-
-            proto.removeChildAt = function(i) {
-                var r = _children.splice(i, 1);
-                if (r.length > 0) {
-                    r[0]._parent = null;
-                    return r[0];
+    /**
+     * Used within scene node functions to extract parameters and child nodes from arguments.
+     *
+     * Here are the four ways you can invoke a scene node function, along with the results extracted from the
+     * arguments in each case by this utility:
+     *
+     * 1. No arguments
+     *
+     *      SceneJS.objects.cube()
+     *
+     *      Result:
+     *
+     *          {
+     *              getParams : function() {
+     *                    return {};
+     *              },
+     *              fixed : true,                   // Parameters will never vary because there are none
+     *              children: []
+     *          }
+     *
+     * 2. Child nodes with no parameters object
+     *
+     *      SceneJS.scene(node, node..)
+     *
+     *      Result:
+     *
+     *          {
+     *              getParams : function() {
+     *                    return {};
+     *              },
+     *              fixed : true,                   // Parameters will never vary because there are none
+     *              children: [ node, node ]
+     *          }
+     *
+     * 3. Parameters object followed by zero or more child nodes
+     *
+     *      SceneJS.rotate({ angle: 45 }, node, node..)
+     *
+     *      Result:
+     *
+     *          {
+     *              getParams : function() {
+     *                    return {
+     *                          angle : 45
+     *                    };
+     *              },
+     *              fixed : true,                   // Paramaters will never vary because they are an object
+     *              children: [ node, node ],
+     *          }
+     *
+     * 4. Dynamic parameterisation function followed by zero or more child nodes
+     *
+     *      SceneJS.rotate(function(data) { return data.get("angle"); }, node, node..)
+     *
+     *      Result:
+     *
+     *          {
+     *              getParams : function(data) {    // Same function passed into the node function above
+     *                    return data.get("angle");
+     *              },
+     *              fixed : false,                   // Params may vary because they are provided through a function
+     *              children: [ node, node ]
+     *          }
+     *
+     * @param args
+     */
+    getNodeConfig : function(args) {
+        args = args || [];
+        var result = {
+            children : [],
+            fixed: true
+        };
+        for (var i = 0; i < args.length; i++) {
+            var arg = args[i];
+            if (arg._render) {
+                result.children.push(arg);
+            } else if (i == 0) {
+                if (arg instanceof Function) {
+                    result.getParams = arg;
+                    result.fixed = false; // Configs generated by function - probably variable
                 } else {
-                    return null;
-                }
-            };
+                    var config = arg;
 
-            proto.addChild = function(node) {
-                if (node._parent != null) {
-                }
-                _children.push(node);
-                node._parent = this;
-                return node;
-            };
-
-            proto.insertChild = function(node, i) {
-                if (node._parent != null) {
-                }
-                if (i == undefined || i <= 0) {
-                    _children.unshift(node);
-                } else if (i >= _children.length) {
-                    _children.push(node);
-                } else {
-                    _children.splice(i, 0, node);
-                }
-                node._parent = this;
-                return node;
-            };
-
-            proto.getParent = function() {
-                return this._parent;
-            };
-
-            proto._renderChildren = function(traversalContext, data) {
-                var child;
-                var len = _children.length;
-                if (len) {
-                    for (var i = 0; i < len; i++) {
-                        child = _children[i];
-                        child._render.call(child, { // Traversal context
-                            appendix : traversalContext.appendix,
-                            insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
-                        }, data);
-                    }
-                } else {
-
-                    /* Leaf node - if on right fringe of tree then
-                     * render appended nodes
+                    /* Config is dynamic if any property is a function
                      */
-                    if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
-                        len = traversalContext.appendix.length;
-                        for (var i = 0; i < len; i++) {
-                            child = traversalContext.appendix[i];
-                            child._render.call(child, { // Traversal context
-                                appendix : null,
-                                insideRightFringe: (i < len - 1)
-                            }, data);
+                    result.fixed = true;  // Config object - may be constant - node may override if config has function
+                    for (var key in arg) {
+                        if (result.fixed && arg[key] instanceof Function) {
+                            result.fixed = false;
                         }
                     }
+                    result.getParams = function() {
+                        return config;
+                    };
+
                 }
-            };
-
-            proto._renderChild = function(index, traversalContext, data) {
-                _children[index]._render(traversalContext, data);
-            };
-
-            return proto;
-        },
-
-        getParam : function(param, data, fallback) {
-            if (param instanceof Function) {
-                return param.call(this, data);
-            } else if (!param) {
-                return fallback;
             } else {
+                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException
+                        ("Invalid node parameters - config should be first, IE. node(config, node, node,...)"));
+            }
+        }
+        if (!result.getParams) {
+            result.getParams = function() {
+                return {
+                };
+            };
+        }
+        return result;
+    },
+
+    NodeParams : function(nodeName, params, data) {
+        this.fixed = true;
+        this.getParam = function(name, mandatory) {
+            var param = params[name];
+            if (param instanceof Function) {
+                this.fixed = false;
+                param = param(data);
+            }
+            if (param) {
                 return param;
             }
-        },
-
-        /**
-         * This function is used when you want to wrap a scene node function invokation it with your own node function,
-         * while adding/overriding members on the parameters argument.
-         *
-         * See SceneJS._utils.getNodeConfigs to see how node arguments are processed.
-         *
-         * Examples
-         * --------
-         *
-         * Wrapping SceneJS.someNode and augmenting the parameters argument with a new member, "myNewParam":
-         *
-         *      SceneJS.myNewNode = function() {
-         *          var extendedArgs = SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" });
-         *          return SceneJS.someNode.apply(this, extendedArgs);
-         *      };
-         *
-         * If the parameters argument already has a "myNewParam" then this won't replace it, unless you force it's
-         * replacement with an override flag like this:
-         *
-         *      var extendedArgs =  SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" }, true);
-         *
-         * @param args The JavaScript Arguments passed to the scene node function
-         * @param cfg Each member of these is attached to the config object extracted from the arguments, overriding any member already there
-         * @param override When true, the extending parameters will replace any already in the Argument's parameters - false by default
-         */
-        extendNodeArgs : function(args, cfg, override) {
-            if (!args || args.length == 0) {
-                return [cfg];
+            if (mandatory) {
+                SceneJS_errorModule.fatalError(
+                        SceneJS.exceptions.NodeConfigExpectedException(
+                                nodeName + " property expected: \"" + name + "\""));
             }
-            args = Array.prototype.slice.call(args);
-            var arg = args[0];
-            if (arg._render) {
+            else {
+                return null;
+            }
+        };
+    },
 
-                /* First arg is a scene graph node - push override configs in front of it
-                 */
-                args.unshift(cfg);
+    createNode : function(type, children, proto) {
+        this._parent = null;
+        var _type = type;
+        var _children = children;
 
-            } else if (arg instanceof Function) {
+        proto.getType = function() {
+            return _type;
+        };
 
-                /* First arg is a dynamic configuration function - wrap it and override members on its result
-                 */
-                var func = arg;
-                args[0] = function(data) {
-                    var result = func(data);
-                    for (var key in cfg) {
-                        if (override || !result[key]) {
-                            result[key] = cfg[key];
-                        }
-                    }
-                    return result;
-                };
+        proto.getNumChildren = function() {
+            return _children.length;
+        };
+
+        proto.getChildren = function() {
+            var list = new Array(_children.length);
+            var len = _children.length;
+            for (var i = 0; i < len; i++) {
+                list[i] = _children[i];
+                child._parent = this;
+            }
+            return list;
+        };
+
+        proto.setChildren = function(children) {
+            var temp = new Array(children.length);
+            var len = children.length;
+            var child;
+            for (var i = 0; i < len; i++) {
+                child = children[i];
+                if (child._parent) {
+
+                }
+                temp[i] = child;
+            }
+            children = temp;
+            return this;
+        };
+
+        proto.getChildAt = function(i) {
+            return _children[i];
+        };
+
+        proto.removeChildAt = function(i) {
+            var r = _children.splice(i, 1);
+            if (r.length > 0) {
+                r[0]._parent = null;
+                return r[0];
+            } else {
+                return null;
+            }
+        };
+
+        proto.addChild = function(node) {
+            if (node._parent != null) {
+            }
+            _children.push(node);
+            node._parent = this;
+            return node;
+        };
+
+        proto.insertChild = function(node, i) {
+            if (node._parent != null) {
+            }
+            if (i == undefined || i <= 0) {
+                _children.unshift(node);
+            } else if (i >= _children.length) {
+                _children.push(node);
+            } else {
+                _children.splice(i, 0, node);
+            }
+            node._parent = this;
+            return node;
+        };
+
+        proto.getParent = function() {
+            return this._parent;
+        };
+
+        proto._renderChildren = function(traversalContext, data) {
+            var child;
+            var len = _children.length;
+            if (len) {
+                for (var i = 0; i < len; i++) {
+                    child = _children[i];
+                    child._render.call(child, { // Traversal context
+                        appendix : traversalContext.appendix,
+                        insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
+                    }, data);
+                }
             } else {
 
-                /* First arg is a configuration object - extend it
+                /* Leaf node - if on right fringe of tree then
+                 * render appended nodes
                  */
-                for (var key in cfg) {
-                    if (override || !arg[key]) {
-                        arg[key] = cfg[key];
-                    }
-                }
-            }
-            return args;
-        },
-
-        //        invokeNode : function(node, args, extraArgs) {
-        //            if (extraArgs) {
-        //                return node.apply(this, SceneJS._utils.extendNodeArgs(args, extraArgs));
-        //            } else {
-        //                return node.apply(this, args);
-        //            }
-        //        },
-
-        /** Visits child nodes in the given node configuration
-         */
-        visitChildren : function(config, traversalContext, data) {
-            var child;
-            if (config.children) {
-                var len = config.children.length;
-
-                if (len) {
+                if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
+                    len = traversalContext.appendix.length;
                     for (var i = 0; i < len; i++) {
-                        child = config.children[i];
+                        child = traversalContext.appendix[i];
                         child._render.call(child, { // Traversal context
-                            appendix : traversalContext.appendix,
-                            insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
+                            appendix : null,
+                            insideRightFringe: (i < len - 1)
                         }, data);
                     }
-                } else {
-
-                    /* Leaf node - if on right fringe of tree then
-                     * render appended nodes
-                     */
-                    if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
-                        len = traversalContext.appendix.length;
-                        for (var i = 0; i < len; i++) {
-                            child = traversalContext.appendix[i];
-                            child._render.call(child, { // Traversal context
-                                appendix : null,
-                                insideRightFringe: (i < len - 1)
-                            }, data);
-                        }
-                    }
                 }
             }
-        },
+        };
 
-        /** Visits a selected child node in the given node configuration
-         */
-        visitChild : function(config, index, traversalContext, data) {
-            if (config.children) {
-                config.children[index]._render(traversalContext, data);
+        proto._renderChild = function(index, traversalContext, data) {
+            _children[index]._render(traversalContext, data);
+        };
+
+        return proto;
+    },
+
+    getParam : function(param, data, fallback) {
+        if (param instanceof Function) {
+            return param.call(this, data);
+        } else if (!param) {
+            return fallback;
+        } else {
+            return param;
+        }
+    },
+
+    /**
+     * This function is used when you want to wrap a scene node function invokation it with your own node function,
+     * while adding/overriding members on the parameters argument.
+     *
+     * See SceneJS._utils.getNodeConfigs to see how node arguments are processed.
+     *
+     * Examples
+     * --------
+     *
+     * Wrapping SceneJS.someNode and augmenting the parameters argument with a new member, "myNewParam":
+     *
+     *      SceneJS.myNewNode = function() {
+     *          var extendedArgs = SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" });
+     *          return SceneJS.someNode.apply(this, extendedArgs);
+     *      };
+     *
+     * If the parameters argument already has a "myNewParam" then this won't replace it, unless you force it's
+     * replacement with an override flag like this:
+     *
+     *      var extendedArgs =  SceneJS._utils.extendNodeArgs(arguments, { myNewParam : "new param value" }, true);
+     *
+     * @param args The JavaScript Arguments passed to the scene node function
+     * @param cfg Each member of these is attached to the config object extracted from the arguments, overriding any member already there
+     * @param override When true, the extending parameters will replace any already in the Argument's parameters - false by default
+     */
+    extendNodeArgs : function(args, cfg, override) {
+        if (!args || args.length == 0) {
+            return [cfg];
+        }
+        args = Array.prototype.slice.call(args);
+        var arg = args[0];
+        if (arg._render) {
+
+            /* First arg is a scene graph node - push override configs in front of it
+             */
+            args.unshift(cfg);
+
+        } else if (arg instanceof Function) {
+
+            /* First arg is a dynamic configuration function - wrap it and override members on its result
+             */
+            var func = arg;
+            args[0] = function(data) {
+                var result = func(data);
+                for (var key in cfg) {
+                    if (override || !result[key]) {
+                        result[key] = cfg[key];
+                    }
+                }
+                return result;
+            };
+        } else {
+
+            /* First arg is a configuration object - extend it
+             */
+            for (var key in cfg) {
+                if (override || !arg[key]) {
+                    arg[key] = cfg[key];
+                }
             }
-        },
+        }
+        return args;
+    },
 
-        /**
-         * Returns a key for a vacant slot in the given map
-         */
-        createKeyForMap : function(keyMap, prefix) {
-            var i = 0;
-            while (true) {
-                var key = prefix + i++;
-                if (!keyMap[key]) {
-                    return key;
+    //        invokeNode : function(node, args, extraArgs) {
+    //            if (extraArgs) {
+    //                return node.apply(this, SceneJS._utils.extendNodeArgs(args, extraArgs));
+    //            } else {
+    //                return node.apply(this, args);
+    //            }
+    //        },
+
+    /** Visits child nodes in the given node configuration
+     */
+    visitChildren : function(config, traversalContext, data) {
+        var child;
+        if (config.children) {
+            var len = config.children.length;
+
+            if (len) {
+                for (var i = 0; i < len; i++) {
+                    child = config.children[i];
+                    child._render.call(child, { // Traversal context
+                        appendix : traversalContext.appendix,
+                        insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
+                    }, data);
+                }
+            } else {
+
+                /* Leaf node - if on right fringe of tree then
+                 * render appended nodes
+                 */
+                if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
+                    len = traversalContext.appendix.length;
+                    for (var i = 0; i < len; i++) {
+                        child = traversalContext.appendix[i];
+                        child._render.call(child, { // Traversal context
+                            appendix : null,
+                            insideRightFringe: (i < len - 1)
+                        }, data);
+                    }
                 }
             }
         }
     },
 
+    /** Visits a selected child node in the given node configuration
+     */
+    visitChild : function(config, index, traversalContext, data) {
+        if (config.children) {
+            config.children[index]._render(traversalContext, data);
+        }
+    },
 
-        /** Registry of modules that provide backend functionality for scene graph nodes
-         */
-            SceneJS._backends = new (function() {
-                var status = {
-                    error: null
-                };
-                var backends = {};
+    /**
+     * Returns a key for a vacant slot in the given map
+     */
+    createKeyForMap : function(keyMap, prefix) {
+        var i = 0;
+        while (true) {
+            var key = prefix + i++;
+            if (!keyMap[key]) {
+                return key;
+            }
+        }
+    }
+};
 
-                /** Context shared by all backend modules
-                 */
-                var ctx = {
-
-                };
-
-                /**
-                 * Installs a backend module. If an error occurrs while installing, it will available
-                 * via getStatus - we allow query for exceptions instead of throwing from this method
-                 * so that we can process them in one place, ie. when we create a scene.
-                 */
-                this.installBackend = function(id, backend) {
-                    if (!status.error) {
-                        try {
-                            var be = backend(ctx);
-                            if (be) {
-
-                                /* Not all backends are registered and available to nodes - some just
-                                 * anonymously set up resources on the backend context, wire up event
-                                 * handlers etc.
-                                 */
-                                backends[id] = be;
-                            }
-                        } catch (e) {
-                            status.error = new SceneJS.exceptions.NodeBackendInstallFailedException
-                                    ("Failed to install backend module for node type \"" + id + "\": " + (e.message || e), e);
-                            throw status.error;
-                        }
-                    }
-                };
-
-                /** Runs the given function in the context of the currently-installed backends, useful for extending them
-                 */
-                this.extend = function(func) {
-                    if (!status.error) {
-                        try {
-                            func(ctx);
-                        } catch (e) {
-                            status.error = new SceneJS.exceptions.NodeBackendInstallFailedException
-                                    ("Failed to extend backends", e);
-                            throw status.error;
-                        }
-                    }
-                };
-
-                /** Returns true if a backend of the given type is installed
-                 */
-                this.hasBackend = function(type) {
-                    var backend = backends[type] ;
-                    return (backend != undefined && backend != null);
-                };
-
-
-                /** Obtains the backend module of the given type
-                 */
-                this.getBackend = function(type) {
-                    var backend = backends[type];
-                    if (!backend) {
-                        throw new SceneJS.exceptions.NodeBackendNotFoundException("No backend installed of type \"" + type + "\"");
-                    }
-                    return backend;
-                };
-
-                /** Returns current SceneJS backend error status
-                 */
-                this.getStatus = function() {
-                    return status;
-                };
-
-                /** Clears current SceneJS backend error status
-                 */
-                this.clearStatus = function() {
-                    status = {};
-                };
-
-                /** Cleans up all resources currently held by backend modules
-                 */
-                this.reset = function() {
-                    for (var type in backends) {
-                        var backend = backends[type];
-                        if (backend.reset) {
-                            backend.reset();
-                        }
-                    }
-                };
-            })();
-})
-        ();
 
 SceneJS._utils.ns = SceneJS._utils.namespace; // in intellij using keyword "namespace" causes parsing errors
 SceneJS._utils.ns("SceneJS");
@@ -1759,7 +1659,7 @@ function SceneJS_webgl_Shader(context, type, source, logging) {
         logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
     }
     if (!this.valid) {
-        SceneJS._backends.getBackend("error").fatalError(
+        SceneJS_errorModule.fatalError(
                 new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile"));
     }
 }
@@ -1815,7 +1715,7 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
     }
 
     if (!this.valid) {
-        SceneJS._backends.getBackend("error").fatalError(
+        SceneJS_errorModule.fatalError(
                 new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link"));
     }
 
@@ -2086,12 +1986,161 @@ function SceneJS_webgl_ArrayBuffer(context, type, values, numItems, itemSize, us
     };
 }
 
-/** Basic scene graph node, generally used as a group node.
+/**
+ @class SceneJS.node
+ <p>The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.</p>
+ @constructor
+ Create a new SceneJS.node
+ @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
 SceneJS.node = function() {
+
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    return {
-        _render: function(traversalContext, data) {
+
+    return new (function () {
+
+        // private
+        this._parent = null;
+
+        // private
+        this._children = cfg.children;
+
+        /* Used by many node types to track the level at which they can
+         * memoise internal state. When rendered, a node increments
+         * this each time it discovers that it can cache more state, so that
+         * it knows not to recompute that state when next rendered.
+         * Since internal state is usually dependent on the states of higher
+         * nodes, this is reset whenever the node is attached to a new
+         * parent.
+         *
+         * private
+         */
+        this._memoLevel = 0;
+
+        /**
+         * Returns the number of child nodes
+         * @returns {int} Number of child nodes
+         */
+        this.getNumChildren = function() {
+            return this._children.length;
+        };
+
+        /** Returns child nodes
+         * @returns {Array} Child nodes
+         */
+        this.getChildren = function() {
+            var list = new Array(this._children.length);
+            var len = this._children.length;
+            for (var i = 0; i < len; i++) {
+                list[i] = this._children[i];
+                child._parent = this;
+            }
+            return list;
+        };
+
+        /** Sets child nodes, removing those already present
+         * @param {Array} children Array of child nodes
+         */
+        this.setChildren = function(children) {
+            var temp = new Array(children.length);
+            var len = children.length;
+            var child;
+            for (var i = 0; i < len; i++) {
+                child = children[i];
+                if (child._parent) {
+
+                }
+                temp[i] = child;
+                child._memoLevel = 0;
+            }
+            this._children = temp;
+            return this;
+        };
+
+        /** Returns child node at given index
+         * @returns {SceneJS.node} Child node
+         */
+        this.getChildAt = function(index) {
+            return this._children[index];
+        };
+
+        /** Removes the child node at the given index
+         * @param {int} index Child node index
+         */
+        this.removeChildAt = function(index) {
+            var r = this._children.splice(index, 1);
+            if (r.length > 0) {
+                r[0]._parent = null;
+                return r[0];
+            } else {
+                return null;
+            }
+        };
+
+        this.addChild = function(node) {
+            if (node._parent != null) {
+            }
+            this._children.push(node);
+            node._parent = this;
+            node._memoLevel = 0;
+            return node;
+        };
+
+        this.insertChild = function(node, i) {
+            if (node._parent != null) {
+            }
+            if (i == undefined || i <= 0) {
+                this._children.unshift(node);
+            } else if (i >= this._children.length) {
+                this._children.push(node);
+            } else {
+                this._children.splice(i, 0, node);
+            }
+            node._parent = this;
+            node._memoLevel = 0;
+            return node;
+        };
+
+        this.getParent = function() {
+            return this._parent;
+        };
+
+        // private
+        this._renderChildren = function(traversalContext, data) {
+            var child;
+            var len = this._children.length;
+            if (len) {
+                for (var i = 0; i < len; i++) {
+                    child = this._children[i];
+                    child._render.call(child, { // Traversal context
+                        appendix : traversalContext.appendix,
+                        insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
+                    }, data);
+                }
+            } else {
+
+                /* Leaf node - if on right fringe of tree then
+                 * render appended nodes
+                 */
+                if (traversalContext.appendix && (!traversalContext.insideRightFringe)) {
+                    len = traversalContext.appendix.length;
+                    for (var i = 0; i < len; i++) {
+                        child = traversalContext.appendix[i];
+                        child._render.call(child, { // Traversal context
+                            appendix : null,
+                            insideRightFringe: (i < len - 1)
+                        }, data);
+                    }
+                }
+            }
+        };
+
+        // private
+        this._renderChild = function(index, traversalContext, data) {
+            this._children[index]._render(traversalContext, data);
+        };
+
+        this._render = function(traversalContext, data) {
             var params = cfg.getParams();
             var childScope = SceneJS._utils.newScope(data, false);
             if (params) {
@@ -2099,9 +2148,10 @@ SceneJS.node = function() {
                     childScope.put(key, params[key]);
                 }
             }
-            SceneJS._utils.visitChildren(cfg, traversalContext, childScope || data);
-        }
-    };
+            this._renderChildren(traversalContext, childScope || data);
+        };
+
+    })();
 };
 /**
  * Classes for exceptions thrown by SceneJS.
@@ -2256,373 +2306,6 @@ SceneJS.exceptions.AssetLoadTimeoutException = function(msg, cause) {
 
 
 
-/**
- * Backend module that defines SceneJS events and provides an interface on the backend context through which
- * backend modules can fire and subscribe to them.
- *
- * Events are actually somewhat more like commands; they are always synchronous, and are often used to decouple the
- * transfer of data between backends, request events in response, and generally trigger some immediate action.
- *
- * Event subscription can optionally be prioritised, to control the order in which the subscriber will be notified of
- * a given event relative to other suscribers. This is useful, for example, when a backend must be the first to handle
- * an INIT, or the last to handle a RESET.
- *
- */
-
-/**
- * Types of events that occur among backend modules. These are given values by the
- * events backend module when it is installed. When you add your own, just give them
- * a zero value like these ones.
- */
-SceneJS._eventTypes = {
-    ERROR : 0,
-
-    INIT : 0,                           // SceneJS framework initialised
-    RESET : 0,                          // SceneJS framework reset
-
-    TIME_UPDATED : 0,                   // System time updated
-
-    SCENE_CREATED : 0,                  // Scene has just been created
-    SCENE_ACTIVATED : 0,                // Scene about to be traversed
-    SCENE_DEACTIVATED : 0,              // Scene just been completely traversed
-    SCENE_DESTROYED : 0,                // Scene just been destroyed
-
-    RENDERER_UPDATED: 0,                // Current WebGL context has been updated to the given state
-    RENDERER_EXPORTED: 0,               // Export of the current WebGL context state
-
-    CANVAS_ACTIVATED : 0,
-    CANVAS_DEACTIVATED : 0,
-
-    VIEWPORT_UPDATED : 0,               // Viewport updated
-
-    GEOMETRY_UPDATED : 0,
-    GEOMETRY_EXPORTED : 0,              // Export of geometry for rendering
-
-    MODEL_TRANSFORM_UPDATED : 0,        // Model transform matrix updated
-    MODEL_TRANSFORM_EXPORTED : 0,       // Export transform matrix for rendering
-
-    PROJECTION_TRANSFORM_UPDATED : 0,   // 
-    PROJECTION_TRANSFORM_EXPORTED : 0,
-
-    VIEW_TRANSFORM_UPDATED : 0,
-    VIEW_TRANSFORM_EXPORTED : 0,
-
-    LIGHTS_UPDATED : 0,
-    LIGHTS_EXPORTED : 0,
-
-    MATERIAL_UPDATED : 0,
-    MATERIAL_EXPORTED : 0,
-
-    TEXTURES_UPDATED : 0,              // Texture activated after a texture node visited
-    TEXTURES_EXPORTED : 0,
-
-    SHADER_ACTIVATE : 0,
-
-    SHADER_ACTIVATED : 0,
-    SHADER_RENDERING : 0,
-    SHADER_DEACTIVATED : 0 ,
-
-    FOG_UPDATED: 0,
-    FOG_EXPORTED: 0,
-
-    NAME_UPDATED: 0,
-
-    PROCESS_CREATED: 0,
-    PROCESS_KILLED: 0,
-    PROCESS_TIMED_OUT: 0
-
-};
-
-SceneJS._backends.installBackend(
-
-        "events",
-
-        function(ctx) {
-
-            /* Initialise event types list
-             */
-            var nevents = 0;
-            for (var key in SceneJS._eventTypes) {
-                SceneJS._eventTypes[key] = nevents;
-                nevents++;
-            }
-            var events = new Array(nevents);
-
-            /**
-             * Registers a handler for the given event
-             *
-             * The handler can be registered with an optional priority number which specifies the order it is
-             * called among the other handler already registered for the event.
-             *
-             * So, with n being the number of commands registered for the given event:
-             *
-             * (priority <= 0)      - command will be the first called
-             * (priority >= n)      - command will be the last called
-             * (0 < priority < n)   - command will be called at the order given by the priority
-             *
-             * @param type Event type - one of the values in SceneJS._eventTypes
-             * @param command - Handler function that will accept whatever parameter object accompanies the event
-             * @param priority - Optional priority number (see above)
-             */
-            function onEvent(type, command, priority) {
-                var list = events[type];
-                if (!list) {
-                    list = [];
-                    events[type] = list;
-                }
-                var handler = {
-                    command: command,
-                    priority : (priority == undefined) ? list.length : priority
-                };
-                for (var i = 0; i < list.length; i++) {
-                    if (list[i].priority > handler.priority) {
-                        list.splice(i, 0, handler);
-                        return;
-                    }
-                }
-                list.push(handler);
-            }
-
-            function fireEvent(type, params) {
-                var list = events[type];
-                if (list) {
-                    for (var i = 0; i < list.length; i++) {
-                        list[i].command(params || {});
-                    }
-                }
-            }
-
-            /* Backend-facing API
-             */
-            ctx.events = {
-                onEvent : onEvent,
-                fireEvent : fireEvent
-            };
-
-            /* Node-facing API            
-             */
-            return {
-                onEvent : onEvent,
-                fireEvent : fireEvent
-            };
-        });
-/**
- * Backend module that provides single point through which exceptions may be raised
- */
-SceneJS._backends.installBackend(
-
-        "error",
-
-        function(ctx) {
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        time = (new Date()).getTime();
-                        ctx.events.fireEvent(SceneJS._eventTypes.TIME_UPDATED, time);
-                    });
-
-            function fatalError(e) {
-                ctx.events.fireEvent(SceneJS._eventTypes.ERROR,
-                {
-                    exception: e,
-                    fatal: true
-                });
-                throw e;
-            }
-
-            function error(e) {
-                ctx.events.fireEvent(SceneJS._eventTypes.ERROR,
-                {
-                    exception: e,
-                    fatal: false
-                });
-            }
-
-            ctx.error = { // Backend-facing API
-                fatalError : fatalError,
-                error : error
-            };
-
-            return {
-                fatalError : fatalError,
-                error : error
-            };
-        });
-/**
- * Backend module that provides the current system time, updating it every time a scene is rendered
- */
-SceneJS._backends.installBackend(
-
-        "time",
-
-        function(ctx) {
-
-            var time = (new Date()).getTime();
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        time = (new Date()).getTime();
-                        ctx.events.fireEvent(SceneJS._eventTypes.TIME_UPDATED, time);
-                    });
-
-            return { // Node-facing API
-
-                getTime: function() {
-                    return time;
-                }
-            };
-        });
-/**
- * Backend module to provide logging that is aware of the current location of scene traversal.
- *
- * There are three "channels" of log message: error, warning, info and debug.
- *
- * Provides an interface on the backend context through which other backends may log messages.
- *
- * Provides an interface to scene nodes to allow them to log messages, as well as set and get the function
- * that actually processes messages on each channel. Those getters and setters are used by the SceneJS.logging node,
- * which may be distributed throughout a scene graph to cause messages to be processed in particular ways for different
- * parts of the graph.
- *
- * Messages are queued. Initially, each channel has no function set for it and will queue messages until a function is
- * set, at which point the queue flushes.  If the function is unset, subsequent messages will queue, then flush when a
- * function is set again. This allows messages to be logged before any SceneJS.logging node is visited.
- *
- * This backend is always the last to handle a RESET
- *
- */
-SceneJS._backends.installBackend(
-
-        "logging",
-
-        function(ctx) {
-
-            var activeSceneId;
-            var funcs = null;
-            var queues = {};
-            var indent = 0;
-            var indentStr = "";
-
-            function log(channel, message) {
-                message = activeSceneId
-                        ? indentStr + activeSceneId + ": " + message
-                        : indentStr + message;
-                var func = funcs ? funcs[channel] : null;
-                if (func) {
-                    func(message);
-                } else {
-                    var queue = queues[channel];
-                    if (!queue) {
-                        queue = queues[channel] = [];
-                    }
-                    queue.push(message);
-                }
-            }
-
-            function flush(channel) {
-                var queue = queues[channel];
-                if (queue) {
-                    var func = funcs ? funcs[channel] : null;
-                    if (func) {
-                        for (var i = 0; i < queue.length; i++) {
-                            func(queue[i]);
-                        }
-                        queues[channel] = [];
-                    }
-                }
-            }
-
-            ctx.logging = {
-
-                setIndent:function(_indent) {
-                    indent = _indent;
-                    var indentArray = [];
-                    for (var i = 0; i < indent; i++) {
-                        indentArray.push("----");
-                    }
-                    indentStr = indentArray.join("");
-                },
-
-                error:function(msg) {
-                    log("error", msg);
-                } ,
-
-                warn:function(msg) {
-                    log("warn", msg);
-                },
-
-                info:function(msg) {
-                    log("info", msg);
-                },
-
-                debug:function(msg) {
-                    log("debug", msg);
-                }
-            };
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED, // Set default logging for scene root
-                    function(params) {
-                        activeSceneId = params.sceneId;                        
-
-                        var element = document.getElementById(SceneJS_webgl_DEFAULT_LOGGING_ID);
-                        if (element) {
-                            funcs = {
-                                warn : function log(msg) {
-                                    element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
-                                },
-                                error : function log(msg) {
-                                    element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
-                                },
-                                debug : function log(msg) {
-                                    element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
-                                },
-                                info : function log(msg) {
-                                    element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
-                                }
-                            };
-                        } else {
-                            funcs = null;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_DEACTIVATED, // Set default logging for scene root
-                    function() {
-                        activeSceneId = null;
-                        //funcs = {};
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        queues = {};
-                        funcs = null;
-                    },
-                    100000);  // Really low priority - must be reset last
-
-            return { // Node-facing API
-
-                getLogger : function() {
-                    return ctx.logging;
-                },
-
-                getFuncs: function() {
-                    return funcs;
-                },
-
-                setFuncs : function(l) {
-                    if (l) {
-                        funcs = l;
-                        for (var channel in queues) {
-                            flush(channel);
-                        }
-                    }
-                }
-            };
-        });
 /** Scene node that routes messages logged by nodes in its subgraph through a given set of logging functions.
  *
  * @class SceneJS.logging
@@ -2630,7 +2313,6 @@ SceneJS._backends.installBackend(
  */
 SceneJS.logging = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('logging');
     var funcs;
 
     return SceneJS._utils.createNode(
@@ -2639,7 +2321,7 @@ SceneJS.logging = function() {
 
             new (function() {
                 this._render = function(traversalContext, data) {
-                    var prevFuncs = backend.getFuncs();
+                    var prevFuncs = SceneJS_loggingModule.getFuncs();
                     if (!funcs || !cfg.fixed) {
                         funcs = cfg.getParams(data);
                         var p = prevFuncs || {};
@@ -2648,9 +2330,9 @@ SceneJS.logging = function() {
                         funcs.debug = funcs.debug || p.debug;
                         funcs.info = funcs.info || p.info;
                     }
-                    backend.setFuncs(funcs);
+                    SceneJS_loggingModule.setFuncs(funcs);
                     this._renderChildren(traversalContext, data);
-                    backend.setFuncs(prevFuncs);
+                    SceneJS_loggingModule.setFuncs(prevFuncs);
                 };
             })());
 };
@@ -2667,12 +2349,9 @@ SceneJS.logging = function() {
  * @extends SceneJS.logging
  */
 (function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
-
     SceneJS.loggingToPage = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-        var backend = SceneJS._backends.getBackend('logging');
         var funcs;
 
         function findElement(elementId) {
@@ -2681,7 +2360,7 @@ SceneJS.logging = function() {
                 elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
                 element = document.getElementById(elementId);
                 if (!element) {
-                    errorBackend.fatalError(new SceneJS.exceptions.PageLoggingElementNotFoundException
+                    SceneJS_errorModule.fatalError(new SceneJS.exceptions.PageLoggingElementNotFoundException
                             ("SceneJS.loggingToPage config 'elementId' omitted and no default element found with ID '"
                                     + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
                 }
@@ -2691,7 +2370,7 @@ SceneJS.logging = function() {
                     elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
                     element = document.getElementById(elementId);
                     if (!element) {
-                        errorBackend.fatalError(
+                        SceneJS_errorModule.fatalError(
                                 new SceneJS.exceptions.PageLoggingElementNotFoundException
                                         ("SceneJS.loggingToPage config 'elementId' does not match any elements in page and no " +
                                          "default element found with ID '" + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
@@ -2728,399 +2407,14 @@ SceneJS.logging = function() {
                                 }
                             };
                         }
-                        var prevFuncs = backend.getFuncs();
-                        backend.setFuncs(funcs);
+                        var prevFuncs = SceneJS_loggingModule.getFuncs();
+                        SceneJS_loggingModule.setFuncs(funcs);
                         this._renderChildren(traversalContext, data);
-                        backend.setFuncs(prevFuncs);
+                        SceneJS_loggingModule.setFuncs(prevFuncs);
                     };
                 })());
     };
 })();
-/**
- * Backend module for asynchronous process management.
- *
- * This module creates a "processes" object on the backend context through which other backend modules may
- * create, destroy and query the state of SceneJS processes.
- *
- * This module maintains a separate group of processes for each active scene. When a scene is defined, it
- * will create a group for it, then whenever it is deactivated it will automatically destroy all processes
- * in its group that have timed out.
- */
-SceneJS._backends.installBackend(
-
-        "processes",
-
-        function(ctx) {
-
-            var time = (new Date()).getTime();          // System time
-            var groups = {};                            // A process group for each existing scene
-            var activeSceneId;                          // ID of currently-active scene
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TIME_UPDATED,
-                    function(t) {
-                        time = t;
-                    });
-
-            ctx.events.onEvent(// Scene defined, create new process group for it
-                    SceneJS._eventTypes.SCENE_CREATED,
-                    function(params) {
-                        var group = {   // IDEA like this
-                            sceneId : params.sceneId,
-                            processes: {} ,
-                            numProcesses : 0
-                        };
-                        groups[params.sceneId] = group;
-                    });
-
-            ctx.events.onEvent(// Scene traversal begins
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function(params) {
-                        activeSceneId = params.sceneId;
-                    });
-
-            ctx.events.onEvent(// Scene traversed - reap its dead and timed-out processes
-                    SceneJS._eventTypes.SCENE_DEACTIVATED,
-                    function() {
-                        var group = groups[activeSceneId];
-                        var processes = group.processes;
-                        for (var pid in processes) {
-                            var process = processes[pid];
-                            if (process) {
-                                if (process.destroyed) {
-                                    processes[pid] = undefined;
-                                    group.numProcesses--;
-                                } else {
-                                    var elapsed = time - process.timeStarted;
-                                    if ((process.timeoutSecs > -1) && (elapsed > (process.timeoutSecs * 1000))) {
-
-                                        ctx.logging.warn("Process timed out after " +
-                                                         process.timeoutSecs +
-                                                         " seconds: " + process.description);
-
-                                        /* Process timed out - notify listeners
-                                         */
-                                        ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_TIMED_OUT, {
-                                            sceneId: activeSceneId,
-                                            process: {
-                                                id: process.id,
-                                                timeStarted : process.timeStarted,
-                                                description: process.description,
-                                                timeoutSecs: process.timeoutSecs
-                                            }
-                                        });
-
-                                        process.destroyed = true;
-                                        processes[pid] = undefined;
-                                        group.numProcesses--;
-                                        if (process.onTimeout) {
-                                            process.onTimeout();
-                                        }
-                                    } else {
-                                        process.timeRunning = elapsed;
-                                    }
-                                }
-                            }
-                        }
-                        activeSceneId = null;
-                    });
-
-            ctx.events.onEvent(// Scene destroyed - destroy its process group
-                    SceneJS._eventTypes.SCENE_DESTROYED,
-                    function(params) {
-                        groups[params.sceneId] = undefined;
-                    });
-
-            ctx.events.onEvent(// Framework reset - destroy all process groups
-                    SceneJS._eventTypes.RESET,
-                    function(params) {
-                        groups = {};
-                        activeSceneId = null;
-                    });
-
-            /**
-             * Create object on backend context through which processes
-             * may be created, destroyed and queried.
-             */
-            SceneJS_processModule = {
-
-                /**
-                 * Creates a new asynchronous process for the currently active scene and returns a handle to it.
-                 * The handle is actually an object containing live information on the process, which must
-                 * not be modified.
-                 *
-                 * Example:
-                 *
-                 * createProcess({
-                 *      description: "loading texture image",
-                 *      timeoutSecs: 30,                         // 30 Seconds
-                 *      onTimeout(function() {
-                 *              alert("arrrg!!");
-                 *          });
-                 */
-                createProcess: function(cfg) {
-                    if (!activeSceneId) {
-                        ctx.error.fatalError(new SceneJS.exceptions.NoSceneActiveException("No scene active - can't create process"));
-                    }
-                    var group = groups[activeSceneId];
-                    var i = 0;
-                    while (true) {
-                        var pid = activeSceneId + i++;
-                        if (!group.processes[pid]) {
-
-                            /* Register process
-                             */
-                            var process = {
-                                sceneId: activeSceneId,
-                                id: pid,
-                                timeStarted : time,
-                                timeRunning: 0,
-                                description : cfg.description || "",
-                                timeoutSecs : cfg.timeoutSecs || 30, // Thirty second default timout
-                                onTimeout : cfg.onTimeout
-                            };
-                            group.processes[pid] = process;
-                            group.numProcesses++;
-
-                            /* Notify listeners
-                             */
-                            ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_CREATED, {
-                                sceneId: activeSceneId,
-                                process: {
-                                    id: process.id,
-                                    timeStarted : process.timeStarted,
-                                    description: process.description,
-                                    timeoutSecs: process.timeoutSecs
-                                }
-                            });
-
-                            return process;
-                        }
-                    }
-                },
-
-                /**
-                 * Destroys the given process, which is the object returned by the previous call to createProcess.
-                 * Does not care if no scene is active, or if the process no longer exists or is dead.
-                 */
-                killProcess: function(process) {
-                    if (process) {
-                        process.destroyed = true;
-
-                        /* Notify listeners
-                             */
-                            ctx.events.fireEvent(SceneJS._eventTypes.PROCESS_KILLED, {
-                                sceneId: activeSceneId,
-                                process: {
-                                    id: process.id,
-                                    timeStarted : process.timeStarted,
-                                    description: process.description,
-                                    timeoutSecs: process.timeoutSecs
-                                }
-                            });
-                    }
-                },
-
-                /**
-                 * Returns the number of living processes for either the scene of the given ID, or if
-                 * no ID supplied, the active scene. If no scene is active, returns zero.
-                 */
-                getNumProcesses : function(sceneId) {
-                    var group = groups[sceneId];
-                    if (!group) {
-                        return 0;
-                    }
-                    return sceneId ? group.numProcesses : (activeSceneId ? groups[activeSceneId].numProcesses : 0);
-                },
-
-                /**
-                 * Returns all living processes for the given scene, which may be null, in which case this
-                 * method will return the living processes for the currently active scene by default. An empty map
-                 * will be returned if there is no scene active.
-                 *
-                 * Process info looks like this:
-                 *
-                 *      {   id: "xx",
-                 *          timeStarted :   65765765765765,             // System time in milliseconds
-                 *          timeRunning:    876870,                     // Elapsed time in milliseconds
-                 *          description :   "loading texture image",
-                 *          timeoutSecs :       30,                      // Timeout in milliseconds
-                 *          onTimeout :     <function>                  // Function that will fire on timeoutSecs
-                 */
-                getProcesses : function(sceneId) {
-                    var group = groups[sceneId];
-                    if (!group) {
-                        return {};
-                    }
-                    return sceneId ? group.processes : (activeSceneId ? groups[activeSceneId].processes : {});
-                }
-            };
-
-            /* Node-facing API            
-             */
-            return {
-
-                getNumProcesses: SceneJS_processModule.getNumProcesses,
-
-                getProcesses: SceneJS_processModule.getProcesses
-
-            };
-        });
-/**
- * Backend module that services the SceneJS.assets.XXX nodes to manage the asynchronous cross-domain
- * load and caching of remotely-stored scene fragments.
- *
- * Uses the memory management backend to mediate cache management.
- */
-SceneJS._backends.installBackend(
-
-        "load",
-
-        function(ctx) {
-
-            var time = (new Date()).getTime();
-            var proxyUri = null;
-            var assets = {};        // Asset content subgraphs for eviction, not reuse
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TIME_UPDATED,
-                    function(t) {
-                        time = t;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        assets = {};
-                    });
-
-            function jsonp(fullUri, callbackName, onLoad) {
-                var head = document.getElementsByTagName("head")[0];
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                window[callbackName] = function(data) {
-                    onLoad(data);
-                    window[callbackName] = undefined;
-                    try {
-                        delete window[callbackName];
-                    } catch(e) {
-                    }
-                    head.removeChild(script);
-                };
-                head.appendChild(script);
-                script.src = fullUri;  // Request fires now
-            }
-
-            /** Loads asset and caches it against uri
-             */
-            function _loadAsset(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {
-                var url = [proxyUri, "?callback=", callbackName , "&uri=" + uri];
-                for (var param in serverParams) { // TODO: memoize string portion that contains params
-                    url.push("&", param, "=", serverParams[param]);
-                }
-                jsonp(url.join(""),
-                        callbackName,
-                        function(data) {    // onLoad
-                            if (!data) {
-                                onError("server response is empty");
-                            } else {
-                                var assetNode = parser(
-                                        data,
-                                        function(msg) {
-                                            onError(msg);
-                                        });
-                                if (!assetNode) {
-                                    onError("asset node's parser returned null result");
-                                } else {
-                                    assets[assetId] = {
-                                        assetId: assetId,
-                                        uri: uri,
-                                        node: assetNode,
-                                        lastUsed: time
-                                    };
-                                    onSuccess(assetNode);
-                                }
-                            }
-                        });
-
-
-            }
-
-            return { // Node-facing API
-
-                setProxy: function(_proxyUri) {
-                    proxyUri = _proxyUri;
-                },
-
-                /** Attempts to get currently-loaded asset, which may have been evicted
-                 */
-                getAsset : function(handle) {
-                    var asset = assets[handle.assetId];
-                    if (asset) {
-                        asset.lastUsed = time;
-                        return asset.node;
-                    }
-                    return null;
-                },
-
-                /**
-                 * Triggers asynchronous JSONP load of asset, creates new process and handle; callback
-                 * will fire with new child for the  client asset node. The asset node will have to then call assetLoaded
-                 * to notify the backend that the asset has loaded and allow backend to kill the process.
-                 *
-                 * JSON does not handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
-                 *
-                 * @uri Location of asset
-                 * @serverParams Request parameters for proxy
-                 * @parser Processes asset data on load
-                 * @onSuccess Callback through which processed asset data is returned
-                 * @onTimeout Callback invoked when no response from proxy
-                 * @onError Callback invoked when error reported by proxy
-                 */
-                loadAsset : function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
-                    if (!proxyUri) {
-                        ctx.error.fatalError(new SceneJS.exceptions.ProxyNotSpecifiedException
-                                ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
-                    }
-                    ctx.logging.debug("Loading asset from " + uri);
-                    var assetId = SceneJS._utils.createKeyForMap(assets, "asset");
-                    var process = SceneJS_processModule.createProcess({
-                        onTimeout: function() {  // process killed automatically on timeout
-                            ctx.logging.error(
-                                    "Asset load failed - timed out waiting for a reply " +
-                                    "(incorrect proxy URI?) - proxy: " + proxyUri +
-                                    ", uri: " + uri);
-                            onTimeout();
-                        },
-                        description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
-                        timeoutSecs: 180 // Big timeout to allow files to parse
-                    });
-                    var callbackName = "callback" + process.id; // Process ID is globally unique
-                    _loadAsset(
-                            uri,
-                            assetId,
-                            serverParams,
-                            callbackName,
-                            parser,
-                            onSuccess,
-                            function(msg) {  // onError
-                                SceneJS_processModule.killProcess(process);
-                                onError(msg);
-                            });
-                    var handle = {
-                        process: process,
-                        assetId : assetId
-                    };
-                    return handle;
-                },
-
-                /** Notifies backend that load has completed; backend then kills the process.
-                 */
-                assetLoaded : function(handle) {
-                    SceneJS_processModule.killProcess(handle.process);
-                }
-            };
-        });
 /**
  * Scene node that asynchronously loads its subgraph, cross-domain. This node is configured with the
  * location of a JavaScript file containing a SceneJS definition of the subgraph. When first visited during scene
@@ -3134,10 +2428,6 @@ SceneJS.load = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     var params;
-
-    var backend = SceneJS._backends.getBackend("load");
-    var logging = SceneJS._backends.getBackend("logging");
-    var errorBackend = SceneJS._backends.getBackend("error");
     var assetNode;
     var handle;
 
@@ -3150,7 +2440,7 @@ SceneJS.load = function() {
     var state = STATE_INITIAL;
 
     function sceneJSParser(data, onError) {
-        if (!data.___isSceneJSNode) {
+        if (!data._render) {
             onError(data.error || "unknown server error");
             return null;
         } else {
@@ -3184,13 +2474,13 @@ SceneJS.load = function() {
                     if (!params) {
                         params = cfg.getParams(data);
                         if (!params.uri) {
-                            errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
                                     ("Scene definiton error - mandatory SceneJS.load parameter missing: uri"));
                         }
                     }
 
                     if (state == STATE_ATTACHED) {
-                        if (!backend.getAsset(handle)) {
+                        if (!SceneJS_loadModule.getAsset(handle)) {
                             state = STATE_INITIAL;
                         }
                     }
@@ -3204,7 +2494,7 @@ SceneJS.load = function() {
                             break;
 
                         case STATE_LOADED:
-                            backend.assetLoaded(handle);  // Finish loading - kill process
+                            SceneJS_loadModule.assetLoaded(handle);  // Finish loading - kill process
                             state = STATE_ATTACHED;
                             visitSubgraph(params.params, data);
                             break;
@@ -3214,7 +2504,7 @@ SceneJS.load = function() {
 
                             /* Asset not currently loaded or loading - load it
                              */
-                            handle = backend.loadAsset(// Process killed automatically on error or abort
+                            handle = SceneJS_loadModule.loadAsset(// Process killed automatically on error or abort
                                     params.uri,
                                     params.serverParams || {
                                         format: "scenejs"
@@ -3226,13 +2516,13 @@ SceneJS.load = function() {
                                     },
                                     function() { // onTimeout
                                         state = STATE_ERROR;
-                                        errorBackend.error(
+                                        SceneJS_errorModule.error(
                                                 new SceneJS.exceptions.AssetLoadTimeoutException(
                                                         "SceneJS.load timed out - uri: " + params.uri));
                                     },
-                                    function(msg) { // onError - backend has killed process
+                                    function(msg) { // onError - SceneJS_loadModule has killed process
                                         state = STATE_ERROR;
-                                        errorBackend.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
+                                        SceneJS_errorModule.error("SceneJS.load failed - " + msg + " - uri: " + params.uri);
                                     });
                             break;
 
@@ -3242,918 +2532,6 @@ SceneJS.load = function() {
                 };
             })());
 };
-/**
- * Backend that parses a COLLADA files into a SceneJS nodes.
- *
- * This is an experimental parser constructed using techniques poached from other examples out there, most notably
- * that of GLGE, which you can find at http://github.com/supereggbert/GLGE
- *
- */
-SceneJS._backends.installBackend(
-
-        "collada",
-
-        function(ctx) {
-            var xmlDoc; // Holds DOM parsed from XML string
-            var uri;    // URI at which Collada document resides
-            var dirURI; // Path to directory containing the Collada document
-            var idMap = {}; // Maps every DOM element by ID
-            var sources = {};
-            var modes = {};
-            var complexity = {};
-
-            /**
-             * Holds any data parsed from camera node, if requested, to create view a projection
-             * transform nodes with which to wrap the result subgraph with just before returning it
-             * from this parser.
-             */
-            var cameraData = {};
-
-            /** Resets parser state
-             */
-            function reset() {
-                xmlDoc = null;
-                idMap = {};
-                sources = {};
-                cameraData = null;
-                modes = {};
-            }
-
-            /**
-             * Parses the given XML string into the xmlDoc
-             */
-            function loadDoc(xml) {
-                if (window.DOMParser) {
-                    var parser = new DOMParser();
-                    xmlDoc = parser.parseFromString(xml, "text/xml");
-                }
-                else { // Internet Explorer
-                    xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-                    xmlDoc.async = "false";
-                    xmlDoc.loadXML(xml);
-                }
-            }
-
-            /**
-             * Finds every element in the xmlDoc and maps the by IDs into the idMap
-             */
-            function buildIdMap() {
-                idMap = {};
-                var elements = xmlDoc.getElementsByTagName("*");
-                var id;
-                for (var i = elements.length - 1; i >= 0; i--) {
-                    id = elements[i].getAttribute("id");
-                    if (id != "") {
-                        idMap[id] = elements[i];
-                    }
-                }
-            }
-
-            /**
-             * Parses the xmlDoc, optionally constrained to the subtree identified by rootId
-             */
-            function parseDoc(rootId) {
-                if (rootId) {
-                    ctx.logging.info("Parsing Collada asset '" + rootId + "'");
-                    var root = idMap[rootId];
-                    if (root) {
-                        return parseNode(root);
-                    } else {
-                        ctx.error.error(new SceneJS.exceptions.ColladaRootNotFoundException(
-                                "SceneJS.assets.collada root not found in COLLADA document: '" + rootId + "'"));
-                    }
-                } else {
-                    ctx.logging.info("Parsing Collada scene. Asset: " + rootId ? "'" + rootId + "'" : "default");
-                    var scene = xmlDoc.getElementsByTagName("scene");
-                    if (scene.length > 0) {
-                        return parseNode(scene[0]);
-                    } else {
-                        ctx.error.error(new SceneJS.exceptions.ColladaRootRequiredException(
-                                "SceneJS.assets.collada root needs to be specified for COLLADA document: " + uri));
-                    }
-                }
-            }
-
-            function parseFloatArray(node) {
-                var result = [];
-                var prev = "";
-                var child = node.firstChild;
-                var currArray;
-                while (child) {
-                    currArray = (prev + child.nodeValue).replace(/\s+/g, " ").replace(/^\s+/g, "").split(" ");
-                    child = child.nextSibling;
-                    if (currArray[0] == "") {
-                        currArray.unshift();
-                    }
-                    if (child) {
-                        prev = currArray.pop();
-                    }
-                    for (var i = 0; i < currArray.length; i++) {
-                        result.push(parseFloat(currArray[i]));
-                    }
-                }
-                return result;
-            }
-
-
-            /**
-             * Returns the data for either a <vertices> or a <source>
-             *
-             * A <source> declares a data repository that provides values according
-             * to the semantics of an <input> element that refers to it.
-             */
-            function getSource(id) {
-                var source = sources[id];
-                if (source) {
-                    return source;
-                }
-                var element = idMap[id];
-                if (element.tagName == "vertices") {
-
-                    /* Recurse to child <source> element
-                     */
-                    source = getSource(
-                            element
-                                    .getElementsByTagName("input")[0]
-                                    .getAttribute("source")
-                                    .substr(1));
-                } else {
-
-                    /* Element is a <source>
-                     */
-                    var accessor = element
-                            .getElementsByTagName("technique_common")[0]
-                            .getElementsByTagName("accessor")[0];
-
-                    var stride = parseInt(accessor.getAttribute("stride"));         // Number of values per unit
-                    var offset = parseInt(accessor.getAttribute("offset")) || 0;    // Index of first value
-                    var count = parseInt(accessor.getAttribute("count"));           // Number of units
-
-                    /* Create mask that indicates what data types are in the
-                     * source - int, float, Name, bool and IDREF.
-                     *
-                     * The number and type of the <param> elements define the
-                     * output of the <accessor>. Parameters are bound to values
-                     * in the order in which both are specified. A <param> wtihout
-                     * a name attribute indicates that the value is not part of the
-                     * input.
-                     */
-                    var params = accessor.getElementsByTagName("param");
-                    var typeMask = [];
-                    for (var i = 0; i < params.length; i++) {
-                        if (params[i].hasAttribute("name")) {
-                            typeMask.push(true);
-                        } else {
-                            typeMask.push(false);
-                        }
-                    }
-
-                    source = {
-                        array:parseFloatArray(idMap[accessor.getAttribute("source").substr(1)]),
-                        stride:stride,
-                        offset:offset,
-                        count:count,
-                        typeMask: typeMask
-                    };
-                }
-                sources[id] = source;
-                return source;
-            }
-
-            function getMaxOffset(inputs) {
-                var maxOffset = 0;
-                for (var n = 0; n < inputs.length; n++) {
-                    var offset = inputs[n].getAttribute("offset");
-                    if (offset > maxOffset) {
-                        maxOffset = offset;
-                    }
-                }
-                return maxOffset;
-            }
-
-            function getTrianglesFromPolyList(polyList) {
-                var i, j, k;
-                var inputs = polyList.getElementsByTagName("input");
-                var maxOffset = getMaxOffset(inputs);
-                var vcount = parseFloatArray(polyList.getElementsByTagName("vcount")[0]);
-                var faces = parseFloatArray(polyList.getElementsByTagName("p")[0]);         // TODO: parseInt
-                var triangles = [];
-                var base = 0;
-                for (i = 0; i < vcount.length; i++) {
-                    for (j = 0; j < vcount[i] - 2; j++) { // For each vertex
-                        for (k = 0; k <= maxOffset; k++) { // A
-                            triangles.push(faces[base + k]);
-                        }
-                        for (k = 0; k <= maxOffset; k++) { // B
-                            triangles.push(faces[base + (maxOffset + 1) * (j + 1) + k]);
-                        }
-                        for (k = 0; k <= maxOffset; k++) { // C
-                            triangles.push(faces[base + (maxOffset + 1) * (j + 2) + k]);
-                        }
-                    }
-                    base = base + (maxOffset + 1) * vcount[i];
-                }
-                return triangles;
-            }
-
-            /** Extracts list of triangles from the given <mesh>, merged from both the
-             * <triangles> and <polylist> child nodes of the <mesh>.
-             */
-            function getTrianglesList(geometryNode) {
-                var trianglesList = [];
-                var meshNode = geometryNode.getElementsByTagName("mesh")[0];
-
-                /* Extract <polylist> children
-                 */
-                var polyLists = meshNode.getElementsByTagName("polylist");
-                for (var i = 0; i < polyLists.length; i++) {
-                    var polyList = polyLists[i];
-                    polyList.getElementsByTagName("p")[0].data = getTrianglesFromPolyList(polyList);
-                    trianglesList.push(polyList);
-                }
-
-                var tris = meshNode.getElementsByTagName("triangles");
-                for (i = 0; i < tris.length; i++) {
-                    trianglesList.push(tris[i]);
-                }
-                return trianglesList;
-            }
-
-
-            /** Parses a <geometry> and returns an array containing a SceneJS.geometry node for
-             * each <mesh> child
-             *
-             * @param id
-             */
-            function getGeometriesData(geometryNode) {
-                var geometriesData = [];
-                var trianglesList = getTrianglesList(geometryNode);
-
-                for (var it = 0; it < trianglesList.length; it++) {
-                    var triangle = trianglesList [it];
-                    var inputs = triangle.getElementsByTagName("input");
-                    var inputArray = [];
-                    var outputData = {};
-
-                    for (var n = 0; n < inputs.length; n++) {
-                        inputs[n].data = getSource(inputs[n].getAttribute("source").substr(1));
-                        var group = inputs[n].getAttribute("semantic");
-                        if (group == "TEXCOORD") {
-                            group = group + inputs[n].getAttribute("set") || 0;
-                        }
-                        inputs[n].group = group;
-                        inputArray[inputs[n].getAttribute("offset")] = inputs[n];
-                        outputData[group] = [];
-                    }
-
-                    var faces;
-                    if (triangle.getElementsByTagName("p")[0].data) {
-                        faces = triangle.getElementsByTagName("p")[0].data;
-                    }
-                    else {
-                        faces = parseFloatArray(triangle.getElementsByTagName("p")[0]);
-                    }
-
-                    for (var i = 0; i < faces.length; i = i + inputArray.length) {
-                        for (var n = 0; n < inputArray.length; n++) {
-                            var group = inputArray[n].group;
-                            var pCount = 0;
-                            for (var j = 0; j < inputArray[n].data.stride; j++) {
-                                if (inputArray[n].data.typeMask[j]) {
-                                    outputData[group].push(
-                                            parseFloat(inputArray[n].data.array[faces[i + n]
-                                                    * inputArray[n].data.stride + j
-                                                    + inputArray[n].data.offset]));
-                                    pCount++;
-                                }
-                            }
-
-                            /* 1D
-                             */
-                            if (group == "VERTEX" && pCount == 1) {
-                                outputData[group].push(0);
-                            }
-
-                            /* 2D
-                             */
-                            if (group == "VERTEX" && pCount == 2) {
-                                outputData[group].push(0);
-                            }
-
-                            /* 2D textures
-                             */
-                            if (group == "TEXCOORD0" && pCount == 3) {
-                                outputData[group].pop();
-                            }
-                            if (group == "TEXCOORD1" && pCount == 3) {
-                                outputData[group].pop();
-                            }
-                        }
-                    }
-
-                    faces = [];
-                    for (n = 0; n < outputData.VERTEX.length / 3; n++) {
-                        faces.push(n);
-                    }
-
-                    geometriesData.push({
-                        materialName : triangle.getAttribute("material"),
-                        positions: outputData.VERTEX,
-                        normals: outputData.NORMAL,
-                        uv : outputData.TEXCOORD0,
-                        uv2 : outputData.TEXCOORD1,
-                        indices: faces
-                    });
-                }
-                return geometriesData;
-            }
-
-            /**
-             * Returns profile/newparam[sid="<sid>"]/sampler2D[0]/source[0].nodeValue
-             */
-            function getSamplerSource(profile, sid) {
-                var params = profile.getElementsByTagName("newparam");
-                for (var i = 0; i < params.length; i++) {
-                    if (params[i].getAttribute("sid") == sid) {
-                        return params[i]
-                                .getElementsByTagName("sampler2D")[0]
-                                .getElementsByTagName("source")[0]
-                                .firstChild
-                                .nodeValue;
-                    }
-                }
-                ctx.error.fatalError(
-                        new SceneJS.exceptions.ColladaParseException
-                                ("COLLADA element expected: "
-                                        + profile.tagName
-                                        + "/newparam[sid == '"
-                                        + sid + "']/sampler2D[0]/source[0]"));
-            }
-
-            /**
-             * Returns profile/newparam[sid="<sid>"]/surface[0]/init_from[0].nodeValue
-             */
-            function getImageId(profile, sid) {
-                var newparams = profile.getElementsByTagName("newparam");
-                for (var i = 0; i < newparams.length; i++) {
-                    if (newparams[i].getAttribute("sid") == sid) {
-                        var surface = newparams[i].getElementsByTagName("surface")[0];
-                        return surface
-                                .getElementsByTagName("init_from")[0]
-                                .firstChild
-                                .nodeValue;
-                    }
-                }
-                ctx.error.fatalError(new SceneJS.exceptions.ColladaParseException
-                        ("COLLADA element expected: "
-                                + profile.tagName
-                                + "/newparam[sid == '"
-                                + sid + "']/surface[0]/init_from[0]"));
-            }
-
-            function getTextureData(profileCommon, texture, applyTo) {
-                var source = getSamplerSource(profileCommon, texture.getAttribute("texture"));
-                var imageId = getImageId(profileCommon, source);
-                var image = idMap[imageId];
-                var imageFileName = image.getElementsByTagName("init_from")[0].firstChild.nodeValue;
-                var blendMode = texture.getElementsByTagName("blend_mode")[0];
-                return {
-                    uri : dirURI + imageFileName,
-                    applyTo: applyTo,
-                    blendMode: (blendMode == "MULTIPLY") ? "multiply" : "add"
-                };
-            }
-
-            function getDiffuseMaterialData(profileCommon, technique, materialData) {
-                var diffuse = technique.getElementsByTagName("diffuse");
-                if (diffuse.length > 0) {
-                    var child = diffuse[0].firstChild;
-                    do{
-                        switch (child.tagName) {
-                            case "color":
-                                var color = child.firstChild.nodeValue.split(" ");
-                                materialData.baseColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]) };
-                                break;
-
-                            case "texture":
-                                materialData.texturesData.push(
-                                        getTextureData(profileCommon, child, "baseColor"));
-                                break;
-                        }
-                    } while (child = child.nextSibling);
-                }
-            }
-
-            function getSpecularColorMaterialData(profileCommon, technique, materialData) {
-                var specular = technique.getElementsByTagName("specular");
-                if (specular.length > 0) {
-                    var child = specular[0].firstChild;
-                    do{
-                        switch (child.tagName) {
-                            case "color":
-                                var color = child.firstChild.nodeValue.split(" ");
-                                materialData.specularColor = { r:parseFloat(color[0]), g:parseFloat(color[1]), b:parseFloat(color[2]),a: 1 };
-                                break;
-
-                            case "texture":
-                                materialData.texturesData.push(
-                                        getTextureData(profileCommon, child, "specularColor"));
-                                break;
-                        }
-                    } while (child = child.nextSibling);
-                }
-            }
-
-            function getShininessMaterialData(profileCommon, technique, materialData) {
-                var shininess = technique.getElementsByTagName("shininess");
-                if (shininess.length > 0) {
-                    var child = shininess[0].firstChild;
-                    do{
-                        switch (child.tagName) {
-                            case "float":
-                                materialData.shine = parseFloat(child.firstChild.nodeValue);
-                                break;
-
-                            case "texture":
-                                materialData.texturesData.push(
-                                        getTextureData(profileCommon, child, "shine"));
-
-                                break;
-                        }
-                    } while (child = child.nextSibling);
-                }
-            }
-
-            function getBumpMapMaterialData(profileCommon, technique, materialData) {
-                var bump = technique.getElementsByTagName("bump");
-                if (bump.length > 0) {
-                    var child = bump[0].firstChild;
-                    do{
-                        switch (child.tagName) {
-                            case "texture":
-                                ctx.logging.warn("Collada bump mapping not supported yet");
-                                break;
-                        }
-                    } while (child = child.nextSibling);
-                }
-            }
-
-            function getMaterialData(id) {
-                var materialNode = idMap[id];
-                var effectId = materialNode
-                        .getElementsByTagName("instance_effect")[0]
-                        .getAttribute("url")
-                        .substr(1);
-                var effect = idMap[effectId];
-                var profileCommon = effect.getElementsByTagName("profile_COMMON")[0];
-                var technique = profileCommon.getElementsByTagName("technique")[0];
-                var materialData = {
-                    texturesData : []
-                };
-                getDiffuseMaterialData(profileCommon, technique, materialData);
-                getSpecularColorMaterialData(profileCommon, technique, materialData);
-                getShininessMaterialData(profileCommon, technique, materialData);
-                getBumpMapMaterialData(profileCommon, technique, materialData);
-                return materialData;
-            }
-
-            function getMaterialsData(instanceGeometryNode) {
-                var materialsData = {};
-                var materials = instanceGeometryNode.getElementsByTagName("instance_material");
-                var material;
-                var materialId;
-                var symbolId;
-                for (var i = 0; i < materials.length; i++) {
-                    material = materials[i];
-                    materialId = material.getAttribute("target").substr(1);
-                    symbolId = material.getAttribute("symbol");
-                    materialsData[symbolId] = getMaterialData(materialId);
-                }
-                return materialsData;
-            }
-
-
-            function wrapWithBoundingBox(e, child) {
-                if (modes.showBoundingBoxes) {
-                    return SceneJS.boundingBox(e, SceneJS.renderer({
-                        lineWidth:2,
-                        enableTexture2D: false
-                    }, SceneJS.material({baseColor: { r: 1, g: 0, b: 0 }},
-                            SceneJS.geometry({
-                                primitive: "lines",
-                                positions : [
-                                    e.xmax, e.ymax, e.zmax,
-                                    e.xmax, e.ymin, e.zmax,
-                                    e.xmin, e.ymin, e.zmax,
-                                    e.xmin, e.ymax, e.zmax,
-                                    e.xmax, e.ymax, e.zmin,
-                                    e.xmax, e.ymin, e.zmin,
-                                    e.xmin, e.ymin, e.zmin,
-                                    e.xmin, e.ymax, e.zmin
-                                ],
-                                indices : [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1,5, 2, 6,3,7 ]
-                            }))), child);
-                } else {
-                    return SceneJS.boundingBox(e, child);
-                }
-            }
-
-            function newExtents() {
-                const hugeNum = 9999999; // TODO: Guarantee this is max
-                return {
-                    xmin : hugeNum, ymin : hugeNum, zmin : hugeNum,
-                    xmax : -hugeNum, ymax : -hugeNum, zmax : -hugeNum
-                };
-            }
-
-
-            function expandExtentsByPositions(e, positions) {
-                for (var i = 0; i < positions.length - 2; i += 3) {
-                    var x = positions[i];
-                    var y = positions[i + 1];
-                    var z = positions[i + 2];
-                    if (x < e.xmin) e.xmin = x;
-                    if (y < e.ymin) e.ymin = y;
-                    if (z < e.zmin) e.zmin = z;
-                    if (x > e.xmax) e.xmax = x;
-                    if (y > e.ymax) e.ymax = y;
-                    if (z > e.zmax) e.zmax = z;
-                }
-                return e;
-            }
-
-            function expandExtentsByExtents(e, e2) {
-                if (e2.xmin < e.xmin) e.xmin = e2.xmin;
-                if (e2.ymin < e.ymin) e.ymin = e2.ymin;
-                if (e2.zmin < e.zmin) e.zmin = e2.zmin;
-                if (e2.xmax > e.xmax) e.xmax = e2.xmax;
-                if (e2.ymax > e.ymax) e.ymax = e2.ymax;
-                if (e2.zmax > e.zmax) e.zmax = e2.zmax;
-                return e;
-            }
-
-            function parseInstanceGeometry(instanceGeometryNode) {
-                var geoUrl = instanceGeometryNode.getAttribute("url").substr(1);
-                var geometryNode = idMap[geoUrl];
-                var geometriesData = getGeometriesData(geometryNode);
-                var materialsData = getMaterialsData(instanceGeometryNode);
-
-                var nodeArgList = []; // Args for SceneJS node result
-
-                var extents = newExtents();
-
-                for (var i = 0; i < geometriesData.length; i++) {
-                    var geoData = geometriesData[i];
-                    var geoType = uri + ":" + geoUrl + i;
-                    var sceneNode = SceneJS.geometry({
-                        type: geoType,
-                        primitive: "triangles",
-                        positions: geoData.positions,
-                        normals: geoData.normals,
-                        uv : geoData.uv,
-                        uv2 : geoData.uv2,
-                        indices: geoData.indices
-                    });
-
-                    if (geoData.materialName) {
-                        var materialData = materialsData[geoData.materialName];
-
-                        /* Wrap in SceneJS.material
-                         */
-                        if (materialData) {
-                            sceneNode = SceneJS.material({
-                                baseColor: materialData.baseColor,
-                                specularColor: materialData.specularColor ,
-                                shine: 10.0,
-                                specular: 1
-                            }, sceneNode);
-
-                            /* Wrap in SceneJS.texture
-                             */
-                            var textureLayers = materialData.texturesData;
-                            if (textureLayers.length > 0) {
-                                var layers = [];
-                                for (var j = 0; j < textureLayers.length; j++) {
-                                    layers.push({
-                                        uri : textureLayers[j].uri,
-                                        applyTo: textureLayers[j].applyTo,
-                                        flipY : false,
-                                        blendMode: textureLayers[j].blendMode,
-
-                                        wrapS: "repeat",
-                                        wrapT: "repeat" ,
-                                        minFilter: "linearMipMapLinear",
-                                        magFilter: "linear"
-                                    });
-                                }
-                                sceneNode = SceneJS.texture({ layers: layers }, sceneNode);
-                            }
-                        }
-                    }
-                    nodeArgList.push(wrapWithBoundingBox(
-                            expandExtentsByPositions(newExtents(), geoData.positions),
-                            sceneNode));
-                }
-                return SceneJS.node.apply(this,nodeArgList);
-            }
-
-            function parseMatrix(node) {
-                var data = parseFloatArray(node);
-                return data;
-            }
-
-            function parseTranslate(node) {
-                var data = parseFloatArray(node);
-                var x = data[0];
-                var y = data[1];
-                var z = data[2];
-                ctx.logging.warn("translate - x: " + x + ", y: " + y + ", z: " + z);
-                return SceneJS_math_translationMat4v(data);
-            }
-
-            function parseRotate(node) {
-                var data = parseFloatArray(node);
-                var x = data[0];
-                var y = data[1];
-                var z = data[2];
-                var angle = data[3];
-                ctx.logging.warn("rotate - x: " + x + ", y: " + y + ", z: " + z + ", angle: " + angle);
-                return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
-            }
-
-            /** Parses data from camera node
-             */
-            function parseCameraOptics(camera) {
-                var optics = camera.getElementsByTagName("optics")[0];
-                var techniqueCommon = optics.getElementsByTagName("technique_common")[0];
-                var perspective = techniqueCommon.getElementsByTagName("perspective")[0];
-
-                var opticsData = {};
-
-                if (perspective) {
-                    var yfov = perspective.getElementsByTagName("yfov")[0];
-                    var aspectRatio = perspective.getElementsByTagName("aspect_ratio")[0];
-                    var znear = perspective.getElementsByTagName("znear")[0];
-                    var zfar = perspective.getElementsByTagName("zfar")[0];
-
-                    opticsData = {
-                        perspective: {
-                            fovy: yfov ? parseFloat(yfov.textContent) : 60.0,
-                            aspect: aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0,
-                            near: znear ? parseFloat(znear.textContent) : 0.1,
-                            far: zfar ? parseFloat(zfar.textContent) : 10000.0
-                        }
-                    };
-
-                    ctx.logging.info("fovy = " + opticsData.perspective.fovy);
-                    ctx.logging.info("aspect = " + opticsData.perspective.aspect);
-                    ctx.logging.info("near = " + opticsData.perspective.near);
-                    ctx.logging.info("far = " + opticsData.perspective.far);
-
-                    return opticsData;
-
-                } else {
-                    var orthographic = techniqueCommon.getElementsByTagName("orthographic")[0];
-                    if (orthographic) {
-
-                        opticsData = {
-                            orthographic: {
-                                left: -1,
-                                right: 1,
-                                bottom: -1,
-                                top: 1,
-                                near: .1,
-                                far: 10000
-                            }
-                        };
-
-                        var xmag = perspective.getElementsByTagName("xmag")[0];
-                        var ymag = perspective.getElementsByTagName("ymag")[0];
-                        var aspectRatio = perspective.getElementsByTagName("aspect_ratio")[0];
-                        var znear = perspective.getElementsByTagName("znear")[0];
-                        var zfar = perspective.getElementsByTagName("zfar")[0];
-
-                        var xmagVal;
-                        var ymagVal;
-                        var aspect;
-                        var near = znear ? parseFloat(znear.textContent) : 0.1;
-                        var far = zfar ? parseFloat(zfar.textContent) : 10000.0;
-
-                        if (xmag && ymag) { // Ignore aspect
-
-                            xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
-                            ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
-                            opticsData = {
-                                orthographic: {
-                                    left: -xmagVal,
-                                    right: xmagVal,
-                                    bottom: -ymagVal,
-                                    top: ymagVal,
-                                    near: near,
-                                    far: far
-                                }
-                            };
-
-
-                        } else if (xmag) {
-                            xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
-                            aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
-                            opticsData = {
-                                orthographic: {
-                                    left: -xmagVal,
-                                    right: xmagVal,
-                                    bottom: -xmagVal * aspect,
-                                    top: xmagVal * aspect,
-                                    near: near,
-                                    far: far
-                                }
-                            };
-
-                        } else if (ymag) {
-                            ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
-                            aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
-                            opticsData = {
-                                orthographic: {
-                                    left: -ymagVal * aspect,
-                                    right: ymagVal * aspect,
-                                    bottom: -ymagVal,
-                                    top: ymagVal,
-                                    near: near,
-                                    far: far
-                                }
-                            };
-                        } else {
-                            ctx.logging.warn("camera.technique_common.optics.orthographic - insufficient data found, falling back on defaults");
-                        }
-
-                        ctx.logging.info("left = " + opticsData.orthographic.left);
-                        ctx.logging.info("right = " + opticsData.orthographic.right);
-                        ctx.logging.info("bottom = " + opticsData.orthographic.bottom);
-                        ctx.logging.info("top = " + opticsData.orthographic.top);
-                        ctx.logging.info("near = " + opticsData.orthographic.near);
-                        ctx.logging.info("far = " + opticsData.orthographic.far);
-
-                    } else {
-                        ctx.logging.warn("camera.technique_common.optics - neither perspective nor perspective found");
-                    }
-                }
-
-                return opticsData;
-            }
-
-
-            /**
-             * Returns a SceneJS node created from the given DOM node.
-             */
-            function parseNode(node) {
-
-                /* Builds params for our scene node
-                 */
-                var sceneNodeParams = [];
-
-                /* Camera optics data from any camera elements found
-                 */
-                var cameraOpticsData = null;
-
-                /* Matrix created from any transforms found
-                 */
-                var matrix = SceneJS_math_identityMat4();
-
-                var child = node.firstChild;
-
-                do{
-                    /* Traverse child nodes
-                     */
-                    switch (child.tagName) {
-
-                        case "node":
-                            ctx.logging.info("node");
-                            sceneNodeParams.push(parseNode(child));
-                            break;
-
-                        case "matrix":
-                            ctx.logging.info("matrix");
-                            var array = parseMatrix(child);
-
-                            /* Convert row-major to SceneJS column-major
-                             */
-                            matrix = [
-                                array[0],array[4],array[8],array[12],
-                                array[1],array[5],array[9],array[13],
-                                array[2],array[6],array[10],array[14],
-                                array[3],array[7],array[11],array[15]];
-                            break;
-
-
-                        case "translate":
-                            ctx.logging.info("translate");
-                            matrix = matrix
-                                    ? SceneJS_math_mulMat4(matrix, parseTranslate(child))
-                                    : parseTranslate(child);
-                            break;
-
-                        case "rotate":
-                            ctx.logging.info("rotate");
-                            matrix = matrix
-                                    ? SceneJS_math_mulMat4(matrix, parseRotate(child))
-                                    : parseRotate(child);
-                            break;
-
-                        case "instance_node":
-                            ctx.logging.info("instance_node");
-                            sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
-                            break;
-
-                        case "instance_visual_scene":
-                            ctx.logging.info("instance_visual_scene");
-                            sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
-                            break;
-
-                        case "instance_geometry":
-                            ctx.logging.info("instance_geometry");
-                            sceneNodeParams.push(parseInstanceGeometry(child));
-                            break;
-
-                        case "instance_camera":
-                            ctx.logging.info("instance_camera");
-                            cameraOpticsData = parseCameraOptics(idMap[child.getAttribute("url").substr(1)]);
-                            break;
-                    }
-                } while (child = child.nextSibling);
-
-                var sceneNode = SceneJS.node.apply(this, sceneNodeParams);
-
-                if (cameraOpticsData) {
-
-                    /* Save camera data for wrapping asset subgraph with when we're done parsing
-                     */
-                    cameraData = {
-                        opticsData : cameraOpticsData,
-                        matrix : matrix
-                    };
-
-                } else {
-
-                    /* Modelling transform
-                     */
-                    if (matrix) {
-                        sceneNode = SceneJS.modelMatrix({ elements: matrix }, sceneNode);
-                    }
-                }
-
-                return sceneNode;
-            }
-
-            return {
-
-                /**
-                 * @param _uri Path to the Collada document (used for texture image paths etc)
-                 * @param xml Collada document string
-                 * @param rootId Optional ID of particular asset we want from Collada document
-                 */
-                parse : function(_uri, xml, rootId, _modes) {
-
-                    reset();
-
-                    uri = _uri;
-                    dirURI = _uri.substring(0, _uri.lastIndexOf("/") + 1);
-                    modes = _modes;
-
-                    loadDoc(xml);
-                    buildIdMap();
-                    var node = parseDoc(rootId);
-
-                    if (modes.loadCamera && cameraData) {
-
-                        /* Camera was parsed -
-                         */
-
-                        /* Wrap result with view transform:
-                         */
-                        if (cameraData.matrix) {
-                            node = SceneJS.viewMatrix({ elements: cameraData.matrix }, node);
-                        }
-
-                        /* Wrap again with projection transform:
-                         */
-                        if (cameraData.opticsData.perspective) {
-                            node = SceneJS.perspective(cameraData.opticsData.perspective, node);
-
-                        } else if (cameraData.opticsData.orthographic) {
-                            node = SceneJS.ortho(cameraData.opticsData.orthographic, node);
-                        }
-                    }
-
-                    if (modes.loadLights && lightsData) {
-                    }
-
-                    reset();
-
-                    return node;
-                }
-            };
-        })
-        ;
 /**
  * Scene node that asynchronously loads its subgraph, cross-domain from a COLLADA file. This node is configured with the
  * location of the COLLADA file. When first visited during scene traversal, it will begin the load and allow traversal
@@ -4170,12 +2548,9 @@ SceneJS.loadCollada = function() {
         {}
     ]);
 
-    var errorBackend = SceneJS._backends.getBackend("error");
-    var colladaBackend = SceneJS._backends.getBackend("collada");
-
     var params = cfg.getParams();
     if (!params.uri) {
-        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+        SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
                 ("Mandatory SceneJS.assets.collada parameter missing: uri"));
     }
 
@@ -4197,7 +2572,7 @@ SceneJS.loadCollada = function() {
         },
 
         parser: function(xml, onError) {
-            return colladaBackend.parse(
+            return SceneJS_colladaParserModule.parse(
                     params.uri, // Used in paths to texture images
                     xml,
                     params.node, // Optional cherry-picked asset
@@ -4207,212 +2582,6 @@ SceneJS.loadCollada = function() {
     });
 
 };
-/* Backend that manages picking
- *
- * Services the SceneJS.scene node, providing it with methods to enter picking mode and collect names of
- * subgraph that was picked.
- *
- */
-SceneJS._backends.installBackend(
-
-        "pick",
-
-        function(ctx) {
-
-            var pickInfo = [];          // Entry for each scene
-            var currentPickInfo;        // Entry for current active scene
-
-            var pickX;
-            var pickY;
-            var canvas;
-
-//            ctx.events.onEvent(
-//                    SceneJS._eventTypes.RESET,
-//                    function() {
-//                        pickInfo = [];
-//                        currentPickInfo = null;
-//                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
-//                    });
-//
-//            ctx.events.onEvent(
-//                    SceneJS._eventTypes.SCENE_CREATED,
-//                    function(params) {
-//                        pickInfo[params.sceneId] = {
-//                            sceneId: params.sceneId
-//                        };
-//                    });
-//
-//            ctx.events.onEvent(
-//                    SceneJS._eventTypes.SCENE_ACTIVATED,
-//                    function(params) {
-//                        currentPickInfo = pickInfo[params.sceneId];
-//                    });
-//
-//            ctx.events.onEvent(
-//                    SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED,
-//                    function(transform) {
-//                        currentPickInfo.projectionTransform = transform;
-//                    });
-//
-//            ctx.events.onEvent(
-//                    SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
-//                    function(transform) {
-//                        currentPickInfo.viewTransform = transform;
-//                    });
-//
-//            ctx.events.onEvent(
-//                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-//                    function(c) {
-//                        canvas = c;
-//                        if (!currentPickInfo.pickBuffer) {
-//                            currentPickInfo.pickBuffer = createPickBuffer();
-//                        }
-//                    });
-//
-//            ctx.events.onEvent(
-//                    SceneJS._eventTypes.SCENE_DESTROYED,
-//                    function(params) {
-//                        pickInfo[params.sceneId] = null;
-//                    });
-
-            function createPickBuffer() { // TODO: Dont assume allocation succeeds!
-                var context = canvas.context;
-                var pickBuffer = {
-                    frameBuffer : context.createFramebuffer(),
-                    renderBuffer : context.createRenderbuffer(),
-                    texture : context.createTexture()
-                };
-                context.bindTexture(context.TEXTURE_2D, pickBuffer.texture);
-                try {
-                    context.texImage2D(
-                            context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, null);
-                } catch (e) {
-                    var texture = new WebUnsignedByteArray(3);
-                    context.texImage2D(
-                            context.TEXTURE_2D, 0, context.RGB, 1, 1, 0, context.RGB, context.UNSIGNED_BYTE, texture);
-                }
-                context.bindFramebuffer(context.FRAMEBUFFER, pickBuffer.frameBuffer);
-                context.bindRenderbuffer(context.RENDERBUFFER, pickBuffer.renderBuffer);
-                context.renderbufferStorage(context.RENDERBUFFER, context.COLOR_COMPONENT, 1, 1);
-                context.bindRenderbuffer(context.RENDERBUFFER, null);
-                context.framebufferTexture2D(
-                        context.FRAMEBUFFER, context.COLOR_ATTACHMENT0, context.TEXTURE_2D, pickBuffer.texture, 0);
-                context.framebufferRenderbuffer(
-                        context.FRAMEBUFFER, context.DEPTH_ATTACHMENT, context.RENDERBUFFER, pickBuffer.renderBuffer);
-                context.bindFramebuffer(context.FRAMEBUFFER, null);
-                return pickBuffer;
-            }
-
-            function activatePicking() {
-                var context = canvas.context;
-                var pickBuffer = pickBuffers[canvas.id];
-
-                context.bindFramebuffer(context.FRAMEBUFFER, pickBuffer.frameBuffer);
-                context.viewport(0, 0, 1, 1);
-                context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-                context.disable(context.BLEND);
-
-                SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
-            }
-
-            function pick(x, y) {
-
-                var viewTransform = currentPickInfo.viewTransform;
-                var projTransform = currentPickInfo.viewTransform;
-
-                var origViewMatrix = viewTransform.matrix;
-                var origProjMatrix = projTransform.matrix;
-
-                /* Get camera space coordinates                
-                 */
-                var xcoord = -( ( ( 2 * x ) / canvas.canvas.width ) - 1 ) / SceneJS_math_getCellMat4(viewTransform.matrix, 1, 1);
-                var ycoord = ( ( ( 2 * y ) / canvas.canvas.height ) - 1 ) / SceneJS_math_getCellMat4(projTransform.matrix, 2, 2);
-                var zcoord = 1;
-
-                if (projTransform.type == "perspective") {
-                    var coord = SceneJS_math_transformPoint3(
-                            SceneJS_math_inverseMat4(viewTransform.matrix),
-                            [xcoord,ycoord,zcoord,0]);
-
-                    var cameraPos = viewTransform.lookAt.eye;
-
-                    var zvec = coord.toUnitVector();
-                    var xvec = (new GLGE.Vec([0,0,1])).cross(zvec).toUnitVector();
-                    var yvec = zvec.cross(xvec).toUnitVector();
-                    this.camera.matrix = new GLGE.Mat([xvec.e(1), yvec.e(1), zvec.e(1), cameraPos.x,
-                        xvec.e(2), yvec.e(2), zvec.e(2), cameraPos.y,
-                        xvec.e(3), yvec.e(3), zvec.e(3), cameraPos.z,
-                        0, 0, 0, 1]).inverse();
-                }
-                if (this.camera.type == GLGE.C_ORTHO) {
-                    this.camera.matrix = this.camera.matrix.inv().x(GLGE.translateMatrix(-xcoord, -ycoord, 0)).inv();
-                }
-                this.camera.pMatrix = GLGE.makeOrtho(-0.0001, 0.0001, -0.0001, 0.0001, this.camera.near, this.camera.far);
-                //render for picking
-                var gl = this.renderer.gl;
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.framePickBuffer);
-                gl.viewport(0, 0, 1, 1);
-                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                this.renderer.gl.disable(this.renderer.gl.BLEND);
-
-                for (var i = 0; i < this.objects.length; i++) {
-                    this.objects[i].GLRender(this.renderer.gl, GLGE.RENDER_PICK);
-                }
-                var data = gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE);
-                //TODO: firefox hack :-( remove when fixed!
-                if (data.data) data = data.data;
-                var index = data[0] + data[1] * 256;
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                gl.viewport(0, 0, this.renderer.canvas.width, this.renderer.canvas.height);
-
-                //revert the view matrix
-                this.camera.matrix = origmatrix;
-                this.camera.pMatrix = origpmatrix;
-
-                if (index > 0) {
-                    return this.objects[index - 1];
-                } else {
-                    return false;
-                }
-
-            }
-
-            function deactivatePicking() {
-                canvas.context.bindFramebuffer(canvas.context.FRAMEBUFFER, null);
-                SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
-            }
-
-            /* Node-facing API
-             */
-            return {
-
-                /** Begin picking at given coordinates, switch to picking mode
-                 */
-                pick: function(x, y) {
-//                    activatePicking();
-//                    pickX = x;
-//                    pickY = y;
-                },
-
-                /** Get name path to whatever was picked, unbind pick buffers, switch back to rendering mode
-                 */
-                getPicked: function() {
-//                    var context = canvas.context;
-//
-//                    var data = context.readPixels(pickX, pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
-//                    if (data.data) {
-//                        data = data.data; // TODO: hack for firefox
-//                    }
-//
-//                    ctx.logging.info(pickX + ", " + pickY + ": " + data[0] + ", " + data[1] + "," + data[2]);
-//
-//                    var id = data[0] + data[1] * 256;
-//
-//                    deactivatePicking();
-//                    return id;
-                }
-            };
-        });
 //Copyright (c) 2009 The Chromium Authors. All rights reserved.
 //Use of this source code is governed by a BSD-style license that can be
 //found in the LICENSE file.
@@ -4850,1840 +3019,257 @@ return {
 };
 
 }();
-/**
- * Backend for a scene node.
- */
-SceneJS._backends.installBackend(
-
-        "scene",
-
-        function(ctx) {
-
-            var initialised = false; // True as soon as first scene registered
-            var scenes = {};
-            var nScenes = 0;
-            var activeSceneId;
-
-            var projMat;
-            var viewMat;
-            var picking;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        scenes = {};
-                        nScenes = 0;
-                        activeSceneId = null;
-                    });
-
-            function updatePick() {
-
-            }
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED,
-                    function(params) {
-                        projMat = params.matrix;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
-                    function(params) {
-                        viewMat = params.matrix;
-                    });
-
-            /** Locates canvas in DOM, finds WebGL context on it,
-             *  sets some default state on the context, then returns
-             *  canvas, canvas ID and context wrapped up in an object.
-             *
-             * If canvasId is null, will fall back on SceneJS_webgl_DEFAULT_CANVAS_ID
-             */
-            var findCanvas = function(canvasId) {
-                var canvas;
-                if (!canvasId) {
-                    ctx.logging.info("SceneJS.scene config 'canvasId' omitted - looking for default canvas with ID '"
-                            + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
-                    canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
-                    canvas = document.getElementById(canvasId);
-                    if (!canvas) {
-                        ctx.error.fatalError(new SceneJS.exceptions.CanvasNotFoundException
-                                ("SceneJS.scene config 'canvasId' omitted and could not find default canvas with ID '"
-                                        + SceneJS_webgl_DEFAULT_CANVAS_ID + "'"));
-                    }
-                } else {
-                    canvas = document.getElementById(canvasId);
-                    if (!canvas) {
-                        ctx.logging.info("SceneJS.scene config 'canvasId' unresolved - looking for default canvas with " +
-                                         "ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
-                        canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
-                        canvas = document.getElementById(canvasId);
-                        if (!canvas) {
-                            ctx.error.fatalError(new SceneJS.exceptions.CanvasNotFoundException
-                                    ("SceneJS.scene config 'canvasId' does not match any elements in the page and no " +
-                                     "default canvas found with ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'"));
-                        }
-                    }
-                }
-                var context;
-                var contextNames = SceneJS_webgl_contextNames;
-                for (var i = 0; (!context) && i < contextNames.length; i++) {
-                    try {
-
-                        context = canvas.getContext(contextNames[i]);
-
-
-//                                                                        alert("WebGL Trace enabled");
-//                                                                        context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
-//                                                                        context.setTracing(true);
-                    } catch (e) {
-
-                    }
-                }
-                if (!context) {
-                    ctx.error.fatalError(new SceneJS.exceptions.WebGLNotSupportedException
-                            ('Canvas document element with ID \''
-                                    + canvasId
-                                    + '\' failed to provide a supported WebGL context'));
-                }
-                context.clearColor(0.0, 0.0, 0.0, 1.0);
-                context.clearDepth(1.0);
-                context.enable(context.DEPTH_TEST);
-                context.disable(context.CULL_FACE);
-                context.disable(context.TEXTURE_2D);
-                context.depthRange(0, 1);
-                context.disable(context.SCISSOR_TEST);
-                return {
-                    canvas: canvas,
-                    context: context,
-                    canvasId : canvasId
-                };
-            };
-
-           
-
-            return { // Node-facing API
-
-                /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
-                 */
-                createScene : function(scene, params) {
-                    if (!initialised) {
-                        ctx.logging.info("SceneJS V" + SceneJS.version + " initialised");
-                        ctx.events.fireEvent(SceneJS._eventTypes.INIT);
-                    }
-                    var canvas = findCanvas(params.canvasId); // canvasId can be null
-                    var sceneId = SceneJS._utils.createKeyForMap(scenes, "scene");
-                    scenes[sceneId] = {
-                        sceneId: sceneId,
-                        scene:scene,
-                        canvas: canvas
-                    };
-                    nScenes++;
-                    ctx.events.fireEvent(SceneJS._eventTypes.SCENE_CREATED, {sceneId : sceneId });
-                    ctx.logging.info("Scene defined: " + sceneId);
-                    return sceneId;
-                },
-
-                /** Deregisters scene
-                 */
-                destroyScene :function(sceneId) {
-                    scenes[sceneId] = null;
-                    nScenes--;
-                    ctx.events.fireEvent(SceneJS._eventTypes.SCENE_DESTROYED, {sceneId : sceneId });
-                    if (activeSceneId == sceneId) {
-                        activeSceneId = null;
-                    }
-                    ctx.logging.info("Scene destroyed: " + sceneId);
-                    if (nScenes == 0) {
-                        ctx.logging.info("SceneJS reset");
-                        ctx.events.fireEvent(SceneJS._eventTypes.RESET);
-
-                    }
-                },
-
-                /** Specifies which registered scene is the currently active one
-                 */
-                activateScene : function(sceneId) {
-                    var scene = scenes[sceneId];
-                    if (!scene) {
-                        ctx.error.fatalError("Scene not defined: '" + sceneId + "'");
-                    }
-                    activeSceneId = sceneId;
-                    ctx.events.fireEvent(SceneJS._eventTypes.SCENE_ACTIVATED, { sceneId: sceneId });
-                    ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_ACTIVATED, scene.canvas);
-                },
-
-                /** Returns the canvas element the given scene is bound to
-                 */
-                getSceneCanvas : function(sceneId) {
-                    var scene = scenes[sceneId];
-                    if (!scene) {
-                        ctx.error.fatalError("Scene not defined: '" + sceneId + "'");
-                    }
-                    return scene.canvas.canvas;
-                },
-                //
-                //                activatePick : function(sceneId) {
-                //
-                //                },
-
-                /** Returns all registered scenes
-                 */
-                getAllScenes:function() {
-                    var list = [];
-                    for (var id in scenes) {
-                        var scene = scenes[id];
-                        if (scene) {
-                            list.push(scene.scene);
-                        }
-                    }
-                    return list;
-                },
-
-                /** Finds a registered scene
-                 */
-                getScene : function(sceneId) {
-                    return scenes[sceneId].scene;
-                },
-
-                /** Deactivates the currently active scene and reaps destroyed and timed out processes
-                 */
-                deactivateScene : function() {
-                    if (!activeSceneId) {
-                        ctx.error.fatalError("Internal error: no scene active");
-                    }
-                    var sceneId = activeSceneId;
-                    activeSceneId = null;
-                    var scene = scenes[sceneId];
-                    if (!scene) {
-                        ctx.error.fatalError("Scene not defined: '" + sceneId + "'");
-                    }
-                    ctx.events.fireEvent(SceneJS._eventTypes.CANVAS_DEACTIVATED, scene.canvas);
-                    ctx.events.fireEvent(SceneJS._eventTypes.SCENE_DEACTIVATED, {sceneId : sceneId });
-                    //ctx.logging.info("Scene deactivated: " + sceneId);
-
-                }
-            };
-        });
 /** Root node of a scene graph
  *
  * @class SceneJS.scene
  * @extends SceneJS.node
  */
-(function() {
+SceneJS.scene = function() {   
 
-    var eventsBackend = SceneJS._backends.getBackend('events');
-    var sceneBackend = SceneJS._backends.getBackend('scene');
-    var loadBackend = SceneJS._backends.getBackend('load');
-    var processesBackend = SceneJS._backends.getBackend('processes');
-    var pickBackend = SceneJS._backends.getBackend('pick');
-
-    /** Creates a new scene
+    /* Collect scene params
      */
-    SceneJS.scene = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    if (!cfg.fixed) {
+        throw new SceneJS.exceptions.UnsupportedOperationException
+                ("Dynamic configuration of SceneJS.scene node is not supported");
+    }
+    var params = cfg.getParams();
 
-        /* Check that backend modules installed OK
-         */
-        if (SceneJS._backends.getStatus().error) {
-            throw SceneJS._backends.getStatus().error;
-        }
+    var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
 
-        /* Collect scene params
-         */
-        var cfg = SceneJS._utils.getNodeConfig(arguments);
-        if (!cfg.fixed) {
-            throw new SceneJS.exceptions.UnsupportedOperationException
-                    ("Dynamic configuration of SceneJS.scene node is not supported");
-        }
-        var params = cfg.getParams();
-
-        var sceneId = null; // Unique ID for this scene graph - null again as soon as scene destroyed
-
-        /* Create, register and return the scene graph
-         */
-        var _scene = SceneJS._utils.createNode(
-                "scene",
-                cfg.children,
-
-                new (function() {
-
-                    var lastRenderedData = null; // Saves data from last render for picking traversal
-
-                    /** Returns the canvas element that this scene is bound to. When no canvasId was configured, it will be one
-                     * that SceneJS selected by default, hence the need to use this method to get the canvas through the scene
-                     * node rather than assume its ID.
-                     */
-                    this.getCanvas = function() {
-                        if (!sceneId) {
-                            return null;
-                        }
-                        return sceneBackend.getSceneCanvas(sceneId);
-                    };
-
-                    /**
-                     * Renders the scene, passing in the given parameters to override any node parameters
-                     * that were set on the config.
-                     */
-                    this.render = function(paramOverrides) {
-                        if (sceneId) {
-                            sceneBackend.activateScene(sceneId);
-                            var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
-                            if (paramOverrides) {        // Override with traversal params
-                                for (var key in paramOverrides) {
-                                    data.put(key, paramOverrides[key]);
-                                }
-                            }
-                            if (params.proxy) {
-                                loadBackend.setProxy(params.proxy);
-                            }
-                            var traversalContext = {
-
-                            };
-                            this._renderChildren(traversalContext, data);
-                            loadBackend.setProxy(null);
-                            sceneBackend.deactivateScene();
-                            lastRenderedData = data;
-                        }
-                    };
-
-                    /**
-                     * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
-                     * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
-                     * The scene must have been previously rendered, since this method re-renders it (to a special
-                     * pick frame buffer) using parameters retained from the prior render() call.
-                     *
-                     * @param canvasX
-                     * @param canvasY
-                     */
-                    this.pick = function(canvasX, canvasY) {
-                        if (sceneId) {
-                            try {
-                                if (!lastRenderedData) {
-                                    throw new SceneJS.exceptions.PickWithoutRenderedException
-                                            ("Scene not rendered - need to render before picking");
-                                }
-                                sceneBackend.activateScene(sceneId);  // Also activates canvas
-                                pickBackend.pick(canvasX, canvasY);
-                                if (params.proxy) {
-                                    loadBackend.setProxy(params.proxy);
-                                }
-                                var traversalContext = {};
-                                this._renderChildren(traversalContext, lastRenderedData);
-                                loadBackend.setProxy(null);
-                                var picked = pickBackend.getPicked();
-                                sceneBackend.deactivateScene();
-                                return picked;
-                            } finally {
-                                SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
-                            }
-                        }
-                    };
-
-                    /**
-                     * Returns count of active processes. A non-zero count indicates that the scene should be rendered
-                     * at least one more time to allow asynchronous processes to complete - since processes are
-                     * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
-                     * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
-                     * a race condition.
-                     */
-                    this.getNumProcesses = function() {
-                        return (sceneId) ? processesBackend.getNumProcesses(sceneId) : 0;
-                    };
-
-                    /** Destroys this scene, after which it cannot be rendered any more. You should destroy
-                     * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
-                     * resources for it (eg. shaders, VBOs etc) that are no longer in use.
-                     */
-                    this.destroy = function() {
-                        if (sceneId) {
-                            sceneBackend.destroyScene(sceneId); // Last one fires RESET command
-                            sceneId = null;
-                        }
-                    };
-
-                    /** Returns true if scene active, ie. not destroyed
-                     */
-                    this.isActive = function() {
-                        return (sceneId != null);
-                    };
-                })());
-
-        /* Register scene - fires a SCENE_CREATED event
-         */
-        sceneId = sceneBackend.createScene(_scene, params);
-
-        return _scene;
-    };
-
-    /** Total SceneJS reset - destroys all scenes and cached resources.
+    /* Create, register and return the scene graph
      */
-    SceneJS.reset = function() {
-        var scenes = sceneBackend.getAllScenes();
-        var temp = [];
-        for (var i = 0; i < scenes.length; i++) {
-            temp.push(scenes[i]);
-        }
-        while (temp.length > 0) {
+    var _scene = SceneJS._utils.createNode(
+            "scene",
+            cfg.children,
 
-            /* Destroy each scene individually so it they can mark itself as destroyed.
-             * A RESET command will be fired after the last one is destroyed.
-             */
-            temp.pop().destroy();
-        }
-    };
+            new (function() {
 
-    SceneJS.onEvent = function(name, func) {
-        switch (name) {
+                var lastRenderedData = null; // Saves data from last render for picking traversal
 
-            case "error" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.ERROR,
-                    function(params) {
-                        func({
-                            exception: params.exception,
-                            fatal: params.fatal
-                        });
-                    });
-                break;
-
-            case "reset" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        func();
-                    });
-                break;
-
-            case "scene-created" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.SCENE_CREATED,
-                    function(params) {
-                        func({
-                            sceneId : params.sceneId
-                        });
-                    });
-                break;
-
-            case "scene-activated" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function(params) {
-                        func({
-                            sceneId : params.sceneId
-                        });
-                    });
-                break;
-
-            case "canvas-activated" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(params) {
-                        func({
-                            canvas: params.canvas
-                        });
-                    });
-                break;
-
-            case "process-created" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.PROCESS_CREATED,
-                    function(params) {
-                        func(params);
-                    });
-                break;
-
-            case "process-timed-out" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.PROCESS_TIMED_OUT,
-                    function(params) {
-                        func(params);
-                    });
-                break;
-
-            case "process-killed" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.PROCESS_KILLED,
-                    function(params) {
-                        func(params);
-                    });
-                break;
-
-            case "scene-deactivated" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.SCENE_DEACTIVATED,
-                    function(params) {
-                        func({
-                            sceneId : params.sceneId
-                        });
-                    });
-                break;
-
-            case "scene-destroyed" : eventsBackend.onEvent(
-                    SceneJS._eventTypes.SCENE_DESTROYED,
-                    function(params) {
-                        func({
-                            sceneId : params.sceneId
-                        });
-                    });
-                break;
-
-
-            default:
-                throw "SceneJS.onEvent - this event type not supported: '" + name + "'";
-        }
-    };
-})();
-/**
- * Backend module for VRAM management. This module tries to ensure that SceneJS always has enough video memory
- * to keep things ticking over, at least slowly. Whenever any backend wants to load something into video RAM, it
- * will get the memory manager to mediate the allocation, passing in a callback that will attempt the actual allocation.
- * The memory manager will then try the callback and if no exception is thrown by it, all is good and that's that.
- *
- * However, if the callback throws an out-of-memory exception, the memory manager will poll each registered evictor to
- * evict something to free up some memory in order to satisfy the request. As soon as one of the evictors has
- * successfully evicted something, the memory manager will have another go with the  callback. It will repeat this
- * process, polling a different evictor each time, until the callback succeeds. For fairness, the memory manager
- * remembers the last evictor it polled, to continue with the next one when it needs to evict something again.
- *
- * This module is to be used only when there is an active canvas.
- */
-SceneJS._backends.installBackend(
-
-        "memory",
-
-        function(ctx) {
-
-            var canvas;                 // Used for testing for error conditions
-            var evictors = [];          // Eviction function for each client
-            var iEvictor = 0;           // Fair eviction policy - don't keep starting polling at first evictor
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(c) {
-                        canvas = c;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_DEACTIVATED,
-                    function() {
-                        canvas = null;
-                    });
-
-            ctx.events.onEvent(// Framework reset - start next polling at first evictor
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        canvas = null;
-                        iEvictor = 0;
-                    });
-
-            /**
-             * Polls each registered evictor backend to evict something. Stops on the first one to
-             * comply. When called again, resumes at the next in sequence to ensure fairness.
-             */
-            function evict() {
-                if (evictors.length == 0) {
-                    return false;
-                }
-                var tries = 0;
-                while (true) {
-                    if (iEvictor > evictors.length) {
-                        iEvictor = 0;
+                /** Returns the canvas element that this scene is bound to. When no canvasId was configured, it will be one
+                 * that SceneJS selected by default, hence the need to use this method to get the canvas through the scene
+                 * node rather than assume its ID.
+                 */
+                this.getCanvas = function() {
+                    if (!sceneId) {
+                        return null;
                     }
-                    if (evictors[iEvictor++]()) {
-                        ctx.logging.warn("Evicted least-used item from memory");
-                        return true;
-                    } else {
-                        tries++;
-                        if (tries == evictors.length) {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            function outOfMemory(description) {
-                ctx.logging.error("Memory allocation failed");
-                ctx.error.fatalError(new SceneJS.exceptions.OutOfVRAMException(
-                        "Out of memory - failed to allocate memory for " + description));
-            }
-
-            ctx.memory = {
+                    return SceneJS_sceneModule.getSceneCanvas(sceneId);
+                };
 
                 /**
-                 * Volunteers the caller as an evictor that is willing to attempt to free some memory when polled
-                 * by this module as memory runs low. The given evict callback is to attempt to free some memory
-                 * held by the caller, and should return true on success else false.
+                 * Renders the scene, passing in the given parameters to override any node parameters
+                 * that were set on the config.
                  */
-                registerEvictor: function(evict) {
-                    evictors.push(evict);
-                },
-
-                /**
-                 * Attempt allocation of some memory for the caller. This method does not return anything - the
-                 * tryAllocate callback is to wrap the allocation attempt and provide the result to the caller via
-                 * a closure, IE. not return it.
-                 */
-                allocate: function(description, tryAllocate) {
-                    // ctx.logging.debug("Allocating memory for: " + description);
-                    if (!canvas) {
-                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException
-                                ("No canvas active - failed to allocate shader memory"));
-                    }
-                    var maxTries = 10; // TODO: Heuristic for this? Does this really need be greater than one?
-                    var context = canvas.context;
-                    if (context.getError() == context.OUT_OF_MEMORY) {
-                        outOfMemory(description);
-                    }
-                    var tries = 0;
-                    while (true) {
-                        try {
-                            tryAllocate();
-                            if (context.getError() == context.OUT_OF_MEMORY) {
-                                outOfMemory(description);
-                            }
-                            return; // No errors, must have worked
-                        } catch (e) {
-                            if (context.getError() != context.OUT_OF_MEMORY) {
-                                ctx.logging.error(e.message || e);
-                                throw e; // We only handle out-of-memory error here
-                            }
-                            if (++tries > maxTries || !evict()) { // Too many tries or no cacher wants to evict
-                                outOfMemory(description);
+                this.render = function(paramOverrides) {
+                    if (sceneId) {
+                        SceneJS_sceneModule.activateScene(sceneId);
+                        var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
+                        if (paramOverrides) {        // Override with traversal params
+                            for (var key in paramOverrides) {
+                                data.put(key, paramOverrides[key]);
                             }
                         }
-                    }
-                }
-            };
-        });
-
-
-
-
-/**
- * This backend encapsulates shading behind an event API.
- *
- * By listening to XXX_UPDATED events, this backend tracks various elements of scene state, such as WebGL settings,
- * texture layers, lighting, current material properties etc.
- *
- * On a SHADER_ACTIVATE event it will compose and activate a shader taylored to the current scene state
- * (ie. where the shader has variables and routines for the current lights, materials etc), then fire a
- * SHADER_ACTIVATED event when the shader is ready for business.
- *
- * Other backends will then handle the SHADER_ACTIVATED event by firing XXXXX_EXPORTED events parameterised with
- * resources that they want loaded into the shader. This backend then handles those by loading their parameters into
- * the shader.
- *
- * The backend will avoid constant re-generation of shaders by caching each of them against a hash code that it
- * derives from the current collective scene state; on a SHADER_ACTIVATE event, it will attempt to reuse a shader
- * cached for the hash of the current scene state.
- *
- * Shader allocation and LRU cache eviction is mediated by the "memory" backend.
- */
-SceneJS._backends.installBackend(
-
-        "shader",
-
-        function(ctx) {
-
-            var time = (new Date()).getTime();      // For LRU caching
-
-            /* Resources contributing to shader
-             */
-            var canvas;                             // Currently active canvas
-            var rendererState;                      // WebGL settings state
-            var lights = [];                        // Current lighting state
-            var material = {};                      // Current material state
-            var fog = null;                         // Current fog
-            var textureLayers = [];                 // Texture layers are pushed/popped to this as they occur
-            var geometry = null;                    // Current geometry
-
-            /* Hash codes identifying states of contributing resources
-             */
-            var rendererHash = "";
-            var fogHash = "";
-            var lightsHash = "";
-            var textureHash = "";
-            var geometryHash = "";
-
-            /* Shader programs
-             */
-            var programs = {};                      // Program cache
-            var activeProgram = null;               // Currently active program
-
-            /* Combined hash from those of contributing resources, to identify shaders
-             */
-            var sceneHash;
-
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TIME_UPDATED,
-                    function(t) {
-                        time = t;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        for (var programId in programs) {  // Just free allocated programs
-                            programs[programId].destroy();
+                        if (params.proxy) {
+                            SceneJS_loadModule.setProxy(params.proxy);
                         }
-                        programs = {};
-                    });
+                        var traversalContext = {
 
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        canvas = null;
-                        rendererState = null;
-                        activeProgram = null;
-                        lights = [];
-                        material = {};
-                        textureLayers = [];
-
-                        sceneHash = null;
-                        fogHash = "";
-                        lightsHash = "";
-                        textureHash = "";
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(c) {
-                        canvas = c;
-                        activeProgram = null;
-                        sceneHash = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_DEACTIVATED,
-                    function() {
-                        canvas = null;
-                        activeProgram = null;
-                        sceneHash = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RENDERER_UPDATED,
-                    function(_rendererState) {
-                        rendererState = _rendererState;  // Canvas change will be signified by a CANVAS_UPDATED
-                        sceneHash = null;
-                        rendererHash = rendererState.enableTexture2D ? "t" : "f";
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RENDERER_EXPORTED,
-                    function(_rendererState) {
-
-                        /* Default ambient material colour is taken from canvas clear colour
-                         */
-                        var clearColor = _rendererState.clearColor;
-                        activeProgram.setUniform("uAmbient",
-                                clearColor
-                                        ? [clearColor.r, clearColor.g, clearColor.b]
-                                        : [0, 0, 0]);
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURES_UPDATED,
-                    function(stack) {
-                        textureLayers = stack;
-                        sceneHash = null;
-
-                        /* Build texture hash
-                         */
-                        var hash = [];
-                        for (var i = 0; i < stack.length; i++) {
-                            var layer = textureLayers[i];
-                            hash.push("/");
-                            hash.push(layer.params.applyFrom);
-                            hash.push("/");
-                            hash.push(layer.params.applyTo);
-                            hash.push("/");
-                            hash.push(layer.params.blendMode);
-                            if (layer.params.matrix) {
-                                hash.push("/anim");
-                            }
-                        }
-                        textureHash = hash.join("");
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TEXTURES_EXPORTED,
-                    function(stack) {
-                        for (var i = 0; i < stack.length; i++) {
-                            var layer = stack[i];
-                            activeProgram.bindTexture("uSampler" + i, layer.texture, i);
-                            if (layer.params.matrixAsArray) {
-                                activeProgram.setUniform("uLayer" + i + "Matrix", layer.params.matrixAsArray);
-                            }
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.LIGHTS_UPDATED,
-                    function(l) {
-                        lights = l;
-                        sceneHash = null;
-
-                        /* Build lights hash
-                         */
-                        var hash = [];
-                        for (var i = 0; i < lights.length; i++) {
-                            var light = lights[i];
-                            hash.push(light.type);
-                            if (light.specular) {
-                                hash.push("s");
-                            }
-                            if (light.diffuse) {
-                                hash.push("d");
-                            }
-                        }
-                        lightsHash = hash.join("");
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.LIGHTS_EXPORTED,
-                    function(_lights) {
-                        for (var i = 0; i < _lights.length; i++) {
-                            var light = _lights[i];
-
-                            activeProgram.setUniform("uLightColor" + i, light.color);
-                            activeProgram.setUniform("uLightDiffuse" + i, light.diffuse);
-
-                            if (light.type == "dir") {
-                                activeProgram.setUniform("uLightDir" + i, light.dir);
-                            }
-                            if (light.type == "point") {
-                                activeProgram.setUniform("uLightPos" + i, light.pos);
-                            }
-                            if (light.type == "spot") {
-                                activeProgram.setUniform("uLightPos" + i, light.pos);
-                                activeProgram.setUniform("uLightDir" + i, light.dir);
-                                activeProgram.setUniform("uLightSpotCosCutOff" + i, light.spotCosCutOff);
-                                activeProgram.setUniform("uLightSpotExp" + i, light.spotExponent);
-                            }
-
-                            activeProgram.setUniform("uLightAttenuation" + i,
-                                    [
-                                        light.constantAttenuation,
-                                        light.linearAttenuation,
-                                        light.quadraticAttenuation
-                                    ]);
-                        }
-                    });
-
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.MATERIAL_UPDATED,
-                    function(m) {
-                        material = m;
-                        sceneHash = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.MATERIAL_EXPORTED,
-                    function(m) {
-                        activeProgram.setUniform("uMaterialBaseColor", m.baseColor);
-                        activeProgram.setUniform("uMaterialSpecularColor", m.specularColor);
-
-                        activeProgram.setUniform("uMaterialSpecular", m.specular);
-                        activeProgram.setUniform("uMaterialShine", m.shine);
-                        activeProgram.setUniform("uMaterialEmit", m.emit);
-                        activeProgram.setUniform("uMaterialAlpha", m.alpha);
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.FOG_UPDATED,
-                    function(f) {
-                        fog = f;
-                        sceneHash = null;
-                        fogHash = fog ? fog.mode : "";
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.FOG_EXPORTED,
-                    function(f) {
-                        activeProgram.setUniform("uFogColor", f.color);
-                        activeProgram.setUniform("uFogDensity", f.density);
-                        activeProgram.setUniform("uFogStart", f.start);
-                        activeProgram.setUniform("uFogEnd", f.end);
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.MODEL_TRANSFORM_EXPORTED,
-                    function(transform) {
-
-                        activeProgram.setUniform("uMMatrix", transform.matrixAsArray);
-                        activeProgram.setUniform("uMNMatrix", transform.normalMatrixAsArray);
-
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.VIEW_TRANSFORM_EXPORTED,
-                    function(transform) {
-                        activeProgram.setUniform("uVMatrix", transform.matrixAsArray);
-                        activeProgram.setUniform("uVNMatrix", transform.normalMatrixAsArray);
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.PROJECTION_TRANSFORM_EXPORTED,
-                    function(transform) {
-                        activeProgram.setUniform("uPMatrix", transform.matrixAsArray);
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.GEOMETRY_UPDATED,
-                    function(geo) {
-                        var hash = [];
-                        geometry = geo;
-                        sceneHash = null;
-                        geometryHash = ([
-                            geometry.normalBuf ? "t" : "f",
-                            geometry.uvBuf ? "t" : "f",
-                            geometry.uvBuf2 ? "t" : "f"]).join("");
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.GEOMETRY_EXPORTED,
-                    function(geo) {
-                        if (geo.vertexBuf) {
-                            activeProgram.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
-                        }
-                        if (geo.normalBuf) {
-                            activeProgram.bindFloatArrayBuffer("aNormal", geo.normalBuf);
-                        }
-                        if (textureLayers.length > 0 && rendererState.enableTexture2D) {
-                            if (geo.uvBuf) {
-                                activeProgram.bindFloatArrayBuffer("aUVCoord", geo.uvBuf);
-                            }
-                            if (geo.uvBuf2) {
-                                activeProgram.bindFloatArrayBuffer("aUVCoord2", geo.uvBuf2);
-                            }
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATE, // Request to activate a shader
-                    function() {
-                        activateProgram();
-                    });
-
-            ctx.memory.registerEvictor(
-                    function() {
-                        var earliest = time;
-                        var programToEvict;
-                        for (var hash in programs) {
-                            if (hash) {
-                                var program = programs[hash];
-
-                                /* Avoiding eviction of shader just used,
-                                 * currently in use, or likely about to use
-                                 */
-                                if (program.lastUsed < earliest && program.hash != sceneHash) {
-                                    programToEvict = program;
-                                    earliest = programToEvict.lastUsed;
-                                }
-                            }
-                        }
-                        if (programToEvict) { // Delete LRU program's shaders and deregister program
-                            //  ctx.logging.info("Evicting shader: " + hash);
-                            programToEvict.destroy();
-                            programs[programToEvict.hash] = null;
-                            return true;
-                        }
-                        return false;   // Couldnt find suitable program to delete
-                    });
-
-            function activateProgram() {
-                if (!canvas) {
-                    ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
-                }
-
-                if (!sceneHash) {
-                    generateHash();
-                }
-
-                if (!activeProgram || activeProgram.hash != sceneHash) {
-                    if (activeProgram) {
-                        canvas.context.flush();
-                        activeProgram.unbind();
-                        activeProgram = null;
-                        ctx.events.fireEvent(SceneJS._eventTypes.SHADER_DEACTIVATED);
-                    }
-
-                    if (!programs[sceneHash]) {
-                        ctx.logging.info("Creating shader: '" + sceneHash + "'");
-                        var vertexShaderSrc = composeVertexShader();
-                        var fragmentShaderSrc = composeFragmentShader();
-                        ctx.memory.allocate(
-                                "shader",
-                                function() {
-                                    try {
-                                        programs[sceneHash] = new SceneJS_webgl_Program(
-                                                sceneHash,
-                                                time,
-                                                canvas.context,
-                                                [vertexShaderSrc],
-                                                [fragmentShaderSrc],
-                                                ctx.logging);
-                                        ctx.logging.info("OK - Created shader: '" + sceneHash + "'");
-                                    } catch (e) {
-                                        ctx.logging.debug("Vertex shader:");
-                                        ctx.logging.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
-                                        ctx.logging.debug("Fragment shader:");
-                                        ctx.logging.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-                                        ctx.error.fatalError(e);
-                                    }
-                                });
-                    }
-                    activeProgram = programs[sceneHash];
-                    activeProgram.lastUsed = time;
-                    activeProgram.bind();
-                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATED);
-                }
-
-                ctx.events.fireEvent(SceneJS._eventTypes.SHADER_RENDERING);
-            }
-
-            /**
-             * Generates a shader hash code from current rendering state.
-             */
-            function generateHash() {
-                if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                    sceneHash = ([canvas.canvasId, "picking"]).join(";");
-                } else {
-                    sceneHash = ([canvas.canvasId, rendererHash, fogHash, lightsHash, textureHash, geometryHash]).join(";");
-                }
-                //      ctx.logging.debug("Scene shading hash:" + sceneHash);
-            }
-
-            function getShaderLoggingSource(src) {
-                var src2 = [];
-                for (var i = 0; i < src.length; i++) {
-                    var padding = (i < 10) ? "&nbsp;&nbsp;&nbsp;" : ((i < 100) ? "&nbsp;&nbsp;" : (i < 1000 ? "&nbsp;" : ""));
-                    src2.push(i + padding + ": " + src[i]);
-                }
-                return src2.join("<br/>");
-            }
-
-            function composeVertexShader() {
-                return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
-                       composeRenderingVertexShader() : composePickingVertexShader();
-            }
-
-            function composeFragmentShader() {
-                return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
-                       composeRenderingFragmentShader() : composePickingFragmentShader();
-            }
-
-            /**
-             * Composes a vertex shader script for rendering mode in current scene state
-             */
-            function composePickingVertexShader() {
-                return [
-                    "attribute vec3 aVertex;",
-                    "uniform mat4 uMMatrix;",
-                    "uniform mat4 uVMatrix;",
-                    "uniform mat4 uPMatrix;",
-                    "void main(void) {",
-                    "  gl_Position = uPMatrix * (uVMatrix * (uMMatrix * vec4(aVertex, 1.0)));",
-                    "}"
-                ].join("\n");
-            }
-
-            /**
-             * Composes a fragment shader script for rendering mode in current scene state
-             */
-            function composePickingFragmentShader() {
-                var g = parseFloat(Math.round((10 + 1) / 256) / 256);
-                var r = parseFloat((10 - g * 256 + 1) / 256);
-                var src = [
-                    "uniform vec3 uColor;",
-                    "void main(void) {",
-
-                    "gl_FragColor = vec4(" + (r.toFixed(17)) + ", " + (g.toFixed(17)) + ",1.0,1.0);",
-
-                    //      "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
-                    "}"
-                ].join("\n");
-
-                return src;
-            }
-
-            function composeRenderingVertexShader() {
-
-                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
-                var lighting = (lights.length > 0 && geometry.normalBuf);
-
-                var src = ["\n"];
-                src.push("attribute vec3 aVertex;");                // World coordinates
-
-                if (lighting) {
-                    src.push("attribute vec3 aNormal;");            // Normal vectors
-                    src.push("uniform mat4 uMNMatrix;");            // Model normal matrix
-                    src.push("uniform mat4 uVNMatrix;");            // View normal matrix
-
-                    src.push("varying vec3 vNormal;");              // Output view normal vector
-                    src.push("varying vec3 vEyeVec;");              // Output view eye vector
-
-                    for (var i = 0; i < lights.length; i++) {
-                        var light = lights[i];
-                        if (light.type == "dir") {
-                            src.push("uniform vec3 uLightDir" + i + ";");
-                        }
-                        if (light.type == "point") {
-                            src.push("uniform vec4 uLightPos" + i + ";");
-                        }
-                        if (light.type == "spot") {
-                            src.push("uniform vec4 uLightPos" + i + ";");
-                        }
-
-                        src.push("varying vec3 vLightVec" + i + ";");
-                        src.push("varying float vLightDist" + i + ";");
-                    }
-                }
-
-                if (texturing) {
-                    if (geometry.uvBuf) {
-                        src.push("attribute vec2 aUVCoord;");      // UV coords
-                    }
-                    if (geometry.uvBuf2) {
-                        src.push("attribute vec2 aUVCoord2;");     // UV2 coords
-                    }
-                }
-                src.push("uniform mat4 uMMatrix;");                // Model matrix
-                src.push("uniform mat4 uVMatrix;");                // View matrix
-                src.push("uniform mat4 uPMatrix;");                 // Projection matrix
-
-                src.push("varying vec4 vViewVertex;");
-
-                if (texturing) {
-                    if (geometry.uvBuf) {
-                        src.push("varying vec2 vUVCoord;");
-                    }
-                    if (geometry.uvBuf2) {
-                        src.push("varying vec2 vUVCoord2;");
-                    }
-                }
-
-                src.push("void main(void) {");
-                if (lighting) {
-                    src.push("  vec4 tmpVNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
-                    src.push("  vNormal = normalize(tmpVNormal.xyz);");
-                }
-                src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
-                src.push("  vViewVertex = tmpVertex;");
-                src.push("  gl_Position = uPMatrix * vViewVertex;");
-
-                src.push("  vec3 tmpVec;");
-
-                if (lighting) {
-                    for (var i = 0; i < lights.length; i++) {
-                        var light = lights[i];
-                        if (light.type == "dir") {
-                            src.push("tmpVec = -uLightDir" + i + ";");
-                        }
-                        if (light.type == "point") {
-                            src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
-                            src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
-                        }
-                        if (light.type == "spot") {
-                            src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
-                            src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
-
-                        }
-                        src.push("vLightVec" + i + " = tmpVec;");                   // Vector from light to vertex
-
-                    }
-                    src.push("vEyeVec = normalize(-vViewVertex.xyz);");
-                }
-
-                if (texturing) {
-                    if (geometry.uvBuf) {
-                        src.push("vUVCoord = aUVCoord;");
-                    }
-                    if (geometry.uvBuf2) {
-                        src.push("vUVCoord2 = aUVCoord2;");
-                    }
-                }
-                src.push("}");
-             //   ctx.logging.info(getShaderLoggingSource(src));
-                return src.join("\n");
-            }
-
-
-            function composeRenderingFragmentShader() {
-                var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
-                var lighting = (lights.length > 0 && geometry.normalBuf);
-
-                var src = ["\n"];
-
-                src.push("varying vec4 vViewVertex;");              // View-space vertex
-
-                if (texturing) {
-                    if (geometry.uvBuf) {
-                        src.push("varying vec2 vUVCoord;");
-                    }
-                    if (geometry.uvBuf2) {
-                        src.push("varying vec2 vUVCoord2;");
-                    }
-
-                    for (var i = 0; i < textureLayers.length; i++) {
-                        var layer = textureLayers[i];
-                        src.push("uniform sampler2D uSampler" + i + ";");
-                        if (layer.params.matrix) {
-                            src.push("uniform mat4 uLayer" + i + "Matrix;");
-                        }
-                    }
-                }
-
-                src.push("uniform vec3  uMaterialBaseColor;");
-                src.push("uniform float uMaterialAlpha;");
-
-                if (lighting) {
-                    src.push("varying vec3 vNormal;");                  // View-space normal
-                    src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
-
-                    src.push("uniform vec3  uAmbient;");                         // Scene ambient colour - taken from clear colour
-                    src.push("uniform float uMaterialEmit;");
-
-                    src.push("uniform vec3  uMaterialSpecularColor;");
-                    src.push("uniform float uMaterialSpecular;");
-                    src.push("uniform float uMaterialShine;");
-
-                    for (var i = 0; i < lights.length; i++) {
-                        var light = lights[i];
-                        src.push("uniform vec3  uLightColor" + i + ";");
-                        if (light.type == "point") {
-                            src.push("uniform vec4   uLightPos" + i + ";");
-                        }
-                        if (light.type == "dir") {
-                            src.push("uniform vec3   uLightDir" + i + ";");
-                        }
-                        if (light.type == "spot") {
-                            src.push("uniform vec4   uLightPos" + i + ";");
-                            src.push("uniform vec3   uLightDir" + i + ";");
-                            src.push("uniform float  uLightSpotCosCutOff" + i + ";");
-                            src.push("uniform float  uLightSpotExp" + i + ";");
-                        }
-                        src.push("uniform vec3  uLightAttenuation" + i + ";");
-                        src.push("varying vec3  vLightVec" + i + ";");         // Vector from light to vertex
-                        src.push("varying float vLightDist" + i + ";");        // Distance from light to vertex
-                    }
-                }
-
-                /* Fog uniforms
-                 */
-                if (fog && fog.mode != "disabled") {
-                    src.push("uniform vec3  uFogColor;");
-                    src.push("uniform float uFogDensity;");
-                    src.push("uniform float uFogStart;");
-                    src.push("uniform float uFogEnd;");
-                }
-
-                src.push("void main(void) {");
-                src.push("  vec3    color   = uMaterialBaseColor;");
-                src.push("  float   alpha   = uMaterialAlpha;");
-
-                if (lighting) {
-                    src.push("  vec3    ambientValue=uAmbient;");
-                    src.push("  float   emit    = uMaterialEmit;");
-
-                    src.push("  vec4    normalmap = vec4(vNormal,0.0);");
-                    src.push("  float   specular=uMaterialSpecular;");
-                    src.push("  vec3    specularColor=uMaterialSpecularColor;");
-                    src.push("  float   shine=uMaterialShine;");
-                    src.push("  float   attenuation = 1.0;");
-                }
-
-                if (texturing) {
-                    src.push("  vec4    texturePos;");
-                    src.push("  vec2    textureCoord=vec2(0.0,0.0);");
-
-                    for (var i = 0; i < textureLayers.length; i++) {
-                        var layer = textureLayers[i];
-
-                        /* Texture input
-                         */
-                        if (layer.params.applyFrom == "normal" && lighting) {
-                            if (geometry.normalBuf) {
-                                src.push("texturePos=vec4(vNormal.xyz, 1.0);");
-                            } else {
-                                ctx.logging.warn("Texture layer applyFrom='normal' but geometry has no normal vectors");
-                                continue;
-                            }
-                        }
-                        if (layer.params.applyFrom == "uv") {
-                            if (geometry.uvBuf) {
-                                src.push("texturePos = vec4(vUVCoord.s, vUVCoord.t, 1.0, 1.0);");
-                            } else {
-                                ctx.logging.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
-                                continue;
-                            }
-                        }
-                        if (layer.params.applyFrom == "uv2") {
-                            if (geometry.uvBuf2) {
-                                src.push("texturePos = vec4(vUVCoord2.s, vUVCoord2.t, 1.0, 1.0);");
-                            } else {
-                                ctx.logging.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
-                                continue;
-                            }
-                        }
-
-                        /* Texture matrix
-                         */
-                        if (layer.params.matrixAsArray) {
-                            src.push("textureCoord=(uLayer" + i + "Matrix * texturePos).xy;");
-                        } else {
-                            src.push("textureCoord=texturePos.xy;");
-                        }
-
-                        /* Texture output
-                         */
-                        if (layer.params.applyTo == "baseColor") {
-                            if (layer.params.blendMode == "multiply") {
-                                src.push("color  = color * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
-                            } else {
-                                src.push("color  = color + texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
-                            }
-                        }
-                    }
-                }
-
-                if (lighting) {
-                    src.push("  vec3    lightValue      = uAmbient;");
-                    src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
-
-                    src.push("  vec3    lightVec;");
-                    src.push("  float   dotN;");
-                    src.push("  float   spotFactor;");
-                    src.push("  float   pf;");
-
-                    for (var i = 0; i < lights.length; i++) {
-                        var light = lights[i];
-                        src.push("lightVec = normalize(vLightVec" + i + ");");
-
-                        /* Point Light
-                         */
-                        if (light.type == "point") {
-                            src.push("dotN = max(dot(vNormal,lightVec),0.0);");
-                            src.push("if (dotN > 0.0) {");
-                            src.push("  attenuation = 1.0 / (" +
-                                     "  uLightAttenuation" + i + "[0] + " +
-                                     "  uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
-                                     "  uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
-                            if (light.diffuse) {
-                                src.push("  lightValue += dotN *  uLightColor" + i + " * attenuation;");
-                            }
-                            if (light.specular) {
-                                src.push("specularValue += attenuation * specularColor * uLightColor" + i +
-                                         " * specular  * pow(max(dot(reflect(lightVec, vNormal), vEyeVec),0.0), shine);");
-                            }
-                            src.push("}");
-                        }
-
-                        /* Directional Light
-                         */
-                        if (light.type == "dir") {
-                            src.push("dotN = max(dot(vNormal,lightVec),0.0);");
-                            if (light.diffuse) {
-                                src.push("lightValue += dotN * uLightColor" + i + ";");
-                            }
-                            if (light.specular) {
-                                src.push("specularValue += specularColor * uLightColor" + i +
-                                         " * specular  * pow(max(dot(reflect(lightVec, vNormal),normalize(vEyeVec)),0.0), shine);");
-                            }
-                        }
-
-                        /* Spot light
-                         */
-                        if (light.type == "spot") {
-                            src.push("spotFactor = max(dot(normalize(uLightDir" + i + "), lightVec));");
-                            src.push("if ( spotFactor > 20) {");
-                            src.push("  spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
-                            src.push("  dotN = max(dot(vNormal,normalize(lightVec)),0.0);");
-                            src.push("      if(dotN>0.0){");
-
-                            //                            src.push("          attenuation = spotFactor / (" +
-                            //                                     "uLightAttenuation" + i + "[0] + " +
-                            //                                     "uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
-                            //                                     "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
-                            src.push("          attenuation = 1;");
-
-                            if (light.diffuse) {
-                                src.push("lightValue +=  dotN * uLightColor" + i + " * attenuation;");
-                            }
-                            if (lights[i].specular) {
-                                src.push("specularValue += attenuation * specularColor * uLightColor" + i +
-                                         " * specular  * pow(max(dot(reflect(normalize(lightVec), vNormal),normalize(vEyeVec)),0.0), shine);");
-                            }
-
-                            src.push("      }");
-                            src.push("}");
-                        }
-                    }
-                    src.push("if (emit>0.0) lightValue = vec3(1.0, 1.0, 1.0);");
-                    src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb, alpha);");
-                } else {
-
-                    /* No lighting
-                     */
-                    src.push("vec4 fragColor = vec4(color.rgb, alpha);");
-                }
-
-                /* Fog
-                 */
-                if (fog && fog.mode != "disabled") {
-                    src.push("float fogFact=1.0;");
-                    if (fog.mode == "exp") {
-                        src.push("fogFact=clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);");
-                    } else if (fog.mode == "linear") {
-                        src.push("fogFact=clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);");
-                    }
-                    src.push("gl_FragColor = fragColor * fogFact + vec4(uFogColor, 1) * (1.0 - fogFact);");
-                } else {
-                    src.push("gl_FragColor = fragColor;");
-                }
-
-                //    src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
-                src.push("}");
-
-           //     ctx.logging.info(getShaderLoggingSource(src));
-                return src.join("\n");
-            }
-        });
-/**
- * Manages a stack of WebGL state frames that may be pushed and popped by SceneJS.renderer nodes.
- */
-SceneJS._backends.installBackend(
-
-        "renderer",
-
-        function(ctx) {
-
-            var canvas;  // Currently active canvas
-            var stateStack;     // Stack of WebGL state frames
-            var currentProps;   // Current map of set WebGL modes and states
-            var loaded;         // True when current state exported
-
-            /**
-             * Maps renderer node properties to WebGL context enums
-             */
-            var glEnum = function(context, name) {
-                if (!name) {
-                    ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Null SceneJS.renderer node config: \"" + name + "\""));
-                }
-                var result = SceneJS_webgl_enumMap[name];
-                if (!result) {
-                    ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised SceneJS.renderer node config value: \"" + name + "\""));
-                }
-                var value = context[result];
-                if (!value) {
-                    ctx.error.fatalError(new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
-                            "This browser's WebGL does not support renderer node config value: \"" + name + "\""));
-                }
-                return value;
-            };
-
-
-            /**
-             * Order-insensitive functions that set WebGL modes ie. not actually causing an
-             * immediate change.
-             *
-             * These map to renderer properties and are called in whatever order their
-             * property is found on the renderer config.
-             *
-             * Each of these wrap a state-setter function on the WebGL context. Each function
-             * also uses the glEnum map to convert its renderer node property argument to the
-             * WebGL enum constant required by its wrapped function.
-             */
-            var glModeSetters = {
-
-                enableBlend: function(context, flag) {
-                    if (flag == null || flag == undefined) {
-                        flag = false;
-                    }
-                    context.enable(context.BLEND, flag);
-                    currentProps.enableBlend = flag;
-                },
-
-                blendColor: function(context, color) {
-                    color = {
-                        r:color.r || 0,
-                        g: color.g || 0,
-                        b: color.b || 0,
-                        a: color.a || 1
-                    };
-                    context.blendColor(color.r, color.g, color.b, color.a);
-                    currentProps.blendColor = color;
-                },
-
-                blendEquation: function(context, eqn) {
-                    eqn = eqn || "func_add";
-                    context.blendEquation(context, glEnum(context, eqn));
-                    currentProps.blendEquation = eqn;
-                },
-
-                /** Sets the RGB blend equation and the alpha blend equation separately
-                 */
-                blendEquationSeparate: function(context, eqn) {
-                    eqn = eqn || {};
-                    eqn = {
-                        rgb : eqn.rgb || "func_add",
-                        alpha : eqn.alpha || "func_add"
-                    };
-                    context.blendEquation(glEnum(context, eqn.rgb), glEnum(context, eqn.alpha));
-                    currentProps.blendEquationSeperate = eqn;
-                },
-
-                blendFunc: function(context, funcs) {
-                    blendFunc = blendFunc || {};
-                    funcs = {
-                        sfactor : funcs.sfactor || "one",
-                        dfactor : funcs.dfactor || "zero"
-                    };
-                    context.blendFunc(glEnum(context, funcs.sfactor || "one"), glEnum(context, funcs.dfactor || "zero"));
-                    currentProps.blendFunc = funcs;
-                },
-
-                blendFuncSeparate: function(context, func) {
-                    func = func || {};
-                    func = {
-                        srcRGB : func.srcRGB || "zero",
-                        dstRGB : func.dstRGB || "zero",
-                        srcAlpha : func.srcAlpha || "zero",
-                        dstAlpha :  func.dstAlpha || "zero"
-                    };
-                    context.blendFuncSeparate(
-                            glEnum(context, func.srcRGB || "zero"),
-                            glEnum(context, func.dstRGB || "zero"),
-                            glEnum(context, func.srcAlpha || "zero"),
-                            glEnum(context, func.dstAlpha || "zero"));
-                    currentProps.blendFuncSeparate = func;
-                },
-
-                clearColor: function(context, color) {
-                    color = color || {};
-                    color.r = color.r || 0;
-                    color.g = color.g || 0;
-                    color.b = color.b || 0;
-                    color.a = color.a || 1;
-                    context.clearColor(color.r, color.g, color.b, color.a);
-                    currentProps.clearColor = color;
-                },
-
-                clearDepth: function(context, depth) {
-                    if (depth == null || depth == undefined) {
-                        depth = 1;
-                    }
-                    context.clearDepth(depth);
-                    currentProps.clearDepth = depth;
-                },
-
-                clearStencil: function(context, clearValue) {
-                    clearValue = clearValue || 0;
-                    context.clearStencil(clearValue);
-                    currentProps.clearStencil = clearValue;
-                },
-
-                colorMask: function(context, color) {
-                    color = color || {};
-                    color.r = color.r || 0;
-                    color.g = color.g || 0;
-                    color.b = color.b || 0;
-                    color.a = color.a || 1;
-                    context.colorMask(color.r, color.g, color.b, color.a);
-                    currentProps.colorMask = color;
-                },
-
-                enableCullFace: function(context, flag) {
-                    if (flag) {
-                        context.enable(context.CULL_FACE);
-                    } else {
-                        flag = false;
-                        context.disable(context.CULL_FACE);
-                    }
-                    currentProps.enableCullFace = flag;
-                },
-
-                cullFace: function(context, mode) {
-                    mode = mode || "back";
-                    context.cullFace(glEnum(context, mode));
-                    currentProps.cullFace = mode;
-                },
-
-                enableDepthTest: function(context, flag) {
-                    if (flag == null || flag == undefined) {
-                        flag = true;
-                    }
-                    if (flag) {
-                        context.enable(context.DEPTH_TEST);
-                    } else {
-                        context.disable(context.DEPTH_TEST);
-                    }
-                    currentProps.enableDepthTest = flag;
-                },
-
-                depthFunc: function(context, func) {
-                    func = func || "less";                    
-                    context.depthFunc(glEnum(context, func));
-                    currentProps.depthFunc = func;
-                },
-
-                enableDepthMask: function(context, flag) {
-                    if (flag == null || flag == undefined) {
-                        flag = true;
-                    }
-                    context.depthMask(flag);
-                    currentProps.enableDepthMask = flag;
-                },
-
-                depthRange: function(context, range) {
-                    range = {
-                        zNear : range.zNear || 0,
-                        zFar : range.zFar || 1
-                    };
-                    context.depthRange(range.zNear, range.zFar);
-                    currentProps.depthRange = range;
-                },
-
-                frontFace: function(context, mode) {
-                    mode = mode || "ccw";
-                    context.frontFace(glEnum(context, mode));
-                    currentProps.frontFace = mode;
-                },
-
-                lineWidth: function(context, width) {
-                    width = width || 1;
-                    context.lineWidth(width);
-                    currentProps.lineWidth = width;
-                },
-
-                enableTexture2D: function(context, flag) {
-                    if (flag) {
-                        context.enable(context.TEXTURE_2D);
-                    } else {
-                        flag = false;
-                        context.disable(context.TEXTURE_2D);
-                    }
-                    currentProps.enableTexture2D = flag;
-                },
-
-                enableScissorTest: function(context, flag) {
-                    if (flag) {
-                        context.enable(context.SCISSOR_TEST);
-                    } else {
-                        flag = false;
-                        context.disable(context.SCISSOR_TEST);
-                    }
-                    currentProps.enableScissorTest = flag;
-                }
-            };
-
-            /**
-             * Order-sensitive functions that immediately effect WebGL state change.
-             *
-             * These map to renderer properties and are called in a particular order since they
-             * affect one another.
-             *
-             * Each of these wrap a state-setter function on the WebGL context. Each function
-             * also uses the glEnum map to convert its renderer node property argument to the
-             * WebGL enum constant required by its wrapped function.
-             */
-            var glStateSetters = {
-
-                /** Set viewport on the given context
-                 */
-                viewport: function(context, v) {
-                    v = v || {};
-                    v = {
-                        x : v.x || 1,
-                        y : v.y || 1,
-                        width: v.width || canvas.width,
-                        height: v.height || canvas.height
-                    };
-                    currentProps.viewport = v;
-                    context.viewport(v.x, v.y, v.width, v.height);
-                    ctx.events.fireEvent(SceneJS._eventTypes.VIEWPORT_UPDATED, v);
-                },
-
-                /** Sets scissor region on the given context
-                 */
-                scissor: function(context, s) {
-                    s = s || {};
-                    s = {
-                        x : s.x || currentProps.viewport.x,
-                        y : s.y || currentProps.viewport.y,
-                        width: s.width || currentProps.viewport.width,
-                        height: s.height || currentProps.viewport.height
-                    };
-                    currentProps.scissor = s;
-                    context.scissor(s.x, s.y, s.width, s.height);
-                },
-
-                /** Clears buffers on the given context as specified in mask
-                 */
-                clear:function(context, mask) {
-                    mask = mask || {};
-                    var m;
-                    if (mask.color) {
-                        m = context.COLOR_BUFFER_BIT;
-                    }
-                    if (mask.depth) {
-                        m = m | context.DEPTH_BUFFER_BIT;
-                    }
-                    if (mask.stencil) {
-                        m = m | context.STENCIL_BUFFER_BIT;
-                    }
-                    if (m) {
-                        context.clear(m);
-                    }
-                }
-            };
-
-            /**
-             * Sets current renderer properties on the given WebGL context. These will then
-             * appear on currentProps.
-             */
-            var setProperties = function(context, props) {
-
-                /* Set order-insensitive properties (modes)
-                 */
-                for (var key in props) {
-                    var setter = glModeSetters[key];
-                    if (setter) {
-                        setter(context, props[key]);
-                    }
-                }
-
-                /* Set order-sensitive properties (states)
-                 */
-                if (props.viewport) {
-                    glStateSetters.viewport(context, props.viewport);
-                }
-                if (props.scissor) {
-                    glStateSetters.clear(context, props.scissor);
-                }
-                if (props.clear) {
-                    glStateSetters.clear(context, props.clear);
-                }
-
-                ctx.events.fireEvent(
-                        SceneJS._eventTypes.RENDERER_UPDATED,
-                        currentProps);
-
-                loaded = false;
-            };
-
-            /** Gets value of the given property on the first higher renderer state that has it
-             */
-            var getSuperProperty = function(name) {
-                for (var i = stateStack.length - 1; i >= 0; i--) {
-                    var state = stateStack[i];
-                    if (!(state.props[name] == undefined)) {
-                        return state.props[name];
-                    }
-                }
-                return null; // Cause default to be set               
-            };
-
-            /* Activate initial defaults
-             */
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(c) {
-                        canvas = c;
-                        currentProps = {
-                            clear: { depth : true, color : true},
-                            //  clearColor: {r: 0, g : 0, b : 0 },
-                            clearDepth: 1.0,
-                            enableDepthTest:true,
-                            enableCullFace: false,
-                            enableTexture2D: true,
-                            depthRange: { zNear: 0, zFar: 1},
-                            enableScissorTest: false,
-                            viewport:{ x : 1, y : 1, width: c.canvas.width, height: canvas.canvas.height}
                         };
-                        stateStack = [
-                            {
-                                props: currentProps,
-                                restore : null          // WebGL properties to set for reverting to previous state
-                            }
-                        ];
-                        loaded = false;
-
-                        setProperties(canvas.context, currentProps);
-
-                        ctx.events.fireEvent(
-                                SceneJS._eventTypes.RENDERER_UPDATED,
-                                currentProps);
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        loaded = false;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        loaded = false;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (!loaded) {
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.RENDERER_EXPORTED,
-                                    currentProps);
-                            loaded = true;
-                        }
-                    });
-
-            return {// Node-facing API
+                        this._renderChildren(traversalContext, data);
+                        SceneJS_loadModule.setProxy(null);
+                        SceneJS_sceneModule.deactivateScene();
+                        lastRenderedData = data;
+                    }
+                };
 
                 /**
-                 * Returns a new WebGL state object to the caller, without making it active.
+                 * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
+                 * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
+                 * The scene must have been previously rendered, since this method re-renders it (to a special
+                 * pick frame buffer) using parameters retained from the prior render() call.
+                 *
+                 * @param canvasX
+                 * @param canvasY
                  */
-                createRendererState : function(props) {
-
-                    /* For each property supplied, find the previous value to restore it to
-                     */
-                    var restore = {};
-                    for (var name in props) {
-                        if (!(props[name] == undefined)) {
-                            restore[name] = getSuperProperty(name);
+                this.pick = function(canvasX, canvasY) {
+                    if (sceneId) {
+                        try {
+                            if (!lastRenderedData) {
+                                throw new SceneJS.exceptions.PickWithoutRenderedException
+                                        ("Scene not rendered - need to render before picking");
+                            }
+                            SceneJS_sceneModule.activateScene(sceneId);  // Also activates canvas
+                            SceneJS_pickModule.pick(canvasX, canvasY);
+                            if (params.proxy) {
+                                SceneJS_loadModule.setProxy(params.proxy);
+                            }
+                            var traversalContext = {};
+                            this._renderChildren(traversalContext, lastRenderedData);
+                            SceneJS_loadModule.setProxy(null);
+                            var picked = SceneJS_pickModule.getPicked();
+                            SceneJS_sceneModule.deactivateScene();
+                            return picked;
+                        } finally {
+                            SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
                         }
                     }
+                };
 
-                    var state = {
-                        props : props,
-                        restore : restore
-                    };
-                    return state;
-                },
-
-                /** Activates the given WebGL state. If no state is active, then it must specify a canvas to activate,
-                 * in which case the default simple shader will be activated as well
+                /**
+                 * Returns count of active processes. A non-zero count indicates that the scene should be rendered
+                 * at least one more time to allow asynchronous processes to complete - since processes are
+                 * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
+                 * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
+                 * a race condition.
                  */
-                setRendererState : function(state) {
-                    stateStack.push(state);
-                    setProperties(canvas.context, state.props);
-                },
+                this.getNumProcesses = function() {
+                    return (sceneId) ? SceneJS_processModule.getNumProcesses(sceneId) : 0;
+                };
 
-                /** Restores previous WebGL state, if any.
+                /** Destroys this scene, after which it cannot be rendered any more. You should destroy
+                 * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
+                 * resources for it (eg. shaders, VBOs etc) that are no longer in use.
                  */
-                restoreRendererState : function(state) {
-                    stateStack.pop();
-                    setProperties(canvas.context, state.restore); // Undo property settings
-                }
-            };
-        });
+                this.destroy = function() {
+                    if (sceneId) {
+                        SceneJS_sceneModule.destroyScene(sceneId); // Last one fires RESET command
+                        sceneId = null;
+                    }
+                };
+
+                /** Returns true if scene active, ie. not destroyed
+                 */
+                this.isActive = function() {
+                    return (sceneId != null);
+                };
+            })());
+
+    /* Register scene - fires a SCENE_CREATED event
+     */
+    sceneId = SceneJS_sceneModule.createScene(_scene, params);
+
+    return _scene;
+};
+
+/** Total SceneJS reset - destroys all scenes and cached resources.
+ */
+SceneJS.reset = function() {
+    var scenes = SceneJS_sceneModule.getAllScenes();
+    var temp = [];
+    for (var i = 0; i < scenes.length; i++) {
+        temp.push(scenes[i]);
+    }
+    while (temp.length > 0) {
+
+        /* Destroy each scene individually so it they can mark itself as destroyed.
+         * A RESET command will be fired after the last one is destroyed.
+         */
+        temp.pop().destroy();
+    }
+};
+
+SceneJS.onEvent = function(name, func) {
+    switch (name) {
+
+        case "error" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.ERROR,
+                function(params) {
+                    func({
+                        exception: params.exception,
+                        fatal: params.fatal
+                    });
+                });
+            break;
+
+        case "reset" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.RESET,
+                function() {
+                    func();
+                });
+            break;
+
+        case "scene-created" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.SCENE_CREATED,
+                function(params) {
+                    func({
+                        sceneId : params.sceneId
+                    });
+                });
+            break;
+
+        case "scene-activated" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.SCENE_ACTIVATED,
+                function(params) {
+                    func({
+                        sceneId : params.sceneId
+                    });
+                });
+            break;
+
+        case "canvas-activated" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.CANVAS_ACTIVATED,
+                function(params) {
+                    func({
+                        canvas: params.canvas
+                    });
+                });
+            break;
+
+        case "process-created" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.PROCESS_CREATED,
+                function(params) {
+                    func(params);
+                });
+            break;
+
+        case "process-timed-out" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.PROCESS_TIMED_OUT,
+                function(params) {
+                    func(params);
+                });
+            break;
+
+        case "process-killed" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.PROCESS_KILLED,
+                function(params) {
+                    func(params);
+                });
+            break;
+
+        case "scene-deactivated" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.SCENE_DEACTIVATED,
+                function(params) {
+                    func({
+                        sceneId : params.sceneId
+                    });
+                });
+            break;
+
+        case "scene-destroyed" : SceneJS_eventModule.onEvent(
+                SceneJS_eventModule.SCENE_DESTROYED,
+                function(params) {
+                    func({
+                        sceneId : params.sceneId
+                    });
+                });
+            break;
 
 
+        default:
+            throw "SceneJS.onEvent - this event type not supported: '" + name + "'";
+    }
+};
 
-/** Scene node that sets WebGL state for nodes in its subtree. 
+/** Scene node that sets WebGL state for nodes in its subtree.
  *
  * @class SceneJS.renderer
  * @extends SceneJS.node
  */
 SceneJS.renderer = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('renderer');
+
     var env;
 
     return SceneJS._utils.createNode(
@@ -6694,455 +3280,160 @@ SceneJS.renderer = function() {
                 this._render = function(traversalContext, data) {
                     if (!env || !cfg.fixed) {
                         var params = cfg.getParams(data);
-                        env = backend.createRendererState(params);
+                        env = SceneJS_rendererModule.createRendererState(params);
                     }
-                    backend.setRendererState(env);
+                    SceneJS_rendererModule.setRendererState(env);
                     this._renderChildren(traversalContext, data);
-                    backend.restoreRendererState(env);
+                    SceneJS_rendererModule.restoreRendererState(env);
                 };
             })());
 };
 /**
- * Services geometry node requests to store and render elements of geometry.
- *
- * Stores geometry in vertex buffers in video RAM, caching them there under a least-recently-used eviction policy
- * mediated by the "memory" backend.
- *
- * Geometry elements are identified by type IDs, which may either be supplied by scene nodes, or automatically
- * generated by this backend.
- *
- * After creating geometry, the backend returns to the node the type ID for the node to retain. The node
- * can then pass in the type ID to test if the geometry still exists (perhaps it has been evicted) or to have the
- * backend render the geometry.
- *
- * The backend is free to evict whatever geometry it chooses between scene traversals, so the node must always check
- * the existence of the geometry and possibly request its re-creation each time before requesting the backend render it.
- *
- * A geometry buffer consists of positions, normals, optional texture coordinates, indices and a primitive type
- * (eg. "triangles").
- *
- * When rendering a geometry element, the backend will first fire a GEOMETRY_UPDATED to give the shader backend a
- * chance to prepare a shader script to render the geometry for current scene state. Then it will fire a SHADER_ACTIVATE
- * to prompt the shader backend to fire a SHADER_ACTIVATED to marshal resources from various backends (including this one)
- * for its shader script variables, which then provide their resources to the shader through XXX_EXPORTED events.
- * This backend then likewise provides its geometry buffers to the shader backend through a GEOMETRY_EXPORTED event,
- * then bind and draw the index buffer.
- *
- * The backend avoids needlessly re-exporting and re-binding geometry (eg. when rendering a bunch of cubes in a row)
- * by tracking the type of the last geometry rendered. That type is maintained until another either geoemetry is rendered,
- * the canvas switches, shader deactivates or scene deactivates.
+ @class SceneJS.geometry
+ @extends SceneJS.node
+ <p>A scene node that defines an element of geometry. These can </p>
+ <p><b>Example 1:</b></p><p>Definition of a cube, with normals and UV texture coordinates, with coordinates shown here only for the first face:</b></p><pre><code>
+ SceneJS.geometry({
+
+    // Mandatory primitive type - "points", "lines", "line-loop", "line-strip", "triangles",
+    // "triangle-strip" or "triangle-fan".
+
+    primitive: "triangles",
+
+    // Mandatory vertices - eight for our cube, each one spaining three array elements for X,Y and Z
+
+    positions : [
+
+        // Front cube face - vertices 0,1,2,3
+
+         5, 5, 5,
+        -5, 5, 5,
+        -5,-5, 5,
+        5,-5, 5,
+
+        //...
+    ],
+
+    // Optional normal vectors, one for each vertex. If you omit these, then cube will not be shaded.
+
+    normals : [
+
+        // Vertices 0,1,2,3
+
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        //...
+    ],
+
+    // Optional 2D texture coordinates corresponding to the 3D positions defined above -
+    // eight for our cube, each one spanning two array elements for X and Y. If you omit these, then the cube
+    // will never be textured.
+
+    uv : [
+
+        // Vertices 0,1,2,3
+
+        5, 5,
+        0, 5,
+        0, 0,
+        5, 0,
+
+        // ...
+    ],
+
+    // Optional coordinates for a second UV layer - just to illustrate their availability
+
+    uv2 : [
+
+    ],
+
+    // Mandatory indices - these organise the positions, normals and uv texture coordinates into geometric
+    // primitives in accordance with the "primitive" parameter, in this case a set of three indices for each triangle.
+    // Note that each triangle in this example is specified in counter-clockwise winding order. You can specify them in
+    // clockwise order if you configure the SceneJS.renderer node's frontFace property as "cw", instead of the
+    // default "ccw".
+
+    indices : [
+
+        // Vertices 0,1,2,3
+
+        0, 1, 2,
+        0, 2, 3,
+
+        // ...
+    ]
+ })
+ </pre></code>
+ @constructor
+ Create a new SceneJS.geometry
+ @param {Object} config The config object, followed by zero or more child nodes
  */
+SceneJS.geometry = function() {
 
-SceneJS._backends.installBackend(
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-        "geometry",
+    return SceneJS._utils.createNode(
+            "geometry",
+            cfg.children,
 
-        function(ctx) {
+            new (function() {
 
-            var time = (new Date()).getTime();  // For LRU caching
-            var canvas;
-            var geoMaps = {};                   // Geometry map for each canvas
-            var currentGeoMap = null;
-            var currentBoundGeoType;            // Type of geometry currently bound to shader
+                var params;
+                var type;
+                var create;
+                var geo = {};
 
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TIME_UPDATED,
-                    function(t) {
-                        time = t;
-                    });
+                this._render = function(traversalContext, data) {
 
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        canvas = null;
-                        currentGeoMap = null;
-                        currentBoundGeoType = null;
-                    });
+                    /* Dynamic config only happens first time
+                     */
+                    if (!params) {
+                        params = cfg.getParams(data);
+                        if (params.create instanceof Function) {
 
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(c) {
-                        if (!geoMaps[c.canvasId]) {      // Lazy-create geometry map for canvas
-                            geoMaps[c.canvasId] = {};
+                            /* Create must not be a dynamic config function!
+                             */
+                            create = params.create;
+                        } else {
+                            geo = {
+                                positions : SceneJS._utils.getParam(params.positions, data) || [],
+                                normals : SceneJS._utils.getParam(params.normals, data) || [],
+                                colors : SceneJS._utils.getParam(params.colors, data) || [],
+                                indices : SceneJS._utils.getParam(params.indices, data) || [],
+                                uv : SceneJS._utils.getParam(params.uv, data) || [],
+                                primitive : SceneJS._utils.getParam(params.primitive, data) || "triangles"
+                            };
                         }
-                        canvas = c;
-                        currentGeoMap = geoMaps[c.canvasId];
-                        currentBoundGeoType = null;
-                    });
+                    }
 
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_DEACTIVATED,
-                    function() {
-                        canvas = null;
-                        currentGeoMap = null;
-                        currentBoundGeoType = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        currentBoundGeoType = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        currentBoundGeoType = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET,
-                    function() {
-                        for (var canvasId in geoMaps) {    // Destroy geometries on all canvases
-                            var geoMap = geoMaps[canvasId];
-                            for (var type in geoMap) {
-                                var geometry = geoMap[type];
-                                destroyGeometry(geometry);
-                            }
+                    /* Check geometry not evicted
+                     */
+                    if (type) {
+                        if (!SceneJS_geometryModule.testGeometryExists(type)) {
+                            type = null;
                         }
-                        canvas = null;
-                        geoMaps = {};
-                        currentGeoMap = null;
-                        currentBoundGeoType = null;
-                    });
-
-            /**
-             * Destroys geometry, returning true if memory freed, else false
-             * where canvas not found and geometry was implicitly destroyed
-             */
-            function destroyGeometry(geo) {
-                //  ctx.logging.debug("Destroying geometry : '" + geo.type + "'");
-                if (geo.type == currentBoundGeoType) {
-                    currentBoundGeoType = null;
-                }
-                if (document.getElementById(geo.canvas.canvasId)) { // Context won't exist if canvas has disappeared
-                    if (geo.vertexBuf) {
-                        geo.vertexBuf.destroy();
                     }
-                    if (geo.normalBuf) {
-                        geo.normalBuf.destroy();
-                    }
-                    if (geo.normalBuf) {
-                        geo.indexBuf.destroy();
-                    }
-                    if (geo.uvBuf) {
-                        geo.uvBuf.destroy();
-                    }
-                    if (geo.uvBuf2) {
-                        geo.uvBuf2.destroy();
-                    }
-                }
-                var geoMap = geoMaps[geo.canvas.canvasId];
-                if (geoMap) {
-                    geoMap[geo.type] = null;
-                }
-            }
 
-            /**
-             * Volunteer to attempt to destroy a geometry when asked to by memory module
-             */
-            ctx.memory.registerEvictor(
-                    function() {
-                        var earliest = time;
-                        var evictee;
-                        for (var canvasId in geoMaps) {
-                            var geoMap = geoMaps[canvasId];
-                            if (geoMap) {
-                                for (var type in geoMap) {
-                                    var geometry = geoMap[type];
-                                    if (geometry) {
-                                        if (geometry.lastUsed < earliest
-                                                && document.getElementById(geometry.canvas.canvasId)) { // Canvas must still exist
-                                            evictee = geometry;
-                                            earliest = geometry.lastUsed;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (evictee) {
-                            ctx.logging.warn("Evicting geometry from memory: " + evictee.type);
-                            destroyGeometry(evictee);
-                            return true;
-                        }
-                        return false;  // Couldnt find a geometry we can delete
-                    });
-
-            /**
-             * Creates an array buffer
-             *
-             * @param context WebGL context
-             * @param bufType Eg. ARRAY_BUFFER
-             * @param values WebGL array
-             * @param numItems
-             * @param itemSize
-             * @param usage Eg. STATIC_DRAW
-             */
-            function createArrayBuffer(description, context, bufType, values, numItems, itemSize, usage) {
-                var buf;
-                ctx.memory.allocate(
-                        description,
-                        function() {
-                            buf = new SceneJS_webgl_ArrayBuffer(context, bufType, values, numItems, itemSize, usage);
-                        });
-                return buf;
-            }
-
-            /**
-             * Converts SceneJS primitive type string to WebGL constant
-             */
-            function getPrimitiveType(context, primitive) {
-                switch (primitive) {
-                    case "points":
-                        return context.POINTS;
-                    case "lines":
-                        return context.LINES;
-                    case "line-loop":
-                        return context.LINE_LOOP;
-                    case "line-strip":
-                        return context.LINE_STRIP;
-                    case "triangles":
-                        return context.TRIANGLES;
-                    case "triangle-strip":
-                        return context.TRIANGLE_STRIP;
-                    case "triangle-fan":
-                        return context.TRIANGLE_FAN;
-                    default:
-                        ctx.error.fatalError(new SceneJS.exceptions.InvalidGeometryConfigException(// Logs and throws
-                                "SceneJS.geometry primitive unsupported: '" +
-                                primitive +
-                                "' - supported types are: 'points', 'lines', 'line-loop', " +
-                                "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'"));
-                }
-            }
-
-            return { // Node-facing API
-
-                /**
-                 * Tests if the given geometry type exists on the currently active canvas
-                 */
-                testGeometryExists : function(type) {
-                    return currentGeoMap[type] ? true : false;
-                },
-
-                /**
-                 * Creates geometry on the active canvas - can optionally take a type ID. On success, when ID given
-                 * will return that ID, else if no ID given, will return a generated one.
-                 */
-                createGeometry : function(type, data) {
+                    /* type is null if geometry evicted or not yet defined
+                     */
                     if (!type) {
-                        type = SceneJS._utils.createKeyForMap(currentGeoMap, "type");
+                        if (create) {
+
+                            /* Type generated if null
+                             */
+                            type = SceneJS_geometryModule.createGeometry(params.type, create()); // Lazy-create geometry through callback
+                        } else {
+                            type = SceneJS_geometryModule.createGeometry(params.type, geo);
+                        }
                     }
-
-                 //   ctx.logging.debug("Creating geometry: '" + type + "'");
-
-                    if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
-                        ctx.error.fatalError(
-                                new SceneJS.exceptions.NodeConfigExpectedException(
-                                        "SceneJS.geometry node property expected : primitive"));
-                    }
-                    var context = canvas.context;
-                    var usage = context.STATIC_DRAW;
-                    //var usage = (!data.fixed) ? context.STREAM_DRAW : context.STATIC_DRAW;
-
-                    var vertexBuf;
-                    var normalBuf;
-                    var uvBuf;
-                    var uvBuf2;
-                    var indexBuf;
-
-                    try { // TODO: Modify usage flags in accordance with how often geometry is evicted
-
-                        vertexBuf = createArrayBuffer("geometry vertex buffer", context, context.ARRAY_BUFFER,
-                                new WebGLFloatArray(data.positions), data.positions.length, 3, usage);
-
-                        if (data.normals && data.normals.length > 0) {
-                            normalBuf = createArrayBuffer("geometry normal buffer", context, context.ARRAY_BUFFER,
-                                    new WebGLFloatArray(data.normals), data.normals.length, 3, usage);
-                        }
-
-                        if (data.uv && data.uv.length > 0) {
-                            if (data.uv) {
-                                uvBuf = createArrayBuffer("geometry UV buffer", context, context.ARRAY_BUFFER,
-                                        new WebGLFloatArray(data.uv), data.uv.length, 2, usage);
-                            }
-                        }
-
-                        if (data.uv2 && data.uv2.length > 0) {
-                            if (data.uv2) {
-                                uvBuf2 = createArrayBuffer("geometry UV2 buffer", context, context.ARRAY_BUFFER,
-                                        new WebGLFloatArray(data.uv2), data.uv2.length, 2, usage);
-                            }
-                        }
-
-                        indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
-                                new WebGLUnsignedShortArray(data.indices), data.indices.length, 1, usage);
-
-                        var geo = {
-                            fixed : true, // TODO: support dynamic geometry
-                            primitive: getPrimitiveType(context, data.primitive),
-                            type: type,
-                            lastUsed: time,
-                            canvas : canvas,
-                            context : context,
-                            vertexBuf : vertexBuf,
-                            normalBuf : normalBuf,
-                            indexBuf : indexBuf,
-                            uvBuf: uvBuf,
-                            uvBuf2: uvBuf2
-                        };
-                        currentGeoMap[type] = geo;
-                        return type;
-                    } catch (e) { // Allocation failure - delete whatever buffers got allocated
-
-                        if (vertexBuf) {
-                            vertexBuf.destroy();
-                        }
-                        if (normalBuf) {
-                            normalBuf.destroy();
-                        }
-                        if (uvBuf) {
-                            uvBuf.destroy();
-                        }
-                        if (uvBuf2) {
-                            uvBuf2.destroy();
-                        }
-                        if (indexBuf) {
-                            indexBuf.destroy();
-                        }
-                        throw e;
-                    }
-                },
-
-                /**
-                 * Draws the geometry of the given ID that exists on the current canvas.
-                 * Client node must ensure prior that the geometry exists on the canvas
-                 * using findGeometry, and have created it if neccessary with createGeometry.
-                 */
-                drawGeometry : function(type) {
-                    if (!canvas) {
-                        ctx.error.fatalError(SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
-                    }
-                    var geo = currentGeoMap[type];
-
-                    ctx.events.fireEvent(SceneJS._eventTypes.GEOMETRY_UPDATED, geo);  // Gives shader backend a chance to generate a shader
-
-                    /* Prompt shader backend to in turn prompt for exports from all backends.
-                     * This backend exports proactively however (see below), since it is the one
-                     * which prompted the shader backend.
-                     */
-                    ctx.events.fireEvent(SceneJS._eventTypes.SHADER_ACTIVATE);
-
-                    geo.lastUsed = time;  // Geometry now not evictable in this scene traversal
-
-                    var context = canvas.context;
-
-                    /* Dont re-export and bind if already the last one exported and bound - this is the case when
-                     * we're drawing a batch of the same object, Eg. a bunch of cubes in a row
-                     */
-                    if (currentBoundGeoType != type) {
-                        for (var i = 0; i < 8; i++) {
-                            context.disableVertexAttribArray(i);
-                        }
-                        ctx.events.fireEvent(
-                                SceneJS._eventTypes.GEOMETRY_EXPORTED,
-                                geo);
-
-                        geo.indexBuf.bind(); // Bind index buffer
-
-                        currentBoundGeoType = type;
-                    }
-
-                    /* Draw geometry
-                     */
-                    context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-                    context.flush();
-
-                    /* Don't need to unbind buffers - only one is bound at a time anyway
-                     */
-
-                    /* Destroy one-off geometry
-                     */
-                    //                    if (!geo.fixed) {
-                    //                        destroyGeometry(geo);
-                    //                        currentBoundGeoType = null;
-                    //                    }
-                }
-            };
-        });
-/**
- * Scene node that defines an element of geometry.
- *
- * @class SceneJS.geometry
- * @extends SceneJS.node
- */
-(function() {
-
-    SceneJS.geometry = function() {
-
-        var cfg = SceneJS._utils.getNodeConfig(arguments);
-        var geometryBackend = SceneJS._backends.getBackend('geometry');
-
-        return SceneJS._utils.createNode(
-                "geometry",
-                cfg.children,
-
-                new (function() {
-
-                    var params;
-                    var type;
-                    var create;
-                    var geo = {};
-
-                    this._render = function(traversalContext, data) {
-
-                        /* Dynamic config only happens first time
-                         */
-                        if (!params) {
-                            params = cfg.getParams(data);
-                            if (params.create instanceof Function) {
-
-                                /* Create must not be a dynamic config function!
-                                 */
-                                create = params.create;
-                            } else {
-                                geo = {
-                                    positions : SceneJS._utils.getParam(params.positions, data) || [],
-                                    normals : SceneJS._utils.getParam(params.normals, data) || [],
-                                    colors : SceneJS._utils.getParam(params.colors, data) || [],
-                                    indices : SceneJS._utils.getParam(params.indices, data) || [],
-                                    uv : SceneJS._utils.getParam(params.uv, data) || [],
-                                    primitive : SceneJS._utils.getParam(params.primitive, data) || "triangles"
-                                };
-                            }
-                        }
-
-                        /* Check geometry not evicted
-                         */
-                        if (type) {
-                            if (!geometryBackend.testGeometryExists(type)) {
-                                type = null;
-                            }
-                        }
-
-                        /* type is null if geometry evicted or not yet defined
-                         */
-                        if (!type) {
-                            if (create) {
-
-                                /* Type generated if null
-                                 */
-                                type = geometryBackend.createGeometry(params.type, create()); // Lazy-create geometry through callback
-                            } else {
-                                type = geometryBackend.createGeometry(params.type, geo);
-                            }
-                        }
-                        geometryBackend.drawGeometry(type);
-                        this._renderChildren(traversalContext, data);
-                    };
-                })());
-    };
-})();
+                    SceneJS_geometryModule.drawGeometry(type);
+                    this._renderChildren(traversalContext, data);
+                };
+            })());
+};
 SceneJS._utils.ns("SceneJS.objects");
 
 /** Provides a teapot geometry node by wrapping a call to the core SceneJS.geometry node.
@@ -13222,95 +9513,6 @@ SceneJS.objects.sphere = function() {
     });
 };
 /**
- * Backend that manages the current modelling transform matrices (modelling and normal).
- *
- * Services the scene modelling transform nodes, such as SceneJS.rotate, providing them with methods to set and
- * get the current modelling transform matrices.
- *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * MODEL_TRANSFORM_EXPORTED to pass the modelling matrix and inverse normal matrix as WebGLFloatArrays to the
- * shading backend.
- *
- * Normal matrix and WebGLFloatArrays are lazy-computed and cached on export to avoid repeatedly regenerating them.
- *
- * Avoids redundant export of the matrices with a dirty flag; they are only exported when that is set, which occurs
- * when transform is set by scene node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
- *
- * Whenever a scene node sets the matrix, this backend publishes it with a PROJECTION_TRANSFORM_UPDATED to allow other
- * dependent backends to synchronise their resources.
- */
-SceneJS._backends.installBackend(
-
-        "model-transform",
-
-        function(ctx) {
-
-            var transform;
-            var dirty;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        transform = {
-                            matrix : SceneJS_math_identityMat4(),
-                            fixed: true,
-                            identity : true
-                        };
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-
-                        if (dirty) {
-
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
-
-                            if (!transform.normalMatrixAsArray) {
-                                transform.normalMatrixAsArray = new WebGLFloatArray(
-                                        SceneJS_math_transposeMat4(
-                                                SceneJS_math_inverseMat4(transform.matrix)));
-                            }
-
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.MODEL_TRANSFORM_EXPORTED,
-                                    transform);
-
-                            dirty = false;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            /* Node-facing API
-             */
-            return {
-
-                setTransform : function(t) {
-                    transform = t;
-                    dirty = true;
-                    ctx.events.fireEvent(SceneJS._eventTypes.MODEL_TRANSFORM_UPDATED, transform);
-                },
-
-                getTransform : function() {
-                    return transform;
-                }
-            };
-        });
-/**
  * Scene node that applies a model-space rotation transform to the nodes within its subgraph, accumulated with higher
  * modelling transform nodes.
  *
@@ -13320,145 +9522,135 @@ SceneJS._backends.installBackend(
 SceneJS.rotate = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
-    var errorBackend = SceneJS._backends.getBackend('error');
-
-    /* Memoization levels
+    /* Augment the basic node type
      */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed
+    return (function($) {
 
-    return SceneJS._utils.createNode(
-            "rotate",
-            cfg.children,
-            
-            new (function() {
-                var _memoLevel = NO_MEMO;
-                var _mat;
-                var xform;
+        var _mat;
+        var xform;
 
-                var _angle = 0;
-                var _x = 0;
-                var _y = 0;
-                var _z = 1;
+        var _angle = 0;
+        var _x = 0;
+        var _y = 0;
+        var _z = 1;
 
-                /** Sets the rotation angle
-                 * @param {double} angle Rotation angle in degrees
-                 * @returns This node
-                 */
-                this.setAngle = function(angle) {
-                    _angle = angle || 0;
-                    _memoLevel = NO_MEMO;
-                    return this;
-                };
+        /** Sets the rotation angle
+         * @param {double} angle Rotation angle in degrees
+         * @returns This node
+         */
+        $.setAngle = function(angle) {
+            _angle = angle || 0;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                /** Returns the angle of rotation
-                 * @returns {double} The angle in degrees
-                 */
-                this.getAngle = function() {
-                    return _angle;
-                };
+        /** Returns the angle of rotation
+         * @returns {double} The angle in degrees
+         */
+        $.getAngle = function() {
+            return _angle;
+        };
 
-                /**
-                 * Sets the vector about which rotation occurs. The elements of the vector must not all be zero.
-                 * @param {object} vector The vector - eg. {x: 0, y: 1, z: 0}
-                 * @returns This node
-                 */
-                this.setXYZ = function(xyz) {
-                    var x = xyz.x || 0;
-                    var y = xyz.y || 0;
-                    var z = xyz.z || 0;
-                    if (x + y + z == 0) {
-                        errorBackend.fatalError(
-                                new SceneJS.exceptions.IllegalRotateConfigException(
-                                        "SceneJS.rotate vector is zero - at least one of properties x,y and z must be non-zero"));
-                    }
-                    _x = x;
-                    _y = y;
-                    _z = z;
-                    _memoLevel = NO_MEMO;
-                    return this;
-                };
+        /**
+         * Sets the vector about which rotation occurs. The elements of the vector must not all be zero.
+         * @param {object} vector The vector - eg. {x: 0, y: 1, z: 0}
+         * @returns This node
+         */
+        $.setXYZ = function(xyz) {
+            var x = xyz.x || 0;
+            var y = xyz.y || 0;
+            var z = xyz.z || 0;
+            if (x + y + z == 0) {
+                SceneJS_errorModule.fatalError(
+                        new SceneJS.exceptions.IllegalRotateConfigException(
+                                "SceneJS.rotate vector is zero - at least one of properties x,y and z must be non-zero"));
+            }
+            _x = x;
+            _y = y;
+            _z = z;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                /** Returns the vector about which rotation occurs
-                 * @returns {object} the vector, eg. {x: 0, y: 1, z: 0}
-                 */
-                this.getXYZ = function() {
-                    return {
-                        x: _x,
-                        y: _y,
-                        z: _z
-                    };
-                };
+        /** Returns the vector about which rotation occurs
+         * @returns {object} the vector, eg. {x: 0, y: 1, z: 0}
+         */
+        $.getXYZ = function() {
+            return {
+                x: _x,
+                y: _y,
+                z: _z
+            };
+        };
 
-                this.setX = function(x) {
-                    _x = x;
-                    _memoLevel = NO_MEMO;
-                    return this;
-                };
+        $.setX = function(x) {
+            _x = x;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                this.getX = function() {
-                    return _x;
-                };
+        $.getX = function() {
+            return _x;
+        };
 
-                this.setY = function(y) {
-                    _y = y;
-                    _memoLevel = NO_MEMO;
-                    return this;
-                };
+        $.setY = function(y) {
+            _y = y;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                this.getY = function() {
-                    return _y;
-                };
+        $.getY = function() {
+            return _y;
+        };
 
-                this.setZ = function(z) {
-                    _z = z;
-                    _memoLevel = NO_MEMO;
-                    return this;
-                };
+        $.setZ = function(z) {
+            _z = z;
+           $._memoLevel = 0;
+            return $;
+        };
 
-                this.getZ = function() {
-                    return _z;
-                };
+        $.getZ = function() {
+            return _z;
+        };
 
-                this._init = function(params) {
-                    if (params.angle) {
-                        this.setAngle(params.angle);
-                    }
-                    this.setXYZ({x : params.x, y: params.y, z: params.z });
-                };
+        var init = function(params) {
+            if (params.angle) {
+                $.setAngle(params.angle);
+            }
+            $.setXYZ({x : params.x, y: params.y, z: params.z });
+        };
 
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
+
+        $._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
                 }
-
-                this._render = function(traversalContext, data) {
-                    if (_memoLevel == NO_MEMO) {
-                        if (!cfg.fixed) {
-                            this._init(cfg.getParams(data));
-                        } else {
-                            _memoLevel = FIXED_CONFIG;
-                        }
-                        _mat = SceneJS_math_rotationMat4v(_angle * Math.PI / 180.0, [_x, _y, _z]);
-                    }
-                    var superXform = modelTransformBackend.getTransform();
-                    if (_memoLevel < FIXED_MODEL_SPACE) {
-                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
-                        xform = {
-                            localMatrix: _mat,
-                            matrix: tempMat,
-                            fixed: superXform.fixed && cfg.fixed
-                        };
-                        if (_memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
-                            _memoLevel = FIXED_MODEL_SPACE;
-                        }
-                    }
-                    modelTransformBackend.setTransform(xform);
-                    this._renderChildren(traversalContext, data);
-                    modelTransformBackend.setTransform(superXform);
+                _mat = SceneJS_math_rotationMat4v(_angle * Math.PI / 180.0, [_x, _y, _z]);
+            }
+            var superXform = SceneJS_modelTransformModule.getTransform();
+            if ($._memoLevel < 2) {
+                var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
+                xform = {
+                    localMatrix: _mat,
+                    matrix: tempMat,
+                    fixed: superXform.fixed && cfg.fixed
                 };
-            })());
+                if ($._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+                    $._memoLevel = 2;
+                }
+            }
+            SceneJS_modelTransformModule.setTransform(xform);
+            $._renderChildren(traversalContext, data);
+            SceneJS_modelTransformModule.setTransform(superXform);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
 /**
  * Scene node that applies a model-space translation transform to the nodes within its subgraph, accumulated with higher
@@ -13467,116 +9659,102 @@ SceneJS.rotate = function() {
  * @class SceneJS.translate
  * @extends SceneJS.node
  */
-(function() {
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
+SceneJS.translate = function() {
 
-    /* Memoization levels
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+
+    /* Augment the basic node type
      */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
+    return (function($) {
+        var _mat;
+        var xform;
 
-    SceneJS.translate = function() {
+        var _x = 0;
+        var _y = 0;
+        var _z = 1;
 
-        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        this.setX = function(x) {
+            _x = x;
+            $._memoLevel = 0;
+            return this;
+        };
 
-        return SceneJS._utils.createNode(
+        this.getX = function() {
+            return _x;
+        };
 
-                "translate",
+        this.setY = function(y) {
+            _y = y;
+            $._memoLevel = 0;
+            return this;
+        };
 
-                cfg.children,
+        this.getY = function() {
+            return _y;
+        };
 
-                new (function() {
-                    var _memoLevel = NO_MEMO;
-                    var _mat;
-                    var xform;
+        this.setZ = function(z) {
+            _z = z;
+            $._memoLevel = 0;
+            return this;
+        };
 
-                    var _x = 0;
-                    var _y = 0;
-                    var _z = 1;
+        this.getZ = function() {
+            return _z;
+        };
 
-                    this.setX = function(x) {
-                        _x = x;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
+        this.setXYZ = function(xyz) {
+            _x = xyz.x == undefined ? 1 : xyz.x;
+            _y = xyz.y == undefined ? 1 : xyz.y;
+            _z = xyz.z == undefined ? 1 : xyz.z;
+            $._memoLevel = 0;
+            return this;
+        };
 
-                    this.getX = function() {
-                        return _x;
-                    };
+        this.getXYZ = function() {
+            return {
+                x: _x,
+                y: _y,
+                z: _z
+            };
+        };
 
-                    this.setY = function(y) {
-                        _y = y;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
+        var init = function(params) {
+            this.setXYZ({x : params.x, y: params.y, z: params.z });
+        };
 
-                    this.getY = function() {
-                        return _y;
-                    };
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
 
-                    this.setZ = function(z) {
-                        _z = z;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
-
-                    this.getZ = function() {
-                        return _z;
-                    };
-
-                    this.setXYZ = function(xyz) {
-                        _x = xyz.x == undefined ? 1 : xyz.x;
-                        _y = xyz.y == undefined ? 1 : xyz.y;
-                        _z = xyz.z == undefined ? 1 : xyz.z;
-                        _memoLevel = NO_MEMO;
-                        return this;
-                    };
-
-                    this.getXYZ = function() {
-                        return {
-                            x: _x,
-                            y: _y,
-                            z: _z
-                        };
-                    };
-
-                    this._init = function(params) {
-                        this.setXYZ({x : params.x, y: params.y, z: params.z });
-                    };
-
-                    if (cfg.fixed) {
-                        this._init(cfg.getParams());
-                    }
-
-                    this._render = function(traversalContext, data) {
-                        if (_memoLevel == NO_MEMO) {
-                            if (!cfg.fixed) {
-                                this._init(cfg.getParams(data));
-                            } else {
-                                _memoLevel = FIXED_CONFIG;
-                            }
-                            _mat = SceneJS_math_translationMat4v([_x, _y, _z]);
-                        }
-                        var superXform = modelTransformBackend.getTransform();
-                        if (_memoLevel < FIXED_MODEL_SPACE) {
-                            var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
-                            xform = {
-                                localMatrix: _mat,
-                                matrix: tempMat,
-                                fixed: superXform.fixed && cfg.fixed
-                            };
-                            if (_memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
-                                _memoLevel = FIXED_MODEL_SPACE;
-                            }
-                        }
-                        modelTransformBackend.setTransform(xform);
-                        this._renderChildren(traversalContext, data);
-                        modelTransformBackend.setTransform(superXform);
-                    };
-                })());
-    };
-})();
+        this._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
+                }
+                _mat = SceneJS_math_translationMat4v([_x, _y, _z]);
+            }
+            var superXform = SceneJS_modelTransformModule.getTransform();
+            if ($._memoLevel < 2) {
+                var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
+                xform = {
+                    localMatrix: _mat,
+                    matrix: tempMat,
+                    fixed: superXform.fixed && cfg.fixed
+                };
+                if ($._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+                    $._memoLevel = 2;
+                }
+            }
+            SceneJS_modelTransformModule.setTransform(xform);
+            this._renderChildren(traversalContext, data);
+            SceneJS_modelTransformModule.setTransform(superXform);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
+};
 /**
  * Scene node that applies a model-space scaling transform to the nodes within its subgraph, accumulated with higher
  * modelling transform nodes.
@@ -13584,113 +9762,104 @@ SceneJS.rotate = function() {
  * @class SceneJS.scale
  * @extends SceneJS.node
  */
-(function() {
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
 
-    /* Memoization levels
+
+SceneJS.scale = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
+
+    /* Augment the basic node type
      */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_MODEL_SPACE = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
+    return (function($) {
 
-    SceneJS.scale = function() {
-        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        var _mat = null;
+        var _xform = null;
 
-        return SceneJS._utils.createNode(
-                "scale",
-                cfg.children,
+        var _x = 0;
+        var _y = 0;
+        var _z = 1;
 
-                new (function() {
-                    this._memoLevel = NO_MEMO;
-                    this._mat = null;
-                    this._xform = null;
+        $.setX = function(x) {
+            _x = x;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                    this._x = 0;
-                    this._y = 0;
-                    this._z = 1;
+        $.getX = function() {
+            return _x;
+        };
 
-                    this.setX = function(x) {
-                        this._x = x;
-                        this._memoLevel = NO_MEMO;
-                        return this;
-                    };
+        $.setY = function(y) {
+            _y = y;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                    this.getX = function() {
-                        return this._x;
-                    };
+        $.getY = function() {
+            return _y;
+        };
 
-                    this.setY = function(y) {
-                        this._y = y;
-                        this._memoLevel = NO_MEMO;
-                        return this;
-                    };
+        $.setZ = function(z) {
+            _z = z;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                    this.getY = function() {
-                        return this._y;
-                    };
+        $.getZ = function() {
+            return _z;
+        };
 
-                    this.setZ = function(z) {
-                        this._z = z;
-                        this._memoLevel = NO_MEMO;
-                        return this;
-                    };
+        $.setXYZ = function(xyz) {
+            _x = xyz.x == undefined ? 1 : xyz.x;
+            _y = xyz.y == undefined ? 1 : xyz.y;
+            _z = xyz.z == undefined ? 1 : xyz.z;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                    this.getZ = function() {
-                        return this._z;
-                    };
+        $.getXYZ = function() {
+            return {
+                x: _x,
+                y: _y,
+                z: _z
+            };
+        };
 
-                    this.setXYZ = function(xyz) {
-                        this._x = xyz.x == undefined ? 1 : xyz.x;
-                        this._y = xyz.y == undefined ? 1 : xyz.y;
-                        this._z = xyz.z == undefined ? 1 : xyz.z;
-                        this._memoLevel = NO_MEMO;
-                        return this;
-                    };
+        var init = function(params) {
+            $.setXYZ({x : params.x, y: params.y, z: params.z });
+        };
 
-                    this.getXYZ = function() {
-                        return {
-                            x: this._x,
-                            y: this._y,
-                            z: this._z
-                        };
-                    };
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
 
-                    this._init = function(params) {
-                        this.setXYZ({x : params.x, y: params.y, z: params.z });
-                    };
-
-                    if (cfg.fixed) {
-                        this._init(cfg.getParams());
-                    }
-
-                    this._render = function(traversalContext, data) {
-                        if (this._memoLevel == NO_MEMO) {
-                            if (!cfg.fixed) {
-                                this._init(cfg.getParams(data));
-                            } else {
-                                this._memoLevel = FIXED_CONFIG;
-                            }
-                            this._mat = SceneJS_math_scalingMat4v([this._x, this._y, this._z]);
-                        }
-                        var superXform = modelTransformBackend.getTransform();
-                        if (this._memoLevel < FIXED_MODEL_SPACE) {
-                            var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
-                            this._xform = {
-                                localMatrix: this._mat,
-                                matrix: tempMat,
-                                fixed: superXform.fixed && cfg.fixed
-                            };
-                            if (this._memoLevel == FIXED_CONFIG && superXform.fixed) {   // Bump up memoization level if model-space fixed
-                                this._memoLevel = FIXED_MODEL_SPACE;
-                            }
-                        }
-                        modelTransformBackend.setTransform(this._xform);
-                        this._renderChildren(traversalContext, data);
-                        modelTransformBackend.setTransform(superXform);
-                    };
-                })());
-    };
-})();
+        $._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
+                }
+                _mat = SceneJS_math_scalingMat4v([_x, _y, _z]);
+            }
+            var superXform = SceneJS_modelTransformModule.getTransform();
+            if ($._memoLevel < 2) {
+                var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
+                _xform = {
+                    localMatrix: _mat,
+                    matrix: tempMat,
+                    fixed: superXform.fixed && cfg.fixed
+                };
+                if ($._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+                    $._memoLevel = 2;
+                }
+            }
+            SceneJS_modelTransformModule.setTransform(_xform);
+            $._renderChildren(traversalContext, data);
+            SceneJS_modelTransformModule.setTransform(superXform);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
+};
 /**
  * Scene node that accumulates a model-space transform for the nodes within its subgraph, accumulated with higher
  * modelling transform nodes.
@@ -13699,9 +9868,6 @@ SceneJS.rotate = function() {
  * @extends SceneJS.node
  */
 SceneJS.modelMatrix = function() {
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var modelTransformBackend = SceneJS._backends.getBackend('model-transform');
-
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     /* Memoization levels
@@ -13721,10 +9887,10 @@ SceneJS.modelMatrix = function() {
 
                 this.setElements = function(elements) {
                     if (!elements) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
                     }
                     if (elements.length != 16) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
                     }
                     for (var i = 0; i < 16; i++) {
                         _mat[i] = elements[i];
@@ -13760,7 +9926,7 @@ SceneJS.modelMatrix = function() {
                             _memoLevel = FIXED_CONFIG;
                         }
                     }
-                    var superXform = modelTransformBackend.getTransform();
+                    var superXform = SceneJS_modelTransformModule.getTransform();
                     if (_memoLevel < FIXED_TRANSFORM) {
                         var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                         _xform = {
@@ -13772,91 +9938,12 @@ SceneJS.modelMatrix = function() {
                             _memoLevel = FIXED_TRANSFORM;
                         }
                     }
-                    modelTransformBackend.setTransform(_xform);
+                    SceneJS_modelTransformModule.setTransform(_xform);
                      this._renderChildren(traversalContext, data);
-                    modelTransformBackend.setTransform(superXform);
+                    SceneJS_modelTransformModule.setTransform(superXform);
                 };
             })());
 };
-/**
- * Backend that manages the current projection transform matrix.
- *
- * Services the scene projection transform nodes, such as SceneJS.frustum, providing them with methods to set and
- * get the current projection matrix.
- *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * PROJECTION_TRANSFORM_EXPORTED to pass the projection matrix as a WebGLFloatArray to the shading backend.
- *
- * The WebGLFloatArray is lazy-computed and cached on export to avoid repeatedly regenerating it.
- *
- * Avoids redundant export of the matrix with a dirty flag; the matrix is only exported when the flag is set, which
- * occurs when the matrix is set by scene node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
- *
- * Whenever a scene node sets the matrix, this backend publishes it with a PROJECTION_TRANSFORM_UPDATED to allow other
- * dependent backends (such as "view-frustum") to synchronise their resources.
- */
-SceneJS._backends.installBackend(
-
-        "projection",
-
-        function(ctx) {
-
-            var transform;
-            var dirty;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        transform = {
-                            matrix : SceneJS_math_identityMat4(),
-                            fixed: true
-                        };
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (dirty) {                
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.PROJECTION_TRANSFORM_EXPORTED,
-                                    transform);
-                            dirty = false;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            /* Node-facing API
-             */
-            return {
-
-                setTransform: function(t) {
-                    transform = t;
-                    dirty = true;
-                    ctx.events.fireEvent(
-                            SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED,
-                            transform);
-                },
-
-                getTransform: function() {
-                    return transform;
-                }
-            };
-        });
 /**
  * Scene node that defines a perspective transformation for the nodes within its subgraph.
  *
@@ -13865,105 +9952,96 @@ SceneJS._backends.installBackend(
  */
 SceneJS.perspective = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var projectionBackend = SceneJS._backends.getBackend('projection');
 
-    /* Memoization levels
+    /* Augment the basic node type
      */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing matrix
+    return (function($) {
+        $._fovy = 60.0;
+        $._aspect = 1.0;
+        $._near = 0.1;
+        $._far = 400.0;
+        $._transform = null;
 
-    return SceneJS._utils.createNode(
-            "perspective",
-            cfg.children,
+        $.setFovY = function(fovy) {
+            $._fovy = fovy;
+            $._memoLevel = 0;
+        };
 
-            new (function() {
-                var _memoLevel = NO_MEMO;
+        $.getFovyY = function() {
+            return $._fovy;
+        };
 
-                var _fovy = 60.0;
-                var _aspect = 1.0;
-                var _near = 0.1;
-                var _far = 400.0;
+        $.setAspect = function(aspect) {
+            $._aspect = aspect;
+            $._memoLevel = 0;
+        };
 
-                var _transform;
+        $.getAspect = function() {
+            return $._aspect;
+        };
 
-                this.setFovY = function(fovy) {
-                    _fovy = fovy;
-                    _memoLevel = NO_MEMO;
-                };
+        $.setNear = function(near) {
+            $._near = near;
+            $._memoLevel = 0;
+        };
 
-                this.getFovyY = function() {
-                    return _fovy;
-                };
+        $.getNear = function() {
+            return $._near;
+        };
 
-                this.setAspect = function(aspect) {
-                    _aspect = aspect;
-                    _memoLevel = NO_MEMO;
-                };
+        $.setFar = function(far) {
+            $._far = far;
+            $._memoLevel = 0;
+        };
 
-                this.getAspect = function() {
-                    return _aspect;
-                };
+        $.getFar = function() {
+            return $._far;
+        };
 
-                this.setNear = function(near) {
-                    _near = near;
-                    _memoLevel = NO_MEMO;
-                };
+        $._init = function(params) {
+            if (params.fovy) {
+                $.setFovY(params.fovy);
+            }
+            if (params.aspect) {
+                $.setAspect(params.aspect);
+            }
+            if (params.near) {
+                $.setNear(params.near);
+            }
+            if (params.far) {
+                $.setFar(params.far);
+            }
+        };
 
-                this.getNear = function() {
-                    return _near;
-                };
+        if (cfg.fixed) {
+            $._init(cfg.getParams());
+        }
 
-                this.setFar = function(far) {
-                    _far = far;
-                    _memoLevel = NO_MEMO;
-                };
-
-                this.getFar = function() {
-                    return _far;
-                };
-
-                this._init = function(params) {
-                    if (params.fovy) {
-                        this.setFovY(params.fovy);
-                    }
-                    if (params.aspect) {
-                        this.setAspect(params.aspect);
-                    }
-                    if (params.near) {
-                        this.setNear(params.near);
-                    }
-                    if (params.far) {
-                        this.setFar(params.far);
-                    }
-                };
-
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
+        // Override
+        $._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    $._init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
                 }
-
-                this._render = function(traversalContext, data) {
-                    if (_memoLevel == NO_MEMO) {
-                        if (!cfg.fixed) {
-                            this._init(cfg.getParams(data));
-                        } else {
-                            _memoLevel = FIXED_CONFIG;
-                        }
-                        var tempMat = SceneJS_math_perspectiveMatrix4(
-                                _fovy * Math.PI / 180.0,
-                                _aspect,
-                                _near,
-                                _far);
-                        _transform = {
-                            type: "perspective",
-                            matrix:tempMat
-                        };
-                    }
-                    var prevTransform = projectionBackend.getTransform();
-                    projectionBackend.setTransform(_transform);
-                    SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    projectionBackend.setTransform(prevTransform);
+                var tempMat = SceneJS_math_perspectiveMatrix4(
+                        $._fovy * Math.PI / 180.0,
+                        $._aspect,
+                        $._near,
+                        $._far);
+                $._transform = {
+                    type: "perspective",
+                    matrix:tempMat
                 };
-            })());
+            }
+            var prevTransform = SceneJS_projectionModule.getTransform();
+            SceneJS_projectionModule.setTransform($._transform);
+            this._renderChildren(traversalContext, data);
+            SceneJS_projectionModule.setTransform(prevTransform);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
 
 /**
@@ -13971,7 +10049,7 @@ SceneJS.perspective = function() {
  */
 SceneJS.ortho = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('projection');
+   
     var transform;
 
     return SceneJS._utils.createNode(
@@ -14003,10 +10081,10 @@ SceneJS.ortho = function() {
                             matrix: tempMat
                         };
                     }
-                    var prevTransform = backend.getTransform();
-                    backend.setTransform(transform);
+                    var prevTransform = SceneJS_projectionModule.getTransform();
+                    SceneJS_projectionModule.setTransform(transform);
                     this._renderChildren(traversalContext, data);
-                    backend.setTransform(prevTransform);
+                    SceneJS_projectionModule.setTransform(prevTransform);
                 };
             })());
 };
@@ -14015,7 +10093,6 @@ SceneJS.ortho = function() {
  */
 SceneJS.frustum = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('projection');
 
     return SceneJS._utils.createNode(
             "frustum",
@@ -14049,102 +10126,13 @@ SceneJS.frustum = function() {
                             matrix: tempMat
                         };
                     }
-                    var prevTransform = backend.getTransform();
-                    backend.setTransform(transform);
+                    var prevTransform = SceneJS_projectionModule.getTransform();
+                    SceneJS_projectionModule.setTransform(transform);
                     this._renderChildren(traversalContext, data);
-                    backend.setTransform(prevTransform);
+                    SceneJS_projectionModule.setTransform(prevTransform);
                 };
             })());
 };
-/**
- * Backend that manages the current view transform matrices (view and normal).
- *
- * Services the scene view transform nodes, such as SceneJS.lookAt, providing them with methods to set and
- * get the current view transform matrices.
- *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * MODEL_TRANSFORM_EXPORTED to pass the view matrix and normal matrix as WebGLFloatArrays to the
- * shading backend.
- *
- * Normal matrix and WebGLFloatArrays are lazy-computed and cached on export to avoid repeatedly regenerating them.
- *
- * Avoids redundant export of the matrices with a dirty flag; they are only exported when that is set, which occurs
- * when transform is set by scene node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
- *
- * Whenever a scene node sets the matrix, this backend publishes it with a VIEW_TRANSFORM_UPDATED to allow other
- * dependent backends (such as "view-frustum") to synchronise their resources.
- */
-SceneJS._backends.installBackend(
-
-        "view-transform",
-
-        function(ctx) {
-
-            var transform;
-            var dirty;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        transform = {
-                            matrix : SceneJS_math_identityMat4(),
-                            fixed: true
-                        };
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (dirty) {
-
-                            if (!transform.matrixAsArray) {
-                                transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
-                            }
-
-                            if (!transform.normalMatrixAsArray) {
-                                transform.normalMatrixAsArray = new WebGLFloatArray(
-                                        SceneJS_math_transposeMat4(
-                                                SceneJS_math_inverseMat4(transform.matrix)));
-                            }
-
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.VIEW_TRANSFORM_EXPORTED,
-                                    transform);
-
-                            dirty = false;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            /* Node-facing API
-             */
-            return {
-
-                setTransform : function(t) {
-                    transform = t;
-                    dirty = true;
-                    ctx.events.fireEvent(
-                            SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
-                            transform);
-                },                               
-
-                getTransform : function() {
-                    return transform;
-                }
-            };
-        });
 /**
  * Scene node that defines a "look at" viewing transformation for the nodes within its subgraph.
  *
@@ -14152,17 +10140,15 @@ SceneJS._backends.installBackend(
  * @extends SceneJS.node
  */
 (function() {
-    var backend = SceneJS._backends.getBackend('view-transform');
-    var errorBackend = SceneJS._backends.getBackend('error');
-
-    /* Memoization levels
-     */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_SPACE = 2;    // Both node config and model-space are fixed
-
     SceneJS.lookAt = function() {
+
         var cfg = SceneJS._utils.getNodeConfig(arguments);
+
+        /* Memoization levels
+         */
+        const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
+        const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
+        const FIXED_SPACE = 2;    // Both node config and model-space are fixed
 
         return SceneJS._utils.createNode(
                 "lookAt",
@@ -14223,7 +10209,7 @@ SceneJS._backends.installBackend(
                         var y = up.y || 0;
                         var z = up.z || 0;
                         if (x + y + z == 0) {
-                            errorBackend.fatalError(
+                            SceneJS_errorModule.fatalError(
                                     new SceneJS.exceptions.IllegalRotateConfigException(
                                             "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero"));
                         }
@@ -14270,7 +10256,7 @@ SceneJS._backends.installBackend(
                                     _lookX, _lookY, _lookZ,
                                     _upX, _upY, _upZ);
                         }
-                        var superXform = backend.getTransform();
+                        var superXform = SceneJS_viewTransformModule.getTransform();
                         if (_memoLevel < FIXED_SPACE) {
                             var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                             xform = {
@@ -14287,9 +10273,9 @@ SceneJS._backends.installBackend(
                                 _memoLevel = FIXED_SPACE;
                             }
                         }
-                        backend.setTransform(xform);
+                        SceneJS_viewTransformModule.setTransform(xform);
                         this._renderChildren(traversalContext, data);
-                        backend.setTransform(superXform);
+                        SceneJS_viewTransformModule.setTransform(superXform);
                     };
                 })());
     };
@@ -14302,9 +10288,7 @@ SceneJS._backends.installBackend(
  * @extends SceneJS.node
  */
 SceneJS.viewMatrix = function() {
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var transformBackend = SceneJS._backends.getBackend('view-transform');
-
+    
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
     /* Memoization levels
@@ -14324,10 +10308,10 @@ SceneJS.viewMatrix = function() {
 
                 this.setElements = function(elements) {
                     if (!elements) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
                     }
                     if (elements.length != 16) {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
                     }
                     for (var i = 0; i < 16; i++) {
                         _mat[i] = elements[i];
@@ -14363,7 +10347,7 @@ SceneJS.viewMatrix = function() {
                             _memoLevel = FIXED_CONFIG;
                         }
                     }
-                    var superXform = transformBackend.getTransform();
+                    var superXform = SceneJS_viewTransformModule.getTransform();
                     if (_memoLevel < FIXED_TRANSFORM) {
                         var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
                         _xform = {
@@ -14375,9 +10359,9 @@ SceneJS.viewMatrix = function() {
                             _memoLevel = FIXED_TRANSFORM;
                         }
                     }
-                    transformBackend.setTransform(_xform);
+                    SceneJS_viewTransformModule.setTransform(_xform);
                     this._renderChildren(cfg, traversalContext, data);
-                    transformBackend.setTransform(superXform);
+                    SceneJS_viewTransformModule.setTransform(superXform);
                 };
             })());
 };
@@ -14392,8 +10376,7 @@ SceneJS.viewMatrix = function() {
  */
 SceneJS.stationary = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('view-transform');
-
+   
     return SceneJS._utils.createNode(
             "stationary",
             cfg.children,
@@ -14403,7 +10386,7 @@ SceneJS.stationary = function() {
                 var xform;
 
                 this._render = function(traversalContext, data) {
-                    var superXform = backend.getTransform();
+                    var superXform = SceneJS_viewTransformModule.getTransform();
                     var lookAt = superXform.lookAt;
                     if (lookAt) {
                         if (!xform || !superXform.fixed) {
@@ -14418,200 +10401,15 @@ SceneJS.stationary = function() {
                                 fixed: superXform.fixed
                             };
                         }
-                        backend.setTransform(xform);
+                        SceneJS_viewTransformModule.setTransform(xform);
                         this._renderChildren(traversalContext, data);
-                        backend.setTransform(superXform);
+                        SceneJS_viewTransformModule.setTransform(superXform);
                     } else {
                         this._renderChildren(traversalContext, data);
                     }
                 };
             })());
 };
-
-/**
- * Backend that manages scene lighting.
- *
- * Holds the sources on a stack and provides the SceneJS.light node with methods to push and pop them.
- *
- * Tracks the view and modelling transform matrices through incoming VIEW_TRANSFORM_UPDATED and
- * MODEL_TRANSFORM_UPDATED events. As each light are pushed, its position and/or direction is multipled by the
- * matrices. The stack will therefore contain sources that are instanced in view space by different modelling
- * transforms, with positions and directions that may be animated,
- *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * LIGHTS_EXPORTED to pass the entire light stack to the shading backend.
- *
- * Avoids redundant export of the sources with a dirty flag; they are only exported when that is set, which occurs
- * when the stack is pushed or popped by the lights node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
- * SHADER_DEACTIVATED events.
- *
- * Whenever a scene node pushes or pops the stack, this backend publishes it with a LIGHTS_UPDATED to allow other
- * dependent backends to synchronise their resources.
- */
-SceneJS._backends.installBackend(
-
-        "lights",
-
-        function(ctx) {
-
-            var viewMat;
-            var modelMat;
-            var lightStack = [];
-            var dirty;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        modelMat = viewMat = SceneJS_math_identityMat4();
-                        lightStack = [];
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
-                    function(params) {
-                        viewMat = params.matrix;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.MODEL_TRANSFORM_UPDATED,
-                    function(params) {
-                        modelMat = params.matrix;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (dirty) {
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.LIGHTS_EXPORTED,
-                                    lightStack);
-                            dirty = false;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            function vectorToArray(v, fallback) {
-                return v ? [ v.x || 0, v.y || 0, v.z || 0] : fallback;
-            }
-
-            function pointToArray(p, fallback) {
-                return p ? [ p.x || 0, p.y || 0, p.z || 0, p.w || 1] : fallback;
-            }
-
-            function colourToArray(v, fallback) {
-                return v ? [
-                    v.r == undefined ? fallback[0] : v.r,
-                    v.g == undefined ? fallback[1] : v.g,
-                    v.b == undefined ? fallback[2] : v.b] : fallback;
-            }
-
-            /* Creates a view-space light
-             */
-            function createLight(light) {
-                if (light.type) {
-                    if (light.type != "dir"
-                            && light.type != "point") {
-                        ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                                "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'"));
-                    }
-                } else {
-                    light.type = light.type || "point";
-                }
-
-                if (light.type == "point") {
-                    return {
-                        type: light.type,
-                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                        diffuse : light.diffuse == undefined ? true : light.diffuse,
-                        specular : light.specular == undefined ? true : light.specular,
-                        pos : SceneJS_math_transformPoint3(
-                                viewMat,
-                                SceneJS_math_transformPoint3(
-                                        modelMat,
-                                        pointToArray(light.pos, [ 0,  0, 1.0, 1.0]))),
-                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-                    };
-                }
-
-                if (light.type == "dir") {
-                    return {
-                        type: light.type,
-                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                        diffuse : light.diffuse == undefined ? true : light.diffuse,
-                        specular : light.specular == undefined ? true : light.specular,
-                        dir : SceneJS_math_transformVector3(
-                                viewMat,
-                                SceneJS_math_transformVector3(
-                                        modelMat,
-                                        vectorToArray(light.dir, [ 0,  0,  1.0])))
-                    };
-                }
-
-                //                if (light.type == "spot") {
-                //                    return {
-                //                        type: light.type,
-                //                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                //                        diffuse : light.diffuse,
-                //                        specular : light.specular,
-                //                        pos : SceneJS_math_transformPoint3(
-                //                                viewMat,
-                //                                SceneJS_math_transformPoint3(
-                //                                        modelMat,
-                //                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
-                //
-                //                        dir : SceneJS_math_transformVector3(
-                //                                viewMat,
-                //                                SceneJS_math_transformVector3(
-                //                                        modelMat,
-                //                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
-                //                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
-                //                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
-                //                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-                //                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-                //                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-                //                    };
-                //                }
-            }
-
-            /* Node-facing API
-             */
-            return {
-
-                pushLights : function(sources) {
-                    for (var i = 0; i < sources.length; i++) {
-                        lightStack.push(createLight(sources[i]));
-                    }
-                    dirty = true;
-                    ctx.events.fireEvent(
-                            SceneJS._eventTypes.LIGHTS_UPDATED,
-                            lightStack);
-                },
-
-                popLights : function(numSources) {
-                    for (var i = 0; i < numSources; i++) {
-                        lightStack.pop();
-                    }
-                    dirty = true;
-                    ctx.events.fireEvent(
-                            SceneJS._eventTypes.LIGHTS_UPDATED,
-                            lightStack);
-                }
-            };
-        });
 
 /**
  * @class SceneJS.lights
@@ -14622,7 +10420,7 @@ SceneJS._backends.installBackend(
  * while directional only have a vector that describes their direction, where they have no actual location since they
  * are an infinite distance away.</p>
  * <p>Therefore, each of these two light types have slightly different properties, as shown in the exaples below.</p>
- * <p><b>Example 1 (functionally composed style):</b></p><p>A cube illuminated by two light sources, point and directional.
+ * <p><b>Example:</b></p><p>A cube illuminated by two light sources, point and directional.
  * The cube has material properties that define how it reflects the light.</b></p><pre><code>
  * SceneJS.lights({
  *          sources: [
@@ -14663,7 +10461,6 @@ SceneJS._backends.installBackend(
  *     )
  * )
  * </pre></code>
- *
  * @constructor
  * Create a new SceneJS.lights
  * @param {Object} The config object or function, followed by zero or more child nodes
@@ -14671,111 +10468,26 @@ SceneJS._backends.installBackend(
  */
 SceneJS.lights = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
-    var backend = SceneJS._backends.getBackend('lights');
 
     return SceneJS._utils.createNode(
             "lights",
             cfg.children,
 
             new (function() {
+
                 this._render = function(traversalContext, data) {
                     if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
                         this._renderChildren(traversalContext, data);
                     } else {
                         var sources = cfg.getParams(data).sources;
-                        backend.pushLights(sources);
+                        SceneJS_lightingModule.pushLights(sources);
                         this._renderChildren(traversalContext, data);
-                        backend.popLights(sources.length);
+                        SceneJS_lightingModule.popLights(sources.length);
                     }
                 };
             })());
 };
 
-/**
- * Backend that manages the current material properties.
- *
- * Services the SceneJS.material scene node, providing it with methods to set and get the current material.
- *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * MATERIAL_EXPORTED to pass the material properties to the shading backend.
- *
- * Avoids redundant export of the material properties with a dirty flag; they are only exported when that is set, which
- * occurs when material is set by the SceneJS.material node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
- * SHADER_DEACTIVATED events.
- *
- * Sets the properties to defaults on SCENE_ACTIVATED.
- *
- * Whenever a SceneJS.material sets the material properties, this backend publishes it with a MATERIAL_UPDATED to allow
- * other dependent backends to synchronise their resources. One such backend is the shader backend, which taylors the
- * active shader according to the material properties.
- */
-SceneJS._backends.installBackend(
-
-        "material",
-
-        function(ctx) {
-
-            var material;
-            var dirty;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        material = {
-                            baseColor : [ 0.5, 0.5, 0.5 ],
-                            specularColor: [ 0.0,  0.0,  0.0 ],
-                            specular : 0,
-                            shine : 0,
-                            reflect : 0,
-                            alpha : 1.0,
-                            emit : 0.0,
-                            blendMode : "multiply"
-                        };
-                        dirty = true;
-                    });
-
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (dirty) {
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.MATERIAL_EXPORTED,
-                                    material);
-                            dirty = false;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-
-            /* Node-facing API
-             */
-            return {
-
-                setMaterial : function(m) {
-                    material = m;
-                    ctx.events.fireEvent(
-                            SceneJS._eventTypes.MATERIAL_UPDATED,
-                            material);
-                    dirty = true;
-                },
-
-                getMaterial : function() {
-                    return material;
-                }
-            };
-        });
 /**
  * @class SceneJS.material
  * @extends SceneJS.node
@@ -14784,7 +10496,7 @@ SceneJS._backends.installBackend(
  * those on outer material nodes for the inner node's subgraph. These nodes are to be defined either above or below
  * {@link SceneJS.lights} nodes, which provide light for geometry to reflect.</p>
  * node,
- * <p><b>Example 1 (functionally composed style):</b></p><p>A cube illuminated by a directional light source and wrapped
+ * <p><b>Example 1:</b></p><p>A cube illuminated by a directional light source and wrapped
  * with material properties that define how it reflects the light.</b></p><pre><code>
  * SceneJS.lights({
  *          sources: [
@@ -14827,8 +10539,6 @@ SceneJS._backends.installBackend(
  *
  */
 SceneJS.material = function() {
-    var errorBackend = SceneJS._backends.getBackend('error');
-    var backend = SceneJS._backends.getBackend('material');
 
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
@@ -14924,7 +10634,7 @@ SceneJS.material = function() {
 
                 this.setBlendMode = function(mode) {
                     if (mode != "add" && mode != "multiply") {
-                        errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
                                 "SceneJS.material blendMode of unsupported type: '" + mode + "' - should be 'add' or 'multiply'"));
                     }
                     _material.blendMode = mode;
@@ -14972,227 +10682,265 @@ SceneJS.material = function() {
                         if (!cfg.fixed) {
                             this._init(cfg.getParams(data));
                         }
-                        var saveMaterial = backend.getMaterial();
-                        backend.setMaterial(_material);
+                        var saveMaterial = SceneJS_materialModule.getMaterial();
+                        SceneJS_materialModule.setMaterial(_material);
                         this._renderChildren(traversalContext, data);
-                        backend.setMaterial(saveMaterial);
+                        SceneJS_materialModule.setMaterial(saveMaterial);
                     }
                 };
             })());
 };
 
 /**
- * Scene node that defines an interpolated animation sequence for a scalar property of a node. Takes a key value
- * from the current data scope and creates a child scope containing an output value that is interpolated within the
- * configured keyframe sequence.
- *
- * @class SceneJS.scalarInterpolator
- * @extends SceneJS.node
+  @class SceneJS.scalarInterpolator
+  @extends SceneJS.node
+  <p>A scene node that interpolates within a sequence of key values, taking the <i>alpha</i> value
+ from the current data scope and writing the output to a child data scope for nodes in its subgraph to
+ configure themselves with.</p>
+  <p><b>Example 1:</b></p><p>A cube whose rotation is animated by a SceneJS.scalarInterpolator, which is
+ in turn driven by an alpha value supplied by a higher SceneJS.withData:</b></p><pre><code>
+     SceneJS.withData({ alpha: 0.4 },
+
+        SceneJS.scalarInterpolator({
+            type:"linear",   // or 'cosine', 'cubic' or 'constant'
+            input:"alpha",
+            output:"angle",
+            keys: [0.0, 0.2, 0.5, 0.7, 0.9, 1.0],
+            values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0]
+        },
+
+                SceneJS.rotate(function(data) {
+                    return { angle : data.get("angle"), y: 1.0 };
+                },
+
+                        SceneJS.objects.cube()
+                        )
+                )
+        )
+  </pre></code>
+
+  @constructor
+  Create a new SceneJS.scalarInterpolator
+  @param {Object} config The config object, followed by zero or more child nodes
+
  */
 SceneJS.scalarInterpolator = function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var NOT_FOUND = 0;
-    var BEFORE_FIRST = 1;
-    var AFTER_LAST = 2;
-    var FOUND = 3;
+    if (!cfg.fixed) {
+
+        /* Can only configure this node type statically with an object, not with a callback
+         */
+        new SceneJS.exceptions.InvalidNodeConfigException(
+                "SceneJS.scalarInterpolator does not support dynamic configuration with a callback");
+    }
+
+    const NOT_FOUND = 0;
+    const BEFORE_FIRST = 1;
+    const AFTER_LAST = 2;
+    const FOUND = 3;
+
+    return (function($) {
+
+        /* ===========================================================================
+         * Initialise
+         * ==========================================================================*/
+
+        var params = cfg.getParams();
+
+        /* input
+         */
+        if (!params.input) {
+            SceneJS_errorModule.fatalError(
+                    new SceneJS.exceptions.NodeConfigExpectedException(
+                            "SceneJS.scalarInterpolator config property expected: input"));
+        }
+        $._input = params.input;
+
+        /* output
+         */
+        if (!params.output) {
+            SceneJS_errorModule.fatalError(
+                    new SceneJS.exceptions.NodeConfigExpectedException(
+                            "SceneJS.scalarInterpolator config property expected: output"));
+        }
+        $._output = params.output;
+        $._outputValue = null;
+
+        /* keys and values
+         */
+        if (params.keys) {
+            if (!params.values) {
+                SceneJS_errorModule.fatalError(
+                        new SceneJS.exceptions.InvalidNodeConfigException(
+                                "SceneJS.scalarInterpolator configuration incomplete: " +
+                                "keys supplied but no values - must supply a value for each key"));
+            }
+        } else if (params.values) {
+            SceneJS_errorModule.fatalError(
+                    new SceneJS.exceptions.InvalidNodeConfigException(
+                            "SceneJS.scalarInterpolator configuration incomplete: " +
+                            "values supplied but no keys - must supply a key for each value"));
+        }
+        for (var i = 1; i < params.keys.length; i++) {
+            if (params.keys[i - 1] >= params.keys[i]) {
+                SceneJS_errorModule.fatalError(
+                        new SceneJS.exceptions.InvalidNodeConfigException(
+                                "SceneJS.scalarInterpolator configuration invalid: " +
+                                "two invalid keys found ("
+                                        + i - 1 + " and " + i + ") - key list should contain distinct values in ascending order"));
+            }
+        }
+        $._keys = params.keys;
+        $._values = params.values;
+        $._key1 = 0;
+        $._key2 = 1;
+
+        /* type
+         */
+        params.type = params.type || 'linear';
+        switch (params.type) {
+            case 'linear':
+                break;
+            case 'constant':
+                break;
+            case 'cosine':
+                break;
+            case 'cubic':
+                if (params.keys.length < 4) {
+                    SceneJS_errorModule.fatalError(
+                            new SceneJS.exceptions.InvalidNodeConfigException(
+                                    "SceneJS.scalarInterpolator configuration invalid: minimum of four keyframes " +
+                                    "required for cubic - only "
+                                            + params.keys.length
+                                            + " are specified"));
+                }
+                break;
+            default:
+                SceneJS_errorModule.fatalError(
+                        new SceneJS.exceptions.InvalidNodeConfigException(
+                                "SceneJS.scalarInterpolator configuration invalid:  type not supported - " +
+                                "only 'linear', 'cosine', 'cubic' and 'constant' are supported"));
+            /*
 
 
-    return SceneJS._utils.createNode(
-            "scalarInterpolator",
-            cfg.children,
+             case 'hermite':
+             break;
+             */
+        }
+        $._type = params.type;
 
-            new (function() {
+        $._linearInterpolate = function(k) {
+            var u = $._keys[$._key2] - $._keys[$._key1];
+            var v = k - $._keys[$._key1];
+            var w = $._values[$._key2] - $._values[$._key1];
+            return $._values[$._key1] + ((v / u) * w);
+        };
 
-                var params;
-                var outputValue;
+        $._constantInterpolate = function(k) {
+            if (Math.abs((k - $._keys[$._key1])) < Math.abs((k - $._keys[$._key2]))) {
+                return $._keys[$._key1];
+            } else
+            {
+                return $._keys[$._key2];
+            }
+        };
 
-                this._render = function(traversalContext, data) {
-                    if (!params) {
-                        params = cfg.getParams(data);
+        $._cosineInterpolate = function(k) {
+            var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
+            return ($._keys[$._key1] * (1 - mu2) + $._keys[$._key2] * mu2);
+        };
 
-                        // Validate
+        $._cubicInterpolate = function(k) {
+            if ($._key1 == 0 || $._key2 == ($._keys.length - 1)) {
 
-                        if (!params.input) {
-                            errorBackend.fatalError(
-                                    new SceneJS.exceptions.NodeConfigExpectedException(
-                                            "SceneJS.scalarInterpolator property missing: input"));
-                        }
+                /* Between first or last pair of keyframes - need four keyframes for cubic, so fall back on cosine
+                 */
+                return $._cosineInterpolate(k);
+            }
+            var y0 = $._keys[$._key1 - 1];
+            var y1 = $._keys[$._key1];
+            var y2 = $._keys[$._key2];
+            var y3 = $._keys[$._key2 + 1];
+            var mu2 = k * k;
+            var a0 = y3 - y2 - y0 + y1;
+            var a1 = y0 - y1 - a0;
+            var a2 = y2 - y0;
+            var a3 = y1;
+            return (a0 * k * mu2 + a1 * mu2 + a2 * k + a3);
+        };
 
-                        if (!params.output) {
-                            errorBackend.fatalError(
-                                    new SceneJS.exceptions.NodeConfigExpectedException(
-                                            "SceneJS.scalarInterpolator property missing: output"));
-                        }
+        $._findEnclosingFrame = function(key) {
+            if ($._keys.length == 0) {
+                return NOT_FOUND;
+            }
+            if (key < $._keys[0]) {
+                return BEFORE_FIRST;
+            }
+            if (key > $._keys[$._keys.length - 1]) {
+                return AFTER_LAST;
+            }
+            while ($._keys[$._key1] > key) {
+                $._key1--;
+                $._key2--;
+            }
+            while ($._keys[$._key2] < key) {
+                $._key1++;
+                $._key2++;
+            }
+            return FOUND;
+        };
 
-                        if (params.keys) {
-                            if (!params.values) {
-                                errorBackend.fatalError(
-                                        new SceneJS.exceptions.InvalidNodeConfigException(
-                                                "SceneJS.scalarInterpolator configuration incomplete: " +
-                                                "keys supplied but no values - must supply a value for each key"));
-                            }
-                        } else if (params.values) {
-                            errorBackend.fatalError(
-                                    new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.scalarInterpolator configuration incomplete: " +
-                                                                                      "values supplied but no keys - must supply a key for each value"));
-                        }
+        $._interpolate = function(k) {
+            switch ($._type) {
+                case 'linear':
+                    return $._linearInterpolate(k);
+                case 'cosine':
+                    return $._cosineInterpolate(k);
+                case 'cubic':
+                    return $._cubicInterpolate(k);
+                case 'constant':
+                    return $._constantInterpolate(k);
+                default:
+                    SceneJS_errorModule.fatalError(
+                            "SceneJS.scalarInterpolator internal error - interpolation type not switched: '"
+                                    + $._type + "'");
+            }
+        };
 
-                        for (var i = 1; i < params.keys.length; i++) {
-                            if (params.keys[i - 1] >= params.keys[i]) {
-                                errorBackend.fatalError(
-                                        new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.scalarInterpolator configuration invalid: " +
-                                                                                          "two invalid keys found ("
-                                                + i - 1 + " and " + i + ") - key list should contain distinct values in ascending order"));
-                            }
-                        }
+        $._update = function(key) {
+            switch ($._findEnclosingFrame(key)) {
+                case NOT_FOUND:
+                    break;
+                case BEFORE_FIRST:
+                    break; // time delay before interpolation begins
+                case AFTER_LAST:
+                    $._outputValue = $._values[$._values.length - 1];
+                    break;
+                case FOUND:
+                    $._outputValue = $._interpolate((key));
+                    break;
+                default:
+                    break;
+            }
+        };
 
-                        params.type = params.type || 'linear';
+        $._render = function(traversalContext, data) {
+            var key = data.get($._input);
+            if (key == undefined || key == null) {
+                SceneJS_errorModule.fatalError(
+                        new SceneJS.exceptions.DataExpectedException(
+                                "SceneJS.scalarInterpolator failed to find input on data: '" + params.input + "'"));
+            }
+            $._update(key);
 
-                        switch (params.type) {
-                            case 'linear':
-                                break;
-                            case 'constant':
-                                break;
-                            case 'cosine':
-                                break;
-                            case 'cubic':
-                                if (params.keys.length < 4) {
-                                    errorBackend.fatalError(
-                                            new SceneJS.exceptions.InvalidNodeConfigException(
-                                                    "SceneJS.scalarInterpolator configuration invalid: minimum of four keyframes " +
-                                                    "required for cubic - only "
-                                                            + params.keys.length
-                                                            + " are specified"));
-                                }
-                                break;
-                            default:
-                                errorBackend.fatalError(
-                                        new SceneJS.exceptions.InvalidNodeConfigException(
-                                                "SceneJS.scalarInterpolator configuration invalid:  type not supported - " +
-                                                "only 'linear', 'cosine', 'cubic' and 'constant' are supported"));
-                            /*
+            var childData = SceneJS._utils.newScope(data, cfg.fixed);
+            childData.put(params.output, $._outputValue);
 
-
-                             case 'hermite':
-                             break;
-                             */
-                        }
-                    }
-
-                    var key = data.get(params.input);
-
-                    if (!key && key != 0) {
-                        errorBackend.fatalError(
-                                new SceneJS.exceptions.DataExpectedException(
-                                        "SceneJS.scalarInterpolator failed to find input on data: '" + params.input + "'"));
-                    }
-
-                    var key1 = 0;
-                    var key2 = 1;
-
-                    var linearInterpolate = function(k) {
-                        var u = params.keys[key2] - params.keys[key1];
-                        var v = k - params.keys[key1];
-                        var w = params.values[key2] - params.values[key1];
-                        return params.values[key1] + ((v / u) * w);
-                    } ;
-
-                    var constantInterpolate = function(k) {
-                        if (Math.abs((k - params.keys[key1])) < Math.abs((k - params.keys[key2]))) {
-                            return params.keys[key1];
-                        } else
-                        {
-                            return params.keys[key2];
-                        }
-                    };
-
-                    var cosineInterpolate = function(k) {
-                        var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
-                        return (params.keys[key1] * (1 - mu2) + params.keys[key2] * mu2);
-                    };
-
-                    var cubicInterpolate = function(k) {
-                        if (key1 == 0 || key2 == (params.keys.length - 1)) {
-                            /* Between first or last pair of keyframes - need four keyframes for cubic, so fall back on cosine
-                             */
-                            return cosineInterpolate(k);
-                        }
-                        var y0 = params.keys[key1 - 1];
-                        var y1 = params.keys[key1];
-                        var y2 = params.keys[key2];
-                        var y3 = params.keys[key2 + 1];
-                        var mu2 = k * k;
-                        var a0 = y3 - y2 - y0 + y1;
-                        var a1 = y0 - y1 - a0;
-                        var a2 = y2 - y0;
-                        var a3 = y1;
-                        return (a0 * k * mu2 + a1 * mu2 + a2 * k + a3);
-                    };
-
-                    var findEnclosingFrame = function(key) {
-                        if (params.keys.length == 0) {
-                            return NOT_FOUND;
-                        }
-                        if (key < params.keys[0]) {
-                            return BEFORE_FIRST;
-                        }
-                        if (key > params.keys[params.keys.length - 1]) {
-                            return AFTER_LAST;
-                        }
-                        while (params.keys[key1] > key) {
-                            key1--;
-                            key2--;
-                        }
-                        while (params.keys[key2] < key) {
-                            key1++;
-                            key2++;
-                        }
-                        return FOUND;
-                    } ;
-
-                    var interpolate = function(k) {
-                        switch (params.type) {
-                            case 'linear':
-                                return linearInterpolate(k);
-                            case 'cosine':
-                                return cosineInterpolate(k);
-                            case 'cubic':
-                                return cubicInterpolate(k);
-                            case 'constant':
-                                return constantInterpolate(k);
-                            default:
-                                errorBackend.fatalError("SceneJS.scalarInterpolator internal error - interpolation type not switched: '"
-                                        + params.type + "'");
-                        }
-                    };
-
-                    var update = function() {
-                        switch (findEnclosingFrame(key)) {
-                            case NOT_FOUND:
-                                break;
-                            case BEFORE_FIRST:
-                                break; // time delay before interpolation begins
-                            case AFTER_LAST:
-                                outputValue = params.values[params.values.length - 1];
-                                break;
-                            case FOUND:
-                                outputValue = interpolate((key));
-                                break;
-                            default:
-                                break;
-                        }
-                    };
-
-                    update();
-
-                    var childData = SceneJS._utils.newScope(data, cfg.fixed);
-                    childData.put(params.output, outputValue);
-
-                    this._renderChildren(traversalContext, childData);
-                };
-            })());
+            $._renderChildren(traversalContext, childData);
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
 
 
@@ -15372,7 +11120,7 @@ SceneJS.withData = function() {
  * @extends SceneJS.node
  */
 (function() {
-    var errorBackend = SceneJS._backends.getBackend("error");
+    var errorBackend = SceneJS._error;
     SceneJS.generator = function() {
         var cfg = SceneJS._utils.getNodeConfig(arguments);
 
@@ -15393,7 +11141,7 @@ SceneJS.withData = function() {
                             for (var key in params) {
                                 childData.put(key, params[key]);
                             }
-                            this._renderChildren(traversalContext, data);
+                            this._renderChildren(traversalContext, childData);
                             params = cfg.getParams(data);
                         }
                     };
@@ -15403,181 +11151,11 @@ SceneJS.withData = function() {
 
 
 /**
- * Backend that maintains a model-space viewing frustum computed from the current viewport and projection
- * and view transform matrices.
- *
- * Services queries on it from scene nodes (ie. intersections etc.).
- *
- * Tracks the viewport and matrices through incoming VIEWPORT_UPDATED, PROJECTION_TRANSFORM_UPDATED and
- * VIEW_TRANSFORM_UPDATED events.
- *
- * Lazy-computes the frustum on demand, caching it until any of the viewport or matrices is updated.
- *
- * Provides an interface through which scene nodes can test axis-aligned bounding boxes against the frustum,
- * eg. to query their intersection or projected size.
- *
- */
-SceneJS._backends.installBackend(
-
-        "view-frustum",
-
-        function(ctx) {
-
-            var viewport;
-            var projMat;
-            var viewMat;
-            var frustum;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        projMat = viewMat = SceneJS_math_identityMat4();
-                        viewport = [0,0,1,1];
-                        frustum = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.VIEWPORT_UPDATED,
-                    function(v) {
-                        viewport = [v.x, v.y, v.width, v.height];
-                        frustum = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.PROJECTION_TRANSFORM_UPDATED,
-                    function(params) {
-                        projMat = params.matrix;
-                        frustum = null;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
-                    function(params) {
-                        viewMat = params.matrix;
-                        frustum = null;
-                    });
-
-            var getFrustum = function() {
-                if (!frustum) {
-                    frustum = new SceneJS_math_Frustum(viewMat, projMat, viewport);
-                }
-                return frustum;
-            };
-
-            /** Node-facing API
-             */
-            return {
-
-                testAxisBoxIntersection : function(box) {
-                    return getFrustum().textAxisBoxIntersection(box);
-                } ,
-
-                getProjectedSize : function(box) {
-                    return getFrustum().getProjectedSize(box);
-                }
-            };
-        });
-/**
- * Backend that maintains a model-space sphere centered about the current eye position, computed from the
- * current view transform matrix.
- *
- * Services queries on it from scene nodes (ie. intersections etc.).
- *
- * Tracks the matrix through incoming VIEW_TRANSFORM_UPDATED events.
- *
- * Lazy-computes the sphere on demand, caching it until the matrix is updated.
- *
- * Provides an interface through which scene nodes can test axis-aligned bounding boxes for intersection
- * with the sphere.
- */
-SceneJS._backends.installBackend(
-
-        "view-locality",
-
-        function(ctx) {
-
-            var eye;
-            var radii;
-            var radii2;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        eye = { x: 0, y: 0, z: 0 };
-                        radii = {
-                            inner : 2000,
-                            outer : 2500
-                        };
-                        radii2 = {
-                            inner : radii.inner * radii.inner,
-                            outer : radii.outer * radii.outer
-                        };
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.VIEW_TRANSFORM_UPDATED,
-                    function(transform) {
-                        if (transform.lookAt) {
-                            var e = transform.lookAt.eye;
-                            eye = [e.x, e.y, e.z];
-                        } else {
-                            eye = [0,0,0];
-                        }
-                    });
-
-            function intersects(radius2, box) { // Simple Arvo method - TODO: Larsson-Arkenine-Moller-Lengyel method
-                var dmin = 0;
-                var e;
-                for (var i = 0; i < 3; i++) {
-                    if (eye[i] < box.min[i]) {
-                        e = eye[i] - box.min[i];
-                        dmin += (e * e);
-                    } else {
-                        if (eye[i] > box.max[i]) {
-                            e = eye[i] - box.max[i];
-                            dmin += (e * e);
-                        }
-                    }
-                }
-                return (dmin <= radius2);
-            }
-
-            /** Node-facing API
-             */
-            return {
-
-                setRadii : function(r) {
-                    radii = {
-                        outer : r.inner,
-                        inner : r.outer
-                    };
-                    radii2 = {
-                        inner : r.inner * r.inner,
-                        outer : r.outer * r.outer
-                    };
-                },
-
-                getRadii : function() {
-                    return radii;
-                },
-
-                testAxisBoxIntersectOuterRadius : function(box) {
-                    return intersects(radii2.outer, box);
-                },
-
-                testAxisBoxIntersectInnerRadius : function(box) {
-                    return intersects(radii2.inner, box);
-                }
-            };
-        });
-/**
  * @class SceneJS.boundingBox
  * @extends SceneJS.node
  * <p>A scene node that defines an axis-aligned box that encloses the spatial extents of its subgraph.</p> <p>You can accelerate
  * the rendering of your scenes by wrapping its most complex subgraphs with these, which causes SceneJS to only render them
  * when their boundingBoxes intersect the viewing frustum.</p><p>An example of a cube wrapped with a boundingBox:</p><pre><code>
- *  //...
- *
  *  SceneJS.boundingBox({
  *        xmin: -3.0, y: -3.0, zmin: -3.0, xmax: 3.0, ymax: 3.0, zmax: 3.0
  *      },
@@ -15596,481 +11174,319 @@ SceneJS._backends.installBackend(
  *</code></pre>
  * @constructor
  * Create a new SceneJS.boundingBox
- * @param {Object} The config object, followed by zero or more child nodes
+ * @param {Object} config Configuration object, followed by zero or more child nodes
  */
-(function() {
+SceneJS.boundingBox = function() {
+    var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    var errorBackend = SceneJS._backends.getBackend("error");
-    var backend = SceneJS._backends.getBackend("view-frustum");
-    var localityBackend = SceneJS._backends.getBackend("view-locality");
-    var modelTransformBackend = SceneJS._backends.getBackend("model-transform");
+    /* Augment the basic node type
+     */
+    return (function($) {
+        var _xmin;
+        var _ymin;
+        var _zmin;
+        var _xmax;
+        var _ymax;
+        var _zmax;
+        var levels;
+        var states = [];
 
-    SceneJS.boundingBox = function() {
-        var cfg = SceneJS._utils.getNodeConfig(arguments);
+        var objectCoords;   // Six object-space vertices for memo level 1
+        var viewBox;        // Axis-aligned view-space box for memo level 2
 
-        return SceneJS._utils.createNode(
-                "boundingBox",
-                cfg.children,
+        /**
+         * Sets the minimum X extent
+         *
+         * @function {SceneJS.boundingBox} setXMin
+         * @param {Double} xmin Minimum X extent
+         * @returns {SceneJS.boundingBox} This node
+         */
+        $.setXMin = function(xmin) {
+            _xmin = xmin;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                new (function() {
+        /**
+         * Gets the minimum X extent
+         *
+         * @function {Double} getXMin
+         * @returns {Double} Minimum X extent
+         */
+        $.getXMin = function() {
+            return _xmin;
+        };
 
-                    const STAGE_REMOTE = 0;
-                    const STAGE_SCENE = 1;
-                    const STATE_BUFFERED = 2;
+        /**
+         * Sets the minimum Y extent
+         *
+         * @function {SceneJS.boundingBox} setYMin
+         * @param {Double} ymin Minimum Y extent
+         * @returns {SceneJS.boundingBox} This node
+         */
+        $.setYMin = function(ymin) {
+            _ymin = ymin;
+            $._memoLevel = 0;
+            return $;
+        };
 
+        /**
+         * Gets the minimum Y extent
+         * @function {Double} getYMin
+         * @returns {Double} Minimum Y extent
+         */
+        $.getYMin = function() {
+            return _ymin;
+        };
 
-                    var objectCoords;
-                    var box;
-                    var levels;
-                    var states = [];
+        /**
+         * Sets the minimum Z extent
+         *
+         * @function {SceneJS.boundingBox} setZMin
+         * @param {Double} zmin Minimum Z extent
+         * @returns {SceneJS.boundingBox} This node
+         */
+        $.setZMin = function(zmin) {
+            _zmin = zmin;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                    //                    this.setXMin = function(x) {
-                    //                        box.xmin = x;
-                    //                        _memoLevel = NO_MEMO;
-                    //                        return this;
-                    //                    };
-                    //
-                    //                    this.getXMin = function() {
-                    //                        return box.xmin;
-                    //                    };
-                    //
-                    //                    this.setYMin = function(y) {
-                    //                        box.ymin = y;
-                    //                        _memoLevel = NO_MEMO;
-                    //                        return this;
-                    //                    };
-                    //
-                    //                    this.getYMin = function() {
-                    //                        return box.ymin;
-                    //                    };
-                    //
-                    //                    this.setZMin = function(z) {
-                    //                        box.zmin = z;
-                    //                        _memoLevel = NO_MEMO;
-                    //                        return this;
-                    //                    };
-                    //
-                    //                    this.getZMin = function() {
-                    //                        return box.zmin;
-                    //                    };
-                    //
-                    //                    this.setZMax = function(x) {
-                    //                        box.xmax = x;
-                    //                        _memoLevel = NO_MEMO;
-                    //                        return this;
-                    //                    };
-                    //
-                    //                    this.getZMax = function() {
-                    //                        return box.xmax;
-                    //                    };
-                    //
-                    //                    this.setYMax = function(y) {
-                    //                        box.ymax = y;
-                    //                        _memoLevel = NO_MEMO;
-                    //                        return this;
-                    //                    };
-                    //                    this.getYMax = function() {
-                    //                        return box.ymax;
-                    //                    };
-                    //
-                    //                    this.setZMax = function(z) {
-                    //                        box.zmax = z;
-                    //                        _memoLevel = NO_MEMO;
-                    //                        return this;
-                    //                    };
-                    //
-                    //                    this.getZMax = function() {
-                    //                        return box.zmax;
-                    //                    };
+        /**
+         * Gets the minimum Z extent
+         * @function {Double} getZMin
+         * @returns {Double} Minimum Z extent
+         */
+        $.getZMin = function() {
+            return _zmin;
+        };
 
-                    this._render = function(traversalContext, data) {
-                        if (!cfg.fixed || !(box || objectCoords)) {
-                            var params = cfg.getParams(data);
+        /**
+         * Sets the maximum X extent
+         *
+         * @function {SceneJS.boundingBox} setXMax
+         * @param {Double} xmax Maximum X extent
+         * @returns {SceneJS.boundingBox} This node
+         */
+        $.setXMax = function(xmax) {
+            _xmax = xmax;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                            params.xmin = params.xmin || 0;
-                            params.ymin = params.ymin || 0;
-                            params.zmin = params.zmin || 0;
-                            params.xmax = params.xmax || 0;
-                            params.ymax = params.ymax || 0;
-                            params.zmax = params.zmax || 0;
+        /**
+         * Gets the maximum X extent
+         * @function setXMax
+         * @returns {Double} Maximum X extent
+         */
+        $.getXMax = function() {
+            return _xmax;
+        };
 
-                            var modelTransform = modelTransformBackend.getTransform();
-                            if (modelTransform.identity) {  // No model transform
-                                box = {
-                                    min: [params.xmin, params.ymin, params.zmin],
-                                    max: [params.xmax, params.ymax, params.zmax]
-                                };
-                            } else {                        // Model transform either fixed or dynamic
-                                objectCoords = [
-                                    [params.xmin, params.ymin, params.zmin],
-                                    [params.xmax, params.ymin, params.zmin],
-                                    [params.xmax, params.ymax, params.zmin],
-                                    [params.xmin, params.ymax, params.zmin],
+        /**
+         * Sets the maximum Y extent
+         *
+         * @function {SceneJS.boundingBox} setYMax
+         * @param {Double} ymax Maximum Y extent
+         * @returns {SceneJS.boundingBox} This node
+         */
+        $.setYMax = function(ymax) {
+            _ymax = ymax;
+            $._memoLevel = 0;
+            return $;
+        };
 
-                                    [params.xmin, params.ymin, params.zmax],
-                                    [params.xmax, params.ymin, params.zmax],
-                                    [params.xmax, params.ymax, params.zmax],
-                                    [params.xmin, params.ymax, params.zmax]
-                                ];
-                            }
-                            if (params.levels) {
-                                if (params.levels.length != cfg.children.length) {
-                                    errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                                            ("SceneJS.boundingBox levels property should have a value for each child node"));
-                                }
+        /**
+         * Gets the maximum Y extent
+         * @function {Double} getYMax
+         * @return {Double} Maximum Y extent
+         */
+        $.getYMax = function() {
+            return _ymax;
+        };
 
-                                for (var i = 1; i < params.levels.length; i++) {
-                                    if (params.levels[i - 1] >= params.levels[i]) {
-                                        errorBackend.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                                                ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
+        /**
+         * Sets the maximum Z extent
+         *
+         * @function {SceneJS.boundingBox} setZMax
+         * @param {Double} zmax Maximum Z extent
+         * @returns {SceneJS.boundingBox} This node
+         */
+        $.setZMax = function(zmax) {
+            _zmax = zmax;
+            $._memoLevel = 0;
+            return $;
+        };
+
+        /**
+         * Gets the maximum Z extent
+         * @function {Double} getZMax
+         * @returns {Double} Maximum Z extent
+         */
+        $.getZMax = function() {
+            return _zmax;
+        };
+
+        /**
+         * Sets all extents
+         * @function {SceneJS.boundingBox} setBoundary
+         * @param {Object} boundary All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
+         */
+        $._setBoundary = function(boundary) {
+            _xmin = boundary.xmin || 0;
+            _ymin = boundary.ymin || 0;
+            _zmin = boundary.zmin || 0;
+            _xmax = boundary.xmax || 0;
+            _ymax = boundary.ymax || 0;
+            _zmax = boundary.zmax || 0;
+            $._memoLevel = 0;
+            return $;
+        };
+
+        /**
+         * Gets all extents
+         * @function {Object} getBoundary
+         * @returns {Object} All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
+         */
+        $.getBoundary = function() {
+            return {
+                xmin: _xmin,
+                ymin: _ymin,
+                zmin: _zmin,
+                xmax: _xmax,
+                ymax: _ymax,
+                zmax : _zmax
+            };
+        };
+
+        var init = function(params) {
+            _xmin = params.xmin || 0;
+            _ymin = params.ymin || 0;
+            _zmin = params.zmin || 0;
+            _xmax = params.xmax || 0;
+            _ymax = params.ymax || 0;
+            _zmax = params.zmax || 0;
+
+            if (params.levels) {
+                if (params.levels.length != cfg.children.length) {
+                    SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                            ("SceneJS.boundingBox levels property should have a value for each child node"));
+                }
+
+                for (var i = 1; i < params.levels.length; i++) {
+                    if (params.levels[i - 1] >= params.levels[i]) {
+                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                                ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
+                    }
+                }
+                levels = params.levels;
+            }
+        };
+
+        if (cfg.fixed) {
+            init(cfg.getParams());
+        }
+
+        this._render = function(traversalContext, data) {
+            if ($._memoLevel == 0) {
+                if (!cfg.fixed) {
+                    $._init(cfg.getParams(data));
+                } else {
+                    $._memoLevel = 1;
+                }
+                var modelTransform = SceneJS_modelTransformModule.getTransform();
+                if (!modelTransform.identity) {
+
+                    /* Model transform exists
+                     */
+                    objectCoords = [
+                        [_xmin, _ymin, _zmin],
+                        [_xmax, _ymin, _zmin],
+                        [_xmax, _ymax, _zmin],
+                        [_xmin, _ymax, _zmin],
+                        [_xmin, _ymin, _zmax],
+                        [_xmax, _ymin, _zmax],
+                        [_xmax, _ymax, _zmax],
+                        [_xmin, _ymax, _zmax]
+                    ];
+                } else {
+
+                    /* No model transform
+                     */
+                    viewBox = {
+                        min: [_xmin, _ymin, _zmin],
+                        max: [_xmax, _ymax, _zmax]
+                    };
+                    $._memoLevel = 2;
+                }
+            }
+
+            if ($._memoLevel < 2) {
+                var modelTransform = SceneJS_modelTransformModule.getTransform();
+                viewBox = new SceneJS_math_Box3().fromPoints(
+                        SceneJS_math_transformPoints3(
+                                modelTransform.matrix,
+                                objectCoords)
+                        );
+                if (modelTransform.fixed && $._memoLevel == 1) {
+                    objectCoords = null;
+                    $._memoLevel = 2;
+                }
+            }
+            if ($._memoLevel < 2) {
+                alert("memoLevel < 2");
+            }
+            if (SceneJS._localityModule.testAxisBoxIntersectOuterRadius(viewBox)) {
+                if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(viewBox)) {
+                    var result = SceneJS_frustumModule.testAxisBoxIntersection(viewBox);
+                    switch (result) {
+                        case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                        case SceneJS_math_INSIDE_FRUSTUM:
+                            if (levels) { // Level-of-detail mode
+                                var size = SceneJS_frustumModule.getProjectedSize(viewBox);
+                                for (var i = levels.length - 1; i >= 0; i--) {
+                                    if (levels[i] <= size) {
+                                        var state = states[i];
+                                        this._renderChild(i, traversalContext, data);
+                                        return;
                                     }
-                                    states.push(STAGE_REMOTE);
                                 }
-                                levels = params.levels;
-                            }
-                        }
-
-                        if (objectCoords) {
-                            var modelTransform = modelTransformBackend.getTransform();
-                            box = new SceneJS_math_Box3().fromPoints(
-                                    SceneJS_math_transformPoints3(
-                                            modelTransform.matrix,
-                                            objectCoords)
-                                    );
-
-                            if (modelTransform.fixed) {
-                                objectCoords = null;    // Ensures we don't recreate axis box next time
-                            }
-                        }
-
-                        if (localityBackend.testAxisBoxIntersectOuterRadius(box)) {
-
-                            if (localityBackend.testAxisBoxIntersectInnerRadius(box)) {
-
-                                var result = backend.testAxisBoxIntersection(box);
-                                window.countTeapots++;
-                                switch (result) {
-                                    case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
-
-                                    case SceneJS_math_INSIDE_FRUSTUM:
-
-                                        if (levels) { // Level-of-detail mode
-
-                                            var size = backend.getProjectedSize(box);
-                                            for (var i = levels.length - 1; i >= 0; i--) {
-                                                if (levels[i] <= size) {
-                                                    var state = states[i];
-                                                    this._renderChild(i, traversalContext, data);
-                                                    return;
-                                                }
-                                            }
-                                        } else {
-                                            this._renderChildren(traversalContext, data);
-                                        }
-                                        break;
-
-                                    case SceneJS_math_OUTSIDE_FRUSTUM:
-                                        break;
-                                }
-
                             } else {
-
-                                /* Allow content staging for subgraph
-                                 */
-
-                                // TODO:
-
                                 this._renderChildren(traversalContext, data);
                             }
-                        }
-                    };
-                })());
-    };
-})();
+                            break;
+
+                        case SceneJS_math_OUTSIDE_FRUSTUM:
+                            break;
+                    }
+                } else {
+
+                    /* Allow content staging for subgraph
+                     */
+
+                    // TODO:
+
+                    this._renderChildren(traversalContext, data);
+                }
+            }
+        };
+
+        return $;
+    })(SceneJS.node.apply(this, arguments));
+};
+                
 /**
- * Backend that manages material texture layers.
- *
- * Manages asynchronous load of texture images.
- *
- * Caches textures with a least-recently-used eviction policy.
- *
- * Holds currently-applied textures as "layers". Each layer specifies a texture and a set of parameters for
- * how the texture is to be applied, ie. to modulate ambient, diffuse, specular material colors, geometry normals etc.
- *
- * Holds the layers on a stack and provides the SceneJS.texture node with methods to push and pop them.
- *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * TEXTURES_EXPORTED to pass the entire layer stack to the shading backend.
- *
- * Avoids redundant export of the layers with a dirty flag; they are only exported when that is set, which occurs
- * when the stack is pushed or popped by the texture node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
- * SHADER_DEACTIVATED events.
- *
- * Whenever a texture node pushes or pops the stack, this backend publishes it with a TEXTURES_UPDATED to allow other
- * dependent backends to synchronise their resources.
- */
-SceneJS._backends.installBackend(
+ * <p>Scene node that defines one or more layers of texture to apply to geometry within its subgraph.</p>
 
-        "texture",
-
-        function(ctx) {
-
-            var time = (new Date()).getTime();      // Current system time for LRU caching
-            var canvas;
-            var textures = {};
-            var layerStack = [];
-            var dirty;
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.TIME_UPDATED,
-                    function(t) {
-                        time = t;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        layerStack = [];
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_ACTIVATED,
-                    function(c) {
-                        canvas = c;
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.CANVAS_DEACTIVATED,
-                    function() {
-                        canvas = null;
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (dirty) {
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.TEXTURES_EXPORTED,
-                                    layerStack
-                                    );
-                            dirty = false;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            /** Removes texture from shader (if canvas exists in DOM) and deregisters it from backend
-             */
-            function deleteTexture(texture) {
-                textures[texture.textureId] = undefined;
-                if (document.getElementById(texture.canvas.canvasId)) {
-                    texture.destroy();
-                }
-            }
-
-            /**
-             * Deletes all textures from their GL contexts - does not attempt
-             * to delete them when their canvases no longer exist in the DOM.
-             */
-            function deleteTextures() {
-                for (var textureId in textures) {
-                    var texture = textures[textureId];
-                    deleteTexture(texture);
-                }
-                textures = {};
-                layerStack = [];
-                dirty = true;
-            }
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.RESET, // Framework reset - delete textures
-                    function() {
-                        deleteTextures();
-                    });
-
-            /**
-             * Registers this backend module with the memory management module as willing
-             * to attempt to destroy a texture when asked, in order to free up memory. Eviction
-             * is done on a least-recently-used basis, where a texture may be evicted if the
-             * time that it was last used is the earliest among all textures, and after the current
-             * system time. Since system time is updated just before scene traversal, this ensures that
-             * textures previously or currently active during this traversal are not suddenly evicted.
-             */
-            ctx.memory.registerEvictor(
-                    function() {
-                        var earliest = time; // Doesn't evict textures that are current in layers
-                        var evictee;
-                        for (var id in textures) {
-                            if (id) {
-                                var texture = textures[id];
-                                if (texture.lastUsed < earliest) {
-                                    evictee = texture;
-                                    earliest = texture.lastUsed;
-                                }
-                            }
-                        }
-                        if (evictee) { // Delete LRU texture
-                            ctx.logging.info("Evicting texture: " + id);
-                            deleteTexture(evictee);
-                            return true;
-                        }
-                        return false;   // Couldnt find suitable evictee
-                    });
-
-            /**
-             * Translates a SceneJS param value to a WebGL enum value,
-             * or to default if undefined. Throws exception when defined
-             * but not mapped to an enum.
-             */
-            function getGLOption(name, context, cfg, defaultVal) {
-                var value = cfg[name];
-                if (value == undefined) {
-                    return defaultVal;
-                }
-                var glName = SceneJS_webgl_enumMap[value];
-                if (glName == undefined) {
-                    ctx.error.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                            "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'"));
-                }
-                var glValue = context[glName];
-                //                if (!glValue) {
-                //                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
-                //                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
-                //                }
-                return glValue;
-            }
-
-            /** Returns default value for when given value is undefined
-             */
-            function getOption(value, defaultVal) {
-                return (value == undefined) ? defaultVal : value;
-            }
-
-            return { // Node-facing API
-
-                /** Verifies that texture still cached - it may have been evicted after lack of recent use,
-                 * in which case client texture node will have to recreate it.
-                 */
-                textureExists : function(texture) {
-                    return textures[texture.textureId];
-                },
-
-                /**
-                 * Starts load of texture image
-                 *
-                 * @param uri Image location
-                 * @param onSuccess Callback returns image on success
-                 * @param onError Callback fired on failure
-                 * @param onAbort Callback fired when load aborted, eg. user hits "stop" button in browser
-                 */
-                loadImage : function(uri, onSuccess, onError, onAbort) {
-                    var image = new Image();
-                    image.onload = function() {
-                        onSuccess(image);
-                    };
-                    image.onerror = function() {
-                        onError();
-                    };
-                    image.onabort = function() {
-                        onAbort();
-                    };
-                    image.src = uri;  // Starts image load
-                    return image;
-                },
-
-               
-
-                /**
-                 * Creates and returns a new texture, or re-uses existing one if possible
-                 */
-                createTexture : function(image, cfg) {
-                    if (!canvas) {
-                        ctx.error.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
-                    }
-                    var context = canvas.context;
-                    var textureId = SceneJS._utils.createKeyForMap(textures, "tex");
-
-                    ctx.memory.allocate(
-                            "texture '" + textureId + "'",
-                            function() {
-                                textures[textureId] = new SceneJS_webgl_Texture2D(context, {
-                                    textureId : textureId,
-                                    canvas: canvas,
-                                    image : image,
-                                    texels :cfg.texels,
-                                    minFilter : getGLOption("minFilter", context, cfg, context.LINEAR),
-                                    magFilter :  getGLOption("magFilter", context, cfg, context.LINEAR),
-                                    wrapS : getGLOption("wrapS", context, cfg, context.CLAMP_TO_EDGE),
-                                    wrapT :   getGLOption("wrapT", context, cfg, context.CLAMP_TO_EDGE),
-                                    isDepth :  getOption(cfg.isDepth, false),
-                                    depthMode : getGLOption("depthMode", context, cfg, context.LUMINANCE),
-                                    depthCompareMode : getGLOption("depthCompareMode", context, cfg, context.COMPARE_R_TO_TEXTURE),
-                                    depthCompareFunc : getGLOption("depthCompareFunc", context, cfg, context.LEQUAL),
-                                    flipY : getOption(cfg.flipY, true),
-                                    width: getOption(cfg.width, 1),
-                                    height: getOption(cfg.height, 1),
-                                    internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
-                                    sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
-                                    sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
-                                    logging: ctx.logging
-                                });
-                            });
-                       //   ctx.logging.info("texture created: '" + textureId + "'");
-                    return textures[textureId];
-                },
-
-                pushLayer : function(texture, params) {
-                    if (!textures[texture.textureId]) {
-                        ctx.error.fatalError("No such texture loaded \"" + texture.textureId + "\"");
-                    }
-                    texture.lastUsed = time;
-
-                    if (params.matrix && !params.matrixAsArray) {
-                        params.matrixAsArray = new WebGLFloatArray(params.matrix);
-                    }
-                    layerStack.push({
-                        texture: texture,
-                        params: params
-                    });
-                    dirty = true;
-                    ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
-                },
-
-                popLayers : function(nLayers) {
-                    for (var i = 0; i < nLayers; i++) {
-                        layerStack.pop();
-                    }
-                    dirty = true;
-                    ctx.events.fireEvent(SceneJS._eventTypes.TEXTURES_UPDATED, layerStack);
-                }
-            };
-        });
-/**
- * Scene node that defines one or more layers of texture to apply to geometry within its subgraph.
- *
+ * @constructor
+ * Create a new SceneJS.texture
+ * @param {Object} The config object or function, followed by zero or more child nodes
  * @class SceneJS.texture
  * @extends SceneJS.node
  */
 (function() {
 
     var utils = SceneJS.__texture = {   // Just one object in closure
-
-        errorBackend : SceneJS._backends.getBackend("error"),
-        textureBackend : SceneJS._backends.getBackend("texture"),
-        loggingBackend : SceneJS._backends.getBackend("logging"),
 
         getMatrix: function(translate, rotate, scale) {
             var matrix = null;
@@ -16149,7 +11565,7 @@ SceneJS._backends.installBackend(
                                         layerParam.applyFrom != "normal" &&
                                         layerParam.applyFrom != "geometry") {
 
-                                        utils.errorBackend.fatalError(
+                                        SceneJS_errorModule.fatalError(
                                                 new SceneJS.exceptions.InvalidNodeConfigException(
                                                         "SceneJS.texture.layers[" + i + "].applyFrom value is unsupported - " +
                                                         "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
@@ -16160,7 +11576,7 @@ SceneJS._backends.installBackend(
                                     if (layerParam.applyTo != "baseColor" && // Colour map
                                         layerParam.applyTo != "diffuseColor") {
 
-                                        utils.errorBackend.fatalError(
+                                        SceneJS_errorModule.fatalError(
                                                 new SceneJS.exceptions.InvalidNodeConfigException(
                                                         "SceneJS.texture.layers[" + i + "].applyTo value is unsupported - " +
                                                         "should be either 'baseColor', 'diffuseColor'"));
@@ -16210,7 +11626,7 @@ SceneJS._backends.installBackend(
                              * in which case we'll have to load it again
                              */
                             if (layer.state == utils.STATE_TEXTURE_CREATED) {
-                                if (!utils.textureBackend.textureExists(layer.texture)) {
+                                if (!SceneJS_textureModule.textureExists(layer.texture)) {
                                     layer.state = utils.STATE_INITIAL;
                                 }
                             }
@@ -16234,7 +11650,7 @@ SceneJS._backends.installBackend(
                                         // utils.loggingBackend.getLogger().info("SceneJS.texture image loading: "
                                         //  + _layer.creationParams.uri);
 
-                                        utils.textureBackend.loadImage(
+                                        SceneJS_textureModule.loadImage(
                                                 _layer.creationParams.uri,
                                                 function(_image) {
 
@@ -16253,19 +11669,19 @@ SceneJS._backends.installBackend(
                                                     _layer.state = utils.STATE_ERROR;
                                                     var message = "SceneJS.texture image load failed: "
                                                             + _layer.creationParams.uri;
-                                                    utils.loggingBackend.getLogger().warn(message);
+                                                    SceneJS_loggingModule.getLogger().warn(message);
 
                                                     /* Currently recovering from failed texture load
                                                      */
 
-                                                    // utils.errorBackend.error(
+                                                    // SceneJS_errorModule.error(
                                                     //       new SceneJS.exceptions.ImageLoadFailedException(message));
                                                 },
 
                                             /* Load aborted - eg. user stopped browser
                                              */
                                                 function() {
-                                                    utils.loggingBackend.getLogger().warn("SceneJS.texture image load aborted: "
+                                                    SceneJS_loggingModule.getLogger().warn("SceneJS.texture image load aborted: "
                                                             + _layer.creationParams.uri);
                                                     _layer.state = utils.STATE_ERROR;
                                                 });
@@ -16284,7 +11700,7 @@ SceneJS._backends.installBackend(
 
                                     /* Create this texture layer
                                      */
-                                    layer.texture = utils.textureBackend.createTexture(layer.image, layer.creationParams);
+                                    layer.texture = SceneJS_textureModule.createTexture(layer.image, layer.creationParams);
                                     layer.state = utils.STATE_TEXTURE_CREATED;
                                     countLayersReady++;
                                     break;
@@ -16302,7 +11718,7 @@ SceneJS._backends.installBackend(
 
                             /* Dont apply textures if picking
                              */
-                            SceneJS._utils.visitChildren(cfg, traversalContext, data);
+                            this._renderChildren(traversalContext, data);
 
                         } else {
 
@@ -16313,7 +11729,7 @@ SceneJS._backends.installBackend(
                             for (var i = 0; i < layers.length; i++) {
                                 var layer = layers[i];
                                 if (layer.state == utils.STATE_TEXTURE_CREATED) {
-                                    utils.textureBackend.pushLayer(layer.texture, {
+                                    SceneJS_textureModule.pushLayer(layer.texture, {
                                         applyFrom : layer.applyFrom,
                                         applyTo : layer.applyTo,
                                         blendMode : layer.blendMode,
@@ -16323,107 +11739,12 @@ SceneJS._backends.installBackend(
                                 }
                             }
                             this._renderChildren(traversalContext, data);
-                            utils.textureBackend.popLayers(countPushed);
+                            SceneJS_textureModule.popLayers(countPushed);
                         }
                     };
                 })());
     };
 })();
-/**
- * Backend that manages scene fog.
- *
- *
- */
-SceneJS._backends.installBackend(
-
-        "fog",
-
-        function(ctx) {
-
-            var fog;
-            var dirty;
-
-            function colourToArray(v, fallback) {
-                return v ?
-                       [
-                           v.r != undefined ? v.r : fallback[0],
-                           v.g != undefined ? v.g : fallback[1],
-                           v.b != undefined ? v.b : fallback[2]
-                       ] : fallback;
-            }
-
-            function _createFog(f) {
-                if (f.mode &&
-                    (f.mode != "disabled"
-                            && f.mode != "exp"
-                            && f.mode != "exp2"
-                            && f.mode != "linear")) {
-                    ctx.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'"));
-                }
-                if (f.mode == "disabled") {
-                    return {
-                        mode: f.mode || "exp"
-                    };
-                } else {
-                    return {
-                        mode: f.mode || "exp",
-                        color: colourToArray(f.color, [ 0.5,  0.5, 0.5 ]),
-                        density: f.density || 1.0,
-                        start: f.start || 0,
-                        end: f.end || 1.0
-                    };
-                }
-            }
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SCENE_ACTIVATED,
-                    function() {
-                        _createFog({});
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_ACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_RENDERING,
-                    function() {
-                        if (dirty) {
-                            ctx.events.fireEvent(
-                                    SceneJS._eventTypes.FOG_EXPORTED,
-                                    fog);
-                            dirty = false;
-                        }
-                    });
-
-            ctx.events.onEvent(
-                    SceneJS._eventTypes.SHADER_DEACTIVATED,
-                    function() {
-                        dirty = true;
-                    });
-
-            /* Node-facing API
-             */
-            return {
-
-                setFog : function(f) {
-                    fog = f ? _createFog(f) : null;
-                    dirty = true;
-                    ctx.events.fireEvent(
-                            SceneJS._eventTypes.FOG_UPDATED,
-                            fog);
-                },
-
-                getFog : function() {
-                    return fog;
-                }
-            };
-        });
-
 /**
  * @class SceneJS.fog
  * @extends SceneJS.node
@@ -16450,171 +11771,166 @@ SceneJS._backends.installBackend(
 SceneJS.fog = function() {
     var cfg = SceneJS._utils.getNodeConfig(arguments);
 
-    return SceneJS._utils.createNode(
-            "fog",
-            cfg.children,
+    /* Augment the basic node type
+     */
+    return (function($) {
+        $._mode = "linear";
+        $._color = { r: 0.5, g: 0.5, b: 0.5 };
+        $._density = 1.0;
+        $._start = 0;
+        $._end = 0;
 
-            new (function() {
-                this._errorBackend = SceneJS._backends.getBackend('error');
-                this._fogBackend = SceneJS._backends.getBackend('fog');
+        /**
+         Sets the fogging mode
+         @function setMode
+         @param {string} mode - "disabled", "exp", "exp2" or "linear"
+         @returns {SceneJS.fog} This fog node
+         */
+        $.setMode = function(mode) {
+            if (mode != "disabled" && mode != "exp" && mode != "exp2" && mode != "linear") {
+                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+                        "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'none', 'exp', 'exp2' or 'linear'"));
+            }
+            $._mode = mode;
+            return $;
+        };
 
-                this._mode = "linear";
-                this._color = { r: 0.5, g: 0.5, b: 0.5 };
-                this._density = 1.0;
-                this._start = 0;
-                this._end = 0;
+        /**
+         Returns fogging mode
+         @function {string} getMode
+         @returns {string} The fog mode - "disabled", "exp", "exp2" or "linear"
+         */
+        $.getMode = function() {
+            return $._mode;
+        };
 
-                /**
-                 Sets the fogging mode
-                 @function setMode
-                 @param {string} mode - "disabled", "exp", "exp2" or "linear"
-                 @returns {SceneJS.fog} This fog node
-                 */
-                this.setMode = function(mode) {
-                    if (mode != "disabled" && mode != "exp" && mode != "exp2" && mode != "linear") {
-                        this._errorBackend.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                                "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'none', 'exp', 'exp2' or 'linear'"));
-                    }
-                    this._mode = mode;
-                    return this;
-                };
+        /**
+         Sets the fog color
+         @function setColor
+         @param {object} color - eg. bright red: {r: 1.0, g: 0, b: 0 }
+         @returns {SceneJS.fog} This fog node
+         */
+        $.setColor = function(color) {
+            $._color.r = color.r != undefined ? color.r : 0.5;
+            $._color.g = color.g != undefined ? color.g : 0.5;
+            $._color.b = color.b != undefined ? color.b : 0.5;
+            return $;
+        };
 
-                /**
-                 Returns fogging mode
-                 @function {string} getMode
-                 @returns {string} The fog mode - "disabled", "exp", "exp2" or "linear"
-                 */
-                this.getMode = function() {
-                    return this._mode;
-                };
+        /**
+         Returns the fog color
+         @function getColor
+         @returns {object} Fog color - eg. bright red: {r: 1.0, g: 0, b: 0 }
+         */
+        $.getColor = function() {
+            return {
+                r: $._color.r,
+                g: $._color.g,
+                b: $._color.b
+            };
+        };
 
-                /**
-                 Sets the fog color
-                 @function setColor
-                 @param {object} color - eg. bright red: {r: 1.0, g: 0, b: 0 }
-                 @returns {SceneJS.fog} This fog node
-                 */
-                this.setColor = function(color) {
-                    this._color.r = color.r != undefined ? color.r : 0.5;
-                    this._color.g = color.g != undefined ? color.g : 0.5;
-                    this._color.b = color.b != undefined ? color.b : 0.5;
-                    return this;
-                };
+        /**
+         Sets the fog density
+         @function setDensity
+         @param {int} density - density factor
+         @returns {SceneJS.fog} This fog node
+         */
+        $.setDensity = function(density) {
+            $._density = density || 1.0;
+            return $;
+        };
 
-                /**
-                 Returns the fog color
-                 @function getColor
-                 @returns {object} Fog color - eg. bright red: {r: 1.0, g: 0, b: 0 }
-                 */
-                this.getColor = function() {
-                    return {
-                        r: this._color.r,
-                        g: this._color.g,
-                        b: this._color.b
-                    };
-                };
+        /**
+         Returns the fog density
+         @function {double} getDensity
+         @returns {double} Fog density factor
+         */
+        $.getDensity = function() {
+            return $._density;
+        };
 
-                /**
-                 Sets the fog density
-                 @function setDensity
-                 @param {int} density - density factor
-                 @returns {SceneJS.fog} This fog node
-                 */
-                this.setDensity = function(density) {
-                    this._density = density || 1.0;
-                    return this;
-                };
+        /**
+         Sets the near point on the Z view-axis at which fog begins
+         @function setStart
+         @param {double} start - location on Z-axis
+         @returns {SceneJS.fog} This fog node
+         */
+        $.setStart = function(start) {
+            $._start = start || 0;
+            return $;
+        };
 
-                /**
-                 Returns the fog density
-                 @function {double} getDensity
-                 @returns {double} Fog density factor
-                 */
-                this.getDensity = function() {
-                    return this._density;
-                };
+        /**
+         Returns the near point on the Z view-axis at which fog begins
+         @function {double} getStart
+         @returns {double} Position on Z view axis
+         */
+        $.getStart = function() {
+            return $._start;
+        };
 
-                /**
-                 Sets the near point on the Z view-axis at which fog begins
-                 @function setStart
-                 @param {double} start - location on Z-axis
-                 @returns {SceneJS.fog} This fog node
-                 */
-                this.setStart = function(start) {
-                    this._start = start || 0;
-                    return this;
-                };
+        /**
+         Sets the farr point on the Z view-axis at which fog ends
+         @function setEnd
+         @param {double} end - location on Z-axis
+         @returns {SceneJS.fog} This fog node
+         */
+        $.setEnd = function(end) {
+            $._end = end || 0;
+            return $;
+        };
 
-                /**
-                 Returns the near point on the Z view-axis at which fog begins
-                 @function {double} getStart
-                 @returns {double} Position on Z view axis
-                 */
-                this.getStart = function() {
-                    return this._start;
-                };
+        /**
+         Returns the far point on the Z view-axis at which fog ends
+         @function {double} getEnd
+         @returns {double} Position on Z view axis
+         */
+        $.getEnd = function() {
+            return $._end;
+        };
 
-                /**
-                 Sets the farr point on the Z view-axis at which fog ends
-                 @function setEnd
-                 @param {double} end - location on Z-axis
-                 @returns {SceneJS.fog} This fog node
-                 */
-                this.setEnd = function(end) {
-                    this._end = end || 0;
-                    return this;
-                };
+        $._init = function(params) {
+            if (params.mode) {
+                $.setMode(params.mode);
+            }
+            if (params.color) {
+                $.setColor(params.color);
+            }
+            if (params.density) {
+                $.setDensity(params.density);
+            }
+            if (params.start) {
+                $.setStart(params.start);
+            }
+            if (params.end) {
+                $.setEnd(params.end);
+            }
+        };
 
-                /**
-                 Returns the far point on the Z view-axis at which fog ends
-                 @function {double} getEnd
-                 @returns {double} Position on Z view axis
-                 */
-                this.getEnd = function() {
-                    return this._end;
-                };
+        if (cfg.fixed) {
+            $._init(cfg.getParams());
+        }
 
-                this._init = function(params) {
-                    if (params.mode) {
-                        this.setMode(params.mode);
-                    }
-                    if (params.color) {
-                        this.setColor(params.color);
-                    }
-                    if (params.density) {
-                        this.setDensity(params.density);
-                    }
-                    if (params.start) {
-                        this.setStart(params.start);
-                    }
-                    if (params.end) {
-                        this.setEnd(params.end);
-                    }
-                };
-
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
+        $._render = function(traversalContext, data) {
+            if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+                $._renderChildren(traversalContext, data);
+            } else {
+                if (!cfg.fixed) {
+                    $._init(cfg.getParams(data));
                 }
-
-                this._render = function(traversalContext, data) {
-                    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-                        SceneJS._utils.visitChildren(cfg, traversalContext, data);
-                    } else {
-                        if (!cfg.fixed) {
-                            this._init(cfg.getParams(data));
-                        }
-                        var f = this._fogBackend.getFog();
-                        this._fogBackend.setFog({
-                            mode: this._mode,
-                            color: this._color,
-                            density: this._density,
-                            start: this._start,
-                            end: this._end
-                        });
-                        this._renderChildren(traversalContext, data);
-                        this._fogBackend.setFog(f);
-                    }
-                };
-            })());
+                var f = SceneJS_fogModule.getFog();
+                SceneJS_fogModule.setFog({
+                    mode: $._mode,
+                    color: $._color,
+                    density: $._density,
+                    start: $._start,
+                    end: $._end
+                });
+                $._renderChildren(traversalContext, data);
+                SceneJS_fogModule.setFog(f);
+            }
+        };
+        return $;
+    })(SceneJS.node.apply(this, arguments));
 };
-
