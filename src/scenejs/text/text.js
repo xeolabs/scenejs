@@ -15,7 +15,7 @@ SceneJS.text = function() {
     if (!params.text) {
         SceneJS_errorModule.fatalError(
                 new SceneJS.exceptions.NodeConfigExpectedException(
-                        "SceneJS.vectorText property missing: text"));
+                        "SceneJS.text property missing: text"));
     }
 
     return SceneJS.geometry({

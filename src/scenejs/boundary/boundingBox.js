@@ -1,325 +1,364 @@
 /**
- * @class SceneJS.boundingBox
- * @extends SceneJS.node
- * <p>A scene node that defines an axis-aligned box that encloses the spatial extents of its subgraph.</p> <p>You can accelerate
- * the rendering of your scenes by wrapping its most complex subgraphs with these, which causes SceneJS to only render them
- * when their boundingBoxes intersect the viewing frustum.</p><p>An example of a cube wrapped with a boundingBox:</p><pre><code>
- *  SceneJS.boundingBox({
- *        xmin: -3.0, y: -3.0, zmin: -3.0, xmax: 3.0, ymax: 3.0, zmax: 3.0
- *      },
+ * @class SceneJS.BoundingBox
+ * @extends SceneJS.Node
+ * <p>A scene node that specifies the spatial boundaries of scene graph subtrees so that the subtrees are
+ * only traversed when their enclosing extents intersect the current view frustum. When configured with a projected size
+ * threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
+ * <p><b>Live Demo</b></p>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-lod-boundingbox-example">Level of Detail Example</a></li></ul>
+ *  <p><b>Example 1.</b></p><p>This BoundingBox is configured to work as a level-of-detail selector. The 'levels'
+ * property specifies thresholds for the boundary's projected size, each corresponding to one of the node's children,
+ * such that the child corresponding to the threshold imediately below the boundary's current projected size is only one
+ * currently traversable.</p><p>This boundingBox will select exactly one of its child nodes to render for its current projected size, where the
+ * levels parameter specifies for each child the size threshold above which the child becomes selected. No child is
+ * selected (nothing is drawn) when the projected size is below the lowest level.</p>
+ * <pre><code>
+ * var bb = new SceneJS.BoundingBox({
+ *          xmin: -2,
+ *          ymin: -2,
+ *          zmin: -2,
+ *          xmax:  2,
+ *          ymax:  2,
+ *          zmax:  2,
  *
- *     SceneJS.material({
- *            ambient: { r:0.2, g:0.2, b:0.5 },
- *            diffuse: { r:0.6, g:0.6, b:0.9 }
- *         },
+ *           // Levels are optional - acts as regular
+ *          // frustum-culling bounding box when not specified
  *
- *        SceneJS.scale({ x: 3, y: 3, z: 3 },
+ *          levels: [
+ *             10,
+ *             200,
+ *             400,
+ *             600
+ *         ]
+ *     },
  *
- *            SceneJS.objects.cube()
- *        )
- *     )
- *  )
- *</code></pre>
+ *     // When size > 10px, draw a cube
+ *
+ *     new SceneJS.objects.Cube(),
+ *
+ *     // When size > 200px,  draw a low-detail sphere
+ *
+ *     new SceneJS.objects.Sphere({
+ *         radius: 1,
+ *         slices:10,
+ *         rings:10
+ *     }),
+ *
+ *     // When size > 400px, draw a medium-detail sphere
+ *
+ *     new SceneJS.objects.Sphere({
+ *         radius: 1,
+ *         slices:20,
+ *         rings:20
+ *     }),
+ *
+ *     // When size > 600px, draw a high-detail sphere
+ *
+ *     new SceneJS.objects.Sphere({
+ *         radius: 1,
+ *         slices:120,
+ *         rings:120
+ *     })
+ * )
+ * </code></pre>
+ *
  * @constructor
  * Create a new SceneJS.boundingBox
  * @param {Object} config Configuration object, followed by zero or more child nodes
  */
-SceneJS.boundingBox = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+SceneJS.BoundingBox = function() {
+    SceneJS.Node.apply(this, arguments);
+    this._xmin = 0;
+    this._ymin = 0;
+    this._zmin = 0;
+    this._xmax = 0;
+    this._ymax = 0;
+    this._zmax = 0;
+    this._levels = null;
+    this._states = [];
+    this._objectsCoords = null;  // Six object-space vertices for memo level 1
+    this._viewBox = null;         // Axis-aligned view-space box for memo level 2
+    if (this._fixedParams) {
+        this._init(this._getParams());
+    }
+};
 
-    /* Augment the basic node type
-     */
-    return (function($) {
-        var _xmin;
-        var _ymin;
-        var _zmin;
-        var _xmax;
-        var _ymax;
-        var _zmax;
-        var levels;
-        var states = [];
+SceneJS._utils.inherit(SceneJS.BoundingBox, SceneJS.Node);
 
-        var objectCoords;   // Six object-space vertices for memo level 1
-        var viewBox;        // Axis-aligned view-space box for memo level 2
+/**
+ * Sets the minimum X extent
+ *
+ * @function {SceneJS.BoundingBox} setXMin
+ * @param {float} xmin Minimum X extent
+ * @returns {SceneJS.BoundingBox} this
+ */
+SceneJS.BoundingBox.prototype.setXMin = function(xmin) {
+    this._xmin = xmin;
+    this._memoLevel = 0;
+    return this;
+};
 
-        /**
-         * Sets the minimum X extent
-         *
-         * @function {SceneJS.boundingBox} setXMin
-         * @param {Double} xmin Minimum X extent
-         * @returns {SceneJS.boundingBox} This node
-         */
-        $.setXMin = function(xmin) {
-            _xmin = xmin;
-            $._memoLevel = 0;
-            return $;
-        };
+/**
+ * Gets the minimum X extent
+ *
+ * @function {float} getXMin
+ * @returns {float} Minimum X extent
+ */
+SceneJS.BoundingBox.prototype.getXMin = function() {
+    return this._xmin;
+};
 
-        /**
-         * Gets the minimum X extent
-         *
-         * @function {Double} getXMin
-         * @returns {Double} Minimum X extent
-         */
-        $.getXMin = function() {
-            return _xmin;
-        };
+/**
+ * Sets the minimum Y extent
+ *
+ * @function  {SceneJS.BoundingBox} setYMin
+ * @param {float} ymin Minimum Y extent
+ * @returns {SceneJS.BoundingBox} this
+ */
+SceneJS.BoundingBox.prototype.setYMin = function(ymin) {
+    this._ymin = ymin;
+    this._memoLevel = 0;
+    return this;
+};
 
-        /**
-         * Sets the minimum Y extent
-         *
-         * @function {SceneJS.boundingBox} setYMin
-         * @param {Double} ymin Minimum Y extent
-         * @returns {SceneJS.boundingBox} This node
-         */
-        $.setYMin = function(ymin) {
-            _ymin = ymin;
-            $._memoLevel = 0;
-            return $;
-        };
+/**
+ * Gets the minimum Y extent
+ * @function {float} getYMin
+ * @returns {float} Minimum Y extent
+ */
+SceneJS.BoundingBox.prototype.getYMin = function() {
+    return this._ymin;
+};
 
-        /**
-         * Gets the minimum Y extent
-         * @function {Double} getYMin
-         * @returns {Double} Minimum Y extent
-         */
-        $.getYMin = function() {
-            return _ymin;
-        };
+/**
+ * Sets the minimum Z extent
+ *
+ * @function {SceneJS.BoundingBox} setZMin
+ * @param {float} zmin Minimum Z extent
+ * @returns {SceneJS.BoundingBox} this
+ */
+SceneJS.BoundingBox.prototype.setZMin = function(zmin) {
+    this._zmin = zmin;
+    this._memoLevel = 0;
+    return this;
+};
 
-        /**
-         * Sets the minimum Z extent
-         *
-         * @function {SceneJS.boundingBox} setZMin
-         * @param {Double} zmin Minimum Z extent
-         * @returns {SceneJS.boundingBox} This node
-         */
-        $.setZMin = function(zmin) {
-            _zmin = zmin;
-            $._memoLevel = 0;
-            return $;
-        };
+/**
+ * Gets the minimum Z extent
+ * @function {float} getZMin
+ * @returns {float} Minimum Z extent
+ */
+SceneJS.BoundingBox.prototype.getZMin = function() {
+    return this._zmin;
+};
 
-        /**
-         * Gets the minimum Z extent
-         * @function {Double} getZMin
-         * @returns {Double} Minimum Z extent
-         */
-        $.getZMin = function() {
-            return _zmin;
-        };
+/**
+ * Sets the maximum X extent
+ *
+ * @function  {SceneJS.BoundingBox} setXMax
+ * @param {float} xmax Maximum X extent
+ * @returns {SceneJS.BoundingBox} this
+ */
+SceneJS.BoundingBox.prototype.setXMax = function(xmax) {
+    this._xmax = xmax;
+    this._memoLevel = 0;
+    return this;
+};
 
-        /**
-         * Sets the maximum X extent
-         *
-         * @function {SceneJS.boundingBox} setXMax
-         * @param {Double} xmax Maximum X extent
-         * @returns {SceneJS.boundingBox} This node
-         */
-        $.setXMax = function(xmax) {
-            _xmax = xmax;
-            $._memoLevel = 0;
-            return $;
-        };
+/**
+ * Gets the maximum X extent
+ * @function  {SceneJS.BoundingBox} setXMax
+ * @returns {float} Maximum X extent
+ */
+SceneJS.BoundingBox.prototype.getXMax = function() {
+    return this._xmax;
+};
 
-        /**
-         * Gets the maximum X extent
-         * @function setXMax
-         * @returns {Double} Maximum X extent
-         */
-        $.getXMax = function() {
-            return _xmax;
-        };
+/**
+ * Sets the maximum Y extent
+ *
+ * @function {SceneJS.BoundingBox} setYMax
+ * @param {float} ymax Maximum Y extent
+ * @returns {SceneJS.BoundingBox} this
+ */
+SceneJS.BoundingBox.prototype.setYMax = function(ymax) {
+    this._ymax = ymax;
+    this._memoLevel = 0;
+    return this;
+};
 
-        /**
-         * Sets the maximum Y extent
-         *
-         * @function {SceneJS.boundingBox} setYMax
-         * @param {Double} ymax Maximum Y extent
-         * @returns {SceneJS.boundingBox} This node
-         */
-        $.setYMax = function(ymax) {
-            _ymax = ymax;
-            $._memoLevel = 0;
-            return $;
-        };
+/**
+ * Gets the maximum Y extent
+ * @function {float} getYMax
+ * @return {float} Maximum Y extent
+ */
+SceneJS.BoundingBox.prototype.getYMax = function() {
+    return this._ymax;
+};
 
-        /**
-         * Gets the maximum Y extent
-         * @function {Double} getYMax
-         * @return {Double} Maximum Y extent
-         */
-        $.getYMax = function() {
-            return _ymax;
-        };
+/**
+ * Sets the maximum Z extent
+ *
+ * @function {SceneJS.BoundingBox} setZMax
+ * @param {float} zmax Maximum Z extent
+ * @returns {SceneJS.BoundingBox} this
+ */
+SceneJS.BoundingBox.prototype.setZMax = function(zmax) {
+    this._zmax = zmax;
+    this._memoLevel = 0;
+    return this;
+};
 
-        /**
-         * Sets the maximum Z extent
-         *
-         * @function {SceneJS.boundingBox} setZMax
-         * @param {Double} zmax Maximum Z extent
-         * @returns {SceneJS.boundingBox} This node
-         */
-        $.setZMax = function(zmax) {
-            _zmax = zmax;
-            $._memoLevel = 0;
-            return $;
-        };
+/**
+ * Gets the maximum Z extent
+ * @function {float} getZMax
+ * @returns {float} Maximum Z extent
+ */
+SceneJS.BoundingBox.prototype.getZMax = function() {
+    return this._zmax;
+};
 
-        /**
-         * Gets the maximum Z extent
-         * @function {Double} getZMax
-         * @returns {Double} Maximum Z extent
-         */
-        $.getZMax = function() {
-            return _zmax;
-        };
+/**
+ * Sets all extents
+ * @function {SceneJS.BoundingBox} setBoundary
+ * @param {Object} boundary All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
+ * @returns {SceneJS.BoundingBox} this
+ */
+SceneJS.BoundingBox.prototype.setBoundary = function(boundary) {
+    this._xmin = boundary.xmin || 0;
+    this._ymin = boundary.ymin || 0;
+    this._zmin = boundary.zmin || 0;
+    this._xmax = boundary.xmax || 0;
+    this._ymax = boundary.ymax || 0;
+    this._zmax = boundary.zmax || 0;
+    this._memoLevel = 0;
+    return this;
+};
 
-        /**
-         * Sets all extents
-         * @function {SceneJS.boundingBox} setBoundary
-         * @param {Object} boundary All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
-         */
-        $._setBoundary = function(boundary) {
-            _xmin = boundary.xmin || 0;
-            _ymin = boundary.ymin || 0;
-            _zmin = boundary.zmin || 0;
-            _xmax = boundary.xmax || 0;
-            _ymax = boundary.ymax || 0;
-            _zmax = boundary.zmax || 0;
-            $._memoLevel = 0;
-            return $;
-        };
+/**
+ * Gets all extents
+ * @function {Object} getBoundary
+ * @returns {Object} All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
+ */
+SceneJS.BoundingBox.prototype.getBoundary = function() {
+    return {
+        xmin: this._xmin,
+        ymin: this._ymin,
+        zmin: this._zmin,
+        xmax: this._xmax,
+        ymax: this._ymax,
+        zmax: this._zmax
+    };
+};
 
-        /**
-         * Gets all extents
-         * @function {Object} getBoundary
-         * @returns {Object} All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
-         */
-        $.getBoundary = function() {
-            return {
-                xmin: _xmin,
-                ymin: _ymin,
-                zmin: _zmin,
-                xmax: _xmax,
-                ymax: _ymax,
-                zmax: _zmax
-            };
-        };
-
-        var init = function(params) {
-            _xmin = params.xmin || 0;
-            _ymin = params.ymin || 0;
-            _zmin = params.zmin || 0;
-            _xmax = params.xmax || 0;
-            _ymax = params.ymax || 0;
-            _zmax = params.zmax || 0;
-
-            if (params.levels) {
-                if (params.levels.length != cfg.children.length) {
-                    SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                            ("SceneJS.boundingBox levels property should have a value for each child node"));
-                }
-
-                for (var i = 1; i < params.levels.length; i++) {
-                    if (params.levels[i - 1] >= params.levels[i]) {
-                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                                ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
-                    }
-                }
-                levels = params.levels;
-            }
-        };
-
-        if (cfg.fixed) {
-            init(cfg.getParams());
+SceneJS.BoundingBox.prototype._init = function(params) {
+    this._xmin = params.xmin || 0;
+    this._ymin = params.ymin || 0;
+    this._zmin = params.zmin || 0;
+    this._xmax = params.xmax || 0;
+    this._ymax = params.ymax || 0;
+    this._zmax = params.zmax || 0;
+    if (params.levels) {
+        if (params.levels.length != this._children.length) {
+            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                    ("SceneJS.boundingBox levels property should have a value for each child node"));
         }
 
-        this._render = function(traversalContext, data) {
-            if ($._memoLevel == 0) {
-                if (!cfg.fixed) {
-                    $._init(cfg.getParams(data));
-                } else {
-                    $._memoLevel = 1;
-                }
-                var modelTransform = SceneJS_modelTransformModule.getTransform();
-                if (!modelTransform.identity) {
-
-                    /* Model transform exists
-                     */
-                    objectCoords = [
-                        [_xmin, _ymin, _zmin],
-                        [_xmax, _ymin, _zmin],
-                        [_xmax, _ymax, _zmin],
-                        [_xmin, _ymax, _zmin],
-                        [_xmin, _ymin, _zmax],
-                        [_xmax, _ymin, _zmax],
-                        [_xmax, _ymax, _zmax],
-                        [_xmin, _ymax, _zmax]
-                    ];
-                } else {
-
-                    /* No model transform
-                     */
-                    viewBox = {
-                        min: [_xmin, _ymin, _zmin],
-                        max: [_xmax, _ymax, _zmax]
-                    };
-                    $._memoLevel = 2;
-                }
+        for (var i = 1; i < params.levels.length; i++) {
+            if (params.levels[i - 1] >= params.levels[i]) {
+                SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                        ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
             }
-
-            if ($._memoLevel < 2) {
-                var modelTransform = SceneJS_modelTransformModule.getTransform();
-                viewBox = new SceneJS_math_Box3().fromPoints(
-                        SceneJS_math_transformPoints3(
-                                modelTransform.matrix,
-                                objectCoords)
-                        );
-                if (modelTransform.fixed && $._memoLevel == 1) {
-                    objectCoords = null;
-                    $._memoLevel = 2;
-                }
-            }
-            if ($._memoLevel < 2) {
-                alert("memoLevel < 2");
-            }
-            if (SceneJS._localityModule.testAxisBoxIntersectOuterRadius(viewBox)) {
-                if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(viewBox)) {
-                    var result = SceneJS_frustumModule.testAxisBoxIntersection(viewBox);
-                    switch (result) {
-                        case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
-                        case SceneJS_math_INSIDE_FRUSTUM:
-                            if (levels) { // Level-of-detail mode
-                                var size = SceneJS_frustumModule.getProjectedSize(viewBox);
-                                for (var i = levels.length - 1; i >= 0; i--) {
-                                    if (levels[i] <= size) {
-                                        var state = states[i];
-                                        this._renderChild(i, traversalContext, data);
-                                        return;
-                                    }
-                                }
-                            } else {
-                                this._renderChildren(traversalContext, data);
-                            }
-                            break;
-
-                        case SceneJS_math_OUTSIDE_FRUSTUM:
-                            break;
-                    }
-                } else {
-
-                    /* Allow content staging for subgraph
-                     */
-
-                    // TODO:
-
-                    this._renderChildren(traversalContext, data);
-                }
-            }
-        };
-
-        return $;
-    })(SceneJS.node.apply(this, arguments));
+        }
+        this._levels = params.levels;
+    }
 };
-                
+
+SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
+    if (this._memoLevel == 0) {
+        if (!this._fixedParams) {
+            this._init(this._getParams(data));
+        } else {
+            this._memoLevel = 1;
+        }
+        var modelTransform = SceneJS_modelTransformModule.getTransform();
+        if (!modelTransform.identity) {
+
+            /* Model transform exists
+             */
+            this._objectCoords = [
+                [this._xmin, this._ymin, this._zmin],
+                [this._xmax, this._ymin, this._zmin],
+                [this._xmax, this._ymax, this._zmin],
+                [this._xmin, this._ymax, this._zmin],
+                [this._xmin, this._ymin, this._zmax],
+                [this._xmax, this._ymin, this._zmax],
+                [this._xmax, this._ymax, this._zmax],
+                [this._xmin, this._ymax, this._zmax]
+            ];
+        } else {
+
+            /* No model transform
+             */
+            this._viewBox = {
+                min: [this._xmin, this._ymin, this._zmin],
+                max: [this._xmax, this._ymax, this._zmax]
+            };
+            this._memoLevel = 2;
+        }
+    }
+
+    if (this._memoLevel < 2) {
+        var modelTransform = SceneJS_modelTransformModule.getTransform();
+        this._viewBox = new SceneJS_math_Box3().fromPoints(
+                SceneJS_math_transformPoints3(
+                        modelTransform.matrix,
+                        this._objectCoords)
+                );
+        if (modelTransform.fixed && this._memoLevel == 1) {
+            this._objectCoords = null;
+            this._memoLevel = 2;
+        }
+    }
+    if (SceneJS_localityModule.testAxisBoxIntersectOuterRadius(this._viewBox)) {
+        if (SceneJS_localityModule.testAxisBoxIntersectInnerRadius(this._viewBox)) {
+            var result = SceneJS_frustumModule.testAxisBoxIntersection(this._viewBox);
+            switch (result) {
+                case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                case SceneJS_math_INSIDE_FRUSTUM:
+                    if (this._levels) { // Level-of-detail mode
+                        var size = SceneJS_frustumModule.getProjectedSize(this._viewBox);
+                        for (var i = this._levels.length - 1; i >= 0; i--) {
+                            if (this._levels[i] <= size) {
+                                var state = this._states[i];
+                                this._renderNode(i, traversalContext, data);
+                                return;
+                            }
+                        }
+                    } else {
+                        this._renderNodes(traversalContext, data);
+                    }
+                    break;
+
+                case SceneJS_math_OUTSIDE_FRUSTUM:
+                    break;
+            }
+        } else {
+
+            /* Allow content staging for subgraph
+             */
+
+            // TODO:
+
+            this._renderNodes(traversalContext, data);
+        }
+    }
+};
+
+/** Function wrapper to support functional scene definition
+ */
+SceneJS.boundingBox = function() {
+    var n = new SceneJS.BoundingBox();
+    SceneJS.BoundingBox.prototype.constructor.apply(n, arguments);
+    return n;
+};

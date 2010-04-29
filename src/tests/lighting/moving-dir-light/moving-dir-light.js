@@ -8,6 +8,11 @@
  lindsay.kay@xeolabs.com
 
  */
+
+SceneJS.onEvent("error", function(e) {
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
+
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
         SceneJS.loggingToPage({ elementId: "logging" },
@@ -132,7 +137,7 @@ var dragging = false;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = exampleScene.getCanvas();
+var canvas = document.getElementById(exampleScene.getCanvasId());
 
 function mouseDown(event) {
     lastX = event.clientX;

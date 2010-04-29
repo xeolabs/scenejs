@@ -8,7 +8,7 @@
 <table>
     <tr>
         <td valign="top">
-            <canvas id="theCanvas" width="1600" height="800">
+            <canvas id="theCanvas" width="600" height="600">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                     &lt;canvas&gt; feature.</p>
@@ -39,6 +39,10 @@
 <!-- Events -->
 
 <script type="application/x-javascript" src="../../../scenejs/events/eventsModule.js"></script>
+
+<!-- Errors -->
+
+<script type="application/x-javascript" src="../../../scenejs/errors/errorsModule.js"></script>
 
 <!-- Time -->
 
@@ -118,10 +122,12 @@
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/localityModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/stationary.js"></script>
 
 <!-- Lighting -->
 
 <script type="application/x-javascript" src="../../../scenejs/lighting/lightingModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/lighting/lightSource.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/lighting/lights.js"></script>
 
 <!-- Material -->
@@ -132,7 +138,7 @@
 
 <!-- Interpolation -->
 
-<script type="application/x-javascript" src="../../../scenejs/animation/scalarInterpolator.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/interpolation/scalarInterpolator.js"></script>
 
 <!-- Scope -->
 
@@ -156,6 +162,7 @@
 
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaParserModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
+
 <script type="application/x-javascript" src="lod.js"></script>
 </body>
 </html>

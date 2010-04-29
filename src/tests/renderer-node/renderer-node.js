@@ -1,5 +1,7 @@
 /*
- The SceneJS.renderer node allows you to tweak GL state for portions of your scene graph.
+ Although SceneJS manages WebGL state settings for you automatically, the SceneJS.renderer node
+ allows you to set them explicitly for portions of your scene graph, perhaps to optimise its performance
+ or do some special rendering effect.
 
  Use it to explicitly set things for subgraphs, such as the current viewport extents, scissoring,
  enable/disable shading, backface culling, and so on.
@@ -89,13 +91,13 @@ var exampleScene = SceneJS.scene({
             /* Specify the equation used for both the RGB blend equation and the Alpha blend equation.
              * Accepted values are: func_add, func_subtract, func_reverse_subtract
              */
-            blendEquation: "func_add",
+            blendEquation: "funcAdd",
 
             /* Set the RGB and alpha blend equations separately
              */
             blendEquationSeperate: {
-                rgb: "func_add",
-                alpha: "func_add"
+                rgb: "funcAdd",
+                alpha: "funcAdd"
             },
 
             /* Specify pixel arithmetic. Accepted values for sfactor and dfactor are:
@@ -266,7 +268,6 @@ var exampleScene = SceneJS.scene({
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
-var pInterval;
 
 var yaw = -45;
 var pitch = 25;
@@ -277,7 +278,7 @@ var dragging = false;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = exampleScene.getCanvas();
+var canvas = document.getElementById(exampleScene.getCanvasId());;
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -296,7 +297,6 @@ function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
-        exampleScene.render({yaw: yaw, pitch: pitch});
         lastX = event.clientX;
         lastY = event.clientY;
     }
@@ -306,17 +306,23 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-exampleScene.render({yaw: yaw, pitch: pitch});
-
 window.render = function() {
-    try {
-        exampleScene.render({yaw: yaw, pitch: pitch});
-    } catch (e) {
-        clearInterval(pInterval);
-        throw e;
-    }
+    exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
-/* Continue animation
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
  */
-pInterval = setInterval("window.render()", 10);
+var pInterval;
+
+SceneJS.onEvent("error", function(e) {
+   // alert(e.exception.message || e.exception);
+    window.clearInterval(pInterval);
+});
+
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
+

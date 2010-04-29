@@ -10,16 +10,25 @@
 <table>
     <tr>
         <td valign="top">
-            <canvas id="theCanvas" width="1600" height="800">
+            <canvas id="theCanvas" width="600" height="600">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
         <td valign="top">
-            <div id="fps"></div>
-          
-            <div id="logging"></div>
+            <h3>Source code</h3>
+            <ul>
+                <li><a href="teapot.js">This example</a></li>
+            </ul>
+
+            <h3>Description</h3>
+
+            <p><span>This is a really simple scene to demonstrate the general SceneJS idea. A scene basically renders images to
+one or more WebGL canvas elements in the browser page. The <a href="teapot.js">source code</a> has lots of comments that will tell you how this example works.<p><span>                  
+            <h3>Scene logging output</h3>
+
+            <div id="_scenejs-default-logging"></div>
         </td>
     </tr>
 </table>
@@ -42,6 +51,10 @@
 <!-- Events -->
 
 <script type="application/x-javascript" src="../../../scenejs/events/eventsModule.js"></script>
+
+<!-- Errors -->
+
+<script type="application/x-javascript" src="../../../scenejs/errors/errorsModule.js"></script>
 
 <!-- Time -->
 
@@ -121,10 +134,12 @@
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/localityModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/stationary.js"></script>
 
 <!-- Lighting -->
 
 <script type="application/x-javascript" src="../../../scenejs/lighting/lightingModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/lighting/lightSource.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/lighting/lights.js"></script>
 
 <!-- Material -->
@@ -159,6 +174,6 @@
 
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaParserModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
-<script type="application/x-javascript" src="tiny-kitchen.js"></script>
+<script type="application/x-javascript" src="renderer-node.js"></script>
 </body>
 </html>

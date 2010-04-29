@@ -1,5 +1,5 @@
 /**
- * SceneJS Example - Teapot cluster flythrough
+ * SceneJS Example - Three hundred teapots
  *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
@@ -16,114 +16,95 @@
  */
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
-        SceneJS.loggingToPage({ elementId: "logging" },
-
-                SceneJS.renderer({
-                    clearColor : { r:.0, g:.0, b:.0, a: 0 },
-                    viewport: { x:0, y:0, width:600, height:600 },
-                    clear : { depth : true, color : true} ,
-                    depthRange : { near: .5, far: 1500 }
+        SceneJS.perspective({ fovy : 43.0, aspect : 1.0, near : .5, far : 1500.0
+        },
+                SceneJS.fog({
+                    mode:"exp",
+                    color:{r:.0, g:.0,b:.0},
+                    start: 50,
+                    end:400
                 },
-                        SceneJS.perspective({ fovy : 43.0, aspect : 1.0, near : .5, far : 1500.0
+
+                        SceneJS.lookAt(function(scope) {
+                            return{
+                                eye : { x: 0.0, y: 0, z: scope.get("z")},
+                                look : { x : 0.0, y : 0.0, z : 0 },
+                                up : { x: 0.0, y: 1.0, z: 0.0 }
+                            };
                         },
-                                SceneJS.fog({
-                                    mode:"exp",
-                                    color:{r:.0, g:.0,b:.0},
-                                    start: 50,
-                                    end:400
-                                },
-
-                                        SceneJS.lookAt(function(data) {
-                                            return{
-                                                eye : { x: 0.0, y: 0, z: data.get("z")},
-                                                look : { x : 0.0, y : 0.0, z : 0 },
-                                                up : { x: 0.0, y: 1.0, z: 0.0 }
-                                            };
+                                SceneJS.lights({
+                                    sources: [
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
                                         },
-                                                SceneJS.lights({
-                                                    sources: [
-                                                        {
-                                                            type:                   "point",
-                                                            ambient:                { r: 0.5, g: 0.5, b: 0.9 },
-                                                            diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-                                                            specular:               { r: 0.9, g: 0.9, b: 0.6 },
-                                                            pos:                    { x: 1000.0, y: 0.0, z: -1000.0 },
-                                                            constantAttenuation:    1.0,
-                                                            quadraticAttenuation:   0.0,
-                                                            linearAttenuation:      0.0
-                                                        },
-                                                        {
-                                                            type:                   "point",
-                                                            ambient:                { r: 0.5, g: 0.5, b: 0.9 },
-                                                            diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-                                                            specular:               { r: 0.9, g: 0.9, b: 0.6 },
-                                                            pos:                    { x: -1000.0, y: 1000.0, z: 0.0 },
-                                                            constantAttenuation:    1.0,
-                                                            quadraticAttenuation:   0.0,
-                                                            linearAttenuation:      0.0
-                                                        } ,
-                                                        {
-                                                            type:                   "point",
-                                                            ambient:                { r: 0.5, g: 0.5, b: 0.9 },
-                                                            diffuse:                { r: 0.6, g: 0.6, b: 0.3 },
-                                                            specular:               { r: 0.9, g: 0.9, b: 0.6 },
-                                                            pos:                    { x: -1000.0, y: 100.0, z: 1000.0 },
-                                                            constantAttenuation:    1.0,
-                                                            quadraticAttenuation:   0.0,
-                                                            linearAttenuation:      0.0
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 2.0, y: 1.0, z: 0.0 }
+                                        }
+
+                                    ]},
+
+                                        SceneJS.generator(
+                                                (function() {
+                                                    var elems = [];
+                                                    for (var i = 0; i < 300; i++) {
+                                                        elems.push({
+                                                            baseColor: {
+                                                                r:  Math.random() + 0.5,
+                                                                g: Math.random() + 0.5,
+                                                                b: Math.random() + 0.5
+                                                            },
+                                                            pos: {x: (50 * Math.random()) - 25.0,
+                                                                y: (50 * Math.random()) - 25.0,
+                                                                z: (800 * Math.random()) - 250.0
+                                                            }
+
+                                                        });
+                                                    }
+                                                    var j = 0;
+                                                    return function() {
+                                                        if (i < elems.length) {
+                                                            return { param: elems[i++] };
+                                                        } else {
+                                                            i = 0;
                                                         }
-                                                    ]},
-                                                        SceneJS.material({
-                                                            ambient:   { r: 0.5, g: 0.5, b: 0.5 },
-                                                            diffuse:   { r: 0.6, g: 0.6, b: 0.6 },
-                                                            specular:  { r: 1, g: 1, b: 1 },
-                                                            emission: { r: 0.0, g: 0.0, b: 0.0 },
-                                                            shininess: 6.0
+                                                    };
+                                                })(),
+                                                SceneJS.material(function(data) {
+                                                    return {
+                                                        baseColor:      data.get("param").baseColor,
+                                                        specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                        specular:       20.9,
+                                                        shine:          100.0
+                                                    };
+                                                },
+                                                        SceneJS.translate(function(data) {
+                                                            return data.get("param").pos;
                                                         },
-                                                                SceneJS.generator(
-                                                                        (function() {
-                                                                            var elems = [];
-                                                                            for (var i = 0; i < 300; i++) {
-                                                                                elems.push({
-                                                                                    x: (50 * Math.random()) - 25.0,
-                                                                                    y: (50 * Math.random()) - 25.0,
-                                                                                    z: (800 * Math.random()) - 250.0
-                                                                                });
-                                                                            }
-                                                                            var j = 0;
-                                                                            return function() {
-                                                                                if (i < elems.length) {
-                                                                                    return { param: elems[i++] };
-                                                                                } else {
-                                                                                    i = 0;
-                                                                                }
-                                                                            };
-                                                                        })(),
-
-                                                                        SceneJS.translate(function(data) {
-                                                                            return data.get("param");
-                                                                        },
-                                                                                SceneJS.scale({ x:2, y:2, z:2 },
-                                                                                        SceneJS.objects.teapot())
-                                                                                )
-                                                                        )
+                                                                SceneJS.scale({ x:2, y:2, z:2 },
+                                                                        SceneJS.objects.teapot())
                                                                 )
-
                                                         )
                                                 )
+
                                         )
                                 )
                         )
                 )
-        ); // scene
+        );
 
-var pInterval;
 var zpos = -500;
 
-window.doit = function() {
+window.render = function() {
     if (zpos > 1500) {
         clearInterval(pInterval);
-        exampleScene.destroy();
     } else {
         zpos += 2.0;
 
@@ -131,15 +112,20 @@ window.doit = function() {
     }
 };
 
-/* Hack to get any scene definition exceptions up front.
- * Chrome seemed to absorb them in setInterval!
+/* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
  */
-exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)});
+var pInterval;
 
-/* Continue animation
- */
-pInterval = setInterval("window.doit()", 10);
+SceneJS.onEvent("error", function() {
+    window.clearInterval(pInterval);
+});
 
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
+});
+
+pInterval = window.setInterval("window.render()", 10);
 
 
 

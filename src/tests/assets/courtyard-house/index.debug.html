@@ -6,20 +6,23 @@
 </head>
 <body margin=20px>
 
-            <canvas id="theCanvas" width="1800" height="900">
-                <p>This example requires a browser that supports the
-                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-                    &lt;canvas&gt; feature.</p>
-            </canvas>
+<canvas id="theCanvas" width="600" height="600">
+    <p>This example requires a browser that supports the
+        <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+        &lt;canvas&gt; feature.</p>
+</canvas>
 
-            <span id="status"></span> <br/>
-                <div id="_scenejs-default-logging"></div>
+<span id="status"></span> <br/>
+
+<div id="_scenejs-default-logging"></div>
 
 
 <script type="text/javascript" src="sylvester.js"></script>
+
 <!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
+
 <script type="application/x-javascript" src="../../../scenejs/core/math.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/webgl.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/node.js"></script>
@@ -120,6 +123,7 @@
 <!-- Lighting -->
 
 <script type="application/x-javascript" src="../../../scenejs/lighting/lightingModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/lighting/lightSource.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/lighting/lights.js"></script>
 
 <!-- Material -->
@@ -130,7 +134,7 @@
 
 <!-- Interpolation -->
 
-<script type="application/x-javascript" src="../../../scenejs/animation/scalarInterpolator.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/interpolation/scalarInterpolator.js"></script>
 
 <!-- Scope -->
 
@@ -154,6 +158,7 @@
 
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaParserModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
+
 <script type="application/x-javascript" src="courtyard-house.js"></script>
 </body>
 </html>

@@ -1,28 +1,39 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
+
 <html>
 <head>
-    <title>SceneJS Example - Generation of a Spiral Staircase</title>
+    <title>SceneJS Example - Parameterised Scene Asset</title>
 </head>
-<body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
+<body margin=20px>
+<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Basic First Example
+</h1>
 <table>
     <tr>
         <td valign="top">
-            <canvas id="theCanvas" width="800" height="800">
+            <canvas id="theCanvas" width="600" height="600">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
-        <td  valign="top">
-        //    <div id="logging"></div>
+        <td valign="top">
+            <h3>Source code</h3>
+            <ul>
+                <li><a href="teapot.js">This example</a></li>
+            </ul>
+
+            <h3>Description</h3>
+
+
+            <div id="logging"></div>
         </td>
     </tr>
 </table>
 
+
 <!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
+
 <script type="application/x-javascript" src="../../../scenejs/core/math.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/webgl.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/node.js"></script>
@@ -35,6 +46,10 @@
 <!-- Events -->
 
 <script type="application/x-javascript" src="../../../scenejs/events/eventsModule.js"></script>
+
+<!-- Errors -->
+
+<script type="application/x-javascript" src="../../../scenejs/errors/errorsModule.js"></script>
 
 <!-- Time -->
 
@@ -54,6 +69,15 @@
 
 <script type="application/x-javascript" src="../../../scenejs/load/loadModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/load/load.js"></script>
+
+<!-- Picking -->
+
+<script type="application/x-javascript" src="../../../scenejs/pick/pickModule.js"></script>
+
+<!-- Third-party lib : WebGL Trace -->
+
+<script type="application/x-javascript" src="../../../scenejs/core/webgl-trace.js"></script>
+
 
 <!-- Scene -->
 
@@ -91,6 +115,7 @@
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/modelMatrix.js"></script>
 
 <!-- Projection transforms -->
 
@@ -102,11 +127,14 @@
 <!-- Viewing transforms -->
 
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/localityModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
+            <script type="application/x-javascript" src="../../../scenejs/transformation/view/stationary.js"></script>
 
 <!-- Lighting -->
 
 <script type="application/x-javascript" src="../../../scenejs/lighting/lightingModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/lighting/lightSource.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/lighting/lights.js"></script>
 
 <!-- Material -->
@@ -117,7 +145,7 @@
 
 <!-- Interpolation -->
 
-<script type="application/x-javascript" src="../../../scenejs/animation/scalarInterpolator.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/interpolation/scalarInterpolator.js"></script>
 
 <!-- Scope -->
 
@@ -138,6 +166,10 @@
 
 <script type="application/x-javascript" src="../../../scenejs/fog/fogModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
-<script type="application/x-javascript" src="zod-array.js"></script>
+
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaParserModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
+
+<script type="application/x-javascript" src="test.js"></script>
 </body>
 </html>

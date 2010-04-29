@@ -22,7 +22,7 @@ SceneJS.billboard = function() {
                         fixed: false
                     };
                     SceneJS_modelTransformModule.setTransform(xform);
-                    this._renderChildren(traversalContext, data);
+                    this._renderNodes(traversalContext, data);
                     SceneJS_modelTransformModule.setTransform(modelXform);
                 };
             })());

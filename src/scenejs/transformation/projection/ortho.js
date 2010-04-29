@@ -37,7 +37,7 @@ SceneJS.ortho = function() {
                     }
                     var prevTransform = SceneJS_projectionModule.getTransform();
                     SceneJS_projectionModule.setTransform(transform);
-                    this._renderChildren(traversalContext, data);
+                    this._renderNodes(traversalContext, data);
                     SceneJS_projectionModule.setTransform(prevTransform);
                 };
             })());

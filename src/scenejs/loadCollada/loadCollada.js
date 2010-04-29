@@ -8,43 +8,41 @@
  * @extends SceneJS.load
  */
 
-SceneJS.loadCollada = function() {
+SceneJS.LoadCollada = function() {
+    SceneJS.Load.apply(this, arguments);
+};
 
-    var cfg = SceneJS._utils.getNodeConfig(arguments || [
-        {}
-    ]);
+SceneJS._utils.inherit(SceneJS.LoadCollada, SceneJS.Load);
 
-    var params = cfg.getParams();
+SceneJS.LoadCollada.prototype._init = function(params) {
     if (!params.uri) {
         SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
-                ("Mandatory SceneJS.assets.collada parameter missing: uri"));
+                ("SceneJS.LoadCollada parameter expected: uri"));
     }
-
+    this._uri = params.uri;
+    this._serverParams = {
+        format: "xml"
+    };
     var modes = {
         loadCamera: params.loadCamera,
         loadLights: params.loadLights,
         showBoundingBoxes : params.showBoundingBoxes
     };
+    this._parser = function(xml, onError) {
+        return SceneJS_colladaParserModule.parse(
+                params.uri, // Used in paths to texture images
+                xml,
+                params.node, // Optional cherry-picked asset
+                modes
+                );
+    };
+};
 
-    return SceneJS.load({
-        uri: params.uri,
 
-        /* Uniquely ID different assets loaded from different nodes of same COLLADA file
-         */
-        id: params.node ? (params.uri + ":" + params.node) : params.uri,
-
-        serverParams: {
-            format: "xml"
-        },
-
-        parser: function(xml, onError) {
-            return SceneJS_colladaParserModule.parse(
-                    params.uri, // Used in paths to texture images
-                    xml,
-                    params.node, // Optional cherry-picked asset
-                    modes
-                    );
-        }
-    });
-
+/** Function wrapper to support functional scene definition
+ */
+SceneJS.loadCollada = function() {
+    var n = new SceneJS.LoadCollada();
+    SceneJS.LoadCollada.prototype.constructor.apply(n, arguments);
+    return n;
 };

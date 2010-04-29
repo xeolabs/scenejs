@@ -11,7 +11,7 @@
  * Provides an interface through which scene nodes can test axis-aligned bounding boxes for intersection
  * with the sphere.
  */
-SceneJS._localityModule = new (function() {
+var SceneJS_localityModule = new (function() {
 
     var eye;
     var radii;

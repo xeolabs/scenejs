@@ -25,6 +25,11 @@ SceneJS._utils = {
     TRAVERSAL_MODE_RENDER: 0x1,
     TRAVERSAL_MODE_PICKING:   0x2,
 
+    inherit : function(DerivedClassName, BaseClassName) {
+        DerivedClassName.prototype = new BaseClassName();
+        DerivedClassName.prototype.constructor = DerivedClassName;
+    },
+
     /** Adds members of o1 to o2 where not already on the latter
      *
      */
@@ -70,7 +75,7 @@ SceneJS._utils = {
      * has data that will vary. So, data derived from the former type may be cached (or 'memoized')
      * in scene nodes, while the latter type must not be cached.
      */
-    newScope : function(_parent, _fixed) {
+    newScope : function(_parent, _fixed) { // TODO: Optimise!
         var parent = _parent;
         var data = {};
         var fixed = _fixed || (_parent ? _parent.isfixed() : false);
@@ -328,7 +333,7 @@ SceneJS._utils = {
             return this._parent;
         };
 
-        proto._renderChildren = function(traversalContext, data) {
+        proto._renderNodes = function(traversalContext, data) {
             var child;
             var len = _children.length;
             if (len) {
@@ -357,7 +362,7 @@ SceneJS._utils = {
             }
         };
 
-        proto._renderChild = function(index, traversalContext, data) {
+        proto._renderNode = function(index, traversalContext, data) {
             _children[index]._render(traversalContext, data);
         };
 

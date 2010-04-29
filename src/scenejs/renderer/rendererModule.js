@@ -322,7 +322,7 @@ var SceneJS_rendererModule = new (function() {
      * Restores previous renderer properties, except for clear - that's the reason we
      * have a seperate set and restore semantic - we don't want to keep clearing the buffers
      */
-    var restoreProperties = function(context, props) {
+    var undoProperties = function(context, props) {
 
         /* Set order-insensitive properties (modes)
          */
@@ -450,9 +450,9 @@ var SceneJS_rendererModule = new (function() {
      * Restores previous WebGL state, if any. We do a seperate restore operation because some "properties",
      * like clear, are actually operations that we don't want to undo, so we don't redo those in a restore.
      */
-    this.restoreRendererState = function(state) {
+    this.undoRendererState = function(state) {
         stateStack.pop();
-        restoreProperties(canvas.context, state.restore); // Undo property settings
+        undoProperties(canvas.context, state.restore); // Undo property settings
     };
 
 })();

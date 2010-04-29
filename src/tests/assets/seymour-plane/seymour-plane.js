@@ -33,7 +33,7 @@ var exampleScene = SceneJS.scene({
             /* Viewing transform:
              */
                 SceneJS.lookAt({
-                    eye : { x: -1.0, y: 0.0, z: 25 },
+                    eye : { x: -1.0, y: 0.0, z: 15 },
                     look : { x: -1.0, y: 0, z: 0 },
                     up : { y: 1.0 }
                 },
@@ -80,7 +80,8 @@ var exampleScene = SceneJS.scene({
                                                     uri: "http://www.scenejs.org/library/v0.7/assets/" +
                                                          "examples/seymourplane_triangulate/" +
                                                          "seymourplane_triangulate.dae",
-                                                    showBoundingBoxes: true
+
+                                                    showBoundingBoxes: false // Set this true - see what happens!
                                                 }))
                                         )
                                 )
@@ -103,7 +104,7 @@ var dragging = false;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = exampleScene.getCanvas();
+var canvas = document.getElementById(exampleScene.getCanvasId());;
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -131,11 +132,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-//var i = 0;
 window.render = function() {
-    //    if (i++ > 10) {
-    //           window.clearInterval(pInterval);
-    //    }
     exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
@@ -143,9 +140,8 @@ SceneJS.onEvent("error", function() {
     window.clearInterval(pInterval);
 });
 
-
-SceneJS.onEvent("error", function(e) {
-    alert(e.exception.message)
+SceneJS.onEvent("reset", function() {
+    window.clearInterval(pInterval);
 });
 
 pInterval = setInterval("window.render()", 10);

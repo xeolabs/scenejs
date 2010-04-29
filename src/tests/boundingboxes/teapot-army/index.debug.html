@@ -11,7 +11,7 @@
 <table>
     <tr>
         <td valign="top">
-            <canvas id="theCanvas" width="600" height="600">
+            <canvas id="theCanvas" width="1800" height="900">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                     &lt;canvas&gt; feature.</p>
@@ -61,6 +61,10 @@
 
 <script type="application/x-javascript" src="../../../scenejs/events/eventsModule.js"></script>
 
+<!-- Errors -->
+
+<script type="application/x-javascript" src="../../../scenejs/errors/errorsModule.js"></script>
+
 <!-- Time -->
 
 <script type="application/x-javascript" src="../../../scenejs/time/timeModule.js"></script>
@@ -79,6 +83,15 @@
 
 <script type="application/x-javascript" src="../../../scenejs/load/loadModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/load/load.js"></script>
+
+<!-- Picking -->
+
+<script type="application/x-javascript" src="../../../scenejs/pick/pickModule.js"></script>
+
+<!-- Third-party lib : WebGL Trace -->
+
+<script type="application/x-javascript" src="../../../scenejs/core/webgl-trace.js"></script>
+
 
 <!-- Scene -->
 
@@ -116,6 +129,7 @@
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/modelMatrix.js"></script>
 
 <!-- Projection transforms -->
 
@@ -127,11 +141,13 @@
 <!-- Viewing transforms -->
 
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/localityModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
 
 <!-- Lighting -->
 
 <script type="application/x-javascript" src="../../../scenejs/lighting/lightingModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/lighting/lightSource.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/lighting/lights.js"></script>
 
 <!-- Material -->
@@ -142,7 +158,7 @@
 
 <!-- Interpolation -->
 
-<script type="application/x-javascript" src="../../../scenejs/animation/scalarInterpolator.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/interpolation/scalarInterpolator.js"></script>
 
 <!-- Scope -->
 
@@ -164,7 +180,8 @@
 <script type="application/x-javascript" src="../../../scenejs/fog/fogModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
 
-
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaParserModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
 <script type="application/x-javascript" src="teapot-army.js"></script>
 </body>
 </html>

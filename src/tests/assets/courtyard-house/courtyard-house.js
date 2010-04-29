@@ -16,7 +16,9 @@
  */
 
 
-
+  SceneJS.onEvent("error", function(e) {
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
 
 var exampleScene = SceneJS.scene({
 
@@ -89,8 +91,12 @@ var exampleScene = SceneJS.scene({
                                                 SceneJS.rotate({x:1,angle:270},
 
                                                         SceneJS.loadCollada({
-                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
-                                                                 "courtyard-house/models/model.dae"  ,
+//                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
+//                                                                 "courtyard-house/models/model.dae"  ,
+                                                           // uri: "http://www.scenejs.org/library/v0.7/assets/examples/collada-duck/duck.dae",
+                                                            uri: "http://www.scenejs.org/library/v0.7/assets/" +
+                                                         "examples/seymourplane_triangulate/" +
+                                                         "seymourplane_triangulate.dae",
                                                             showBoundingBoxes: true
                                                         }))
                                                 )
@@ -121,7 +127,7 @@ var eye;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = exampleScene.getCanvas();
+var canvas = document.getElementById(exampleScene.getCanvasId());;
 
 function mouseDown(event) {
     lastX = event.clientX;

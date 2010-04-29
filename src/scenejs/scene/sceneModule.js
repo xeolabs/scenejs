@@ -104,6 +104,7 @@ var SceneJS_sceneModule = new (function() {
 
     return { // Node-facing API
 
+
         /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
          */
         createScene : function(scene, params) {

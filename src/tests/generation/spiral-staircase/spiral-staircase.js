@@ -19,6 +19,10 @@
  * returning anything.
  */
 
+SceneJS.onEvent("error", function(e) {
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
+
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas'}, // node always has a config object
 
         SceneJS.perspective({ fovy : 65.0, aspect : 1.0, near : 0.10, far : 300.0
@@ -89,13 +93,12 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas'}, // node always has a 
                                                                     return { angle : data.get("angle"), y: 1.0 };
                                                                 },
                                                                         SceneJS.translate(function(data) {
-                                                                            return { x: 5.0,
-                                                                                y : data.get("height") };
+                                                                            return { x: 5.0, y : data.get("height") };
                                                                         },
                                                                             /** Slab for step
                                                                              */
                                                                                 SceneJS.scale({x: 3.0, y: 0.2, z: 1.0},
-                                                                                        SceneJS.objects.cube()
+                                                                                        SceneJS.objects.sphere()
                                                                                         )
                                                                                 ) // rotate
                                                                         ) // translate
@@ -119,7 +122,7 @@ var dragging = false;
  */
 exampleScene.render({yaw: yaw, pitch: pitch});
 
-var canvas = exampleScene.getCanvas();
+var canvas = document.getElementById(exampleScene.getCanvasId());;
 
 function mouseDown(event) {
     lastX = event.clientX;

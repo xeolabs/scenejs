@@ -9,7 +9,7 @@ SceneJS.exceptions.WebGLNotSupportedException = function(msg, cause) {
     this.cause = cause;
 };
 
-SceneJS.exceptions.NodeBackendInstallFailedException = function(msg, cause) {
+SceneJS.exceptions.SceneDestroyedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };

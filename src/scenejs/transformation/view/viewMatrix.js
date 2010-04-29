@@ -1,85 +1,97 @@
 /**
- * Scene node that accumulates a view transform matrix for the nodes within its subgraph, accumulated with higher
- * view transform nodes.
+ * @class SceneJS.ViewMatrix
+ * @extends SceneJS.Node
+ * <p>Scene node that applies a model-space transform to the nodes within its subgraph.</p>
+ * <p><b>Example</b></p><p>A cube translated along the X, Y and Z axis.</b></p><pre><code>
+ * var mat = new SceneJS.ViewMatrix({
+ *       elements : [
+ *              1, 0, 0, 10,
+ *              0, 1, 0, 5,
+ *              0, 0, 1, 3,
+ *              0, 0, 0, 1
+ *          ]
+ *   },
  *
- * @class SceneJS.viewMatrix
- * @extends SceneJS.node
+ *      new SceneJS.objects.Cube()
+ * )
+ * </pre></code>
+ * @constructor
+ * Create a new SceneJS.ViewMatrix
+ * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
-SceneJS.viewMatrix = function() {
-    
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+SceneJS.ViewMatrix = function() {
+    this._mat = SceneJS_math_identityMat4();
+    this._xform = null;
+    if (this._fixedParams) {
+        this._init(this._getParams());
+    }
+};
 
-    /* Memoization levels
-     */
-    const NO_MEMO = 0;              // No memoization, assuming that node's configuration is dynamic
-    const FIXED_CONFIG = 1;         // Node config is fixed, memoizing local object-space matrix
-    const FIXED_TRANSFORM = 2;    // Both node config and model-space are fixed, memoizing axis-aligned volume
+SceneJS._utils.inherit(SceneJS.ViewMatrix, SceneJS.Node);
 
-    return SceneJS._utils.createNode(
-            "viewMatrix",
-            cfg.children,
+/**
+ * Sets the matrix elements
+ * @param {Array} elements One-dimensional array of matrix elements
+ * @returns {SceneJS.ViewMatrix} this
+ */
+SceneJS.ViewMatrix.prototype.setElements = function(elements) {
+    if (!elements) {
+        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.ViewMatrix elements undefined"));
+    }
+    if (elements.length != 16) {
+        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.ViewMatrix elements should number 16"));
+    }
+    for (var i = 0; i < 16; i++) {
+        this._mat[i] = elements[i];
+    }
+    this._memoLevel = 0;
+    return this;
+};
 
-            new (function() {
-                var _memoLevel = NO_MEMO;
-                var _mat = new Array(16);
-                var _xform;
+/** Returns the matrix elements
+ * @returns {Object} One-dimensional array of matrix elements
+ */
+SceneJS.ViewMatrix.prototype.getElements = function() {
+    var elements = new Array(16);
+    for (var i = 0; i < 16; i++) {
+        elements[i] = this._mat[i];
+    }
+    return elements;
+};
 
-                this.setElements = function(elements) {
-                    if (!elements) {
-                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements undefined"));
-                    }
-                    if (elements.length != 16) {
-                        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.modelMatrix elements should number 16"));
-                    }
-                    for (var i = 0; i < 16; i++) {
-                        _mat[i] = elements[i];
-                    }
-                    _memoLevel = NO_MEMO;
-                };
+SceneJS.ViewMatrix.prototype._init = function(params) {
+    this.setElements(params.elements);
+};
 
-                this.getElements = function() {
-                    var elements = new Array(16);
-                    for (var i = 0; i < 16; i++) {
-                        elements[i] = _mat[i];
-                    }
-                    return elements;
-                };
+SceneJS.ViewMatrix.prototype._render = function(traversalContext, data) {
+    if (this._memoLevel == 0) {
+        if (!this._fixedParams) {
+            this._init(this._getParams(data));
+        } else {
+            this._memoLevel = 1;
+        }
+    }
+    var superXform = SceneJS_viewTransformModule.getTransform();
+    if (this._memoLevel < 2) {
+        var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
+        this._xform = {
+            localMatrix: this._mat,
+            matrix: tempMat,
+            fixed: superXform.fixed && this._fixedParams
+        };
+        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+            this._memoLevel = 2;
+        }
+    }
+    SceneJS_modelTransformModule.setTransform(this._xform);
+    this._renderNodes(traversalContext, data);
+    SceneJS_modelTransformModule.setTransform(superXform);
+};
 
-                this.setIdentity = function() {
-                    _mat = SceneJS_math_identityMat4();
-                };
-
-                this._init = function(params) {
-                    this.setElements(params.elements);
-                };
-
-                if (cfg.fixed) {
-                    this._init(cfg.getParams());
-                }
-
-                this._render = function(traversalContext, data) {
-                    if (_memoLevel == NO_MEMO) {
-                        if (!cfg.fixed) {
-                            this._init(cfg.getParams(data));
-                        } else {
-                            _memoLevel = FIXED_CONFIG;
-                        }
-                    }
-                    var superXform = SceneJS_viewTransformModule.getTransform();
-                    if (_memoLevel < FIXED_TRANSFORM) {
-                        var tempMat = SceneJS_math_mulMat4(superXform.matrix, _mat);
-                        _xform = {
-                            localMatrix: _mat,
-                            matrix: tempMat,
-                            fixed: superXform.fixed && cfg.fixed
-                        };
-                        if (_memoLevel == FIXED_CONFIG && superXform.fixed) {
-                            _memoLevel = FIXED_TRANSFORM;
-                        }
-                    }
-                    SceneJS_viewTransformModule.setTransform(_xform);
-                    this._renderChildren(cfg, traversalContext, data);
-                    SceneJS_viewTransformModule.setTransform(superXform);
-                };
-            })());
+/** Function wrapper to support functional scene definition
+ */
+SceneJS.ViewMatrix = function() {
+    var n = new SceneJS.ViewMatrix();
+    SceneJS.ViewMatrix.prototype.constructor.apply(n, arguments);
+    return n;
 };

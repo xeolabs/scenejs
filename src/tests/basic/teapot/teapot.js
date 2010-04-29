@@ -14,6 +14,11 @@
  the invocation of the "render" function near the bottom of this example, which passes them in.
 
  */
+
+SceneJS.onEvent("error", function(e) {
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
+
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
     /* Perspective transformation
@@ -120,7 +125,7 @@ exampleScene.render({yaw: yaw, pitch: pitch});
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = exampleScene.getCanvas();
+var canvas = document.getElementById(exampleScene.getCanvasId());;
 
 function mouseDown(event) {
     lastX = event.clientX;

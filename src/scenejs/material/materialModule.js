@@ -31,8 +31,7 @@ var SceneJS_materialModule = new (function() {
                     shine : 0,
                     reflect : 0,
                     alpha : 1.0,
-                    emit : 0.0,
-                    blendMode : "multiply"
+                    emit : 0.0
                 };
                 dirty = true;
             });

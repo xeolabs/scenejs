@@ -45,7 +45,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                     color:                  { r: 0.6, g: 0.6, b: 0.6 },
                                     diffuse:                true,
                                     specular:               true,
-                                    pos:                    { x: 100.0, y: -100.0, z: -100.0 },
+                                    pos:                    { x: 100.0, y: -100.0, z: 200.0 },
                                     constantAttenuation:    1.0,
                                     quadraticAttenuation:   0.0,
                                     linearAttenuation:      0.0

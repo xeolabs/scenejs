@@ -68,94 +68,21 @@ var SceneJS_lightingModule = new (function() {
                 dirty = true;
             });
 
-    function vectorToArray(v, fallback) {
-        return v ? [ v.x || 0, v.y || 0, v.z || 0] : fallback;
-    }
-
-    function pointToArray(p, fallback) {
-        return p ? [ p.x || 0, p.y || 0, p.z || 0, p.w || 1] : fallback;
-    }
-
-    function colourToArray(v, fallback) {
-        return v ? [
-            v.r == undefined ? fallback[0] : v.r,
-            v.g == undefined ? fallback[1] : v.g,
-            v.b == undefined ? fallback[2] : v.b] : fallback;
-    }
-
-    /* Creates a view-space light
-     */
-    function createLight(light) {
-        if (light.type) {
-            if (light.type != "dir"
-                    && light.type != "point") {
-                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
-                        "SceneJS.light node has a light of unsupported type - should be 'dir' or 'point'"));
-            }
-        } else {
-            light.type = light.type || "point";
-        }
-
-        if (light.type == "point") {
-            return {
-                type: light.type,
-                color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                diffuse : light.diffuse == undefined ? true : light.diffuse,
-                specular : light.specular == undefined ? true : light.specular,
-                pos : SceneJS_math_transformPoint3(
-                        viewMat,
-                        SceneJS_math_transformPoint3(
-                                modelMat,
-                                pointToArray(light.pos, [ 0,  0, 1.0, 1.0]))),
-                constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-                linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-                quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-            };
-        }
-
-        if (light.type == "dir") {
-            return {
-                type: light.type,
-                color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-                diffuse : light.diffuse == undefined ? true : light.diffuse,
-                specular : light.specular == undefined ? true : light.specular,
-                dir : SceneJS_math_transformVector3(
-                        viewMat,
-                        SceneJS_math_transformVector3(
-                                modelMat,
-                                vectorToArray(light.dir, [ 0,  0,  1.0])))
-            };
-        }
-
-        //                if (light.type == "spot") {
-        //                    return {
-        //                        type: light.type,
-        //                        color: colourToArray(light.color, [ 1.0, 1.0, 1.0 ]),
-        //                        diffuse : light.diffuse,
-        //                        specular : light.specular,
-        //                        pos : SceneJS_math_transformPoint3(
-        //                                viewMat,
-        //                                SceneJS_math_transformPoint3(
-        //                                        modelMat,
-        //                                        pointToArray(light.pos, [ 0,  0,  1.0, 1.0]))),
-        //
-        //                        dir : SceneJS_math_transformVector3(
-        //                                viewMat,
-        //                                SceneJS_math_transformVector3(
-        //                                        modelMat,
-        //                                        vectorToArray(light.dir, [ 0,  0,  1.0]))),
-        //                        spotExponent: light.spotExponent == undefined ? 1.0 : light.spotExponent,
-        //                        spotCosCutOff: light.spotCosCutOff == undefined ? 20.0 : light.spotCosCutOff,
-        //                        constantAttenuation: light.constantAttenuation == undefined ? 1.0 : light.constantAttenuation,
-        //                        linearAttenuation: light.linearAttenuation == undefined ? 0.0 : light.linearAttenuation,
-        //                        quadraticAttenuation: light.quadraticAttenuation == undefined ? 0.0 : light.quadraticAttenuation
-        //                    };
-        //                }
-    }
-
-    this.pushLights = function(sources) {
+    function instanceSources(sources) {
         for (var i = 0; i < sources.length; i++) {
-            lightStack.push(createLight(sources[i]));
+            var source = sources[i];
+            if (source._type == "point") {
+                source._viewPos =  SceneJS_math_transformPoint3(viewMat, SceneJS_math_transformPoint3(modelMat, source._pos));
+            } else if (source._type == "dir") {
+                source._viewDir = SceneJS_math_transformVector3(viewMat, SceneJS_math_transformVector3(modelMat, source._dir));
+            }
+        }
+    };
+
+    this.pushLightSources = function(sources) {
+        instanceSources(sources);
+        for (var i = 0; i < sources.length; i++) {
+            lightStack.push(sources[i]);
         }
         dirty = true;
         SceneJS_eventModule.fireEvent(
@@ -163,7 +90,7 @@ var SceneJS_lightingModule = new (function() {
                 lightStack);
     };
 
-    this.popLights = function(numSources) {
+    this.popLightSources = function(numSources) {
         for (var i = 0; i < numSources; i++) {
             lightStack.pop();
         }

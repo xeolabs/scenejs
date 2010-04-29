@@ -486,6 +486,16 @@ var SceneJS_colladaParserModule = new (function() {
 
 
     function wrapWithBoundingBox(e, child) {
+
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        return child;
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
         if (modes.showBoundingBoxes) {
             return SceneJS.boundingBox(e, SceneJS.renderer({
                 lineWidth:2,
@@ -505,7 +515,7 @@ var SceneJS_colladaParserModule = new (function() {
                         ],
                         indices : [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1,5, 2, 6,3,7 ]
                     }))), child);
-        } else {
+        } else {                                   f
             return SceneJS.boundingBox(e, child);
         }
     }
@@ -619,7 +629,7 @@ var SceneJS_colladaParserModule = new (function() {
         var x = data[0];
         var y = data[1];
         var z = data[2];
-        SceneJS_loggingModule.warn("translate - x: " + x + ", y: " + y + ", z: " + z);
+      //  SceneJS_loggingModule.warn("translate - x: " + x + ", y: " + y + ", z: " + z);
         return SceneJS_math_translationMat4v(data);
     }
 
@@ -629,7 +639,7 @@ var SceneJS_colladaParserModule = new (function() {
         var y = data[1];
         var z = data[2];
         var angle = data[3];
-        SceneJS_loggingModule.warn("rotate - x: " + x + ", y: " + y + ", z: " + z + ", angle: " + angle);
+      //  SceneJS_loggingModule.warn("rotate - x: " + x + ", y: " + y + ", z: " + z + ", angle: " + angle);
         return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
     }
 
@@ -657,10 +667,10 @@ var SceneJS_colladaParserModule = new (function() {
                 }
             };
 
-            SceneJS_loggingModule.info("fovy = " + opticsData.perspective.fovy);
-            SceneJS_loggingModule.info("aspect = " + opticsData.perspective.aspect);
-            SceneJS_loggingModule.info("near = " + opticsData.perspective.near);
-            SceneJS_loggingModule.info("far = " + opticsData.perspective.far);
+//            SceneJS_loggingModule.info("fovy = " + opticsData.perspective.fovy);
+//            SceneJS_loggingModule.info("aspect = " + opticsData.perspective.aspect);
+//            SceneJS_loggingModule.info("near = " + opticsData.perspective.near);
+//            SceneJS_loggingModule.info("far = " + opticsData.perspective.far);
 
             return opticsData;
 
@@ -738,12 +748,12 @@ var SceneJS_colladaParserModule = new (function() {
                     SceneJS_loggingModule.warn("camera.technique_common.optics.orthographic - insufficient data found, falling back on defaults");
                 }
 
-                SceneJS_loggingModule.info("left = " + opticsData.orthographic.left);
-                SceneJS_loggingModule.info("right = " + opticsData.orthographic.right);
-                SceneJS_loggingModule.info("bottom = " + opticsData.orthographic.bottom);
-                SceneJS_loggingModule.info("top = " + opticsData.orthographic.top);
-                SceneJS_loggingModule.info("near = " + opticsData.orthographic.near);
-                SceneJS_loggingModule.info("far = " + opticsData.orthographic.far);
+//                SceneJS_loggingModule.info("left = " + opticsData.orthographic.left);
+//                SceneJS_loggingModule.info("right = " + opticsData.orthographic.right);
+//                SceneJS_loggingModule.info("bottom = " + opticsData.orthographic.bottom);
+//                SceneJS_loggingModule.info("top = " + opticsData.orthographic.top);
+//                SceneJS_loggingModule.info("near = " + opticsData.orthographic.near);
+//                SceneJS_loggingModule.info("far = " + opticsData.orthographic.far);
 
             } else {
                 SceneJS_loggingModule.warn("camera.technique_common.optics - neither perspective nor perspective found");
@@ -784,7 +794,7 @@ var SceneJS_colladaParserModule = new (function() {
                     break;
 
                 case "matrix":
-                    SceneJS_loggingModule.info("matrix");
+                   SceneJS_loggingModule.info("matrix");
                     var array = parseMatrix(child);
 
                     /* Convert row-major to SceneJS column-major
@@ -827,7 +837,7 @@ var SceneJS_colladaParserModule = new (function() {
                     break;
 
                 case "instance_camera":
-                    SceneJS_loggingModule.info("instance_camera");
+                   SceneJS_loggingModule.info("instance_camera");
                     cameraOpticsData = parseCameraOptics(idMap[child.getAttribute("url").substr(1)]);
                     break;
             }
@@ -835,23 +845,23 @@ var SceneJS_colladaParserModule = new (function() {
 
         var sceneNode = SceneJS.node.apply(this, sceneNodeParams);
 
-        if (cameraOpticsData) {
-
-            /* Save camera data for wrapping asset subgraph with when we're done parsing
-             */
-            cameraData = {
-                opticsData : cameraOpticsData,
-                matrix : matrix
-            };
-
-        } else {
+//        if (cameraOpticsData) {
+//
+//            /* Save camera data for wrapping asset subgraph with when we're done parsing
+//             */
+//            cameraData = {
+//                opticsData : cameraOpticsData,
+//                matrix : matrix
+//            };
+//
+//        } else {
 
             /* Modelling transform
              */
             if (matrix) {
                 sceneNode = SceneJS.modelMatrix({ elements: matrix }, sceneNode);
             }
-        }
+//        }
 
         return sceneNode;
     }
