@@ -1,9 +1,3 @@
-<!--
-	Builds SceneJS
-
-	Guava3D home:	http://scenejs.org
-	Author: 	Lindsay S. Kay, Jan 2, 2010
--->
 <project name="" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="0"/>
@@ -46,7 +40,7 @@
 
     <target name="all" depends="archive"/>
 
-    <target name="docs" depends="package" description="Create JS Docs">
+    <target name="docs" description="Create JS Docs">
         <taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit">
             <classpath>
                 <path refid="jsdoc.classpath"/>
@@ -54,9 +48,9 @@
         </taskdef>
 
         <jsdoctoolkit
-                jsdochome="${basedir}/jsdoc-toolkit/"
+                jsdochome="${basedir}/lib/jsdoc-toolkit/"
                 template="jsdoc"
-                outputdir="/home/lindsay/docs/"
+                outputdir="${basedir}/docs/"
                 inputdir="${basedir}/src/scenejs/"/>
     </target>
 
@@ -206,6 +200,7 @@
             <!-- Lighting -->
 
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightsBackend.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
 
             <!-- Material -->

@@ -6,49 +6,84 @@
 	.REGX {color: #339;}
 	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
-<span class='line'>  2</span>  * The SceneJS.generator node loops over its children, each time creating a child data for them from the result of its
-<span class='line'>  3</span>  * configuration function, repeating this process until the config function returns nothing.
+<span class='line'>  2</span>  *  @class SceneJS.Generator
+<span class='line'>  3</span>  *  @extends SceneJS.Node
 <span class='line'>  4</span>  *
-<span class='line'>  5</span>  * This node type must be configured dynamically therefore, in the SceneJS style, with a configuration function.
-<span class='line'>  6</span>  *
-<span class='line'>  7</span>  * This node type is useful for procedurally generating scene subtrees. Its most common application would be
-<span class='line'>  8</span>  * to dynamically instance elements of primitive geometry to build complex objects.
+<span class='line'>  5</span>  *  &lt;p>Scene node that loops over its children, each time creating a child data scope for them from the result of its
+<span class='line'>  6</span>  *  configuration function, repeating this process until the config function returns nothing.&lt;/p>
+<span class='line'>  7</span>  *
+<span class='line'>  8</span>  *  &lt;p>This node type must be configured dynamically therefore, in the SceneJS style, with a configuration function.&lt;/p>
 <span class='line'>  9</span>  *
-<span class='line'> 10</span>  * Note that generator nodes can have a negative impact on performance, where they will often prevent subnodes from
-<span class='line'> 11</span>  * employing memoization strategies that fast scene graphs often depend upon. Use them carefully when high performance
-<span class='line'> 12</span>  * is desired in large scenes. The impact will depend on the type of subnode that receives the generated data.
-<span class='line'> 13</span>  * For example, inability to memoize will cascade downwards through  modelling transform node hierarchies since they
-<span class='line'> 14</span>  * will have to re-multiply matrices by dynamic parent modelling transforms etc.
-<span class='line'> 15</span>  */</span><span class="WHIT">
-<span class='line'> 16</span> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 17</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">errorBackend</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._backends.getBackend</span><span class="PUNC">(</span><span class="STRN">"error"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 18</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.generator</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 19</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">cfg</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.getNodeConfig</span><span class="PUNC">(</span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 20</span> 
-<span class='line'> 21</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.createNode</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'> 22</span> </span><span class="WHIT">                </span><span class="STRN">"generator"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 23</span> </span><span class="WHIT">                </span><span class="NAME">cfg.children</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 24</span> 
-<span class='line'> 25</span> </span><span class="WHIT">                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 26</span> </span><span class="WHIT">                    </span><span class="NAME">this._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 27</span> </span><span class="WHIT">                        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cfg.fixed</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 28</span> </span><span class="WHIT">                            </span><span class="NAME">errorBackend.fatalError</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">                                    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.exceptions.InvalidNodeConfigException</span><span class="WHIT">
-<span class='line'> 30</span> </span><span class="WHIT">                                            </span><span class="PUNC">(</span><span class="STRN">'SceneJS.generator node must be configured with a function'</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 31</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 32</span> </span><span class="WHIT">                        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cfg.getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 33</span> </span><span class="WHIT">                        </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 34</span> </span><span class="WHIT">                            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">childData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.newScope</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 35</span> </span><span class="WHIT">                            </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">key</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="WHIT">                                </span><span class="NAME">childData.put</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">                            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="WHIT">                            </span><span class="NAME">this._renderChildren</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="WHIT">                            </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cfg.getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 40</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 45</span> 
-<span class='line'> 46</span> 
-<span class='line'> 47</span> </span></pre></body></html>
+<span class='line'> 10</span>  *  &lt;p>This node type is useful for procedurally generating scene subtrees. Its most common application would be
+<span class='line'> 11</span>  *  to dynamically instance elements of primitive geometry to build complex objects.&lt;/p>
+<span class='line'> 12</span>  *
+<span class='line'> 13</span>  *  &lt;p>Note that generator nodes can have a negative impact on performance, where they will often prevent subnodes from
+<span class='line'> 14</span>  *  employing memoization strategies that fast scene graphs often depend upon. Use them carefully when high performance
+<span class='line'> 15</span>  *  is desired in large scenes. The impact will depend on the type of subnode that receives the generated data.
+<span class='line'> 16</span>  *  For example, inability to memoize will cascade downwards through  modelling transform node hierarchies since they
+<span class='line'> 17</span>  *  will have to re-multiply matrices by dynamic parent modelling transforms etc.&lt;/p>
+<span class='line'> 18</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
+<span class='line'> 19</span>  * &lt;ul>&lt;li>&lt;a target = "other" href="http://bit.ly/c9ySdG">Example 1&lt;/a>&lt;/li>&lt;/ul>
+<span class='line'> 20</span>  * &lt;p>&lt;b>Example Usage&lt;/b>&lt;/p>&lt;p>Below is a SceneJS.Generator that loops over its subgraph to create a ring of cubes, 45 degrees apart.&lt;/b>&lt;/p>&lt;pre>&lt;code>
+<span class='line'> 21</span>  * var g = new SceneJS.Generator(
+<span class='line'> 22</span>  *        (function() {                        // Higher order function tracks the angle in closure
+<span class='line'> 23</span>  *            var angle = 0;
+<span class='line'> 24</span>  *            return function() {              // Generator function
+<span class='line'> 25</span>  *                angle += 45.0;
+<span class='line'> 26</span>  *                if (angle &lt;= 360.0) {
+<span class='line'> 27</span>  *                    return { angle: angle }; // Angle still less than 360, return config object
+<span class='line'> 28</span>  *                } else {  // Reset the generator
+<span class='line'> 29</span>  *                    angle = 0;               // Angle at max, reset and return nothing,
+<span class='line'> 30</span>  *                }                            // causing loop to finish for this frame
+<span class='line'> 31</span>  *            };
+<span class='line'> 32</span>  *        })(),
+<span class='line'> 33</span>  *
+<span class='line'> 34</span>  *        new SceneJS.Rotate(function(data) {
+<span class='line'> 35</span>  *            return { angle : data.get("angle"), y: 1.0 };
+<span class='line'> 36</span>  *        },
+<span class='line'> 37</span>  *                new SceneJS.Translate(function(data) {
+<span class='line'> 38</span>  *                    return { x: 10.0 };
+<span class='line'> 39</span>  *                },
+<span class='line'> 40</span>  *
+<span class='line'> 41</span>  *                new SceneJS.objects.cube()
+<span class='line'> 42</span>  *            )
+<span class='line'> 43</span>  *         )
+<span class='line'> 44</span>  *   );
+<span class='line'> 45</span>  *  &lt;/pre>&lt;/code>
+<span class='line'> 46</span>  * @constructor
+<span class='line'> 47</span>  * Create a new SceneJS.Generator
+<span class='line'> 48</span>  * @param {Object} func  Config function, followed by one or more child nodes
+<span class='line'> 49</span>  */</span><span class="WHIT">
+<span class='line'> 50</span> 
+<span class='line'> 51</span> </span><span class="NAME">SceneJS.Generator</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">cfg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"generator"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 55</span> 
+<span class='line'> 56</span> </span><span class="NAME">SceneJS._utils.inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Generator</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 57</span> 
+<span class='line'> 58</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="NAME">SceneJS.Generator.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.exceptions.InvalidNodeConfigException</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">                        </span><span class="PUNC">(</span><span class="STRN">"SceneJS.Generator may only be configured with a function"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">childData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.newScope</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">key</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">            </span><span class="NAME">childData.put</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">childData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">        </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 75</span> 
+<span class='line'> 76</span> </span><span class="COMM">/** Function wrapper to support functional scene definition
+<span class='line'> 77</span>  */</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="NAME">SceneJS.generator</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Generator</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Generator.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
