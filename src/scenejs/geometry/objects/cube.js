@@ -20,6 +20,7 @@ SceneJS._utils.ns("SceneJS.objects");
  */
 SceneJS.objects.Cube = function() {
     SceneJS.Geometry.apply(this, arguments);
+    this._nodeType = "cube";
     if (this._fixedParams) {
         this._init(this._getParams());
     }
@@ -27,6 +28,7 @@ SceneJS.objects.Cube = function() {
 
 SceneJS._utils.inherit(SceneJS.objects.Cube, SceneJS.Geometry);
 
+// @private
 SceneJS.objects.Cube.prototype._init = function(params) {
     var x = params.xSize || 1;
     var y = params.ySize || 1;

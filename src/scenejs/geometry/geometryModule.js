@@ -27,8 +27,10 @@
  * The backend avoids needlessly re-exporting and re-binding geometry (eg. when rendering a bunch of cubes in a row)
  * by tracking the type of the last geometry rendered. That type is maintained until another either geoemetry is rendered,
  * the canvas switches, shader deactivates or scene deactivates.
- */
+ *
+ *  @private
 
+ */
 var SceneJS_geometryModule = new (function() {
 
     var time = (new Date()).getTime();  // For LRU caching
@@ -101,6 +103,7 @@ var SceneJS_geometryModule = new (function() {
     /**
      * Destroys geometry, returning true if memory freed, else false
      * where canvas not found and geometry was implicitly destroyed
+     * @private
      */
     function destroyGeometry(geo) {
         //  SceneJS_loggingModule.debug("Destroying geometry : '" + geo.type + "'");
@@ -132,6 +135,7 @@ var SceneJS_geometryModule = new (function() {
 
     /**
      * Volunteer to attempt to destroy a geometry when asked to by memory module
+     *
      */
     SceneJS_memoryModule.registerEvictor(
             function() {
@@ -163,6 +167,7 @@ var SceneJS_geometryModule = new (function() {
     /**
      * Creates an array buffer
      *
+     * @private
      * @param context WebGL context
      * @param bufType Eg. ARRAY_BUFFER
      * @param values WebGL array
@@ -182,6 +187,7 @@ var SceneJS_geometryModule = new (function() {
 
     /**
      * Converts SceneJS primitive type string to WebGL constant
+     * @private
      */
     function getPrimitiveType(context, primitive) {
         switch (primitive) {
@@ -211,6 +217,7 @@ var SceneJS_geometryModule = new (function() {
 
     /**
      * Tests if the given geometry type exists on the currently active canvas
+     * @private
      */
     this.testGeometryExists = function(type) {
         return currentGeoMap[type] ? true : false;
@@ -219,6 +226,7 @@ var SceneJS_geometryModule = new (function() {
     /**
      * Creates geometry on the active canvas - can optionally take a type ID. On success, when ID given
      * will return that ID, else if no ID given, will return a generated one.
+     * @private
      */
     this.createGeometry = function(type, data) {
         if (!type) {
@@ -309,6 +317,7 @@ var SceneJS_geometryModule = new (function() {
      * Draws the geometry of the given ID that exists on the current canvas.
      * Client node must ensure prior that the geometry exists on the canvas
      * using findGeometry, and have created it if neccessary with createGeometry.
+     * @private
      */
     this.drawGeometry = function(type) {
         if (!canvas) {

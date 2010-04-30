@@ -26,8 +26,8 @@ var scene = SceneJS.scene({
 var renderer =
         scene.addNode(
                 SceneJS.renderer({
-                    clearColor: { r: 0.5, g: 0.5, b: 0.5 } //,
-                    //    clear: { color: true, depth: true }
+                    clearColor: { r: 0.5, g: 0.5, b: 0.5 } ,
+                        clear: { color: true, depth: true }
                 }));
 
 /* Perspective transformation
@@ -80,7 +80,7 @@ var lights =
                     ]}));
 
 var anotherSource =
-        SceneJS.lightSource({  // Define one more
+        new SceneJS.LightSource({  // Define one more
             type:     "dir",
             color:    { r: 1.0, g: 1.0, b: 1.0 },
             diffuse:  true,
@@ -137,16 +137,16 @@ scale.addNode(
 
 /* A "loading" message which will be hidden by the model when it loads
  */
-lights.addNode(
-        SceneJS.material({
-            baseColor: { g: 1 }
-        },
-                SceneJS.scale({x:2, y: 2, z: 2},
-                        SceneJS.translate({x: 5, y: 35 },
-                                SceneJS.rotate({ angle: 180, y: 1.0 },
-                                        SceneJS.renderer({ lineWidth: 3 },
-                                                SceneJS.text({
-                                                    text : "Temple model\nloading here, \nplease wait..." })))))));
+//lights.addNode(
+//        SceneJS.material({
+//            baseColor: { g: 1 }
+//        },
+//                SceneJS.scale({x:2, y: 2, z: 2},
+//                        SceneJS.translate({x: 5, y: 35 },
+//                                SceneJS.rotate({ angle: 180, y: 1.0 },
+//                                        SceneJS.renderer({ lineWidth: 3 },
+//                                                SceneJS.text({
+//                                                    text : "Temple model\nloading here, \nplease wait..." })))))));
 
 
 /*----------------------------------------------------------------------
@@ -172,7 +172,7 @@ var pitchInc = 0;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = scene.getCanvas();
+var canvas = document.getElementById(scene.getCanvasId());;
 
 function mouseDown(event) {
     lastX = event.clientX;

@@ -41,6 +41,7 @@
  */
 SceneJS.Material = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "material";
     this._material = {
         baseColor : [ 0.0, 0.0, 0.0 ],
         specularColor: [ 0.0,  0.0,  0.0 ],
@@ -213,7 +214,7 @@ SceneJS.Material.prototype.getAlpha = function() {
     return this._material.alpha;
 };
 
-
+  // @private
 SceneJS.Material.prototype._init = function(params) {
     if (params.baseColor) {
         this.setBaseColor(params.baseColor);
@@ -238,6 +239,7 @@ SceneJS.Material.prototype._init = function(params) {
     }
 };
 
+// @private
 SceneJS.Material.prototype._render = function(traversalContext, data) {
     if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);

@@ -10,6 +10,8 @@
  *
  * Provides an interface through which scene nodes can test axis-aligned bounding boxes for intersection
  * with the sphere.
+ *
+ * @private
  */
 var SceneJS_localityModule = new (function() {
 
@@ -42,6 +44,9 @@ var SceneJS_localityModule = new (function() {
                 }
             });
 
+    /**
+     * @private
+     */
     function intersects(radius2, box) { // Simple Arvo method - TODO: Larsson-Arkenine-Moller-Lengyel method
         var dmin = 0;
         var e;
@@ -60,6 +65,7 @@ var SceneJS_localityModule = new (function() {
     }
 
     /** Sets radii of inner and outer locality spheres
+     * @private
      */
     this.setRadii = function(r) {
         radii = {
@@ -73,7 +79,7 @@ var SceneJS_localityModule = new (function() {
     };
 
     /** Returns current inner and ouer sphere radii
-     *
+     * @private
      */
     this.getRadii = function() {
         return radii;
@@ -82,6 +88,7 @@ var SceneJS_localityModule = new (function() {
     /** Tests the given axis-aligned bounding box for intersection with the outer locality sphere
      *
      * @param box
+     * @private
      */
     this.testAxisBoxIntersectOuterRadius = function(box) {
         return intersects(radii2.outer, box);
@@ -90,6 +97,7 @@ var SceneJS_localityModule = new (function() {
     /** Tests the given axis-aligned bounding box for intersection with the inner locality sphere
      *
      * @param box
+     * @private
      */
     this.testAxisBoxIntersectInnerRadius = function(box) {
         return intersects(radii2.inner, box);

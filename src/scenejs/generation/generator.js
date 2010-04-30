@@ -42,7 +42,7 @@
  *            )
  *         )
  *   );
- *  </pre></code> 
+ *  </pre></code>
  * @constructor
  * Create a new SceneJS.Generator
  * @param {Object} func  Config function, followed by one or more child nodes
@@ -50,10 +50,12 @@
 
 SceneJS.Generator = function(cfg) {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "generator";
 };
 
 SceneJS._utils.inherit(SceneJS.Generator, SceneJS.Node);
 
+// @private
 SceneJS.Generator.prototype._render = function(traversalContext, data) {
     if (this._fixedParams) {
         SceneJS_errorModule.fatalError(

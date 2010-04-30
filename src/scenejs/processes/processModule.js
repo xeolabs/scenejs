@@ -6,6 +6,8 @@
  * This module maintains a separate group of processes for each active scene. When a scene is defined, it
  * will create a group for it, then whenever it is deactivated it will automatically reap all processes
  * in its group that have timed out.
+ *
+ *  @private
  */
 var SceneJS_processModule = new (function() {
 
@@ -97,6 +99,7 @@ var SceneJS_processModule = new (function() {
 
 
     /**
+     *
      * Creates a new asynchronous process for the currently active scene and returns a handle to it.
      * The handle is actually an object containing live information on the process, which must
      * not be modified.
@@ -109,6 +112,8 @@ var SceneJS_processModule = new (function() {
      *      onTimeout(function() {
      *              alert("arrrg!!");
      *          });
+     *
+     * @private
      */
     this.createProcess = function(cfg) {
         if (!activeSceneId) {
@@ -154,6 +159,8 @@ var SceneJS_processModule = new (function() {
     /**
      * Destroys the given process, which is the object returned by the previous call to createProcess.
      * Does not care if no scene is active, or if the process no longer exists or is dead.
+     *
+     * @private
      */
     this.killProcess = function(process) {
         if (process) {
@@ -176,6 +183,8 @@ var SceneJS_processModule = new (function() {
     /**
      * Returns the number of living processes for either the scene of the given ID, or if
      * no ID supplied, the active scene. If no scene is active, returns zero.
+     *
+     * @private
      */
     this.getNumProcesses = function(sceneId) {
         var group = groups[sceneId];
@@ -198,6 +207,8 @@ var SceneJS_processModule = new (function() {
      *          description :   "loading texture image",
      *          timeoutSecs :       30,                      // Timeout in milliseconds
      *          onTimeout :     <function>                  // Function that will fire on timeoutSecs
+     *
+     * @private
      */
     this.getProcesses = function(sceneId) {
         var group = groups[sceneId];

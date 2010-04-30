@@ -18,6 +18,7 @@
  */
 SceneJS.Translate = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "translate";
     this._mat = null;
     this._xform = null;
     this._x = 0;

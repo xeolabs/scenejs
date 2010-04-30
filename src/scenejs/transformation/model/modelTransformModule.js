@@ -15,6 +15,8 @@
  *
  * Whenever a scene node sets the matrix, this backend publishes it with a PROJECTION_TRANSFORM_UPDATED to allow other
  * dependent backends to synchronise their resources.
+ *
+ *  @private
  */
 var SceneJS_modelTransformModule = new (function() {
 

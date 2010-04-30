@@ -32,6 +32,8 @@
  @param {Object} config  Config object or function, followed by zero or more child nodes
  */
 SceneJS.Name = function() {
+    SceneJS.Node.apply(this, arguments);
+    this._nodeType = "name";
     this._name = "undefined";
     if (this._fixedParams) {
         this._init(this._getParams());
@@ -64,12 +66,14 @@ SceneJS.Name.prototype.getName = function() {
     return this._name;
 };
 
+// @private
 SceneJS.Name.prototype._init = function(params) {
     if (params.name) {
         this.setName(params.name);
     }
 };
 
+// @private
 SceneJS.Name.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
         this._init(this._getParams(data));

@@ -16,6 +16,8 @@
  *
  * This backend is always the last to handle a RESET
  *
+ *  @private
+ *
  */
 var SceneJS_loggingModule = new (function() {
 
@@ -25,6 +27,9 @@ var SceneJS_loggingModule = new (function() {
     var indent = 0;
     var indentStr = "";
 
+    /**
+     * @private
+     */
     function log(channel, message) {
         message = activeSceneId
                 ? indentStr + activeSceneId + ": " + message
@@ -41,6 +46,9 @@ var SceneJS_loggingModule = new (function() {
         }
     }
 
+    /**
+     * @private
+     */
     function flush(channel) {
         var queue = queues[channel];
         if (queue) {
@@ -94,6 +102,7 @@ var SceneJS_loggingModule = new (function() {
             },
             100000);  // Really low priority - must be reset last
 
+    // @private
     this.setIndent = function(_indent) {
         indent = _indent;
         var indentArray = [];
@@ -103,26 +112,32 @@ var SceneJS_loggingModule = new (function() {
         indentStr = indentArray.join("");
     };
 
+    // @private
     this.error = function(msg) {
         log("error", msg);
     };
 
+    // @private
     this.warn = function(msg) {
         log("warn", msg);
     };
 
+    // @private
     this.info = function(msg) {
         log("info", msg);
     };
 
+    // @private
     this.debug = function(msg) {
         log("debug", msg);
     };
 
+    // @private
     this.getFuncs = function() {
         return funcs;
     };
 
+    // @private
     this.setFuncs = function(l) {
         if (l) {
             funcs = l;

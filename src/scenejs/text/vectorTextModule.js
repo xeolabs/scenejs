@@ -1,5 +1,5 @@
 /** Backend module that creates vector geometry repreentations of text
- *
+ *  @private
  */
 var SceneJS_vectorTextModule = new (function() {
 
@@ -1389,18 +1389,22 @@ var SceneJS_vectorTextModule = new (function() {
         ] }
     };
 
+    // @private
     function letter(ch) {
         return letters[ch];
     }
 
+    // @private
     function ascent(font, size) {
         return size;
     }
 
+    // @private
     function descent(font, size) {
         return 7.0 * size / 25.0;
     }
 
+    // @private
     function measure(font, size, str)
     {
         var total = 0;
@@ -1413,6 +1417,7 @@ var SceneJS_vectorTextModule = new (function() {
         return total;
     }
 
+    // @private
     this.getGeometry = function(size, xPos, yPos, text) {
         var geo = {
             positions : [],

@@ -20,6 +20,7 @@
  */
 SceneJS.Rotate = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "rotate";
     this._mat = null;
     this._xform = null;
     this._angle = 0;
@@ -59,11 +60,11 @@ SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     var x = xyz.x || 0;
     var y = xyz.y || 0;
     var z = xyz.z || 0;
-//    if (x + y + z == 0) {
-//        SceneJS_errorModule.fatalError(
-//                new SceneJS.exceptions.IllegalRotateConfigException(
-//                        "SceneJS.rotate vector is zero - at least one of properties x,y and z must be non-zero"));
-//    }
+    //    if (x + y + z == 0) {
+    //        SceneJS_errorModule.fatalError(
+    //                new SceneJS.exceptions.IllegalRotateConfigException(
+    //                        "SceneJS.rotate vector is zero - at least one of properties x,y and z must be non-zero"));
+    //    }
     this._x = x;
     this._y = y;
     this._z = z;

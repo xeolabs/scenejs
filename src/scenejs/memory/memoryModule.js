@@ -11,6 +11,8 @@
  * remembers the last evictor it polled, to continue with the next one when it needs to evict something again.
  *
  * This module is to be used only when there is an active canvas.
+ *
+ *  @private
  */
 var SceneJS_memoryModule = new (function() {
 
@@ -40,6 +42,7 @@ var SceneJS_memoryModule = new (function() {
     /**
      * Polls each registered evictor backend to evict something. Stops on the first one to
      * comply. When called again, resumes at the next in sequence to ensure fairness.
+     * @private
      */
     function evict() {
         if (evictors.length == 0) {
@@ -62,6 +65,7 @@ var SceneJS_memoryModule = new (function() {
         }
     }
 
+    // @private
     function outOfMemory(description) {
         SceneJS_loggingModule.error("Memory allocation failed");
         SceneJS_errorModule.fatalError(new SceneJS.exceptions.OutOfVRAMException(
@@ -72,6 +76,7 @@ var SceneJS_memoryModule = new (function() {
      * Volunteers the caller as an evictor that is willing to attempt to free some memory when polled
      * by this module as memory runs low. The given evict callback is to attempt to free some memory
      * held by the caller, and should return true on success else false.
+     * @private
      */
     this.registerEvictor = function(evict) {
         evictors.push(evict);
@@ -81,6 +86,7 @@ var SceneJS_memoryModule = new (function() {
      * Attempt allocation of some memory for the caller. This method does not return anything - the
      * tryAllocate callback is to wrap the allocation attempt and provide the result to the caller via
      * a closure, IE. not return it.
+     * @private
      */
     this.allocate = function(description, tryAllocate) {
         // SceneJS_loggingModule.debug("Allocating memory for: " + description);

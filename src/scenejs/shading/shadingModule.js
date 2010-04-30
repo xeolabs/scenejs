@@ -17,6 +17,7 @@
  * cached for the hash of the current scene state.
  *
  * Shader allocation and LRU cache eviction is mediated by SceneJS_memoryModule.
+ *  @private
  */
 var SceneJS_shaderModule = new (function() {
 
@@ -326,6 +327,9 @@ var SceneJS_shaderModule = new (function() {
                 return false;   // Couldnt find suitable program to delete
             });
 
+    /**
+     * @private
+     */
     function activateProgram() {
         if (!canvas) {
             SceneJS_errorModule.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
@@ -379,6 +383,7 @@ var SceneJS_shaderModule = new (function() {
 
     /**
      * Generates a shader hash code from current rendering state.
+     * @private
      */
     function generateHash() {
         if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
@@ -389,6 +394,9 @@ var SceneJS_shaderModule = new (function() {
         //      SceneJS_loggingModule.debug("Scene shading hash:" + sceneHash);
     }
 
+    /**
+     * @private
+     */
     function getShaderLoggingSource(src) {
         var src2 = [];
         for (var i = 0; i < src.length; i++) {
@@ -398,11 +406,17 @@ var SceneJS_shaderModule = new (function() {
         return src2.join("<br/>");
     }
 
+    /**
+     * @private
+     */
     function composeVertexShader() {
         return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
                composeRenderingVertexShader() : composePickingVertexShader();
     }
 
+    /**
+     * @private
+     */
     function composeFragmentShader() {
         return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
                composeRenderingFragmentShader() : composePickingFragmentShader();
@@ -410,6 +424,7 @@ var SceneJS_shaderModule = new (function() {
 
     /**
      * Composes a vertex shader script for rendering mode in current scene state
+     * @private
      */
     function composePickingVertexShader() {
         return [
@@ -425,6 +440,7 @@ var SceneJS_shaderModule = new (function() {
 
     /**
      * Composes a fragment shader script for rendering mode in current scene state
+     * @private
      */
     function composePickingFragmentShader() {
         var g = parseFloat(Math.round((10 + 1) / 256) / 256);
@@ -442,6 +458,9 @@ var SceneJS_shaderModule = new (function() {
         return src;
     }
 
+    /**
+     * @private
+     */
     function composeRenderingVertexShader() {
 
         var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
@@ -539,11 +558,14 @@ var SceneJS_shaderModule = new (function() {
             }
         }
         src.push("}");
-    //      SceneJS_loggingModule.info(getShaderLoggingSource(src));
+        //      SceneJS_loggingModule.info(getShaderLoggingSource(src));
         return src.join("\n");
     }
 
 
+    /**
+     * @private
+     */
     function composeRenderingFragmentShader() {
         var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
         var lighting = (lights.length > 0 && geometry.normalBuf);
@@ -777,10 +799,10 @@ var SceneJS_shaderModule = new (function() {
             src.push("gl_FragColor = fragColor;");
         }
 
-           src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+        // src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         src.push("}");
 
-          // SceneJS_loggingModule.info(getShaderLoggingSource(src));
+        // SceneJS_loggingModule.info(getShaderLoggingSource(src));
         return src.join("\n");
     }
 })();

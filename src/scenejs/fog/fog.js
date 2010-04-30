@@ -28,6 +28,7 @@
  */
 SceneJS.Fog = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "fog";
     this._mode = "linear";
     this._color = { r: 0.5, g: 0.5, b: 0.5 };
     this._density = 1.0;
@@ -150,6 +151,7 @@ SceneJS.Fog.prototype.getEnd = function() {
     return this._end;
 };
 
+// @private
 SceneJS.Fog.prototype._init = function(params) {
     if (params.mode) {
         this.setMode(params.mode);
@@ -168,6 +170,7 @@ SceneJS.Fog.prototype._init = function(params) {
     }
 };
 
+// @private
 SceneJS.Fog.prototype._render = function(traversalContext, data) {
     if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);

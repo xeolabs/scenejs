@@ -5,19 +5,34 @@
     <title>SceneJS Example - Parameterised Scene Asset</title>
 </head>
 <body margin=20px>
+<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Basic First Example
+</h1>
+<table>
+    <tr>
+        <td valign="top">
+            <canvas id="theCanvas" width="600" height="600">
+                <p>This example requires a browser that supports the
+                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                    &lt;canvas&gt; feature.</p>
+            </canvas>
+        </td>
+        <td valign="top">
+            <h3>Source code</h3>
+            <ul>
+                <li><a href="teapot.js">This example</a></li>
+            </ul>
 
-<canvas id="theCanvas" width="1800" height="900">
-    <p>This example requires a browser that supports the
-        <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-        &lt;canvas&gt; feature.</p>
-</canvas>
+            <h3>Description</h3>
 
-<span id="status"></span> <br/>
+            <p><span>This is a really simple scene to demonstrate the general SceneJS idea. A scene basically renders images to
+one or more WebGL canvas elements in the browser page. The <a href="teapot.js">source code</a> has lots of comments that will tell you how this example works.<p><span>                  
+            <h3>Scene logging output</h3>
 
-<div id="_scenejs-default-logging"></div>
+            <div id="logging"></div>
+        </td>
+    </tr>
+</table>
 
-
-<script type="text/javascript" src="sylvester.js"></script>
 
 <!-- Core -->
 
@@ -159,6 +174,6 @@
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaParserModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
 
-<script type="application/x-javascript" src="courtyard-house.js"></script>
+<script type="application/x-javascript" src="teapot-asset.js"></script>
 </body>
 </html>

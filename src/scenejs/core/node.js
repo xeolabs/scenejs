@@ -5,7 +5,11 @@
  Create a new SceneJS.node
  @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
+SceneJS._nodeCount = 0;
+
 SceneJS.Node = function() {
+    this._nodeType = "node";
+    this._nodeId = "" + SceneJS._nodeCount++;
     this._children = [];
     this._fixedParams = true;
     this._parent = null;
@@ -57,9 +61,11 @@ SceneJS.Node = function() {
             };
         }
     } else {
-        this._getParams = function() {
-            return {};
-        };
+        if (!this._getParams) {
+            this._getParams = function() {
+                return {};
+            };
+        }
     }
 };
 
@@ -95,20 +101,29 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data) {
 };
 
 SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
-    this._children[index]._render(traversalContext, data);
+    this._children[index]._render.call(traversalContext, data);
+};
+
+
+SceneJS.Node.prototype._toString2 = function(strList, indent) {
+    for (var i = 0; i < indent; i++) {
+        strList.push("  ");
+    }
+    strList.push(this._nodeType + ":" + this._nodeId);
+
+    for (var i = 0; i < this._children.length; i++) {
+        this._children[i]._toString2(strList, indent);
+    }
+};
+
+SceneJS.Node.prototype._toString = function() {
+    var strList = [];
+    this._toString2(strList, 0);
+    return strList.join("\n");
 };
 
 SceneJS.Node.prototype._render = function(traversalContext, data) {
-  
-    var params = this._getParams(data);
-    while (params) {
-        var childData = SceneJS._utils.newScope(data);
-        for (var key in params) {
-            childData.put(key, params[key]);
-        }
-        this._renderNodes(traversalContext, childData);
-        params = this._getParams(data);
-    }
+      this._renderNodes(traversalContext, data);
 };
 
 /**

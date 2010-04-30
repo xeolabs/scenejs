@@ -1,129 +1,156 @@
-/** Private math utilities.
- */
-
+/** @private */
 function SceneJS_math_divVec3(u, v) {
     return [u[0] / v[0], u[1] / v[1], u[2] / v[2]];
 }
 
+/** @private */
 function SceneJS_math_negateVector4(v) {
     return [-v[0],-v[1],-v[2],-v[3]];
 }
 
+/** @private */
 function SceneJS_math_addVec4(u, v) {
     return [u[0] + v[0],u[1] + v[1],u[2] + v[2],u[3] + v[3]];
 }
 
+/** @private */
 function SceneJS_math_addVec4s(v, s) {
     return [v[0] + s,v[1] + s,v[2] + s,v[3] + s];
 }
 
+/** @private */
 function SceneJS_math_addScalarVec4(s, v) {
     return SceneJS_math_addVec4s(v, s)
 }
 
+/** @private */
 function SceneJS_math_subVec4(u, v) {
     return [u[0] - v[0],u[1] - v[1],u[2] - v[2],u[3] - v[3]];
 }
 
+/** @private */
 function SceneJS_math_subVec3(u, v) {
     return [u[0] - v[0],u[1] - v[1],u[2] - v[2]];
 }
 
+/** @private */
 function SceneJS_math_subVec4Scalar(v, s) {
     return [v[0] - s,v[1] - s,v[2] - s,v[3] - s];
 }
 
+/** @private */
 function SceneJS_math_subScalarVec4(v, s) {
     return [s - v[0],s - v[1],s - v[2],s - v[3]];
 }
 
+/** @private */
 function SceneJS_math_mulVec4(u, v) {
     return [u[0] * v[0],u[1] * v[1],u[2] * v[2],u[3] * v[3]];
 }
 
+/** @private */
 function SceneJS_math_mulVec4Scalar(v, s) {
     return [v[0] * s,v[1] * s,v[2] * s,v[3] * s];
 }
 
+/** @private */
 function SceneJS_math_divVec4(u, v) {
     return [u[0] / v[0],u[1] / v[1],u[2] / v[2],u[3] / v[3]];
 }
 
+/** @private */
 function SceneJS_math_divScalarVec3(s, v) {
     return [s / v[0], s / v[1], s / v[2]];
 }
 
-
+/** @private */
 function SceneJS_math_divVec3s(v, s) {
     return [v[0] / s, v[1] / s, v[2] / s];
 }
 
+/** @private */
 function SceneJS_math_divVec4s(v, s) {
     return [v[0] / s,v[1] / s,v[2] / s,v[3] / s];
 }
 
+/** @private */
 function SceneJS_math_divScalarVec4(s, v) {
     return [s / v[0],s / v[1],s / v[2],s / v[3]];
 }
 
 
+/** @private */
 function SceneJS_math_dotVector4(u, v) {
     return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2] + u[3] * v[3]);
 }
 
+/** @private */
 function SceneJS_math_cross3Vec4(u, v) {
     return [u[1] * v[2] - u[2] * v[1],u[2] * v[0] - u[0] * v[2],u[0] * v[1] - u[1] * v[0],0.0];
 }
 
+/** @private */
 function SceneJS_math_sqLenVec4(v) {
     return SceneJS_math_dotVector4(v, v);
 }
 
+/** @private */
 function SceneJS_math_lenVec4(v) {
     return Math.sqrt(SceneJS_math_sqLenVec4(v));
 }
 
+/** @private */
 function SceneJS_math_dotVector3(u, v) {
     return (u[0] * v[0] + u[1] * v[1] + u[2] * v[2]);
 }
 
+/** @private */
 function SceneJS_math_sqLenVec3(v) {
     return SceneJS_math_dotVector3(v, v);
 }
 
+/** @private */
 function SceneJS_math_lenVec3(v) {
     return Math.sqrt(SceneJS_math_sqLenVec3(v));
 }
 
+/** @private */
 function SceneJS_math_rcpVec3(v) {
     return SceneJS_math_divScalarVec3(1.0, v);
 }
 
+/** @private */
 function SceneJS_math_normalizeVec4(v) {
     var f = 1.0 / SceneJS_math_lenVec4(v);
     return SceneJS_math_mulVec4Scalar(v, f);
 }
 
+/** @private */
 function SceneJS_math_mat4() {
     return new Array(16);
 }
 
+/** @private */
 function SceneJS_math_dupMat4(m) {
     return m.slice(0, 16);
 }
 
+/** @private */
 function SceneJS_math_getCellMat4(m, row, col) {
     return m[row + col * 4];
 }
 
+/** @private */
 function SceneJS_math_setCellMat4(m, row, col, s) {
     m[row + col * 4] = s;
 }
 
+/** @private */
 function SceneJS_math_getRowMat4(m, r) {
     return [m[r + 0], m[r + 4], m[r + 8], m[r + 12]];
 }
 
+/** @private */
 function SceneJS_math_setRowMat4(m, r, v) {
     m[r + 0] = v[0];
     m[r + 4] = v[1];
@@ -131,19 +158,23 @@ function SceneJS_math_setRowMat4(m, r, v) {
     m[r + 12] = v[3];
 }
 
+/** @private */
 function SceneJS_math_setRowMat4c(m, r, x, y, z, w) {
     SceneJS_math_setRowMat4(m, r, [x,y,z,w]);
 }
 
+/** @private */
 function SceneJS_math_setRowMat4s(m, r, s) {
     SceneJS_math_setRowMat4c(m, r, s, s, s, s);
 }
 
+/** @private */
 function SceneJS_math_getColMat4(m, c) {
     var i = c * 4;
     return [m[i + 0], m[i + 1],m[i + 2],m[i + 3]];
 }
 
+/** @private */
 function SceneJS_math_setColMat4v(m, c, v) {
     var i = c * 4;
     m[i + 0] = v[0];
@@ -152,14 +183,17 @@ function SceneJS_math_setColMat4v(m, c, v) {
     m[i + 3] = v[3];
 }
 
+/** @private */
 function SceneJS_math_setColMat4c(m, c, x, y, z, w) {
     SceneJS_math_setColMat4v(m, c, [x,y,z,w]);
 }
 
+/** @private */
 function SceneJS_math_setColMat4Scalar(m, c, s) {
     SceneJS_math_setColMat4c(m, c, s, s, s, s);
 }
 
+/** @private */
 function SceneJS_math_mat4To3(m) {
     return [
         m[0],m[1],m[2],
@@ -168,6 +202,7 @@ function SceneJS_math_mat4To3(m) {
     ];
 }
 
+/** @private */
 function SceneJS_math_m4s(s) {
     return [
         s,s,s,s,
@@ -177,14 +212,17 @@ function SceneJS_math_m4s(s) {
     ];
 }
 
+/** @private */
 function SceneJS_math_setMat4ToZeroes() {
     return SceneJS_math_m4s(0.0);
 }
 
+/** @private */
 function SceneJS_math_setMat4ToOnes() {
     return SceneJS_math_m4s(1.0);
 }
 
+/** @private */
 function SceneJS_math_diagonalMat4v(v) {
     return [
         v[0], 0.0, 0.0, 0.0,
@@ -194,18 +232,22 @@ function SceneJS_math_diagonalMat4v(v) {
     ];
 }
 
+/** @private */
 function SceneJS_math_diagonalMat4c(x, y, z, w) {
     return SceneJS_math_diagonalMat4v([x,y,z,w]);
 }
 
+/** @private */
 function SceneJS_math_diagonalMat4s(s) {
     return SceneJS_math_diagonalMat4c(s, s, s, s);
 }
 
+/** @private */
 function SceneJS_math_identityMat4() {
     return SceneJS_math_diagonalMat4s(1.0);
 }
 
+/** @private */
 function SceneJS_math_isIdentityMat4(m) {
     var i = 0;
     var j = 0;
@@ -228,6 +270,7 @@ function SceneJS_math_isIdentityMat4(m) {
     return true;
 }
 
+/** @private */
 function SceneJS_math_negateMat4(m) {
     var r = SceneJS_math_mat4();
     for (var i = 0; i < 16; ++i) {
@@ -236,6 +279,7 @@ function SceneJS_math_negateMat4(m) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_addMat4(a, b) {
     var r = SceneJS_math_mat4();
     for (var i = 0; i < 16; ++i) {
@@ -244,6 +288,7 @@ function SceneJS_math_addMat4(a, b) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_addMat4Scalar(m, s) {
     var r = SceneJS_math_mat4();
     for (var i = 0; i < 16; ++i) {
@@ -252,10 +297,12 @@ function SceneJS_math_addMat4Scalar(m, s) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_addScalarMat4(s, m) {
     return SceneJS_math_addMat4Scalar(m, s);
 }
 
+/** @private */
 function SceneJS_math_subMat4(a, b) {
     var r = SceneJS_math_mat4();
     for (var i = 0; i < 16; ++i) {
@@ -264,6 +311,7 @@ function SceneJS_math_subMat4(a, b) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_subMat4Scalar(m, s) {
     var r = SceneJS_math_mat4();
     for (var i = 0; i < 16; ++i) {
@@ -272,6 +320,7 @@ function SceneJS_math_subMat4Scalar(m, s) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_subScalarMat4(s, m) {
     var r = SceneJS_math_mat4();
     for (var i = 0; i < 16; ++i) {
@@ -280,6 +329,7 @@ function SceneJS_math_subScalarMat4(s, m) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_mulMat4(a, b) {
     var r = SceneJS_math_mat4();
     var i = 0;
@@ -298,6 +348,7 @@ function SceneJS_math_mulMat4(a, b) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_mulMat4s(m, s)
 {
     var r = SceneJS_math_mat4();
@@ -307,6 +358,7 @@ function SceneJS_math_mulMat4s(m, s)
     return r;
 }
 
+/** @private */
 function SceneJS_math_mulMat4v4(m, v) {
     return [
         m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12] * v[3],
@@ -316,6 +368,7 @@ function SceneJS_math_mulMat4v4(m, v) {
     ];
 }
 
+/** @private */
 function SceneJS_math_transposeMat4(m) {
     var r = SceneJS_math_mat4();
     var i = 0;
@@ -328,6 +381,7 @@ function SceneJS_math_transposeMat4(m) {
     return r;
 }
 
+/** @private */
 function SceneJS_math_determinantMat4(m) {
     var f = SceneJS_math_getCellMat4;
     return (
@@ -340,6 +394,7 @@ function SceneJS_math_determinantMat4(m) {
             );
 }
 
+/** @private */
 function SceneJS_math_inverseMat4(m) {
     var t = SceneJS_math_mat4();
 
@@ -369,10 +424,12 @@ function SceneJS_math_inverseMat4(m) {
     return SceneJS_math_mulMat4s(t, s);
 }
 
+/** @private */
 function SceneJS_math_traceMat4(m) {
     return (m[0] + m[5] + m[10] + m[15]);
 }
 
+/** @private */
 function SceneJS_math_translationMat4v(v) {
     var m = SceneJS_math_identityMat4();
     m[12] = v[0];
@@ -381,14 +438,17 @@ function SceneJS_math_translationMat4v(v) {
     return m;
 }
 
+/** @private */
 function SceneJS_math_translationMat4c(x, y, z) {
     return SceneJS_math_translationMat4v([x,y,z]);
 }
 
+/** @private */
 function SceneJS_math_translationMat4s(s) {
     return SceneJS_math_translationMat4c(s, s, s);
 }
 
+/** @private */
 function SceneJS_math_rotationMat4v(anglerad, axis) {
     var ax = SceneJS_math_normalizeVec4([axis[0],axis[1],axis[2],0.0]);
     var s = Math.sin(anglerad);
@@ -436,10 +496,12 @@ function SceneJS_math_rotationMat4v(anglerad, axis) {
     return m;
 }
 
+/** @private */
 function SceneJS_math_rotationMat4c(anglerad, x, y, z) {
     return SceneJS_math_rotationMat4v(anglerad, [x,y,z]);
 }
 
+/** @private */
 function SceneJS_math_scalingMat4v(v) {
     var m = SceneJS_math_identityMat4();
     m[0] = v[0];
@@ -448,14 +510,17 @@ function SceneJS_math_scalingMat4v(v) {
     return m;
 }
 
+/** @private */
 function SceneJS_math_scalingMat4c(x, y, z) {
     return SceneJS_math_scalingMat4v([x,y,z]);
 }
 
+/** @private */
 function SceneJS_math_scalingMat4s(s) {
     return SceneJS_math_scalingMat4c(s, s, s);
 }
 
+/** @private */
 function SceneJS_math_lookAtMat4v(pos, target, up) {
     var pos4 = [pos[0],pos[1],pos[2],0.0];
     var target4 = [target[0],target[1],target[2],0.0];
@@ -494,10 +559,12 @@ function SceneJS_math_lookAtMat4v(pos, target, up) {
     return m;
 }
 
+/** @private */
 function SceneJS_math_lookAtMat4c(posx, posy, posz, targetx, targety, targetz, upx, upy, upz) {
     return SceneJS_math_lookAtMat4v([posx,posy,posz], [targetx,targety,targetz], [upx,upy,upz]);
 }
 
+/** @private */
 function SceneJS_math_orthoMat4v(omin, omax) {
     var omin4 = [omin[0],omin[1],omin[2],0.0];
     var omax4 = [omax[0],omax[1],omax[2],0.0];
@@ -529,10 +596,12 @@ function SceneJS_math_orthoMat4v(omin, omax) {
     return m;
 }
 
+/** @private */
 function SceneJS_math_orthoMat4c(left, right, bottom, top, znear, zfar) {
     return SceneJS_math_orthoMat4v([left,bottom,znear], [right,top,zfar]);
 }
 
+/** @private */
 function SceneJS_math_frustumMat4v(fmin, fmax) {
     var fmin4 = [fmin[0],fmin[1],fmin[2],0.0];
     var fmax4 = [fmax[0],fmax[1],fmax[2],0.0];
@@ -565,6 +634,7 @@ function SceneJS_math_frustumMat4v(fmin, fmax) {
     return m;
 }
 
+/** @private */
 function SceneJS_math_frustumMatrix4(left, right, bottom, top, znear, zfar) {
     var fmin4 = [left,right,bottom,0.0];
     var fmax4 = [top,znear,zfar,0.0];
@@ -597,6 +667,7 @@ function SceneJS_math_frustumMatrix4(left, right, bottom, top, znear, zfar) {
     return m;
 }
 
+/** @private */
 function SceneJS_math_perspectiveMatrix4(fovyrad, aspectratio, znear, zfar) {
     var pmin = new Array(4);
     var pmax = new Array(4);
@@ -613,6 +684,7 @@ function SceneJS_math_perspectiveMatrix4(fovyrad, aspectratio, znear, zfar) {
     return SceneJS_math_frustumMat4v(pmin, pmax);
 }
 
+/** @private */
 function SceneJS_math_transformPoint3(m, p) {
     return [
         (m[0] * p[0]) + (m[4] * p[1]) + (m[8] * p[2]) + m[12],
@@ -622,6 +694,7 @@ function SceneJS_math_transformPoint3(m, p) {
     ];
 }
 
+/** @private */
 function SceneJS_math_transformPoints3(m, points) {
     var result = new Array(points.length);
     var len = points.length;
@@ -631,6 +704,7 @@ function SceneJS_math_transformPoints3(m, points) {
     return result;
 }
 
+/** @private */
 function SceneJS_math_transformVector3(m, v) {
     return [
         (m[0] * v[0]) + (m[4] * v[1]) + (m[8] * v[2]),
@@ -639,12 +713,14 @@ function SceneJS_math_transformVector3(m, v) {
     ];
 }
 
+/** @private */
 function SceneJS_math_projectVec4(v) {
     var f = 1.0 / v[3];
     return [v[0] * f, v[1] * f, v[2] * f, 1.0];
 }
 
 
+/** @private */
 function SceneJS_math_Plane3(normal, offset, normalize) {
     this.normal = [0.0, 0.0, 1.0 ];
     this.offset = 0.0;
@@ -671,13 +747,19 @@ function SceneJS_math_Plane3(normal, offset, normalize) {
     }
 }
 
+/** @private */
 const SceneJS_math_MAX_DOUBLE = 1000000000000.0;
+/** @private */
 const SceneJS_math_MIN_DOUBLE = -1000000000000.0;
 
+/** @private
+ *
+ */
 function SceneJS_math_Box3(min, max) {
     this.min = min || [ SceneJS_math_MAX_DOUBLE,SceneJS_math_MAX_DOUBLE,SceneJS_math_MAX_DOUBLE ];
     this.max = max || [ SceneJS_math_MIN_DOUBLE,SceneJS_math_MIN_DOUBLE,SceneJS_math_MIN_DOUBLE ];
 
+    /** @private */
     this.init = function(min, max) {
         for (var i = 0; i < 3; ++i) {
             this.min[i] = min[i];
@@ -686,6 +768,7 @@ function SceneJS_math_Box3(min, max) {
         return this;
     };
 
+    /** @private */
     this.fromPoints = function(points) {
         var points2 = [];
         for (var i = 0; i < points.length; i++) {
@@ -706,6 +789,7 @@ function SceneJS_math_Box3(min, max) {
         return this;
     };
 
+    /** @private */
     this.isEmpty = function() {
         return (
                 (this.min[0] >= this.max[0])
@@ -714,6 +798,7 @@ function SceneJS_math_Box3(min, max) {
                 );
     };
 
+    /** @private */
     this.getCenter = function() {
         return [
             (this.max[0] + this.min[0]) / 2.0,
@@ -722,6 +807,7 @@ function SceneJS_math_Box3(min, max) {
         ];
     };
 
+    /** @private */
     this.getSize = function() {
         return [
             (this.max[0] - this.min[0]),
@@ -730,6 +816,7 @@ function SceneJS_math_Box3(min, max) {
         ];
     };
 
+    /** @private */
     this.getFacesAreas = function() {
         var s = this.size;
         return [
@@ -739,16 +826,19 @@ function SceneJS_math_Box3(min, max) {
         ];
     };
 
+    /** @private */
     this.getSurfaceArea = function() {
         var a = this.getFacesAreas();
         return ((a[0] + a[1] + a[2]) * 2.0);
     };
 
+    /** @private */
     this.getVolume = function() {
         var s = this.size;
         return (s[0] * s[1] * s[2]);
     };
 
+    /** @private */
     this.getOffset = function(half_delta) {
         for (var i = 0; i < 3; ++i) {
             this.min[i] -= half_delta;
@@ -758,6 +848,11 @@ function SceneJS_math_Box3(min, max) {
     };
 }
 
+/** @private
+ *
+ * @param min
+ * @param max
+ */
 function SceneJS_math_AxisBox3(min, max) {
     this.verts = [
         [min[0], min[1], min[2]],
@@ -771,6 +866,7 @@ function SceneJS_math_AxisBox3(min, max) {
         [min[0], max[1], max[2]]
     ];
 
+    /** @private */
     this.toBox3 = function() {
         var box = new SceneJS_math_Box3();
         for (var i = 0; i < 8; i++) {
@@ -787,24 +883,33 @@ function SceneJS_math_AxisBox3(min, max) {
     };
 }
 
+/** @private
+ *
+ * @param center
+ * @param radius
+ */
 function SceneJS_math_Sphere3(center, radius) {
     this.center = [center[0], center[1], center[2] ];
     this.radius = radius;
 
+    /** @private */
     this.isEmpty = function() {
         return (this.radius == 0.0);
     };
 
+    /** @private */
     this.surfaceArea = function() {
         return (4.0 * Math.PI * this.radius * this.radius);
     };
 
+    /** @private */
     this.getVolume = function() {
         return ((4.0 / 3.0) * Math.PI * this.radius * this.radius * this.radius);
     };
 }
 
 /** Creates billboard matrix from given view matrix
+ * @private
  */
 function SceneJS_math_billboardMat(viewMatrix) {
     var rotVec = [
@@ -838,6 +943,7 @@ function SceneJS_math_billboardMat(viewMatrix) {
     //return SceneJS_math_mulMat4(sMatInv, SceneJS_math_mulMat4(rotMatInverse, sMat));
 }
 
+/** @private */
 function SceneJS_math_FrustumPlane(nx, ny, nz, offset) {
     var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
     this.normal = [nx * s, ny * s, nz * s];
@@ -848,10 +954,14 @@ function SceneJS_math_FrustumPlane(nx, ny, nz, offset) {
         (this.normal[2] >= 0.0) ? (1) : (0)];
 }
 
+/** @private */
 const SceneJS_math_OUTSIDE_FRUSTUM = 3;
+/** @private */
 const SceneJS_math_INTERSECT_FRUSTUM = 4;
+/** @private */
 const SceneJS_math_INSIDE_FRUSTUM = 5;
 
+/** @private */
 function SceneJS_math_Frustum(viewMatrix, projectionMatrix, viewport) {
     var m = SceneJS_math_mulMat4(projectionMatrix, viewMatrix);
     var q = [ m[3], m[7], m[11] ];
@@ -896,6 +1006,7 @@ function SceneJS_math_Frustum(viewMatrix, projectionMatrix, viewport) {
     this.billboardMatrix = SceneJS_math_mulMat4(sMatInv, SceneJS_math_mulMat4(rotMatInverse, sMat));
     this.viewport = viewport.slice(0, 4);
 
+    /** @private */
     this.textAxisBoxIntersection = function(box) {
         var ret = SceneJS_math_INSIDE_FRUSTUM;
         var bminmax = [ box.min, box.max ];
@@ -919,7 +1030,7 @@ function SceneJS_math_Frustum(viewMatrix, projectionMatrix, viewport) {
         return ret;
     };
 
-
+/** @private */
     this.getProjectedSize = function(box) {
         var diagVec = SceneJS_math_subVec3(box.max, box.min);
 

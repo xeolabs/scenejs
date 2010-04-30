@@ -1,5 +1,5 @@
 /*
-class SceneJS.LightSource
+ class SceneJS.LightSource
 
  A light source for containment within a SceneJS.Lights node.
 
@@ -20,33 +20,7 @@ SceneJS.LightSource = function(cfg) {
     this._quadraticAttenuation = 0.0;
 
     if (cfg) {
-        if (cfg.type) {
-            this.setType(cfg.type);
-        }
-        if (cfg.color) {
-            this.setColor(cfg.color);
-        }
-        if (cfg.diffuse != undefined) {
-            this._diffuse = cfg.diffuse;
-        }
-        if (cfg.specular != undefined) {
-            this._specular = cfg.specular;
-        }
-        if (cfg.pos) {
-            this.setPos(cfg.pos);
-        }
-        if (cfg.dir) {
-            this.setDir(cfg.dir);
-        }
-        if (cfg.constantAttenuation) {
-            this.setConstantAttenuation(cfg.constantAttenuation);
-        }
-        if (cfg.linearAttenuation) {
-            this.setLinearAttenuation(cfg.linearAttenuation);
-        }
-        if (cfg.quadraticAttenuation) {
-            this.setQuadraticAttenuation(cfg.quadraticAttenuation);
-        }
+        this._init(cfg);
     }
 };
 
@@ -223,4 +197,47 @@ SceneJS.LightSource.prototype.setQuadraticAttenuation = function (quadraticAtten
  */
 SceneJS.LightSource.prototype.getQuadraticAttenuation = function() {
     return this._quadraticAttenuation;
+};
+
+
+// @private
+SceneJS.LightSource.prototype._init = function(cfg) {
+    if (cfg) {
+        if (cfg.type) {
+            this.setType(cfg.type);
+        }
+        if (cfg.color) {
+            this.setColor(cfg.color);
+        }
+        if (cfg.diffuse != undefined) {
+            this._diffuse = cfg.diffuse;
+        }
+        if (cfg.specular != undefined) {
+            this._specular = cfg.specular;
+        }
+        if (cfg.pos) {
+            this.setPos(cfg.pos);
+        }
+        if (cfg.dir) {
+            this.setDir(cfg.dir);
+        }
+        if (cfg.constantAttenuation) {
+            this.setConstantAttenuation(cfg.constantAttenuation);
+        }
+        if (cfg.linearAttenuation) {
+            this.setLinearAttenuation(cfg.linearAttenuation);
+        }
+        if (cfg.quadraticAttenuation) {
+            this.setQuadraticAttenuation(cfg.quadraticAttenuation);
+        }
+    }
+};
+
+
+/** Function wrapper to support functional scene definition
+ */
+SceneJS.lightSource = function() {
+    var n = new SceneJS.LightSource();
+    SceneJS.LightSource.prototype.constructor.apply(n, arguments);
+    return n;
 };

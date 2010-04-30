@@ -20,6 +20,8 @@
  * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
 SceneJS.ViewMatrix = function() {
+    SceneJS.Node.apply(this, arguments);
+    this._nodeType = "viewMatrix";
     this._mat = SceneJS_math_identityMat4();
     this._xform = null;
     if (this._fixedParams) {

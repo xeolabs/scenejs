@@ -1,8 +1,8 @@
 /**
  * Backend that parses a COLLADA files into a SceneJS nodes.
  *
- * This is an experimental parser constructed using techniques poached from other examples out there, most notably
- * that of GLGE, which you can find at http://github.com/supereggbert/GLGE
+ * 
+ * @private
  *
  */
 var SceneJS_colladaParserModule = new (function() {
@@ -22,6 +22,7 @@ var SceneJS_colladaParserModule = new (function() {
     var cameraData = {};
 
     /** Resets parser state
+     * @private
      */
     function reset() {
         xmlDoc = null;
@@ -33,6 +34,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /**
      * Parses the given XML string into the xmlDoc
+     * @private
      */
     function loadDoc(xml) {
         if (window.DOMParser) {
@@ -48,6 +50,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /**
      * Finds every element in the xmlDoc and maps the by IDs into the idMap
+     * @private
      */
     function buildIdMap() {
         idMap = {};
@@ -63,6 +66,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /**
      * Parses the xmlDoc, optionally constrained to the subtree identified by rootId
+     * @private
      */
     function parseDoc(rootId) {
         if (rootId) {
@@ -86,6 +90,7 @@ var SceneJS_colladaParserModule = new (function() {
         }
     }
 
+    // @private
     function parseFloatArray(node) {
         var result = [];
         var prev = "";
@@ -113,6 +118,7 @@ var SceneJS_colladaParserModule = new (function() {
      *
      * A <source> declares a data repository that provides values according
      * to the semantics of an <input> element that refers to it.
+     * @private
      */
     function getSource(id) {
         var source = sources[id];
@@ -172,6 +178,7 @@ var SceneJS_colladaParserModule = new (function() {
         return source;
     }
 
+    // @private
     function getMaxOffset(inputs) {
         var maxOffset = 0;
         for (var n = 0; n < inputs.length; n++) {
@@ -183,6 +190,7 @@ var SceneJS_colladaParserModule = new (function() {
         return maxOffset;
     }
 
+    // @private
     function getTrianglesFromPolyList(polyList) {
         var i, j, k;
         var inputs = polyList.getElementsByTagName("input");
@@ -210,6 +218,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /** Extracts list of triangles from the given <mesh>, merged from both the
      * <triangles> and <polylist> child nodes of the <mesh>.
+     * @private
      */
     function getTrianglesList(geometryNode) {
         var trianglesList = [];
@@ -234,7 +243,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /** Parses a <geometry> and returns an array containing a SceneJS.geometry node for
      * each <mesh> child
-     *
+     * @private
      * @param id
      */
     function getGeometriesData(geometryNode) {
@@ -322,6 +331,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /**
      * Returns profile/newparam[sid="<sid>"]/sampler2D[0]/source[0].nodeValue
+     * @private
      */
     function getSamplerSource(profile, sid) {
         var params = profile.getElementsByTagName("newparam");
@@ -344,6 +354,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /**
      * Returns profile/newparam[sid="<sid>"]/surface[0]/init_from[0].nodeValue
+     * @private
      */
     function getImageId(profile, sid) {
         var newparams = profile.getElementsByTagName("newparam");
@@ -363,6 +374,7 @@ var SceneJS_colladaParserModule = new (function() {
                         + sid + "']/surface[0]/init_from[0]"));
     }
 
+    // @private
     function getTextureData(profileCommon, texture, applyTo) {
         var source = getSamplerSource(profileCommon, texture.getAttribute("texture"));
         var imageId = getImageId(profileCommon, source);
@@ -376,6 +388,7 @@ var SceneJS_colladaParserModule = new (function() {
         };
     }
 
+    // @private
     function getDiffuseMaterialData(profileCommon, technique, materialData) {
         var diffuse = technique.getElementsByTagName("diffuse");
         if (diffuse.length > 0) {
@@ -396,6 +409,7 @@ var SceneJS_colladaParserModule = new (function() {
         }
     }
 
+    // @private
     function getSpecularColorMaterialData(profileCommon, technique, materialData) {
         var specular = technique.getElementsByTagName("specular");
         if (specular.length > 0) {
@@ -416,6 +430,7 @@ var SceneJS_colladaParserModule = new (function() {
         }
     }
 
+    // @private
     function getShininessMaterialData(profileCommon, technique, materialData) {
         var shininess = technique.getElementsByTagName("shininess");
         if (shininess.length > 0) {
@@ -436,6 +451,7 @@ var SceneJS_colladaParserModule = new (function() {
         }
     }
 
+    // @private
     function getBumpMapMaterialData(profileCommon, technique, materialData) {
         var bump = technique.getElementsByTagName("bump");
         if (bump.length > 0) {
@@ -450,6 +466,7 @@ var SceneJS_colladaParserModule = new (function() {
         }
     }
 
+    // @private
     function getMaterialData(id) {
         var materialNode = idMap[id];
         var effectId = materialNode
@@ -469,6 +486,7 @@ var SceneJS_colladaParserModule = new (function() {
         return materialData;
     }
 
+    // @private
     function getMaterialsData(instanceGeometryNode) {
         var materialsData = {};
         var materials = instanceGeometryNode.getElementsByTagName("instance_material");
@@ -485,17 +503,8 @@ var SceneJS_colladaParserModule = new (function() {
     }
 
 
+    // @private
     function wrapWithBoundingBox(e, child) {
-
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        return child;
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-
         if (modes.showBoundingBoxes) {
             return SceneJS.boundingBox(e, SceneJS.renderer({
                 lineWidth:2,
@@ -515,11 +524,12 @@ var SceneJS_colladaParserModule = new (function() {
                         ],
                         indices : [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1,5, 2, 6,3,7 ]
                     }))), child);
-        } else {                                   f
+        } else {                                   
             return SceneJS.boundingBox(e, child);
         }
     }
 
+    // @private
     function newExtents() {
         const hugeNum = 9999999; // TODO: Guarantee this is max
         return {
@@ -528,7 +538,7 @@ var SceneJS_colladaParserModule = new (function() {
         };
     }
 
-
+   // @private
     function expandExtentsByPositions(e, positions) {
         for (var i = 0; i < positions.length - 2; i += 3) {
             var x = positions[i];
@@ -544,6 +554,7 @@ var SceneJS_colladaParserModule = new (function() {
         return e;
     }
 
+    // @private
     function expandExtentsByExtents(e, e2) {
         if (e2.xmin < e.xmin) e.xmin = e2.xmin;
         if (e2.ymin < e.ymin) e.ymin = e2.ymin;
@@ -554,6 +565,7 @@ var SceneJS_colladaParserModule = new (function() {
         return e;
     }
 
+    // @private
     function parseInstanceGeometry(instanceGeometryNode) {
         var geoUrl = instanceGeometryNode.getAttribute("url").substr(1);
         var geometryNode = idMap[geoUrl];
@@ -619,11 +631,13 @@ var SceneJS_colladaParserModule = new (function() {
         return SceneJS.node.apply(this, nodeArgList);
     }
 
+    // @private
     function parseMatrix(node) {
         var data = parseFloatArray(node);
         return data;
     }
 
+    // @private
     function parseTranslate(node) {
         var data = parseFloatArray(node);
         var x = data[0];
@@ -633,6 +647,7 @@ var SceneJS_colladaParserModule = new (function() {
         return SceneJS_math_translationMat4v(data);
     }
 
+    // @private
     function parseRotate(node) {
         var data = parseFloatArray(node);
         var x = data[0];
@@ -644,6 +659,7 @@ var SceneJS_colladaParserModule = new (function() {
     }
 
     /** Parses data from camera node
+     * @private
      */
     function parseCameraOptics(camera) {
         var optics = camera.getElementsByTagName("optics")[0];
@@ -766,6 +782,7 @@ var SceneJS_colladaParserModule = new (function() {
 
     /**
      * Returns a SceneJS node created from the given DOM node.
+     * @private
      */
     function parseNode(node) {
 
@@ -870,6 +887,7 @@ var SceneJS_colladaParserModule = new (function() {
      * @param _uri Path to the Collada document (used for texture image paths etc)
      * @param xml Collada document string
      * @param rootId Optional ID of particular asset we want from Collada document
+     * @private
      */
     this.parse = function(_uri, xml, rootId, _modes) {
 

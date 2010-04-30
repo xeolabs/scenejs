@@ -1,5 +1,7 @@
 /**
  * Backend module that provides single point through which exceptions may be raised
+ *
+ * @private
  */
 var SceneJS_errorModule = new (function() {
 
@@ -10,6 +12,7 @@ var SceneJS_errorModule = new (function() {
                 SceneJS_eventModule.fireEvent(SceneJS_eventModule.TIME_UPDATED, time);
             });
 
+    // @private
     this.fatalError = function(e) {
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
             exception: e,
@@ -18,6 +21,7 @@ var SceneJS_errorModule = new (function() {
         throw e;
     };
 
+    // @private
     this.error = function(e) {
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
             exception: e,

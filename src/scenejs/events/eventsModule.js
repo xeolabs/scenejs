@@ -9,17 +9,10 @@
  * a given event relative to other suscribers. This is useful, for example, when a backend must be the first to handle
  * an INIT, or the last to handle a RESET.
  *
- */
-
-/**
- * Types of events that occur among backend modules. These are given values by the
- * events backend module when it is installed. When you add your own, just give them
- * a zero value like these ones.
+ * @private
  */
 var SceneJS_eventModule = new (function() {
 
-    /* Event types in SceneJS
-     */
     this.ERROR = 0;
     this.INIT = 1;                           // SceneJS framework initialised
     this.RESET = 2;                          // SceneJS framework reset
@@ -73,7 +66,7 @@ var SceneJS_eventModule = new (function() {
      * (priority <= 0)      - command will be the first called
      * (priority >= n)      - command will be the last called
      * (0 < priority < n)   - command will be called at the order given by the priority
-     *
+     * @private
      * @param type Event type - one of the values in SceneJS_eventModule
      * @param command - Handler function that will accept whatever parameter object accompanies the event
      * @param priority - Optional priority number (see above)
@@ -97,6 +90,9 @@ var SceneJS_eventModule = new (function() {
         list.push(handler);
     };
 
+    /**
+     * @private     
+     */
     this.fireEvent = function(type, params) {
         var list = events[type];
         if (list) {

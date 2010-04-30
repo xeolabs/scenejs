@@ -5,6 +5,7 @@
  * push and pop a name to and from the path. On each push or pop, fires a NAME_UPDATED event
  * to notify subscribers of changes to the path.
  *
+ *  @private
  */
 var SceneJS_nameModule = new (function() {
     var canvas;
@@ -66,6 +67,7 @@ var SceneJS_nameModule = new (function() {
 //        //                }
 //    };
 
+    // @private
     function nextColor() {
         if (blueCount < 1) {
             blueCount += 0.01;
@@ -85,6 +87,7 @@ var SceneJS_nameModule = new (function() {
         return [redCount, greenCount, blueCount];
     }
 
+    // @private
     this.pushName = function(name) {
         if (!canvas) {
             SceneJS_errorModule.fatalError("No canvas active");
@@ -104,6 +107,7 @@ var SceneJS_nameModule = new (function() {
                 item);
     };
 
+    // @private
     this.popName = function() {
         nameStack.pop();
         namePath = nameStack.join("/");

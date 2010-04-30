@@ -3,6 +3,7 @@
  * Services the SceneJS.scene node, providing it with methods to enter picking mode and collect names of
  * subgraph that was picked.
  *
+ *  @private
  */
 var SceneJS_pickModule = new (function() {
 
@@ -62,6 +63,9 @@ var SceneJS_pickModule = new (function() {
     //                        pickInfo[params.sceneId] = null;
     //                    });
 
+    /**
+     * @private
+     */
     function createPickBuffer() { // TODO: Dont assume allocation succeeds!
         var context = canvas.context;
         var pickBuffer = {
@@ -90,6 +94,9 @@ var SceneJS_pickModule = new (function() {
         return pickBuffer;
     }
 
+    /**
+     * @private
+     */
     function activatePicking() {
         var context = canvas.context;
         var pickBuffer = pickBuffers[canvas.id];
@@ -102,6 +109,9 @@ var SceneJS_pickModule = new (function() {
         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
     }
 
+    /**
+     * @private
+     */
     function pick(x, y) {
 
         var viewTransform = currentPickInfo.viewTransform;
@@ -164,6 +174,9 @@ var SceneJS_pickModule = new (function() {
 
     }
 
+    /**
+     * @private
+     */
     function deactivatePicking() {
         canvas.context.bindFramebuffer(canvas.context.FRAMEBUFFER, null);
         SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
@@ -171,6 +184,7 @@ var SceneJS_pickModule = new (function() {
 
 
     /** Begin picking at given coordinates, switch to picking mode
+     * @private
      */
     this.pick = function(x, y) {
         //                    activatePicking();
@@ -179,6 +193,7 @@ var SceneJS_pickModule = new (function() {
     };
 
     /** Get name path to whatever was picked, unbind pick buffers, switch back to rendering mode
+     * @private
      */
     this.getPicked = function() {
         //                    var context = canvas.context;

@@ -29,7 +29,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
              * at the origin by default
              */
                 SceneJS.lookAt({
-                    eye : { x: 0.0, y: 10.0, z: -15 },
+                    eye : { x: 0.0, y: 10.0, z: -10 },
                     look : { y:1.0 },
                     up : { y: 1.0 }
                 },
@@ -100,7 +100,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                     /* Teapot's geometry
                                                      */
                                                         SceneJS.scale({x:1.0,y:1.0,z:1.0},
-                                                                SceneJS.objects.teapot()
+                                                                        SceneJS.objects.teapot.apply(this, [])
                                                                 )
                                                         )
                                                 )
@@ -125,7 +125,8 @@ exampleScene.render({yaw: yaw, pitch: pitch});
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = document.getElementById(exampleScene.getCanvasId());;
+var canvas = document.getElementById(exampleScene.getCanvasId());
+;
 
 function mouseDown(event) {
     lastX = event.clientX;

@@ -1,7 +1,7 @@
 /**
  * @class SceneJS.texture
  * @extends SceneJS.node
- * 
+ *
  * <p>Scene node that defines one or more layers of texture to apply to all geometries within its subgraph that have UV coordinates.</p>
  * <p>Texture layers are applied to specified material reflection cooficients, and may be transformed.</p>
  * <p><b>Example 1</b></p>
@@ -94,11 +94,13 @@
  */
 SceneJS.Texture = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "texture";
     this._layers = null;
 };
 
 SceneJS._utils.inherit(SceneJS.Texture, SceneJS.Node);
 
+// @private
 SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
     var matrix = null;
     var t;
@@ -288,27 +290,27 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
         }
     }
 
-//    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
-//        this._renderNodes(traversalContext, data);
-//    } else {
-//        //if ((countLayersReady == this._layers.length)) { // All or none - saves on generating/destroying shaders
-//        var countPushed = 0;
-//        for (var i = 0; i < this._layers.length; i++) {
-//            var layer = this._layers[i];
-//            if (layer.state == this._STATE_TEXTURE_CREATED) {
-//                SceneJS_textureModule.pushLayer(layer.texture, {
-//                    applyFrom : layer.applyFrom,
-//                    applyTo : layer.applyTo,
-//                    blendMode : layer.blendMode,
-//                    matrix: layer.createMatrix(data)
-//                });
-//                countPushed++;
-//            }
-//        }
-//        //}
+    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
-//        SceneJS_textureModule.popLayers(countPushed);
-//    }
+    } else {
+        if ((countLayersReady == this._layers.length)) { // All or none - saves on generating/destroying shaders
+            var countPushed = 0;
+            for (var i = 0; i < this._layers.length; i++) {
+                var layer = this._layers[i];
+              //   if (layer.state == this._STATE_TEXTURE_CREATED) {
+                SceneJS_textureModule.pushLayer(layer.texture, {
+                    applyFrom : layer.applyFrom,
+                    applyTo : layer.applyTo,
+                    blendMode : layer.blendMode,
+                    matrix: layer.createMatrix(data)
+                });
+                countPushed++;
+                }
+           // }
+            this._renderNodes(traversalContext, data);
+            SceneJS_textureModule.popLayers(countPushed);
+        }
+    }
 };
 
 

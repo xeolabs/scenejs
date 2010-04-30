@@ -68,6 +68,7 @@
  */
 SceneJS.BoundingBox = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType="boundingBox";
     this._xmin = 0;
     this._ymin = 0;
     this._zmin = 0;
@@ -251,6 +252,7 @@ SceneJS.BoundingBox.prototype.getBoundary = function() {
     };
 };
 
+// @private
 SceneJS.BoundingBox.prototype._init = function(params) {
     this._xmin = params.xmin || 0;
     this._ymin = params.ymin || 0;
@@ -274,6 +276,7 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     }
 };
 
+// @private
 SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {

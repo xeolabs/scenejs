@@ -6,6 +6,7 @@
  */
 SceneJS.Scene = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "scene";
     if (!this._fixedParams) {
         SceneJS_errorModule.fatalError(
                 new SceneJS.exceptions.UnsupportedOperationException
@@ -32,6 +33,7 @@ SceneJS.Scene.prototype.getCanvasId = function() {
 /**
  * Renders the scene, passing in the given parameters to override any node parameters
  * that were set on the Scene config.
+ * @private
  */
 SceneJS.Scene.prototype.render = function(paramOverrides) {
     if (!this._sceneId) {

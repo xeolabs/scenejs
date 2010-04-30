@@ -1,13 +1,14 @@
 /**
  * Backend that manages scene fog.
  *
- *
+ * @private
  */
 var SceneJS_fogModule = new (function() {
 
     var fog;
     var dirty;
 
+    // @private
     function colourToArray(v, fallback) {
         return v ?
                [
@@ -17,6 +18,7 @@ var SceneJS_fogModule = new (function() {
                ] : fallback;
     }
 
+    // @private
     function _createFog(f) {
         if (f.mode &&
             (f.mode != "disabled"
@@ -73,6 +75,7 @@ var SceneJS_fogModule = new (function() {
 
     /** Sets the current fog
      *
+     * @private
      * @param f
      */
     this.setFog = function(f) {
@@ -84,6 +87,7 @@ var SceneJS_fogModule = new (function() {
     };
 
     /** Returns the current fog
+     * @private
      */
     this.getFog = function() {
         return fog;

@@ -3,6 +3,8 @@
  * load and caching of remotely-stored scene fragments.
  *
  * Uses the memory management backend to mediate cache management.
+ *
+ *  @private
  */
 var SceneJS_loadModule = new (function() {
 
@@ -22,6 +24,7 @@ var SceneJS_loadModule = new (function() {
                 assets = {};
             });
 
+    // @private
     function jsonp(fullUri, callbackName, onLoad) {
         var head = document.getElementsByTagName("head")[0];
         var script = document.createElement("script");
@@ -40,6 +43,7 @@ var SceneJS_loadModule = new (function() {
     }
 
     /** Loads asset and caches it against uri
+     * @private
      */
     function _loadAsset(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {
         var url = [proxyUri, "?callback=", callbackName , "&uri=" + uri];
@@ -74,11 +78,13 @@ var SceneJS_loadModule = new (function() {
 
     }
 
+    // @private
     this.setProxy = function(_proxyUri) {
         proxyUri = _proxyUri;
     };
 
     /** Attempts to get currently-loaded asset, which may have been evicted
+     * @private
      */
     this.getAsset = function(handle) {
         var asset = assets[handle.assetId];
@@ -96,6 +102,7 @@ var SceneJS_loadModule = new (function() {
      *
      * JSON does not handle errors, so the best we can do is manage timeouts withing SceneJS's process management.
      *
+     * @private
      * @uri Location of asset
      * @serverParams Request parameters for proxy
      * @parser Processes asset data on load
@@ -141,6 +148,7 @@ var SceneJS_loadModule = new (function() {
     };
 
     /** Notifies backend that load has completed; backend then kills the process.
+     * @private
      */
     this.assetLoaded = function(handle) {
         SceneJS_processModule.killProcess(handle.process);

@@ -14,6 +14,8 @@
  *
  * Whenever a scene node sets the matrix, this backend publishes it with a PROJECTION_TRANSFORM_UPDATED to allow other
  * dependent backends (such as "view-frustum") to synchronise their resources.
+ *
+ *  @private
  */
 var SceneJS_projectionModule = new (function() {
 

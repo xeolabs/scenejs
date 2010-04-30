@@ -14,12 +14,14 @@ SceneJS._utils.ns("SceneJS.objects");
  */
 SceneJS.objects.Teapot = function() {
     SceneJS.Geometry.apply(this, arguments);
+    this._nodeType = "teapot";
 
     /* Type ID ensures that we save memory by reusing any teapot that has already been created
      */
     this._type = "teapot";
 
     /* Callback that does the creation when teapot not created yet
+     * @private
      */
     this._create = function() {
         var positions = [
@@ -5756,6 +5758,7 @@ SceneJS.objects.Teapot = function() {
             [1401,1422,1418]
         ];
 
+        // @private
         var calculateNormals = function(positions, indices) {
             var nvecs = new Array(positions.length);
 
@@ -5800,6 +5803,7 @@ SceneJS.objects.Teapot = function() {
             return normals;
         };
 
+        // @private
         var flatten = function (ar, numPerElement) {
             var result = [];
             for (var i = 0; i < ar.length; i++) {

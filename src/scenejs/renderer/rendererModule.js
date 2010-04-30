@@ -1,5 +1,6 @@
 /**
  * Manages a stack of WebGL state frames that may be pushed and popped by SceneJS.renderer nodes.
+ *  @private
  */
 var SceneJS_rendererModule = new (function() {
 
@@ -10,6 +11,7 @@ var SceneJS_rendererModule = new (function() {
 
     /**
      * Maps renderer node properties to WebGL context enums
+     * @private
      */
     var glEnum = function(context, name) {
         if (!name) {
@@ -40,6 +42,8 @@ var SceneJS_rendererModule = new (function() {
      * Each of these wrap a state-setter function on the WebGL context. Each function
      * also uses the glEnum map to convert its renderer node property argument to the
      * WebGL enum constant required by its wrapped function.
+     *
+     * @private
      */
     var glModeSetters = {
 
@@ -233,6 +237,8 @@ var SceneJS_rendererModule = new (function() {
      * Each of these wrap a state-setter function on the WebGL context. Each function
      * also uses the glEnum map to convert its renderer node property argument to the
      * WebGL enum constant required by its wrapped function.
+     *
+     * @private
      */
     var glStateSetters = {
 
@@ -287,6 +293,7 @@ var SceneJS_rendererModule = new (function() {
 
     /**
      * Sets current renderer properties.
+     * @private
      */
     var setProperties = function(context, props) {
 
@@ -321,6 +328,7 @@ var SceneJS_rendererModule = new (function() {
     /**
      * Restores previous renderer properties, except for clear - that's the reason we
      * have a seperate set and restore semantic - we don't want to keep clearing the buffers
+     * @private
      */
     var undoProperties = function(context, props) {
 
@@ -351,6 +359,7 @@ var SceneJS_rendererModule = new (function() {
 
 
     /** Gets value of the given property on the first higher renderer state that has it
+     * @private
      */
     var getSuperProperty = function(name) {
         for (var i = stateStack.length - 1; i >= 0; i--) {
@@ -419,6 +428,7 @@ var SceneJS_rendererModule = new (function() {
 
     /**
      * Returns a new WebGL state object to the caller, without making it active.
+     * @private
      */
     this.createRendererState = function(props) {
 
@@ -440,6 +450,7 @@ var SceneJS_rendererModule = new (function() {
 
     /** Activates the given WebGL state. If no state is active, then it must specify a canvas to activate,
      * in which case the default simple shader will be activated as well
+     * @private
      */
     this.setRendererState = function(state) {
         stateStack.push(state);
@@ -449,6 +460,7 @@ var SceneJS_rendererModule = new (function() {
     /**
      * Restores previous WebGL state, if any. We do a seperate restore operation because some "properties",
      * like clear, are actually operations that we don't want to undo, so we don't redo those in a restore.
+     * @private
      */
     this.undoRendererState = function(state) {
         stateStack.pop();

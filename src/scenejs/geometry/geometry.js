@@ -85,6 +85,7 @@
  */
 SceneJS.Geometry = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "geometry";
     this._geo = null;  // Holds geometry when configured as given arrays
     this._create = null; // Callback to create geometry
     this._type = null; // Optional geometry type ID
@@ -93,6 +94,7 @@ SceneJS.Geometry = function() {
 
 SceneJS._utils.inherit(SceneJS.Geometry, SceneJS.Node);
 
+// @private
 SceneJS.Geometry.prototype._render = function(traversalContext, data) {
     if (!this._geo && !this._create) {
 

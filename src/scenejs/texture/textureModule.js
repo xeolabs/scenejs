@@ -19,6 +19,8 @@
  *
  * Whenever a texture node pushes or pops the stack, this backend publishes it with a TEXTURES_UPDATED to allow other
  * dependent backends to synchronise their resources.
+ *
+ *  @private
  */
 var SceneJS_textureModule = new (function() {
 
@@ -80,6 +82,7 @@ var SceneJS_textureModule = new (function() {
             });
 
     /** Removes texture from shader (if canvas exists in DOM) and deregisters it from backend
+     * @private
      */
     function deleteTexture(texture) {
         textures[texture.textureId] = undefined;
@@ -91,6 +94,7 @@ var SceneJS_textureModule = new (function() {
     /**
      * Deletes all textures from their GL contexts - does not attempt
      * to delete them when their canvases no longer exist in the DOM.
+     * @private
      */
     function deleteTextures() {
         for (var textureId in textures) {
@@ -141,6 +145,7 @@ var SceneJS_textureModule = new (function() {
      * Translates a SceneJS param value to a WebGL enum value,
      * or to default if undefined. Throws exception when defined
      * but not mapped to an enum.
+     * @private
      */
     function getGLOption(name, context, cfg, defaultVal) {
         var value = cfg[name];
@@ -161,6 +166,7 @@ var SceneJS_textureModule = new (function() {
     }
 
     /** Returns default value for when given value is undefined
+     * @private
      */
     function getOption(value, defaultVal) {
         return (value == undefined) ? defaultVal : value;
@@ -169,6 +175,7 @@ var SceneJS_textureModule = new (function() {
 
     /** Verifies that texture still cached - it may have been evicted after lack of recent use,
      * in which case client texture node will have to recreate it.
+     * @private
      */
     this.textureExists = function(texture) {
         return textures[texture.textureId];
@@ -177,6 +184,7 @@ var SceneJS_textureModule = new (function() {
     /**
      * Starts load of texture image
      *
+     * @private
      * @param uri Image location
      * @param onSuccess Callback returns image on success
      * @param onError Callback fired on failure
@@ -199,6 +207,7 @@ var SceneJS_textureModule = new (function() {
 
     /**
      * Creates and returns a new texture, or re-uses existing one if possible
+     * @private
      */
     this.createTexture = function(image, cfg) {
         if (!canvas) {
@@ -236,6 +245,7 @@ var SceneJS_textureModule = new (function() {
         return textures[textureId];
     };
 
+    // @private
     this.pushLayer = function(texture, params) {
         if (!textures[texture.textureId]) {
             SceneJS_errorModule.fatalError("No such texture loaded \"" + texture.textureId + "\"");
@@ -253,6 +263,7 @@ var SceneJS_textureModule = new (function() {
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.TEXTURES_UPDATED, layerStack);
     };
 
+    // @private
     this.popLayers = function(nLayers) {
         for (var i = 0; i < nLayers; i++) {
             layerStack.pop();

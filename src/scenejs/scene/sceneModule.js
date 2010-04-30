@@ -1,5 +1,6 @@
 /**
  * Backend for a scene node.
+ *  @private
  */
 var SceneJS_sceneModule = new (function() {
 
@@ -20,6 +21,7 @@ var SceneJS_sceneModule = new (function() {
                 activeSceneId = null;
             });
 
+    // @private
     function updatePick() {
     }
 
@@ -40,6 +42,7 @@ var SceneJS_sceneModule = new (function() {
      *  canvas, canvas ID and context wrapped up in an object.
      *
      * If canvasId is null, will fall back on SceneJS_webgl_DEFAULT_CANVAS_ID
+     * @private
      */
     var findCanvas = function(canvasId) {
         var canvas;
@@ -102,106 +105,110 @@ var SceneJS_sceneModule = new (function() {
         };
     };
 
-    return { // Node-facing API
+    /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
+     * @private
+     */
+    this.createScene = function(scene, params) {
+        if (!initialised) {
+            SceneJS_loggingModule.info("SceneJS V" + SceneJS.version + " initialised");
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.INIT);
+        }
+        var canvas = findCanvas(params.canvasId); // canvasId can be null
+        var sceneId = SceneJS._utils.createKeyForMap(scenes, "scene");
+        scenes[sceneId] = {
+            sceneId: sceneId,
+            scene:scene,
+            canvas: canvas
+        };
+        nScenes++;
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_CREATED, {sceneId : sceneId });
+        SceneJS_loggingModule.info("Scene defined: " + sceneId);
+        return sceneId;
+    };
 
-
-        /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
-         */
-        createScene : function(scene, params) {
-            if (!initialised) {
-                SceneJS_loggingModule.info("SceneJS V" + SceneJS.version + " initialised");
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.INIT);
-            }
-            var canvas = findCanvas(params.canvasId); // canvasId can be null
-            var sceneId = SceneJS._utils.createKeyForMap(scenes, "scene");
-            scenes[sceneId] = {
-                sceneId: sceneId,
-                scene:scene,
-                canvas: canvas
-            };
-            nScenes++;
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_CREATED, {sceneId : sceneId });
-            SceneJS_loggingModule.info("Scene defined: " + sceneId);
-            return sceneId;
-        },
-
-        /** Deregisters scene
-         */
-        destroyScene :function(sceneId) {
-            scenes[sceneId] = null;
-            nScenes--;
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DESTROYED, {sceneId : sceneId });
-            if (activeSceneId == sceneId) {
-                activeSceneId = null;
-            }
-            SceneJS_loggingModule.info("Scene destroyed: " + sceneId);
-            if (nScenes == 0) {
-                SceneJS_loggingModule.info("SceneJS reset");
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.RESET);
-
-            }
-        },
-
-        /** Specifies which registered scene is the currently active one
-         */
-        activateScene : function(sceneId) {
-            var scene = scenes[sceneId];
-            if (!scene) {
-                SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
-            }
-            activeSceneId = sceneId;
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_ACTIVATED, { sceneId: sceneId });
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_ACTIVATED, scene.canvas);
-        },
-
-        /** Returns the canvas element the given scene is bound to
-         */
-        getSceneCanvas : function(sceneId) {
-            var scene = scenes[sceneId];
-            if (!scene) {
-                SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
-            }
-            return scene.canvas.canvas;
-        },
-        //
-        //                activatePick : function(sceneId) {
-        //
-        //                },
-
-        /** Returns all registered scenes
-         */
-        getAllScenes:function() {
-            var list = [];
-            for (var id in scenes) {
-                var scene = scenes[id];
-                if (scene) {
-                    list.push(scene.scene);
-                }
-            }
-            return list;
-        },
-
-        /** Finds a registered scene
-         */
-        getScene : function(sceneId) {
-            return scenes[sceneId].scene;
-        },
-
-        /** Deactivates the currently active scene and reaps destroyed and timed out processes
-         */
-        deactivateScene : function() {
-            if (!activeSceneId) {
-                SceneJS_errorModule.fatalError("Internal error: no scene active");
-            }
-            var sceneId = activeSceneId;
+    /** Deregisters scene
+     * @private
+     */
+    this.destroyScene = function(sceneId) {
+        scenes[sceneId] = null;
+        nScenes--;
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DESTROYED, {sceneId : sceneId });
+        if (activeSceneId == sceneId) {
             activeSceneId = null;
-            var scene = scenes[sceneId];
-            if (!scene) {
-                SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
-            }
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_DEACTIVATED, scene.canvas);
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DEACTIVATED, {sceneId : sceneId });
-            //SceneJS_loggingModule.info("Scene deactivated: " + sceneId);
+        }
+        SceneJS_loggingModule.info("Scene destroyed: " + sceneId);
+        if (nScenes == 0) {
+            SceneJS_loggingModule.info("SceneJS reset");
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.RESET);
+
         }
     };
+
+    /** Specifies which registered scene is the currently active one
+     * @private
+     */
+    this.activateScene = function(sceneId) {
+        var scene = scenes[sceneId];
+        if (!scene) {
+            SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+        }
+        activeSceneId = sceneId;
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_ACTIVATED, { sceneId: sceneId });
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_ACTIVATED, scene.canvas);
+    };
+
+    /** Returns the canvas element the given scene is bound to
+     * @private
+     */
+    this.getSceneCanvas = function(sceneId) {
+        var scene = scenes[sceneId];
+        if (!scene) {
+            SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+        }
+        return scene.canvas.canvas;
+    };
+    //
+    //                activatePick : function(sceneId) {
+    //
+    //                },
+
+    /** Returns all registered scenes
+     * @private
+     */
+    this.getAllScenes = function() {
+        var list = [];
+        for (var id in scenes) {
+            var scene = scenes[id];
+            if (scene) {
+                list.push(scene.scene);
+            }
+        }
+        return list;
+    };
+
+    /** Finds a registered scene
+     * @private
+     */
+    this.getScene = function(sceneId) {
+        return scenes[sceneId].scene;
+    };
+
+    /** Deactivates the currently active scene and reaps destroyed and timed out processes
+     * @private
+     */
+    this.deactivateScene = function() {
+        if (!activeSceneId) {
+            SceneJS_errorModule.fatalError("Internal error: no scene active");
+        }
+        var sceneId = activeSceneId;
+        activeSceneId = null;
+        var scene = scenes[sceneId];
+        if (!scene) {
+            SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+        }
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_DEACTIVATED, scene.canvas);
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DEACTIVATED, {sceneId : sceneId });
+        //SceneJS_loggingModule.info("Scene deactivated: " + sceneId);
+    };
+
 })();

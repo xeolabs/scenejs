@@ -11,6 +11,7 @@
  *
  * Provides an interface through which scene nodes can test axis-aligned bounding boxes against the frustum,
  * eg. to query their intersection or projected size.
+ *  @private
  *
  */
 var SceneJS_frustumModule = new (function() {
@@ -49,6 +50,9 @@ var SceneJS_frustumModule = new (function() {
                 frustum = null;
             });
 
+    /**
+     * @private
+     */
     var getFrustum = function() {
         if (!frustum) {
             frustum = new SceneJS_math_Frustum(viewMat, projMat, viewport);
@@ -58,7 +62,7 @@ var SceneJS_frustumModule = new (function() {
 
     /**
      * Tests the given axis-aligned box for intersection with the frustum
-     *
+     * @private
      * @param box
      */
     this.testAxisBoxIntersection = function(box) {
@@ -67,7 +71,7 @@ var SceneJS_frustumModule = new (function() {
 
     /**
      * Returns the projected size of the given axis-aligned box with respect to the frustum
-     *
+     * @private
      * @param box
      */
     this.getProjectedSize = function(box) {

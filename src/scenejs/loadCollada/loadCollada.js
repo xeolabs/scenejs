@@ -10,10 +10,12 @@
 
 SceneJS.LoadCollada = function() {
     SceneJS.Load.apply(this, arguments);
+    this._nodeType = "loadCollada";
 };
 
 SceneJS._utils.inherit(SceneJS.LoadCollada, SceneJS.Load);
 
+// @private
 SceneJS.LoadCollada.prototype._init = function(params) {
     if (!params.uri) {
         SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException

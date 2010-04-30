@@ -19,17 +19,19 @@ SceneJS._utils.ns("SceneJS.objects");
  */
 SceneJS.objects.Sphere = function() {
     SceneJS.Geometry.apply(this, arguments);
+    this._nodeType = "sphere";
 };
 
 SceneJS._utils.inherit(SceneJS.objects.Sphere, SceneJS.Geometry);
 
+// @private
 SceneJS.objects.Sphere.prototype._init = function(params) {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 
     /* Type ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
-      */
+     */
     this._type = "sphere_" + rings + "_" + slices;
 
     /* Callback that does the creation in case we can't find matching sphere to reuse     

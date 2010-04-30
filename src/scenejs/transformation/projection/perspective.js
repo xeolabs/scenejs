@@ -1,26 +1,27 @@
 /**
  @class SceneJS.Perspective
-  @extends SceneJS.Node
+ @extends SceneJS.Node
 
  <p>Scene node that defines a perspective transformation for the nodes within its subgraph.</p>
 
  <p><b>Example:</b></p><p>Defining perspective, specifying parameters that happen to be the default values</b></p><pre><code>
-   var p = new SceneJS.Perspective({
-            fovy : 55.0,
-            aspect : 1.0,
-            near : 0.10,
-            far : 5000.0 },
- 
-            // ... child nodes
-         )
+ var p = new SceneJS.Perspective({
+ fovy : 55.0,
+ aspect : 1.0,
+ near : 0.10,
+ far : 5000.0 },
+
+ // ... child nodes
+ )
  </pre></code>
 
-  @constructor
-  Create a new SceneJS.Perspective
-  @param {Object} cfg  Config object or function, followed by zero or more child nodes
+ @constructor
+ Create a new SceneJS.Perspective
+ @param {Object} cfg  Config object or function, followed by zero or more child nodes
  */
 SceneJS.Perspective = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "perspective";
     this._fovy = 45.0;
     this._aspect = 1.0;
     this._near = 0.1;

@@ -27,6 +27,7 @@
  */
 SceneJS.Load = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "load";
     this._uri = null;
     this._assetParams = null;
     this._parser = null;
@@ -40,12 +41,22 @@ SceneJS.Load = function() {
 
 SceneJS._utils.inherit(SceneJS.Load, SceneJS.Node);
 
+// @private
 SceneJS.Load.prototype._STATE_ERROR = -1;         // Asset load or texture creation failed
+
+// @private
 SceneJS.Load.prototype._STATE_INITIAL = 0;        // Ready to start load
+
+// @private
 SceneJS.Load.prototype._STATE_LOADING = 1;        // Load in progress
+
+// @private
 SceneJS.Load.prototype._STATE_LOADED = 2;         // Load completed
+
+// @private
 SceneJS.Load.prototype._STATE_ATTACHED = 3;       // Subgraph integrated
 
+// @private
 SceneJS.Load.prototype._init = function(params) {
     if (!params.uri) {
         SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
@@ -56,13 +67,15 @@ SceneJS.Load.prototype._init = function(params) {
     this._parser = params.parser;
 };
 
+// @private
 SceneJS.Load.prototype._visitSubgraph = function(data) {
     var traversalContext = {
         appendix : this._children
-    };
+    };      
     this._assetNode._render.call(this._assetNode, traversalContext, data);
 };
 
+// @private
 SceneJS.Load.prototype._parse = function(data, onError) {
     if (!data._render) {
         onError(data.error || "unknown server error");
@@ -72,6 +85,7 @@ SceneJS.Load.prototype._parse = function(data, onError) {
     }
 };
 
+// @private
 SceneJS.Load.prototype._render = function(traversalContext, data) {
     if (!this._uri) {
         this._init(this._getParams(data));

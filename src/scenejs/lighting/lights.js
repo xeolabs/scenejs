@@ -101,6 +101,7 @@
  */
 SceneJS.Lights = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "lights";
     this._sources = [];
     if (this._fixedParams) {
         this._init(this._getParams());
@@ -171,6 +172,7 @@ SceneJS.Lights.prototype.removeSourceAt = function(index) {
     }
 };
 
+// @private
 SceneJS.Lights.prototype._init = function(params) {
     if (params.sources) {
         this._sources = [];
@@ -180,6 +182,7 @@ SceneJS.Lights.prototype._init = function(params) {
     }
 };
 
+// @private
 SceneJS.Lights.prototype._render = function(traversalContext, data) {
     if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);

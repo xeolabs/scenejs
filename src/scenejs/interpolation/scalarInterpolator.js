@@ -43,6 +43,7 @@
  */
 SceneJS.ScalarInterpolator = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "scalarInterpolator";
     this._input = null;
     this._output = null;
     this._outputValue = null;
@@ -58,11 +59,20 @@ SceneJS._utils.inherit(SceneJS.ScalarInterpolator, SceneJS.Node);
 /* ScalarInterpolator attempts to track the pair of keys that enclose the current alpha value -
  * these are the node's current states with regard to that:
  */
+
+// @private
 SceneJS.ScalarInterpolator.prototype._NOT_FOUND = 0;        // Alpha outside of key sequence
+
+// @private
 SceneJS.ScalarInterpolator.prototype._BEFORE_FIRST = 1;     // Alpha before first key
+
+// @private
 SceneJS.ScalarInterpolator.prototype._AFTER_LAST = 2;       // Alpha after last key
+
+// @private
 SceneJS.ScalarInterpolator.prototype._FOUND = 3;            // Found keys before and after alpha
 
+// @private
 SceneJS.ScalarInterpolator.prototype._linearInterpolate = function(k) {
     var u = this._keys[this._key2] - this._keys[this._key1];
     var v = k - this._keys[this._key1];
@@ -70,6 +80,7 @@ SceneJS.ScalarInterpolator.prototype._linearInterpolate = function(k) {
     return this._values[this._key1] + ((v / u) * w);
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._constantInterpolate = function(k) {
     if (Math.abs((k - this._keys[this._key1])) < Math.abs((k - this._keys[this._key2]))) {
         return this._keys[this._key1];
@@ -78,11 +89,13 @@ SceneJS.ScalarInterpolator.prototype._constantInterpolate = function(k) {
     }
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._cosineInterpolate = function(k) {
     var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
     return (this._keys[this._key1] * (1 - mu2) + this._keys[this._key2] * mu2);
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._cubicInterpolate = function(k) {
     if (this._key1 == 0 || this._key2 == (this._keys.length - 1)) {
 
@@ -102,6 +115,7 @@ SceneJS.ScalarInterpolator.prototype._cubicInterpolate = function(k) {
     return (a0 * k * mu2 + a1 * mu2 + a2 * k + a3);
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._findEnclosingFrame = function(key) {
     if (this._keys.length == 0) {
         return this._NOT_FOUND;
@@ -123,6 +137,7 @@ SceneJS.ScalarInterpolator.prototype._findEnclosingFrame = function(key) {
     return this._FOUND;
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._interpolate = function(k) {
     switch (this._type) {
         case 'linear':
@@ -140,6 +155,7 @@ SceneJS.ScalarInterpolator.prototype._interpolate = function(k) {
     }
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._update = function(key) {
     switch (this._findEnclosingFrame(key)) {
         case this._NOT_FOUND:
@@ -157,6 +173,7 @@ SceneJS.ScalarInterpolator.prototype._update = function(key) {
     }
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._init = function(params) {
 
     /* Name of input property in data scope
@@ -242,6 +259,7 @@ SceneJS.ScalarInterpolator.prototype._init = function(params) {
     this._type = params.type;
 };
 
+// @private
 SceneJS.ScalarInterpolator.prototype._render = function(traversalContext, data) {
     if (!this.type) {
         /* Allow one-shot dynamic config

@@ -34,6 +34,7 @@
  */
 SceneJS.WithData = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "withData";
     this._data = {};
     this._childData = {};
     if (this._fixedParams) {

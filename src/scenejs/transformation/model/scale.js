@@ -18,6 +18,7 @@
  */
 SceneJS.Scale = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "scale";
     this._mat = null;
     this._xform = null;
     this._x = 0;

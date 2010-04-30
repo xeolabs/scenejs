@@ -15,6 +15,8 @@
  * Whenever a SceneJS.material sets the material properties, this backend publishes it with a MATERIAL_UPDATED to allow
  * other dependent backends to synchronise their resources. One such backend is the shader backend, which taylors the
  * active shader according to the material properties.
+ *
+ *  @private
  */
 var SceneJS_materialModule = new (function() {
 
@@ -60,6 +62,7 @@ var SceneJS_materialModule = new (function() {
                 dirty = true;
             });
 
+    // @private
     this.setMaterial = function(m) {
         material = m;
         SceneJS_eventModule.fireEvent(
@@ -68,6 +71,7 @@ var SceneJS_materialModule = new (function() {
         dirty = true;
     };
 
+    // @private
     this.getMaterial = function() {
         return material;
     };

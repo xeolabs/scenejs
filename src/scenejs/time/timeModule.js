@@ -1,5 +1,6 @@
 /**
  * Backend module that provides the current system time, updating it every time a scene is rendered
+ *  @private
  */
 var SceneJS_timeModule = new (function() {
 

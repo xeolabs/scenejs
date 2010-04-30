@@ -17,6 +17,8 @@
  *
  * Whenever a scene node pushes or pops the stack, this backend publishes it with a LIGHTS_UPDATED to allow other
  * dependent backends to synchronise their resources.
+ *
+ *  @private
  */
 var SceneJS_lightingModule = new (function() {
 
@@ -68,6 +70,9 @@ var SceneJS_lightingModule = new (function() {
                 dirty = true;
             });
 
+    /**
+     * @private
+     */
     function instanceSources(sources) {
         for (var i = 0; i < sources.length; i++) {
             var source = sources[i];
@@ -79,6 +84,7 @@ var SceneJS_lightingModule = new (function() {
         }
     };
 
+    // @private
     this.pushLightSources = function(sources) {
         instanceSources(sources);
         for (var i = 0; i < sources.length; i++) {
@@ -90,6 +96,7 @@ var SceneJS_lightingModule = new (function() {
                 lightStack);
     };
 
+    // @private
     this.popLightSources = function(numSources) {
         for (var i = 0; i < numSources; i++) {
             lightStack.pop();

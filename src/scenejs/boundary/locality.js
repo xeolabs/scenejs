@@ -1,4 +1,3 @@
-
 /**
  @class SceneJS.Locality
  @extends SceneJS.Node
@@ -9,11 +8,11 @@
  <p>You can have as many of these as neccessary throughout your scene.</p>
  <p><b>Example:</b></p><p>Defining a locality</b></p><pre><code>
  var locality = new SceneJS.Locality({
-        inner: 1000,  // Default values, override these where needed
-        outer: 2000
-    },
+ inner: 1000,  // Default values, override these where needed
+ outer: 2000
+ },
 
-    // ... child nodes containing SceneJS.BoundingBox nodes ...
+ // ... child nodes containing SceneJS.BoundingBox nodes ...
  )
  </pre></code>
 
@@ -23,6 +22,7 @@
  */
 SceneJS.Locality = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "locality";
     this._radii = {
         inner : 1000,
         outer : 2000
@@ -74,6 +74,7 @@ SceneJS.Locality.prototype.getOuter = function() {
     return this._radii.outer;
 };
 
+// @private
 SceneJS.Locality.prototype._init = function(params) {
     if (params.inner) {
         this.setInner(params.inner);
@@ -83,6 +84,7 @@ SceneJS.Locality.prototype._init = function(params) {
     }
 };
 
+// @private
 SceneJS.Locality.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
         this._init(this._getParams(data));

@@ -11,6 +11,14 @@
  the invocation of the "render" function near the bottom of this example, which passes them in.
 
  */
+
+SceneJS.onEvent("error", function(e) {
+    if (e.exception) {
+        alert("Error: " + e.exception.message);
+    } else {
+    alert("Error: " + e.exception || e.message || e);
+    }
+});
 var exampleScene = SceneJS.scene({
 
     /* Bind to a WebGL canvas:
@@ -33,7 +41,7 @@ var exampleScene = SceneJS.scene({
             /* Viewing transform:
              */
                 SceneJS.lookAt({
-                    eye : { x: -1.0, y: 0.0, z: 15 },
+                    eye : { x: -1.0, y: 0.0, z: -25 },
                     look : { x: -1.0, y: 0, z: 0 },
                     up : { y: 1.0 }
                 },
@@ -43,7 +51,7 @@ var exampleScene = SceneJS.scene({
                      */
                         SceneJS.lights({
                             sources: [
-                                {
+                               {
                                     type:                   "dir",
                                     color:                  { r: 1.0, g: 1.0, b: 1.0 },
                                     dir:                    { x: 1.0, y: -1.0, z: 1.0 },
@@ -76,14 +84,25 @@ var exampleScene = SceneJS.scene({
 
                                             /* Load our COLLADA airplane model:
                                              */
+//                                                SceneJS.material({
+//                                                                                                baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+//                                                                                                specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+//                                                                                                specular:       0.9,
+//                                                                                                shine:          6.0
+//                                                                                            },
+//                                                        SceneJS.objects.teapot()
+
                                                 SceneJS.loadCollada({
                                                     uri: "http://www.scenejs.org/library/v0.7/assets/" +
                                                          "examples/seymourplane_triangulate/" +
                                                          "seymourplane_triangulate.dae",
 
+                                                 //   uri: "http://www.scenejs.org/library/v0.7/assets/examples/cube/cube.dae",
+
                                                     showBoundingBoxes: false // Set this true - see what happens!
-                                                }))
-                                        )
+                                                })
+))
+                                        //)
                                 )
                         )
                 )
@@ -131,6 +150,7 @@ function mouseMove(event) {
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
+
 
 window.render = function() {
     exampleScene.render({yaw: yaw, pitch: pitch});

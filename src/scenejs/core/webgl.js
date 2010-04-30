@@ -3,18 +3,22 @@
 
 
 /** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
+ * @private
  */
 const SceneJS_webgl_DEFAULT_CANVAS_ID = "_scenejs-default-canvas";
 
 /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
+ * @private
  */
 const SceneJS_webgl_DEFAULT_LOGGING_ID = "_scenejs-default-logging";
 
 /** IDs of supported WebGL canvas contexts
+ * @private
  */
 const SceneJS_webgl_contextNames = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
 
 /** Maps SceneJS node parameter names to WebGL enum names
+ * @private
  */
 const SceneJS_webgl_enumMap = {
     funcAdd: "FUNC_ADD",
@@ -68,14 +72,17 @@ const SceneJS_webgl_enumMap = {
     unsignedByte: "UNSIGNED_BYTE"
 };
 
+/** @private
+ */
 const SceneJS_webgl_fogModes = {
     EXP: 0,
     EXP2: 1,
     LINEAR: 2
 };
 
+/** @private */
 function SceneJS_webgl_ProgramUniform(context, program, name, type, size, location, logging) {
-    //  logging.debug("Program uniform found in shader: " + name);
+
     var func = null;
     if (type == context.BOOL) {
         func = function (v) {
@@ -141,16 +148,18 @@ function SceneJS_webgl_ProgramUniform(context, program, name, type, size, locati
         throw "Unsupported shader uniform type: " + type;
     }
 
+        /** @private */
     this.setValue = function(v) {
-        //   alert("setValue " + name + " = " + v);
         func(v);
     };
 
+        /** @private */
     this.getValue = function() {
         return context.getUniform(program, location);
     };
 }
 
+/** @private */
 function SceneJS_webgl_ProgramSampler(context, program, name, type, size, location, logging) {
     //  logging.debug("Program sampler found in shader: " + name);
     this.bindTexture = function(texture, unit) {
@@ -160,6 +169,7 @@ function SceneJS_webgl_ProgramSampler(context, program, name, type, size, locati
 }
 
 /** An attribute within a shader
+ * @private
  */
 function SceneJS_webgl_ProgramAttribute(context, program, name, type, size, location, logging) {
     // logging.debug("Program attribute found in shader: " + name);
@@ -175,6 +185,7 @@ function SceneJS_webgl_ProgramAttribute(context, program, name, type, size, loca
 /**
  * A vertex/fragment shader in a program
  *
+ * @private
  * @param context WebGL context
  * @param gl.VERTEX_SHADER | gl.FRAGMENT_SHADER
  * @param source Source code for shader
@@ -206,6 +217,7 @@ function SceneJS_webgl_Shader(context, type, source, logging) {
 /**
  * A program on an active WebGL context
  *
+ * @private
  * @param hash SceneJS-managed ID for program
  * @param lastUsed Time program was lst activated, for LRU cache eviction
  * @param context WebGL context
@@ -311,11 +323,13 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
         }
     }
 
+    /** @private */
     this.bind = function() {
         context.useProgram(handle);
     };
 
 
+    /** @private */
     this.setUniform = function(name, value) {
         var u = uniforms[name];
         if (u) {
@@ -325,6 +339,7 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
         }
     };
 
+    /** @private */
     this.bindFloatArrayBuffer = function(name, buffer) {
         var attr = attributes[name];
         if (attr) {
@@ -334,6 +349,7 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
         }
     };
 
+    /** @private */
     this.bindTexture = function(name, texture, unit) {
         var sampler = samplers[name];
         if (sampler) {
@@ -343,10 +359,13 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
         }
     };
 
+    /** @private
+     */
     this.unbind = function() {
         //     context.useProgram(0);
     };
 
+    /** @private */
     this.destroy = function() {
         if (this.valid) {
             //   logging.debug("Destroying shader program: '" + hash + "'");
@@ -362,6 +381,7 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
     };
 }
 
+/** @private */
 function SceneJS_webgl_Texture2D(context, cfg) {
     //  cfg.logging.debug("Creating texture: '" + cfg.textureId + "'");
     this.canvas = cfg.canvas;
@@ -464,25 +484,25 @@ function SceneJS_webgl_Texture2D(context, cfg) {
 
     context.bindTexture(this.target, null);
 
-    //        gl.activeTexture(gl.TEXTURE0);
-    //  gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
-    //  gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
-
+    /** @private */
     this.bind = function(unit) {
         context.activeTexture(context["TEXTURE" + unit]);
         context.bindTexture(this.target, this.handle);
 
     };
 
+    /** @private */
     this.unbind = function(unit) {
         context.activeTexture(context["TEXTURE" + unit]);
         context.bindTexture(this.target, null);
     };
 
+    /** @private */
     this.generateMipmap = function() {
         context.generateMipmap(context.TEXTURE_2D);
     };
 
+    /** @private */
     this.destroy = function() {
         if (this.handle) {
             // cfg.logging.debug("Destroying texture");
@@ -494,6 +514,7 @@ function SceneJS_webgl_Texture2D(context, cfg) {
 
 /** Buffer for vertices and indices
  *
+ * @private
  * @param context  WebGL context
  * @param type     Eg. ARRAY_BUFFER, ELEMENT_ARRAY_BUFFER
  * @param values   WebGL array wrapper
@@ -511,14 +532,17 @@ function SceneJS_webgl_ArrayBuffer(context, type, values, numItems, itemSize, us
     this.numItems = numItems;
     this.itemSize = itemSize;
 
+        /** @private */
     this.bind = function() {
         context.bindBuffer(type, this.handle);
     };
 
+        /** @private */
     this.unbind = function() {
         context.bindBuffer(type, null);
     };
 
+        /** @private */
     this.destroy = function() {
         context.deleteBuffer(this.handle);
     };
