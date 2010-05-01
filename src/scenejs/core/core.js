@@ -20,7 +20,7 @@ var SceneJS = {
     /** Names of supported WebGL canvas contexts
      */
     SUPPORTED_WEBGL_CONTEXT_NAMES:["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"],
-   
+
     /** @private */
     _traversalMode :0x1,
 
@@ -67,8 +67,6 @@ var SceneJS = {
             }
         }
     }
-
-    
 };
 
 SceneJS._namespace("SceneJS");

@@ -13,22 +13,24 @@
  */
 
 SceneJS.onEvent("error", function(e) {
-    if (e.exception) {
+    if (e.exception.message) {
         alert("Error: " + e.exception.message);
     } else {
-    alert("Error: " + e.exception || e.message || e);
+        alert("Error: " + e.exception);
     }
 });
 var exampleScene = SceneJS.scene({
 
     /* Bind to a WebGL canvas:
      */
-    canvasId: 'theCanvas',
+    canvasId: 'theCanvas'
+    //,
 
-    /* URL of the proxy server which will mediate the
-     * cross-domain load of our airplane COLLADA model
-     */
-    proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
+//    /* URL of the proxy server which will mediate the
+//     * cross-domain load of our airplane COLLADA model
+//     */
+//    proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl"
+},
 
     /* Perspective transform:
      */
@@ -93,9 +95,7 @@ var exampleScene = SceneJS.scene({
 //                                                        SceneJS.objects.teapot()
 
                                                 SceneJS.loadCollada({
-                                                    uri: "http://www.scenejs.org/library/v0.7/assets/" +
-                                                         "examples/seymourplane_triangulate/" +
-                                                         "seymourplane_triangulate.dae",
+                                                    uri: "./seymourplane_triangulate/seymourplane_triangulate.dae",
 
                                                  //   uri: "http://www.scenejs.org/library/v0.7/assets/examples/cube/cube.dae",
 

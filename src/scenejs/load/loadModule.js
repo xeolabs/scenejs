@@ -24,8 +24,60 @@ var SceneJS_loadModule = new (function() {
                 assets = {};
             });
 
-    // @private
-    function jsonp(fullUri, callbackName, onLoad) {
+    /** @private */
+    function _loadFile(url, onLoad, onError) {
+        try {
+            var x;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function() {
+                if (request.readyState == 4) {
+                    if (request.status == 200) {
+                        onLoad(request.responseText);
+                    } else {
+                        onError(request.status, request.statusText);
+                    }
+                }
+            };
+            request.open("GET", url, true);
+            request.send(null);
+        }
+        catch (e) {
+            onError(request.status, e.toString());
+        }
+    }
+
+    /** @private */
+    function _loadAssetSameDomain(uri, assetId, parser, onSuccess, onError) {
+        _loadFile(uri,
+                function(data) {  // onLoad
+                    if (!data) {
+                        onError(new SceneJS.EmptyResponseException("loaded content is empty"));
+                    } else {
+                        var assetNode = parser(
+                                data,
+                                function(msg) {
+                                    onError(msg);
+                                });
+                        if (!assetNode) {
+                            onError(new SceneJS.InternalException("parser returned null result"));
+                        } else {
+                            assets[assetId] = {
+                                assetId: assetId,
+                                uri: uri,
+                                node: assetNode,
+                                lastUsed: time
+                            };
+                            onSuccess(assetNode);
+                        }
+                    }
+                },
+                function(status, statusText) {
+                    onError(new SceneJS.HttpException(status + " - " + (statusText || "")));
+                });
+    }
+
+    /** @private */
+    function _jsonp(fullUri, callbackName, onLoad) {
         var head = document.getElementsByTagName("head")[0];
         var script = document.createElement("script");
         script.type = "text/javascript";
@@ -45,16 +97,18 @@ var SceneJS_loadModule = new (function() {
     /** Loads asset and caches it against uri
      * @private
      */
-    function _loadAsset(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {
+    function _loadAssetCrossDomain(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {
         var url = [proxyUri, "?callback=", callbackName , "&uri=" + uri];
         for (var param in serverParams) { // TODO: memoize string portion that contains params
             url.push("&", param, "=", serverParams[param]);
         }
-        jsonp(url.join(""),
+        _jsonp(url.join(""),
                 callbackName,
                 function(data) {    // onLoad
                     if (!data) {
-                        onError("server response is empty");
+                        onError(new SceneJS.ProxyEmptyResponseException("proxy server response is empty"));
+                    } else if (data.error) {
+                        onError(new SceneJS.ProxyErrorResponseException("proxy server responded with error - " + data.error));
                     } else {
                         var assetNode = parser(
                                 data,
@@ -62,7 +116,7 @@ var SceneJS_loadModule = new (function() {
                                     onError(msg);
                                 });
                         if (!assetNode) {
-                            onError("asset node's parser returned null result");
+                            onError(new SceneJS.InternalException("parser returned null result"));
                         } else {
                             assets[assetId] = {
                                 assetId: assetId,
@@ -74,8 +128,6 @@ var SceneJS_loadModule = new (function() {
                         }
                     }
                 });
-
-
     }
 
     // @private
@@ -111,11 +163,15 @@ var SceneJS_loadModule = new (function() {
      * @onError Callback invoked when error reported by proxy
      */
     this.loadAsset = function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
-        if (!proxyUri) {
-            SceneJS_errorModule.fatalError(new SceneJS.ProxyNotSpecifiedException
-                    ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
+        //        if (!proxyUri) {
+        //            SceneJS_errorModule.fatalError(new SceneJS.ProxyNotSpecifiedException
+        //                    ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
+        //        }
+        if (proxyUri) {
+            SceneJS_loggingModule.debug("Loading asset cross-domain from " + uri);
+        } else {
+            SceneJS_loggingModule.debug("Loading asset from local domain " + uri);
         }
-        SceneJS_loggingModule.debug("Loading asset from " + uri);
         var assetId = SceneJS._createKeyForMap(assets, "asset");
         var process = SceneJS_processModule.createProcess({
             onTimeout: function() {  // process killed automatically on timeout
@@ -128,18 +184,30 @@ var SceneJS_loadModule = new (function() {
             description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
             timeoutSecs: 180 // Big timeout to allow files to parse
         });
-        var callbackName = "callback" + process.id; // Process ID is globally unique
-        _loadAsset(
-                uri,
-                assetId,
-                serverParams,
-                callbackName,
-                parser,
-                onSuccess,
-                function(msg) {  // onError
-                    SceneJS_processModule.killProcess(process);
-                    onError(msg);
-                });
+        if (proxyUri) {
+            var callbackName = "callback" + process.id; // Process ID is globally unique
+            _loadAssetCrossDomain(
+                    uri,
+                    assetId,
+                    serverParams,
+                    callbackName,
+                    parser,
+                    onSuccess,
+                    function(msg) {  // onError
+                        SceneJS_processModule.killProcess(process);
+                        onError(msg);
+                    });
+        } else {
+            _loadAssetSameDomain(
+                    uri,
+                    assetId,
+                    parser,
+                    onSuccess,
+                    function(msg) {  // onError
+                        SceneJS_processModule.killProcess(process);
+                        onError(msg);
+                    });
+        }
         var handle = {
             process: process,
             assetId : assetId

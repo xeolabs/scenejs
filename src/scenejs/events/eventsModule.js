@@ -111,16 +111,13 @@ var SceneJS_eventModule = new (function() {
  * <p><b>Supported events</b></p>
  * <p><b><em>error</em></b></p><p>An error has occurred either while defining or rendering a scene. These can be either fatal,
  * or errors that SceneJS can recover from.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
- *      "error",
- *      function(e) {
- *          var exception = e.exception;
- *          if (e.fatal) {
- *               alert("Fatal error: " + e.exception.message || e.exception);
- *          } else {
- *               alert("Recovered from error: " + e.exception.message || e.exception);
- *          }
- *      });
+ * SceneJS.onEvent("error", function(e) {
+ *     if (e.exception.message) {
+ *         alert("Error: " + e.exception.message);
+ *     } else {
+ *         alert("Error: " + e.exception);
+ *     }
+*  });
  * </pre></code>
  *
  * <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all SceneJS.Scene instances are destroyed and resources

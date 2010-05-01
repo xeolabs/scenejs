@@ -115,6 +115,40 @@ SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
 };
 
 /**
+ * @class  Exception thrown to signify an error response from the proxy configured for cross-domain loads
+ * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ */
+SceneJS.ProxyErrorResponseException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify an empty response from the proxy configured for cross-domain loads
+ * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ */
+SceneJS.ProxyEmptyResponseException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify that empty content was loaded (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ */
+SceneJS.EmptyResponseException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ */
+SceneJS.HttpException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+/**
  * @class  Exception thrown by nodes such as SceneJS.Renderer and SceneJS.Texture when the browser's WebGL does not support
  * a specified config value.
  */
@@ -142,6 +176,14 @@ SceneJS.DataExpectedException = function(msg, cause) {
  * @class  Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
  */
 SceneJS.LoadTimeoutException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify a general internal SceneJS exception, ie. a SceneJS implementation bug.
+ */
+SceneJS.InternalException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };

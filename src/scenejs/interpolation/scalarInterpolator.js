@@ -149,8 +149,8 @@ SceneJS.ScalarInterpolator.prototype._interpolate = function(k) {
             return this._constantInterpolate(k);
         default:
             SceneJS_errorModule.fatalError(
-                    "SceneJS.ScalarInterpolator internal error - interpolation type not switched: '"
-                            + this._type + "'");
+                    new SceneJS.InternalException("SceneJS.ScalarInterpolator internal error - interpolation type not switched: '"
+                            + this._type + "'"));
     }
 };
 

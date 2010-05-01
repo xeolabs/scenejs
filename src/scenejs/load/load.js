@@ -129,11 +129,12 @@ SceneJS.Load.prototype._render = function(traversalContext, data) {
                     function() { // onTimeout
                         _this._state = _this._STATE_ERROR;
                         SceneJS_errorModule.error(
-                                new SceneJS.LoadTimeoutException("SceneJS.Load timed out - uri: " + _this._uri));
+                                new SceneJS.LoadTimeoutException("Load timed out - uri: " + _this._uri));
                     },
-                    function(msg) { // onError - SceneJS_loadModule has killed process
+                    function(e) { // onError - SceneJS_loadModule has killed process
                         _this._state = _this._STATE_ERROR;
-                        SceneJS_errorModule.error("SceneJS.Load failed - " + msg + " - uri: " + _this._uri);
+                        e.message = "Load failed - " + e.message + " - uri: " + _this._uri;
+                        SceneJS_errorModule.error(e);
                     });
             break;
 
