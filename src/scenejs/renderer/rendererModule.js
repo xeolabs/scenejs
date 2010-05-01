@@ -15,17 +15,17 @@ var SceneJS_rendererModule = new (function() {
      */
     var glEnum = function(context, name) {
         if (!name) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+            SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                     "Null SceneJS.renderer node config: \"" + name + "\""));
         }
         var result = SceneJS_webgl_enumMap[name];
         if (!result) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+            SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                     "Unrecognised SceneJS.renderer node config value: \"" + name + "\""));
         }
         var value = context[result];
         if (!value) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+            SceneJS_errorModule.fatalError(new SceneJS.WebGLUnsupportedNodeConfigException(
                     "This browser's WebGL does not support renderer node config value: \"" + name + "\""));
         }
         return value;

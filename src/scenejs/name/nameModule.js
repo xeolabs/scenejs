@@ -37,7 +37,7 @@ var SceneJS_nameModule = new (function() {
     SceneJS_eventModule.onEvent(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
-                //  if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+                //  if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
                 SceneJS_eventModule.fireEvent(
                         SceneJS_eventModule.NAME_EXPORTED,
                         item);

@@ -6,107 +6,107 @@
 	.REGX {color: #339;}
 	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
-<span class='line'>  2</span>  * @class SceneJS.WithData
+<span class='line'>  2</span>  * @class A scene node that creates data in a scope for its subgraph.
 <span class='line'>  3</span>  * @extends SceneJS.Node
-<span class='line'>  4</span>  * &lt;p>Scene node that creates a child data scope containing the elements of its configuration.&lt;/p>&lt;p>This node provides
-<span class='line'>  5</span>  * a simple yet flexible mechanism for passing data down into a scene graph at runtime.&lt;/p>.
-<span class='line'>  6</span>  * &lt;p>&lt;b>Example:&lt;/b>&lt;/p>&lt;p>Creating data for a child SceneJS.Scale node, which configures itself from the data
-<span class='line'>  7</span>  * with a configuration function:&lt;/b>&lt;/p>&lt;pre>&lt;code>
-<span class='line'>  8</span>  *
-<span class='line'>  9</span>  * var wd new SceneJS.WithData({
-<span class='line'> 10</span>  *         sizeX: 5,
-<span class='line'> 11</span>  *         sizeY: 10,
-<span class='line'> 12</span>  *         sizeZ: 2
-<span class='line'> 13</span>  *      },
-<span class='line'> 14</span>  *      new SceneJS.translate({ x: 100 },
-<span class='line'> 15</span>  *
-<span class='line'> 16</span>  *          new SceneJS.scale(function(data) {        // Function in this case, instead of a config object
-<span class='line'> 17</span>  *                   return {
-<span class='line'> 18</span>  *                       x: data.get("sizeX"),
-<span class='line'> 19</span>  *                       y: data.get("sizeY"),
-<span class='line'> 20</span>  *                       z: data.get("sizeZ")
-<span class='line'> 21</span>  *                   }
-<span class='line'> 22</span>  *          },
-<span class='line'> 23</span>  *
-<span class='line'> 24</span>  *              new SceneJS.objects.Cube()
-<span class='line'> 25</span>  *          )
-<span class='line'> 26</span>  *      )
-<span class='line'> 27</span>  *  )
-<span class='line'> 28</span>  *
-<span class='line'> 29</span>  * &lt;/code>&lt;/pre>
-<span class='line'> 30</span>  * @constructor
-<span class='line'> 31</span>  * Create a new SceneJS.WithData
-<span class='line'> 32</span>  * @param {Object} config The config object, followed by zero or more child nodes
-<span class='line'> 33</span>  *
-<span class='line'> 34</span>  */</span><span class="WHIT">
-<span class='line'> 35</span> </span><span class="NAME">SceneJS.WithData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"withData"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="WHIT">    </span><span class="NAME">this._childData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 44</span> 
-<span class='line'> 45</span> </span><span class="NAME">SceneJS._utils.inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.WithData</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 46</span> 
-<span class='line'> 47</span> </span><span class="COMM">/**
-<span class='line'> 48</span>  Sets a property
-<span class='line'> 49</span>  @param {String} key Name of property
-<span class='line'> 50</span>  @param {Object} value Value of property
-<span class='line'> 51</span>  @returns {SceneJS.WithData} this
-<span class='line'> 52</span>  */</span><span class="WHIT">
-<span class='line'> 53</span> </span><span class="NAME">SceneJS.WithData.prototype.setProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 54</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 55</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 56</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 57</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 58</span> 
-<span class='line'> 59</span> </span><span class="COMM">/**
-<span class='line'> 60</span>  * Returns the value of a property
-<span class='line'> 61</span>  *
-<span class='line'> 62</span>  * @param {String} key Name of property
-<span class='line'> 63</span>  * @returns {Object} Value of property
-<span class='line'> 64</span>  */</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="NAME">SceneJS.WithData.prototype.getProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 68</span> 
-<span class='line'> 69</span> 
-<span class='line'> 70</span> </span><span class="COMM">/** Clears all properties
-<span class='line'> 71</span>  *@returns {SceneJS.WithData} this
-<span class='line'> 72</span>  */</span><span class="WHIT">
-<span class='line'> 73</span> </span><span class="NAME">SceneJS.WithData.prototype.clearProperties</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 75</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 76</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 77</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 78</span> 
-<span class='line'> 79</span> </span><span class="NAME">SceneJS.WithData.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">key</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 81</span> </span><span class="WHIT">        </span><span class="NAME">this._data</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 82</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 83</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 84</span> 
-<span class='line'> 85</span> </span><span class="NAME">SceneJS.WithData.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 87</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 88</span> </span><span class="WHIT">            </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 89</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="WHIT">            </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="WHIT">        </span><span class="NAME">this._childData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.newScope</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 95</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">key</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 96</span> </span><span class="WHIT">            </span><span class="NAME">this._childData.put</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 97</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>  4</span>  * &lt;p>This node provides a simple yet flexible mechanism for passing data down into a scene graph at runtime, analogous to
+<span class='line'>  5</span>  * creation of a closure's data scope in JavaScript .&lt;/p>.
+<span class='line'>  6</span>  * &lt;p>The data scope is implemented by a SceneJS.Data instance. On each render a SceneJS.Scene creates a global
+<span class='line'>  7</span>  * SceneJS.Data populated with any properties that were given to the SceneJS.Scene's render method. That Data forms a
+<span class='line'>  8</span>  * chain on which SceneJS.With nodes will push and pop as they are visited and departed from during scene traversal.&lt;/p>
+<span class='line'>  9</span>  * &lt;p>When some node, or node config callback, looks for a property on its local SceneJS.Data, it will hunt up the chain
+<span class='line'> 10</span>  * to get the first occurance of that property it finds.&lt;/p>
+<span class='line'> 11</span>  * &lt;p>&lt;b>Example:&lt;/b>&lt;/p>&lt;p>Creating data for a child SceneJS.Scale node, which has a callback to configure itself from
+<span class='line'> 12</span>  * the data:&lt;/b>&lt;/p>&lt;pre>&lt;code>
+<span class='line'> 13</span>  * var wd new SceneJS.WithData({
+<span class='line'> 14</span>  *         sizeX: 5,
+<span class='line'> 15</span>  *         sizeY: 10,
+<span class='line'> 16</span>  *         sizeZ: 2
+<span class='line'> 17</span>  *      },
+<span class='line'> 18</span>  *      new SceneJS.translate({ x: 100 },
+<span class='line'> 19</span>  *
+<span class='line'> 20</span>  *          new SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+<span class='line'> 21</span>  *                   return {
+<span class='line'> 22</span>  *                       x: data.get("sizeX"),
+<span class='line'> 23</span>  *                       y: data.get("sizeY"),
+<span class='line'> 24</span>  *                       z: data.get("sizeZ")
+<span class='line'> 25</span>  *                   }
+<span class='line'> 26</span>  *          },
+<span class='line'> 27</span>  *
+<span class='line'> 28</span>  *              new SceneJS.objects.Cube()
+<span class='line'> 29</span>  *          )
+<span class='line'> 30</span>  *      )
+<span class='line'> 31</span>  *  )
+<span class='line'> 32</span>  *
+<span class='line'> 33</span>  * &lt;/code>&lt;/pre>
+<span class='line'> 34</span>  * @constructor
+<span class='line'> 35</span>  * Create a new SceneJS.WithData
+<span class='line'> 36</span>  * @param {Object} config The config object, followed by zero or more child nodes
+<span class='line'> 37</span>  *
+<span class='line'> 38</span>  */</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="NAME">SceneJS.WithData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"withData"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="NAME">this._childData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 48</span> 
+<span class='line'> 49</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.WithData</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 50</span> 
+<span class='line'> 51</span> </span><span class="COMM">/**
+<span class='line'> 52</span>  Sets a property
+<span class='line'> 53</span>  @param {String} key Name of property
+<span class='line'> 54</span>  @param {Object} value Value of property
+<span class='line'> 55</span>  @returns {SceneJS.WithData} this
+<span class='line'> 56</span>  */</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="NAME">SceneJS.WithData.prototype.setProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 62</span> 
+<span class='line'> 63</span> </span><span class="COMM">/**
+<span class='line'> 64</span>  * Returns the value of a property
+<span class='line'> 65</span>  *
+<span class='line'> 66</span>  * @param {String} key Name of property
+<span class='line'> 67</span>  * @returns {Object} Value of property
+<span class='line'> 68</span>  */</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="NAME">SceneJS.WithData.prototype.getProperty</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> 
+<span class='line'> 73</span> 
+<span class='line'> 74</span> </span><span class="COMM">/** Clears all properties
+<span class='line'> 75</span>  *@returns {SceneJS.WithData} this
+<span class='line'> 76</span>  */</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="NAME">SceneJS.WithData.prototype.clearProperties</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 82</span> 
+<span class='line'> 83</span> </span><span class="NAME">SceneJS.WithData.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">key</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">        </span><span class="NAME">this._data</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">[</span><span class="NAME">key</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 88</span> 
+<span class='line'> 89</span> </span><span class="NAME">SceneJS.WithData.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">            </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">            </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 98</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">data.isfixed</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 99</span> </span><span class="WHIT">            </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>100</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>101</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>102</span> </span><span class="WHIT">    </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._childData</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">    </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Data</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._fixedParams</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>103</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>104</span> 
 <span class='line'>105</span> </span><span class="COMM">/** Function wrapper to support functional scene definition

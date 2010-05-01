@@ -1,7 +1,5 @@
 /**
- * <p>A scene node that defines an element of geometry.</p>
- * @class SceneJS.Geometry
- * @extends SceneJS.Node
+ * @class A scene node that defines an element of geometry.
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-geometry-example">Example 1</a></li></ul>
  * <p><b>Example Usage</b></p><p>Definition of a cube, with normals and UV texture coordinates, with coordinates shown here only for the first face:</b></p><pre><code>
@@ -79,6 +77,7 @@
  *        ]
  * });
  *  </pre></code>
+ * @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.Geometry
  * @param {Object} config The config object, followed by zero or more child nodes
@@ -92,7 +91,7 @@ SceneJS.Geometry = function() {
     this._handle = null; // Handle to created geometry
 };
 
-SceneJS._utils.inherit(SceneJS.Geometry, SceneJS.Node);
+SceneJS._inherit(SceneJS.Geometry, SceneJS.Node);
 
 // @private
 SceneJS.Geometry.prototype._render = function(traversalContext, data) {
@@ -143,7 +142,9 @@ SceneJS.Geometry.prototype._render = function(traversalContext, data) {
     this._renderNodes(traversalContext, data);
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Geometry instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Geometry constructor
+ * @returns {SceneJS.Geometry}
  */
 SceneJS.geometry = function() {
     var n = new SceneJS.Geometry();

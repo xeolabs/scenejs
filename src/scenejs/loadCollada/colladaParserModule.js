@@ -75,7 +75,7 @@ var SceneJS_colladaParserModule = new (function() {
             if (root) {
                 return parseNode(root);
             } else {
-                SceneJS_errorModule.error(new SceneJS.exceptions.ColladaRootNotFoundException(
+                SceneJS_errorModule.error(new SceneJS.ColladaRootNotFoundException(
                         "SceneJS.assets.collada root not found in COLLADA document: '" + rootId + "'"));
             }
         } else {
@@ -84,7 +84,7 @@ var SceneJS_colladaParserModule = new (function() {
             if (scene.length > 0) {
                 return parseNode(scene[0]);
             } else {
-                SceneJS_errorModule.error(new SceneJS.exceptions.ColladaRootRequiredException(
+                SceneJS_errorModule.error(new SceneJS.ColladaRootRequiredException(
                         "SceneJS.assets.collada root needs to be specified for COLLADA document: " + uri));
             }
         }
@@ -345,7 +345,7 @@ var SceneJS_colladaParserModule = new (function() {
             }
         }
         SceneJS_errorModule.fatalError(
-                new SceneJS.exceptions.ColladaParseException
+                new SceneJS.ColladaParseException
                         ("COLLADA element expected: "
                                 + profile.tagName
                                 + "/newparam[sid == '"
@@ -367,7 +367,7 @@ var SceneJS_colladaParserModule = new (function() {
                         .nodeValue;
             }
         }
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.ColladaParseException
+        SceneJS_errorModule.fatalError(new SceneJS.ColladaParseException
                 ("COLLADA element expected: "
                         + profile.tagName
                         + "/newparam[sid == '"

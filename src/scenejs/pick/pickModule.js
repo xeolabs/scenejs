@@ -19,7 +19,7 @@ var SceneJS_pickModule = new (function() {
     //                    function() {
     //                        pickInfo = [];
     //                        currentPickInfo = null;
-    //                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+    //                        SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
     //                    });
     //
     //            SceneJS_eventModule.onEvent(
@@ -106,7 +106,7 @@ var SceneJS_pickModule = new (function() {
         context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
         context.disable(context.BLEND);
 
-        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_PICKING;
+        SceneJS._traversalMode = SceneJS.TRAVERSAL_MODE_PICKING;
     }
 
     /**
@@ -179,7 +179,7 @@ var SceneJS_pickModule = new (function() {
      */
     function deactivatePicking() {
         canvas.context.bindFramebuffer(canvas.context.FRAMEBUFFER, null);
-        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+        SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
     }
 
 

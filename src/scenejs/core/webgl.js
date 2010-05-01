@@ -2,20 +2,6 @@
  */
 
 
-/** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
- * @private
- */
-const SceneJS_webgl_DEFAULT_CANVAS_ID = "_scenejs-default-canvas";
-
-/** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
- * @private
- */
-const SceneJS_webgl_DEFAULT_LOGGING_ID = "_scenejs-default-logging";
-
-/** IDs of supported WebGL canvas contexts
- * @private
- */
-const SceneJS_webgl_contextNames = ["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"];
 
 /** Maps SceneJS node parameter names to WebGL enum names
  * @private
@@ -209,7 +195,7 @@ function SceneJS_webgl_Shader(context, type, source, logging) {
     }
     if (!this.valid) {
         SceneJS_errorModule.fatalError(
-                new SceneJS.exceptions.ShaderCompilationFailureException("Shader program failed to compile"));
+                new SceneJS.ShaderCompilationFailureException("Shader program failed to compile"));
     }
 }
 
@@ -266,7 +252,7 @@ function SceneJS_webgl_Program(hash, lastUsed, context, vertexSources, fragmentS
 
     if (!this.valid) {
         SceneJS_errorModule.fatalError(
-                new SceneJS.exceptions.ShaderLinkFailureException("Shader program failed to link"));
+                new SceneJS.ShaderLinkFailureException("Shader program failed to link"));
     }
 
     /* Discover active uniforms and samplers

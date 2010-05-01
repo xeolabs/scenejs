@@ -1,9 +1,9 @@
 /**
- *  @class SceneJS.Generator
- *  @extends SceneJS.Node
+ *  @class A scene node that performs procedural scene generation by causing its child nodes to be rendered multiple times
+ * in a loop within a scene traversal, while varying the data available to them in each loop.
  *
- *  <p>Scene node that loops over its children, each time creating a child data scope for them from the result of its
- *  configuration function, repeating this process until the config function returns nothing.</p>
+ *  <p>Each time a SceneJS.Generator loops over its children it creates a child data scope for them from the result of its
+ *  configuration callback function, then repeats the process as long as the function returns something.</p>
  *
  *  <p>This node type must be configured dynamically therefore, in the SceneJS style, with a configuration function.</p>
  *
@@ -43,6 +43,7 @@
  *         )
  *   );
  *  </pre></code>
+ *  @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.Generator
  * @param {Object} func  Config function, followed by one or more child nodes
@@ -53,27 +54,25 @@ SceneJS.Generator = function(cfg) {
     this._nodeType = "generator";
 };
 
-SceneJS._utils.inherit(SceneJS.Generator, SceneJS.Node);
+SceneJS._inherit(SceneJS.Generator, SceneJS.Node);
 
 // @private
 SceneJS.Generator.prototype._render = function(traversalContext, data) {
     if (this._fixedParams) {
         SceneJS_errorModule.fatalError(
-                new SceneJS.exceptions.InvalidNodeConfigException
+                new SceneJS.InvalidNodeConfigException
                         ("SceneJS.Generator may only be configured with a function"));
     }
     var params = this._getParams(data);
     while (params) {
-        var childData = SceneJS._utils.newScope(data);
-        for (var key in params) {
-            childData.put(key, params[key]);
-        }
-        this._renderNodes(traversalContext, childData);
+        this._renderNodes(traversalContext, new SceneJS.Data(data, false, params));
         params = this._getParams(data);
     }
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Generator instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Generator constructor
+ * @returns {SceneJS.Generator}
  */
 SceneJS.generator = function() {
     var n = new SceneJS.Generator();

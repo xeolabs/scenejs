@@ -68,7 +68,7 @@ var SceneJS_memoryModule = new (function() {
     // @private
     function outOfMemory(description) {
         SceneJS_loggingModule.error("Memory allocation failed");
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.OutOfVRAMException(
+        SceneJS_errorModule.fatalError(new SceneJS.OutOfVRAMException(
                 "Out of memory - failed to allocate memory for " + description));
     }
 
@@ -91,7 +91,7 @@ var SceneJS_memoryModule = new (function() {
     this.allocate = function(description, tryAllocate) {
         // SceneJS_loggingModule.debug("Allocating memory for: " + description);
         if (!canvas) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NoCanvasActiveException
+            SceneJS_errorModule.fatalError(new SceneJS.NoCanvasActiveException
                     ("No canvas active - failed to allocate shader memory"));
         }
         var maxTries = 10; // TODO: Heuristic for this? Does this really need be greater than one?

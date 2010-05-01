@@ -26,7 +26,7 @@
 <span class='line'> 19</span> </span><span class="WHIT">    </span><span class="COMM">//                    function() {</span><span class="WHIT">
 <span class='line'> 20</span> </span><span class="WHIT">    </span><span class="COMM">//                        pickInfo = [];</span><span class="WHIT">
 <span class='line'> 21</span> </span><span class="WHIT">    </span><span class="COMM">//                        currentPickInfo = null;</span><span class="WHIT">
-<span class='line'> 22</span> </span><span class="WHIT">    </span><span class="COMM">//                        SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="WHIT">    </span><span class="COMM">//                        SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;</span><span class="WHIT">
 <span class='line'> 23</span> </span><span class="WHIT">    </span><span class="COMM">//                    });</span><span class="WHIT">
 <span class='line'> 24</span> </span><span class="WHIT">    </span><span class="COMM">//</span><span class="WHIT">
 <span class='line'> 25</span> </span><span class="WHIT">    </span><span class="COMM">//            SceneJS_eventModule.onEvent(</span><span class="WHIT">
@@ -113,7 +113,7 @@
 <span class='line'>106</span> </span><span class="WHIT">        </span><span class="NAME">context.clear</span><span class="PUNC">(</span><span class="NAME">context.COLOR_BUFFER_BIT</span><span class="WHIT"> </span><span class="PUNC">|</span><span class="WHIT"> </span><span class="NAME">context.DEPTH_BUFFER_BIT</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>107</span> </span><span class="WHIT">        </span><span class="NAME">context.disable</span><span class="PUNC">(</span><span class="NAME">context.BLEND</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>108</span> 
-<span class='line'>109</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._utils.traversalMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.TRAVERSAL_MODE_PICKING</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._traversalMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.TRAVERSAL_MODE_PICKING</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>110</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>111</span> 
 <span class='line'>112</span> </span><span class="WHIT">    </span><span class="COMM">/**
@@ -186,7 +186,7 @@
 <span class='line'>179</span>      */</span><span class="WHIT">
 <span class='line'>180</span> </span><span class="WHIT">    </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="NAME">deactivatePicking</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>181</span> </span><span class="WHIT">        </span><span class="NAME">canvas.context.bindFramebuffer</span><span class="PUNC">(</span><span class="NAME">canvas.context.FRAMEBUFFER</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>182</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._utils.traversalMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.TRAVERSAL_MODE_RENDER</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._traversalMode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._TRAVERSAL_MODE_RENDER</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>183</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>184</span> 
 <span class='line'>185</span> 

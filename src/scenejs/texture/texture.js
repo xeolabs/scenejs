@@ -1,8 +1,6 @@
 /**
- * @class SceneJS.texture
+ * @class A scene node that defines one or more layers of texture to apply to all geometries within its subgraph that have UV coordinates.
  * @extends SceneJS.node
- *
- * <p>Scene node that defines one or more layers of texture to apply to all geometries within its subgraph that have UV coordinates.</p>
  * <p>Texture layers are applied to specified material reflection cooficients, and may be transformed.</p>
  * <p><b>Example 1</b></p>
  * <p>A cube wrapped with a material which specifies its base (diffuse) color coefficient, and a texture with
@@ -98,7 +96,7 @@ SceneJS.Texture = function() {
     this._layers = null;
 };
 
-SceneJS._utils.inherit(SceneJS.Texture, SceneJS.Node);
+SceneJS._inherit(SceneJS.Texture, SceneJS.Node);
 
 // @private
 SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
@@ -139,13 +137,13 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
         this._layers = [];
         var params = this._getParams(data);
         if (!params.layers) {
-            throw new SceneJS.exceptions.NodeConfigExpectedException(
+            throw new SceneJS.NodeConfigExpectedException(
                     "SceneJS.Texture.layers is undefined");
         }
         for (var i = 0; i < params.layers.length; i++) {
             var layerParam = params.layers[i];
             if (!layerParam.uri) {
-                throw new SceneJS.exceptions.NodeConfigExpectedException(
+                throw new SceneJS.NodeConfigExpectedException(
                         "SceneJS.Texture.layers[" + i + "].uri is undefined");
             }
             if (layerParam.applyFrom) {
@@ -154,7 +152,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                     layerParam.applyFrom != "normal" &&
                     layerParam.applyFrom != "geometry") {
                     SceneJS_errorModule.fatalError(
-                            new SceneJS.exceptions.InvalidNodeConfigException(
+                            new SceneJS.InvalidNodeConfigException(
                                     "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
                                     "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
                 }
@@ -163,7 +161,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                 if (layerParam.applyTo != "baseColor" && // Colour map
                     layerParam.applyTo != "diffuseColor") {
                     SceneJS_errorModule.fatalError(
-                            new SceneJS.exceptions.InvalidNodeConfigException(
+                            new SceneJS.InvalidNodeConfigException(
                                     "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
                                     "should be either 'baseColor', 'diffuseColor'"));
                 }
@@ -253,8 +251,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                                 /* Currently recovering from failed texture load
                                  */
 
-                                // SceneJS_errorModule.error(
-                                //       new SceneJS.exceptions.ImageLoadFailedException(message));
+                               
                             },
 
                         /* Load aborted - eg. user stopped browser
@@ -290,7 +287,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
         }
     }
 
-    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+    if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
     } else {
         if ((countLayersReady == this._layers.length)) { // All or none - saves on generating/destroying shaders

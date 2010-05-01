@@ -1,12 +1,13 @@
 /**
  * Scene node that specifies the current viewing volume and transform matrix
+ * @private
  */
 
 
 SceneJS.frustum = function() {
     var cfg = SceneJS.utils.getNodeConfig(arguments);
     
-    return SceneJS._utils.createNode(
+    return SceneJS.createNode(
             "frustum",
             cfg.children,
 

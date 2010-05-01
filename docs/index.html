@@ -186,7 +186,23 @@ ul.inheritsList
 	
 	<li><i><a href="symbols/_global_.html">_global_</a></i></li>
 	
+	<li><a href="symbols/SceneJS.html">SceneJS</a></li>
+	
 	<li><a href="symbols/SceneJS.BoundingBox.html">SceneJS.BoundingBox</a></li>
+	
+	<li><a href="symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
+	
+	<li><a href="symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
+	
+	<li><a href="symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
+	
+	<li><a href="symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
+	
+	<li><a href="symbols/SceneJS.Data.html">SceneJS.Data</a></li>
+	
+	<li><a href="symbols/SceneJS.DataExpectedException.html">SceneJS.DataExpectedException</a></li>
+	
+	<li><a href="symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -194,11 +210,15 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></li>
 	
+	<li><a href="symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
+	
 	<li><a href="symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
 	<li><a href="symbols/SceneJS.Load.html">SceneJS.Load</a></li>
 	
 	<li><a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	
+	<li><a href="symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
 	<li><a href="symbols/SceneJS.Locality.html">SceneJS.Locality</a></li>
 	
@@ -214,13 +234,21 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
+	<li><a href="symbols/SceneJS.Node.html">SceneJS.Node</a></li>
+	
+	<li><a href="symbols/SceneJS.NodeConfigExpectedException.html">SceneJS.NodeConfigExpectedException</a></li>
+	
 	<li><a href="symbols/SceneJS.objects.Cube.html">SceneJS.objects.Cube</a></li>
 	
 	<li><a href="symbols/SceneJS.objects.Sphere.html">SceneJS.objects.Sphere</a></li>
 	
 	<li><a href="symbols/SceneJS.objects.Teapot.html">SceneJS.objects.Teapot</a></li>
 	
+	<li><a href="symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
+	
 	<li><a href="symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	
+	<li><a href="symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
 	<li><a href="symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
@@ -244,6 +272,10 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></li>
 	
+	<li><a href="symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
+	
+	<li><a href="symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
 	<li><a href="symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
 </ul>
@@ -261,56 +293,125 @@ ul.inheritsList
 			<hr />
 			
 			<div>
+				<h2><a href="symbols/SceneJS.html">SceneJS</a></h2>
+				SceneJS
+SceneJS name space
+			</div>
+			<hr />
+			
+			<div>
 				<h2><a href="symbols/SceneJS.BoundingBox.html">SceneJS.BoundingBox</a></h2>
-				SceneJS.BoundingBox
+				A scene node that specifies the spatial boundaries of scene graph subtrees to support visibility and
+level-of-detail culling.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></h2>
+				Exception thrown when a SceneJS.Scene 'canvasId' configuration does not match any elements in the page and no
+default canvas was found with the ID specified in SceneJS.DEFAULT_CANVAS_ID.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></h2>
+				Exception thrown by a SceneJS.LoadCollada node when parsing of a Collada file fails for some reason.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></h2>
+				Exception thrown by a SceneJS.LoadCollada node when the element ID given in its 'node' configuration does not match the ID
+of any node in the Collada document.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></h2>
+				Exception thrown by a SceneJS.LoadCollada node when it could not find the default Collada node ("asset) to parse and needs you to
+explicitly provide the ID of a target asset through a 'node' configuration property.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.Data.html">SceneJS.Data</a></h2>
+				Data scope that is passed as the single argument to the callback function that many scene node classes may be
+dynamically configured through.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.DataExpectedException.html">SceneJS.DataExpectedException</a></h2>
+				Exception thrown when a node (such as SceneJs.ScalarInterpolator) expects to find some element of data on the current
+data scope (SceneJS.Data).
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></h2>
+				Exception thrown when a SceneJS.LoggingToPage 'elementId' configuration does not match any elements in the page and no
+default DIV was found with the ID specified in SceneJS.DEFAULT_LOGGING_DIV_ID.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Fog.html">SceneJS.Fog</a></h2>
-				SceneJS.Fog
+				A scene node that defines fog for nodes in its sub graph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Generator.html">SceneJS.Generator</a></h2>
-				SceneJS.Generator
+				A scene node that performs procedural scene generation by causing its child nodes to be rendered multiple times
+in a loop within a scene traversal, while varying the data available to them in each loop.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></h2>
-				SceneJS.Geometry
+				A scene node that defines an element of geometry.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></h2>
+				Exception thrown by SceneJS node classes when configuration property is invalid.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Lights.html">SceneJS.Lights</a></h2>
-				SceneJS.Lights
+				A scene node that defines a set of light sources for its subgraph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Load.html">SceneJS.Load</a></h2>
-				SceneJS.Load
+				A scene node that asynchronously loads JavaScript content for its subgraph from a server.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></h2>
-				SceneJS.load
+				A scene node that asynchronously loads its subgraph from a COLLADA file.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></h2>
+				Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Locality.html">SceneJS.Locality</a></h2>
-				SceneJS.Locality
+				A scene node that defines inner and outer spheres of locality centered about the viewpoint.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.logging.html">SceneJS.logging</a></h2>
-				SceneJS.logging
+				A scene node that routes messages logged by nodes in its subgraph through a given set of logging functions.
 			</div>
 			<hr />
 			
@@ -322,123 +423,159 @@ ul.inheritsList
 			
 			<div>
 				<h2><a href="symbols/SceneJS.LookAt.html">SceneJS.LookAt</a></h2>
-				SceneJS.LookAt
+				A scene node that defines a viewing transform by specifing location of the eye position, the point being looked
+at, and the direction of "up".
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Material.html">SceneJS.Material</a></h2>
-				SceneJS.Material
+				A scene node that defines how light is reflected by the geometry within its subgraph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></h2>
-				SceneJS.ModelMatrix
+				A scene node that applies a model-space transform to the nodes within its subgraph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Name.html">SceneJS.Name</a></h2>
-				SceneJS.Name
+				A scene node that specifies a name for the nodes in its subgraph.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.Node.html">SceneJS.Node</a></h2>
+				The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.NodeConfigExpectedException.html">SceneJS.NodeConfigExpectedException</a></h2>
+				Exception thrown by SceneJS node classes when a mandatory configuration was not supplied
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.objects.Cube.html">SceneJS.objects.Cube</a></h2>
-				SceneJS.objects.Cube
+				A scene node that defines cube geometry.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.objects.Sphere.html">SceneJS.objects.Sphere</a></h2>
-				SceneJS.objects.Sphere
+				A scene node that defines sphere geometry.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.objects.Teapot.html">SceneJS.objects.Teapot</a></h2>
-				SceneJS.objects.Teapot
+				A scene node that defines the geometry of the venerable OpenGL teapot.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></h2>
+				Exception thrown when SceneJS fails to allocate a buffer (eg.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></h2>
-				SceneJS.Perspective
+				A scene node that defines a perspective transformation for the nodes within its subgraph.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></h2>
+				Exception thrown when you have attempted to make a cross-domain load without specify the proxy to mediate the transfer.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></h2>
-				SceneJS.Renderer
+				A scene node that sets WebGL state for nodes in its subtree.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></h2>
-				SceneJS.Rotate
+				A scene node that applies a model-space rotation transform to the nodes within its subgraph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></h2>
-				SceneJS.scalarInterpolator
+				A scene node that animates interpolates a scalar value by interpolating within a sequence of key values.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Scale.html">SceneJS.Scale</a></h2>
-				SceneJS.Scale
+				A scene node that applies a model-space scale transform to the nodes within its subgraph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Scene.html">SceneJS.Scene</a></h2>
-				SceneJS.Scene
+				Root node of a SceneJS scene graph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></h2>
-				SceneJS.Stationary
+				A Scene node that defines a region within a SceneJS.LookAt in which the translations specified by that node have no effect.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.text.html">SceneJS.text</a></h2>
-				SceneJS.text
+				A scene node that defines a string of text.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Texture.html">SceneJS.Texture</a></h2>
-				SceneJS.texture
+				A scene node that defines one or more layers of texture to apply to all geometries within its subgraph that have UV coordinates.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.TextureLayer.html">SceneJS.TextureLayer</a></h2>
-				SceneJS.TextureLayer
-
- <p>A layer within a SceneJS.Texture node.
+				A layer within a SceneJS.Texture node.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Translate.html">SceneJS.Translate</a></h2>
-				SceneJS.Translate
+				A scene node that applies a model-space translate transform to the nodes within its subgraph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></h2>
-				SceneJS.ViewMatrix
+				A scene node that applies a model-space transform to the nodes within its subgraph.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></h2>
+				Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a SceneJS.Scene.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></h2>
+				Exception thrown by nodes such as SceneJS.Renderer and SceneJS.Texture when the browser's WebGL does not support
+a specified config value.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.WithData.html">SceneJS.WithData</a></h2>
-				SceneJS.WithData
+				A scene node that creates data in a scope for its subgraph.
 			</div>
 			<hr />
 			
@@ -446,7 +583,7 @@ ul.inheritsList
 		</div>
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Fri Apr 30 2010 22:22:03 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Sat May 01 2010 17:11:46 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

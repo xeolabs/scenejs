@@ -1,0 +1,168 @@
+var SceneJS = {
+    version: '0.7.2'
+};
+
+
+/** Includes JavaScript - use this for pulling in extra libraries like extensions, plugins etc.
+ */
+//    SceneJS.require = function(url) {
+//
+//    };
+
+/** All exceptions thrown by SceneJS
+ */
+SceneJS.exceptions = {
+
+};
+
+
+/**
+ * @class SceneJS.Data
+ * <p>Data scope that is passed as the single argument to callbacks used to dynamically configure scene nodes.</p>.
+ * <p>These are created whenever data is generated within a scene graph, to transport the data down to sub-nodes.</p>
+ * <p>Some nodes that create these are: SceneJS.Scene when rendered, SceneJs.WithData and SceneJS.ScalarInterpolator.</p>.
+ * <p><b>Example:</b></p><p>Nested creation of these will form a linked chain of data scopes. The outer SceneJS.WithData
+ * node creates one SceneJS.Data with "sizeX" and "sizeY" properties, then the inner SceneJS.WithData chains another SceneJS.Data
+ * onto that with a "sizeZ" property. The dynamic config callback on the SceneJS.Scale node then hunts up the chain to
+ * get the properties for its SceneJS.Scale node.</b></p><pre><code>
+ *
+ * var wd new SceneJS.WithData({
+ *          sizeX: 5,
+ *          sizeY: 6
+ *      },
+ *      new SceneJS.Translate({ x: 100 },
+ *
+ *          var wd new SceneJS.WithData({
+ *              sizeZ: 2
+ *          },
+ *          new SceneJS.Scale(function(data) {        // Here's our SceneJS.Data object
+ *                   return {
+ *                       x: data.get("sizeX"),
+ *                       y: data.get("sizeY"),
+ *                       z: data.get("sizeZ")
+ *                   }
+ *          },
+ *
+ *              new SceneJS.objects.Cube()
+ *          )
+ *      )
+ *  )
+ * </code></pre>
+ * @constructor
+ * @private
+ */
+SceneJS.Data = function(_parent, _fixed, _data) {
+    this._parent = _parent;
+    this._data = _data || {};
+    this._fixed = _fixed || (_parent ? _parent._fixed : false);
+
+    /** Hunts up the data scope chain to get the property with the given key, getting it off the
+     * first data scope that has it.
+     * @param {String} key Name of property
+     * @returns {Object} The property
+     */
+    this.get = function(key) {
+        var value = this._data[key];
+        if ((value == 0) || value) {
+            return value;
+        }
+        if (!parent) {
+            return null;
+        }
+        return parent.get(key);
+    };
+
+    /**
+     * Returns true if all data on the scope chain is fixed, ie. will not change between scene graph traversals.
+     * @returns {boolean}  
+     */
+    this.isFixed = function() {
+        return this._fixed;
+    };
+};
+
+
+/** Private resources
+ *
+ */
+SceneJS._utils = {
+
+    traversalMode :0x1,
+
+    TRAVERSAL_MODE_RENDER: 0x1,
+    TRAVERSAL_MODE_PICKING:   0x2,
+
+    /**
+     * @private
+     */
+    inherit : function(DerivedClassName, BaseClassName) {
+        DerivedClassName.prototype = new BaseClassName();
+        DerivedClassName.prototype.constructor = DerivedClassName;
+    },
+
+    /** Adds members of o1 to o2 where not already on the latter
+     * @private
+     */
+    applyIf : function(o1, o2) {
+        for (var key in o2) {
+            if (!o1[key]) {
+                o1[key] = o2[key];
+            }
+        }
+        return o1;
+    },
+
+    /**
+     * @private
+     *
+     */
+    apply : function(o1, o2) {
+        for (var key in o2) {
+            o1[key] = o2[key];
+        }
+        return o1;
+    },
+
+    /** Converts degrees to radiians
+     * @private
+     */
+    degToRad : function(degrees) {
+        return degrees * Math.PI / 180.0;
+    },
+
+    /** Creates a namespace
+     * @private
+     */
+    namespace : function() {
+        var a = arguments, o = null, i, j, d, rt;
+        for (i = 0; i < a.length; ++i) {
+            d = a[i].split(".");
+            rt = d[0];
+            eval('if (typeof ' + rt + ' == "undefined"){' + rt + ' = {};} o = ' + rt + ';');
+            for (j = 1; j < d.length; ++j) {
+                o[d[j]] = o[d[j]] || {};
+                o = o[d[j]];
+            }
+        }
+    },
+
+    /**
+     * Returns a key for a vacant slot in the given map
+     * @private
+     */
+    createKeyForMap : function(keyMap, prefix) {
+        var i = 0;
+        while (true) {
+            var key = prefix + i++;
+            if (!keyMap[key]) {
+                return key;
+            }
+        }
+    }
+};
+
+
+SceneJS._utils.ns = SceneJS._utils.namespace; // in intellij using keyword "namespace" causes parsing errors
+SceneJS._utils.ns("SceneJS");
+
+

@@ -8,28 +8,28 @@
  */
 
 SceneJS.loggingToPage = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var cfg = SceneJS.getNodeConfig(arguments);
 
     function findElement(elementId) {
         var element;
         if (!elementId) {
-            elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
+            elementId = SceneJS.DEFAULT_LOGGING_DIV_ID;
             element = document.getElementById(elementId);
             if (!element) {
-                SceneJS_errorModule.fatalError(new SceneJS.exceptions.PageLoggingElementNotFoundException
+                SceneJS_errorModule.fatalError(new SceneJS.DocumentElementNotFoundException
                         ("SceneJS.loggingToPage config 'elementId' omitted and no default element found with ID '"
-                                + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
+                                + SceneJS.DEFAULT_LOGGING_DIV_ID + "'"));
             }
         } else {
             element = document.getElementById(elementId);
             if (!element) {
-                elementId = SceneJS_webgl_DEFAULT_LOGGING_ID;
+                elementId = SceneJS.DEFAULT_LOGGING_DIV_ID;
                 element = document.getElementById(elementId);
                 if (!element) {
                     SceneJS_errorModule.fatalError(
-                            new SceneJS.exceptions.PageLoggingElementNotFoundException
+                            new SceneJS.DocumentElementNotFoundException
                                     ("SceneJS.loggingToPage config 'elementId' does not match any elements in page and no " +
-                                     "default element found with ID '" + SceneJS_webgl_DEFAULT_LOGGING_ID + "'"));
+                                     "default element found with ID '" + SceneJS.DEFAULT_LOGGING_DIV_ID + "'"));
                 }
             }
         }

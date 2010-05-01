@@ -1,10 +1,9 @@
-/** Scene node that routes messages logged by nodes in its subgraph through a given set of logging functions.
- *
- * @class SceneJS.logging
+/** 
+ * @class A scene node that routes messages logged by nodes in its subgraph through a given set of logging functions.
  * @extends SceneJS.node
  */
 SceneJS.logging = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var cfg = SceneJS.getNodeConfig(arguments);
 
     /* Augment the basic node type
      */

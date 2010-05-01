@@ -1,9 +1,9 @@
-SceneJS._utils.ns("SceneJS.objects");
+SceneJS._namespace("SceneJS.objects");
 
 /**
- * @class SceneJS.objects.Cube
- * @extends SceneJS.Geometry
- * <p>A scene node that defines cube geometry. A Cube may be configured with an optional half-size for each axis. Where
+ * @class A scene node that defines cube geometry.
+ * <p>The geometry is complete with normals for shading and one layer of UV coordinates for
+ * texture-mapping. A Cube may be configured with an optional half-size for each axis. Where
  * not specified, the half-size on each axis will be 1 by default. It can also be configured as solid (default),
  * to construct it from triangles with normals for shading and one layer of UV coordinates for texture-mapping
  * one made of triangles. When not solid, it will be a wireframe drawn as line segments.</p>
@@ -14,6 +14,7 @@ SceneJS._utils.ns("SceneJS.objects");
  *          solid: true // Optional - when true (default) cube is solid, otherwise it is wireframe
  *     })
  * </pre></code>
+ * @extends SceneJS.Geometry
  * @constructor
  * Create a new SceneJS.objects.Cube
  * @param {Object} config  Config object or function, followed by zero or more child nodes
@@ -26,7 +27,7 @@ SceneJS.objects.Cube = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.objects.Cube, SceneJS.Geometry);
+SceneJS._inherit(SceneJS.objects.Cube, SceneJS.Geometry);
 
 // @private
 SceneJS.objects.Cube.prototype._init = function(params) {
@@ -170,7 +171,9 @@ SceneJS.objects.Cube.prototype._init = function(params) {
     };
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.objects.Cube instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.objects.Cube constructor
+ * @returns {SceneJS.objects.Cube}
  */
 SceneJS.objects.cube = function() {
     var n = new SceneJS.objects.Cube();

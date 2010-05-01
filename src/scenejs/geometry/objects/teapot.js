@@ -1,13 +1,12 @@
-SceneJS._utils.ns("SceneJS.objects");
+SceneJS._namespace("SceneJS.objects");
 /**
- * @class SceneJS.objects.Teapot
- * @extends SceneJS.Geometry
- * <p>A scene node that defines the geometry of the OpenGL teapot.</p>
+ * @class A scene node that defines the geometry of the venerable OpenGL teapot.
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-example-teapot">Example 1</a></li></ul>
  * <p><b>Example Usage</b></p><p>Definition of teapot:</b></p><pre><code>
  * var c = new SceneJS.objects.Teapot(); // Requires no parameters
  * </pre></code>
+ * @extends SceneJS.Geometry
  * @constructor
  * Create a new SceneJS.objects.Teapot
  * @param {Object} config  Config object or function, followed by zero or more child nodes
@@ -5808,7 +5807,7 @@ SceneJS.objects.Teapot = function() {
             var result = [];
             for (var i = 0; i < ar.length; i++) {
                 if (numPerElement && ar[i].length != numPerElement)
-                    throw new SceneJS.exceptions.InvalidGeometryConfigException("Bad geometry array element");
+                    throw new SceneJS.InvalidNodeConfigException("Bad geometry array element");
                 for (var j = 0; j < ar[i].length; j++)
                     result.push(ar[i][j]);
             }
@@ -5823,9 +5822,11 @@ SceneJS.objects.Teapot = function() {
     };
 };
 
-SceneJS._utils.inherit(SceneJS.objects.Teapot, SceneJS.Geometry);
+SceneJS._inherit(SceneJS.objects.Teapot, SceneJS.Geometry);
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.objects.Teapot instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.objects.Teapot constructor
+ * @returns {SceneJS.objects.Teapot}
  */
 SceneJS.objects.teapot = function() {
     return new SceneJS.objects.Teapot();

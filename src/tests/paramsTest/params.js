@@ -30,7 +30,7 @@ var NodeParams = function(nodeName, data) {
             if (fallback) {
                 return fallback;
             }
-            throw SceneJS.exceptions.NodeConfigExpectedException(
+            throw SceneJS.NodeConfigExpectedException(
                     nodeName + " property expected: \"" + name + "\"");
         } else if (!param) {
             alert("returning fallback");

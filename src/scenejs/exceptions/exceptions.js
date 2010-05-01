@@ -1,150 +1,147 @@
 /**
- * Classes for exceptions thrown by SceneJS.
- *
- * Exceptions have classes so that they can be discriminated on by application code.
+ * @class Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a SceneJS.Scene.
  */
-
-SceneJS.exceptions.WebGLNotSupportedException = function(msg, cause) {
+SceneJS.WebGLNotSupportedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.SceneDestroyedException = function(msg, cause) {
+/**
+ * @class Exception thrown by SceneJS node classes when a mandatory configuration was not supplied
+ */
+SceneJS.NodeConfigExpectedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.NodeConfigExpectedException = function(msg, cause) {
+/**
+ * @private
+ */
+SceneJS.ShaderCompilationFailureException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.ShaderCompilationFailureException = function(msg, cause) {
+/**
+ * @private
+ */
+SceneJS.ShaderLinkFailureException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.ShaderLinkFailureException = function(msg, cause) {
+/**
+ * @private
+ */
+SceneJS.NoSceneActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.ShaderVariableNotFoundException = function(msg, cause) {
+/**
+ * @private
+ */
+SceneJS.NoCanvasActiveException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.NoSceneActiveException = function(msg, cause) {
+/**
+ * @class Exception thrown when a SceneJS.Scene 'canvasId' configuration does not match any elements in the page and no
+ * default canvas was found with the ID specified in SceneJS.DEFAULT_CANVAS_ID.
+ */
+SceneJS.CanvasNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.NoCanvasActiveException = function(msg, cause) {
+/**
+ * @class Exception thrown by SceneJS node classes when configuration property is invalid.
+ */
+SceneJS.InvalidNodeConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.NoShaderActiveException = function(msg, cause) {
+/**
+ * @class  Exception thrown when SceneJS fails to allocate a buffer (eg. texture, vertex array) in video RAM.
+ * <p>Whether this is actually thrown before your GPU/computer hangs depends on the quality of implementation within the underlying
+ * OS/OpenGL/WebGL stack, so there are no guarantees that SceneJS will warn you with one of these.</p.
+ */
+SceneJS.OutOfVRAMException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.CanvasNotFoundException = function(msg, cause) {
+/**@class  Exception thrown when a SceneJS.LoggingToPage 'elementId' configuration does not match any elements in the page and no
+ * default DIV was found with the ID specified in SceneJS.DEFAULT_LOGGING_DIV_ID.
+ */
+SceneJS.DocumentElementNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.CanvasAlreadyActiveException = function(msg, cause) {
+/** @class  Exception thrown by a SceneJS.LoadCollada node when parsing of a Collada file fails for some reason.
+ */
+SceneJS.ColladaParseException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.InvalidLookAtConfigException = function(msg, cause) {
+/** @class  Exception thrown by a SceneJS.LoadCollada node when the element ID given in its 'node' configuration does not match the ID
+ * of any node in the Collada document.
+ */
+SceneJS.ColladaRootNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.InvalidGeometryConfigException = function(msg, cause) {
+/** @class  Exception thrown by a SceneJS.LoadCollada node when it could not find the default Collada node ("asset) to parse and needs you to
+ * explicitly provide the ID of a target asset through a 'node' configuration property.
+ */
+SceneJS.ColladaRootRequiredException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.UnsupportedOperationException = function(msg, cause) {
+/**
+ * @class  Exception thrown when you have attempted to make a cross-domain load without specify the proxy to mediate the transfer. The
+ * URL of the proxy must be specified with a 'proxy' configuration property on either the SceneJS.Scene node or the node
+ * that does the load  (eg. SceneJS.Load, SceneJS.LoadCollada etc).
+ */
+SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.IllegalRotateConfigException = function(msg, cause) {
+/**
+ * @class  Exception thrown by nodes such as SceneJS.Renderer and SceneJS.Texture when the browser's WebGL does not support
+ * a specified config value.
+ */
+SceneJS.WebGLUnsupportedNodeConfigException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.InvalidNodeConfigException = function(msg, cause) {
+/** @private */
+SceneJS.PickWithoutRenderedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.NodeBackendNotFoundException = function(msg, cause) {
+/**
+ * @class  Exception thrown when a node (such as SceneJs.ScalarInterpolator) expects to find some element of data on the current
+ * data scope (SceneJS.Data).
+ */
+SceneJS.DataExpectedException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-SceneJS.exceptions.AssetLoadFailureException = function(msg, uri, proxy) {      // TODO: handle more cases for asset failure?
-    this.message = msg + " (uri=\"" + (uri || "null") + "\", proxy=\"" + (proxy || "null") + "\")";
-};
-
-SceneJS.exceptions.OutOfVRAMException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.PageLoggingElementNotFoundException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.ColladaParseException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.ColladaRootNotFoundException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.ColladaRootRequiredException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.ProxyNotSpecifiedException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-
-SceneJS.exceptions.WebGLUnsupportedNodeConfigException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.PickWithoutRenderedException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.DataExpectedException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.ImageLoadFailedException = function(msg, cause) {
-    this.message = msg;
-    this.cause = cause;
-};
-
-SceneJS.exceptions.AssetLoadTimeoutException = function(msg, cause) {
+/**
+ * @class  Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
+ */
+SceneJS.LoadTimeoutException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };

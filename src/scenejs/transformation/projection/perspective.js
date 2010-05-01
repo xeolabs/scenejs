@@ -1,9 +1,6 @@
 /**
- @class SceneJS.Perspective
+ @class A scene node that defines a perspective transformation for the nodes within its subgraph.
  @extends SceneJS.Node
-
- <p>Scene node that defines a perspective transformation for the nodes within its subgraph.</p>
-
  <p><b>Example:</b></p><p>Defining perspective, specifying parameters that happen to be the default values</b></p><pre><code>
  var p = new SceneJS.Perspective({
  fovy : 55.0,
@@ -31,7 +28,7 @@ SceneJS.Perspective = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Perspective, SceneJS.Node);
+SceneJS._inherit(SceneJS.Perspective, SceneJS.Node);
 
 /** Sets the field-of-view angle in degrees
  *

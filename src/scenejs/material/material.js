@@ -1,10 +1,8 @@
 /**
- * @class SceneJS.Material
- * @extends SceneJS.Node
- * <p>A scene node that defines how light is reflected by the geometry within its subgraph. These may be defined anywhere within
- * a scene graph and may be nested. When nested, the properties on an inner material node will override
- * those on outer material nodes for the inner node's subgraph. These nodes are to be defined either above or below
- * SceneJS.Lights nodes, which provide light for geometry to reflect.</p>
+ * @class A scene node that defines how light is reflected by the geometry within its subgraph.
+ * <p> These may be defined anywhere within a scene graph and may be nested. When nested, the properties on an inner material
+ * node will override those on outer material nodes for the inner node's subgraph. These nodes are to be defined either
+ * above or below SceneJS.Lights nodes, which provide light for geometry to reflect.</p>
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-material-example">Example 1</a></li></ul>
  * <p><b>Usage Example</b></p><p>A cube illuminated by a directional light source and wrapped
@@ -33,7 +31,7 @@
  *     )
  * )
  * </pre></code>
- *
+ * * @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.Material
  * @param {Object} config The config object or function, followed by zero or more child nodes
@@ -56,7 +54,7 @@ SceneJS.Material = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Material, SceneJS.Node);
+SceneJS._inherit(SceneJS.Material, SceneJS.Node);
 
 /**
  * Sets the material base color
@@ -241,7 +239,7 @@ SceneJS.Material.prototype._init = function(params) {
 
 // @private
 SceneJS.Material.prototype._render = function(traversalContext, data) {
-    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+    if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
     } else {
         if (!this._fixedParams) {
@@ -254,7 +252,9 @@ SceneJS.Material.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Material instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Material constructor
+ * @returns {SceneJS.Material}
  */
 SceneJS.material = function() {
     var n = new SceneJS.Material();

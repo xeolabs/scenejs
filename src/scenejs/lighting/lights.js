@@ -1,7 +1,6 @@
 /**
- * @class SceneJS.Lights
- * @extends SceneJS.Node
- * <p>A scene node that defines a set of light sources. Multiple instances of this  node may appear at
+ * @class A scene node that defines a set of light sources for its subgraph.
+ * <p>Multiple instances of this  node may appear at
  * any location in a scene graph, to define multiple sources of light, the number of which is only limited
  * by video memory.</p>
  * <p>Currently, two kinds of light are supported: point and directional. Point lights have a location, like a lightbulb,
@@ -95,6 +94,7 @@
  *  pointSource.setPos({ z: -150.0 });
  *
  * </pre></code>
+ * @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.Lights
  * @param {Object} cfg  Config object or function, followed by zero or more child nodes
@@ -108,7 +108,7 @@ SceneJS.Lights = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Lights, SceneJS.Node);
+SceneJS._inherit(SceneJS.Lights, SceneJS.Node);
 
 /**
  Adds a light source.
@@ -184,7 +184,7 @@ SceneJS.Lights.prototype._init = function(params) {
 
 // @private
 SceneJS.Lights.prototype._render = function(traversalContext, data) {
-    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+    if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
     } else {
         if (!this._fixedParams) {
@@ -196,7 +196,9 @@ SceneJS.Lights.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Lights instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Lights constructor
+ * @returns {SceneJS.Lights}
  */
 SceneJS.lights = function() {
     var n = new SceneJS.Lights();

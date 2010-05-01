@@ -6,12 +6,12 @@
 	.REGX {color: #339;}
 	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
-<span class='line'>  2</span> 
+<span class='line'>  2</span>  * @private
 <span class='line'>  3</span>  */</span><span class="WHIT">
 <span class='line'>  4</span> </span><span class="NAME">SceneJS.billboard</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>  5</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">cfg</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.getNodeConfig</span><span class="PUNC">(</span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  5</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">cfg</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.getNodeConfig</span><span class="PUNC">(</span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>  6</span> </span><span class="WHIT">    
-<span class='line'>  7</span>     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">SceneJS._utils.createNode</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>  7</span>     </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">SceneJS.createNode</span><span class="PUNC">(</span><span class="WHIT">
 <span class='line'>  8</span> </span><span class="WHIT">            </span><span class="STRN">"billboard"</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>  9</span> </span><span class="WHIT">            </span><span class="NAME">cfg.children</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'> 10</span> 

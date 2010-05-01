@@ -1,9 +1,7 @@
 /**
- * @class SceneJS.LookAt
+ * @class A scene node that defines a viewing transform by specifing location of the eye position, the point being looked
+ * at, and the direction of "up".
  * @extends SceneJS.Node
- *
- * <p>A scene node that defines a viewing transform by specifing location of the eye position, the point being looked
- * at, and the direction of "up".</p>
  *
  * <p><b>Example:</b></p><p>Defining perspective, specifying parameters that happen to be the default values</b></p><pre><code>
  * var l = new SceneJS.LookAt({
@@ -42,7 +40,7 @@ SceneJS.LookAt = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.LookAt, SceneJS.Node);
+SceneJS._inherit(SceneJS.LookAt, SceneJS.Node);
 
 /** Sets the eye position.
  * Don't allow this position to be the same as the position being looked at.
@@ -106,7 +104,7 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     var z = up.z || 0;
     if (x + y + z == 0) {
         SceneJS_errorModule.fatalError(
-                new SceneJS.exceptions.IllegalRotateConfigException(
+                new SceneJS.InvalidNodeConfigException(
                         "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero"));
     }
     this._upX = x;

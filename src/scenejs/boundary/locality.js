@@ -1,24 +1,21 @@
 /**
- @class SceneJS.Locality
- @extends SceneJS.Node
- <p>Defines inner and outer spheres of locality centered about the viewpoint.</p>
- <p>The subgraphs of contained SceneJS.BoundingBox nodes will only be rendered when their SceneJS.BoundingBox intersects
- the inner radius.</p><p>When a SceneJS.BoundingBox intersects the outer radius, its subgraph stages (pre-loads)
- content for when it will be rendered.</p>
- <p>You can have as many of these as neccessary throughout your scene.</p>
- <p><b>Example:</b></p><p>Defining a locality</b></p><pre><code>
- var locality = new SceneJS.Locality({
- inner: 1000,  // Default values, override these where needed
- outer: 2000
- },
-
- // ... child nodes containing SceneJS.BoundingBox nodes ...
- )
- </pre></code>
-
- @constructor
- Create a new SceneJS.Locality
- @param {Object} cfg  Config object or function, followed by zero or more child nodes
+ *@class A scene node that defines inner and outer spheres of locality centered about the viewpoint.
+ *<p>The subgraphs of contained SceneJS.BoundingBox nodes will only be rendered when their boundaries intersect
+ *the inner radius.</p><p>The outer radius is used internally by SceneJS to support content staging strategies.</p> 
+ *<p>You can have as many of these as neccessary throughout your scene.</p>
+ *<p><b>Example:</b></p><p>Defining a locality</b></p><pre><code>
+ *  var locality = new SceneJS.Locality({
+ *      inner: 1000,  // Default values, override these where needed
+ *      outer: 2000
+ *      },
+ *
+ *      // ... child nodes containing SceneJS.BoundingBox nodes ...
+ *  )
+ *</pre></code>
+ *  @extends SceneJS.Node
+ *@constructor
+ *Create a new SceneJS.Locality
+ * @param {Object} cfg  Config object or function, followed by zero or more child nodes
  */
 SceneJS.Locality = function() {
     SceneJS.Node.apply(this, arguments);
@@ -32,7 +29,7 @@ SceneJS.Locality = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Locality, SceneJS.Node);
+SceneJS._inherit(SceneJS.Locality, SceneJS.Node);
 
 /**
  Sets the inner radius
@@ -95,7 +92,9 @@ SceneJS.Locality.prototype._render = function(traversalContext, data) {
     SceneJS_localityModule.setRadii(prevRadii);
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Locality instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Locality constructor
+ * @returns {SceneJS.Locality}
  */
 SceneJS.locality = function() {
     var n = new SceneJS.Locality();

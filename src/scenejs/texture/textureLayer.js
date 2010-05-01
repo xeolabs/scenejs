@@ -1,7 +1,5 @@
 /**
- @class SceneJS.TextureLayer
-
- <p>A layer within a SceneJS.Texture node.</p>
+ @class A layer within a SceneJS.Texture node.
 
  @constructor
  Create a new SceneJS.TextureLayer

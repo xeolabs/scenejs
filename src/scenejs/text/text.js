@@ -1,12 +1,10 @@
 /**
- * Scene node that defines a string of text.
- *
- * @class SceneJS.text
+ * @class A scene node that defines a string of text.
  * @extends SceneJS.geometry
  */
 SceneJS.text = function() {
 
-    var cfg = SceneJS._utils.getNodeConfig(arguments || [
+    var cfg = SceneJS.getNodeConfig(arguments || [
         {}
     ]);
 
@@ -14,7 +12,7 @@ SceneJS.text = function() {
 
     if (!params.text) {
         SceneJS_errorModule.fatalError(
-                new SceneJS.exceptions.NodeConfigExpectedException(
+                new SceneJS.NodeConfigExpectedException(
                         "SceneJS.text property missing: text"));
     }
 

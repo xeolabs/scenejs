@@ -1,10 +1,9 @@
-SceneJS._utils.ns("SceneJS.objects");
+SceneJS._namespace("SceneJS.objects");
 
 
 /**
- * @class SceneJS.objects.Sphere
- * @extends SceneJS.Geometry
- * <p>A scene node that defines sphere geometry, complete with normals for shading and one layer of UV coordinates for
+ * @class A scene node that defines sphere geometry.
+ * <p>The geometry is complete with normals for shading and one layer of UV coordinates for
  * texture-mapping. A Sphere may be configured with an optional radius, which will be 1 by default.</p>
  * <p><b>Example Usage</b></p><p>Definition of sphere with a radius of 6 units:</b></p><pre><code>
  * var c = new SceneJS.objects.Sphere({
@@ -13,6 +12,7 @@ SceneJS._utils.ns("SceneJS.objects");
  *          radius : 6      // Optional radius (1 is default)
  *     })
  * </pre></code>
+* @extends SceneJS.Geometry
  * @constructor
  * Create a new SceneJS.objects.Sphere
  * @param {Object} config  Config object or function, followed by zero or more child nodes
@@ -22,7 +22,7 @@ SceneJS.objects.Sphere = function() {
     this._nodeType = "sphere";
 };
 
-SceneJS._utils.inherit(SceneJS.objects.Sphere, SceneJS.Geometry);
+SceneJS._inherit(SceneJS.objects.Sphere, SceneJS.Geometry);
 
 // @private
 SceneJS.objects.Sphere.prototype._init = function(params) {
@@ -94,7 +94,9 @@ SceneJS.objects.Sphere.prototype._init = function(params) {
 };
 
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.objects.Sphere instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.objects.Sphere constructor
+ * @returns {SceneJS.objects.Sphere}
  */
 SceneJS.objects.sphere = function() {
     var n = new SceneJS.objects.Sphere();

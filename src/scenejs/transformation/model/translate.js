@@ -1,7 +1,6 @@
 /**
- * @class SceneJS.Translate
+ * @class A scene node that applies a model-space translate transform to the nodes within its subgraph.
  * @extends SceneJS.Node
- * <p>Scene node that applies a model-space translate transform to the nodes within its subgraph.</p>
  * <p><b>Example</b></p><p>A cube translated along the X axis.</b></p><pre><code>
  * var translate = new SceneJS.Translate({
  *       x: 5.0,
@@ -29,7 +28,7 @@ SceneJS.Translate = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Translate, SceneJS.Node);
+SceneJS._inherit(SceneJS.Translate, SceneJS.Node);
 
 /**
  * Sets the translation vector

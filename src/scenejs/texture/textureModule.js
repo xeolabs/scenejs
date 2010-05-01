@@ -154,12 +154,12 @@ var SceneJS_textureModule = new (function() {
         }
         var glName = SceneJS_webgl_enumMap[value];
         if (glName == undefined) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+            SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                     "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'"));
         }
         var glValue = context[glName];
         //                if (!glValue) {
-        //                    throw new SceneJS.exceptions.WebGLUnsupportedNodeConfigException(
+        //                    throw new SceneJS.WebGLUnsupportedNodeConfigException(
         //                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
         //                }
         return glValue;
@@ -211,10 +211,10 @@ var SceneJS_textureModule = new (function() {
      */
     this.createTexture = function(image, cfg) {
         if (!canvas) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
+            SceneJS_errorModule.fatalError(new SceneJS.NoCanvasActiveException("No canvas active"));
         }
         var context = canvas.context;
-        var textureId = SceneJS._utils.createKeyForMap(textures, "tex");
+        var textureId = SceneJS._createKeyForMap(textures, "tex");
 
         SceneJS_memoryModule.allocate(
                 "texture '" + textureId + "'",

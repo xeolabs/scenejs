@@ -6,155 +6,152 @@
 	.REGX {color: #339;}
 	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
-<span class='line'>  2</span>  @class SceneJS.Perspective
+<span class='line'>  2</span>  @class A scene node that defines a perspective transformation for the nodes within its subgraph.
 <span class='line'>  3</span>  @extends SceneJS.Node
-<span class='line'>  4</span> 
-<span class='line'>  5</span>  &lt;p>Scene node that defines a perspective transformation for the nodes within its subgraph.&lt;/p>
-<span class='line'>  6</span> 
-<span class='line'>  7</span>  &lt;p>&lt;b>Example:&lt;/b>&lt;/p>&lt;p>Defining perspective, specifying parameters that happen to be the default values&lt;/b>&lt;/p>&lt;pre>&lt;code>
-<span class='line'>  8</span>  var p = new SceneJS.Perspective({
-<span class='line'>  9</span>  fovy : 55.0,
-<span class='line'> 10</span>  aspect : 1.0,
-<span class='line'> 11</span>  near : 0.10,
-<span class='line'> 12</span>  far : 5000.0 },
-<span class='line'> 13</span> 
-<span class='line'> 14</span>  // ... child nodes
-<span class='line'> 15</span>  )
-<span class='line'> 16</span>  &lt;/pre>&lt;/code>
-<span class='line'> 17</span> 
-<span class='line'> 18</span>  @constructor
-<span class='line'> 19</span>  Create a new SceneJS.Perspective
-<span class='line'> 20</span>  @param {Object} cfg  Config object or function, followed by zero or more child nodes
-<span class='line'> 21</span>  */</span><span class="WHIT">
-<span class='line'> 22</span> </span><span class="NAME">SceneJS.Perspective</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 23</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"perspective"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">this._fovy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">45.0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 26</span> </span><span class="WHIT">    </span><span class="NAME">this._aspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 27</span> </span><span class="WHIT">    </span><span class="NAME">this._near</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0.1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">this._far</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 30</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 31</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 32</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 33</span> 
-<span class='line'> 34</span> </span><span class="NAME">SceneJS._utils.inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Perspective</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 35</span> 
-<span class='line'> 36</span> </span><span class="COMM">/** Sets the field-of-view angle in degrees
-<span class='line'> 37</span>  *
-<span class='line'> 38</span>  * @param {float} fovy
-<span class='line'> 39</span>  * @returns {SceneJS.Perspective} this
-<span class='line'> 40</span>  */</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="NAME">SceneJS.Perspective.prototype.setFovY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fovy</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">    </span><span class="NAME">this._fovy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fovy</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 45</span> 
-<span class='line'> 46</span> </span><span class="COMM">/** Returns the field-of-view angle in degrees
-<span class='line'> 47</span>  * @returns {float} field-of-view
-<span class='line'> 48</span>  */</span><span class="WHIT">
-<span class='line'> 49</span> </span><span class="NAME">SceneJS.Perspective.prototype.getFovyY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 50</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._fovy</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 51</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 52</span> 
-<span class='line'> 53</span> </span><span class="COMM">/** Sets the height-width aspect ratio
-<span class='line'> 54</span>  *
-<span class='line'> 55</span>  * @param {float} aspect
-<span class='line'> 56</span>  * @returns {SceneJS.Perspective} this
-<span class='line'> 57</span>  */</span><span class="WHIT">
-<span class='line'> 58</span> </span><span class="NAME">SceneJS.Perspective.prototype.setAspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">aspect</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="NAME">this._aspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">aspect</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 61</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 62</span> 
-<span class='line'> 63</span> </span><span class="COMM">/** Returns the height-width aspect ratio
-<span class='line'> 64</span>  * @returns {float} aspect ratio
-<span class='line'> 65</span>  */</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="NAME">SceneJS.Perspective.prototype.getAspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._aspect</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 68</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 69</span> 
-<span class='line'> 70</span> </span><span class="COMM">/** Sets the distance of the near clipping plane on the Z-axis
-<span class='line'> 71</span>  *
-<span class='line'> 72</span>  * @param {float} near
-<span class='line'> 73</span>  * @returns {SceneJS.Perspective} this
-<span class='line'> 74</span>  */</span><span class="WHIT">
-<span class='line'> 75</span> </span><span class="NAME">SceneJS.Perspective.prototype.setNear</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">near</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 76</span> </span><span class="WHIT">    </span><span class="NAME">this._near</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">near</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 77</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 79</span> 
-<span class='line'> 80</span> </span><span class="COMM">/** Returns the distance of the near clipping plane on the Z-axis
-<span class='line'> 81</span>  *
-<span class='line'> 82</span>  * @returns {float} near
-<span class='line'> 83</span>  */</span><span class="WHIT">
-<span class='line'> 84</span> </span><span class="NAME">SceneJS.Perspective.prototype.getNear</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._near</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 86</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 87</span> 
-<span class='line'> 88</span> </span><span class="COMM">/** Sets the distance of the far clipping plane on the Z-axis
-<span class='line'> 89</span>  *
-<span class='line'> 90</span>  * @param {float} far
-<span class='line'> 91</span>  * @returns {SceneJS.Perspective} this
-<span class='line'> 92</span>  */</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="NAME">SceneJS.Perspective.prototype.setFar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">far</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="NAME">this._far</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">far</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 96</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 97</span> 
-<span class='line'> 98</span> </span><span class="COMM">/** Returns the distance of the far clipping plane on the Z-axis
-<span class='line'> 99</span>  *
-<span class='line'>100</span>  * @returns {float} far
-<span class='line'>101</span>  */</span><span class="WHIT">
-<span class='line'>102</span> </span><span class="NAME">SceneJS.Perspective.prototype.getFar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>103</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._far</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>104</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>105</span> 
-<span class='line'>106</span> </span><span class="NAME">SceneJS.Perspective.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>107</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.fovy</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>108</span> </span><span class="WHIT">        </span><span class="NAME">this.setFovY</span><span class="PUNC">(</span><span class="NAME">params.fovy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  4</span>  &lt;p>&lt;b>Example:&lt;/b>&lt;/p>&lt;p>Defining perspective, specifying parameters that happen to be the default values&lt;/b>&lt;/p>&lt;pre>&lt;code>
+<span class='line'>  5</span>  var p = new SceneJS.Perspective({
+<span class='line'>  6</span>  fovy : 55.0,
+<span class='line'>  7</span>  aspect : 1.0,
+<span class='line'>  8</span>  near : 0.10,
+<span class='line'>  9</span>  far : 5000.0 },
+<span class='line'> 10</span> 
+<span class='line'> 11</span>  // ... child nodes
+<span class='line'> 12</span>  )
+<span class='line'> 13</span>  &lt;/pre>&lt;/code>
+<span class='line'> 14</span> 
+<span class='line'> 15</span>  @constructor
+<span class='line'> 16</span>  Create a new SceneJS.Perspective
+<span class='line'> 17</span>  @param {Object} cfg  Config object or function, followed by zero or more child nodes
+<span class='line'> 18</span>  */</span><span class="WHIT">
+<span class='line'> 19</span> </span><span class="NAME">SceneJS.Perspective</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 20</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"perspective"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 22</span> </span><span class="WHIT">    </span><span class="NAME">this._fovy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">45.0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 23</span> </span><span class="WHIT">    </span><span class="NAME">this._aspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 24</span> </span><span class="WHIT">    </span><span class="NAME">this._near</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0.1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">this._far</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1.0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 27</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 30</span> 
+<span class='line'> 31</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Perspective</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 32</span> 
+<span class='line'> 33</span> </span><span class="COMM">/** Sets the field-of-view angle in degrees
+<span class='line'> 34</span>  *
+<span class='line'> 35</span>  * @param {float} fovy
+<span class='line'> 36</span>  * @returns {SceneJS.Perspective} this
+<span class='line'> 37</span>  */</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="NAME">SceneJS.Perspective.prototype.setFovY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">fovy</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">    </span><span class="NAME">this._fovy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">fovy</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 42</span> 
+<span class='line'> 43</span> </span><span class="COMM">/** Returns the field-of-view angle in degrees
+<span class='line'> 44</span>  * @returns {float} field-of-view
+<span class='line'> 45</span>  */</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="NAME">SceneJS.Perspective.prototype.getFovyY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._fovy</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 49</span> 
+<span class='line'> 50</span> </span><span class="COMM">/** Sets the height-width aspect ratio
+<span class='line'> 51</span>  *
+<span class='line'> 52</span>  * @param {float} aspect
+<span class='line'> 53</span>  * @returns {SceneJS.Perspective} this
+<span class='line'> 54</span>  */</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="NAME">SceneJS.Perspective.prototype.setAspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">aspect</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">    </span><span class="NAME">this._aspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">aspect</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 59</span> 
+<span class='line'> 60</span> </span><span class="COMM">/** Returns the height-width aspect ratio
+<span class='line'> 61</span>  * @returns {float} aspect ratio
+<span class='line'> 62</span>  */</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="NAME">SceneJS.Perspective.prototype.getAspect</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._aspect</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> 
+<span class='line'> 67</span> </span><span class="COMM">/** Sets the distance of the near clipping plane on the Z-axis
+<span class='line'> 68</span>  *
+<span class='line'> 69</span>  * @param {float} near
+<span class='line'> 70</span>  * @returns {SceneJS.Perspective} this
+<span class='line'> 71</span>  */</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="NAME">SceneJS.Perspective.prototype.setNear</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">near</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">    </span><span class="NAME">this._near</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">near</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 76</span> 
+<span class='line'> 77</span> </span><span class="COMM">/** Returns the distance of the near clipping plane on the Z-axis
+<span class='line'> 78</span>  *
+<span class='line'> 79</span>  * @returns {float} near
+<span class='line'> 80</span>  */</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="NAME">SceneJS.Perspective.prototype.getNear</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._near</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 84</span> 
+<span class='line'> 85</span> </span><span class="COMM">/** Sets the distance of the far clipping plane on the Z-axis
+<span class='line'> 86</span>  *
+<span class='line'> 87</span>  * @param {float} far
+<span class='line'> 88</span>  * @returns {SceneJS.Perspective} this
+<span class='line'> 89</span>  */</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="NAME">SceneJS.Perspective.prototype.setFar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">far</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">    </span><span class="NAME">this._far</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">far</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> 
+<span class='line'> 95</span> </span><span class="COMM">/** Returns the distance of the far clipping plane on the Z-axis
+<span class='line'> 96</span>  *
+<span class='line'> 97</span>  * @returns {float} far
+<span class='line'> 98</span>  */</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="NAME">SceneJS.Perspective.prototype.getFar</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._far</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>102</span> 
+<span class='line'>103</span> </span><span class="NAME">SceneJS.Perspective.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.fovy</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">        </span><span class="NAME">this.setFovY</span><span class="PUNC">(</span><span class="NAME">params.fovy</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.aspect</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">        </span><span class="NAME">this.setAspect</span><span class="PUNC">(</span><span class="NAME">params.aspect</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>109</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>110</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.aspect</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>111</span> </span><span class="WHIT">        </span><span class="NAME">this.setAspect</span><span class="PUNC">(</span><span class="NAME">params.aspect</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.near</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">        </span><span class="NAME">this.setNear</span><span class="PUNC">(</span><span class="NAME">params.near</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>112</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>113</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.near</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>114</span> </span><span class="WHIT">        </span><span class="NAME">this.setNear</span><span class="PUNC">(</span><span class="NAME">params.near</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.far</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">        </span><span class="NAME">this.setFar</span><span class="PUNC">(</span><span class="NAME">params.far</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>115</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>116</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.far</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>117</span> </span><span class="WHIT">        </span><span class="NAME">this.setFar</span><span class="PUNC">(</span><span class="NAME">params.far</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>118</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>119</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>120</span> 
-<span class='line'>121</span> </span><span class="COMM">// Override</span><span class="WHIT">
-<span class='line'>122</span> </span><span class="NAME">SceneJS.Perspective.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>123</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>124</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>125</span> </span><span class="WHIT">            </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>126</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>127</span> </span><span class="WHIT">            </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>128</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>129</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tempMat</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_math_perspectiveMatrix4</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'>130</span> </span><span class="WHIT">                </span><span class="NAME">this._fovy</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">180.0</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="WHIT">                </span><span class="NAME">this._aspect</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>132</span> </span><span class="WHIT">                </span><span class="NAME">this._near</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>133</span> </span><span class="WHIT">                </span><span class="NAME">this._far</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>134</span> </span><span class="WHIT">        </span><span class="NAME">this._transform</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>135</span> </span><span class="WHIT">            </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"perspective"</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="WHIT">            </span><span class="NAME">matrix</span><span class="PUNC">:</span><span class="NAME">tempMat</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>138</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>139</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prevTransform</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_projectionModule.getTransform</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>140</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS_projectionModule.setTransform</span><span class="PUNC">(</span><span class="NAME">this._transform</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>141</span> </span><span class="WHIT">    </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>142</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS_projectionModule.setTransform</span><span class="PUNC">(</span><span class="NAME">prevTransform</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>144</span> 
-<span class='line'>145</span> 
-<span class='line'>146</span> </span><span class="COMM">/** Function wrapper to support functional scene definition
-<span class='line'>147</span>  */</span><span class="WHIT">
-<span class='line'>148</span> </span><span class="NAME">SceneJS.perspective</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>149</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Perspective</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>150</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Perspective.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>151</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>153</span> </span></pre></body></html>
+<span class='line'>116</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> 
+<span class='line'>118</span> </span><span class="COMM">// Override</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="NAME">SceneJS.Perspective.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="WHIT">            </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">            </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">tempMat</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_math_perspectiveMatrix4</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">                </span><span class="NAME">this._fovy</span><span class="WHIT"> </span><span class="PUNC">*</span><span class="WHIT"> </span><span class="NAME">Math.PI</span><span class="WHIT"> </span><span class="PUNC">/</span><span class="WHIT"> </span><span class="NUMB">180.0</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">                </span><span class="NAME">this._aspect</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">                </span><span class="NAME">this._near</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">                </span><span class="NAME">this._far</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">        </span><span class="NAME">this._transform</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">            </span><span class="NAME">type</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"perspective"</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">            </span><span class="NAME">matrix</span><span class="PUNC">:</span><span class="NAME">tempMat</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">prevTransform</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_projectionModule.getTransform</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS_projectionModule.setTransform</span><span class="PUNC">(</span><span class="NAME">this._transform</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">    </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS_projectionModule.setTransform</span><span class="PUNC">(</span><span class="NAME">prevTransform</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> 
+<span class='line'>142</span> 
+<span class='line'>143</span> </span><span class="COMM">/** Function wrapper to support functional scene definition
+<span class='line'>144</span>  */</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="NAME">SceneJS.perspective</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Perspective</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Perspective.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>150</span> </span></pre></body></html>

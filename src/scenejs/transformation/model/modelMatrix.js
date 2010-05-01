@@ -1,7 +1,6 @@
 /**
- * @class SceneJS.ModelMatrix
+ * @class A scene node that applies a model-space transform to the nodes within its subgraph.
  * @extends SceneJS.Node
- * <p>Scene node that applies a model-space transform to the nodes within its subgraph.</p>
  * <p><b>Example</b></p><p>A cube translated along the X, Y and Z axis.</b></p><pre><code>
  * var mat = new SceneJS.ModelMatrix({
  *       elements : [
@@ -30,7 +29,7 @@ SceneJS.ModelMatrix = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.ModelMatrix, SceneJS.Node);
+SceneJS._inherit(SceneJS.ModelMatrix, SceneJS.Node);
 
 /**
  * Sets the matrix elements
@@ -39,10 +38,10 @@ SceneJS._utils.inherit(SceneJS.ModelMatrix, SceneJS.Node);
  */
 SceneJS.ModelMatrix.prototype.setElements = function(elements) {
     if (!elements) {
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.ModelMatrix elements undefined"));
+        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.ModelMatrix elements undefined"));
     }
     if (elements.length != 16) {
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.ModelMatrix elements should number 16"));
+        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.ModelMatrix elements should number 16"));
     }
     for (var i = 0; i < 16; i++) {
         this._mat[i] = elements[i];

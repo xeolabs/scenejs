@@ -1,7 +1,6 @@
 /**
- * @class SceneJS.Scale
+ * @class A scene node that applies a model-space scale transform to the nodes within its subgraph.
  * @extends SceneJS.Node
- * <p>Scene node that applies a model-space scale transform to the nodes within its subgraph.</p>
  * <p><b>Example</b></p><p>A cube scaled to become a flat square tile.</b></p><pre><code>
  * var scale = new SceneJS.Scale({
  *       x: 5.0,
@@ -29,7 +28,7 @@ SceneJS.Scale = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Scale, SceneJS.Node);
+SceneJS._inherit(SceneJS.Scale, SceneJS.Node);
 
 /**
  * Sets all scale factors.

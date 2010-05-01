@@ -1,6 +1,5 @@
-/** Scene node that sets WebGL state for nodes in its subtree.
- *
- * @class SceneJS.Renderer
+/** @class A scene node that sets WebGL state for nodes in its subtree.
+ * (TODO)
  * @extends SceneJS.Node
  */
 SceneJS.Renderer = function() {
@@ -11,7 +10,7 @@ SceneJS.Renderer = function() {
     this._lastRenderedData = null;
 };
 
-SceneJS._utils.inherit(SceneJS.Renderer, SceneJS.Node);
+SceneJS._inherit(SceneJS.Renderer, SceneJS.Node);
 
 // @private
 SceneJS.Renderer.prototype._render = function(traversalContext, data) {
@@ -26,6 +25,10 @@ SceneJS.Renderer.prototype._render = function(traversalContext, data) {
     SceneJS_rendererModule.undoRendererState(this._rendererState);
 };
 
+/** Returns a new SceneJS.Renderer instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Renderer constructor
+ * @returns {SceneJS.Renderer}
+ */
 SceneJS.renderer = function() {
     var n = new SceneJS.Renderer();
     SceneJS.Renderer.prototype.constructor.apply(n, arguments);

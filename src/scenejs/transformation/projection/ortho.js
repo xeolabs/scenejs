@@ -1,12 +1,13 @@
 /**
  * Scene node that constructs an ortographic projection matrix and sets it on the current shader.
+ * @private
  */
 SceneJS.ortho = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var cfg = SceneJS.getNodeConfig(arguments);
    
     var transform;
 
-    return SceneJS._utils.createNode(
+    return SceneJS.createNode(
             "ortho",
             cfg.children,
 

@@ -1,15 +1,12 @@
 /**
- @class SceneJS.node
- <p>The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.</p>
+ @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
  @constructor
  Create a new SceneJS.node
  @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
-SceneJS._nodeCount = 0;
-
 SceneJS.Node = function() {
     this._nodeType = "node";
-    this._nodeId = "" + SceneJS._nodeCount++;
+
     this._children = [];
     this._fixedParams = true;
     this._parent = null;
@@ -50,7 +47,7 @@ SceneJS.Node = function() {
                     };
                 }
             } else {
-                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException
+                SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException
                         ("Invalid node parameters - config should be first, IE. node(config, node, node,...)"));
             }
         }
@@ -105,22 +102,22 @@ SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
 };
 
 
-SceneJS.Node.prototype._toString2 = function(strList, indent) {
-    for (var i = 0; i < indent; i++) {
-        strList.push("  ");
-    }
-    strList.push(this._nodeType + ":" + this._nodeId);
-
-    for (var i = 0; i < this._children.length; i++) {
-        this._children[i]._toString2(strList, indent);
-    }
-};
-
-SceneJS.Node.prototype._toString = function() {
-    var strList = [];
-    this._toString2(strList, 0);
-    return strList.join("\n");
-};
+//SceneJS.Node.prototype._toString2 = function(strList, indent) {
+//    for (var i = 0; i < indent; i++) {
+//        strList.push("  ");
+//    }
+//    strList.push(this._nodeType + ":" + this._nodeId);
+//
+//    for (var i = 0; i < this._children.length; i++) {
+//        this._children[i]._toString2(strList, indent);
+//    }
+//};
+//
+//SceneJS.Node.prototype._toString = function() {
+//    var strList = [];
+//    this._toString2(strList, 0);
+//    return strList.join("\n");
+//};
 
 SceneJS.Node.prototype._render = function(traversalContext, data) {
       this._renderNodes(traversalContext, data);

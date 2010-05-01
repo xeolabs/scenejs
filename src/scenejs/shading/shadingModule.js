@@ -332,7 +332,7 @@ var SceneJS_shaderModule = new (function() {
      */
     function activateProgram() {
         if (!canvas) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
+            SceneJS_errorModule.fatalError(new SceneJS.NoCanvasActiveException("No canvas active"));
         }
 
         if (!sceneHash) {
@@ -386,7 +386,7 @@ var SceneJS_shaderModule = new (function() {
      * @private
      */
     function generateHash() {
-        if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+        if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
             sceneHash = ([canvas.canvasId, "picking"]).join(";");
         } else {
             sceneHash = ([canvas.canvasId, rendererHash, fogHash, lightsHash, textureHash, geometryHash]).join(";");
@@ -410,7 +410,7 @@ var SceneJS_shaderModule = new (function() {
      * @private
      */
     function composeVertexShader() {
-        return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
+        return SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_RENDER ?
                composeRenderingVertexShader() : composePickingVertexShader();
     }
 
@@ -418,7 +418,7 @@ var SceneJS_shaderModule = new (function() {
      * @private
      */
     function composeFragmentShader() {
-        return SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_RENDER ?
+        return SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_RENDER ?
                composeRenderingFragmentShader() : composePickingFragmentShader();
     }
 

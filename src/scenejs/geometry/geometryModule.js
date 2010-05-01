@@ -206,7 +206,7 @@ var SceneJS_geometryModule = new (function() {
             case "triangle-fan":
                 return context.TRIANGLE_FAN;
             default:
-                SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidGeometryConfigException(// Logs and throws
+                SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(// Logs and throws
                         "SceneJS.geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
@@ -230,14 +230,14 @@ var SceneJS_geometryModule = new (function() {
      */
     this.createGeometry = function(type, data) {
         if (!type) {
-            type = SceneJS._utils.createKeyForMap(currentGeoMap, "type");
+            type = SceneJS._createKeyForMap(currentGeoMap, "type");
         }
 
         //   SceneJS_loggingModule.debug("Creating geometry: '" + type + "'");
 
         if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
             SceneJS_errorModule.fatalError(
-                    new SceneJS.exceptions.NodeConfigExpectedException(
+                    new SceneJS.NodeConfigExpectedException(
                             "SceneJS.geometry node property expected : primitive"));
         }
         var context = canvas.context;
@@ -321,7 +321,7 @@ var SceneJS_geometryModule = new (function() {
      */
     this.drawGeometry = function(type) {
         if (!canvas) {
-            SceneJS_errorModule.fatalError(SceneJS.exceptions.NoCanvasActiveException("No canvas active"));
+            SceneJS_errorModule.fatalError(SceneJS.NoCanvasActiveException("No canvas active"));
         }
         var geo = currentGeoMap[type];
 

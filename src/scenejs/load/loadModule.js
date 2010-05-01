@@ -112,11 +112,11 @@ var SceneJS_loadModule = new (function() {
      */
     this.loadAsset = function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
         if (!proxyUri) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.ProxyNotSpecifiedException
+            SceneJS_errorModule.fatalError(new SceneJS.ProxyNotSpecifiedException
                     ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
         }
         SceneJS_loggingModule.debug("Loading asset from " + uri);
-        var assetId = SceneJS._utils.createKeyForMap(assets, "asset");
+        var assetId = SceneJS._createKeyForMap(assets, "asset");
         var process = SceneJS_processModule.createProcess({
             onTimeout: function() {  // process killed automatically on timeout
                 SceneJS_loggingModule.error(

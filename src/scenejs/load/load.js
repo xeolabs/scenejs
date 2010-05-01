@@ -1,10 +1,10 @@
 /**
- * @class SceneJS.Load
- * @extends SceneJS.Node
- * <p>A scene node that asynchronously loads its subgraph, cross-domain. This node is configured with the
+ * @class A scene node that asynchronously loads JavaScript content for its subgraph from a server.
+ * <p>A scene node can load content cross-domain if neccessary. This node is configured with the
  * location of a JavaScript file containing a SceneJS definition of the subgraph. When first visited during scene
- * traversal, it will begin the load and allow traversal to cintinue at its next sibling node. When on a subsequent
- * visit its subgraph has been loaded, it will then allow traversal to decsend into that subgraph to render it.</p>
+ * traversal, it will begin the load and allow traversal to continue at its next sibling node. When on a subsequent
+ * visit its subgraph has been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
  * <p><b>Live Examples</b></p>
  * <li><a target = "other" href="http://bit.ly/scenejs-asset-js-examples">Example 1</a></li>
  * </ul>
@@ -16,11 +16,12 @@
  *       // JSONP proxy location - needed only for cros-domain load
  *       proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" });
  *
- *       newSceneJS.Load({
+ *       new SceneJS.Load({
  *                 uri:"http://foo.com/my-asset.js"
  *            })
  *  );
  *  </pre></code>
+ * @extends SceneJS.Node
  *  @constructor
  *  Create a new SceneJS.Load
  *  @param {Object} cfg  Config object or function, followed by zero or more child nodes
@@ -39,7 +40,7 @@ SceneJS.Load = function() {
     //    }
 };
 
-SceneJS._utils.inherit(SceneJS.Load, SceneJS.Node);
+SceneJS._inherit(SceneJS.Load, SceneJS.Node);
 
 // @private
 SceneJS.Load.prototype._STATE_ERROR = -1;         // Asset load or texture creation failed
@@ -59,7 +60,7 @@ SceneJS.Load.prototype._STATE_ATTACHED = 3;       // Subgraph integrated
 // @private
 SceneJS.Load.prototype._init = function(params) {
     if (!params.uri) {
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+        SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.Load parameter expected: uri"));
     }
     this._uri = params.uri;
@@ -71,7 +72,7 @@ SceneJS.Load.prototype._init = function(params) {
 SceneJS.Load.prototype._visitSubgraph = function(data) {
     var traversalContext = {
         appendix : this._children
-    };      
+    };
     this._assetNode._render.call(this._assetNode, traversalContext, data);
 };
 
@@ -122,13 +123,13 @@ SceneJS.Load.prototype._render = function(traversalContext, data) {
                     },
                     this._parser || this._parse,
                     function(asset) { // Success
-                        _this._assetNode = asset;   // Asset is wrapper created by SceneJS._utils.createNode
+                        _this._assetNode = asset;   // Asset is wrapper created by SceneJS.createNode
                         _this._state = _this._STATE_LOADED;
                     },
                     function() { // onTimeout
                         _this._state = _this._STATE_ERROR;
                         SceneJS_errorModule.error(
-                                new SceneJS.exceptions.AssetLoadTimeoutException("SceneJS.Load timed out - uri: " + _this._uri));
+                                new SceneJS.LoadTimeoutException("SceneJS.Load timed out - uri: " + _this._uri));
                     },
                     function(msg) { // onError - SceneJS_loadModule has killed process
                         _this._state = _this._STATE_ERROR;
@@ -141,7 +142,9 @@ SceneJS.Load.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Load instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Load constructor
+ * @returns {SceneJS.Load}
  */
 SceneJS.load = function() {
     var n = new SceneJS.Load();

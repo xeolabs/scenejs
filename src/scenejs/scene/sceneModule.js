@@ -41,37 +41,37 @@ var SceneJS_sceneModule = new (function() {
      *  sets some default state on the context, then returns
      *  canvas, canvas ID and context wrapped up in an object.
      *
-     * If canvasId is null, will fall back on SceneJS_webgl_DEFAULT_CANVAS_ID
+     * If canvasId is null, will fall back on SceneJS.DEFAULT_CANVAS_ID
      * @private
      */
     var findCanvas = function(canvasId) {
         var canvas;
         if (!canvasId) {
             SceneJS_loggingModule.info("SceneJS.scene config 'canvasId' omitted - looking for default canvas with ID '"
-                    + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
-            canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
+                    + SceneJS.DEFAULT_CANVAS_ID + "'");
+            canvasId = SceneJS.DEFAULT_CANVAS_ID;
             canvas = document.getElementById(canvasId);
             if (!canvas) {
-                SceneJS_errorModule.fatalError(new SceneJS.exceptions.CanvasNotFoundException
-                        ("SceneJS.scene config 'canvasId' omitted and could not find default canvas with ID '"
-                                + SceneJS_webgl_DEFAULT_CANVAS_ID + "'"));
+                SceneJS_errorModule.fatalError(new SceneJS.CanvasNotFoundException
+                        ("SceneJS.Scene config 'canvasId' omitted and could not find default canvas with ID '"
+                                + SceneJS.DEFAULT_CANVAS_ID + "'"));
             }
         } else {
             canvas = document.getElementById(canvasId);
             if (!canvas) {
                 SceneJS_loggingModule.info("SceneJS.scene config 'canvasId' unresolved - looking for default canvas with " +
-                                           "ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'");
-                canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
+                                           "ID '" + SceneJS.DEFAULT_CANVAS_ID + "'");
+                canvasId = SceneJS.DEFAULT_CANVAS_ID;
                 canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    SceneJS_errorModule.fatalError(new SceneJS.exceptions.CanvasNotFoundException
-                            ("SceneJS.scene config 'canvasId' does not match any elements in the page and no " +
-                             "default canvas found with ID '" + SceneJS_webgl_DEFAULT_CANVAS_ID + "'"));
+                    SceneJS_errorModule.fatalError(new SceneJS.CanvasNotFoundException
+                            ("SceneJS.Scene config 'canvasId' does not match any elements in the page and no " +
+                             "default canvas found with ID '" + SceneJS.DEFAULT_CANVAS_ID + "'"));
                 }
             }
         }
         var context;
-        var contextNames = SceneJS_webgl_contextNames;
+        var contextNames = SceneJS.SUPPORTED_WEBGL_CONTEXT_NAMES;
         for (var i = 0; (!context) && i < contextNames.length; i++) {
             try {
 
@@ -86,7 +86,7 @@ var SceneJS_sceneModule = new (function() {
             }
         }
         if (!context) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.WebGLNotSupportedException
+            SceneJS_errorModule.fatalError(new SceneJS.WebGLNotSupportedException
                     ('Canvas document element with ID \''
                             + canvasId
                             + '\' failed to provide a supported WebGL context'));
@@ -110,11 +110,11 @@ var SceneJS_sceneModule = new (function() {
      */
     this.createScene = function(scene, params) {
         if (!initialised) {
-            SceneJS_loggingModule.info("SceneJS V" + SceneJS.version + " initialised");
+            SceneJS_loggingModule.info("SceneJS V" + SceneJS.VERSION + " initialised");
             SceneJS_eventModule.fireEvent(SceneJS_eventModule.INIT);
         }
         var canvas = findCanvas(params.canvasId); // canvasId can be null
-        var sceneId = SceneJS._utils.createKeyForMap(scenes, "scene");
+        var sceneId = SceneJS._createKeyForMap(scenes, "scene");
         scenes[sceneId] = {
             sceneId: sceneId,
             scene:scene,

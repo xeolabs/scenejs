@@ -1,8 +1,7 @@
 /**
- * @class SceneJS.Rotate
+ * @class A scene node that applies a model-space rotation transform to the nodes within its subgraph.
  * @extends SceneJS.Node
- * <p>Scene node that applies a model-space rotation transform to the nodes within its subgraph.</p><p>The rotation
- * is described as a vector about which the rotation occurs, along with the angle or rotation in degrees.</p>
+ * <p>The rotation is described as a vector about which the rotation occurs, along with the angle or rotation in degrees.</p>
  * <p><b>Example</b></p><p>A cube rotated 45 degrees about its Y axis.</b></p><pre><code>
  * var rotate = new SceneJS.Rotate({
  *       angle: 45.0,    // Angle in degrees
@@ -32,7 +31,7 @@ SceneJS.Rotate = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Rotate, SceneJS.Node);
+SceneJS._inherit(SceneJS.Rotate, SceneJS.Node);
 
 /** Sets the rotation angle
  * @param {float} angle Rotation angle in degrees
@@ -59,12 +58,7 @@ SceneJS.Rotate.prototype.getAngle = function() {
 SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     var x = xyz.x || 0;
     var y = xyz.y || 0;
-    var z = xyz.z || 0;
-    //    if (x + y + z == 0) {
-    //        SceneJS_errorModule.fatalError(
-    //                new SceneJS.exceptions.IllegalRotateConfigException(
-    //                        "SceneJS.rotate vector is zero - at least one of properties x,y and z must be non-zero"));
-    //    }
+    var z = xyz.z || 0;   
     this._x = x;
     this._y = y;
     this._z = z;

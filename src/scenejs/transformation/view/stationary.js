@@ -1,9 +1,8 @@
 /**
- * @class SceneJS.Stationary
+ * @class A Scene node that defines a region within a SceneJS.LookAt in which the translations specified by that node have no effect.
  * @extends SceneJS.Node
  *
- * <p>Scene node that defines a region within a SceneJS.LookAt in which the translations specified by that node
- * have no effect. As the parameters of the SceneJS.lookAt are modified, the content in the subgraph
+ * <p> As the parameters of the SceneJS.lookAt are modified, the content in the subgraph
  * of this node will rotate about the eye position, but will not translate as the eye position moves. You could therefore
  * define a skybox within the subgraph of this node, that will always stay in the distance.</p>
  *
@@ -32,7 +31,7 @@ SceneJS.Stationary = function() {
     this._xform = null;
 };
 
-SceneJS._utils.inherit(SceneJS.Stationary, SceneJS.Node);
+SceneJS._inherit(SceneJS.Stationary, SceneJS.Node);
 
 SceneJS.Stationary.prototype._render = function(traversalContext, data) {
     var superXform = SceneJS_viewTransformModule.getTransform();

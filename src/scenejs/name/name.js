@@ -1,8 +1,6 @@
 /**
- *@class SceneJS.Name
- *@extends SceneJS.Node
- *<p>Scene node that specifies a name for the nodes in its subgraph. These may be nested to create hierarchical
- *names, effectively overlaying semantics onto a scene</p>.
+ *@class A scene node that specifies a name for the nodes in its subgraph.
+ *<p> These may be nested to create hierarchical names, effectively overlaying semantics onto a scene.</p>
  *<p><b>Example:</b></p><p>Two cubes, blue and green, assigned names "cubes.blue" and "cubes.green".</b></p><pre><code>
  * var n = SceneJS.Name({ name: "cubes" },
  *      new SceneJS.Name({ name: "blue" },
@@ -27,9 +25,10 @@
  *      )
  *  // ...
  * </code></pre>
+ * @extends SceneJS.Node
  *  @constructor
- Create a new SceneJS.Name
- @param {Object} config  Config object or function, followed by zero or more child nodes
+ * Create a new SceneJS.Name
+ * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
 SceneJS.Name = function() {
     SceneJS.Node.apply(this, arguments);
@@ -40,7 +39,7 @@ SceneJS.Name = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Name, SceneJS.Node);
+SceneJS._inherit(SceneJS.Name, SceneJS.Node);
 
 /**
  * Sets the name value
@@ -49,11 +48,11 @@ SceneJS._utils.inherit(SceneJS.Name, SceneJS.Node);
  */
 SceneJS.Name.prototype.setName = function(name) {
     if (!name) {
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name is undefined"));
+        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.name name is undefined"));
     }
     name = name.replace(/^\s+|\s+$/g, ''); // Trim
     if (name.length == 0) {
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
+        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
     }
     this._name = name;
     return this;
@@ -83,7 +82,9 @@ SceneJS.Name.prototype._render = function(traversalContext, data) {
     SceneJS_nameModule.popName();
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Name instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Name constructor
+ * @returns {SceneJS.Name}
  */
 SceneJS.name = function() {
     var n = new SceneJS.Name();

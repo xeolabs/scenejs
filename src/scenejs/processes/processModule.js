@@ -117,7 +117,7 @@ var SceneJS_processModule = new (function() {
      */
     this.createProcess = function(cfg) {
         if (!activeSceneId) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NoSceneActiveException("No scene active - can't create process"));
+            SceneJS_errorModule.fatalError(new SceneJS.NoSceneActiveException("No scene active - can't create process"));
         }
         var group = groups[activeSceneId];
         var i = 0;

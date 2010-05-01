@@ -1,7 +1,7 @@
 /**
- * @class SceneJS.Fog
- *  @extends SceneJS.Node
- * <p>Defines fog within a scene. Fog is effectively a region on the Z-axis of the view coordinate system within which
+ * @class A scene node that defines fog for nodes in its sub graph.
+
+ * <p>Fog is effectively a region on the Z-axis of the view coordinate system within which
  * the colour of elements will blend with the scene ambient colour in proportion to their depth. You can define the
  * points on the Z axis at which the fog region starts and ends, along with the proportion as a linear, exponential
  * or quadratic mode. Scene content falling in front of the start point will have no fog applied, while content
@@ -22,6 +22,7 @@
  *     // ... child nodes
  * )
  * </pre></code>
+ *  @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.Fog
  * @param {Object} config  Config object or function, followed by zero or more child nodes
@@ -39,7 +40,7 @@ SceneJS.Fog = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Fog, SceneJS.Node);
+SceneJS._inherit(SceneJS.Fog, SceneJS.Node);
 
 /**
  Sets the fogging mode
@@ -49,7 +50,7 @@ SceneJS._utils.inherit(SceneJS.Fog, SceneJS.Node);
  */
 SceneJS.Fog.prototype.setMode = function(mode) {
     if (mode != "disabled" && mode != "exp" && mode != "exp2" && mode != "linear") {
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.InvalidNodeConfigException(
+        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                 "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'none', 'exp', 'exp2' or 'linear'"));
     }
     this._mode = mode;
@@ -172,7 +173,7 @@ SceneJS.Fog.prototype._init = function(params) {
 
 // @private
 SceneJS.Fog.prototype._render = function(traversalContext, data) {
-    if (SceneJS._utils.traversalMode == SceneJS._utils.TRAVERSAL_MODE_PICKING) {
+    if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
     } else {
         if (!this._fixedParams) {
@@ -191,7 +192,9 @@ SceneJS.Fog.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.Fog instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Fog constructor
+ * @returns {SceneJS.Fog}
  */
 SceneJS.fog = function() {
     var n = new SceneJS.Fog();

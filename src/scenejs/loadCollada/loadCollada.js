@@ -1,10 +1,26 @@
 /**
- * Scene node that asynchronously loads its subgraph, cross-domain from a COLLADA file. This node is configured with the
- * location of the COLLADA file. When first visited during scene traversal, it will begin the load and allow traversal
- * to cintinue at its next sibling node. When on a subsequent visit its subgraph has been loaded, it will then allow
- * traversal to descend into that subgraph to render it.
+ * @class A scene node that asynchronously loads its subgraph from a COLLADA file.
+ * <p>This node is configured with the location of the COLLADA file, which it can load-cross domain when a proxy is
+ * provided. When first visited during scene traversal, it will
+ * begin the load and allow traversal to continue at its next sibling node. When on a subsequent visit its subgraph has
+ * been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
+ * <p><b>Usage Example</b></p><p>The SceneJS.LoadCollada node shown below loads a target asset cross-domain, from
+ * the <node> with ID "propeller" in a Collada file "airplane.dae" stored on a server at "foo.com". The transfer is
+ * routed via the JSONP proxy located by the <b>uri</b> property on the SceneJS.Scene node.</b></p>
+ * <pre><code>
+ * var exampleScene = new SceneJS.Scene({
  *
- * @class SceneJS.load
+ *       // JSONP proxy location - needed only for cros-domain load
+ *       proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" });
+ *
+ *       new SceneJS.LoadCollada({
+ *                  uri: "http://foo.com/airplane.dae",
+ *                  node: "propeller"
+ *            })
+ *  );
+ *  </pre></code>
+ *
  * @extends SceneJS.load
  */
 
@@ -13,12 +29,12 @@ SceneJS.LoadCollada = function() {
     this._nodeType = "loadCollada";
 };
 
-SceneJS._utils.inherit(SceneJS.LoadCollada, SceneJS.Load);
+SceneJS._inherit(SceneJS.LoadCollada, SceneJS.Load);
 
 // @private
 SceneJS.LoadCollada.prototype._init = function(params) {
     if (!params.uri) {
-        SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+        SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.LoadCollada parameter expected: uri"));
     }
     this._uri = params.uri;
@@ -41,7 +57,9 @@ SceneJS.LoadCollada.prototype._init = function(params) {
 };
 
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.LoadCollada instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.LoadCollada constructor
+ * @returns {SceneJS.LoadCollada}
  */
 SceneJS.loadCollada = function() {
     var n = new SceneJS.LoadCollada();

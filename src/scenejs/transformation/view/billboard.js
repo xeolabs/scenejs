@@ -1,10 +1,10 @@
 /**
-
+ * @private
  */
 SceneJS.billboard = function() {
-    var cfg = SceneJS._utils.getNodeConfig(arguments);
+    var cfg = SceneJS.getNodeConfig(arguments);
     
-    return SceneJS._utils.createNode(
+    return SceneJS.createNode(
             "billboard",
             cfg.children,
 

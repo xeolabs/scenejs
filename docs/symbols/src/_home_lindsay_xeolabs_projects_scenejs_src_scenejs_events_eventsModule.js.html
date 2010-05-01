@@ -98,7 +98,7 @@
 <span class='line'> 91</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 92</span> 
 <span class='line'> 93</span> </span><span class="WHIT">    </span><span class="COMM">/**
-<span class='line'> 94</span>      * @private     
+<span class='line'> 94</span>      * @private
 <span class='line'> 95</span>      */</span><span class="WHIT">
 <span class='line'> 96</span> </span><span class="WHIT">    </span><span class="NAME">this.fireEvent</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">type</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 97</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">list</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">events</span><span class="PUNC">[</span><span class="NAME">type</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
@@ -111,4 +111,223 @@
 <span class='line'>104</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>105</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>106</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>107</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'>107</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>108</span> 
+<span class='line'>109</span> 
+<span class='line'>110</span> </span><span class="COMM">/** &lt;p>Adds a listener to be notified when a given event occurs within SceneJS.&lt;/p>
+<span class='line'>111</span>  * &lt;p>&lt;b>Supported events&lt;/b>&lt;/p>
+<span class='line'>112</span>  * &lt;p>&lt;b>&lt;em>error&lt;/em>&lt;/b>&lt;/p>&lt;p>An error has occurred either while defining or rendering a scene. These can be either fatal,
+<span class='line'>113</span>  * or errors that SceneJS can recover from.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>114</span>  *  SceneJS.onEvent(
+<span class='line'>115</span>  *      "error",
+<span class='line'>116</span>  *      function(e) {
+<span class='line'>117</span>  *          var exception = e.exception;
+<span class='line'>118</span>  *          if (e.fatal) {
+<span class='line'>119</span>  *               alert("Fatal error: " + e.exception.message || e.exception);
+<span class='line'>120</span>  *          } else {
+<span class='line'>121</span>  *               alert("Recovered from error: " + e.exception.message || e.exception);
+<span class='line'>122</span>  *          }
+<span class='line'>123</span>  *      });
+<span class='line'>124</span>  * &lt;/pre>&lt;/code>
+<span class='line'>125</span>  *
+<span class='line'>126</span>  * &lt;p>&lt;b>&lt;em>reset&lt;/em>&lt;/b>&lt;/p>&lt;p>The SceneJS framework has been reset, where all SceneJS.Scene instances are destroyed and resources
+<span class='line'>127</span>  * held for them freed.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>128</span>  *  SceneJS.onEvent(
+<span class='line'>129</span>  *      "reset",
+<span class='line'>130</span>  *      function(e) {
+<span class='line'>131</span>  *          alert("SceneJS has been reset");
+<span class='line'>132</span>  *      });
+<span class='line'>133</span>  * &lt;/pre>&lt;/code>
+<span class='line'>134</span> 
+<span class='line'>135</span>  * &lt;p>&lt;b>&lt;em>scene-created&lt;/em>&lt;/b>&lt;/p>&lt;p>A SceneJS.Scene has been defined.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>136</span>  *  SceneJS.onEvent(
+<span class='line'>137</span>  *      "scene-created",
+<span class='line'>138</span>  *      function(e) {
+<span class='line'>139</span>  *          alert("A new Scene has been created - scene ID: " + e.sceneId);
+<span class='line'>140</span>  *      });
+<span class='line'>141</span>  * &lt;/pre>&lt;/code>
+<span class='line'>142</span>  *
+<span class='line'>143</span>  * &lt;p>&lt;b>&lt;em>scene-activated&lt;/em>&lt;/b>&lt;/p>&lt;p>Traversal (render) of a SceneJS.Scene has just begun.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>144</span>  *  SceneJS.onEvent(
+<span class='line'>145</span>  *      "scene-activated",
+<span class='line'>146</span>  *      function(e) {
+<span class='line'>147</span>  *          alert("Rendering of a new Scene has just begun - scene ID: " + e.sceneId);
+<span class='line'>148</span>  *      });
+<span class='line'>149</span>  * &lt;/pre>&lt;/code>
+<span class='line'>150</span>  *
+<span class='line'>151</span>  * &lt;p>&lt;b>&lt;em>canvas-activated&lt;/em>&lt;/b>&lt;/p>&lt;p>A canvas has just been activated for a Scene, where the Scene is about to start
+<span class='line'>152</span>  * rendering to it. This will come right after a "scene-activated" event, which will indicate which Scene is the one
+<span class='line'>153</span>  * about to do the rendering.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>154</span>  *  SceneJS.onEvent(
+<span class='line'>155</span>  *      "canvas-activated",
+<span class='line'>156</span>  *      function(e) {
+<span class='line'>157</span>  *          var canvas = e.canvas;
+<span class='line'>158</span>  *          var context = e.context;
+<span class='line'>159</span>  *          var canvasId = e.canvasId;
+<span class='line'>160</span>  *          alert("Canvas is about to be rendered to : " + canvasId);
+<span class='line'>161</span>  *      });
+<span class='line'>162</span>  * &lt;/pre>&lt;/code>
+<span class='line'>163</span>  *
+<span class='line'>164</span>  * &lt;p>&lt;b>&lt;em>process-created&lt;/em>&lt;/b>&lt;/p>&lt;p>An asynchronous process has started within a Scene. Processes track the progress of
+<span class='line'>165</span>  * tasks such as the loading of remotely-stored content by SceneJS.Load and SceneJS.LoadCollada nodes. This event is
+<span class='line'>166</span>  * paticularly useful to monitor for content loading. Since loads are triggered in one scene traversal, and then loaded
+<span class='line'>167</span>  * content is integrated during a subsequent traversal, you might listen for this along with "process-killed" on a
+<span class='line'>168</span>  * non-animated scene to ensure that a final scene image is rendered once all loads have completed and content
+<span class='line'>169</span>  * integrated.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>170</span>  *  SceneJS.onEvent(
+<span class='line'>171</span>  *      "process-created",
+<span class='line'>172</span>  *      function(e) {
+<span class='line'>173</span>  *          var sceneId = e.sceneId;
+<span class='line'>174</span>  *          var processId = e.process.id;
+<span class='line'>175</span>  *          var timeStarted = e.process.timeStarted;
+<span class='line'>176</span>  *          var description = e.process.description;
+<span class='line'>177</span>  *          var timeoutSecs = e.process.timeoutSecs;
+<span class='line'>178</span>  *
+<span class='line'>179</span>  *          // ...
+<span class='line'>180</span>  *      });
+<span class='line'>181</span>  * &lt;/pre>&lt;/code>
+<span class='line'>182</span>  *
+<span class='line'>183</span>  * &lt;p>&lt;b>&lt;em>process-timed-out&lt;/em>&lt;/b>&lt;/p>&lt;p>An asynchronous process has timed out. This will be followed by a "process-killed" event.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>184</span>  *  SceneJS.onEvent(
+<span class='line'>185</span>  *      "process-timed-out",
+<span class='line'>186</span>  *      function(e) {
+<span class='line'>187</span>  *          var sceneId = e.sceneId;
+<span class='line'>188</span>  *          var processId = e.process.id;
+<span class='line'>189</span>  *          var timeStarted = e.process.timeStarted;
+<span class='line'>190</span>  *          var description = e.process.description;
+<span class='line'>191</span>  *          var timeoutSecs = e.process.timeoutSecs;
+<span class='line'>192</span>  *
+<span class='line'>193</span>  *          // ...
+<span class='line'>194</span>  *      });
+<span class='line'>195</span>  * &lt;/pre>&lt;/code>
+<span class='line'>196</span>  *
+<span class='line'>197</span>  * &lt;p>&lt;b>&lt;em>process-killed&lt;/em>&lt;/b>&lt;/p>&lt;p>An asynchronous process has finished.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>198</span>  *  SceneJS.onEvent(
+<span class='line'>199</span>  *      "process-killed",
+<span class='line'>200</span>  *      function(e) {
+<span class='line'>201</span>  *          var sceneId = e.sceneId;
+<span class='line'>202</span>  *          var processId = e.process.id;
+<span class='line'>203</span>  *          var timeStarted = e.process.timeStarted;
+<span class='line'>204</span>  *          var description = e.process.description;
+<span class='line'>205</span>  *          var timeoutSecs = e.process.timeoutSecs;
+<span class='line'>206</span>  *
+<span class='line'>207</span>  *          // ...
+<span class='line'>208</span>  *      });
+<span class='line'>209</span>  * &lt;/pre>&lt;/code>
+<span class='line'>210</span>  *
+<span class='line'>211</span>  * &lt;p>&lt;b>&lt;em>scene-deactivated&lt;/em>&lt;/b>&lt;/p>&lt;p>A SceneJS.Scene traversal has completed.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>212</span>  *  SceneJS.onEvent(
+<span class='line'>213</span>  *      "scene-created",
+<span class='line'>214</span>  *      function(e) {
+<span class='line'>215</span>  *          alert("Traversal completed for Scene - scene ID: " + e.sceneId);
+<span class='line'>216</span>  *      });
+<span class='line'>217</span>  * &lt;/pre>&lt;/code>
+<span class='line'>218</span>  *
+<span class='line'>219</span>  * &lt;p>&lt;b>&lt;em>scene-destroyed&lt;/em>&lt;/b>&lt;/b>&lt;/p>&lt;p>A SceneJS.Scene traversal has been destroyed.&lt;/p>&lt;p>Example:&lt;/p>&lt;pre>&lt;code>
+<span class='line'>220</span>  *  SceneJS.onEvent(
+<span class='line'>221</span>  *      "scene-destroyed",
+<span class='line'>222</span>  *      function(e) {
+<span class='line'>223</span>  *          alert("Scene has been destroyed - scene ID: " + e.sceneId);
+<span class='line'>224</span>  *      });
+<span class='line'>225</span>  * &lt;/pre>&lt;/code>
+<span class='line'>226</span>  * @param name Event name
+<span class='line'>227</span>  * @param func Callback function
+<span class='line'>228</span>  */</span><span class="WHIT">
+<span class='line'>229</span> </span><span class="NAME">SceneJS.onEvent</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">func</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">    </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>231</span> 
+<span class='line'>232</span> </span><span class="WHIT">        </span><span class="COMM">/**
+<span class='line'>233</span>          * @event error
+<span class='line'>234</span>          * Fires when the data cache has changed in a bulk manner (e.g., it has been sorted, filtered, etc.) and a
+<span class='line'>235</span>          * widget that is using this Store as a Record cache should refresh its view.
+<span class='line'>236</span>          * @param {Store} this
+<span class='line'>237</span>          */</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"error"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.ERROR</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>242</span> </span><span class="WHIT">                        </span><span class="NAME">exception</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.exception</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">                        </span><span class="NAME">fatal</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.fatal</span><span class="WHIT">
+<span class='line'>244</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>246</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>247</span> 
+<span class='line'>248</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"reset"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>249</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.RESET</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>250</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>251</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>252</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>253</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>254</span> 
+<span class='line'>255</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"scene-created"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>256</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.SCENE_CREATED</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>257</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>258</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>259</span> </span><span class="WHIT">                        </span><span class="NAME">sceneId</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.sceneId</span><span class="WHIT">
+<span class='line'>260</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>261</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>262</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>263</span> 
+<span class='line'>264</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"scene-activated"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.SCENE_ACTIVATED</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>268</span> </span><span class="WHIT">                        </span><span class="NAME">sceneId</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.sceneId</span><span class="WHIT">
+<span class='line'>269</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>270</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>271</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>272</span> 
+<span class='line'>273</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"canvas-activated"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>274</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.CANVAS_ACTIVATED</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>277</span> </span><span class="WHIT">                        </span><span class="NAME">canvas</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.canvas</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>279</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>280</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>281</span> 
+<span class='line'>282</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"process-created"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.PROCESS_CREATED</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>284</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>288</span> 
+<span class='line'>289</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"process-timed-out"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.PROCESS_TIMED_OUT</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>295</span> 
+<span class='line'>296</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"process-killed"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.PROCESS_KILLED</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>298</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>299</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>302</span> 
+<span class='line'>303</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"scene-deactivated"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.SCENE_DEACTIVATED</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="WHIT">                        </span><span class="NAME">sceneId</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.sceneId</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>311</span> 
+<span class='line'>312</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="STRN">"scene-destroyed"</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventModule.onEvent</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>313</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS_eventModule.SCENE_DESTROYED</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>314</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="WHIT">                    </span><span class="NAME">func</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>316</span> </span><span class="WHIT">                        </span><span class="NAME">sceneId</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.sceneId</span><span class="WHIT">
+<span class='line'>317</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>318</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>319</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>320</span> 
+<span class='line'>321</span> </span><span class="WHIT">        </span><span class="KEYW">default</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">"SceneJS.onEvent - this event type not supported: '"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"'"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>325</span> 
+<span class='line'>326</span> </span></pre></body></html>

@@ -6,9 +6,9 @@
 	.REGX {color: #339;}
 	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
-<span class='line'>  2</span>  * @class SceneJS.ViewMatrix
+<span class='line'>  2</span>  * @class A scene node that applies a model-space transform to the nodes within its subgraph.
 <span class='line'>  3</span>  * @extends SceneJS.Node
-<span class='line'>  4</span>  * &lt;p>Scene node that applies a model-space transform to the nodes within its subgraph.&lt;/p>
+<span class='line'>  4</span> 
 <span class='line'>  5</span>  * &lt;p>&lt;b>Example&lt;/b>&lt;/p>&lt;p>A cube translated along the X, Y and Z axis.&lt;/b>&lt;/p>&lt;pre>&lt;code>
 <span class='line'>  6</span>  * var mat = new SceneJS.ViewMatrix({
 <span class='line'>  7</span>  *       elements : [
@@ -36,7 +36,7 @@
 <span class='line'> 29</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 30</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 31</span> 
-<span class='line'> 32</span> </span><span class="NAME">SceneJS._utils.inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.ViewMatrix</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.ViewMatrix</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 33</span> 
 <span class='line'> 34</span> </span><span class="COMM">/**
 <span class='line'> 35</span>  * Sets the matrix elements
@@ -45,10 +45,10 @@
 <span class='line'> 38</span>  */</span><span class="WHIT">
 <span class='line'> 39</span> </span><span class="NAME">SceneJS.ViewMatrix.prototype.setElements</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">elements</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 40</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">elements</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.exceptions.InvalidNodeConfigException</span><span class="PUNC">(</span><span class="STRN">"SceneJS.ViewMatrix elements undefined"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.InvalidNodeConfigException</span><span class="PUNC">(</span><span class="STRN">"SceneJS.ViewMatrix elements undefined"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 42</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 43</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">elements.length</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NUMB">16</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.exceptions.InvalidNodeConfigException</span><span class="PUNC">(</span><span class="STRN">"SceneJS.ViewMatrix elements should number 16"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.InvalidNodeConfigException</span><span class="PUNC">(</span><span class="STRN">"SceneJS.ViewMatrix elements should number 16"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 45</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 46</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NUMB">16</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 47</span> </span><span class="WHIT">        </span><span class="NAME">this._mat</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">elements</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">

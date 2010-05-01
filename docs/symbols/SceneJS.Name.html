@@ -191,7 +191,23 @@ ul.inheritsList
 	
 	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
 	
+	<li><a href="../symbols/SceneJS.html">SceneJS</a></li>
+	
 	<li><a href="../symbols/SceneJS.BoundingBox.html">SceneJS.BoundingBox</a></li>
+	
+	<li><a href="../symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Data.html">SceneJS.Data</a></li>
+	
+	<li><a href="../symbols/SceneJS.DataExpectedException.html">SceneJS.DataExpectedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -199,11 +215,15 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></li>
 	
+	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
 	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
 	
 	<li><a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	
+	<li><a href="../symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Locality.html">SceneJS.Locality</a></li>
 	
@@ -219,13 +239,21 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
+	<li><a href="../symbols/SceneJS.Node.html">SceneJS.Node</a></li>
+	
+	<li><a href="../symbols/SceneJS.NodeConfigExpectedException.html">SceneJS.NodeConfigExpectedException</a></li>
+	
 	<li><a href="../symbols/SceneJS.objects.Cube.html">SceneJS.objects.Cube</a></li>
 	
 	<li><a href="../symbols/SceneJS.objects.Sphere.html">SceneJS.objects.Sphere</a></li>
 	
 	<li><a href="../symbols/SceneJS.objects.Teapot.html">SceneJS.objects.Teapot</a></li>
 	
+	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	
+	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
@@ -249,6 +277,10 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></li>
 	
+	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
 </ul>
@@ -267,9 +299,11 @@ ul.inheritsList
 			<p class="description">
 				
 				<br />Extends
-					SceneJS.Node
-<p>Scene node that specifies a name for the nodes in its subgraph. These may be nested to create hierarchical
-names, effectively overlaying semantics onto a scene</p>.
+					<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>.<br />
+				
+			
+				A scene node that specifies a name for the nodes in its subgraph.
+<p> These may be nested to create hierarchical names, effectively overlaying semantics onto a scene.</p>
 <p><b>Example:</b></p><p>Two cubes, blue and green, assigned names "cubes.blue" and "cubes.green".</b></p><pre><code>
 var n = SceneJS.Name({ name: "cubes" },
      new SceneJS.Name({ name: "blue" },
@@ -293,10 +327,7 @@ var n = SceneJS.Name({ name: "cubes" },
              )
      )
  // ...
-</code></pre>.<br />
-				
-			
-				SceneJS.Name
+</code></pre>
 				
 				
 					<br /><i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_name_name.js.html">name.js</a>.
@@ -366,6 +397,10 @@ var n = SceneJS.Name({ name: "cubes" },
 				</table>
 				
 				
+				
+				<dl class="inheritsList">
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setNodes">setNodes</a></dd>
+				</dl>
 				
 			
 <!-- ============================== events summary ======================== -->
@@ -508,7 +543,7 @@ var n = SceneJS.Name({ name: "cubes" },
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Apr 30 2010 22:22:02 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 01 2010 17:11:45 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

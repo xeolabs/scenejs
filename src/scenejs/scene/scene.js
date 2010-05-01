@@ -1,27 +1,26 @@
 /**
- @class SceneJS.Scene
+ @class Root node of a SceneJS scene graph.
+ <p>This is entry and exit point for execution when rendering one frame of a scene graph.</p>  
  @extends SceneJS.Node
- <p>Root node of a scene graph</p>
- @throws {SceneJS.exceptions.UnsupportedOperationException} If attempt made to configure scene with function
  */
 SceneJS.Scene = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "scene";
     if (!this._fixedParams) {
         SceneJS_errorModule.fatalError(
-                new SceneJS.exceptions.UnsupportedOperationException
+                new SceneJS.InvalidNodeConfigException
                         ("Dynamic configuration of SceneJS.scene node is not supported"));
     }
     this._params = this._getParams();
     this._lastRenderedData = null;
     if (this._params.canvasId) {
-        this._canvasId = document.getElementById(this._params.canvasId) ? this._params.canvasId : SceneJS_webgl_DEFAULT_CANVAS_ID;
+        this._canvasId = document.getElementById(this._params.canvasId) ? this._params.canvasId : SceneJS.DEFAULT_CANVAS_ID;
     } else {
-        this._canvasId = SceneJS_webgl_DEFAULT_CANVAS_ID;
+        this._canvasId = SceneJS.DEFAULT_CANVAS_ID;
     }
 };
 
-SceneJS._utils.inherit(SceneJS.Scene, SceneJS.Node);
+SceneJS._inherit(SceneJS.Scene, SceneJS.Node);
 
 /** Returns the ID of the canvas element that this scene is to bind to. When no canvasId was configured, it will be the
  * the default ID of "_scenejs-default-canvas".
@@ -31,30 +30,46 @@ SceneJS.Scene.prototype.getCanvasId = function() {
 };
 
 /**
- * Renders the scene, passing in the given parameters to override any node parameters
- * that were set on the Scene config.
- * @private
+ * Renders the scene, passing in any properties required for dynamic configuration of its contained nodes.
+ * <p><b>Example:</b></p><p>A Scene with a LookAt node whoe's "eye" property is dynamically configured with a callback. When the Scene is
+ * rendered, a value for the property is injected into it. The Scene will put the property on a data scope (implemented by a SceneJS.Data)
+ * that the LookAt's config callback then accesses.</b></p><pre><code>
+ * var myScene = new SceneJS.Scene(
+ *          {
+ *              // .. scene configs .. //
+ *          },
+ *
+ *          new SceneJS.LookAt(
+ *              function(data) {
+ *                  return {
+ *                      eye: data.get("eye")
+ *                  };
+ *              },
+ *
+ *              // ..more scene nodes..
+ *      );
+ *
+ * myScene.render({
+ *          eye: {
+ *             x: 0, y: 0, z: -100
+ *          }
+ *      });
+ *
+ * </pre></code>
  */
 SceneJS.Scene.prototype.render = function(paramOverrides) {
     if (!this._sceneId) {
         this._sceneId = SceneJS_sceneModule.createScene(this, this._getParams());
     }
     SceneJS_sceneModule.activateScene(this._sceneId);
-    var data = SceneJS._utils.newScope(null, false); // TODO: how to determine fixed data for cacheing??
-    if (paramOverrides) {        // Override with traversal params
-        for (var key in paramOverrides) {
-            data.put(key, paramOverrides[key]);
-        }
-    }
     if (this._params.proxy) {
         SceneJS_loadModule.setProxy(this._params.proxy);
     }
-    var traversalContext = {
-    };
-    this._renderNodes(traversalContext, data);
+    var traversalContext = {};
+    this._renderNodes(traversalContext, new SceneJS.Data(null, false, paramOverrides));
     SceneJS_loadModule.setProxy(null);
     SceneJS_sceneModule.deactivateScene();
-    this._lastRenderedData = data;
+    this._lastRenderedData = paramOverrides;
 };
 
 /**
@@ -70,7 +85,7 @@ SceneJS.Scene.prototype.render = function(paramOverrides) {
 //    if (this._sceneId) {
 //        try {
 //            if (!this._lastRenderedData) {
-//                throw new SceneJS.exceptions.PickWithoutRenderedException
+//                throw new SceneJS.PickWithoutRenderedException
 //                        ("Scene not rendered - need to render before picking");
 //            }
 //            SceneJS_sceneModule.activateScene(this._sceneId);  // Also activates canvas
@@ -85,7 +100,7 @@ SceneJS.Scene.prototype.render = function(paramOverrides) {
 //            SceneJS_sceneModule.deactivateScene();
 //            return picked;
 //        } finally {
-//            SceneJS._utils.traversalMode = SceneJS._utils.TRAVERSAL_MODE_RENDER;
+//            SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
 //        }
 //    }
 //};
@@ -121,8 +136,9 @@ SceneJS.Scene.prototype.isActive = function() {
     return (this._sceneId != null);
 };
 
-/** Factory function that returns a new Scene instance
- *
+/** Returns a new SceneJS.Scene instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Scene constructor
+ * @returns {SceneJS.Scene}
  */
 SceneJS.scene = function() {
     var n = new SceneJS.Scene();
@@ -144,97 +160,6 @@ SceneJS.reset = function() {
          * A RESET command will be fired after the last one is destroyed.
          */
         temp.pop().destroy();
-    }
-};
-
-SceneJS.onEvent = function(name, func) {
-    switch (name) {
-
-        case "error" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.ERROR,
-                function(params) {
-                    func({
-                        exception: params.exception,
-                        fatal: params.fatal
-                    });
-                });
-            break;
-
-        case "reset" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.RESET,
-                function() {
-                    func();
-                });
-            break;
-
-        case "scene-created" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.SCENE_CREATED,
-                function(params) {
-                    func({
-                        sceneId : params.sceneId
-                    });
-                });
-            break;
-
-        case "scene-activated" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.SCENE_ACTIVATED,
-                function(params) {
-                    func({
-                        sceneId : params.sceneId
-                    });
-                });
-            break;
-
-        case "canvas-activated" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.CANVAS_ACTIVATED,
-                function(params) {
-                    func({
-                        canvas: params.canvas
-                    });
-                });
-            break;
-
-        case "process-created" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.PROCESS_CREATED,
-                function(params) {
-                    func(params);
-                });
-            break;
-
-        case "process-timed-out" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.PROCESS_TIMED_OUT,
-                function(params) {
-                    func(params);
-                });
-            break;
-
-        case "process-killed" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.PROCESS_KILLED,
-                function(params) {
-                    func(params);
-                });
-            break;
-
-        case "scene-deactivated" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.SCENE_DEACTIVATED,
-                function(params) {
-                    func({
-                        sceneId : params.sceneId
-                    });
-                });
-            break;
-
-        case "scene-destroyed" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.SCENE_DESTROYED,
-                function(params) {
-                    func({
-                        sceneId : params.sceneId
-                    });
-                });
-            break;
-
-        default:
-            throw "SceneJS.onEvent - this event type not supported: '" + name + "'";
     }
 };
 

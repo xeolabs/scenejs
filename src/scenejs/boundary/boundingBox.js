@@ -1,9 +1,12 @@
 /**
- * @class SceneJS.BoundingBox
- * @extends SceneJS.Node
- * <p>A scene node that specifies the spatial boundaries of scene graph subtrees so that the subtrees are
- * only traversed when their enclosing extents intersect the current view frustum. When configured with a projected size
- * threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
+ * @class A scene node that specifies the spatial boundaries of scene graph subtrees to support visibility and
+ * level-of-detail culling.
+ *
+ * <p>The subgraphs of these are only traversed when the boundary intersect the current view frustum. When this node
+ * is within the subgraph of a SceneJS.Locality node, it the boundary must also intersect the inner radius of the Locality.
+ * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.</p> 
+ *  
+ * <p>When configured with a projected size threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
  * <p><b>Live Demo</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-lod-boundingbox-example">Level of Detail Example</a></li></ul>
  *  <p><b>Example 1.</b></p><p>This BoundingBox is configured to work as a level-of-detail selector. The 'levels'
@@ -61,7 +64,7 @@
  *     })
  * )
  * </code></pre>
- *
+ * @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.boundingBox
  * @param {Object} config Configuration object, followed by zero or more child nodes
@@ -84,7 +87,7 @@ SceneJS.BoundingBox = function() {
     }
 };
 
-SceneJS._utils.inherit(SceneJS.BoundingBox, SceneJS.Node);
+SceneJS._inherit(SceneJS.BoundingBox, SceneJS.Node);
 
 /**
  * Sets the minimum X extent
@@ -262,13 +265,13 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     this._zmax = params.zmax || 0;
     if (params.levels) {
         if (params.levels.length != this._children.length) {
-            SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+            SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                     ("SceneJS.boundingBox levels property should have a value for each child node"));
         }
 
         for (var i = 1; i < params.levels.length; i++) {
             if (params.levels[i - 1] >= params.levels[i]) {
-                SceneJS_errorModule.fatalError(new SceneJS.exceptions.NodeConfigExpectedException
+                SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                         ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
             }
         }
@@ -358,7 +361,9 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Function wrapper to support functional scene definition
+/** Returns a new SceneJS.BoundingBox instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.BoundingBox constructor
+ * @returns {SceneJS.BoundingBox}
  */
 SceneJS.boundingBox = function() {
     var n = new SceneJS.BoundingBox();
