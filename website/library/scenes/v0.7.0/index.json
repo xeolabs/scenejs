@@ -1,7 +1,0 @@
-[
-    {
-        title: "Hello, Teapot!",
-        description: "Basic example that demonstrates scene syntax, point lighting, material colours, mouse interaction, perspective, view and modelling transforms",
-        file: "hello-teapot/hello-teapot.js"
-    }
-]
