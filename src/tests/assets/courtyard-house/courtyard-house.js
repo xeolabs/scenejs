@@ -91,8 +91,9 @@ var exampleScene = SceneJS.scene({
                                                 SceneJS.rotate({x:1,angle:270},
 
                                                         SceneJS.loadCollada({
-                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
-                                                                 "courtyard-house/models/model.dae"  ,
+//                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
+//                                                                 "courtyard-house/models/model.dae"  ,
+                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/interno/Interno.obj.dae",
 //                                                           // uri: "http://www.scenejs.org/library/v0.7/assets/examples/collada-duck/duck.dae",
 //                                                            uri: "http://www.scenejs.org/library/v0.7/assets/" +
 //                                                         "examples/seymourplane_triangulate/" +

@@ -92,7 +92,7 @@ SceneJS.ViewMatrix.prototype._render = function(traversalContext, data) {
 
 /** Function wrapper to support functional scene definition
  */
-SceneJS.ViewMatrix = function() {
+SceneJS.viewMatrix = function() {
     var n = new SceneJS.ViewMatrix();
     SceneJS.ViewMatrix.prototype.constructor.apply(n, arguments);
     return n;

@@ -54,6 +54,11 @@ function SceneJS_math_mulVec4Scalar(v, s) {
 }
 
 /** @private */
+function SceneJS_math_mulVec3Scalar(v, s) {
+    return [v[0] * s, v[1] * s, v[2] * s];
+}
+
+/** @private */
 function SceneJS_math_divVec4(u, v) {
     return [u[0] / v[0],u[1] / v[1],u[2] / v[2],u[3] / v[3]];
 }
@@ -90,6 +95,11 @@ function SceneJS_math_cross3Vec4(u, v) {
 }
 
 /** @private */
+function SceneJS_math_cross3Vec3(u, v) {
+    return [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+}
+
+/** @private */
 function SceneJS_math_sqLenVec4(v) {
     return SceneJS_math_dotVector4(v, v);
 }
@@ -123,6 +133,12 @@ function SceneJS_math_rcpVec3(v) {
 function SceneJS_math_normalizeVec4(v) {
     var f = 1.0 / SceneJS_math_lenVec4(v);
     return SceneJS_math_mulVec4Scalar(v, f);
+}
+
+/** @private */
+function SceneJS_math_normalizeVec3(v) {
+    var f = 1.0 / SceneJS_math_lenVec3(v);
+    return SceneJS_math_mulVec3Scalar(v, f);
 }
 
 /** @private */
@@ -939,7 +955,7 @@ function SceneJS_math_billboardMat(viewMatrix) {
     SceneJS_math_setRowMat4(rotMatInverse, 2, rotVec[2]);
 
     return SceneJS_math_mulMat4(rotMatInverse, sMat);
-   // return SceneJS_math_mulMat4(sMat, SceneJS_math_mulMat4(rotMatInverse, sMat));
+    // return SceneJS_math_mulMat4(sMat, SceneJS_math_mulMat4(rotMatInverse, sMat));
     //return SceneJS_math_mulMat4(sMatInv, SceneJS_math_mulMat4(rotMatInverse, sMat));
 }
 
@@ -1030,7 +1046,7 @@ function SceneJS_math_Frustum(viewMatrix, projectionMatrix, viewport) {
         return ret;
     };
 
-/** @private */
+    /** @private */
     this.getProjectedSize = function(box) {
         var diagVec = SceneJS_math_subVec3(box.max, box.min);
 

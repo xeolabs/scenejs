@@ -95,7 +95,7 @@ SceneJS.WithData.prototype._render = function(traversalContext, data) {
         }
     }
     if (this._memoLevel < 2) {
-        if (this._memoLevel == 1 && data.isfixed()) {
+        if (this._memoLevel == 1 && data.isFixed()) {
             this._memoLevel = 2;
         }
     }

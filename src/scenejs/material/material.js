@@ -31,7 +31,7 @@
  *     )
  * )
  * </pre></code>
- * * @extends SceneJS.Node
+ * @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.Material
  * @param {Object} config The config object or function, followed by zero or more child nodes

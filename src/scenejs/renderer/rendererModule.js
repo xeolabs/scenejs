@@ -67,7 +67,7 @@ var SceneJS_rendererModule = new (function() {
         },
 
         blendEquation: function(context, eqn) {
-            eqn = eqn || "func_add";
+            eqn = eqn || "funcAdd";
             context.blendEquation(context, glEnum(context, eqn));
             currentProps.blendEquation = eqn;
         },
@@ -77,8 +77,8 @@ var SceneJS_rendererModule = new (function() {
         blendEquationSeparate: function(context, eqn) {
             eqn = eqn || {};
             eqn = {
-                rgb : eqn.rgb || "func_add",
-                alpha : eqn.alpha || "func_add"
+                rgb : eqn.rgb || "funcAdd",
+                alpha : eqn.alpha || "funcAdd"
             };
             context.blendEquation(glEnum(context, eqn.rgb), glEnum(context, eqn.alpha));
             currentProps.blendEquationSeperate = eqn;

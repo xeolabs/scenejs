@@ -24,8 +24,8 @@ var SceneJS_localityModule = new (function() {
             function() {
                 eye = { x: 0, y: 0, z: 0 };
                 radii = {
-                    inner : 2000,
-                    outer : 2500
+                    inner : 100000,
+                    outer : 200000
                 };
                 radii2 = {
                     inner : radii.inner * radii.inner,

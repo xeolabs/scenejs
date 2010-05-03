@@ -126,7 +126,7 @@ exampleScene.render({yaw: yaw, pitch: pitch});
  * can't find the one specified
  */
 var canvas = document.getElementById(exampleScene.getCanvasId());
-;
+
 
 function mouseDown(event) {
     lastX = event.clientX;

@@ -6,7 +6,6 @@
  */
 SceneJS.Node = function() {
     this._nodeType = "node";
-
     this._children = [];
     this._fixedParams = true;
     this._parent = null;
@@ -38,8 +37,10 @@ SceneJS.Node = function() {
                     var config = arg;               // arg is config object
                     this._fixedParams = true;
                     for (var key in arg) {
-                        if (this._fixedParams && arg[key] instanceof Function) {
-                            this._fixedParams = false;
+                        if (arg.hasOwnProperty(key)) {
+                            if (this._fixedParams && arg[key] instanceof Function) {
+                                this._fixedParams = false;
+                            }
                         }
                     }
                     this._getParams = function() {  // Wrap with function to return config object
@@ -98,7 +99,8 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data) {
 };
 
 SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
-    this._children[index]._render.call(traversalContext, data);
+    var child = this._children[index];
+    child._render.call(child, traversalContext, data);
 };
 
 
@@ -120,7 +122,7 @@ SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
 //};
 
 SceneJS.Node.prototype._render = function(traversalContext, data) {
-      this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext, data);
 };
 
 /**
@@ -205,9 +207,55 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
     return node;
 };
 
+/** Returns the parent node
+ * @return {SceneJS.node} The parent node
+ */
 SceneJS.Node.prototype.getParent = function() {
     return this._parent;
 };
+
+/** Returns either all child or all sub-nodes of the given type, depending on whether search is recursive or not.
+ * @param {string} type Node type
+ * @param {boolean} recursive When true, will return all matching nodes in subgraph, otherwise returns just children (default)
+ * @return {SceneJS.node[]} Array of matching nodes
+ */
+SceneJS.Node.prototype.findNodesByType = function(type, recursive) {
+    return this._findNodesByType(type, [], recursive);
+};
+
+/** @private */
+SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
+    for (var i = 0; i < this._children; i++) {
+        var node = this._children[i];
+        if (node.nodeType == type) {
+            list.add(node);
+        }
+    }
+    if (recursive) {
+        for (var i = 0; i < this._children; i++) {
+            this._children[i]._getNodesByType(type, list, recursive);
+        }
+    }
+    return list;
+};
+
+
+//SceneJS.Node.prototype._toString2 = function(strList, indent) {
+//    for (var i = 0; i < indent; i++) {
+//        strList.push("  ");
+//    }
+//    strList.push(this._nodeType + ":" + this._nodeId);
+//
+//    for (var i = 0; i < this._children.length; i++) {
+//        this._children[i]._toString2(strList, indent);
+//    }
+//};
+//
+//SceneJS.Node.prototype._toString = function() {
+//    var strList = [];
+//    this._toString2(strList, 0);
+//    return strList.join("\n");
+//};
 
 SceneJS.node = function() {
     var n = new SceneJS.Node();
