@@ -42,7 +42,7 @@
  */
 SceneJS.ScalarInterpolator = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "scalarInterpolator";
+    this._nodeType = "scalar-interpolator";
     this._input = null;
     this._output = null;
     this._outputValue = null;

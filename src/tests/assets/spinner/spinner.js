@@ -92,15 +92,13 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',
                                                                 angle: data.get('pitch'), x : 1.0
                                                             };
                                                         },
-                                                            /* Load COLLADA airplane model from the SceneJS
-                                                             * model repository
-                                                             */
-                                                                   SceneJS.translate({z:-20},
-                                                                           SceneJS.translate({y:-2.5},
-                                                                SceneJS.loadCollada({
-                                                                    uri: "http://www.scenejs.org/library/v0.7/assets/examples/spinner/models/Spinner.dae",
-                                                                    node: "Group1"
-                                                                }))))
+
+                                                                SceneJS.translate({z:-20},
+                                                                        SceneJS.translate({y:-2.5},
+                                                                                SceneJS.loadCollada({
+                                                                                    uri: "http://www.scenejs.org/library/v0.7/assets/examples/spinner/models/Spinner.dae",
+                                                                                    node: "Group1"
+                                                                                }))))
                                                         )
                                                 )
                                         )
@@ -119,7 +117,8 @@ var dragging = false;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = document.getElementById(exampleScene.getCanvasId());;
+var canvas = document.getElementById(exampleScene.getCanvasId());
+;
 
 function mouseDown(event) {
     lastX = event.clientX;

@@ -16,7 +16,7 @@
  */
 
 
-  SceneJS.onEvent("error", function(e) {
+SceneJS.onEvent("error", function(e) {
     alert(e.exception.message ? e.exception.message : e.exception);
 });
 
@@ -31,75 +31,77 @@ var exampleScene = SceneJS.scene({
      */
     proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
 
-    /* Perspective transform:
-     */
-        SceneJS.perspective({
-            fovy : 55.0,
-            aspect : 2.0,
-            near : 0.10,
-            far : 4000.0 },
-
-            /* Viewing transform:
+        SceneJS.loggingToPage({ canvasId: "myCanvas" },
+            /* Perspective transform:
              */
-                SceneJS.lookAt(function(data) {
-                    return {
-                        eye : data.get("eye"),
-                        look : { x: -1.0, y: 50, z: 0 },
-                        up : { y: 1.0 }
-                    };
-                },
+                SceneJS.perspective({
+                    fovy : 55.0,
+                    aspect : 2.0,
+                    near : 0.10,
+                    far : 4000.0 },
 
-                    /* A lights node inserts lights into the world-space.  You can have as many
-                     * lights as you want throughout your scene:
+                    /* Viewing transform:
                      */
-                        SceneJS.lights({
-                            sources: [
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    dir:                    { x: 1.0, y: -1.0, z: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    dir:                    { x: -1.0, y: -1.0, z: -3.0 },
-                                    diffuse:                true,
-                                    specular:               true
-                                }
-                            ]},
+                        SceneJS.lookAt(function(data) {
+                            return {
+                                eye : data.get("eye"),
+                                look : { x: -1.0, y: 50, z: 0 },
+                                up : { y: 1.0 }
+                            };
+                        },
 
-                            /* Next, modelling transforms to orient the house.  These particular
-                             * transforms are dynamically configured from data injected into the
-                             * scene graph when its rendered:
+                            /* A lights node inserts lights into the world-space.  You can have as many
+                             * lights as you want throughout your scene:
                              */
-                                SceneJS.rotate(function(data) {
-                                    return {
-                                        angle: data.get('pitch'), x : 1.0
-                                    };
-                                },
+                                SceneJS.lights({
+                                    sources: [
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                            dir:                    { x: 1.0, y: -1.0, z: 1.0 },
+                                            diffuse:                true,
+                                            specular:               true
+                                        },
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                            dir:                    { x: -1.0, y: -1.0, z: -3.0 },
+                                            diffuse:                true,
+                                            specular:               true
+                                        }
+                                    ]},
+
+                                    /* Next, modelling transforms to orient the house.  These particular
+                                     * transforms are dynamically configured from data injected into the
+                                     * scene graph when its rendered:
+                                     */
                                         SceneJS.rotate(function(data) {
                                             return {
-                                                angle: data.get('yaw'), y : 1.0
+                                                angle: data.get('pitch'), x : 1.0
                                             };
                                         },
+                                                SceneJS.rotate(function(data) {
+                                                    return {
+                                                        angle: data.get('yaw'), y : 1.0
+                                                    };
+                                                },
 
-                                            /* Load our COLLADA house model, rotating it to align
-                                             * with our modelling coordinate system:
-                                             */
-                                                SceneJS.rotate({x:1,angle:270},
+                                                    /* Load our COLLADA house model, rotating it to align
+                                                     * with our modelling coordinate system:
+                                                     */
+                                                        SceneJS.rotate({x:1,angle:270},
 
-                                                        SceneJS.loadCollada({
-//                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
-//                                                                 "courtyard-house/models/model.dae"  ,
-                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/interno/Interno.obj.dae",
-//                                                           // uri: "http://www.scenejs.org/library/v0.7/assets/examples/collada-duck/duck.dae",
-//                                                            uri: "http://www.scenejs.org/library/v0.7/assets/" +
-//                                                         "examples/seymourplane_triangulate/" +
-//                                                         "seymourplane_triangulate.dae",
-                                                            showBoundingBoxes: false
-                                                        }))
+                                                                SceneJS.loadCollada({
+                                                                    uri: "http://www.scenejs.org/library/v0.7/assets/examples/" +
+                                                                         "courtyard-house/models/model.dae"  ,
+                                                                    //uri: "http://www.scenejs.org/library/v0.7/assets/examples/interno/Interno.obj.dae",
+                                                                    //                                                           // uri: "http://www.scenejs.org/library/v0.7/assets/examples/collada-duck/duck.dae",
+                                                                    //                                                            uri: "http://www.scenejs.org/library/v0.7/assets/" +
+                                                                    //                                                         "examples/seymourplane_triangulate/" +
+                                                                    //                                                         "seymourplane_triangulate.dae",
+                                                                    showBoundingBoxes: false
+                                                                }))
+                                                        )
                                                 )
                                         )
                                 )
@@ -128,7 +130,8 @@ var eye;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = document.getElementById(exampleScene.getCanvasId());;
+var canvas = document.getElementById(exampleScene.getCanvasId());
+;
 
 function mouseDown(event) {
     lastX = event.clientX;

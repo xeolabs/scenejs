@@ -56,6 +56,7 @@ var SceneJS_rendererModule = new (function() {
         },
 
         blendColor: function(context, color) {
+            color = color || {};
             color = {
                 r: color.r || 0,
                 g: color.g || 0,
@@ -187,6 +188,7 @@ var SceneJS_rendererModule = new (function() {
         },
 
         depthRange: function(context, range) {
+            range = range || {};
             range = {
                 zNear : range.zNear || 0,
                 zFar : range.zFar || 1

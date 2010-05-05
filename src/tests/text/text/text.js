@@ -155,15 +155,14 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 
-var i = 0;
+
 window.render = function() {
-    if (i++ > 0) {
-        window.clearInterval(pInterval);
-    }
+
     exampleScene.render({dist: dist, yaw: yaw, pitch: pitch});
 };
 
-SceneJS.onEvent("error", function() {
+SceneJS.onEvent("error", function(e) {
+    alert(e);
     window.clearInterval(pInterval);
 });
 

@@ -32,17 +32,12 @@ var exampleScene = SceneJS.scene({
                              * into this scene as it is rendered. Those parameters are generated
                              * in mouse handlers outside the scene graph - see below.
                              */
-                                SceneJS.lookAt({
-
-                                    eye : function(data) {
-                                        return data.get("eye");
-                                    },
-
-                                    look : function(data) {
-                                        return data.get("look");
-                                    },
-
-                                    up : { y: 1.0 }
+                                SceneJS.lookAt(function(data) {
+                                    return {
+                                        eye :  data.get("eye"),
+                                        look :  data.get("look"),
+                                        up : { y: 1.0 }
+                                    };
                                 },
 
                                     /* A SceneJS.stationary node defines a sub-space within the view space in which

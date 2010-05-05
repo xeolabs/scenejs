@@ -26,10 +26,10 @@ SceneJS.LoggingToPage = function() {
     this._nodeType = "logging-to-page";
     this._elementId = null;
     this._element = null;
-    this._funcs = null; // Lazily initialised
     if (this._fixedParams) {
         this._init(this._getParams());
     }
+    this._funcs = null; // Lazily initialised
 };
 
 /** ID ("_scenejs-default-logging") of element to which SceneJS will log to if found.
@@ -49,18 +49,15 @@ SceneJS._inherit(SceneJS.LoggingToPage, SceneJS.Node);
  * @throws {SceneJS.DocumentElementNotFoundException} Element not found in document
  */
 SceneJS.LoggingToPage.prototype.setElementId = function(elementId) {
-    if (elementId) {
-        var element = document.getElementById(elementId);
-        if (!element) {
-            SceneJS_errorModule.fatalError(new SceneJS.DocumentElementNotFoundException
-                    ("SceneJS.LoggingToPage cannot find document element with ID '" + elementId + "'"));
-        }
-        this._elementId = elementId;
-        this._element = element;
-    } else {
-        this._elementId = SceneJS.DEFAULT_LOGGING_DIV_ID;
-        this._element = document.getElementById(SceneJS.DEFAULT_LOGGING_DIV_ID);
+    elementId = elementId || "_scenejs-default-logging";
+    var element = document.getElementById(elementId);
+    if (!element) {
+        SceneJS_errorModule.fatalError(new SceneJS.DocumentElementNotFoundException
+                ("SceneJS.LoggingToPage cannot find document element with ID '"
+                        + SceneJS.DEFAULT_LOGGING_DIV_ID + "'"));
     }
+    this._elementId = elementId;
+    this._element = element;
     return this;
 };
 
@@ -83,31 +80,26 @@ SceneJS.LoggingToPage.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
         this._init(this._getParams(data));
     }
-    if (!this._funcs && this._element) {
-        var element = this._element;
+    if (!this._funcs) {
         this._funcs = {
             warn : function (msg) {
-                element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
+                this._element.innerHTML += "<p style=\"color:orange;\">" + msg + "</p>";
             },
             error : function (msg) {
-                element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
+                this._element.innerHTML += "<p style=\"color:darkred;\">" + msg + "</p>";
             },
             debug : function (msg) {
-                element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
+                this._element.innerHTML += "<p style=\"color:darkblue;\">" + msg + "</p>";
             },
             info : function (msg) {
-                element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
+                this._element.innerHTML += "<p style=\"color:darkgreen;\">" + msg + "</p>";
             }
         };
     }
-    if (this._element) {
-        var prevFuncs = SceneJS_loggingModule.getFuncs();
-        SceneJS_loggingModule.setFuncs(this._funcs);
-        this._renderNodes(traversalContext, data);
-        SceneJS_loggingModule.setFuncs(prevFuncs);
-    } else {
-        this._renderNodes(traversalContext, data);
-    }
+    var prevFuncs = SceneJS_loggingModule.getFuncs();
+    SceneJS_loggingModule.setFuncs(this._funcs);
+    this._renderNodes(traversalContext, data);
+    SceneJS_loggingModule.setFuncs(prevFuncs);
 };
 
 /** Returns a new SceneJS.LoggingToPage instance

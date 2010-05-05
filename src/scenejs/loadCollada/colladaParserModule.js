@@ -806,12 +806,10 @@ var SceneJS_colladaParserModule = new (function() {
             switch (child.tagName) {
 
                 case "node":
-                    SceneJS_loggingModule.info("node");
                     sceneNodeParams.push(parseNode(child));
                     break;
 
                 case "matrix":
-                   SceneJS_loggingModule.info("matrix");
                     var array = parseMatrix(child);
 
                     /* Convert row-major to SceneJS column-major
@@ -825,36 +823,30 @@ var SceneJS_colladaParserModule = new (function() {
 
 
                 case "translate":
-                    SceneJS_loggingModule.info("translate");
                     matrix = matrix
                             ? SceneJS_math_mulMat4(matrix, parseTranslate(child))
                             : parseTranslate(child);
                     break;
 
                 case "rotate":
-                    SceneJS_loggingModule.info("rotate");
                     matrix = matrix
                             ? SceneJS_math_mulMat4(matrix, parseRotate(child))
                             : parseRotate(child);
                     break;
 
                 case "instance_node":
-                    SceneJS_loggingModule.info("instance_node");
                     sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
                     break;
 
                 case "instance_visual_scene":
-                    SceneJS_loggingModule.info("instance_visual_scene");
                     sceneNodeParams.push(parseNode(idMap[child.getAttribute("url").substr(1)]));
                     break;
 
                 case "instance_geometry":
-                    SceneJS_loggingModule.info("instance_geometry");
                     sceneNodeParams.push(parseInstanceGeometry(child));
                     break;
 
                 case "instance_camera":
-                   SceneJS_loggingModule.info("instance_camera");
                     cameraOpticsData = parseCameraOptics(idMap[child.getAttribute("url").substr(1)]);
                     break;
             }

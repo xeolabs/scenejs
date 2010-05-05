@@ -2,12 +2,9 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>SceneJS Example - Simple Level-of-Detail Example</title>
+    <title>SceneJS Test</title>
 </head>
-<body margin=20px>
-<h1><a href="http://scenejs.org">SceneJS.org</a> &gt; <a href="../../index.html">Examples</a> &gt; Simple
-    Level-of-Detail Example
-</h1>
+<body leftmargin="0px" topmargin="0px" marginwidth="0px" marginheight="0px">
 <table>
     <tr>
         <td valign="top">
@@ -17,151 +14,77 @@
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
-        <td valign="top">
-            <h3>Source code</h3>
-            <ul>
-                <li><a href="sphere-lod.js">This example</a></li>
-            </ul>
-            <h3>Resources</h3>
-            <ul>
-                <li><a href="http://lindsaystanleykay.blogspot.com/2010/03/scenejs-boundingbox-nodes.html"
-                       target="other">Blog article on the boundingBox node</a></li>
-            </ul>
-            <h3>Description</h3>
-
-            <p><span>SceneJS V0.7.0 introduced <b>SceneJS.boundingBox</b> nodes, which specify the spatial boundaries
-                of scene graph subtrees so that they are only traversed when their enclosing boundingBoxes intersect the
-                current view frustum. When configured with a projected size threshold for each child, they can also
-                function as level-of-detail (LOD) selectors, activating a different child as its projected size crosses
-            each threshold.</span></p>
-
-            <p><span>This example features a boundingBox that selects from among a four child nodes (box, low-detail sphere,
-                medium-detail sphere and high-detail sphere) for each size threshold as the viewpoint approaches and departs.</span></p>
-            <h3>Scene logging output</h3>
-
+        <td>
             <div id="logging"></div>
         </td>
     </tr>
 </table>
 
-<!-- Core -->
 
 <script type="application/x-javascript" src="../../../scenejs/core/core.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/exceptions/exceptions.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/math.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/core/webgl.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/core/webgl-trace.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/core/data.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/node/node.js"></script>
-
-<!-- Exceptions -->
-
-<script type="application/x-javascript" src="../../../scenejs/exceptions/exceptions.js"></script>
-
-
-<!-- Events -->
-
 <script type="application/x-javascript" src="../../../scenejs/events/eventsModule.js"></script>
-
-<!-- Time -->
-
+<script type="application/x-javascript" src="../../../scenejs/errors/errorsModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/time/timeModule.js"></script>
-
-<!-- Logger -->
-
 <script type="application/x-javascript" src="../../../scenejs/logging/loggingModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/logging/logging.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/logging/loggingToPage.js"></script>
-
-<!-- Process management -->
-
+<script type="application/x-javascript" src="../../../scenejs/memory/memoryModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/name/nameModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/name/name.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/processes/processModule.js"></script>
-
-<!-- Assets -->
-
 <script type="application/x-javascript" src="../../../scenejs/load/loadModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/load/load.js"></script>
-
-<!-- Scene -->
-
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/colladaParserModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/loadCollada/loadCollada.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/scene/sceneModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/scene/scene.js"></script>
-
-
-<!-- Memory manager -->
-
-<script type="application/x-javascript" src="../../../scenejs/memory/memoryModule.js"></script>
-
-
-<!-- Shading -->
-
 <script type="application/x-javascript" src="../../../scenejs/shading/shadingModule.js"></script>
-
-
-<!-- Renderer -->
-<!-- Depends on shaders because it enables simple shader by default for new canvas activation -->
-
 <script type="application/x-javascript" src="../../../scenejs/renderer/rendererModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/renderer/renderer.js"></script>
-
-<!-- Geometry -->
-
 <script type="application/x-javascript" src="../../../scenejs/geometry/geometryModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/geometry.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/objects/teapot.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/objects/cube.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/geometry/objects/sphere.js"></script>
-
-<!-- Modelling transforms -->
-
+<script type="application/x-javascript" src="../../../scenejs/geometry/text/vectorTextModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/geometry/text/text.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/modelTransformModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/rotate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/translate.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/model/scale.js"></script>
-
-<!-- Projection transforms -->
-
+<script type="application/x-javascript" src="../../../scenejs/transformation/model/modelMatrix.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/projection/projectionModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/projection/perspective.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/projection/ortho.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/projection/frustum.js"></script>
-
-<!-- Viewing transforms -->
-
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/viewTransformModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/transformation/view/lookAt.js"></script>
-
-<!-- Lighting -->
-
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/viewMatrix.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/transformation/view/stationary.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/lighting/lightingModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/lighting/lightSource.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/lighting/lights.js"></script>
-
-<!-- Material -->
-
-<script type="application/x-javascript" src="../../../scenejs/material/material.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/material/materialModule.js"></script>
-
-
-<!-- Interpolation -->
-
+<script type="application/x-javascript" src="../../../scenejs/material/material.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/interpolation/scalarInterpolator.js"></script>
-
-<!-- Scope -->
-
 <script type="application/x-javascript" src="../../../scenejs/withData/withData.js"></script>
-
-<!-- Generation -->
-
 <script type="application/x-javascript" src="../../../scenejs/generation/generator.js"></script>
-
-<!-- Axis-aligned bounding boxes -->
-
 <script type="application/x-javascript" src="../../../scenejs/boundary/viewFrustumModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/boundary/viewLocalityModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/boundary/boundingBox.js"></script>
-
-
+<script type="application/x-javascript" src="../../../scenejs/boundary/locality.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/texture/textureModule.js"></script>
+<script type="application/x-javascript" src="../../../scenejs/texture/textureLayer.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/texture/texture.js"></script>
-
 <script type="application/x-javascript" src="../../../scenejs/fog/fogModule.js"></script>
 <script type="application/x-javascript" src="../../../scenejs/fog/fog.js"></script>
+
 
 <script type="application/x-javascript" src="sphere-lod.js"></script>
 </body>

@@ -95,7 +95,7 @@ var exampleScene = SceneJS.scene({
 //                                                        SceneJS.objects.teapot()
 
                                                 SceneJS.loadCollada({
-                                                    uri: "./seymourplane_triangulate/seymourplane_triangulate.dae",
+                                                    uri: "/home/lindsay/xeolabs/projects/scenejs/src/tests/assets/seymour-plane/seymourplane_triangulate/seymourplane_triangulate.dae",
 
                                                  //   uri: "http://www.scenejs.org/library/v0.7/assets/examples/cube/cube.dae",
 

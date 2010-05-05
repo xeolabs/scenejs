@@ -10,14 +10,14 @@
  * to get the first occurance of that property it finds.</p>
  * <p><b>Example:</b></p><p>Creating data for a child SceneJS.Scale node, which has a callback to configure itself from
  * the data:</b></p><pre><code>
- * var wd new SceneJS.WithData({
+ * var wd = new SceneJS.WithData({
  *         sizeX: 5,
  *         sizeY: 10,
  *         sizeZ: 2
  *      },
- *      new SceneJS.translate({ x: 100 },
+ *      new SceneJS.Translate({ x: 100 },
  *
- *          new SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+ *          new SceneJS.Scale(function(data) {        // Function in this case, instead of a config object
  *                   return {
  *                       x: data.get("sizeX"),
  *                       y: data.get("sizeY"),

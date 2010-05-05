@@ -69,6 +69,18 @@ SceneJS.Node = function() {
 
 SceneJS.Node.prototype.constructor = SceneJS.Node;
 
+/**
+ * Resets memoization level to zero - used when moving nodes around in graph
+ * @private
+ */
+SceneJS.Node.prototype._resetMemoLevel = function() {
+    this._memoLevel = 0;
+    for (var i = 0; i < this._children.length; i++) {
+        this._children[i]._resetMemoLevel();
+    }
+};
+
+/** @private */
 SceneJS.Node.prototype._renderNodes = function(traversalContext, data) {
     var child;
     var len = this._children.length;
@@ -98,29 +110,13 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data) {
     }
 };
 
+/** @private */
 SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
     var child = this._children[index];
     child._render.call(child, traversalContext, data);
 };
 
-
-//SceneJS.Node.prototype._toString2 = function(strList, indent) {
-//    for (var i = 0; i < indent; i++) {
-//        strList.push("  ");
-//    }
-//    strList.push(this._nodeType + ":" + this._nodeId);
-//
-//    for (var i = 0; i < this._children.length; i++) {
-//        this._children[i]._toString2(strList, indent);
-//    }
-//};
-//
-//SceneJS.Node.prototype._toString = function() {
-//    var strList = [];
-//    this._toString2(strList, 0);
-//    return strList.join("\n");
-//};
-
+/** @private */
 SceneJS.Node.prototype._render = function(traversalContext, data) {
     this._renderNodes(traversalContext, data);
 };
@@ -145,14 +141,14 @@ SceneJS.Node.prototype.getNodes = function() {
     return list;
 };
 
-/** Sets child nodes, removing those already present
- * @param {Array} children Array of child nodes
- * @return this
- */
-SceneJS.Node.prototype.setNodes = function(children) {
-    throw "SceneJS.node.setNodes not implemented yet";
-    return this;
-};
+///** Sets child nodes, removing those already present
+// * @param {Array} children Array of child nodes
+// * @return this
+// */
+//SceneJS.Node.prototype.setNodes = function(children) {
+//    throw "SceneJS.node.setNodes not implemented yet";
+//    return this;
+//};
 
 /** Returns child node at given index
  * @returns {SceneJS.node} Child node
@@ -183,7 +179,7 @@ SceneJS.Node.prototype.addNode = function(node) {
     }
     this._children.push(node);
     node._parent = this;
-    node._memoLevel = 0;
+    node._resetMemoLevel();
     return node;
 };
 
@@ -203,7 +199,7 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
         this._children.splice(i, 0, node);
     }
     node._parent = this;
-    node._memoLevel = 0;
+    node._resetMemoLevel();
     return node;
 };
 
@@ -233,30 +229,16 @@ SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
     }
     if (recursive) {
         for (var i = 0; i < this._children; i++) {
-            this._children[i]._getNodesByType(type, list, recursive);
+            this._children[i]._findNodesByType(type, list, recursive);
         }
     }
     return list;
 };
 
-
-//SceneJS.Node.prototype._toString2 = function(strList, indent) {
-//    for (var i = 0; i < indent; i++) {
-//        strList.push("  ");
-//    }
-//    strList.push(this._nodeType + ":" + this._nodeId);
-//
-//    for (var i = 0; i < this._children.length; i++) {
-//        this._children[i]._toString2(strList, indent);
-//    }
-//};
-//
-//SceneJS.Node.prototype._toString = function() {
-//    var strList = [];
-//    this._toString2(strList, 0);
-//    return strList.join("\n");
-//};
-
+/** Returns a new SceneJS.Node instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Node constructor
+ * @returns {SceneJS.Node}
+ */
 SceneJS.node = function() {
     var n = new SceneJS.Node();
     SceneJS.Node.prototype.constructor.apply(n, arguments);
