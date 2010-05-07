@@ -117,7 +117,7 @@ var SceneJS_eventModule = new (function() {
  *     } else {
  *         alert("Error: " + e.exception);
  *     }
-*  });
+ *  });
  * </pre></code>
  *
  * <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all SceneJS.Scene instances are destroyed and resources

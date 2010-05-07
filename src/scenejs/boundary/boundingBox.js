@@ -321,7 +321,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
                         modelTransform.matrix,
                         this._objectCoords)
                 );
-        if (modelTransform.fixed && this._memoLevel == 1) {
+        if (modelTransform.fixed && this._memoLevel == 1 && (!SceneJS_instancingModule.instancing())) {
             this._objectCoords = null;
             this._memoLevel = 2;
         }

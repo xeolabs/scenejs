@@ -81,7 +81,7 @@ SceneJS.ViewMatrix.prototype._render = function(traversalContext, data) {
             matrix: tempMat,
             fixed: superXform.fixed && this._fixedParams
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }

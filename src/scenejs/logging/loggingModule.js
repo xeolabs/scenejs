@@ -67,7 +67,7 @@ var SceneJS_loggingModule = new (function() {
             function(params) {
                 activeSceneId = params.sceneId;
 
-                var element = document.getElementById(SceneJS.DEFAULT_LOGGING_DIV_ID);
+                var element = document.getElementById(SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID);
                 if (element) {
                     funcs = {
                         warn : function log(msg) {

@@ -2,813 +2,60 @@
 <project relativePaths="false" version="4">
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Tile_Ceramic_MultinoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/pluto/pluto.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_bl.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/text/text.js" afterPath="$PROJECT_DIR$/src/scenejs/text/text.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/withData/withData.js" afterPath="$PROJECT_DIR$/src/scenejs/withData/withData.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/uranus/uranus.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/arrow.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/preview.php.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/data/version.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture19.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/lighting/moving-dir-light/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/lighting/moving-dir-light/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/saturn/saturn.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture9.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/graph.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Metal_Corrogated_Shiny.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ide/catalogue/basic/teapot/teapot.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_teapots/multiple-teapots.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/header_splash.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/images/important.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/models/model.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/header_bullet_arrows.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture15.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Material8noCulling.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/teapot/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/teapot/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture13.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture18.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture24.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/gears.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Tile1_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/catalogue/css/catalog.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/seymour-plane/seymour-plane.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_flat_75_ffffff_40x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/server_client_exchange.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Tile_Octagon_Tan.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture10.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture10.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture14.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/textures/earth/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/textures/earth/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture17.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/catalogue/catalog.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/index.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture21.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_gloss-wave_35_f6a828_500x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture22.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/util.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/canvases/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Stone_Marble_VermontDanby.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/canvas.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/grid-floor/grid-floor.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Material1_1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/zip.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/_20080829054322_50m11s.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stars/gigapixel-milky-way.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/venus/venus.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/BRKWEA_B.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/jquery.alerts.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/_20080829054322_50m11s.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/example.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/mars/mars.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/site/utils.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Tile11.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_tl.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/breadcrumbs/css/BreadCrumb.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/icon_bullet.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/textures/cube/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_2e83ff_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/undo.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/lightcycles/doc.kml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/texture.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/texture.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/tick.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture26.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture29.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Wood_Floor_Parquet1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery.cookie.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture11.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/pouring-teapot/pouring-teapot.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/facebook50.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/tokenizejavascript.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/images/help.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/red_rug.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_222222_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7.0/scenes/index.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/images/texture3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/brushed_aluminiumnoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/earth/earthmap1k.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/index.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/red-stone.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/mupfel2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Stone_Marble_VermontDanby1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/venus/venusmap.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/editor.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/illegal-rotate-config.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/interpolation/scalarInterpolator.js" afterPath="$PROJECT_DIR$/src/scenejs/interpolation/scalarInterpolator.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/breadcrumbs/jquery.jBreadCrumb.1.1.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Brickm.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture25.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tank/images/Tile_NavynoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/models/mySpace.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture21.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/spinner/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/spinner/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/orange-teapot/orange-teapot.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Stone41l.JPG" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_highlight-soft_75_cccccc_1x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/ide-examples2.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/planetarium/planetarium.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/S_S_Plank1_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.3.6.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_teapots/index.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/master.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/kanban.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Aquario_bw_top1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/select.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-room/dining-room.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Brick_Flemish_Mix.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/viewMatrix.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/viewMatrix.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsedummy.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/core/data.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/menu-tail.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/scenes/v0.7.0/index.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_viewports/multiple-viewports.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture10.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture15.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/backend-classes.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/downloads.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Tile_Mosaic_Browns.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/load/load.js" afterPath="$PROJECT_DIR$/src/scenejs/load/load.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/lindsayk.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/load/loadModule.js" afterPath="$PROJECT_DIR$/src/scenejs/load/loadModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery.tabs.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/LEM-CF.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/mupfel1_1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/keyboard.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/name/name.js" afterPath="$PROJECT_DIR$/src/scenejs/name/name.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/jquery-ui-1.7.2.custom.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/__CorrogateShiny_2noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/asset/importBackend.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ide/catalogue/animation/teapot-cloud/teapot-cloud.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Beam_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_teapots/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.3.8.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture18.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/backgrounds/starry-sky/usage.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/sky/sky_1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Gravl2_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/highlight.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/LEM-CF.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/downloads.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/introduction.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Material5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/mupfel2_1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/illegal-geometry-parameters.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/images/arrow_right.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/images/info.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/jquery/jquery.youtubeplaylist.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Bark3.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/animation/interpolated-rotation/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/animation/interpolated-rotation/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/jquery/jquery.jtemplates.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Material1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Stone45l.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/tokenize.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/earth/earth.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Benedeti.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture14.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/lighting/default-lights.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/seymour-plane/seymour-plane.js" afterPath="$PROJECT_DIR$/src/tests/assets/seymour-plane/seymour-plane.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/collada-viewer/scenejs.min.js" afterPath="$PROJECT_DIR$/src/tests/assets/collada-viewer/scenejs.min.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/mupfel2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Natur04l.JPG" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/splitter/vdockbar.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Wood_Bamboo_Medium.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture14.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.2.5.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/demo-icon-small.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/__Metal_Corrogated_Shiny_1_1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture12.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/scenes/v0.7.0/hello-teapot/hello-teapot.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_inset-soft_95_fef1ec_1x100.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/collada-viewer/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/collada-viewer/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-soft_100_deedf7_1x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Material1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture12.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/jquery/jquery-ui-1.7.2.custom.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/js/compressedjquery.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Cement1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_diagonals-thick_18_b81900_40x40.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/splitter.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/features.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/experiments/exp1/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Tile_Limestone_MultinoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture17.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_glass_100_e4f1fb_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/modern-art-41108-24x48-w.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/no-webgl.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/optick-house/optick-house.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Material3noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture12.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/IMG0041.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-hard_70_000000_1x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/models/tiny-kitchen.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Wood_Bamboo_Medium1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/models/The_Ark.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/extending.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture12.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/js/jquery.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/Material_29noCulling.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/rotate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/rotate.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/generation/generator.js" afterPath="$PROJECT_DIR$/src/scenejs/generation/generator.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/paramsTest/params.js" afterPath="$PROJECT_DIR$/src/tests/paramsTest/params.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/images/ajaxImage.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/grids/grid.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/playroom.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/__Glass_Sky_Reflection_6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_55_fbf9ee_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture4.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture27.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/models/dinner-table.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/run-it.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/starship-bridge/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/starship-bridge/index.debug.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/lighting/moving-point-light/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/lighting/moving-point-light/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture1.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/moving-point-light/moving-point-light.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-icons_ef8c08_256x240.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" afterPath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/accept-icon-medium.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/seymourplane_triangulate/images/planeDiffuse.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture20.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" afterPath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_ffffff_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/bullet_point_32x32.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/animation/interpolation/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture8.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture23.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/models/model.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/blogger_logo.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/google/jsapi.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/__CorrogateShiny_.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/material/material.js" afterPath="$PROJECT_DIR$/src/scenejs/material/material.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture12.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spiral-staircase/spiral-staircase.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/mupfel1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/mars/mars_1k_color.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture1.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/howitworks.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture10.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture17.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/Material_23_1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/button_src_hv.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/jquery-ui-1.7.2.custom.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Tile_Hexagon_WhitenoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/js/jtip.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Blown2.jpg" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/scenejs/core/node.js" afterPath="$PROJECT_DIR$/src/scenejs/node/node.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Rbrik1_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture8.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsedummy.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture8.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/shader-variable-not-found.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/images/Thumbs.db" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Blinds_Vertical_Stripe_Gray.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/objects/sphere.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/objects/sphere.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture8.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/webgl.js" afterPath="$PROJECT_DIR$/src/scenejs/core/webgl.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/images/title.gif" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" afterPath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture7.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_diagonals-thick_90_eeeeee_40x40.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_diagonals-thick_20_666666_40x40.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/scenejs/scenejs.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsecss.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/teapot-cloud/teapot-cloud.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/modelMatrix.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/modelMatrix.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/models/study.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Wood_Floor_Parquet.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/projection/perspective.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/projection/perspective.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/backend-not-found.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_75_e6e6e6_1x400.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/basic/teapot/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/basic/teapot/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Blutile.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/textures.txt" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Material4noCulling.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/__CorrogateShiny_2noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Material4noCulling.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/arrow_down_green.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/backgrounds/sphere/starry-sky.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/downloads.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/textures/planets/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/textures/planets/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/notes/notes.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Botticin.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Metal_Corrogated_Shiny1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Basebrd.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/bullet_point_16x16.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/BrickWall.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/dev/dev.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spiral-staircase/spiral-staircase.min.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/tron-tank/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/tron-tank/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Asphalt2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture30.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/jquery/jquery.url.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/water/IMG0064.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/textureLayer.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/textureLayer.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Stone42l.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Fencing_Lattice_NaturalnoCulling.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Metal_Corrogated_Shiny1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_glass_100_f6f6f6_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/broken/issue18.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/catalog.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/models/dining-table.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/tabs.css" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/picking/basic/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/picking/basic/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/canvases/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture26.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture16.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Barkdrk.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/loadCollada/loadCollada.js" afterPath="$PROJECT_DIR$/src/scenejs/loadCollada/loadCollada.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/media_play_gray.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/__CorrogateShiny_1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/3001.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Belmonte.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/tar.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/moving-dir-light/moving-dir-light.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/animation/interpolation/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/backgrounds/sphere/usage.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture27.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/mupfel1_1noCulling.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/viewing/index.html" afterPath="$PROJECT_DIR$/src/tests/viewing/index.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Brickwk.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_b.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/button_demo_hv.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/teapot-asset/teapot-asset.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_2694e8_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture1.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/memory/memoryModule.js" afterPath="$PROJECT_DIR$/src/scenejs/memory/memoryModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-icons_ffd27a_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture29.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/entries/minimal2/layout.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/codemirror.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiled-floor/tiled-floor.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/mirrorframe.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/load-ide.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/media_play_green.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Wood_Floor_Parquet.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_br.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/renderer-node/renderer-node.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Blown.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/ide.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_viewports/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/marble/white-marble.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/S_S_Cracks.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/sylvester/sylvester.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/LEM-CF2noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/doc.kml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/scene.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/scene.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture4.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/editor.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Cdnmistl.JPG" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/seymour-plane.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/animated-texture/animated-texture.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/entries/minimal1/scene.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/mail_write.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/jquery/jquery-1.3.2.min.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/pick/pickModule.js" afterPath="$PROJECT_DIR$/src/scenejs/pick/pickModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/basic/multiobject/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/basic/multiobject/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/ASHSEN_2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture8.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Bage.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/node-config-expected.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/body-stripe.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_72a7cf_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-hard_100_f2f5f7_1x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/spiral-staircase/spiral-staircase.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture19.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/lightcycles/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/clipart/lindsayk.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture3.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/stationary/starry-sky/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/stationary/starry-sky/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture16.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture7.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-icons_228ef1_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Pine1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsejavascript.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tank/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/backend-classes-sequence.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Material2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/dev/dev.css" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/stress-tests/memory/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/stress-tests/memory/index.debug.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture4.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/invalid-lookat-parameters.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/projection/frustum.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/projection/frustum.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/style.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/images/loader.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture13.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture24.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/sanity/test/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/sanity/test/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/models/model.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/BigStones.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/tutorial-icon.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Material3noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tank/models/Tank.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture9.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-icons_222222_256x240.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture11.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/projection/ortho.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/projection/ortho.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/tokenizejavascript.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/lookAt.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/lookAt.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/book_green_tiny.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tank/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/registry.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture15.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture18.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/import1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/tron-tank/tron-tank.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/doc.kml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/billboard.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/billboard.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/3083.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Bamboo_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/collada-duck/duck.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/saturn/saturnmap.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture22.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Material1_1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Brick_Flemish_Mix.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/indexV2.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/tokenize.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture7.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/stationary.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/stationary.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Wood_Cherry_OriginalnoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/Material_28noCulling.JPG" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/models/model.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_flat_10_000000_40x100.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/animation/teapot-cloud/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/animation/teapot-cloud/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_glass_65_ffffff_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Brickm2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/jscolors.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/models/Spinner.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Metal_Corrogated_Shiny1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsehtmlmixed.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Material2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/menu-right.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/throbber.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture11.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/temple/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/temple/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/courtyard-house/courtyard-house.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/seymourplane_triangulate/seymourplane_triangulate.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/catalogue.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Asph-min.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/jquery/jquery-url.packed.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture9.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/no-canvas-active.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/tron/wall1.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/loadCollada/colladaParserModule.js" afterPath="$PROJECT_DIR$/src/scenejs/loadCollada/colladaParserModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Material1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/jupiter/jup0vss1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_highlight-soft_25_ffef8f_1x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture22.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/viewing/stationary/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/viewing/stationary/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Textile_NaturalnoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsecss.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/entries/minimal1/layout.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/util.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/teapot-example1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/default-error.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/mupfel3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_cd0a0a_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_l.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture11.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/asset-load-failure.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture7.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/jscolors.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7.0/scenes/hello-teapot/hello-teapot.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Textile_NaturalnoCulling.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Bark1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Stone09l.JPG" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Material8noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/css/catalogue.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Metal_Corrogated_Shiny1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Muddy1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery-ui-1.7.2.custom.min.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/locality.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/locality.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/data/data.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/lightcycles/images/__Blue_Tile_noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/csscolors.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/backgrounds/starry-sky/starry-sky.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/__CorrogateShiny_noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/assets/collada-cube/collada-cube.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture3.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/frustum.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/frustum.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-bg_flat_15_cd0a0a_40x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/node-backend-install-failed.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/translate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/translate.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/home/home.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_flat_0_aaaaaa_40x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_r.png" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/temple/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/temple/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/colosseum/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/colosseum/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/smith-house/smith house.zip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/collada-duck/images/duckCM.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jalerts/jquery.alerts.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture24.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/America.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/neptune/neptune.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/mirrorframe.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/objects/cube.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/objects/cube.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/repository/entries/minimal2/scene.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture16.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/images/texture4.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Metal_Corrogated_ShinynoCulling.jpg" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/withData/withData.js" afterPath="$PROJECT_DIR$/src/scenejs/withData/withData.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/spinner/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/spinner/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/basic/teapot/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/basic/teapot/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/geometry/test1/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/geometry/test1/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/lookAt.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/lookAt.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/lighting/moving-dir-light/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/lighting/moving-dir-light/index.debug.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/renderer-node/test1/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/renderer-node/test1/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/lod/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/lod/index.debug.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/courtyard-house/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/courtyard-house/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Amethyst.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/smith-house/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Groundcover_Gravel_IndiannoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/stringstream.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture28.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/branching/selector.js" afterPath="$PROJECT_DIR$/src/scenejs/branching/selector.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Breccia.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture4.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Brckrgh.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/Tile_Various_TannoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture19.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/splitter/vgrabber2-active.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/geometry/custom-geometry.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/codemirror.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/spiral_staircase/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/canvases/scene.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/canvas-already-active.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/Misc-Tutorial-icon.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/models/Polyhex.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/tex_022.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/smith-house/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Brkwea_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/tron/wall4.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/graphapi.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/red_rug.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Cncrt1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/images/texture0.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture20.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Material5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/textures/cube/general-zod.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/lightcycles/models/LightCycle.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture14.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/illegal-playroom-request.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/splitter/hgrabber.gif" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/animation/texture/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/animation/texture/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/unsupported-operation.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/scenejs-snapshot.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture20.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Material1_1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/asset/scenejs/nativeBackend.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture13.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/neptune/neptunemap.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Beatone.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.3.9.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/docs/procedural-scene-composition.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsexml.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture8.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/select.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/jquery/jyoutube.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/feedback/scene-loading.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/tron/wall2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture2.jpg" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/boundingboxes/teapot-army/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/boundingboxes/teapot-army/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/invalid-node-config.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/animation/interpolation/interpolation.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/images/ui-icons_3d80b3_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Green.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-icons_ffffff_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Brickm3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery.url.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsesparql.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/canvas-not-found.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/menu-left.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/homepage/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_65_ffffff_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/__Tile_Ceramic_Multi_1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/doc.kml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/geometry/cube/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/geometry/cube/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/index.json~" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture10.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/textures/layered/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/textures/layered/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/images/arrow_left.gif" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/boundingboxes/sphere-resolution/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/boundingboxes/sphere-resolution/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dinner-table/images/__Blinds_Vertical_Stripe_Gray_1noCulling.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/modelling/house/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/modelling/house/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Basphlt.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/no-shader-active.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Gravl1_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/tutorial-icon-small.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/scenejs_small.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/textures/cube/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/mupfel2_1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/collada-loader/colladaImport.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/core.js" afterPath="$PROJECT_DIR$/src/scenejs/core/core.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture9.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/Metal_Corrogated_ShinynoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/__Metal_Corrogated_Shiny_1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/images/texture1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/Brake-Light_Red1noCulling.JPG" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture23.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture28.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/images/texture2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/mashup/mashup.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/tron/wall3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/smith-house/models/smith-house.dae" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/textures/general-zod/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/textures/general-zod/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsexml.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/neptune/nep0fds1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture7.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/modern-art-41108-24x48-w.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/Untitled-2_copy.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture17.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/jupiter/jupitermap.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/Material_23noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/mupfel1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/dev.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/jupiter/jupiter.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/highlight.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/generation/spiral-staircase/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/generation/spiral-staircase/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/uranus/uranusmap.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/scenejs/scenejs.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture4.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Kitchen_01.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture4.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/venus/ven0aaa2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/index-ide-examples.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture7.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/shader-link-failure.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/cupertino/jquery-ui-1.7.2.custom.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/dev/dev.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture9.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/study/images/keyboard.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery.template.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Biasard.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/rendererModule.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/rendererModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/textureModule.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/textureModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/asset/import.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_454545_256x240.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/style.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/textures.txt" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/viewing/skydome/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/viewing/skydome/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/BUBING_2.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/models/study.dae" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture11.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Bark5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/catalogue.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/parsejavascript.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/tooltips/css/global.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Blossom.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/processes/processModule.js" afterPath="$PROJECT_DIR$/src/scenejs/processes/processModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture23.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/ui-lightness/images/ui-bg_highlight-soft_100_eeeeee_1x100.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery.easing.1.3.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/br_tyrell_copy.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/images/texture25.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/jquery/jquery-1.3.2.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Barnwod1.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/js/blogfeed/blogfeed.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/courtyard-house/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/courtyard-house/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/rotate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/rotate.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/logging.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/logging.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/css/sandbox.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_t.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/water/Waterpl.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture25.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/mupfel3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture15.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/my-space/images/texture9.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/spinner/images/__Glass_Sky_Reflection_5.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture3.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/load-ide2.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/assets/collada-cube/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/demo-icon-large.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/border/border_tr.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/temple/textures.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_2e83ff_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsehtmlmixed.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/ide.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/parsesparql.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/wood/Barn1_t.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/github_logo_sm.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/splitter/vgrabber2-normal.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/sparqlcolors.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/uss-excelsior-bridge/uss-excelsior-bridge.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/doc.kml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/paul-manning/altihex/images/texture16.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Metal_Corrogated_ShinynoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-bg_glass_75_dadada_1x400.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Borduex.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/spiral_staircase/spiral-staircase.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/multiple_viewports/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Aquario_bw_topnoCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Blam.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/study/images/Wood_Floor_Parquet1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/scene-load-failed.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/css/xmlcolors.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/messages/error/out-of-memory.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/css/themes/custom/images/ui-icons_888888_256x240.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/tiny-kitchen/images/Metal_Corrogated_Shiny1_1noCulling.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/js/codemirror/undo.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/a-xeolabs-project.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/licenses/MIT_LICENSE.txt" afterPath="$PROJECT_DIR$/licenses/MIT_LICENSE.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/seymour-plane/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/seymour-plane/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/generation/spiral_staircase/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/ga/gatag.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/broken/issue29.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/templates/ide-examples.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/fallingwater/images/texture27.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/sceneModule.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/sceneModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/basic/test/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/basic/test/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture26.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/images/lego.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/custom-geometry/custom-geometry.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/lib/codemirror/js/stringstream.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/pluto/plutomap1k.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/planets/mercury/mercurymap.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/examples/images/splitter/vgrabber.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture13.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture21.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/cybertron-ark/images/texture4.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/excelsior-bridge/images/texture7.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/downloads/scenejs.0.3.7.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture28.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/revision-house/images/texture6.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/planets/mercury/mercury.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/misc/general-zod.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/textures/stone/Azulbah.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/fog/fog.js" afterPath="$PROJECT_DIR$/src/scenejs/fog/fog.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/scenes/examples/hello-teapot/hello-teapot.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/node/node.js" afterPath="$PROJECT_DIR$/src/scenejs/node/node.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests/instancing/test1/instanced-spiral-staircase.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/texture.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/texture.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/generation/spiral-staircase/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/generation/spiral-staircase/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/lighting/moving-point-light/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/lighting/moving-point-light/index.debug.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/viewMatrix.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/viewMatrix.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/js-staircase-asset-demo.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/teapot/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/teapot/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/tron-tank/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/tron-tank/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/stationary.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/stationary.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/instancing/test1/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" afterPath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/load/load.js" afterPath="$PROJECT_DIR$/src/scenejs/load/load.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/load/loadModule.js" afterPath="$PROJECT_DIR$/src/scenejs/load/loadModule.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/instancing/test2/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" afterPath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/modelMatrix.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/modelMatrix.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests/instancing/test2/instanced-teapot.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/text/text/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/text/text/index.debug.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/website/library/v0.7/assets/examples/dining-table/images/texture5.jpg" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/loadCollada/loadCollada.js" afterPath="$PROJECT_DIR$/src/scenejs/loadCollada/loadCollada.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/core.js" afterPath="$PROJECT_DIR$/src/scenejs/core/core.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/modelTransformModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/modelTransformModule.js" />
     </list>
-    <ignored path="scenejs.iws" />
     <ignored path=".idea/workspace.xml" />
+    <ignored path="scenejs.iws" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="Commander">
@@ -864,91 +111,93 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="loadModule.js" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/load/loadModule.js">
+      <file leaf-file-name="instanced-spiral-staircase.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/instanced-spiral-staircase.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="63" selection-start="1174" selection-end="1174" vertical-scroll-proportion="0.7583643">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="load.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/load/load.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="135" column="24" selection-start="5088" selection-end="5088" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="scalarInterpolator.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/interpolation/scalarInterpolator.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="151" column="20" selection-start="5319" selection-end="5349" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="exceptions.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="143" column="98" selection-start="4520" selection-end="4520" vertical-scroll-proportion="0.0">
+            <state line="177" column="8" selection-start="9405" selection-end="9405" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="index.debug.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/index.debug.html">
+        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/index.debug.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="180" column="0" selection-start="7641" selection-end="7641" vertical-scroll-proportion="-28.041666">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="seymour-plane.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/seymour-plane.js">
+      <file leaf-file-name="instanced-teapot.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/instanced-teapot.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="111" column="84" selection-start="5001" selection-end="5001" vertical-scroll-proportion="0.0">
+            <state line="60" column="92" selection-start="3001" selection-end="3001" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="seymourplane_triangulate.dae" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/seymourplane_triangulate/seymourplane_triangulate.dae">
+      <file leaf-file-name="scenejs.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/website/lib/scenejs/scenejs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="6" selection-start="2114" selection-end="2114" vertical-scroll-proportion="0.0">
+            <state line="33" column="9" selection-start="854" selection-end="854" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="errorsModule.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/errors/errorsModule.js">
+      <file leaf-file-name="index.debug.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/index.debug.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="40" column="11" selection-start="2126" selection-end="2419" vertical-scroll-proportion="-26.208334">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="eventsModule.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/events/eventsModule.js">
+      <file leaf-file-name="symbol.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/symbol.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="118" column="7" selection-start="4675" selection-end="4675" vertical-scroll-proportion="0.0">
+            <state line="1" column="2" selection-start="0" selection-end="2671" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1273200338000" expanded="true" signature="0:2671" placeholder="/**...*/" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="131" column="81" selection-start="7819" selection-end="7819" vertical-scroll-proportion="-10.625">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="colladaParserModule.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/loadCollada/colladaParserModule.js">
+      <file leaf-file-name="generator.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/generation/generator.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="77" column="61" selection-start="2170" selection-end="2173" vertical-scroll-proportion="-23.8">
+            <state line="62" column="79" selection-start="3069" selection-end="3244" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="instancingModule.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="43" column="13" selection-start="1244" selection-end="1244" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="instance.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instance.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="9" column="33" selection-start="554" selection-end="554" vertical-scroll-proportion="0.17133258">
               <folding />
             </state>
           </provider>
@@ -960,6 +209,12 @@
     <FindUsagesManager>
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/scenejs/logging/logging.js" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="#JAVA_INTERNAL" />
   </component>
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" />
@@ -1018,6 +273,32 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
+          <option name="myItemId" value="website" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="lib" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
           <option name="myItemId" value="src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
@@ -1048,7 +329,11 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="assets" />
+          <option name="myItemId" value="instancing" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="test2" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1074,45 +359,11 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="assets" />
+          <option name="myItemId" value="instancing" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="seymour-plane" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="tests" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="assets" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="seymour-plane" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="seymourplane_triangulate" />
+          <option name="myItemId" value="test1" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1138,41 +389,11 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="assets" />
+          <option name="myItemId" value="generation" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="courtyard-house" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="tests" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="assets" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="collada-viewer" />
+          <option name="myItemId" value="spiral-staircase" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1220,7 +441,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="loadCollada" />
+          <option name="myItemId" value="pick" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1246,7 +467,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="load" />
+          <option name="myItemId" value="name" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1272,7 +493,111 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="interpolation" />
+          <option name="myItemId" value="material" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="lighting" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="instancing" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="generation" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="fog" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1316,15 +641,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="events" />
+          <option name="myItemId" value="licenses" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1342,15 +659,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="errors" />
+          <option name="myItemId" value="dist" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -1358,6 +667,30 @@
         <PATH_ELEMENT>
           <option name="myItemId" value="scenejs" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="dist" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="extracted" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs-0.7.0" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="lib" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
     </subPane>
@@ -1384,15 +717,15 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.lastSelected" value="preferences.editor" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="options.lastSelected" value="project.scopes" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -1511,14 +844,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1931" y="26" width="1902" height="1133" extended-state="0" />
+    <frame x="1922" y="26" width="1902" height="1133" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12714429" sideWeight="0.5" order="1" side_tool="false" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.065590315" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
@@ -1527,7 +860,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19708423" sideWeight="0.86579216" order="0" side_tool="false" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28347734" sideWeight="0.9273461" order="0" side_tool="false" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" />
@@ -1565,114 +898,118 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/scenejs/core/core.js">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/name/nameModule.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="5" selection-start="1751" selection-end="1751" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/boundary/locality.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="8" selection-start="1138" selection-end="1138" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="89" column="47" selection-start="3266" selection-end="3266" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/node/node.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="8" selection-start="248" selection-end="248" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/tests/assets/courtyard-house/index.debug.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="156" column="100" selection-start="568" selection-end="6840" vertical-scroll-proportion="-22.291666">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/core/data.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="104" selection-start="1267" selection-end="1267" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/index.debug.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="180" column="0" selection-start="7641" selection-end="7641" vertical-scroll-proportion="-28.041666">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/loadCollada/colladaParserModule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="77" column="61" selection-start="2170" selection-end="2173" vertical-scroll-proportion="-23.8">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/errors/errorsModule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/events/eventsModule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="118" column="7" selection-start="4675" selection-end="4675" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/interpolation/scalarInterpolator.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="151" column="20" selection-start="5319" selection-end="5349" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/load/load.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="135" column="24" selection-start="5088" selection-end="5088" vertical-scroll-proportion="0.0">
+        <state line="109" column="0" selection-start="3192" selection-end="3192" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="143" column="98" selection-start="4520" selection-end="4520" vertical-scroll-proportion="0.0">
+        <state line="194" column="56" selection-start="6028" selection-end="6028" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1273193680000" expanded="true" signature="5849:5971" placeholder="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/fog/fog.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="169" column="58" selection-start="4948" selection-end="4948" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/seymourplane_triangulate/seymourplane_triangulate.dae">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/lighting/lights.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="6" selection-start="2114" selection-end="2114" vertical-scroll-proportion="0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/seymour-plane.js">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/material/materialModule.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="111" column="84" selection-start="5001" selection-end="5001" vertical-scroll-proportion="0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/load/loadModule.js">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/material/material.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="63" selection-start="1174" selection-end="1174" vertical-scroll-proportion="0.7583643">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/generation/generator.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="79" selection-start="3069" selection-end="3244" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/index.debug.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="13" selection-start="1244" selection-end="1244" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/instanced-spiral-staircase.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="177" column="8" selection-start="9405" selection-end="9405" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/instanced-teapot.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="92" selection-start="3001" selection-end="3001" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/lib/scenejs/scenejs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="9" selection-start="854" selection-end="854" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/index.debug.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="11" selection-start="2126" selection-end="2419" vertical-scroll-proportion="-26.208334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="131" column="81" selection-start="7819" selection-end="7819" vertical-scroll-proportion="-10.625">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/symbol.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="2" selection-start="0" selection-end="2671" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1273200338000" expanded="true" signature="0:2671" placeholder="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instance.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="33" selection-start="554" selection-end="554" vertical-scroll-proportion="0.17133258">
           <folding />
         </state>
       </provider>
@@ -1694,12 +1031,19 @@
           <value>
             <UIState>
               <option name="proportions">
-                <SplitterProportionsDataImpl />
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
               </option>
+              <option name="lastEditedConfigurable" value="IDE Profiles" />
             </UIState>
           </value>
         </entry>
-        <entry key="ScopeChooserConfigurable.UI">
+        <entry key="ProjectJDKs.UI">
           <value>
             <UIState>
               <option name="proportions">
@@ -1711,11 +1055,15 @@
                   </option>
                 </SplitterProportionsDataImpl>
               </option>
-              <option name="lastEditedConfigurable" value="Unnamed" />
-              <option name="order">
-                <list>
-                  <option value="Unnamed" />
-                </list>
+              <option name="lastEditedConfigurable" value="1.6" />
+            </UIState>
+          </value>
+        </entry>
+        <entry key="ScopeChooserConfigurable.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl />
               </option>
             </UIState>
           </value>
@@ -1737,12 +1085,19 @@
           <value>
             <UIState>
               <option name="proportions">
-                <SplitterProportionsDataImpl />
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
               </option>
+              <option name="lastEditedConfigurable" value="IDE Profiles" />
             </UIState>
           </value>
         </entry>
-        <entry key="ScopeChooserConfigurable.UI">
+        <entry key="ProjectJDKs.UI">
           <value>
             <UIState>
               <option name="proportions">
@@ -1754,11 +1109,15 @@
                   </option>
                 </SplitterProportionsDataImpl>
               </option>
-              <option name="lastEditedConfigurable" value="Unnamed" />
-              <option name="order">
-                <list>
-                  <option value="Unnamed" />
-                </list>
+              <option name="lastEditedConfigurable" value="1.6" />
+            </UIState>
+          </value>
+        </entry>
+        <entry key="ScopeChooserConfigurable.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl />
               </option>
             </UIState>
           </value>

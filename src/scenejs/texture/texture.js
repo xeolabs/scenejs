@@ -2,7 +2,9 @@
  * @class A scene node that defines one or more layers of texture to apply to all geometries within its subgraph that have UV coordinates.
  * @extends SceneJS.node
  * <p>Texture layers are applied to specified material reflection cooficients, and may be transformed.</p>
- * <p><b>Example 1</b></p>
+ * <p><b>Live Examples</b></p>
+ * <li><a target = "other" href="http://bit.ly/scenejs-animated-texture">Animated Texture</a></li>
+ * </ul>
  * <p>A cube wrapped with a material which specifies its base (diffuse) color coefficient, and a texture with
  * one layer which applies a texture image to that particular coefficient. The texture is also translated, scaled and
  * rotated, in that order. All the texture properties are specified here to show what they are. </p>

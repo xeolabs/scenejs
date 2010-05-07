@@ -1,5 +1,5 @@
 /**
- * @class A scene node allows you to intercept SceneJS logging at selected points within your scene graph.
+ * @class A scene node that allows you to intercept SceneJS logging at selected points within your scene graph.
  * <p><b>Example Usage</b></p><p>Routing all logging within a given subgraph to alert popups:</b></p><pre><code>
  * var node = new SceneJS.Node(
  *

@@ -129,13 +129,14 @@ SceneJS.Scale.prototype._render = function(traversalContext, data) {
     }
     var superXform = SceneJS_modelTransformModule.getTransform();
     if (this._memoLevel < 2) {
+        var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams
+            fixed: superXform.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }

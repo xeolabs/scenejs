@@ -12,65 +12,69 @@
 <span class='line'>  5</span>  * begin the load and allow traversal to continue at its next sibling node. When on a subsequent visit its subgraph has
 <span class='line'>  6</span>  * been loaded, it will then allow traversal to descend into that subgraph to render it.&lt;/p>
 <span class='line'>  7</span>  * &lt;p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().&lt;/p>
-<span class='line'>  8</span>  * &lt;p>&lt;b>Usage Example&lt;/b>&lt;/p>&lt;p>The SceneJS.LoadCollada node shown below loads a target asset cross-domain, from
-<span class='line'>  9</span>  * the &lt;node> with ID "propeller" in a Collada file "airplane.dae" stored on a server at "foo.com". The transfer is
-<span class='line'> 10</span>  * routed via the JSONP proxy located by the &lt;b>uri&lt;/b> property on the SceneJS.Scene node.&lt;/b>&lt;/p>
-<span class='line'> 11</span>  * &lt;pre>&lt;code>
-<span class='line'> 12</span>  * var exampleScene = new SceneJS.Scene({
-<span class='line'> 13</span>  *
-<span class='line'> 14</span>  *       // JSONP proxy location - needed only for cros-domain load
-<span class='line'> 15</span>  *       proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" });
-<span class='line'> 16</span>  *
-<span class='line'> 17</span>  *       new SceneJS.LoadCollada({
-<span class='line'> 18</span>  *                  uri: "http://foo.com/airplane.dae",
-<span class='line'> 19</span>  *                  node: "propeller"
-<span class='line'> 20</span>  *            })
-<span class='line'> 21</span>  *  );
-<span class='line'> 22</span>  *  &lt;/pre>&lt;/code>
-<span class='line'> 23</span>  *
-<span class='line'> 24</span>  * @extends SceneJS.load
-<span class='line'> 25</span>  */</span><span class="WHIT">
-<span class='line'> 26</span> 
-<span class='line'> 27</span> </span><span class="NAME">SceneJS.LoadCollada</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Load.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"loadCollada"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 30</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 31</span> 
-<span class='line'> 32</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.LoadCollada</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Load</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 33</span> 
-<span class='line'> 34</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'> 35</span> </span><span class="NAME">SceneJS.LoadCollada.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 36</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">params.uri</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 37</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.NodeConfigExpectedException</span><span class="WHIT">
-<span class='line'> 38</span> </span><span class="WHIT">                </span><span class="PUNC">(</span><span class="STRN">"SceneJS.LoadCollada parameter expected: uri"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 39</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="NAME">this._uri</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 41</span> </span><span class="WHIT">    </span><span class="NAME">this._serverParams</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 42</span> </span><span class="WHIT">        </span><span class="NAME">format</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"xml"</span><span class="WHIT">
-<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 44</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">modes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 45</span> </span><span class="WHIT">        </span><span class="NAME">loadCamera</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.loadCamera</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 46</span> </span><span class="WHIT">        </span><span class="NAME">loadLights</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.loadLights</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 47</span> </span><span class="WHIT">        </span><span class="NAME">showBoundingBoxes</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.showBoundingBoxes</span><span class="WHIT">
-<span class='line'> 48</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 49</span> </span><span class="WHIT">    </span><span class="NAME">this._parser</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">xml</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">onError</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 50</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">SceneJS_colladaParserModule.parse</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'> 51</span> </span><span class="WHIT">                </span><span class="NAME">params.uri</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">// Used in paths to texture images</span><span class="WHIT">
-<span class='line'> 52</span> </span><span class="WHIT">                </span><span class="NAME">xml</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'> 53</span> </span><span class="WHIT">                </span><span class="NAME">params.node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">// Optional cherry-picked asset</span><span class="WHIT">
-<span class='line'> 54</span> </span><span class="WHIT">                </span><span class="NAME">modes</span><span class="WHIT">
-<span class='line'> 55</span> </span><span class="WHIT">                </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 56</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 57</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 58</span> 
-<span class='line'> 59</span> 
-<span class='line'> 60</span> </span><span class="COMM">/** Returns a new SceneJS.LoadCollada instance
-<span class='line'> 61</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.LoadCollada constructor
-<span class='line'> 62</span>  * @returns {SceneJS.LoadCollada}
-<span class='line'> 63</span>  */</span><span class="WHIT">
-<span class='line'> 64</span> </span><span class="NAME">SceneJS.loadCollada</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.LoadCollada</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.LoadCollada.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 68</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 69</span> </span></pre></body></html>
+<span class='line'>  8</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
+<span class='line'>  9</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-collada-load-seymour">Seymour Plane&lt;/a>&lt;/li>
+<span class='line'> 10</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-tron-tank">Tron Tank&lt;/a>&lt;/li>
+<span class='line'> 11</span>  * &lt;/ul>
+<span class='line'> 12</span>  * &lt;p>&lt;b>Usage Example&lt;/b>&lt;/p>&lt;p>The SceneJS.LoadCollada node shown below loads a target asset cross-domain, from
+<span class='line'> 13</span>  * the &lt;node> with ID "propeller" in a Collada file "airplane.dae" stored on a server at "foo.com". The transfer is
+<span class='line'> 14</span>  * routed via the JSONP proxy located by the &lt;b>uri&lt;/b> property on the SceneJS.Scene node.&lt;/b>&lt;/p>
+<span class='line'> 15</span>  * &lt;pre>&lt;code>
+<span class='line'> 16</span>  * var exampleScene = new SceneJS.Scene({
+<span class='line'> 17</span>  *
+<span class='line'> 18</span>  *       // JSONP proxy location - needed only for cros-domain load
+<span class='line'> 19</span>  *       proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" });
+<span class='line'> 20</span>  *
+<span class='line'> 21</span>  *       new SceneJS.LoadCollada({
+<span class='line'> 22</span>  *                  uri: "http://foo.com/airplane.dae",
+<span class='line'> 23</span>  *                  node: "propeller"
+<span class='line'> 24</span>  *            })
+<span class='line'> 25</span>  *  );
+<span class='line'> 26</span>  *  &lt;/pre>&lt;/code>
+<span class='line'> 27</span>  *
+<span class='line'> 28</span>  * @extends SceneJS.load
+<span class='line'> 29</span>  */</span><span class="WHIT">
+<span class='line'> 30</span> 
+<span class='line'> 31</span> </span><span class="NAME">SceneJS.LoadCollada</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Load.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"loadCollada"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 35</span> 
+<span class='line'> 36</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.LoadCollada</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Load</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 37</span> 
+<span class='line'> 38</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="NAME">SceneJS.LoadCollada.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">params.uri</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.NodeConfigExpectedException</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">                </span><span class="PUNC">(</span><span class="STRN">"SceneJS.LoadCollada parameter expected: uri"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">    </span><span class="NAME">this._uri</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="NAME">this._serverParams</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="WHIT">        </span><span class="NAME">format</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">"xml"</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">modes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 49</span> </span><span class="WHIT">        </span><span class="NAME">loadCamera</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.loadCamera</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 50</span> </span><span class="WHIT">        </span><span class="NAME">loadLights</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.loadLights</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">        </span><span class="NAME">showBoundingBoxes</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">params.showBoundingBoxes</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">    </span><span class="NAME">this._parser</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">xml</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">onError</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">SceneJS_colladaParserModule.parse</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">                </span><span class="NAME">params.uri</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">// Used in paths to texture images</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">                </span><span class="NAME">xml</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">                </span><span class="NAME">params.node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">// Optional cherry-picked asset</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">                </span><span class="NAME">modes</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">                </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 62</span> 
+<span class='line'> 63</span> 
+<span class='line'> 64</span> </span><span class="COMM">/** Returns a new SceneJS.LoadCollada instance
+<span class='line'> 65</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.LoadCollada constructor
+<span class='line'> 66</span>  * @returns {SceneJS.LoadCollada}
+<span class='line'> 67</span>  */</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="NAME">SceneJS.loadCollada</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.LoadCollada</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.LoadCollada.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> </span></pre></body></html>

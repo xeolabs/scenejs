@@ -55,7 +55,7 @@
 <span class='line'> 48</span> 
 <span class='line'> 49</span> </span><span class="COMM">/**
 <span class='line'> 50</span>  * @class Exception thrown when a SceneJS.Scene 'canvasId' configuration does not match any elements in the page and no
-<span class='line'> 51</span>  * default canvas was found with the ID specified in SceneJS.DEFAULT_CANVAS_ID.
+<span class='line'> 51</span>  * default canvas was found with the ID specified in SceneJS.Scene.DEFAULT_CANVAS_ID.
 <span class='line'> 52</span>  */</span><span class="WHIT">
 <span class='line'> 53</span> </span><span class="NAME">SceneJS.CanvasNotFoundException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 54</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
@@ -81,7 +81,7 @@
 <span class='line'> 74</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 75</span> 
 <span class='line'> 76</span> </span><span class="COMM">/**@class  Exception thrown when a SceneJS.LoggingToPage 'elementId' configuration does not match any elements in the page and no
-<span class='line'> 77</span>  * default DIV was found with the ID specified in SceneJS.DEFAULT_LOGGING_DIV_ID.
+<span class='line'> 77</span>  * default DIV was found with the ID specified in SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID.
 <span class='line'> 78</span>  */</span><span class="WHIT">
 <span class='line'> 79</span> </span><span class="NAME">SceneJS.DocumentElementNotFoundException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 80</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
@@ -122,37 +122,91 @@
 <span class='line'>115</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>116</span> 
 <span class='line'>117</span> </span><span class="COMM">/**
-<span class='line'>118</span>  * @class  Exception thrown by nodes such as SceneJS.Renderer and SceneJS.Texture when the browser's WebGL does not support
-<span class='line'>119</span>  * a specified config value.
+<span class='line'>118</span>  * @class  Exception thrown to signify an error response from the proxy configured for cross-domain loads
+<span class='line'>119</span>  * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
 <span class='line'>120</span>  */</span><span class="WHIT">
-<span class='line'>121</span> </span><span class="NAME">SceneJS.WebGLUnsupportedNodeConfigException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="NAME">SceneJS.ProxyErrorResponseException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>122</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>123</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>124</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>125</span> 
-<span class='line'>126</span> </span><span class="COMM">/** @private */</span><span class="WHIT">
-<span class='line'>127</span> </span><span class="NAME">SceneJS.PickWithoutRenderedException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>128</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>129</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>130</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>131</span> 
-<span class='line'>132</span> </span><span class="COMM">/**
-<span class='line'>133</span>  * @class  Exception thrown when a node (such as SceneJs.ScalarInterpolator) expects to find some element of data on the current
-<span class='line'>134</span>  * data scope (SceneJS.Data).
-<span class='line'>135</span>  */</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="NAME">SceneJS.DataExpectedException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>138</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>139</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>140</span> 
-<span class='line'>141</span> </span><span class="COMM">/**
-<span class='line'>142</span>  * @class  Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
-<span class='line'>143</span>  */</span><span class="WHIT">
-<span class='line'>144</span> </span><span class="NAME">SceneJS.LoadTimeoutException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>145</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>147</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>148</span> 
-<span class='line'>149</span> 
+<span class='line'>126</span> </span><span class="COMM">/**
+<span class='line'>127</span>  * @class  Exception thrown to signify an empty response from the proxy configured for cross-domain loads
+<span class='line'>128</span>  * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+<span class='line'>129</span>  */</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="NAME">SceneJS.ProxyEmptyResponseException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> 
+<span class='line'>135</span> </span><span class="COMM">/**
+<span class='line'>136</span>  * @class  Exception thrown to signify that empty content was loaded (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+<span class='line'>137</span>  */</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="NAME">SceneJS.EmptyResponseException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>142</span> 
+<span class='line'>143</span> </span><span class="COMM">/**
+<span class='line'>144</span>  * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+<span class='line'>145</span>  */</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="NAME">SceneJS.HttpException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>150</span> 
-<span class='line'>151</span> </span></pre></body></html>
+<span class='line'>151</span> </span><span class="COMM">/**
+<span class='line'>152</span>  * @class  Exception thrown by nodes such as SceneJS.Renderer and SceneJS.Texture when the browser's WebGL does not support
+<span class='line'>153</span>  * a specified config value.
+<span class='line'>154</span>  */</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="NAME">SceneJS.WebGLUnsupportedNodeConfigException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>159</span> 
+<span class='line'>160</span> </span><span class="COMM">/** @private */</span><span class="WHIT">
+<span class='line'>161</span> </span><span class="NAME">SceneJS.PickWithoutRenderedException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>165</span> 
+<span class='line'>166</span> </span><span class="COMM">/**
+<span class='line'>167</span>  * @class  Exception thrown when a node (such as SceneJs.ScalarInterpolator) expects to find some element of data on the current
+<span class='line'>168</span>  * data scope (SceneJS.Data).
+<span class='line'>169</span>  */</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="NAME">SceneJS.DataExpectedException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>173</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>174</span> 
+<span class='line'>175</span> </span><span class="COMM">/**
+<span class='line'>176</span>  * @class  Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
+<span class='line'>177</span>  */</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="NAME">SceneJS.LoadTimeoutException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>182</span> 
+<span class='line'>183</span> </span><span class="COMM">/**
+<span class='line'>184</span>  * @class  Exception thrown to signify a general internal SceneJS exception, ie. a SceneJS implementation bug.
+<span class='line'>185</span>  */</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="NAME">SceneJS.InternalException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>190</span> 
+<span class='line'>191</span> </span><span class="COMM">/**
+<span class='line'>192</span>  * @class  Exception thrown to signify that a SceneJS.Instance node could not find
+<span class='line'>193</span>  * a SceneJS.Symbol to instance
+<span class='line'>194</span>  */</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="NAME">SceneJS.SymbolNotFoundException</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">    </span><span class="NAME">this.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">    </span><span class="NAME">this.cause</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">cause</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>199</span> 
+<span class='line'>200</span> 
+<span class='line'>201</span> 
+<span class='line'>202</span> 
+<span class='line'>203</span> 
+<span class='line'>204</span> 
+<span class='line'>205</span> </span></pre></body></html>

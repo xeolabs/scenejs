@@ -5,6 +5,10 @@
  * begin the load and allow traversal to continue at its next sibling node. When on a subsequent visit its subgraph has
  * been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
  * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
+ * <p><b>Live Examples</b></p>
+ * <li><a target = "other" href="http://bit.ly/scenejs-collada-load-seymour">Seymour Plane</a></li>
+ * <li><a target = "other" href="http://bit.ly/scenejs-tron-tank">Tron Tank</a></li>
+ * </ul>
  * <p><b>Usage Example</b></p><p>The SceneJS.LoadCollada node shown below loads a target asset cross-domain, from
  * the <node> with ID "propeller" in a Collada file "airplane.dae" stored on a server at "foo.com". The transfer is
  * routed via the JSONP proxy located by the <b>uri</b> property on the SceneJS.Scene node.</b></p>

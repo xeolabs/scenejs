@@ -13,7 +13,7 @@
 <span class='line'>  6</span>  * visit its subgraph has been loaded, it will then allow traversal to descend into that subgraph to render it.&lt;/p>
 <span class='line'>  7</span>  * &lt;p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().&lt;/p>
 <span class='line'>  8</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
-<span class='line'>  9</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-asset-js-examples">Example 1&lt;/a>&lt;/li>
+<span class='line'>  9</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-asset-load">Example 1&lt;/a>&lt;/li>
 <span class='line'> 10</span>  * &lt;/ul>
 <span class='line'> 11</span>  * &lt;p>&lt;b>Usage Example&lt;/b>&lt;/p>&lt;p>The SceneJS.Load node shown below loads a fragment of JavaScript-defined scene
 <span class='line'> 12</span>  * definition cross-domain, via the JSONP proxy located by the &lt;b>uri&lt;/b> property on the SceneJS.Scene node.&lt;/b>&lt;/p>
@@ -136,26 +136,27 @@
 <span class='line'>129</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onTimeout</span><span class="WHIT">
 <span class='line'>130</span> </span><span class="WHIT">                        </span><span class="NAME">_this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_this._STATE_ERROR</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>131</span> </span><span class="WHIT">                        </span><span class="NAME">SceneJS_errorModule.error</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'>132</span> </span><span class="WHIT">                                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.LoadTimeoutException</span><span class="PUNC">(</span><span class="STRN">"SceneJS.Load timed out - uri: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_this._uri</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">                                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.LoadTimeoutException</span><span class="PUNC">(</span><span class="STRN">"Load timed out - uri: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_this._uri</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>133</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>134</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">msg</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onError - SceneJS_loadModule has killed process</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onError - SceneJS_loadModule has killed process</span><span class="WHIT">
 <span class='line'>135</span> </span><span class="WHIT">                        </span><span class="NAME">_this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">_this._STATE_ERROR</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="WHIT">                        </span><span class="NAME">SceneJS_errorModule.error</span><span class="PUNC">(</span><span class="STRN">"SceneJS.Load failed - "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">msg</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" - uri: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_this._uri</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>138</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>139</span> 
-<span class='line'>140</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">this._STATE_ERROR</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>141</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>142</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>144</span> 
-<span class='line'>145</span> </span><span class="COMM">/** Returns a new SceneJS.Load instance
-<span class='line'>146</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Load constructor
-<span class='line'>147</span>  * @returns {SceneJS.Load}
-<span class='line'>148</span>  */</span><span class="WHIT">
-<span class='line'>149</span> </span><span class="NAME">SceneJS.load</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>150</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Load</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>151</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Load.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>153</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>154</span> </span></pre></body></html>
+<span class='line'>136</span> </span><span class="WHIT">                        </span><span class="NAME">e.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"Load failed - "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">e.message</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" - uri: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_this._uri</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">                        </span><span class="NAME">SceneJS_errorModule.error</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> 
+<span class='line'>141</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">this._STATE_ERROR</span><span class="PUNC">:</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>145</span> 
+<span class='line'>146</span> </span><span class="COMM">/** Returns a new SceneJS.Load instance
+<span class='line'>147</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Load constructor
+<span class='line'>148</span>  * @returns {SceneJS.Load}
+<span class='line'>149</span>  */</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="NAME">SceneJS.load</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Load</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>152</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Load.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>155</span> </span></pre></body></html>

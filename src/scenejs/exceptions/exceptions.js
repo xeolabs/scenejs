@@ -48,7 +48,7 @@ SceneJS.NoCanvasActiveException = function(msg, cause) {
 
 /**
  * @class Exception thrown when a SceneJS.Scene 'canvasId' configuration does not match any elements in the page and no
- * default canvas was found with the ID specified in SceneJS.DEFAULT_CANVAS_ID.
+ * default canvas was found with the ID specified in SceneJS.Scene.DEFAULT_CANVAS_ID.
  */
 SceneJS.CanvasNotFoundException = function(msg, cause) {
     this.message = msg;
@@ -74,7 +74,7 @@ SceneJS.OutOfVRAMException = function(msg, cause) {
 };
 
 /**@class  Exception thrown when a SceneJS.LoggingToPage 'elementId' configuration does not match any elements in the page and no
- * default DIV was found with the ID specified in SceneJS.DEFAULT_LOGGING_DIV_ID.
+ * default DIV was found with the ID specified in SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID.
  */
 SceneJS.DocumentElementNotFoundException = function(msg, cause) {
     this.message = msg;
@@ -187,6 +187,18 @@ SceneJS.InternalException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
+
+/**
+ * @class  Exception thrown to signify that a SceneJS.Instance node could not find
+ * a SceneJS.Symbol to instance
+ */
+SceneJS.SymbolNotFoundException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+
+
 
 
 

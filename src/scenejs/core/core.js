@@ -13,10 +13,6 @@ var SceneJS = {
      */
     DEFAULT_CANVAS_ID:"_scenejs-default-canvas",
 
-    /** ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
-     */
-    DEFAULT_LOGGING_DIV_ID:"_scenejs-default-logging",
-
     /** Names of supported WebGL canvas contexts
      */
     SUPPORTED_WEBGL_CONTEXT_NAMES:["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"],

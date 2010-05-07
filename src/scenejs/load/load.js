@@ -6,7 +6,7 @@
  * visit its subgraph has been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
  * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
  * <p><b>Live Examples</b></p>
- * <li><a target = "other" href="http://bit.ly/scenejs-asset-js-examples">Example 1</a></li>
+ * <li><a target = "other" href="http://bit.ly/scenejs-asset-load">Example 1</a></li>
  * </ul>
  * <p><b>Usage Example</b></p><p>The SceneJS.Load node shown below loads a fragment of JavaScript-defined scene
  * definition cross-domain, via the JSONP proxy located by the <b>uri</b> property on the SceneJS.Scene node.</b></p>

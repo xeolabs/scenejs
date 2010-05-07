@@ -43,23 +43,18 @@ var SceneJS_modelTransformModule = new (function() {
     SceneJS_eventModule.onEvent(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
-
                 if (dirty) {
-
                     if (!transform.matrixAsArray) {
                         transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                     }
-
                     if (!transform.normalMatrixAsArray) {
                         transform.normalMatrixAsArray = new WebGLFloatArray(
                                 SceneJS_math_transposeMat4(
                                         SceneJS_math_inverseMat4(transform.matrix)));
                     }
-
                     SceneJS_eventModule.fireEvent(
                             SceneJS_eventModule.MODEL_TRANSFORM_EXPORTED,
                             transform);
-
                     dirty = false;
                 }
             });

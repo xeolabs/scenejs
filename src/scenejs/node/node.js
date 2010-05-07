@@ -151,7 +151,7 @@ SceneJS.Node.prototype.getNodes = function() {
 //};
 
 /** Returns child node at given index
- * @returns {SceneJS.node} Child node
+ * @returns {SceneJS.Node} Child node
  */
 SceneJS.Node.prototype.getNodeAt = function(index) {
     return this._children[index];
@@ -171,8 +171,8 @@ SceneJS.Node.prototype.removeNodeAt = function(index) {
 };
 
 /** Appends a child node
- * @param {SceneJS.node} node Child node
- * @return {SceneJS.node} The child node
+ * @param {SceneJS.Node} node Child node
+ * @return {SceneJS.Node} The child node
  */
 SceneJS.Node.prototype.addNode = function(node) {
     if (node._parent != null) {
@@ -184,9 +184,9 @@ SceneJS.Node.prototype.addNode = function(node) {
 };
 
 /** Inserts a child node
- * @param {SceneJS.node} node Child node
+ * @param {SceneJS.Node} node Child node
  * @param {int} i Index for new child node
- * @return {SceneJS.node} The child node
+ * @return {SceneJS.Node} The child node
  */
 SceneJS.Node.prototype.insertNode = function(node, i) {
     if (node._parent != null) {
@@ -204,7 +204,7 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
 };
 
 /** Returns the parent node
- * @return {SceneJS.node} The parent node
+ * @return {SceneJS.Node} The parent node
  */
 SceneJS.Node.prototype.getParent = function() {
     return this._parent;

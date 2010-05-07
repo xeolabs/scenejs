@@ -58,7 +58,7 @@ SceneJS.Rotate.prototype.getAngle = function() {
 SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     var x = xyz.x || 0;
     var y = xyz.y || 0;
-    var z = xyz.z || 0;   
+    var z = xyz.z || 0;
     this._x = x;
     this._y = y;
     this._z = z;
@@ -152,13 +152,14 @@ SceneJS.Rotate.prototype._render = function(traversalContext, data) {
     }
     var superXform = SceneJS_modelTransformModule.getTransform();
     if (this._memoLevel < 2) {
+        var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams
+            fixed: superXform.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }

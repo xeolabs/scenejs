@@ -1,5 +1,9 @@
 /** @class A scene node that sets WebGL state for nodes in its subtree.
- * (TODO)
+ * <p>This node basically exposes various WebGL state configurations through the SceneJS API.</p>
+ * (TODO: more comments here!)
+ * <p><b>Live Examples</b></p>
+ * <li><a target = "other" href="http://bit.ly/scenejs-renderer-node">Example 1</a></li>
+ * </ul>
  * @extends SceneJS.Node
  */
 SceneJS.Renderer = function() {

@@ -17,14 +17,14 @@
 <span class='line'> 10</span>  * to get the first occurance of that property it finds.&lt;/p>
 <span class='line'> 11</span>  * &lt;p>&lt;b>Example:&lt;/b>&lt;/p>&lt;p>Creating data for a child SceneJS.Scale node, which has a callback to configure itself from
 <span class='line'> 12</span>  * the data:&lt;/b>&lt;/p>&lt;pre>&lt;code>
-<span class='line'> 13</span>  * var wd new SceneJS.WithData({
+<span class='line'> 13</span>  * var wd = new SceneJS.WithData({
 <span class='line'> 14</span>  *         sizeX: 5,
 <span class='line'> 15</span>  *         sizeY: 10,
 <span class='line'> 16</span>  *         sizeZ: 2
 <span class='line'> 17</span>  *      },
-<span class='line'> 18</span>  *      new SceneJS.translate({ x: 100 },
+<span class='line'> 18</span>  *      new SceneJS.Translate({ x: 100 },
 <span class='line'> 19</span>  *
-<span class='line'> 20</span>  *          new SceneJS.scale(function(data) {        // Function in this case, instead of a config object
+<span class='line'> 20</span>  *          new SceneJS.Scale(function(data) {        // Function in this case, instead of a config object
 <span class='line'> 21</span>  *                   return {
 <span class='line'> 22</span>  *                       x: data.get("sizeX"),
 <span class='line'> 23</span>  *                       y: data.get("sizeY"),
@@ -102,7 +102,7 @@
 <span class='line'> 95</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 96</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'> 97</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 98</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">data.isfixed</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">data.isFixed</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">SceneJS_instancingModule.instancing</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 99</span> </span><span class="WHIT">            </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>100</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>101</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">

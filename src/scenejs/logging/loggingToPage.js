@@ -1,5 +1,5 @@
 /**
- * @class A scene node allows you to intercept SceneJS logging at selected points within your
+ * @class A scene node that allows you to intercept SceneJS logging at selected points within your
  * scene graph and write it to a specified DIV tag.
  * <p><b>Example Usage</b></p><p>Routing all logging within a given subgraph to alert popups:</b></p><pre><code>
  * var node = new SceneJS.Node(
@@ -58,8 +58,8 @@ SceneJS.LoggingToPage.prototype.setElementId = function(elementId) {
         this._elementId = elementId;
         this._element = element;
     } else {
-        this._elementId = SceneJS.DEFAULT_LOGGING_DIV_ID;
-        this._element = document.getElementById(SceneJS.DEFAULT_LOGGING_DIV_ID);
+        this._elementId = SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID;
+        this._element = document.getElementById(SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID);
     }
     return this;
 };

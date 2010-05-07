@@ -209,11 +209,19 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
+	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
 	<li><a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></li>
+	
+	<li><a href="../symbols/SceneJS.HttpException.html">SceneJS.HttpException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a></li>
+	
+	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
@@ -227,9 +235,9 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Locality.html">SceneJS.Locality</a></li>
 	
-	<li><a href="../symbols/SceneJS.logging.html">SceneJS.logging</a></li>
+	<li><a href="../symbols/SceneJS.Logging.html">SceneJS.Logging</a></li>
 	
-	<li><a href="../symbols/SceneJS.loggingToPage.html">SceneJS.loggingToPage</a></li>
+	<li><a href="../symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a></li>
 	
 	<li><a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a></li>
 	
@@ -253,6 +261,10 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
 	
+	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ProxyErrorResponseException.html">SceneJS.ProxyErrorResponseException</a></li>
+	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
@@ -267,7 +279,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
-	<li><a href="../symbols/SceneJS.text.html">SceneJS.text</a></li>
+	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
+	
+	<li><a href="../symbols/SceneJS.SymbolNotFoundException.html">SceneJS.SymbolNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Text.html">SceneJS.Text</a></li>
 	
 	<li><a href="../symbols/SceneJS.Texture.html">SceneJS.Texture</a></li>
 	
@@ -275,7 +291,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></li>
+	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
@@ -337,7 +353,7 @@ var mat = new SceneJS.ViewMatrix({
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/SceneJS.html#.ViewMatrix#constructor">SceneJS.ViewMatrix</a></b>(config)
+								<b><a href="../symbols/SceneJS.ViewMatrix.html#constructor">SceneJS.ViewMatrix</a></b>(config)
 							</div>
 							<div class="description"></div>
 						</td>
@@ -350,6 +366,42 @@ var mat = new SceneJS.ViewMatrix({
 			
 
 <!-- ============================== methods summary ======================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class SceneJS.ViewMatrix.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.ViewMatrix.html#getElements">getElements</a></b>()
+								</div>
+								<div class="description">Returns the matrix elements</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.ViewMatrix.html#setElements">setElements</a></b>(elements)
+								</div>
+								<div class="description">Sets the matrix elements</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
 			
 <!-- ============================== events summary ======================== -->
 			
@@ -400,6 +452,86 @@ var mat = new SceneJS.ViewMatrix({
 
 <!-- ============================== method details ========================= -->		
 			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="getElements"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Object}</span>
+					<b>getElements</b>()
+					
+					</div>
+					<div class="description">
+						Returns the matrix elements
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> One-dimensional array of matrix elements</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="setElements"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a>}</span>
+					<b>setElements</b>(elements)
+					
+					</div>
+					<div class="description">
+						Sets the matrix elements
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Array}</span> <b>elements</b>
+									
+								</dt>
+								<dd>One-dimensional array of matrix elements</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a>}</span> this</dd>
+							
+							</dl>
+						
+						
+						
+
+					
+				
+			
 			
 <!-- ============================== event details ========================= -->		
 			
@@ -411,7 +543,7 @@ var mat = new SceneJS.ViewMatrix({
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 01 2010 17:11:45 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri May 07 2010 14:46:09 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

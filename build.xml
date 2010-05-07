@@ -37,6 +37,75 @@
         </fileset>
     </path>
 
+    <path id="sourcefiles">
+        <fileset dir="${basedir}" includes="license.txt"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/data.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/name/nameModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/name/name.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/processes/processModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/load/loadModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/colladaParserModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/loadCollada.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/shading/shadingModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/vectorTextModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/text.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/modelTransformModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/rotate.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/translate.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/scale.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/modelMatrix.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/projectionModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/perspective.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/ortho.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/frustum.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewTransformModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/lookAt.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewMatrix.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/stationary.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightingModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/material/materialModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/scalarInterpolator.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/withData/withData.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
+    </path>
 
     <target name="all" depends="archive"/>
 
@@ -50,8 +119,49 @@
         <jsdoctoolkit
                 jsdochome="${basedir}/lib/jsdoc-toolkit/"
                 template="jsdoc"
-                outputdir="${basedir}/docs/"
-                inputdir="${basedir}/src/scenejs/"/>
+                outputdir="${basedir}/docs/">
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/core/data.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/name/name.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/loadCollada.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/text.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/rotate.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/translate.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/scale.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/modelMatrix.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/perspective.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/ortho.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/frustum.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/lookAt.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewMatrix.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/stationary.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/scalarInterpolator.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/withData/withData.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
+        </jsdoctoolkit>
     </target>
 
 
@@ -64,8 +174,8 @@
         <zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
 
         <!-- Write version data to website -->
-        <echo file="website/data/version.js" append="false">{ version: "${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}" }
-        </echo>
+        <!--<echo file="website/data/version.js" append="false">{ version: "${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}" }-->
+        <!--</echo>-->
     </target>
 
     <!-- Create compressed javascript lib -->
@@ -93,149 +203,7 @@
         <echo message="Building ${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}"/>
 
         <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}">
-            <fileset dir="${basedir}" includes="license.txt"/>
-
-            <!-- Core -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
-
-            <!-- Exceptions -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
-
-            <!-- Event routing -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsBackend.js"/>
-
-            <!-- Error handling -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsBackend.js"/>
-
-            <!-- Time -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/time/timeBackend.js"/>
-
-            <!-- Logging -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
-
-            <!-- Process management -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/processes/processesBackend.js"/>
-
-            <!-- Load SceneJS format -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/load/loadBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
-
-            <!-- Load COLLADA -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/colladaBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/loadCollada.js"/>
-
-            <!-- Picking -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickBackend.js"/>
-
-            <!-- WebGL Trace -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
-
-            <!-- Scene -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
-
-            <!-- VRAM cache management -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryBackend.js"/>
-
-            <!-- Shader backend -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/shaderBackend.js"/>
-
-            <!-- Renderer -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
-
-            <!-- Geometry -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
-
-            <!-- Modelling transforms -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/modelTransformBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/rotate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/translate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/scale.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/model/modelMatrix.js"/>
-
-            <!-- Projection transforms -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/projectionBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/perspective.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/ortho.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/frustum.js"/>
-
-            <!-- Viewing transforms -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewTransformBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/lookAt.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/viewMatrix.js"/>
-
-            <!-- Stationary view space -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/view/stationary.js"/>
-
-            <!-- Lighting -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightsBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
-
-            <!-- Material -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/material/materialBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
-
-            <!-- Interpolation -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/animation/scalarInterpolator.js"/>
-
-            <!-- Scope -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/withData/withData.js"/>
-
-            <!-- Generation -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/generation/generator.js"/>
-
-            <!-- Bounding boxes -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
-
-            <!-- Textures -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
-
-            <!-- Fog -->
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogBackend.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
-
+            <path refid="sourcefiles"/>
         </concat>
 
         <copy file="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}"

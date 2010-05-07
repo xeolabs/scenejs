@@ -67,7 +67,7 @@ var SceneJS_nameModule = new (function() {
 //        //                }
 //    };
 
-    // @private
+    /** @private */
     function nextColor() {
         if (blueCount < 1) {
             blueCount += 0.01;
@@ -87,8 +87,8 @@ var SceneJS_nameModule = new (function() {
         return [redCount, greenCount, blueCount];
     }
 
-    // @private
-    this.pushName = function(name) {
+    /** @private */
+    this.pushName = function(name, node) {
         if (!canvas) {
             SceneJS_errorModule.fatalError("No canvas active");
         }
@@ -98,6 +98,7 @@ var SceneJS_nameModule = new (function() {
         if (!item) {
             item = {
                 path : namePath,
+                node: node,
                 color: nextColor()
             };
             namesByPath[namePath] = item;
@@ -106,8 +107,8 @@ var SceneJS_nameModule = new (function() {
                 SceneJS_eventModule.NAME_UPDATED,
                 item);
     };
-
-    // @private
+    
+    /** @private */
     this.popName = function() {
         nameStack.pop();
         namePath = nameStack.join("/");
@@ -115,4 +116,5 @@ var SceneJS_nameModule = new (function() {
                 SceneJS_eventModule.NAME_UPDATED,
                 namesByPath[namePath]); // Can be null
     };
+    
 })();

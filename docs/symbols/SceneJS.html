@@ -209,11 +209,19 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
+	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
 	<li><a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></li>
+	
+	<li><a href="../symbols/SceneJS.HttpException.html">SceneJS.HttpException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a></li>
+	
+	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
@@ -227,9 +235,9 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Locality.html">SceneJS.Locality</a></li>
 	
-	<li><a href="../symbols/SceneJS.logging.html">SceneJS.logging</a></li>
+	<li><a href="../symbols/SceneJS.Logging.html">SceneJS.Logging</a></li>
 	
-	<li><a href="../symbols/SceneJS.loggingToPage.html">SceneJS.loggingToPage</a></li>
+	<li><a href="../symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a></li>
 	
 	<li><a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a></li>
 	
@@ -253,6 +261,10 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
 	
+	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ProxyErrorResponseException.html">SceneJS.ProxyErrorResponseException</a></li>
+	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
@@ -267,7 +279,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
-	<li><a href="../symbols/SceneJS.text.html">SceneJS.text</a></li>
+	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
+	
+	<li><a href="../symbols/SceneJS.SymbolNotFoundException.html">SceneJS.SymbolNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Text.html">SceneJS.Text</a></li>
 	
 	<li><a href="../symbols/SceneJS.Texture.html">SceneJS.Texture</a></li>
 	
@@ -275,7 +291,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></li>
+	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
@@ -360,16 +376,6 @@ SceneJS name space
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								SceneJS.<b><a href="../symbols/SceneJS.html#.DEFAULT_LOGGING_DIV_ID">DEFAULT_LOGGING_DIV_ID</a></b>
-								</div>
-								<div class="description">ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
 								SceneJS.<b><a href="../symbols/SceneJS.html#.SUPPORTED_WEBGL_CONTEXT_NAMES">SUPPORTED_WEBGL_CONTEXT_NAMES</a></b>
 								</div>
 								<div class="description">Names of supported WebGL canvas contexts</div>
@@ -446,6 +452,15 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.instance">instance</a></b>(args)
+								</div>
+								<div class="description">Returns a new SceneJS.Instance instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.lights">lights</a></b>(args)
 								</div>
 								<div class="description">Returns a new SceneJS.Lights instance</div>
@@ -491,6 +506,24 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.logging">logging</a></b>(args)
+								</div>
+								<div class="description">Returns a new SceneJS.Logging instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.loggingToPage">loggingToPage</a></b>(args)
+								</div>
+								<div class="description">Returns a new SceneJS.LoggingToPage instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.lookAt">lookAt</a></b>()
 								</div>
 								<div class="description">Function wrapper to support functional scene definition</div>
@@ -521,6 +554,15 @@ SceneJS name space
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.name">name</a></b>(args)
 								</div>
 								<div class="description">Returns a new SceneJS.Name instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.node">node</a></b>(args)
+								</div>
+								<div class="description">Returns a new SceneJS.Node instance</div>
 							</td>
 						</tr>
 					
@@ -599,18 +641,27 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.selector">selector</a></b>()
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.stationary">stationary</a></b>()
 								</div>
-								<div class="description">Scene node that selects which of its children are active.</div>
+								<div class="description">Function wrapper to support functional scene definition</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.stationary">stationary</a></b>()
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.symbol">symbol</a></b>(args)
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Returns a new SceneJS.Symbol symbol</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.text">text</a></b>(args)
+								</div>
+								<div class="description">Returns a new SceneJS.Text instance</div>
 							</td>
 						</tr>
 					
@@ -635,7 +686,7 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.ViewMatrix">ViewMatrix</a></b>()
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.viewMatrix">viewMatrix</a></b>()
 								</div>
 								<div class="description">Function wrapper to support functional scene definition</div>
 							</td>
@@ -704,28 +755,6 @@ SceneJS name space
 					</div>
 					<div class="description">
 						ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".DEFAULT_LOGGING_DIV_ID"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">SceneJS.</span><b>DEFAULT_LOGGING_DIV_ID</b>
-					
-					</div>
-					<div class="description">
-						ID of element SceneJS looks for when SceneJS.loggingToPage node does not supply one
 						
 						
 					</div>
@@ -975,6 +1004,52 @@ SceneJS name space
 
 					<hr />
 				
+					<a name=".instance"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a>}</span>
+					<span class="light">SceneJS.</span><b>instance</b>(args)
+					
+					</div>
+					<div class="description">
+						Returns a new SceneJS.Instance instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_instance.js.html">instance.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									
+								</dt>
+								<dd>Variable arguments that are passed to the SceneJS.Instance constructor</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".lights"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1187,6 +1262,98 @@ SceneJS name space
 
 					<hr />
 				
+					<a name=".logging"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/SceneJS.Logging.html">SceneJS.Logging</a>}</span>
+					<span class="light">SceneJS.</span><b>logging</b>(args)
+					
+					</div>
+					<div class="description">
+						Returns a new SceneJS.Logging instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_logging_logging.js.html">logging.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									
+								</dt>
+								<dd>Variable arguments that are passed to the SceneJS.Logging constructor</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Logging.html">SceneJS.Logging</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".loggingToPage"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a>}</span>
+					<span class="light">SceneJS.</span><b>loggingToPage</b>(args)
+					
+					</div>
+					<div class="description">
+						Returns a new SceneJS.LoggingToPage instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_logging_loggingToPage.js.html">loggingToPage.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									
+								</dt>
+								<dd>Variable arguments that are passed to the SceneJS.LoggingToPage constructor</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".lookAt"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1335,6 +1502,52 @@ SceneJS name space
 
 					<hr />
 				
+					<a name=".node"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
+					<span class="light">SceneJS.</span><b>node</b>(args)
+					
+					</div>
+					<div class="description">
+						Returns a new SceneJS.Node instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_node_node.js.html">node.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									
+								</dt>
+								<dd>Variable arguments that are passed to the SceneJS.Node constructor</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".onEvent"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1347,16 +1560,13 @@ SceneJS name space
 <p><b>Supported events</b></p>
 <p><b><em>error</em></b></p><p>An error has occurred either while defining or rendering a scene. These can be either fatal,
 or errors that SceneJS can recover from.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "error",
-     function(e) {
-         var exception = e.exception;
-         if (e.fatal) {
-              alert("Fatal error: " + e.exception.message || e.exception);
-         } else {
-              alert("Recovered from error: " + e.exception.message || e.exception);
-         }
-     });
+SceneJS.onEvent("error", function(e) {
+    if (e.exception.message) {
+        alert("Error: " + e.exception.message);
+    } else {
+        alert("Error: " + e.exception);
+    }
+ });
 </pre></code>
 
 <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all SceneJS.Scene instances are destroyed and resources
@@ -1744,34 +1954,6 @@ integrated.</p><p>Example:</p><pre><code>
 
 					<hr />
 				
-					<a name=".selector"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">SceneJS.</span><b>selector</b>()
-					
-					</div>
-					<div class="description">
-						Scene node that selects which of its children are active.
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_branching_selector.js.html">selector.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name=".stationary"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1794,6 +1976,98 @@ integrated.</p><p>Example:</p><pre><code>
 						
 						
 						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".symbol"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a>}</span>
+					<span class="light">SceneJS.</span><b>symbol</b>(args)
+					
+					</div>
+					<div class="description">
+						Returns a new SceneJS.Symbol symbol
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_symbol.js.html">symbol.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									
+								</dt>
+								<dd>Variable arguments that are passed to the SceneJS.Symbol constructor</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".text"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/SceneJS.Text.html">SceneJS.Text</a>}</span>
+					<span class="light">SceneJS.</span><b>text</b>(args)
+					
+					</div>
+					<div class="description">
+						Returns a new SceneJS.Text instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_geometry_text_text.js.html">text.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									
+								</dt>
+								<dd>Variable arguments that are passed to the SceneJS.Text constructor</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Text.html">SceneJS.Text</a>}</span> </dd>
+							
+							</dl>
 						
 						
 						
@@ -1856,11 +2130,11 @@ integrated.</p><p>Example:</p><pre><code>
 
 					<hr />
 				
-					<a name=".ViewMatrix"> </a>
+					<a name=".viewMatrix"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">SceneJS.</span><b>ViewMatrix</b>()
+					<span class="light">SceneJS.</span><b>viewMatrix</b>()
 					
 					</div>
 					<div class="description">
@@ -1924,7 +2198,7 @@ integrated.</p><p>Example:</p><pre><code>
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 01 2010 17:11:44 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri May 07 2010 14:46:07 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

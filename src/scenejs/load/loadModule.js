@@ -1,5 +1,5 @@
 /**
- * Backend module that services the SceneJS.assets.XXX nodes to manage the asynchronous cross-domain
+ * Backend module that services the SceneJS.loadXXX nodes to manage the asynchronous cross-domain
  * load and caching of remotely-stored scene fragments.
  *
  * Uses the memory management backend to mediate cache management.

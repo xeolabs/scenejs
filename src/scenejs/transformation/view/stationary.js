@@ -48,7 +48,7 @@ SceneJS.Stationary.prototype._render = function(traversalContext, data) {
                 lookAt: lookAt,
                 fixed: superXform.fixed
             };
-            if (superXform.fixed) {
+            if (superXform.fixed && !SceneJS_instancingModule.instancing()) {
                 this._memoLevel = 1;
             }
         }

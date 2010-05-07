@@ -209,11 +209,19 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
+	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
 	<li><a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></li>
+	
+	<li><a href="../symbols/SceneJS.HttpException.html">SceneJS.HttpException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a></li>
+	
+	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
@@ -227,9 +235,9 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Locality.html">SceneJS.Locality</a></li>
 	
-	<li><a href="../symbols/SceneJS.logging.html">SceneJS.logging</a></li>
+	<li><a href="../symbols/SceneJS.Logging.html">SceneJS.Logging</a></li>
 	
-	<li><a href="../symbols/SceneJS.loggingToPage.html">SceneJS.loggingToPage</a></li>
+	<li><a href="../symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a></li>
 	
 	<li><a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a></li>
 	
@@ -253,6 +261,10 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
 	
+	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ProxyErrorResponseException.html">SceneJS.ProxyErrorResponseException</a></li>
+	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
@@ -267,7 +279,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
-	<li><a href="../symbols/SceneJS.text.html">SceneJS.text</a></li>
+	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
+	
+	<li><a href="../symbols/SceneJS.SymbolNotFoundException.html">SceneJS.SymbolNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Text.html">SceneJS.Text</a></li>
 	
 	<li><a href="../symbols/SceneJS.Texture.html">SceneJS.Texture</a></li>
 	
@@ -275,7 +291,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></li>
+	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
@@ -303,7 +319,7 @@ ul.inheritsList
 				The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_core_node.js.html">node.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_node_node.js.html">node.js</a>.
 				
 			</p>
 
@@ -360,6 +376,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a></b>(type, recursive)
+								</div>
+								<div class="description">Returns either all child or all sub-nodes of the given type, depending on whether search is recursive or not.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a></b>(index)
 								</div>
 								<div class="description">Returns child node at given index</div>
@@ -387,6 +412,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#getParent">getParent</a></b>()
+								</div>
+								<div class="description">Returns the parent node</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a></b>(node, i)
 								</div>
 								<div class="description">Inserts a child node</div>
@@ -399,15 +433,6 @@ ul.inheritsList
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></b>(index)
 								</div>
 								<div class="description">Removes the child node at the given index</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#setNodes">setNodes</a></b>(children)
-								</div>
-								<div class="description">Sets child nodes, removing those already present</div>
 							</td>
 						</tr>
 					
@@ -444,7 +469,7 @@ ul.inheritsList
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{SceneJS.node|...}</span>  <b>arguments</b>
+								<span class="light fixedFont">{<a href="../symbols/SceneJS.html#.node">SceneJS.node</a>|...}</span>  <b>arguments</b>
 								
 							</dt>
 								<dd>Zero or more child nodes</dd>
@@ -473,7 +498,7 @@ ul.inheritsList
 					<a name="addNode"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{SceneJS.node}</span>
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
 					<b>addNode</b>(node)
 					
 					</div>
@@ -490,7 +515,7 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{SceneJS.node}</span> <b>node</b>
+									<span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> <b>node</b>
 									
 								</dt>
 								<dd>Child node</dd>
@@ -504,7 +529,56 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{SceneJS.node}</span> The child node</dd>
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> The child node</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="findNodesByType"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/SceneJS.html#.node">SceneJS.node</a>[]}</span>
+					<b>findNodesByType</b>(type, recursive)
+					
+					</div>
+					<div class="description">
+						Returns either all child or all sub-nodes of the given type, depending on whether search is recursive or not.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{string}</span> <b>type</b>
+									
+								</dt>
+								<dd>Node type</dd>
+							
+								<dt>
+									<span class="light fixedFont">{boolean}</span> <b>recursive</b>
+									
+								</dt>
+								<dd>When true, will return all matching nodes in subgraph, otherwise returns just children (default)</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.html#.node">SceneJS.node</a>[]}</span> Array of matching nodes</dd>
 							
 							</dl>
 						
@@ -516,7 +590,7 @@ ul.inheritsList
 					<a name="getNodeAt"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{SceneJS.node}</span>
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
 					<b>getNodeAt</b>(index)
 					
 					</div>
@@ -547,7 +621,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{SceneJS.node}</span> Child node</dd>
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> Child node</dd>
 							
 							</dl>
 						
@@ -620,10 +694,42 @@ ul.inheritsList
 
 					<hr />
 				
+					<a name="getParent"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
+					<b>getParent</b>()
+					
+					</div>
+					<div class="description">
+						Returns the parent node
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> The parent node</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="insertNode"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{SceneJS.node}</span>
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
 					<b>insertNode</b>(node, i)
 					
 					</div>
@@ -640,7 +746,7 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{SceneJS.node}</span> <b>node</b>
+									<span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> <b>node</b>
 									
 								</dt>
 								<dd>Child node</dd>
@@ -660,7 +766,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{SceneJS.node}</span> The child node</dd>
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> The child node</dd>
 							
 							</dl>
 						
@@ -703,49 +809,6 @@ ul.inheritsList
 						
 						
 
-					<hr />
-				
-					<a name="setNodes"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>setNodes</b>(children)
-					
-					</div>
-					<div class="description">
-						Sets child nodes, removing those already present
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Array}</span> <b>children</b>
-									
-								</dt>
-								<dd>Array of child nodes</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd>this</dd>
-							
-							</dl>
-						
-						
-						
-
 					
 				
 			
@@ -760,7 +823,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 01 2010 17:11:45 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri May 07 2010 14:46:09 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

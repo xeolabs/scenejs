@@ -204,11 +204,19 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
+	<li><a href="symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
 	<li><a href="symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
 	<li><a href="symbols/SceneJS.Generator.html">SceneJS.Generator</a></li>
 	
 	<li><a href="symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></li>
+	
+	<li><a href="symbols/SceneJS.HttpException.html">SceneJS.HttpException</a></li>
+	
+	<li><a href="symbols/SceneJS.Instance.html">SceneJS.Instance</a></li>
+	
+	<li><a href="symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
 	<li><a href="symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
@@ -222,9 +230,9 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Locality.html">SceneJS.Locality</a></li>
 	
-	<li><a href="symbols/SceneJS.logging.html">SceneJS.logging</a></li>
+	<li><a href="symbols/SceneJS.Logging.html">SceneJS.Logging</a></li>
 	
-	<li><a href="symbols/SceneJS.loggingToPage.html">SceneJS.loggingToPage</a></li>
+	<li><a href="symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a></li>
 	
 	<li><a href="symbols/SceneJS.LookAt.html">SceneJS.LookAt</a></li>
 	
@@ -248,6 +256,10 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
 	
+	<li><a href="symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
+	
+	<li><a href="symbols/SceneJS.ProxyErrorResponseException.html">SceneJS.ProxyErrorResponseException</a></li>
+	
 	<li><a href="symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
 	<li><a href="symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
@@ -262,7 +274,11 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
-	<li><a href="symbols/SceneJS.text.html">SceneJS.text</a></li>
+	<li><a href="symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
+	
+	<li><a href="symbols/SceneJS.SymbolNotFoundException.html">SceneJS.SymbolNotFoundException</a></li>
+	
+	<li><a href="symbols/SceneJS.Text.html">SceneJS.Text</a></li>
 	
 	<li><a href="symbols/SceneJS.Texture.html">SceneJS.Texture</a></li>
 	
@@ -270,7 +286,7 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></li>
+	<li><a href="symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
 	
 	<li><a href="symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
@@ -309,7 +325,7 @@ level-of-detail culling.
 			<div>
 				<h2><a href="symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></h2>
 				Exception thrown when a SceneJS.Scene 'canvasId' configuration does not match any elements in the page and no
-default canvas was found with the ID specified in SceneJS.DEFAULT_CANVAS_ID.
+default canvas was found with the ID specified in SceneJS.Scene.DEFAULT_CANVAS_ID.
 			</div>
 			<hr />
 			
@@ -350,7 +366,13 @@ data scope (SceneJS.Data).
 			<div>
 				<h2><a href="symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></h2>
 				Exception thrown when a SceneJS.LoggingToPage 'elementId' configuration does not match any elements in the page and no
-default DIV was found with the ID specified in SceneJS.DEFAULT_LOGGING_DIV_ID.
+default DIV was found with the ID specified in SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></h2>
+				Exception thrown to signify that empty content was loaded (eg.
 			</div>
 			<hr />
 			
@@ -370,6 +392,24 @@ in a loop within a scene traversal, while varying the data available to them in 
 			<div>
 				<h2><a href="symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></h2>
 				A scene node that defines an element of geometry.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.HttpException.html">SceneJS.HttpException</a></h2>
+				Exception thrown to signify that an HTTP error occured while attempting to load content (eg.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.Instance.html">SceneJS.Instance</a></h2>
+				A scene node that instantiates the contents of a previously-defined SceneJS.Symbol node.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></h2>
+				Exception thrown to signify a general internal SceneJS exception, ie.
 			</div>
 			<hr />
 			
@@ -410,14 +450,15 @@ in a loop within a scene traversal, while varying the data available to them in 
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.logging.html">SceneJS.logging</a></h2>
-				A scene node that routes messages logged by nodes in its subgraph through a given set of logging functions.
+				<h2><a href="symbols/SceneJS.Logging.html">SceneJS.Logging</a></h2>
+				A scene node that allows you to intercept SceneJS logging at selected points within your scene graph.
 			</div>
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.loggingToPage.html">SceneJS.loggingToPage</a></h2>
-				SceneJS.loggingToPage
+				<h2><a href="symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a></h2>
+				A scene node that allows you to intercept SceneJS logging at selected points within your
+scene graph and write it to a specified DIV tag.
 			</div>
 			<hr />
 			
@@ -489,6 +530,20 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
+				<h2><a href="symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></h2>
+				Exception thrown to signify an empty response from the proxy configured for cross-domain loads
+(eg.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.ProxyErrorResponseException.html">SceneJS.ProxyErrorResponseException</a></h2>
+				Exception thrown to signify an error response from the proxy configured for cross-domain loads
+(eg.
+			</div>
+			<hr />
+			
+			<div>
 				<h2><a href="symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></h2>
 				Exception thrown when you have attempted to make a cross-domain load without specify the proxy to mediate the transfer.
 			</div>
@@ -531,8 +586,21 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.text.html">SceneJS.text</a></h2>
-				A scene node that defines a string of text.
+				<h2><a href="symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></h2>
+				A scene node that marks its subgraph as a "symbol" which can be then instanced with SceneJS.Instance nodes.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.SymbolNotFoundException.html">SceneJS.SymbolNotFoundException</a></h2>
+				Exception thrown to signify that a SceneJS.Instance node could not find
+a SceneJS.Symbol to instance
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.Text.html">SceneJS.Text</a></h2>
+				A scene node that defines vector text.
 			</div>
 			<hr />
 			
@@ -555,7 +623,7 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.html#.ViewMatrix">SceneJS.ViewMatrix</a></h2>
+				<h2><a href="symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></h2>
 				A scene node that applies a model-space transform to the nodes within its subgraph.
 			</div>
 			<hr />
@@ -583,7 +651,7 @@ a specified config value.
 		</div>
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Sat May 01 2010 17:11:46 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Fri May 07 2010 14:46:09 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

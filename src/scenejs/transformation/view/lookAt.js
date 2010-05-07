@@ -2,8 +2,7 @@
  * @class A scene node that defines a viewing transform by specifing location of the eye position, the point being looked
  * at, and the direction of "up".
  * @extends SceneJS.Node
- *
- * <p><b>Example:</b></p><p>Defining perspective, specifying parameters that happen to be the default values</b></p><pre><code>
+ * <p><b>Usage Example:</b></p><p>Defining perspective, specifying parameters that happen to be the default values</b></p><pre><code>
  * var l = new SceneJS.LookAt({
  *     eye : { x: 0.0, y: 10.0, z: -15 },
  *    look : { y:1.0 },
@@ -164,7 +163,7 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
             },
             fixed: superXform.fixed && this._fixedParams
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if space fixed
             this._memoLevel = 2;
         }
     }
