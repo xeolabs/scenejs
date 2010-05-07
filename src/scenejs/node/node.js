@@ -81,12 +81,13 @@ SceneJS.Node.prototype._resetMemoLevel = function() {
 };
 
 /** @private */
-SceneJS.Node.prototype._renderNodes = function(traversalContext, data) {
+SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children) {
     var child;
-    var len = this._children.length;
+    children = children || this._children;
+    var len = children.length;
     if (len) {
         for (var i = 0; i < len; i++) {
-            child = this._children[i];
+            child = children[i];
             child._render.call(child, { // Traversal context
                 appendix : traversalContext.appendix,
                 insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)

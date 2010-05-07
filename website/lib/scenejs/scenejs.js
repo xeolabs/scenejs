@@ -1,34 +1,37 @@
-// Define a "teapot" symbol, inside a namespace for fun.
+var scene = new SceneJS.Scene(
+        { /* ... */
+        },
 
-SceneJS.name({name: "mySymbols"},
+        new SceneJS.symbol({
+                    name: "theScene"
+                },
 
-        SceneJS.symbol({
-                name: "teapot"
-            },
-            SceneJS.objects.teapot()
+            new SceneJS.objects.Teapot()
         ),
 
-        // Instance the teapot Symbol from inside the namespace.
-        // See how the symbol reference is relative, where it
-        // does not start with a '/'.
+        new SceneJS.Selector(
+                function(data) {
+                    return {
+                        selection: [data.get("activeCamera")]
+                    };
+                },
 
-        SceneJS.translate({y : 10},
-                SceneJS.instance({name: "teapot" })
+            new SceneJS.LookAt({
+                    eye : { z: 10.0 }
+                 },
+                 new SceneJS.Instance({ name: "theScene"})),
+
+            new SceneJS.LookAt({
+                    eye : { x: 10.0 }
+                 },
+                 new SceneJS.Instance({ name: "theScene"})),
+
+            new SceneJS.LookAt({
+                    eye : { x: -5.0, y: 5, z: 5 }
+                 },
+                 new SceneJS.Instance({ name: "theScene" })
+            )
         )
-),
+    );
 
-// Instance the teapot Symbol again, from outside the namespace
-
-SceneJS.translate({y : 0},
-     SceneJS.instance({name: "mySymbols/teapot"})
-),
-
-// Instance the teapot Symbol one more time from outside the
-// namespace to show how an absolute path can be specified to
-// the Symbol
-
-SceneJS.translate({y : -10},
-     SceneJS.instance({name: "/mySymbols/teapot"})
-)
-
-// ...
+scene.render({ activeCamera: 0 });

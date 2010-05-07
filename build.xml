@@ -58,6 +58,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/selector/selector.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/processes/processModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/load/loadModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
@@ -130,6 +131,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/selector/selector.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/load/load.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/loadCollada/loadCollada.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>

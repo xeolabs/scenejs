@@ -10,34 +10,38 @@
  * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a Name, then instantiating it three times with
  * Instance nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
  * created by a Name node:</b></p><pre><code>
+ * var scene = new SceneJS.Scene(
  *
- *  // Define a "teapot" symbol inside a namespace.
- *  // Note that the Name is not mandatory.
+ *      // ...
  *
- *  SceneJS.name({name: "mySymbols"},
+ *      // Define a "teapot" symbol inside a namespace.
+ *      // Note that the Name is not mandatory.
  *
- *       SceneJS.symbol({ name: "teapot" },
- *           SceneJS.objects.teapot()
- *       ),
+ *      new SceneJS.Name({name: "mySymbols"},
  *
- *       // Instance the teapot Symbol from inside the namespace.
- *       // See how the symbol reference is relative, where it
- *       // does not start with a '/'.
+ *          new SceneJS.Symbol({ name: "teapot" },
+ *              new SceneJS.objects.Teapot()
+ *          ),
  *
- *       SceneJS.instance({name: "teapot" })
- * ),
+ *          // Instance the teapot Symbol from inside the namespace.
+ *          // See how the symbol reference is relative, where it
+ *          // does not start with a '/'.
  *
- * // Instance the teapot Symbol again, from outside the namespace
+ *          new SceneJS.Instance({name: "teapot" })
+ *      ),
  *
- * SceneJS.instance({name: "mySymbols/teapot"}),
+ *      // Instance the teapot Symbol again, from outside the namespace
  *
- * // Instance the teapot Symbol one more time from outside the
- * // namespace to show how an absolute path can be specified to
- * // the Symbol
+ *      new SceneJS.Instance({name: "mySymbols/teapot"}),
  *
- * SceneJS.instance({name: "/mySymbols/teapot"})
+ *      // Instance the teapot Symbol one more time from outside the
+ *      // namespace to show how an absolute path can be specified to
+ *      // the Symbol
  *
- * // ...
+ *      new SceneJS.Instance({name: "/mySymbols/teapot"})
+ *
+ *      // ...
+ * );
  * </pre></code>
  *  @extends SceneJS.Node
  * @constructor

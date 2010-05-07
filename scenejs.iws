@@ -3,15 +3,18 @@
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/translate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/translate.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/temple/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/temple/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/colosseum/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/colosseum/index.debug.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/selector/test3/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/scale.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/withData/withData.js" afterPath="$PROJECT_DIR$/src/scenejs/withData/withData.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests/selector/test3/switching-select-view.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/spinner/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/spinner/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/basic/teapot/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/basic/teapot/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/geometry/test1/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/geometry/test1/index.debug.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/lookAt.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/lookAt.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/lighting/moving-dir-light/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/lighting/moving-dir-light/index.debug.html" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="" />
@@ -20,6 +23,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/boundingboxes/teapot-army/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/boundingboxes/teapot-army/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/courtyard-house/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/courtyard-house/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/website/lib/scenejs/scenejs.js" afterPath="$PROJECT_DIR$/website/lib/scenejs/scenejs.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/rotate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/rotate.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/logging.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/logging.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/licenses/MIT_LICENSE.txt" afterPath="$PROJECT_DIR$/licenses/MIT_LICENSE.txt" />
@@ -27,6 +31,9 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/node/node.js" afterPath="$PROJECT_DIR$/src/scenejs/node/node.js" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests/instancing/test1/instanced-spiral-staircase.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/texture.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/texture.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests/selector/test2/select-view.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/selector/selector.js" afterPath="$PROJECT_DIR$/src/scenejs/selector/selector.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/selector/test1/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/generation/spiral-staircase/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/generation/spiral-staircase/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/lighting/moving-point-light/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/lighting/moving-point-light/index.debug.html" />
@@ -36,6 +43,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/teapot/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/teapot/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/assets/tron-tank/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/assets/tron-tank/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/selector/test2/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/view/stationary.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/view/stationary.js" />
       <change type="MOVED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/instancing/test1/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" afterPath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" />
@@ -43,10 +51,10 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/load/load.js" afterPath="$PROJECT_DIR$/src/scenejs/load/load.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/load/loadModule.js" afterPath="$PROJECT_DIR$/src/scenejs/load/loadModule.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" />
       <change type="MOVED" beforePath="$PROJECT_DIR$/src/tests/assets/js-staircase-asset/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/instancing/test2/index.debug.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" afterPath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests/selector/test1/teapots.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/model/modelMatrix.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/model/modelMatrix.js" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/tests/instancing/test2/instanced-teapot.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tests/text/text/index.debug.html" afterPath="$PROJECT_DIR$/src/tests/text/text/index.debug.html" />
@@ -111,17 +119,17 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="instanced-spiral-staircase.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/instanced-spiral-staircase.js">
+      <file leaf-file-name="teapots.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/selector/test1/teapots.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="177" column="8" selection-start="9405" selection-end="9405" vertical-scroll-proportion="0.0">
+            <state line="69" column="8" selection-start="3445" selection-end="3445" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="index.debug.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/index.debug.html">
+        <entry file="file://$PROJECT_DIR$/src/tests/selector/test2/index.debug.html">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
               <folding />
@@ -129,10 +137,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="instanced-teapot.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/instanced-teapot.js">
+      <file leaf-file-name="select-view.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/selector/test2/select-view.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="60" column="92" selection-start="3001" selection-end="3001" vertical-scroll-proportion="0.0">
+            <state line="60" column="17" selection-start="2672" selection-end="2672" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.debug.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/selector/test3/index.debug.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="switching-select-view.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/selector/test3/switching-select-view.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="16" column="88" selection-start="371" selection-end="371" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="selector.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/selector/selector.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="46" column="79" selection-start="14" selection-end="2197" vertical-scroll-proportion="0.67637175">
               <folding />
             </state>
           </provider>
@@ -141,63 +176,36 @@
       <file leaf-file-name="scenejs.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/website/lib/scenejs/scenejs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="9" selection-start="854" selection-end="854" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.debug.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/index.debug.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="11" selection-start="2126" selection-end="2419" vertical-scroll-proportion="-26.208334">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="symbol.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/symbol.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="2" selection-start="0" selection-end="2671" vertical-scroll-proportion="0.0">
+            <state line="36" column="34" selection-start="0" selection-end="934" vertical-scroll-proportion="0.0">
               <folding>
-                <marker date="1273200338000" expanded="true" signature="0:2671" placeholder="/**...*/" />
+                <marker date="1273224101000" expanded="true" signature="90:146" placeholder="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.xml">
+      <file leaf-file-name="sylvester.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/assets/courtyard-house/sylvester.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="131" column="81" selection-start="7819" selection-end="7819" vertical-scroll-proportion="-10.625">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="generator.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/generation/generator.js">
+      <file leaf-file-name="courtyard-house.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/assets/courtyard-house/courtyard-house.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="79" selection-start="3069" selection-end="3244" vertical-scroll-proportion="0.0">
+            <state line="93" column="63" selection-start="4430" selection-end="4430" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="instancingModule.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js">
+      <file leaf-file-name="seymour-plane.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/seymour-plane.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="43" column="13" selection-start="1244" selection-end="1244" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="instance.js" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instance.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="33" selection-start="554" selection-end="554" vertical-scroll-proportion="0.17133258">
+            <state line="99" column="58" selection-start="4357" selection-end="4858" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -329,6 +337,96 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
+          <option name="myItemId" value="selector" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="test3" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="tests" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="selector" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="test2" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="tests" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="selector" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="test1" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="tests" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
           <option name="myItemId" value="instancing" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
@@ -415,7 +513,101 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
+          <option name="myItemId" value="tests" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="assets" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
           <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="tests" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="assets" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="spinner" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="tests" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="assets" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="seymour-plane" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="tests" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="assets" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="courtyard-house" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -438,192 +630,6 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="pick" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="name" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="material" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="lighting" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="instancing" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="generation" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="fog" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="scenejs" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="exceptions" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -898,71 +904,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/scenejs/name/nameModule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="109" column="0" selection-start="3192" selection-end="3192" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="194" column="56" selection-start="6028" selection-end="6028" vertical-scroll-proportion="0.0">
-          <folding>
-            <marker date="1273193680000" expanded="true" signature="5849:5971" placeholder="/**...*/" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/fog/fog.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="169" column="58" selection-start="4948" selection-end="4948" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/lighting/lights.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/material/materialModule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/material/material.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/generation/generator.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="79" selection-start="3069" selection-end="3244" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/index.debug.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="13" selection-start="1244" selection-end="1244" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/instanced-spiral-staircase.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="177" column="8" selection-start="9405" selection-end="9405" vertical-scroll-proportion="0.0">
@@ -972,44 +913,109 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/tests/instancing/test2/instanced-teapot.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="92" selection-start="3001" selection-end="3001" vertical-scroll-proportion="0.0">
+        <state line="48" column="22" selection-start="0" selection-end="6783" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/website/lib/scenejs/scenejs.js">
+    <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instance.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="9" selection-start="854" selection-end="854" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/tests/instancing/test1/index.debug.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="11" selection-start="2126" selection-end="2419" vertical-scroll-proportion="-26.208334">
-          <folding />
+        <state line="44" column="3" selection-start="1743" selection-end="1756" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1273202441000" expanded="true" signature="0:1926" placeholder="/**...*/" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/build.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="131" column="81" selection-start="7819" selection-end="7819" vertical-scroll-proportion="-10.625">
+        <state line="60" column="4" selection-start="2684" selection-end="2755" vertical-scroll-proportion="36.458332">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/symbol.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="2" selection-start="0" selection-end="2671" vertical-scroll-proportion="0.0">
+        <state line="16" column="70" selection-start="1310" selection-end="1422" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/selector/test1/index.debug.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="79" selection-start="2499" selection-end="2499" vertical-scroll-proportion="-24.083334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/selector/test2/index.debug.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/selector/test3/index.debug.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/assets/courtyard-house/sylvester.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/assets/courtyard-house/courtyard-house.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="93" column="63" selection-start="4430" selection-end="4430" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/assets/seymour-plane/seymour-plane.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="99" column="58" selection-start="4357" selection-end="4858" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/selector/test2/select-view.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="17" selection-start="2672" selection-end="2672" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tests/selector/test1/teapots.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="69" column="8" selection-start="3445" selection-end="3445" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/website/lib/scenejs/scenejs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="36" column="34" selection-start="0" selection-end="934" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1273200338000" expanded="true" signature="0:2671" placeholder="/**...*/" />
+            <marker date="1273224101000" expanded="true" signature="90:146" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/instancing/instance.js">
+    <entry file="file://$PROJECT_DIR$/src/tests/selector/test3/switching-select-view.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="33" selection-start="554" selection-end="554" vertical-scroll-proportion="0.17133258">
+        <state line="16" column="88" selection-start="371" selection-end="371" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/selector/selector.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="79" selection-start="14" selection-end="2197" vertical-scroll-proportion="0.67637175">
           <folding />
         </state>
       </provider>
