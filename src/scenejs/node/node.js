@@ -1,8 +1,48 @@
 /**
  @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
- @constructor
- Create a new SceneJS.node
- @param {SceneJS.node, ...} arguments Zero or more child nodes
+ <p>Every node type has a specific type, which is its SceneJS-specific type name, along with methods for checking the
+ * type like {@link #getType}. This is the list of all valid xtypes:</p>
+ *
+ * <table>
+ * <tr><td>type</td><td>Class</td></tr>
+ * <tr><td>----</td><td>-----</td></tr>
+ * <tr><td>bounding-box</td><td>{@link SceneJS.BoundingBox}</td></tr>
+ * <tr><td>cube</td><td>{@link SceneJS.objects.Cube}</td></tr>
+ * <tr><td>fog</td><td>{@link SceneJS.Fog}</td></tr>
+ * <tr><td>generator</td><td>{@link SceneJS.Generator}</td></tr>
+ * <tr><td>geometry</td><td>{@link SceneJS.Geometry}</td></tr>
+ * <tr><td>instance</td><td>{@link SceneJS.Instance}</td></tr>
+ * <tr><td>lights</td><td>{@link SceneJS.Lights}</td></tr>
+ * <tr><td>load</td><td>{@link SceneJS.Load}</td></tr>
+ * <tr><td>load-collada</td><td>{@link SceneJS.LoadCollada}</td></tr>
+ * <tr><td>locality</td><td>{@link SceneJS.Locality}</td></tr>
+ * <tr><td>logging</td><td>{@link SceneJS.Logging}</td></tr>
+ * <tr><td>logging-to-page</td><td>{@link SceneJS.LoggingToPage}</td></tr>
+ * <tr><td>lookat</td><td>{@link SceneJS.LookAt}</td></tr>
+ * <tr><td>material</td><td>{@link SceneJS.Material}</td></tr>
+ * <tr><td>model-matrix</td><td>{@link SceneJS.ModelMatrix}</td></tr>
+ * <tr><td>name</td><td>{@link SceneJS.Name}</td></tr>
+ * <tr><td>node</td><td>{@link SceneJS.Node}</td></tr>
+ * <tr><td>perspective</td><td>{@link SceneJS.Perspective}</td></tr>
+ * <tr><td>renderer</td><td>{@link SceneJS.Renderer}</td></tr>
+ * <tr><td>rotate</td><td>{@link SceneJS.Rotate}</td></tr>
+ * <tr><td>scale</td><td>{@link SceneJS.Scale}</td></tr>
+ * <tr><td>scene</td><td>{@link SceneJS.Scene}</td></tr>
+ * <tr><td>scalar-interpolator</td><td>{@link SceneJS.ScalerInterpolator}</td></tr>
+ * <tr><td>selector</td><td>{@link SceneJS.Selector}</td></tr>
+ * <tr><td>sphere</td><td>{@link SceneJS.objects.Sphere}</td></tr>
+ * <tr><td>stationary</td><td>{@link SceneJS.Stationary}</td></tr>
+ * <tr><td>symbol</td><td>{@link SceneJS.Symbol}</td></tr>
+ * <tr><td>teapot</td><td>{@link SceneJS.objects.Teapot}</td></tr>
+ * <tr><td>text</td><td>{@link SceneJS.Text}</td></tr>
+ * <tr><td>texture</td><td>{@link SceneJS.Texture}</td></tr>
+ * <tr><td>translate</td><td>{@link SceneJS.Translate}</td></tr>
+ * <tr><td>view-matrix</td><td>{@link SceneJS.ViewMatrix}</td></tr>
+ * <tr><td>with-data</td><td>{@link SceneJS.WithData}</td></tr>
+ * </table>
+ * @constructor
+ * Create a new SceneJS.node
+ * @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
 SceneJS.Node = function() {
     this._nodeType = "node";
@@ -120,6 +160,15 @@ SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
 /** @private */
 SceneJS.Node.prototype._render = function(traversalContext, data) {
     this._renderNodes(traversalContext, data);
+};
+
+/**
+ * Returns the type ID of the node. For the SceneJS.Node base class, it is "node",
+ * which is overriden in sub-classes.
+ * @returns {string} Type ID
+ */
+SceneJS.Node.prototype.getType = function() {
+    return this._nodeType;
 };
 
 /**

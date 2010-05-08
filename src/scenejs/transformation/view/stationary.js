@@ -1,8 +1,8 @@
 /**
- * @class A Scene node that defines a region within a SceneJS.LookAt in which the translations specified by that node have no effect.
+ * @class A Scene node that defines a region within a {@link SceneJS.LookAt} in which the translations specified by that node have no effect.
  * @extends SceneJS.Node
  *
- * <p> As the parameters of the SceneJS.lookAt are modified, the content in the subgraph
+ * <p> As the parameters of the {@link SceneJS.LookAt} are modified, the content in the subgraph
  * of this node will rotate about the eye position, but will not translate as the eye position moves. You could therefore
  * define a skybox within the subgraph of this node, that will always stay in the distance.</p>
  *

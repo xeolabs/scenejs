@@ -4,7 +4,14 @@
  * provided. When first visited during scene traversal, it will
  * begin the load and allow traversal to continue at its next sibling node. When on a subsequent visit its subgraph has
  * been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
- * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
+ * <p><b>Loading Cross-Domain</b></p>
+ * <p>When the {@link SceneJS.Scene} node is configured with the URL of a SceneJS JSON proxy server, you can perform the
+ * load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
+ * in order to not violate the browser' same-domain security policy.
+ * <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
+ * JSONP proxy script written in Perl.</p>
+ * <p><b>Monitoring Load Progress</b></p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with {@link SceneJS.onEvent()}.</p>
  * <p><b>Live Examples</b></p>
  * <li><a target = "other" href="http://bit.ly/scenejs-collada-load-seymour">Seymour Plane</a></li>
  * <li><a target = "other" href="http://bit.ly/scenejs-tron-tank">Tron Tank</a></li>
@@ -30,7 +37,7 @@
 
 SceneJS.LoadCollada = function() {
     SceneJS.Load.apply(this, arguments);
-    this._nodeType = "loadCollada";
+    this._nodeType = "load-collada";
 };
 
 SceneJS._inherit(SceneJS.LoadCollada, SceneJS.Load);
@@ -45,20 +52,33 @@ SceneJS.LoadCollada.prototype._init = function(params) {
     this._serverParams = {
         format: "xml"
     };
-    var modes = {
+    var options = {
         loadCamera: params.loadCamera,
         loadLights: params.loadLights,
+        createBoundingBoxes : params.createBoundingBoxes == undefined ? true : params.createBoundingBoxes,
         showBoundingBoxes : params.showBoundingBoxes
     };
     this._parser = function(xml, onError) {
         return SceneJS_colladaParserModule.parse(
                 params.uri, // Used in paths to texture images
                 xml,
+                //params.nodes || [], // Optional cherry-picked asset
                 params.node, // Optional cherry-picked asset
-                modes
+                options
                 );
     };
 };
+
+
+SceneJS.LoadCollada.prototype.getCameras = function(index) {
+    
+};
+
+
+SceneJS.LoadCollada.prototype.setActiveCamera = function(index) {
+
+};
+
 
 
 /** Returns a new SceneJS.LoadCollada instance

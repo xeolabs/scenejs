@@ -46,7 +46,7 @@
  *       )
  *   );
  *
- * myScene.render({ activeCamera: 0 });  // Render scene for first viewpoint 
+ * myScene.render({ activeCamera: 0 });  // Render scene for first viewpoint
  * myScene.render({ activeCamera: 1 });  // Once more for second viewpoint
  *
  * </pre></code>
@@ -59,6 +59,7 @@
  */
 SceneJS.Selector = function() {
     SceneJS.Node.apply(this, arguments);
+    this._nodeType = "selector";
     this._selection = [];
     if (this._fixedParams) {
         this._init(this._getParams());

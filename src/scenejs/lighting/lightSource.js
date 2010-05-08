@@ -1,7 +1,7 @@
 /*
  class SceneJS.LightSource
 
- A light source for containment within a SceneJS.Lights node.
+ A light source for containment within a @link SceneJS.Lights} node.
 
  @constructor
  Create a new SceneJS.LightSource

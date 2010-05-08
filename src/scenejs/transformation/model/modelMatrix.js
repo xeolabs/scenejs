@@ -20,7 +20,7 @@
  */
 SceneJS.ModelMatrix = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "modelMatrix";
+    this._nodeType = "model-matrix";
     this._mat = SceneJS_math_identityMat4();
     this._xform = null;
     if (this._fixedParams) {

@@ -1,15 +1,15 @@
 /**
  * @class A scene node that instantiates a previously-defined SceneJS.Symbol node.
  *
- * <p>When rendered, a SceneJS.Symbol node registers its contents against a specified name, without rendering the
- * content. Then when SceneJS then finds a SceneJS.Instance node that refers to the registered name,
+ * <p>When rendered, a {@link SceneJS.Symbol} node registers its contents against a specified name, without rendering the
+ * content. Then when SceneJS then finds a {@link SceneJS.Instance} node that refers to the registered name,
  * it will instantiate the Symbol's child nodes as if they were children of the Instance node.</p>
  *
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/9d8wLu">Example 1</a></li></ul>
  * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a Name, then instantiating it three times with
- * Instance nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
- * created by a Name node:</b></p><pre><code>
+ * {@link SceneJS.Instance} nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
+ * created by a {@link SceneJS.Name} node:</b></p><pre><code>
  * var scene = new SceneJS.Scene(
  *
  *      // ...

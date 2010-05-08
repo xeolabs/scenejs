@@ -4,11 +4,12 @@
  * for nodes in its subgraph to configure themselves with.</p>
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-scalarinterpolator-example">Example 1</a></li></ul>
- * <p><b>Example Usage</b></p><p>This example defines a cube with rotation that is animated by a SceneJS.ScalarInterpolator, which is
- * in turn driven by an alpha value supplied by a higher SceneJS.WithData. If we thought of <em>alpha</em> as
- * elapsed seconds, then this cube will rotate 360 degrees over one second, then rotate 180 in the reverse direction
- * over the next 0.5 seconds. In this example however, the alpha is actually fixed, where the cube is stuck at
- * 180 degrees - you would need to vary the "alpha" property on the WithData node to actually animate it.</p><pre><code>
+ * <p><b>Example Usage</b></p><p>This example defines a {@link SceneJS.objects.Cube} with rotation that is animated by
+ * a SceneJS.ScalarInterpolator, which isin turn driven by an alpha value supplied by a higher {@link SceneJS.WithData}.
+ * If we thought of <em>alpha</em> as elapsed seconds, then this cube will rotate 360 degrees over one second, then
+ * rotate 180 in the reverse direction over the next 0.5 seconds. In this example however, the alpha is actually fixed,
+ * where the cube is stuck at 180 degrees - you would need to vary the "alpha" property on the WithData node to actually
+ * animate it.</p><pre><code>
  * var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to 180 degrees
  *
  *      new SceneJS.ScalarInterpolator({

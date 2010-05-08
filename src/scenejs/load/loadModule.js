@@ -47,7 +47,7 @@ var SceneJS_loadModule = new (function() {
     }
 
     /** @private */
-    function _loadAssetSameDomain(uri, assetId, parser, onSuccess, onError) {
+    function _loadAssetSameDomain(uri, assetId, parser, onSuccess, onError) { 
         _loadFile(uri,
                 function(data) {  // onLoad
                     if (!data) {

@@ -3,7 +3,7 @@
  * level-of-detail culling.
  *
  * <p>The subgraphs of these are only traversed when the boundary intersect the current view frustum. When this node
- * is within the subgraph of a SceneJS.Locality node, it the boundary must also intersect the inner radius of the Locality.
+ * is within the subgraph of a {@link SceneJS.Locality} node, it the boundary must also intersect the inner radius of the Locality.
  * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.</p> 
  *  
  * <p>When configured with a projected size threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
@@ -71,7 +71,7 @@
  */
 SceneJS.BoundingBox = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType="boundingBox";
+    this._nodeType="bounding-box";
     this._xmin = 0;
     this._ymin = 0;
     this._zmin = 0;

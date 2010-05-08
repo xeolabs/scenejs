@@ -18,7 +18,7 @@
  */
 SceneJS.LookAt = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "lookAt";
+    this._nodeType = "lookat";
     this._mat = null;
     this._xform = null;
 

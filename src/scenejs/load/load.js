@@ -1,15 +1,22 @@
 /**
  * @class A scene node that asynchronously loads JavaScript content for its subgraph from a server.
- * <p>A scene node can load content cross-domain if neccessary. This node is configured with the
+ * <p>This node is configured with the
  * location of a JavaScript file containing a SceneJS definition of the subgraph. When first visited during scene
  * traversal, it will begin the load and allow traversal to continue at its next sibling node. When on a subsequent
  * visit its subgraph has been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
- * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
+ * <p><b>Loading Cross-Domain</b></p>
+ * <p>When the {@link SceneJS.Scene} node is configured with the URL of a SceneJS JSON proxy server, you can perform the
+ * load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
+ * in order to not violate the browser' same-domain security policy.
+ * <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
+ * JSONP proxy script written in Perl.</p>
+ * <p><b>Monitoring Load Progress</b></p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with {@link SceneJS.onEvent()}.</p>
  * <p><b>Live Examples</b></p>
  * <li><a target = "other" href="http://bit.ly/scenejs-asset-load">Example 1</a></li>
  * </ul>
  * <p><b>Usage Example</b></p><p>The SceneJS.Load node shown below loads a fragment of JavaScript-defined scene
- * definition cross-domain, via the JSONP proxy located by the <b>uri</b> property on the SceneJS.Scene node.</b></p>
+ * definition cross-domain, via the JSONP proxy located by the <b>uri</b> property on the {@link SceneJS.Scene} node.</b></p>
  * <pre><code>
  * var exampleScene = new SceneJS.Scene({
  *
@@ -76,13 +83,27 @@ SceneJS.Load.prototype._visitSubgraph = function(data) {
     this._assetNode._render.call(this._assetNode, traversalContext, data);
 };
 
-// @private
+/**
+ * Parser callback to convert the response content into a SceneJS subgraph. For this SceneJS.Load base class,
+ * the format of the data could be either raw JavaScript in the case of a same-domain load, or a pre-evaluated
+ * SceneJS.Node or subtype for a cross-domain JSONP request. 
+ * @private
+ */
 SceneJS.Load.prototype._parse = function(data, onError) {
-    if (!data._render) {
-        onError(data.error || "unknown server error");
-        return null;
-    } else {
+    if (data._render) {  // Cross-domain JSONP
         return data;
+    }
+    if (data.error) {
+        onError(data.error);
+    }
+    try {
+        var data = eval(data);  // Same-domain
+        if (data.error) {
+            onError(data.error);
+        }
+        return data;
+    } catch (e) {
+        onError("Error parsing response: " + e);
     }
 };
 

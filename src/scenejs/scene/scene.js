@@ -1,7 +1,45 @@
 /**
- @class Root node of a SceneJS scene graph.
- <p>This is entry and exit point for execution when rendering one frame of a scene graph.</p>  
- @extends SceneJS.Node
+ *@class Root node of a SceneJS scene graph.
+ *
+ * <p>This is entry and exit point for execution when rendering one frame of a scene graph, which also configures certain
+ * global scene parameters as listed below. </p>
+ * <p><b>Binding to a Canvas</b></p>
+ * <p>The Scene node can be configured with the ID of a WebGL compatible Canvas element for the scene to render to. When that
+ * is omitted, it will look for one with ID "_scenejs-default-canvas" by default.</p>
+ * <p><b>JSONP Proxy for Cross-Domain Content</b></p>
+ * <p>The Scene node can be configured with a <b>proxy</b> property to specify the URL of a SceneJS JSON proxy server to enable
+ * {@link SceneJS.Load} and {@link SceneJS.LoadCollada} nodes can do their content loading cross-domain. When that property
+ * is omitted, those nodes can only load their content from the local server domain in order to not violate the browser's
+ * same-domain security policy. <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is
+ * a download of </a>an example of a SceneJS JSONP proxy script written in Perl.</p>
+ * <p><b>Usage Example:</b></p><p>A Scene bound to a canvas and specifying a JSONP proxy, that contains a LookAt node
+ * whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada} node loads a Collada
+ * model cross-domain through the proxy. When the Scene is rendered, a value for the {@link Scene.LookAt}'s property is
+ * injected into it. The Scene will put the property on a data scope (which is implemented by a {@link SceneJS.Data})
+ * that the {@link SceneJS.LookAt}'s config callback then accesses.</b></p><pre><code>
+ * var myScene = new SceneJS.Scene({
+ *              canvasId: "myCanvas",
+ *              proxy: "http://scenejs.org/cgi-bin/jsonp_proxy.pl"
+ *          },
+ *
+ *          new SceneJS.LookAt(
+ *              function(data) {
+ *                  return {
+ *                      eye: data.get("eye")
+ *                  };
+ *              },
+ *
+ *              new SceneJS.LoadCollada("http://foo.com/models/myModel.dae")
+ *      );
+ *
+ * myScene.render({
+ *          eye: {
+ *             x: 0, y: 0, z: -100
+ *          }
+ *      });
+ *
+ * </pre></code>
+ * @extends SceneJS.Node
  */
 SceneJS.Scene = function() {
     SceneJS.Node.apply(this, arguments);
@@ -31,31 +69,7 @@ SceneJS.Scene.prototype.getCanvasId = function() {
 
 /**
  * Renders the scene, passing in any properties required for dynamic configuration of its contained nodes.
- * <p><b>Example:</b></p><p>A Scene with a LookAt node whoe's "eye" property is dynamically configured with a callback. When the Scene is
- * rendered, a value for the property is injected into it. The Scene will put the property on a data scope (implemented by a SceneJS.Data)
- * that the LookAt's config callback then accesses.</b></p><pre><code>
- * var myScene = new SceneJS.Scene(
- *          {
- *              // .. scene configs .. //
- *          },
  *
- *          new SceneJS.LookAt(
- *              function(data) {
- *                  return {
- *                      eye: data.get("eye")
- *                  };
- *              },
- *
- *              // ..more scene nodes..
- *      );
- *
- * myScene.render({
- *          eye: {
- *             x: 0, y: 0, z: -100
- *          }
- *      });
- *
- * </pre></code>
  */
 SceneJS.Scene.prototype.render = function(paramOverrides) {
     if (!this._sceneId) {

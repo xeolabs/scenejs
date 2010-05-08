@@ -2,7 +2,7 @@
  * @class A scene node that defines how light is reflected by the geometry within its subgraph.
  * <p> These may be defined anywhere within a scene graph and may be nested. When nested, the properties on an inner material
  * node will override those on outer material nodes for the inner node's subgraph. These nodes are to be defined either
- * above or below SceneJS.Lights nodes, which provide light for geometry to reflect.</p>
+ * above or below {@link SceneJS.Lights} nodes, which provide light for geometry to reflect.</p>
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-material-example">Example 1</a></li></ul>
  * <p><b>Usage Example</b></p><p>A cube illuminated by a directional light source and wrapped

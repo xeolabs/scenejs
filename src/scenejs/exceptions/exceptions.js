@@ -1,5 +1,5 @@
 /**
- * @class Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a SceneJS.Scene.
+ * @class Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a {@link SceneJS.Scene}.
  */
 SceneJS.WebGLNotSupportedException = function(msg, cause) {
     this.message = msg;
@@ -7,7 +7,7 @@ SceneJS.WebGLNotSupportedException = function(msg, cause) {
 };
 
 /**
- * @class Exception thrown by SceneJS node classes when a mandatory configuration was not supplied
+ * @class Exception thrown by {@link SceneJS.Node} or subtypes when a mandatory configuration was not supplied
  */
 SceneJS.NodeConfigExpectedException = function(msg, cause) {
     this.message = msg;
@@ -47,8 +47,8 @@ SceneJS.NoCanvasActiveException = function(msg, cause) {
 };
 
 /**
- * @class Exception thrown when a SceneJS.Scene 'canvasId' configuration does not match any elements in the page and no
- * default canvas was found with the ID specified in SceneJS.Scene.DEFAULT_CANVAS_ID.
+ * @class Exception thrown when a {@link SceneJS.Scene} 'canvasId' configuration does not match any elements in the page and no
+ * default canvas was found with the ID specified in {@link SceneJS.Scene.DEFAULT_CANVAS_ID}.
  */
 SceneJS.CanvasNotFoundException = function(msg, cause) {
     this.message = msg;
@@ -73,22 +73,22 @@ SceneJS.OutOfVRAMException = function(msg, cause) {
     this.cause = cause;
 };
 
-/**@class  Exception thrown when a SceneJS.LoggingToPage 'elementId' configuration does not match any elements in the page and no
- * default DIV was found with the ID specified in SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID.
+/**@class  Exception thrown when a {@link SceneJS.LoggingToPage} 'elementId' configuration does not match any elements in the page and no
+ * default DIV was found with the ID specified in {@link SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID}.
  */
 SceneJS.DocumentElementNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-/** @class  Exception thrown by a SceneJS.LoadCollada node when parsing of a Collada file fails for some reason.
+/** @class  Exception thrown by a {@link SceneJS.LoadCollada} node when parsing of a Collada file fails for some reason.
  */
 SceneJS.ColladaParseException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-/** @class  Exception thrown by a SceneJS.LoadCollada node when the element ID given in its 'node' configuration does not match the ID
+/** @class  Exception thrown by a {@link SceneJS.LoadCollada} node when the element ID given in its 'node' configuration does not match the ID
  * of any node in the Collada document.
  */
 SceneJS.ColladaRootNotFoundException = function(msg, cause) {
@@ -96,7 +96,7 @@ SceneJS.ColladaRootNotFoundException = function(msg, cause) {
     this.cause = cause;
 };
 
-/** @class  Exception thrown by a SceneJS.LoadCollada node when it could not find the default Collada node ("asset) to parse and needs you to
+/** @class  Exception thrown by a {@link SceneJS.LoadCollada} node when it could not find the default Collada node ("asset) to parse and needs you to
  * explicitly provide the ID of a target asset through a 'node' configuration property.
  */
 SceneJS.ColladaRootRequiredException = function(msg, cause) {
@@ -116,7 +116,7 @@ SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
 
 /**
  * @class  Exception thrown to signify an error response from the proxy configured for cross-domain loads
- * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyErrorResponseException = function(msg, cause) {
     this.message = msg;
@@ -125,7 +125,7 @@ SceneJS.ProxyErrorResponseException = function(msg, cause) {
 
 /**
  * @class  Exception thrown to signify an empty response from the proxy configured for cross-domain loads
- * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyEmptyResponseException = function(msg, cause) {
     this.message = msg;
@@ -133,7 +133,7 @@ SceneJS.ProxyEmptyResponseException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown to signify that empty content was loaded (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * @class  Exception thrown to signify that empty content was loaded (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.EmptyResponseException = function(msg, cause) {
     this.message = msg;
@@ -141,7 +141,7 @@ SceneJS.EmptyResponseException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.HttpException = function(msg, cause) {
     this.message = msg;
@@ -149,7 +149,7 @@ SceneJS.HttpException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown by nodes such as SceneJS.Renderer and SceneJS.Texture when the browser's WebGL does not support
+ * @class  Exception thrown by nodes such as {@link SceneJS.Renderer} and {@link SceneJS.Texture} when the browser's WebGL does not support
  * a specified config value.
  */
 SceneJS.WebGLUnsupportedNodeConfigException = function(msg, cause) {
@@ -164,7 +164,7 @@ SceneJS.PickWithoutRenderedException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown when a node (such as SceneJs.ScalarInterpolator) expects to find some element of data on the current
+ * @class  Exception thrown when a node (such as {@link SceneJs.ScalarInterpolator}) expects to find some element of data on the current
  * data scope (SceneJS.Data).
  */
 SceneJS.DataExpectedException = function(msg, cause) {
@@ -173,7 +173,7 @@ SceneJS.DataExpectedException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
+ * @class  Exception thrown by nodes such as {@link SceneJs.Load} and {@link SceneJS.LoadCollada} when they timeout waiting for their content to load.
  */
 SceneJS.LoadTimeoutException = function(msg, cause) {
     this.message = msg;
@@ -189,8 +189,8 @@ SceneJS.InternalException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown to signify that a SceneJS.Instance node could not find
- * a SceneJS.Symbol to instance
+ * @class  Exception thrown to signify that a {@link SceneJS.Instance} node could not find
+ * a {@link SceneJS.Symbol} to instance
  */
 SceneJS.SymbolNotFoundException = function(msg, cause) {
     this.message = msg;

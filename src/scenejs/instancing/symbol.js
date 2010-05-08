@@ -1,5 +1,5 @@
 /**
- * @class A scene node that marks its subgraph as a "symbol" which can be then instanced with SceneJS.Instance nodes.
+ * @class A scene node that marks its subgraph as a "symbol" which can be then instanced with {@link SceneJS.Instance} nodes.
  *
  * <p>This node type is useful for keeping scene size small, while also simplifying editing of a scene; when you edit
  * content within a Symbol, all instances of the Symbol update to reflect the edits.</p>
@@ -7,19 +7,20 @@
  * <p>When rendered, SceneJS registers this node against its specified name and prevents SceneJS from traversing
  * into its subgraph. The content defined within the Symbol will therefore only be rendered when it is instanced.
  * The registered name will be actually be the concatenation of the specified name with the namespace formed by
- * any enclosing SceneJS.Name nodes. When SceneJS then finds a SceneJS.Instance node that refers to the registered name,
- * it will instantiate the Symbol's child nodes as if they were children of the Instance node.</p>
+ * any enclosing {@link SceneJS.Name} nodes. When SceneJS then finds a {@link SceneJS.Instance} node that refers to the
+ * registered name, it will instantiate the Symbol's child nodes as if they were children of the {@link SceneJS.Instance}
+ *  node.</p>
  *
- * <p>Beware potential performance penalties for using Symbols and Instances. Within every subgraph, SceneJS
+ * <p>Beware potential performance penalties for using Symbols and {@link SceneJS.Instances}. Within every subgraph, SceneJS
  * internally memoises whatever state it determines will not change between scene traversals. SceneJS may therefore be
  * restricted in what state it can memoise within a Symbol's subgraph when it is likely to be dynamically affected by
  * the different scene locations it which it is instanced.</p>
  *
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/9d8wLu">Example 1</a></li></ul>
- * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a Name, then instantiating it three times with
- * Instance nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
- * created by a Name node:</b></p><pre><code>
+ * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a {@link SceneJS.Name}, then instantiating it three times with
+ * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to a namespace
+ * created by a {@link SceneJS.Name} node:</b></p><pre><code>
  * var scene = new SceneJS.Scene(
  *
  *      // ...
