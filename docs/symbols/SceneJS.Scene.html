@@ -225,6 +225,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
+	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
 	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
@@ -321,7 +323,45 @@ ul.inheritsList
 				
 			
 				Root node of a SceneJS scene graph.
- <p>This is entry and exit point for execution when rendering one frame of a scene graph.</p>
+
+<p>This is entry and exit point for execution when rendering one frame of a scene graph, which also configures certain
+global scene parameters as listed below. </p>
+<p><b>Binding to a Canvas</b></p>
+<p>The Scene node can be configured with the ID of a WebGL compatible Canvas element for the scene to render to. When that
+is omitted, it will look for one with ID "_scenejs-default-canvas" by default.</p>
+<p><b>JSONP Proxy for Cross-Domain Content</b></p>
+<p>The Scene node can be configured with a <b>proxy</b> property to specify the URL of a SceneJS JSON proxy server to enable
+<a href="../symbols/SceneJS.Load.html">SceneJS.Load</a> and <a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> nodes can do their content loading cross-domain. When that property
+is omitted, those nodes can only load their content from the local server domain in order to not violate the browser's
+same-domain security policy. <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is
+a download of </a>an example of a SceneJS JSONP proxy script written in Perl.</p>
+<p><b>Usage Example:</b></p><p>A Scene bound to a canvas and specifying a JSONP proxy, that contains a LookAt node
+whose "eye" property is dynamically configured with a callback. A <a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> node loads a Collada
+model cross-domain through the proxy. When the Scene is rendered, a value for the Scene.LookAt's property is
+injected into it. The Scene will put the property on a data scope (which is implemented by a <a href="../symbols/SceneJS.Data.html">SceneJS.Data</a>)
+that the <a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a>'s config callback then accesses.</b></p><pre><code>
+var myScene = new SceneJS.Scene({
+             canvasId: "myCanvas",
+             proxy: "http://scenejs.org/cgi-bin/jsonp_proxy.pl"
+         },
+
+         new SceneJS.LookAt(
+             function(data) {
+                 return {
+                     eye: data.get("eye")
+                 };
+             },
+
+             new SceneJS.LoadCollada("http://foo.com/models/myModel.dae")
+     );
+
+myScene.render({
+         eye: {
+            x: 0, y: 0, z: -100
+         }
+     });
+
+</pre></code>
 				
 				
 					<br /><i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_scene_scene.js.html">scene.js</a>.
@@ -420,7 +460,7 @@ ul.inheritsList
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></dd>
 				</dl>
 				
 			
@@ -584,31 +624,6 @@ when you render it.
 					</div>
 					<div class="description">
 						Renders the scene, passing in any properties required for dynamic configuration of its contained nodes.
-<p><b>Example:</b></p><p>A Scene with a LookAt node whoe's "eye" property is dynamically configured with a callback. When the Scene is
-rendered, a value for the property is injected into it. The Scene will put the property on a data scope (implemented by a SceneJS.Data)
-that the LookAt's config callback then accesses.</b></p><pre><code>
-var myScene = new SceneJS.Scene(
-         {
-             // .. scene configs .. //
-         },
-
-         new SceneJS.LookAt(
-             function(data) {
-                 return {
-                     eye: data.get("eye")
-                 };
-             },
-
-             // ..more scene nodes..
-     );
-
-myScene.render({
-         eye: {
-            x: 0, y: 0, z: -100
-         }
-     });
-
-</pre></code>
 						
 						
 					</div>
@@ -648,7 +663,7 @@ myScene.render({
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri May 07 2010 21:30:42 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:52 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

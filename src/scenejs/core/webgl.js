@@ -512,11 +512,14 @@ function SceneJS_webgl_ArrayBuffer(context, type, values, numItems, itemSize, us
     this.handle = context.createBuffer();
     context.bindBuffer(type, this.handle);
     context.bufferData(type, values, usage);
+    this.handle.numItems = numItems;
+    this.handle.itemSize = itemSize;
     context.bindBuffer(type, null);
 
     this.type = type;
     this.numItems = numItems;
     this.itemSize = itemSize;
+
 
         /** @private */
     this.bind = function() {

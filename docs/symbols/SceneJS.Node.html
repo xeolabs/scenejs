@@ -225,6 +225,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
+	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
 	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
@@ -319,6 +321,46 @@ ul.inheritsList
 				
 			
 				The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
+ <p>Every node type has a specific type, which is its SceneJS-specific type name, along with methods for checking the
+type like <a href="#getType">#getType</a>. This is the list of all valid xtypes:</p>
+
+<table>
+<tr><td>type</td><td>Class</td></tr>
+<tr><td>----</td><td>-----</td></tr>
+<tr><td>bounding-box</td><td><a href="../symbols/SceneJS.BoundingBox.html">SceneJS.BoundingBox</a></td></tr>
+<tr><td>cube</td><td><a href="../symbols/SceneJS.objects.Cube.html">SceneJS.objects.Cube</a></td></tr>
+<tr><td>fog</td><td><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></td></tr>
+<tr><td>generator</td><td><a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a></td></tr>
+<tr><td>geometry</td><td><a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a></td></tr>
+<tr><td>instance</td><td><a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a></td></tr>
+<tr><td>lights</td><td><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></td></tr>
+<tr><td>load</td><td><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></td></tr>
+<tr><td>load-collada</td><td><a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></td></tr>
+<tr><td>locality</td><td><a href="../symbols/SceneJS.Locality.html">SceneJS.Locality</a></td></tr>
+<tr><td>logging</td><td><a href="../symbols/SceneJS.Logging.html">SceneJS.Logging</a></td></tr>
+<tr><td>logging-to-page</td><td><a href="../symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a></td></tr>
+<tr><td>lookat</td><td><a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a></td></tr>
+<tr><td>material</td><td><a href="../symbols/SceneJS.Material.html">SceneJS.Material</a></td></tr>
+<tr><td>model-matrix</td><td><a href="../symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></td></tr>
+<tr><td>name</td><td><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></td></tr>
+<tr><td>node</td><td><a href="../symbols/SceneJS.Node.html">SceneJS.Node</a></td></tr>
+<tr><td>perspective</td><td><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></td></tr>
+<tr><td>renderer</td><td><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></td></tr>
+<tr><td>rotate</td><td><a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></td></tr>
+<tr><td>scale</td><td><a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a></td></tr>
+<tr><td>scene</td><td><a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a></td></tr>
+<tr><td>scalar-interpolator</td><td>SceneJS.ScalerInterpolator</td></tr>
+<tr><td>selector</td><td><a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a></td></tr>
+<tr><td>sphere</td><td><a href="../symbols/SceneJS.objects.Sphere.html">SceneJS.objects.Sphere</a></td></tr>
+<tr><td>stationary</td><td><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></td></tr>
+<tr><td>symbol</td><td><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></td></tr>
+<tr><td>teapot</td><td><a href="../symbols/SceneJS.objects.Teapot.html">SceneJS.objects.Teapot</a></td></tr>
+<tr><td>text</td><td><a href="../symbols/SceneJS.Text.html">SceneJS.Text</a></td></tr>
+<tr><td>texture</td><td><a href="../symbols/SceneJS.Texture.html">SceneJS.Texture</a></td></tr>
+<tr><td>translate</td><td><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></td></tr>
+<tr><td>view-matrix</td><td><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></td></tr>
+<tr><td>with-data</td><td><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></td></tr>
+</table>
 				
 				
 					<br /><i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_node_node.js.html">node.js</a>.
@@ -417,6 +459,15 @@ ul.inheritsList
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#getParent">getParent</a></b>()
 								</div>
 								<div class="description">Returns the parent node</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#getType">getType</a></b>()
+								</div>
+								<div class="description">Returns the type ID of the node.</div>
 							</td>
 						</tr>
 					
@@ -728,6 +779,39 @@ ul.inheritsList
 
 					<hr />
 				
+					<a name="getType"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{string}</span>
+					<b>getType</b>()
+					
+					</div>
+					<div class="description">
+						Returns the type ID of the node. For the SceneJS.Node base class, it is "node",
+which is overriden in sub-classes.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{string}</span> Type ID</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="insertNode"> </a>
 					<div class="fixedFont">
 					
@@ -825,7 +909,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri May 07 2010 21:30:41 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:52 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

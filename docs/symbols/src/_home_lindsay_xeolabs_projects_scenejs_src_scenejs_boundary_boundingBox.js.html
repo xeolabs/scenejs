@@ -10,7 +10,7 @@
 <span class='line'>  3</span>  * level-of-detail culling.
 <span class='line'>  4</span>  *
 <span class='line'>  5</span>  * &lt;p>The subgraphs of these are only traversed when the boundary intersect the current view frustum. When this node
-<span class='line'>  6</span>  * is within the subgraph of a SceneJS.Locality node, it the boundary must also intersect the inner radius of the Locality.
+<span class='line'>  6</span>  * is within the subgraph of a {@link SceneJS.Locality} node, it the boundary must also intersect the inner radius of the Locality.
 <span class='line'>  7</span>  * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.&lt;/p> 
 <span class='line'>  8</span>  *  
 <span class='line'>  9</span>  * &lt;p>When configured with a projected size threshold for each child, they can also function as level-of-detail (LOD) selectors.&lt;/p>
@@ -78,7 +78,7 @@
 <span class='line'> 71</span>  */</span><span class="WHIT">
 <span class='line'> 72</span> </span><span class="NAME">SceneJS.BoundingBox</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 73</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="PUNC">=</span><span class="STRN">"boundingBox"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="PUNC">=</span><span class="STRN">"bounding-box"</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 75</span> </span><span class="WHIT">    </span><span class="NAME">this._xmin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 76</span> </span><span class="WHIT">    </span><span class="NAME">this._ymin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 77</span> </span><span class="WHIT">    </span><span class="NAME">this._zmin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">

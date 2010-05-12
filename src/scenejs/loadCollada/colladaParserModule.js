@@ -1,7 +1,7 @@
 /**
  * Backend that parses a COLLADA files into a SceneJS nodes.
  *
- * 
+ *
  * @private
  *
  */
@@ -15,11 +15,13 @@ var SceneJS_colladaParserModule = new (function() {
     var modes = {};
 
     /**
-     * Holds any data parsed from camera node, if requested, to create view a projection
+     * Holds any data parsed from camera nodes, if requested, to create view a projection
      * transform nodes with which to wrap the result subgraph with just before returning it
      * from this parser.
      */
-    var cameraData = {};
+    var camerasData = [];
+
+    var lightsData = [];
 
     /** Resets parser state
      * @private
@@ -28,7 +30,7 @@ var SceneJS_colladaParserModule = new (function() {
         xmlDoc = null;
         idMap = {};
         sources = {};
-        cameraData = null;
+        camerasData = [];
         modes = {};
     }
 
@@ -524,7 +526,7 @@ var SceneJS_colladaParserModule = new (function() {
                         ],
                         indices : [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1,5, 2, 6,3,7 ]
                     }))), child);
-        } else {                                   
+        } else {
             return SceneJS.boundingBox(e, child);
         }
     }
@@ -538,7 +540,7 @@ var SceneJS_colladaParserModule = new (function() {
         };
     }
 
-   // @private
+    // @private
     function expandExtentsByPositions(e, positions) {
         for (var i = 0; i < positions.length - 2; i += 3) {
             var x = positions[i];
@@ -643,7 +645,7 @@ var SceneJS_colladaParserModule = new (function() {
         var x = data[0];
         var y = data[1];
         var z = data[2];
-      //  SceneJS_loggingModule.warn("translate - x: " + x + ", y: " + y + ", z: " + z);
+        //  SceneJS_loggingModule.warn("translate - x: " + x + ", y: " + y + ", z: " + z);
         return SceneJS_math_translationMat4v(data);
     }
 
@@ -654,19 +656,19 @@ var SceneJS_colladaParserModule = new (function() {
         var y = data[1];
         var z = data[2];
         var angle = data[3];
-      //  SceneJS_loggingModule.warn("rotate - x: " + x + ", y: " + y + ", z: " + z + ", angle: " + angle);
+        //  SceneJS_loggingModule.warn("rotate - x: " + x + ", y: " + y + ", z: " + z + ", angle: " + angle);
         return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
     }
 
     /** Parses data from camera node
      * @private
      */
-    function parseCameraOptics(camera) {
+    function parseCamera(camera) {
         var optics = camera.getElementsByTagName("optics")[0];
         var techniqueCommon = optics.getElementsByTagName("technique_common")[0];
         var perspective = techniqueCommon.getElementsByTagName("perspective")[0];
 
-        var opticsData = {};
+        var cameraData = {};
 
         if (perspective) {
             var yfov = perspective.getElementsByTagName("yfov")[0];
@@ -674,7 +676,7 @@ var SceneJS_colladaParserModule = new (function() {
             var znear = perspective.getElementsByTagName("znear")[0];
             var zfar = perspective.getElementsByTagName("zfar")[0];
 
-            opticsData = {
+            cameraData = {
                 perspective: {
                     fovy: yfov ? parseFloat(yfov.textContent) : 60.0,
                     aspect: aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0,
@@ -682,19 +684,13 @@ var SceneJS_colladaParserModule = new (function() {
                     far: zfar ? parseFloat(zfar.textContent) : 10000.0
                 }
             };
-
-//            SceneJS_loggingModule.info("fovy = " + opticsData.perspective.fovy);
-//            SceneJS_loggingModule.info("aspect = " + opticsData.perspective.aspect);
-//            SceneJS_loggingModule.info("near = " + opticsData.perspective.near);
-//            SceneJS_loggingModule.info("far = " + opticsData.perspective.far);
-
-            return opticsData;
+            return cameraData;
 
         } else {
             var orthographic = techniqueCommon.getElementsByTagName("orthographic")[0];
             if (orthographic) {
 
-                opticsData = {
+                cameraData = {
                     orthographic: {
                         left: -1,
                         right: 1,
@@ -721,7 +717,7 @@ var SceneJS_colladaParserModule = new (function() {
 
                     xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
                     ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
-                    opticsData = {
+                    cameraData = {
                         orthographic: {
                             left: -xmagVal,
                             right: xmagVal,
@@ -736,7 +732,7 @@ var SceneJS_colladaParserModule = new (function() {
                 } else if (xmag) {
                     xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
                     aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
-                    opticsData = {
+                    cameraData = {
                         orthographic: {
                             left: -xmagVal,
                             right: xmagVal,
@@ -750,7 +746,7 @@ var SceneJS_colladaParserModule = new (function() {
                 } else if (ymag) {
                     ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
                     aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
-                    opticsData = {
+                    cameraData = {
                         orthographic: {
                             left: -ymagVal * aspect,
                             right: ymagVal * aspect,
@@ -763,20 +759,57 @@ var SceneJS_colladaParserModule = new (function() {
                 } else {
                     SceneJS_loggingModule.warn("camera.technique_common.optics.orthographic - insufficient data found, falling back on defaults");
                 }
-
-//                SceneJS_loggingModule.info("left = " + opticsData.orthographic.left);
-//                SceneJS_loggingModule.info("right = " + opticsData.orthographic.right);
-//                SceneJS_loggingModule.info("bottom = " + opticsData.orthographic.bottom);
-//                SceneJS_loggingModule.info("top = " + opticsData.orthographic.top);
-//                SceneJS_loggingModule.info("near = " + opticsData.orthographic.near);
-//                SceneJS_loggingModule.info("far = " + opticsData.orthographic.far);
-
             } else {
                 SceneJS_loggingModule.warn("camera.technique_common.optics - neither perspective nor perspective found");
             }
         }
+        return cameraData;
+    }
 
-        return opticsData;
+
+    function parseLight(light) {
+        var techniqueCommon = light.getElementsByTagName("technique_common")[0];
+        var directional = techniqueCommon.getElementsByTagName("directional")[0];
+        if (directional) {
+            return {
+                type: "dir",
+                dir: { x: 0, y: 0, z: -1.0 },
+                color: parseFloatArray(directional.getElementsByTagName("color")[0])
+            };
+        }
+        var point = techniqueCommon.getElementsByTagName("point")[0];
+        if (point) {
+            var constantAttenuation = point.getElementsByTagName("constant_attenuation")[0];
+            var linearAttenuation = point.getElementsByTagName("linear_attenuation")[0];
+            var quadraticAttenuation = point.getElementsByTagName("quadratic_attenuation")[0];
+            return {
+                type: "point",
+                pos: { x: 0, y: 0, z: 0},
+                color: parseFloatArray(point.getElementsByTagName("color")[0]),
+                constantAttenuation : constantAttenuation ? parseFloat(constantAttenuation) : 1.0,
+                linearAttenuation : linearAttenuation ? parseFloat(linearAttenuation) : 0.0,
+                quadraticAttenuation : quadraticAttenuation ? parseFloat(quadraticAttenuation) : 0.0
+            };
+        }
+        var spot = techniqueCommon.getElementsByTagName("spot")[0];
+        if (spot) {
+            var constantAttenuation = spot.getElementsByTagName("constant_attenuation")[0];
+            var linearAttenuation = spot.getElementsByTagName("linear_attenuation")[0];
+            var quadraticAttenuation = spot.getElementsByTagName("quadratic_attenuation")[0];
+            var falloffAngle = spot.getElementsByTagName("falloff_angle")[0];
+            var falloffExponent = spot.getElementsByTagName("falloff_exponent")[0];
+            return {
+                type: "spot",
+                // TODO: position & dir?
+                color: parseFloatArray(spot.getElementsByTagName("color")[0]) ,
+                constantAttenuation : constantAttenuation ? parseFloat(constantAttenuation) : 1.0,
+                linearAttenuation : linearAttenuation ? parseFloat(linearAttenuation) : 0.0,
+                quadraticAttenuation : quadraticAttenuation ? parseFloat(quadraticAttenuation) : 0.0,
+                falloffAngle : falloffAngle ? parseFloat(falloffAngle) : 180.0,
+                falloffExponent : falloffExponent ? parseFloat(falloffExponent) : 0.0
+            };
+        }
+        return null;
     }
 
 
@@ -790,9 +823,8 @@ var SceneJS_colladaParserModule = new (function() {
          */
         var sceneNodeParams = [];
 
-        /* Camera optics data from any camera elements found
-         */
-        var cameraOpticsData = null;
+        var cameraData = null;
+        var lightData = null;
 
         /* Matrix created from any transforms found
          */
@@ -847,30 +879,55 @@ var SceneJS_colladaParserModule = new (function() {
                     break;
 
                 case "instance_camera":
-                    cameraOpticsData = parseCameraOptics(idMap[child.getAttribute("url").substr(1)]);
+                    if (modes.loadCameras) {
+                        cameraData = parseCamera(idMap[child.getAttribute("url").substr(1)]);
+                    }
+                    break;
+
+                case "instance_light":
+                    if (modes.loadLights) {
+                        lightData = parseLight(idMap[child.getAttribute("url").substr(1)]);
+                    }
                     break;
             }
         } while (child = child.nextSibling);
 
         var sceneNode = SceneJS.node.apply(this, sceneNodeParams);
 
-//        if (cameraOpticsData) {
-//
-//            /* Save camera data for wrapping asset subgraph with when we're done parsing
-//             */
-//            cameraData = {
-//                opticsData : cameraOpticsData,
-//                matrix : matrix
-//            };
-//
-//        } else {
+        if (cameraData) {
+            camerasData.push({
+                id: node.getAttribute("id"),
+                cameraData : cameraData ,
+                matrix : SceneJS_math_inverseMat4(matrix) // Get view transform
+            });
+
+        } else {
 
             /* Modelling transform
              */
             if (matrix) {
                 sceneNode = SceneJS.modelMatrix({ elements: matrix }, sceneNode);
             }
-//        }
+        }
+
+        if (lightData) {
+            if (matrix) {
+
+                /* Transform lights
+                 */
+                if (lightData.type == "point") {
+                    var pos = SceneJS_math_transformPoint3(matrix, [0,0,0]);
+                    lightData.pos = { x: pos[0], y: pos[1], z: pos[2] };
+                } else if (lightData.type == "dir") {
+                    var dir = SceneJS_math_transformVector3(matrix, [0,0,-1]);
+                    lightData.dir = { x: dir[0], y: dir[1], z: dir[2] };
+                }
+            }
+            lightsData.push({
+                id: node.getAttribute("id"),
+                lightData : lightData
+            });
+        }
 
         return sceneNode;
     }
@@ -891,34 +948,86 @@ var SceneJS_colladaParserModule = new (function() {
 
         loadDoc(xml);
         buildIdMap();
-        var node = parseDoc(rootId);
 
-        if (modes.loadCamera && cameraData) {
+        var root = parseDoc(rootId);
+        var metadata = {
+            cameras: [],
+            lights: []
+        };
 
-            /* Camera was parsed -
-             */
+        /* Selector node selects camera by Collada node ID
+         */
+        var cameraNameMap = { };
+        for (var i = 0; i < camerasData.length; i++) {
+            var camera = camerasData[i];
+            cameraNameMap[camera.id] = i;
+            metadata.cameras.push({
+                id: camera.id
+            });
+        }
+        var defaultCamera = camerasData.length;
+        var selector = SceneJS.selector(
+                function(data) {
+                    var activeCamera = data.get("activeCamera");
+                    if (activeCamera) {
+                        var index = cameraNameMap[activeCamera] + 1;
+                        if (index) {
+                            return {
+                                selection: [index]
+                            };
+                        }
+                    }
+                    return {
 
-            /* Wrap result with view transform:
-             */
-            if (cameraData.matrix) {
-                node = SceneJS.viewMatrix({ elements: cameraData.matrix }, node);
+                        /* Default selection is no camera
+                         */
+                        selection: [0]
+                    };
+                });
+
+        root = SceneJS.node(
+                SceneJS.symbol({ name: "content" }, root),
+                selector);
+
+        /* Add scene instances to selector, each wrapped
+         * with projection and viewing transforms. Last scene
+         * instance has no camera, to rely on camera defined
+         * in surrounding scene.
+         */
+        selector.addNode(SceneJS.instance({ name: "content" }));
+        for (var i = 0; i < camerasData.length; i++) {
+            var camera = camerasData[i];
+            var node = SceneJS.instance({ name: "content" });
+            if (camera.matrix) {
+                node = SceneJS.viewMatrix({ elements: camera.matrix }, node);
             }
-
-            /* Wrap again with projection transform:
-             */
-            if (cameraData.opticsData.perspective) {
-                node = SceneJS.perspective(cameraData.opticsData.perspective, node);
-
-            } else if (cameraData.opticsData.orthographic) {
-                node = SceneJS.ortho(cameraData.opticsData.orthographic, node);
+            if (camera.cameraData.perspective) {
+                node = SceneJS.perspective(camera.cameraData.perspective, node);
+            } else if (camera.cameraData.orthographic) {
+                node = SceneJS.ortho(camera.cameraData.orthographic, node);
             }
+            selector.addNode(node);
         }
 
-        if (modes.loadLights && lightsData) {
+        /* If any lights were parsed, then wrap the root with a SceneJS.Lights node
+         */
+        if (lightsData.length > 0) {
+            var lightsNode = new SceneJS.Lights();
+            for (var i = 0; i < lightsData.length; i++) {
+                var light = lightsData[i];
+                lightsNode.addSource(new SceneJS.LightSource(light.lightData));
+                metadata.lights.push({
+                    id: light.id
+                });
+            }
+            lightsNode.addNode(root);
+            root = lightsNode;
         }
 
         reset();
 
-        return node;
+        return { root: root,
+            metadata : metadata
+        };
     };
 })();

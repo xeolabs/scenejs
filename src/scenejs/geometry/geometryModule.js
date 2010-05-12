@@ -275,7 +275,7 @@ var SceneJS_geometryModule = new (function() {
             }
 
             indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
-                    new WebGLUnsignedShortArray(data.indices), data.indices.length, 1, usage);
+                    new WebGLUnsignedShortArray(data.indices), data.indices.length, 3, usage);
 
             var geo = {
                 fixed : true, // TODO: support dynamic geometry
@@ -322,7 +322,7 @@ var SceneJS_geometryModule = new (function() {
     this.drawGeometry = function(type) {
         if (!canvas) {
             SceneJS_errorModule.fatalError(SceneJS.NoCanvasActiveException("No canvas active"));
-        }
+        }       
         var geo = currentGeoMap[type];
 
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.GEOMETRY_UPDATED, geo);  // Gives shader backend a chance to generate a shader
@@ -340,7 +340,7 @@ var SceneJS_geometryModule = new (function() {
         /* Dont re-export and bind if already the last one exported and bound - this is the case when
          * we're drawing a batch of the same object, Eg. a bunch of cubes in a row
          */
-        if (currentBoundGeoType != type) {
+      //  if (currentBoundGeoType != type) {
             for (var i = 0; i < 8; i++) {
                 context.disableVertexAttribArray(i);
             }
@@ -351,7 +351,7 @@ var SceneJS_geometryModule = new (function() {
             geo.indexBuf.bind(); // Bind index buffer
 
             currentBoundGeoType = type;
-        }
+       // }
 
         /* Draw geometry
          */

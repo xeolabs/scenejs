@@ -3,6 +3,8 @@
  * <p>Multiple instances of this  node may appear at
  * any location in a scene graph, to define multiple sources of light, the number of which is only limited
  * by video memory.</p>
+ * <p>note that SceneJS does not create any default light sources for you, so if you have non-emissive
+ * {@link SceneJS.Material}s with no lights you may not see anything in your scene until you add a light.</p>  
  * <p>Currently, two kinds of light are supported: point and directional. Point lights have a location, like a lightbulb,
  * while directional only have a vector that describes their direction, where they have no actual location since they
  * are an infinite distance away.</p>
@@ -12,7 +14,7 @@
  * <li><a target = "other" href="http://bit.ly/scenejs-point-lighting-exam">Point Lighting</a></li>
  * </ul>
  * <p><b>Example Usage</b></p><p>This example defines a cube that is illuminated by two light sources, point and directional.
- * The cube has material properties that define how it reflects the light.</b></p><pre><code>
+ * The cube has a {@link SceneJS.Material} that define how it reflects the light.</b></p><pre><code>
  *  var l = new SceneJS.Lights({
  *      sources: [
  *          {
@@ -35,7 +37,7 @@
  *              color: { r: 1.0, g: 1.0, b: 0.0 },
  *              diffuse: true,
  *              specular: true,
- *              dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction of light from coordinate space origin
+ *              dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction - default is { x: 0, y: 0, z: -1 } 
  *          }
  *      ]
  *  },

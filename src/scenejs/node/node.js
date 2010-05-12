@@ -191,15 +191,6 @@ SceneJS.Node.prototype.getNodes = function() {
     return list;
 };
 
-///** Sets child nodes, removing those already present
-// * @param {Array} children Array of child nodes
-// * @return this
-// */
-//SceneJS.Node.prototype.setNodes = function(children) {
-//    throw "SceneJS.node.setNodes not implemented yet";
-//    return this;
-//};
-
 /** Returns child node at given index
  * @returns {SceneJS.Node} Child node
  */
@@ -226,6 +217,10 @@ SceneJS.Node.prototype.removeNodeAt = function(index) {
  */
 SceneJS.Node.prototype.addNode = function(node) {
     if (node._parent != null) {
+        SceneJS_errorModule.fatalError(
+                new SceneJS.InvalidSceneGraphException(
+                        "Attempted to add a child to a node without " +
+                        "first removing the child from it's current parent"));
     }
     this._children.push(node);
     node._parent = this;
@@ -240,6 +235,10 @@ SceneJS.Node.prototype.addNode = function(node) {
  */
 SceneJS.Node.prototype.insertNode = function(node, i) {
     if (node._parent != null) {
+         SceneJS_errorModule.fatalError(
+                new SceneJS.InvalidSceneGraphException(
+                        "Attempted to insert a child to a node without " +
+                        "first removing the child from it's current parent"));
     }
     if (i == undefined || i <= 0) {
         this._children.unshift(node);

@@ -140,7 +140,9 @@ SceneJS.Perspective.prototype._render = function(traversalContext, data) {
 };
 
 
-/** Function wrapper to support functional scene definition
+/** Returns a new {@link SceneJS.Perspective} instance
+ * @param {Arguments} args Variable arguments that are passed to the {@link SceneJS.Perspective} constructor
+ * @returns {SceneJS.Perspective}
  */
 SceneJS.perspective = function() {
     var n = new SceneJS.Perspective();

@@ -38,6 +38,7 @@
 SceneJS.LoadCollada = function() {
     SceneJS.Load.apply(this, arguments);
     this._nodeType = "load-collada";
+    this._metadata = null;
 };
 
 SceneJS._inherit(SceneJS.LoadCollada, SceneJS.Load);
@@ -53,33 +54,28 @@ SceneJS.LoadCollada.prototype._init = function(params) {
         format: "xml"
     };
     var options = {
-        loadCamera: params.loadCamera,
+        loadCameras: params.loadCameras,
         loadLights: params.loadLights,
         createBoundingBoxes : params.createBoundingBoxes == undefined ? true : params.createBoundingBoxes,
         showBoundingBoxes : params.showBoundingBoxes
     };
-    this._parser = function(xml, onError) {
-        return SceneJS_colladaParserModule.parse(
+    var _this = this;
+    this._parse = function(xml, onError) { // Override default SceneJS.Load._parse
+        var result = SceneJS_colladaParserModule.parse(
                 params.uri, // Used in paths to texture images
                 xml,
                 //params.nodes || [], // Optional cherry-picked asset
                 params.node, // Optional cherry-picked asset
                 options
                 );
+        _this._metadata = result.metadata;
+        return result.root;
     };
 };
 
-
-SceneJS.LoadCollada.prototype.getCameras = function(index) {
-    
+SceneJS.LoadCollada.prototype.getMetadata = function() {
+    return this._metadata;
 };
-
-
-SceneJS.LoadCollada.prototype.setActiveCamera = function(index) {
-
-};
-
-
 
 /** Returns a new SceneJS.LoadCollada instance
  * @param {Arguments} args Variable arguments that are passed to the SceneJS.LoadCollada constructor

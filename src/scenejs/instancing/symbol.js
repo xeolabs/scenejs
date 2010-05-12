@@ -17,7 +17,7 @@
  * the different scene locations it which it is instanced.</p>
  *
  * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/9d8wLu">Example 1</a></li></ul>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint</a></li></ul>
  * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a {@link SceneJS.Name}, then instantiating it three times with
  * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to a namespace
  * created by a {@link SceneJS.Name} node:</b></p><pre><code>

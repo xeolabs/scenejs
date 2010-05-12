@@ -266,8 +266,13 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 
-
+      var x = 0;
 window.render = function() {
+    x++;
+    if (x == 10) {
+      // clearInterval(pInterval);
+    }
+
     try {
         pitch += pitchInc;
 

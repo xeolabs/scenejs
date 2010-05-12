@@ -1,17 +1,19 @@
 /**
  * SceneJS Example - Switchable Viewpoint using the Symbol, Instance and Selector Nodes.
  *
- * This example 
+ * A Selector node is a branch node that selects which among its children are currently active, while
+ * a Symbol node marks its subgraph so that it can be instanced by Instance nodes.
+ *
+ * This example demonstrates these nodes by defining three LookAt (view transform) nodes that can be switched with
+ * a Selector. Each LookAt contains an Instance of the scene content, which is defined within a Symbol.
+ *
+ * Click the mouse to switch between the viewpoints.
  *
  * Lindsay Kay
- * lindsay.kay AT xeolabs.com
+ * lindsay.kay@xeolabs.com
  * January 2010
- *
- *
  */
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
-
-    // Perspective transform
 
         SceneJS.perspective({
             fovy : 65.0, aspect : 1.0, near : 0.40, far : 300.0
@@ -61,21 +63,15 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                     };
                 },
 
-                    // First view point - looking down the -Z axis
-
                         SceneJS.lookAt({
                             eye : { z: 10.0 }
                         },
                                 SceneJS.instance({ name: "theScene"})),
 
-                    // Second view point - looking down the -X axis
-
                         SceneJS.lookAt({
                             eye : { x: 10.0 }
                         },
                                 SceneJS.instance({ name: "theScene"})),
-
-                    // Third view point - oblique
 
                         SceneJS.lookAt({
                             eye : { x: -5.0, y: 5, z: 5 }

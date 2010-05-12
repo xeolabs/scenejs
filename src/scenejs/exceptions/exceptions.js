@@ -1,4 +1,12 @@
 /**
+ * @class Wrapper for an exception not recognised by SceneJS.
+ */
+SceneJS.Exception = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+/**
  * @class Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a {@link SceneJS.Scene}.
  */
 SceneJS.WebGLNotSupportedException = function(msg, cause) {
@@ -196,6 +204,16 @@ SceneJS.SymbolNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
+
+/**
+ * @class  Exception thrown to signify an attempt to link/nest {@link SceneJS.Node}s or subtypes in a manner that would create an invalid scene graph
+ * a {@link SceneJS.Symbol} to instance
+ */
+SceneJS.InvalidSceneGraphException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
 
 
 

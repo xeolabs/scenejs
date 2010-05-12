@@ -42,9 +42,6 @@ SceneJS.Load = function() {
     this._assetNode = null;
     this._handle = null;
     this._state = SceneJS.Load.prototype._STATE_INITIAL;
-    //    if (this._fixedParams) {
-    //        this._init(this._getParams());
-    //    }
 };
 
 SceneJS._inherit(SceneJS.Load, SceneJS.Node);
@@ -71,8 +68,6 @@ SceneJS.Load.prototype._init = function(params) {
                 ("SceneJS.Load parameter expected: uri"));
     }
     this._uri = params.uri;
-    this._serverParams = params.serverParams;
-    this._parser = params.parser;
 };
 
 // @private
@@ -86,7 +81,7 @@ SceneJS.Load.prototype._visitSubgraph = function(data) {
 /**
  * Parser callback to convert the response content into a SceneJS subgraph. For this SceneJS.Load base class,
  * the format of the data could be either raw JavaScript in the case of a same-domain load, or a pre-evaluated
- * SceneJS.Node or subtype for a cross-domain JSONP request. 
+ * SceneJS.Node or subtype for a cross-domain JSONP request.
  * @private
  */
 SceneJS.Load.prototype._parse = function(data, onError) {
@@ -142,7 +137,7 @@ SceneJS.Load.prototype._render = function(traversalContext, data) {
                     this._serverParams || {
                         format: "scenejs"
                     },
-                    this._parser || this._parse,
+                    this._parse,
                     function(asset) { // Success
                         _this._assetNode = asset;   // Asset is wrapper created by SceneJS.createNode
                         _this._state = _this._STATE_LOADED;

@@ -1,32 +1,20 @@
-/*
- COLLADA Load Example - Seymour Plane Test Model
-
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
-
- Demonstrates the import of a COLLADA asset - the Seymour test model from collada.org
-
- This scene is interactive; to rotate the view, it takes two variables, "yaw" and "pitch", which are
- injected into the scene graph. Take a close look at the rotate nodes, which use these variables, and
- the invocation of the "render" function near the bottom of this example, which passes them in.
-
+/**
+ * SceneJS Example - A Dream Within a Dream, by Edgar Allen Poe, using the SceneJS.Text Node
+ *
+ * Lindsay Kay
+ * lindsay.kay@xeolabs.com
+ * January 2010
  */
 var exampleScene = SceneJS.scene({
 
-    /* Bind to a WebGL canvas:
-     */
     canvasId: 'theCanvas' },
 
-    /* Perspective transform:
-     */
         SceneJS.perspective({
             fovy : 55.0,
             aspect : 2.0,
             near : 0.10,
             far : 5000.0 },
 
-            /* Viewing transform:
-             */
                 SceneJS.lookAt(function(data) {
                     return {
                         eye : { x: -1.0, y: 0.0, z: data.get("dist") },
@@ -35,9 +23,6 @@ var exampleScene = SceneJS.scene({
                     };
                 },
 
-                    /* A lights node inserts lights into the world-space.  You can have as many
-                     * lights as you want throughout your scene:
-                     */
                         SceneJS.lights({
                             sources: [
                                 {
@@ -55,13 +40,17 @@ var exampleScene = SceneJS.scene({
                                     specular:               true
                                 }
                             ]},
-
                                 SceneJS.material({
                                     baseColor:      { r: 1, g: 1.3, b: 1.9 },
                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                     specular:       0.9,
                                     shine:          6.0
                                 },
+                                        //------------------------------------------------------------------------------
+                                        // These rotation nodes allow us to rotate the text around using angles injected
+                                        // into the scene graph that are updated by mouse handlers
+                                        //------------------------------------------------------------------------------
+
                                         SceneJS.rotate(function(data) {
                                             return {
                                                 angle: data.get('yaw'), y : 1.0
@@ -72,17 +61,46 @@ var exampleScene = SceneJS.scene({
                                                         angle: data.get('pitch'), x : 1.0
                                                     };
                                                 },
-                                                      //  SceneJS.objects.cube(),
                                                         SceneJS.translate({x:100, z: 100},
-                                                            //SceneJS.objects.cube(),
-                                                            /* Load our COLLADA airplane model:
-                                                             */
-                                                              //  SceneJS.billboard(
-                                                                        SceneJS.renderer({lineWidth:1 },
-                                                                                SceneJS.scale({x:5,y:5,z:5},
-                                                                                        SceneJS.text({
-                                                                                            text: "Take this kiss upon the brow!\nAnd, in parting from you now,\nThus much let me avow--\nYou are not wrong, who deem\nThat my days have been a dream;\nYet if hope has flown away\nIn a night, or in a day,\nIn a vision, or in none,\nIs it therefore the less gone?\nAll that we see or seem\nIs but a dream within a dream.\nI stand amid the roar\nOf a surf-tormented shore,And I hold within my hand\nGrains of the golden sand--\nHow few! yet how they creep\nThrough my fingers to the deep,\nWhile I weep--while I weep!\nO God! can I not grasp\nThem with a\n tighter clasp?\nO God! can I not save\nOne from the pitiless wave?\nIs all that we see or seem\nBut a dream within a dream?"
-                                                                                        })))))))//)
+                                                                SceneJS.scale({x:5,y:5,z:5},
+
+                                                                    //--------------------------------------------------
+                                                                    // We'll set a fairly narrow line width for our text
+                                                                    //--------------------------------------------------
+
+                                                                        SceneJS.renderer({ lineWidth:1 },
+
+                                                                                SceneJS.text({
+                                                                                    text: "Take this kiss upon the brow!\n " +
+                                                                                          "And, in parting from you now,\n " +
+                                                                                          "Thus much let me avow--\n " +
+                                                                                          "You are not wrong, who deem\n " +
+                                                                                          "That my days have been a dream;\n " +
+                                                                                          "Yet if hope has flown away\n " +
+                                                                                          "In a night, or in a day,\n " +
+                                                                                          "In a vision, or in none,\n " +
+                                                                                          "Is it therefore the less gone?\n " +
+                                                                                          "All that we see or seem\n " +
+                                                                                          "Is but a dream within a dream.\n " +
+                                                                                          "I stand amid the roar\n " +
+                                                                                          "Of a surf-tormented shore," +
+                                                                                          "And I hold within my hand\n " +
+                                                                                          "Grains of the golden sand--\n " +
+                                                                                          "How few! yet how they creep\n " +
+                                                                                          "Through my fingers to the deep,\n " +
+                                                                                          "While I weep--while I weep!\n " +
+                                                                                          "O God! can I not grasp\n " +
+                                                                                          "Them with a tighter clasp?\n " +
+                                                                                          "O God! can I not save\n " +
+                                                                                          "One from the pitiless wave?\n " +
+                                                                                          "Is all that we see or seem\n " +
+                                                                                          "But a dream within a dream?"
+                                                                                }))
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                        )
                                 )
 
                         )
@@ -105,7 +123,8 @@ var dist = -10;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = document.getElementById(exampleScene.getCanvasId());;
+var canvas = document.getElementById(exampleScene.getCanvasId());
+;
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -157,12 +176,10 @@ canvas.addEventListener('mousewheel', mouseWheel, true);
 
 
 window.render = function() {
-
     exampleScene.render({dist: dist, yaw: yaw, pitch: pitch});
 };
 
-SceneJS.onEvent("error", function(e) {
-    alert(e);
+SceneJS.onEvent("error", function() {
     window.clearInterval(pInterval);
 });
 

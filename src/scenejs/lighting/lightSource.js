@@ -1,5 +1,4 @@
-/*
- class SceneJS.LightSource
+/** @class SceneJS.LightSource
 
  A light source for containment within a @link SceneJS.Lights} node.
 
@@ -14,7 +13,7 @@ SceneJS.LightSource = function(cfg) {
     this._specular = true;
     this._pos = [0.0, 0.0, 0.0];
     this._viewPos = [0.0, 0.0, 0.0]; // Transformed view-space pos - accessed by lights module and shading module
-    this._dir = [0.0, 0.0, 0.0];
+    this._dir = [0.0, 0.0, -1.0];
     this._constantAttenuation = 1.0;
     this._linearAttenuation = 0.0;
     this._quadraticAttenuation = 0.0;
@@ -125,12 +124,17 @@ SceneJS.LightSource.prototype.getPos = function() {
 
 /** Sets the light source object-space direction vector.
  * This is only used when the source is of type "dir".
+ * Components will fall back on defaults of { x: 0, y: 0, z: -1 } where not supplied;
+ * <pre><code>
+ * myLightSource.setDir({  });       // Sets direction of { x : 0.0, y: 0.0, z: -1.0 }
+ * myLightSource.setDir({ y: 2.0 }); // Sets direction of { x : 0.0, y: 2.0, z: -1.0 }
+ * </pre></code>
  *
  * @param dir {Object} - Eg. {x: 5.0, y: 5.0, z: 5.0 }
  * @return {SceneJS.LightSource} this
  */
 SceneJS.LightSource.prototype.setDir = function(dir) {
-    this._dir = [ dir.x || 0.0, dir.y || 0.0, dir.z || 0.0 ];
+    this._dir = [ dir.x || 0.0, dir.y || 0.0, (dir.z == undefined || dir.z == null) ? -1 : dir.z ];
     return this;
 };
 

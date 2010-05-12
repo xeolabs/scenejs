@@ -78,9 +78,9 @@ var SceneJS_sceneModule = new (function() {
                 context = canvas.getContext(contextNames[i]);
 
 
-                //                                                                        alert("WebGL Trace enabled");
-                //                                                                        context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
-                //                                                                        context.setTracing(true);
+//                                                                                        alert("WebGL Trace enabled");
+//                                                                                        context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
+//                                                                                        context.setTracing(true);
             } catch (e) {
 
             }

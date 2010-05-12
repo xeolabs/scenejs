@@ -27,13 +27,13 @@ var SceneJS_materialModule = new (function() {
             SceneJS_eventModule.SCENE_ACTIVATED,
             function() {
                 material = {
-                    baseColor : [ 0.5, 0.5, 0.5 ],
+                    baseColor : [ 1.0, 1.0, 1.0 ],
                     specularColor: [ 0.0,  0.0,  0.0 ],
                     specular : 0,
                     shine : 0,
                     reflect : 0,
                     alpha : 1.0,
-                    emit : 0.0
+                    emit : 1.0
                 };
                 dirty = true;
             });

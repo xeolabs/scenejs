@@ -652,35 +652,7 @@ function SceneJS_math_frustumMat4v(fmin, fmax) {
 
 /** @private */
 function SceneJS_math_frustumMatrix4(left, right, bottom, top, znear, zfar) {
-    var fmin4 = [left,right,bottom,0.0];
-    var fmax4 = [top,znear,zfar,0.0];
-    var vsum = SceneJS_math_addVec4(fmax4, fmin4);
-    var vdif = SceneJS_math_subVec4(fmax4, fmin4);
-    var t = 2.0 * fmin4[2];
-
-    var m = SceneJS_math_mat4();
-
-    m[0] = t / vdif[0];
-    m[1] = 0.0;
-    m[2] = 0.0;
-    m[3] = 0.0;
-
-    m[4] = 0.0;
-    m[5] = t / vdif[1];
-    m[6] = 0.0;
-    m[7] = 0.0;
-
-    m[8] = vsum[0] / vdif[0];
-    m[9] = vsum[1] / vdif[1];
-    m[10] = -vsum[2] / vdif[2];
-    m[11] = -1.0;
-
-    m[12] = 0.0;
-    m[13] = 0.0;
-    m[14] = -t * fmax4[2] / vdif[2];
-    m[15] = 0.0;
-
-    return m;
+    return SceneJS_math_frustumMat4v([left, bottom, znear], [right, top, zfar]);
 }
 
 /** @private */

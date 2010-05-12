@@ -23,7 +23,7 @@ var exampleScene = SceneJS.scene({
 
     /* Bind to a WebGL canvas:
      */
-    canvasId: 'theCanvas'
+    canvasId: 'theCanvas', proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl"
     //,
 
 //    /* URL of the proxy server which will mediate the
@@ -95,7 +95,9 @@ var exampleScene = SceneJS.scene({
 //                                                        SceneJS.objects.teapot()
 
                                                 SceneJS.loadCollada({
-                                                    uri: "/home/lindsay/xeolabs/projects/scenejs/src/tests/assets/seymour-plane/seymourplane_triangulate/seymourplane_triangulate.dae",
+                                                    uri: "http://www.scenejs.org/library/v0.7/assets/" +
+                                                         "examples/seymourplane_triangulate/" +
+                                                         "seymourplane_triangulate.dae",
 
                                                  //   uri: "http://www.scenejs.org/library/v0.7/assets/examples/cube/cube.dae",
 
@@ -151,8 +153,11 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-
+              var x = 0;
 window.render = function() {
+    if (++x == 20) {
+        clearInterval(pInterval);
+    }
     exampleScene.render({yaw: yaw, pitch: pitch});
 };
 

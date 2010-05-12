@@ -7,7 +7,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.3',
+    VERSION: '0.7.4',
 
     /** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
      */
@@ -68,7 +68,7 @@ var SceneJS = {
 SceneJS._namespace("SceneJS");
 
 /**
- * @class Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a SceneJS.Scene.
+ * @class Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a {@link SceneJS.Scene}.
  */
 SceneJS.WebGLNotSupportedException = function(msg, cause) {
     this.message = msg;
@@ -76,7 +76,7 @@ SceneJS.WebGLNotSupportedException = function(msg, cause) {
 };
 
 /**
- * @class Exception thrown by SceneJS node classes when a mandatory configuration was not supplied
+ * @class Exception thrown by {@link SceneJS.Node} or subtypes when a mandatory configuration was not supplied
  */
 SceneJS.NodeConfigExpectedException = function(msg, cause) {
     this.message = msg;
@@ -116,8 +116,8 @@ SceneJS.NoCanvasActiveException = function(msg, cause) {
 };
 
 /**
- * @class Exception thrown when a SceneJS.Scene 'canvasId' configuration does not match any elements in the page and no
- * default canvas was found with the ID specified in SceneJS.Scene.DEFAULT_CANVAS_ID.
+ * @class Exception thrown when a {@link SceneJS.Scene} 'canvasId' configuration does not match any elements in the page and no
+ * default canvas was found with the ID specified in {@link SceneJS.Scene.DEFAULT_CANVAS_ID}.
  */
 SceneJS.CanvasNotFoundException = function(msg, cause) {
     this.message = msg;
@@ -142,22 +142,22 @@ SceneJS.OutOfVRAMException = function(msg, cause) {
     this.cause = cause;
 };
 
-/**@class  Exception thrown when a SceneJS.LoggingToPage 'elementId' configuration does not match any elements in the page and no
- * default DIV was found with the ID specified in SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID.
+/**@class  Exception thrown when a {@link SceneJS.LoggingToPage} 'elementId' configuration does not match any elements in the page and no
+ * default DIV was found with the ID specified in {@link SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID}.
  */
 SceneJS.DocumentElementNotFoundException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-/** @class  Exception thrown by a SceneJS.LoadCollada node when parsing of a Collada file fails for some reason.
+/** @class  Exception thrown by a {@link SceneJS.LoadCollada} node when parsing of a Collada file fails for some reason.
  */
 SceneJS.ColladaParseException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
 
-/** @class  Exception thrown by a SceneJS.LoadCollada node when the element ID given in its 'node' configuration does not match the ID
+/** @class  Exception thrown by a {@link SceneJS.LoadCollada} node when the element ID given in its 'node' configuration does not match the ID
  * of any node in the Collada document.
  */
 SceneJS.ColladaRootNotFoundException = function(msg, cause) {
@@ -165,7 +165,7 @@ SceneJS.ColladaRootNotFoundException = function(msg, cause) {
     this.cause = cause;
 };
 
-/** @class  Exception thrown by a SceneJS.LoadCollada node when it could not find the default Collada node ("asset) to parse and needs you to
+/** @class  Exception thrown by a {@link SceneJS.LoadCollada} node when it could not find the default Collada node ("asset) to parse and needs you to
  * explicitly provide the ID of a target asset through a 'node' configuration property.
  */
 SceneJS.ColladaRootRequiredException = function(msg, cause) {
@@ -185,7 +185,7 @@ SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
 
 /**
  * @class  Exception thrown to signify an error response from the proxy configured for cross-domain loads
- * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyErrorResponseException = function(msg, cause) {
     this.message = msg;
@@ -194,7 +194,7 @@ SceneJS.ProxyErrorResponseException = function(msg, cause) {
 
 /**
  * @class  Exception thrown to signify an empty response from the proxy configured for cross-domain loads
- * (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyEmptyResponseException = function(msg, cause) {
     this.message = msg;
@@ -202,7 +202,7 @@ SceneJS.ProxyEmptyResponseException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown to signify that empty content was loaded (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * @class  Exception thrown to signify that empty content was loaded (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.EmptyResponseException = function(msg, cause) {
     this.message = msg;
@@ -210,7 +210,7 @@ SceneJS.EmptyResponseException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by SceneJS.Load, SceneJS.LoadCollada etc).
+ * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.HttpException = function(msg, cause) {
     this.message = msg;
@@ -218,7 +218,7 @@ SceneJS.HttpException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown by nodes such as SceneJS.Renderer and SceneJS.Texture when the browser's WebGL does not support
+ * @class  Exception thrown by nodes such as {@link SceneJS.Renderer} and {@link SceneJS.Texture} when the browser's WebGL does not support
  * a specified config value.
  */
 SceneJS.WebGLUnsupportedNodeConfigException = function(msg, cause) {
@@ -233,7 +233,7 @@ SceneJS.PickWithoutRenderedException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown when a node (such as SceneJs.ScalarInterpolator) expects to find some element of data on the current
+ * @class  Exception thrown when a node (such as {@link SceneJs.ScalarInterpolator}) expects to find some element of data on the current
  * data scope (SceneJS.Data).
  */
 SceneJS.DataExpectedException = function(msg, cause) {
@@ -242,7 +242,7 @@ SceneJS.DataExpectedException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
+ * @class  Exception thrown by nodes such as {@link SceneJs.Load} and {@link SceneJS.LoadCollada} when they timeout waiting for their content to load.
  */
 SceneJS.LoadTimeoutException = function(msg, cause) {
     this.message = msg;
@@ -256,6 +256,28 @@ SceneJS.InternalException = function(msg, cause) {
     this.message = msg;
     this.cause = cause;
 };
+
+/**
+ * @class  Exception thrown to signify that a {@link SceneJS.Instance} node could not find
+ * a {@link SceneJS.Symbol} to instance
+ */
+SceneJS.SymbolNotFoundException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify an attempt to link/nest {@link SceneJS.Node}s or subtypes in a manner that would create an invalid scene graph
+ * a {@link SceneJS.Symbol} to instance
+ */
+SceneJS.InvalidSceneGraphException = function(msg, cause) {
+    this.message = msg;
+    this.cause = cause;
+};
+
+
+
+
 
 
 
@@ -2376,9 +2398,49 @@ SceneJS.Data = function(_parent, _fixed, _data) {
 };
 /**
  @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
- @constructor
- Create a new SceneJS.node
- @param {SceneJS.node, ...} arguments Zero or more child nodes
+ <p>Every node type has a specific type, which is its SceneJS-specific type name, along with methods for checking the
+ * type like {@link #getType}. This is the list of all valid xtypes:</p>
+ *
+ * <table>
+ * <tr><td>type</td><td>Class</td></tr>
+ * <tr><td>----</td><td>-----</td></tr>
+ * <tr><td>bounding-box</td><td>{@link SceneJS.BoundingBox}</td></tr>
+ * <tr><td>cube</td><td>{@link SceneJS.objects.Cube}</td></tr>
+ * <tr><td>fog</td><td>{@link SceneJS.Fog}</td></tr>
+ * <tr><td>generator</td><td>{@link SceneJS.Generator}</td></tr>
+ * <tr><td>geometry</td><td>{@link SceneJS.Geometry}</td></tr>
+ * <tr><td>instance</td><td>{@link SceneJS.Instance}</td></tr>
+ * <tr><td>lights</td><td>{@link SceneJS.Lights}</td></tr>
+ * <tr><td>load</td><td>{@link SceneJS.Load}</td></tr>
+ * <tr><td>load-collada</td><td>{@link SceneJS.LoadCollada}</td></tr>
+ * <tr><td>locality</td><td>{@link SceneJS.Locality}</td></tr>
+ * <tr><td>logging</td><td>{@link SceneJS.Logging}</td></tr>
+ * <tr><td>logging-to-page</td><td>{@link SceneJS.LoggingToPage}</td></tr>
+ * <tr><td>lookat</td><td>{@link SceneJS.LookAt}</td></tr>
+ * <tr><td>material</td><td>{@link SceneJS.Material}</td></tr>
+ * <tr><td>model-matrix</td><td>{@link SceneJS.ModelMatrix}</td></tr>
+ * <tr><td>name</td><td>{@link SceneJS.Name}</td></tr>
+ * <tr><td>node</td><td>{@link SceneJS.Node}</td></tr>
+ * <tr><td>perspective</td><td>{@link SceneJS.Perspective}</td></tr>
+ * <tr><td>renderer</td><td>{@link SceneJS.Renderer}</td></tr>
+ * <tr><td>rotate</td><td>{@link SceneJS.Rotate}</td></tr>
+ * <tr><td>scale</td><td>{@link SceneJS.Scale}</td></tr>
+ * <tr><td>scene</td><td>{@link SceneJS.Scene}</td></tr>
+ * <tr><td>scalar-interpolator</td><td>{@link SceneJS.ScalerInterpolator}</td></tr>
+ * <tr><td>selector</td><td>{@link SceneJS.Selector}</td></tr>
+ * <tr><td>sphere</td><td>{@link SceneJS.objects.Sphere}</td></tr>
+ * <tr><td>stationary</td><td>{@link SceneJS.Stationary}</td></tr>
+ * <tr><td>symbol</td><td>{@link SceneJS.Symbol}</td></tr>
+ * <tr><td>teapot</td><td>{@link SceneJS.objects.Teapot}</td></tr>
+ * <tr><td>text</td><td>{@link SceneJS.Text}</td></tr>
+ * <tr><td>texture</td><td>{@link SceneJS.Texture}</td></tr>
+ * <tr><td>translate</td><td>{@link SceneJS.Translate}</td></tr>
+ * <tr><td>view-matrix</td><td>{@link SceneJS.ViewMatrix}</td></tr>
+ * <tr><td>with-data</td><td>{@link SceneJS.WithData}</td></tr>
+ * </table>
+ * @constructor
+ * Create a new SceneJS.node
+ * @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
 SceneJS.Node = function() {
     this._nodeType = "node";
@@ -2457,12 +2519,13 @@ SceneJS.Node.prototype._resetMemoLevel = function() {
 };
 
 /** @private */
-SceneJS.Node.prototype._renderNodes = function(traversalContext, data) {
+SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children) {
     var child;
-    var len = this._children.length;
+    children = children || this._children;
+    var len = children.length;
     if (len) {
         for (var i = 0; i < len; i++) {
-            child = this._children[i];
+            child = children[i];
             child._render.call(child, { // Traversal context
                 appendix : traversalContext.appendix,
                 insideRightFringe: traversalContext.insideRightFringe || (i < len - 1)
@@ -2498,6 +2561,15 @@ SceneJS.Node.prototype._render = function(traversalContext, data) {
 };
 
 /**
+ * Returns the type ID of the node. For the SceneJS.Node base class, it is "node",
+ * which is overriden in sub-classes.
+ * @returns {string} Type ID
+ */
+SceneJS.Node.prototype.getType = function() {
+    return this._nodeType;
+};
+
+/**
  * Returns the number of child nodes
  * @returns {int} Number of child nodes
  */
@@ -2516,15 +2588,6 @@ SceneJS.Node.prototype.getNodes = function() {
     }
     return list;
 };
-
-///** Sets child nodes, removing those already present
-// * @param {Array} children Array of child nodes
-// * @return this
-// */
-//SceneJS.Node.prototype.setNodes = function(children) {
-//    throw "SceneJS.node.setNodes not implemented yet";
-//    return this;
-//};
 
 /** Returns child node at given index
  * @returns {SceneJS.Node} Child node
@@ -2552,6 +2615,10 @@ SceneJS.Node.prototype.removeNodeAt = function(index) {
  */
 SceneJS.Node.prototype.addNode = function(node) {
     if (node._parent != null) {
+        SceneJS_errorModule.fatalError(
+                new SceneJS.InvalidSceneGraphException(
+                        "Attempted to add a child to a node without " +
+                        "first removing the child from it's current parent"));
     }
     this._children.push(node);
     node._parent = this;
@@ -2566,6 +2633,10 @@ SceneJS.Node.prototype.addNode = function(node) {
  */
 SceneJS.Node.prototype.insertNode = function(node, i) {
     if (node._parent != null) {
+         SceneJS_errorModule.fatalError(
+                new SceneJS.InvalidSceneGraphException(
+                        "Attempted to insert a child to a node without " +
+                        "first removing the child from it's current parent"));
     }
     if (i == undefined || i <= 0) {
         this._children.unshift(node);
@@ -2739,7 +2810,7 @@ var SceneJS_eventModule = new (function() {
  *     } else {
  *         alert("Error: " + e.exception);
  *     }
-*  });
+ *  });
  * </pre></code>
  *
  * <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all SceneJS.Scene instances are destroyed and resources
@@ -3563,7 +3634,7 @@ var SceneJS_nameModule = new (function() {
 //        //                }
 //    };
 
-    // @private
+    /** @private */
     function nextColor() {
         if (blueCount < 1) {
             blueCount += 0.01;
@@ -3583,8 +3654,8 @@ var SceneJS_nameModule = new (function() {
         return [redCount, greenCount, blueCount];
     }
 
-    // @private
-    this.pushName = function(name) {
+    /** @private */
+    this.pushName = function(name, node) {
         if (!canvas) {
             SceneJS_errorModule.fatalError("No canvas active");
         }
@@ -3594,6 +3665,7 @@ var SceneJS_nameModule = new (function() {
         if (!item) {
             item = {
                 path : namePath,
+                node: node,
                 color: nextColor()
             };
             namesByPath[namePath] = item;
@@ -3602,8 +3674,8 @@ var SceneJS_nameModule = new (function() {
                 SceneJS_eventModule.NAME_UPDATED,
                 item);
     };
-
-    // @private
+    
+    /** @private */
     this.popName = function() {
         nameStack.pop();
         namePath = nameStack.join("/");
@@ -3611,6 +3683,7 @@ var SceneJS_nameModule = new (function() {
                 SceneJS_eventModule.NAME_UPDATED,
                 namesByPath[namePath]); // Can be null
     };
+    
 })();
 /**
  *@class A scene node that specifies a name for the nodes in its subgraph.
@@ -3703,6 +3776,425 @@ SceneJS.Name.prototype._render = function(traversalContext, data) {
 SceneJS.name = function() {
     var n = new SceneJS.Name();
     SceneJS.Name.prototype.constructor.apply(n, arguments);
+    return n;
+};
+/**
+ * Backend module that services the SceneJS.Symbol and SceneJS.Instance nodes to manage instancing of scene
+ * fragments called "symbols".
+ *  @private
+ */
+var SceneJS_instancingModule = new (function() {
+
+    var _symbols = {};
+    var _nameSpace = null;
+    var _countInstances = 0;
+
+    SceneJS_eventModule.onEvent(
+            SceneJS_eventModule.RESET,
+            function() {
+                _symbols = {};
+                _nameSpace = null;
+                _countInstances = 0;
+            });
+
+    SceneJS_eventModule.onEvent(
+            SceneJS_eventModule.SCENE_ACTIVATED,
+            function() {
+                _symbols = {};
+                _nameSpace = null;
+                _countInstances = 0;
+            });
+
+    SceneJS_eventModule.onEvent(
+            SceneJS_eventModule.NAME_UPDATED,
+            function(params) {
+                _nameSpace = params.path;
+            });
+
+    /** @private */
+    this.createSymbol = function(name, symbol) {
+        _symbols[_nameSpace ? _nameSpace + "/" + name : name] = symbol;
+    };
+
+    /** @private */
+    this.acquireInstance = function(name) {
+        if (name.charAt(0) != "/") {
+            if (_nameSpace) {
+                name = _nameSpace + "/" + name;
+            }
+        } else {
+            name = name.substr(1); // remove '/'
+        }
+        var symbol = _symbols[name];
+        if (symbol) {
+            _countInstances++;
+        }
+        return symbol;
+    };
+
+    /** @private */
+    this.instancing = function() {
+        return _countInstances > 0;
+    };
+
+    /** @private */
+    this.releaseInstance = function() {
+        _countInstances--;
+    };
+})();
+/**
+ * @class A scene node that marks its subgraph as a "symbol" which can be then instanced with {@link SceneJS.Instance} nodes.
+ *
+ * <p>This node type is useful for keeping scene size small, while also simplifying editing of a scene; when you edit
+ * content within a Symbol, all instances of the Symbol update to reflect the edits.</p>
+ *
+ * <p>When rendered, SceneJS registers this node against its specified name and prevents SceneJS from traversing
+ * into its subgraph. The content defined within the Symbol will therefore only be rendered when it is instanced.
+ * The registered name will be actually be the concatenation of the specified name with the namespace formed by
+ * any enclosing {@link SceneJS.Name} nodes. When SceneJS then finds a {@link SceneJS.Instance} node that refers to the
+ * registered name, it will instantiate the Symbol's child nodes as if they were children of the {@link SceneJS.Instance}
+ *  node.</p>
+ *
+ * <p>Beware potential performance penalties for using Symbols and {@link SceneJS.Instances}. Within every subgraph, SceneJS
+ * internally memoises whatever state it determines will not change between scene traversals. SceneJS may therefore be
+ * restricted in what state it can memoise within a Symbol's subgraph when it is likely to be dynamically affected by
+ * the different scene locations it which it is instanced.</p>
+ *
+ * <p><b>Live Examples</b></p>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint</a></li></ul>
+ * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a {@link SceneJS.Name}, then instantiating it three times with
+ * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to a namespace
+ * created by a {@link SceneJS.Name} node:</b></p><pre><code>
+ * var scene = new SceneJS.Scene(
+ *
+ *      // ...
+ *
+ *      // Define a "teapot" symbol inside a namespace.
+ *      // Note that the Name is not mandatory.
+ *
+ *      new SceneJS.Name({name: "mySymbols"},
+ *
+ *          new SceneJS.Symbol({ name: "teapot" },
+ *              new SceneJS.objects.Teapot()
+ *          ),
+ *
+ *          // Instance the teapot Symbol from inside the namespace.
+ *          // See how the symbol reference is relative, where it
+ *          // does not start with a '/'.
+ *
+ *          new SceneJS.Instance({name: "teapot" })
+ *      ),
+ *
+ *      // Instance the teapot Symbol again, from outside the namespace
+ *
+ *      new SceneJS.Instance({name: "mySymbols/teapot"}),
+ *
+ *      // Instance the teapot Symbol one more time from outside the
+ *      // namespace to show how an absolute path can be specified to
+ *      // the Symbol
+ *
+ *      new SceneJS.Instance({name: "/mySymbols/teapot"})
+ *
+ *      // ...
+ * );
+ * </pre></code>
+ *  @extends SceneJS.Node
+ * @constructor
+ * Create a new SceneJS.Symbol
+ * @param {Object} config  Config object or function, followed by zero or more child nodes
+ */
+SceneJS.Symbol = function() {
+    SceneJS.Node.apply(this, arguments);
+    this._name = "unnamed";
+    if (this._fixedParams) {
+        this._init(this._getParams());
+    }
+};
+
+SceneJS._inherit(SceneJS.Symbol, SceneJS.Node);
+
+/**
+ Sets the symbol name. When the given value is undefined, the name will default to "unnamed".
+ @function setName
+ @param {string} name
+ @returns {SceneJS.Symbol} This symbol node
+ */
+SceneJS.Symbol.prototype.setName = function(name) {
+    this._name = name || "unnamed";
+    return this;
+};
+
+/**
+ * Returns the symbol name. The name will be "unnamed" if none is specified.
+ * @function {string} getName
+ * @returns {string} The symbol name
+ */
+SceneJS.Symbol.prototype.getName = function() {
+    return this._name;
+};
+
+// @private
+SceneJS.Symbol.prototype._init = function(params) {
+    if (params.name) {
+        this.setName(params.name);
+    }
+};
+
+// @private
+SceneJS.Symbol.prototype._render = function(traversalContext, data) {
+    if (!this._fixedParams) {
+        this._init(this._getParams(data));
+    }
+    SceneJS_instancingModule.createSymbol(this._name, this);
+};
+
+/** Returns a new SceneJS.Symbol symbol
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Symbol constructor
+ * @returns {SceneJS.Symbol}
+ */
+SceneJS.symbol = function() {
+    var n = new SceneJS.Symbol();
+    SceneJS.Symbol.prototype.constructor.apply(n, arguments);
+    return n;
+};
+/**
+ * @class A scene node that instantiates a previously-defined SceneJS.Symbol node.
+ *
+ * <p>When rendered, a {@link SceneJS.Symbol} node registers its contents against a specified name, without rendering the
+ * content. Then when SceneJS then finds a {@link SceneJS.Instance} node that refers to the registered name,
+ * it will instantiate the Symbol's child nodes as if they were children of the Instance node.</p>
+ *
+ * <p><b>Live Examples</b></p>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint</a></li></ul>
+ * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a Name, then instantiating it three times with
+ * {@link SceneJS.Instance} nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
+ * created by a {@link SceneJS.Name} node:</b></p><pre><code>
+ * var scene = new SceneJS.Scene(
+ *
+ *      // ...
+ *
+ *      // Define a "teapot" symbol inside a namespace.
+ *      // Note that the Name is not mandatory.
+ *
+ *      new SceneJS.Name({name: "mySymbols"},
+ *
+ *          new SceneJS.Symbol({ name: "teapot" },
+ *              new SceneJS.objects.Teapot()
+ *          ),
+ *
+ *          // Instance the teapot Symbol from inside the namespace.
+ *          // See how the symbol reference is relative, where it
+ *          // does not start with a '/'.
+ *
+ *          new SceneJS.Instance({name: "teapot" })
+ *      ),
+ *
+ *      // Instance the teapot Symbol again, from outside the namespace
+ *
+ *      new SceneJS.Instance({name: "mySymbols/teapot"}),
+ *
+ *      // Instance the teapot Symbol one more time from outside the
+ *      // namespace to show how an absolute path can be specified to
+ *      // the Symbol
+ *
+ *      new SceneJS.Instance({name: "/mySymbols/teapot"})
+ *
+ *      // ...
+ * );
+ * </pre></code>
+ *  @extends SceneJS.Node
+ * @constructor
+ * Create a new SceneJS.Instance
+ * @param {Object} config  Config object or function, followed by zero or more child nodes
+ */
+SceneJS.Instance = function() {
+    SceneJS.Node.apply(this, arguments);
+    this._nodeType = "instance";
+    this._name = null;
+    if (this._fixedParams) {
+        this._init(this._getParams());
+    }
+};
+
+SceneJS._inherit(SceneJS.Instance, SceneJS.Node);
+
+/**
+ Sets the name of the symbol to instance. The name will be "unnamed" if none is specified.
+ @function setName
+ @param {string} name
+ @returns {SceneJS.Instance} This instance node
+ */
+SceneJS.Instance.prototype.setName = function(name) {
+    this._name = name || "unnamed";
+    return this;
+};
+
+/**
+ Returns the name of the instanced symbol. The name will be "unnamed" if none is specified.
+ @function {string} getName
+ @returns {string} The name
+ */
+SceneJS.Instance.prototype.getName = function() {
+    return this._name;
+};
+
+// @private
+SceneJS.Instance.prototype._init = function(params) {
+    if (params.name) {
+        this.setName(params.name);
+    }
+};
+
+// @private
+SceneJS.Instance.prototype._render = function(traversalContext, data) {
+    if (!this._fixedParams) {
+        this._init(this._getParams(data));
+    }
+    var nameNode = SceneJS_instancingModule.acquireInstance(this._name);
+    if (!nameNode) {
+        SceneJS_errorModule.fatalError(
+                new SceneJS.SymbolNotFoundException
+                        ("SceneJS.Instance could not find SceneJS.Symbol to instance: '" + this._name + "'"));
+    } else {
+        nameNode._renderNodes(traversalContext, data);
+        SceneJS_instancingModule.releaseInstance();
+    }
+};
+
+/** Returns a new SceneJS.Instance instance
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Instance constructor
+ * @returns {SceneJS.Instance}
+ */
+SceneJS.instance = function() {
+    var n = new SceneJS.Instance();
+    SceneJS.Instance.prototype.constructor.apply(n, arguments);
+    return n;
+};
+/**
+ * @class A scene branch node that selects which among its children are currently active.
+ *
+ * <p>This node is useful for dynamically controlling traversal within a scene graph.</p>
+ * <p><b>Live Examples</b></p>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-teapot-select">Example 1 - Switching Geometry</a></li></ul>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 2 - Switchable Viewpoint</a></li></ul>
+ * <p><b>Example Usage 1</b></p><p>This selector will allow only child nodes at indices 0 and 2 to be rendered,
+ * which are the teapot and sphere. Child 1, a cube, is not selected and therefore won't be rendered.</p><pre><code>
+ * var s = new SceneJS.Selector({ selection: [0, 2]},
+ *
+ *      new SceneJS.objects.teapot(),   // Child 0
+ *
+ *      new SceneJS.objects.cube(),     // Child 1
+ *
+ *      new SceneJS.objects.sphere())   // Child 2
+ *
+ * s.setSelection([0,1,2]);  // Select all three child nodes
+ *
+ * </pre></code>
+ * <p><b>Example Usage 2</b></p><p>A more advanced example - the selector in this example switches between three
+ * viewpoints of the scene content. The content is instanced within each child of the Selector using Instance and Symbol
+ * nodes. When we render the scene, we can pass in the selection.</p><pre><code>
+ * var myScene = new SceneJS.Scene({ ... },
+ *
+ *       new SceneJS.symbol({ name: "theScene" },
+ *           new SceneJS.objects.Teapot()
+ *       ),
+ *
+ *       new SceneJS.Selector(
+ *               function(data) {   // Child index as a dynamic config
+ *                   return {
+ *                       selection: [data.get("activeCamera")]  // Selection
+ *                   };
+ *               },
+ *
+ *           new SceneJS.LookAt({ eye : { z: 10.0 } },
+ *                new SceneJS.Instance({ name: "theScene"})),
+ *
+ *           new SceneJS.LookAt({ eye : { x: 10.0 }},
+ *                new SceneJS.Instance({ name: "theScene"})),
+ *
+ *           new SceneJS.LookAt({ eye : { x: -5.0, y: 5, z: 5 }},
+ *                new SceneJS.Instance({ name: "theScene" })
+ *           )
+ *       )
+ *   );
+ *
+ * myScene.render({ activeCamera: 0 });  // Render scene for first viewpoint
+ * myScene.render({ activeCamera: 1 });  // Once more for second viewpoint
+ *
+ * </pre></code>
+ *
+ *
+ * @extends SceneJS.Node
+ * @constructor
+ * Create a new SceneJS.Selector
+ * @param {Object} config  Config object or function, followed by zero or more child nodes
+ */
+SceneJS.Selector = function() {
+    SceneJS.Node.apply(this, arguments);
+    this._nodeType = "selector";
+    this._selection = [];
+    if (this._fixedParams) {
+        this._init(this._getParams());
+    }
+};
+
+SceneJS._inherit(SceneJS.Selector, SceneJS.Node);
+
+/**
+ Sets the indices of selected children. When the value is undefined or an empty array, then no children will be selected.
+ @function setSelection
+ @param {int []} selection
+ @returns {SceneJS.Selector} This Selector node
+ */
+SceneJS.Selector.prototype.setSelection = function(selection) {
+    this._selection = selection;
+    return this;
+};
+
+/**
+ * Returns the indices of the selected child. The result will be an empty array if none are currently selected.
+ * @function {int []} getSelection
+ * @returns {int []} Array containing indices of selected children.
+ */
+SceneJS.Selector.prototype.getSelection = function() {
+    var selection = new Array(this._selection.length);
+    for (var i = 0; i < this._selection; i++) {
+        selection[i] = this._selection[i];
+    }
+    return selection;
+};
+
+// @private
+SceneJS.Selector.prototype._init = function(params) {
+    if (params.selection) {
+        this.setSelection(params.selection);
+    }
+};
+
+// @private
+SceneJS.Selector.prototype._render = function(traversalContext, data) {
+    if (!this._fixedParams) {
+        this._init(this._getParams(data));
+    }
+    if (this._selection.length) {
+        var children = [];
+        for (var i = 0; i < this._selection.length; i++) {
+            var j = this._selection[i];
+            if (0 <= j && j < this._children.length) {
+                children.push(this._children[j]);
+            }
+        }
+        this._renderNodes(traversalContext, data, children);
+    }
+};
+
+/** Returns a new SceneJS.Selector Selector
+ * @param {Arguments} args Variable arguments that are passed to the SceneJS.Selector constructor
+ * @returns {SceneJS.Selector}
+ */
+SceneJS.selector = function() {
+    var n = new SceneJS.Selector();
+    SceneJS.Selector.prototype.constructor.apply(n, arguments);
     return n;
 };
 /**
@@ -3926,7 +4418,7 @@ var SceneJS_processModule = new (function() {
     };
 })();
 /**
- * Backend module that services the SceneJS.assets.XXX nodes to manage the asynchronous cross-domain
+ * Backend module that services the SceneJS.loadXXX nodes to manage the asynchronous cross-domain
  * load and caching of remotely-stored scene fragments.
  *
  * Uses the memory management backend to mediate cache management.
@@ -3974,7 +4466,7 @@ var SceneJS_loadModule = new (function() {
     }
 
     /** @private */
-    function _loadAssetSameDomain(uri, assetId, parser, onSuccess, onError) {
+    function _loadAssetSameDomain(uri, assetId, parser, onSuccess, onError) { 
         _loadFile(uri,
                 function(data) {  // onLoad
                     if (!data) {
@@ -4152,16 +4644,23 @@ var SceneJS_loadModule = new (function() {
 })();
 /**
  * @class A scene node that asynchronously loads JavaScript content for its subgraph from a server.
- * <p>A scene node can load content cross-domain if neccessary. This node is configured with the
+ * <p>This node is configured with the
  * location of a JavaScript file containing a SceneJS definition of the subgraph. When first visited during scene
  * traversal, it will begin the load and allow traversal to continue at its next sibling node. When on a subsequent
  * visit its subgraph has been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
- * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
+ * <p><b>Loading Cross-Domain</b></p>
+ * <p>When the {@link SceneJS.Scene} node is configured with the URL of a SceneJS JSON proxy server, you can perform the
+ * load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
+ * in order to not violate the browser' same-domain security policy.
+ * <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
+ * JSONP proxy script written in Perl.</p>
+ * <p><b>Monitoring Load Progress</b></p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with {@link SceneJS.onEvent()}.</p>
  * <p><b>Live Examples</b></p>
  * <li><a target = "other" href="http://bit.ly/scenejs-asset-load">Example 1</a></li>
  * </ul>
  * <p><b>Usage Example</b></p><p>The SceneJS.Load node shown below loads a fragment of JavaScript-defined scene
- * definition cross-domain, via the JSONP proxy located by the <b>uri</b> property on the SceneJS.Scene node.</b></p>
+ * definition cross-domain, via the JSONP proxy located by the <b>uri</b> property on the {@link SceneJS.Scene} node.</b></p>
  * <pre><code>
  * var exampleScene = new SceneJS.Scene({
  *
@@ -4187,9 +4686,6 @@ SceneJS.Load = function() {
     this._assetNode = null;
     this._handle = null;
     this._state = SceneJS.Load.prototype._STATE_INITIAL;
-    //    if (this._fixedParams) {
-    //        this._init(this._getParams());
-    //    }
 };
 
 SceneJS._inherit(SceneJS.Load, SceneJS.Node);
@@ -4215,9 +4711,7 @@ SceneJS.Load.prototype._init = function(params) {
         SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.Load parameter expected: uri"));
     }
-    this._uri = params.uri;
-    this._serverParams = params.serverParams;
-    this._parser = params.parser;
+    this._uri = params.uri;   
 };
 
 // @private
@@ -4228,13 +4722,27 @@ SceneJS.Load.prototype._visitSubgraph = function(data) {
     this._assetNode._render.call(this._assetNode, traversalContext, data);
 };
 
-// @private
+/**
+ * Parser callback to convert the response content into a SceneJS subgraph. For this SceneJS.Load base class,
+ * the format of the data could be either raw JavaScript in the case of a same-domain load, or a pre-evaluated
+ * SceneJS.Node or subtype for a cross-domain JSONP request. 
+ * @private
+ */
 SceneJS.Load.prototype._parse = function(data, onError) {
-    if (!data._render) {
-        onError(data.error || "unknown server error");
-        return null;
-    } else {
+    if (data._render) {  // Cross-domain JSONP
         return data;
+    }
+    if (data.error) {
+        onError(data.error);
+    }
+    try {
+        var data = eval(data);  // Same-domain
+        if (data.error) {
+            onError(data.error);
+        }
+        return data;
+    } catch (e) {
+        onError("Error parsing response: " + e);
     }
 };
 
@@ -4273,7 +4781,7 @@ SceneJS.Load.prototype._render = function(traversalContext, data) {
                     this._serverParams || {
                         format: "scenejs"
                     },
-                    this._parser || this._parse,
+                    this._parse,
                     function(asset) { // Success
                         _this._assetNode = asset;   // Asset is wrapper created by SceneJS.createNode
                         _this._state = _this._STATE_LOADED;
@@ -5234,7 +5742,14 @@ var SceneJS_colladaParserModule = new (function() {
  * provided. When first visited during scene traversal, it will
  * begin the load and allow traversal to continue at its next sibling node. When on a subsequent visit its subgraph has
  * been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
- * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
+ * <p><b>Loading Cross-Domain</b></p>
+ * <p>When the {@link SceneJS.Scene} node is configured with the URL of a SceneJS JSON proxy server, you can perform the
+ * load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
+ * in order to not violate the browser' same-domain security policy.
+ * <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
+ * JSONP proxy script written in Perl.</p>
+ * <p><b>Monitoring Load Progress</b></p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with {@link SceneJS.onEvent()}.</p>
  * <p><b>Live Examples</b></p>
  * <li><a target = "other" href="http://bit.ly/scenejs-collada-load-seymour">Seymour Plane</a></li>
  * <li><a target = "other" href="http://bit.ly/scenejs-tron-tank">Tron Tank</a></li>
@@ -5260,7 +5775,7 @@ var SceneJS_colladaParserModule = new (function() {
 
 SceneJS.LoadCollada = function() {
     SceneJS.Load.apply(this, arguments);
-    this._nodeType = "loadCollada";
+    this._nodeType = "load-collada";
 };
 
 SceneJS._inherit(SceneJS.LoadCollada, SceneJS.Load);
@@ -5275,20 +5790,33 @@ SceneJS.LoadCollada.prototype._init = function(params) {
     this._serverParams = {
         format: "xml"
     };
-    var modes = {
+    var options = {
         loadCamera: params.loadCamera,
         loadLights: params.loadLights,
+        createBoundingBoxes : params.createBoundingBoxes == undefined ? true : params.createBoundingBoxes,
         showBoundingBoxes : params.showBoundingBoxes
     };
-    this._parser = function(xml, onError) {
+    this._parse = function(xml, onError) { // Override default SceneJS.Load._parse
         return SceneJS_colladaParserModule.parse(
                 params.uri, // Used in paths to texture images
                 xml,
+                //params.nodes || [], // Optional cherry-picked asset
                 params.node, // Optional cherry-picked asset
-                modes
+                options
                 );
     };
 };
+
+
+SceneJS.LoadCollada.prototype.getCameras = function(index) {
+    
+};
+
+
+SceneJS.LoadCollada.prototype.setActiveCamera = function(index) {
+
+};
+
 
 
 /** Returns a new SceneJS.LoadCollada instance
@@ -5515,9 +6043,47 @@ var SceneJS_sceneModule = new (function() {
 
 })();
 /**
- @class Root node of a SceneJS scene graph.
- <p>This is entry and exit point for execution when rendering one frame of a scene graph.</p>  
- @extends SceneJS.Node
+ *@class Root node of a SceneJS scene graph.
+ *
+ * <p>This is entry and exit point for execution when rendering one frame of a scene graph, which also configures certain
+ * global scene parameters as listed below. </p>
+ * <p><b>Binding to a Canvas</b></p>
+ * <p>The Scene node can be configured with the ID of a WebGL compatible Canvas element for the scene to render to. When that
+ * is omitted, it will look for one with ID "_scenejs-default-canvas" by default.</p>
+ * <p><b>JSONP Proxy for Cross-Domain Content</b></p>
+ * <p>The Scene node can be configured with a <b>proxy</b> property to specify the URL of a SceneJS JSON proxy server to enable
+ * {@link SceneJS.Load} and {@link SceneJS.LoadCollada} nodes can do their content loading cross-domain. When that property
+ * is omitted, those nodes can only load their content from the local server domain in order to not violate the browser's
+ * same-domain security policy. <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is
+ * a download of </a>an example of a SceneJS JSONP proxy script written in Perl.</p>
+ * <p><b>Usage Example:</b></p><p>A Scene bound to a canvas and specifying a JSONP proxy, that contains a LookAt node
+ * whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada} node loads a Collada
+ * model cross-domain through the proxy. When the Scene is rendered, a value for the {@link Scene.LookAt}'s property is
+ * injected into it. The Scene will put the property on a data scope (which is implemented by a {@link SceneJS.Data})
+ * that the {@link SceneJS.LookAt}'s config callback then accesses.</b></p><pre><code>
+ * var myScene = new SceneJS.Scene({
+ *              canvasId: "myCanvas",
+ *              proxy: "http://scenejs.org/cgi-bin/jsonp_proxy.pl"
+ *          },
+ *
+ *          new SceneJS.LookAt(
+ *              function(data) {
+ *                  return {
+ *                      eye: data.get("eye")
+ *                  };
+ *              },
+ *
+ *              new SceneJS.LoadCollada("http://foo.com/models/myModel.dae")
+ *      );
+ *
+ * myScene.render({
+ *          eye: {
+ *             x: 0, y: 0, z: -100
+ *          }
+ *      });
+ *
+ * </pre></code>
+ * @extends SceneJS.Node
  */
 SceneJS.Scene = function() {
     SceneJS.Node.apply(this, arguments);
@@ -5547,31 +6113,7 @@ SceneJS.Scene.prototype.getCanvasId = function() {
 
 /**
  * Renders the scene, passing in any properties required for dynamic configuration of its contained nodes.
- * <p><b>Example:</b></p><p>A Scene with a LookAt node whoe's "eye" property is dynamically configured with a callback. When the Scene is
- * rendered, a value for the property is injected into it. The Scene will put the property on a data scope (implemented by a SceneJS.Data)
- * that the LookAt's config callback then accesses.</b></p><pre><code>
- * var myScene = new SceneJS.Scene(
- *          {
- *              // .. scene configs .. //
- *          },
  *
- *          new SceneJS.LookAt(
- *              function(data) {
- *                  return {
- *                      eye: data.get("eye")
- *                  };
- *              },
- *
- *              // ..more scene nodes..
- *      );
- *
- * myScene.render({
- *          eye: {
- *             x: 0, y: 0, z: -100
- *          }
- *      });
- *
- * </pre></code>
  */
 SceneJS.Scene.prototype.render = function(paramOverrides) {
     if (!this._sceneId) {
@@ -13547,12 +14089,12 @@ SceneJS._namespace("SceneJS.objects");
 /**
  * @class A scene node that defines sphere geometry.
  * <p>The geometry is complete with normals for shading and one layer of UV coordinates for
- * texture-mapping. A Sphere may be configured with an optional radius, which will be 1 by default.</p>
+ * texture-mapping.</p>
+ * <p>The radius is 1.0 -  use the SceneJS.Scale node to set the size of a Sphere.</p>
  * <p><b>Example Usage</b></p><p>Definition of sphere with a radius of 6 units:</b></p><pre><code>
  * var c = new SceneJS.objects.Sphere({
  *          slices: 30,     // Optional number of longitudinal slices (30 is default)
- *          rings: 30,      // Optional number of latitudinal slices (30 is default)
- *          radius : 6      // Optional radius (1 is default)
+ *          rings: 30      // Optional number of latitudinal slices (30 is default)
  *     })
  * </pre></code>
 * @extends SceneJS.Geometry
@@ -15238,23 +15780,18 @@ var SceneJS_modelTransformModule = new (function() {
     SceneJS_eventModule.onEvent(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
-
                 if (dirty) {
-
                     if (!transform.matrixAsArray) {
                         transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                     }
-
                     if (!transform.normalMatrixAsArray) {
                         transform.normalMatrixAsArray = new WebGLFloatArray(
                                 SceneJS_math_transposeMat4(
                                         SceneJS_math_inverseMat4(transform.matrix)));
                     }
-
                     SceneJS_eventModule.fireEvent(
                             SceneJS_eventModule.MODEL_TRANSFORM_EXPORTED,
                             transform);
-
                     dirty = false;
                 }
             });
@@ -15335,7 +15872,7 @@ SceneJS.Rotate.prototype.getAngle = function() {
 SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     var x = xyz.x || 0;
     var y = xyz.y || 0;
-    var z = xyz.z || 0;   
+    var z = xyz.z || 0;
     this._x = x;
     this._y = y;
     this._z = z;
@@ -15429,13 +15966,14 @@ SceneJS.Rotate.prototype._render = function(traversalContext, data) {
     }
     var superXform = SceneJS_modelTransformModule.getTransform();
     if (this._memoLevel < 2) {
+        var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams
+            fixed: superXform.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
@@ -15582,13 +16120,14 @@ SceneJS.Translate.prototype._render = function(traversalContext, data) {
     }
     var superXform = SceneJS_modelTransformModule.getTransform();
     if (this._memoLevel < 2) {
+        var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams
+            fixed: superXform.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
@@ -15735,13 +16274,14 @@ SceneJS.Scale.prototype._render = function(traversalContext, data) {
     }
     var superXform = SceneJS_modelTransformModule.getTransform();
     if (this._memoLevel < 2) {
+        var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams
+            fixed: superXform.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
@@ -15779,7 +16319,7 @@ SceneJS.scale = function() {
  */
 SceneJS.ModelMatrix = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "modelMatrix";
+    this._nodeType = "model-matrix";
     this._mat = SceneJS_math_identityMat4();
     this._xform = null;
     if (this._fixedParams) {
@@ -15836,13 +16376,14 @@ SceneJS.ModelMatrix.prototype._render = function(traversalContext, data) {
     }
     var superXform = SceneJS_modelTransformModule.getTransform();
     if (this._memoLevel < 2) {
+        var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams
+            fixed: superXform.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
@@ -16273,7 +16814,7 @@ var SceneJS_viewTransformModule = new (function() {
  */
 SceneJS.LookAt = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "lookAt";
+    this._nodeType = "lookat";
     this._mat = null;
     this._xform = null;
 
@@ -16418,7 +16959,7 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
             },
             fixed: superXform.fixed && this._fixedParams
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if space fixed
             this._memoLevel = 2;
         }
     }
@@ -16517,7 +17058,7 @@ SceneJS.ViewMatrix.prototype._render = function(traversalContext, data) {
             matrix: tempMat,
             fixed: superXform.fixed && this._fixedParams
         };
-        if (this._memoLevel == 1 && superXform.fixed) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
@@ -16534,10 +17075,10 @@ SceneJS.viewMatrix = function() {
     return n;
 };
 /**
- * @class A Scene node that defines a region within a SceneJS.LookAt in which the translations specified by that node have no effect.
+ * @class A Scene node that defines a region within a {@link SceneJS.LookAt} in which the translations specified by that node have no effect.
  * @extends SceneJS.Node
  *
- * <p> As the parameters of the SceneJS.lookAt are modified, the content in the subgraph
+ * <p> As the parameters of the {@link SceneJS.LookAt} are modified, the content in the subgraph
  * of this node will rotate about the eye position, but will not translate as the eye position moves. You could therefore
  * define a skybox within the subgraph of this node, that will always stay in the distance.</p>
  *
@@ -16583,7 +17124,7 @@ SceneJS.Stationary.prototype._render = function(traversalContext, data) {
                 lookAt: lookAt,
                 fixed: superXform.fixed
             };
-            if (superXform.fixed) {
+            if (superXform.fixed && !SceneJS_instancingModule.instancing()) {
                 this._memoLevel = 1;
             }
         }
@@ -16716,7 +17257,7 @@ var SceneJS_lightingModule = new (function() {
 /*
  class SceneJS.LightSource
 
- A light source for containment within a SceneJS.Lights node.
+ A light source for containment within a @link SceneJS.Lights} node.
 
  @constructor
  Create a new SceneJS.LightSource
@@ -16961,6 +17502,8 @@ SceneJS.lightSource = function() {
  * <p>Multiple instances of this  node may appear at
  * any location in a scene graph, to define multiple sources of light, the number of which is only limited
  * by video memory.</p>
+ * <p>note that SceneJS does not create any default light sources for you, so if you have non-emissive
+ * {@link SceneJS.Material}s with no lights you may not see anything in your scene until you add a light.</p>  
  * <p>Currently, two kinds of light are supported: point and directional. Point lights have a location, like a lightbulb,
  * while directional only have a vector that describes their direction, where they have no actual location since they
  * are an infinite distance away.</p>
@@ -16970,7 +17513,7 @@ SceneJS.lightSource = function() {
  * <li><a target = "other" href="http://bit.ly/scenejs-point-lighting-exam">Point Lighting</a></li>
  * </ul>
  * <p><b>Example Usage</b></p><p>This example defines a cube that is illuminated by two light sources, point and directional.
- * The cube has material properties that define how it reflects the light.</b></p><pre><code>
+ * The cube has a {@link SceneJS.Material} that define how it reflects the light.</b></p><pre><code>
  *  var l = new SceneJS.Lights({
  *      sources: [
  *          {
@@ -17192,13 +17735,13 @@ var SceneJS_materialModule = new (function() {
             SceneJS_eventModule.SCENE_ACTIVATED,
             function() {
                 material = {
-                    baseColor : [ 0.5, 0.5, 0.5 ],
+                    baseColor : [ 1.0, 1.0, 1.0 ],
                     specularColor: [ 0.0,  0.0,  0.0 ],
                     specular : 0,
                     shine : 0,
                     reflect : 0,
                     alpha : 1.0,
-                    emit : 0.0
+                    emit : 1.0
                 };
                 dirty = true;
             });
@@ -17245,7 +17788,19 @@ var SceneJS_materialModule = new (function() {
  * @class A scene node that defines how light is reflected by the geometry within its subgraph.
  * <p> These may be defined anywhere within a scene graph and may be nested. When nested, the properties on an inner material
  * node will override those on outer material nodes for the inner node's subgraph. These nodes are to be defined either
- * above or below SceneJS.Lights nodes, which provide light for geometry to reflect.</p>
+ * above or below {@link SceneJS.Lights} nodes, which provide light for geometry to reflect.</p>
+ * <p><b>Default Material</b></p>
+ * <p>When you have not specified any SceneJS.Material nodes in your scene, then SceneJS will apply these default
+ * material properties in order to make your geometry visible until you do:</p>
+ * <table>
+ * <tr><td>baseColor</td><td>{ r: 1.0, g: 1.0, b: 1.0 }</td></tr>
+ * <tr><td>specularColor</td><td>{ r: 1.0, g: 1.0, b: 1.0 }</td></tr>
+ * <tr><td>specular</td><td>0</td></tr>
+ * <tr><td>shine</td><td>0</td></tr>
+ * <tr><td>reflect</td><td>0</td></tr>
+ * <tr><td>alpha</td><td>1.0</td></tr>
+ * <tr><td>emit</td><td>1.0</td></tr>
+ * </table>
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-material-example">Example 1</a></li></ul>
  * <p><b>Usage Example</b></p><p>A cube illuminated by a directional light source and wrapped
@@ -17455,7 +18010,7 @@ SceneJS.Material.prototype.getAlpha = function() {
     return this._material.alpha;
 };
 
-  // @private
+// @private
 SceneJS.Material.prototype._init = function(params) {
     if (params.baseColor) {
         this.setBaseColor(params.baseColor);
@@ -17511,11 +18066,12 @@ SceneJS.material = function() {
  * for nodes in its subgraph to configure themselves with.</p>
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-scalarinterpolator-example">Example 1</a></li></ul>
- * <p><b>Example Usage</b></p><p>This example defines a cube with rotation that is animated by a SceneJS.ScalarInterpolator, which is
- * in turn driven by an alpha value supplied by a higher SceneJS.WithData. If we thought of <em>alpha</em> as
- * elapsed seconds, then this cube will rotate 360 degrees over one second, then rotate 180 in the reverse direction
- * over the next 0.5 seconds. In this example however, the alpha is actually fixed, where the cube is stuck at
- * 180 degrees - you would need to vary the "alpha" property on the WithData node to actually animate it.</p><pre><code>
+ * <p><b>Example Usage</b></p><p>This example defines a {@link SceneJS.objects.Cube} with rotation that is animated by
+ * a SceneJS.ScalarInterpolator, which isin turn driven by an alpha value supplied by a higher {@link SceneJS.WithData}.
+ * If we thought of <em>alpha</em> as elapsed seconds, then this cube will rotate 360 degrees over one second, then
+ * rotate 180 in the reverse direction over the next 0.5 seconds. In this example however, the alpha is actually fixed,
+ * where the cube is stuck at 180 degrees - you would need to vary the "alpha" property on the WithData node to actually
+ * animate it.</p><pre><code>
  * var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to 180 degrees
  *
  *      new SceneJS.ScalarInterpolator({
@@ -17804,9 +18360,9 @@ SceneJS.scalarInterpolator = function() {
  * @extends SceneJS.Node
  * <p>This node provides a simple yet flexible mechanism for passing data down into a scene graph at runtime, analogous to
  * creation of a closure's data scope in JavaScript .</p>.
- * <p>The data scope is implemented by a SceneJS.Data instance. On each render a SceneJS.Scene creates a global
+ * <p>The data scope is implemented by a {@link SceneJS.Data} instance. On each render a {@link SceneJS.Scene} creates a global
  * SceneJS.Data populated with any properties that were given to the SceneJS.Scene's render method. That Data forms a
- * chain on which SceneJS.With nodes will push and pop as they are visited and departed from during scene traversal.</p>
+ * chain on which SceneJS.WithData nodes will push and pop as they are visited and departed from during scene traversal.</p>
  * <p>When some node, or node config callback, looks for a property on its local SceneJS.Data, it will hunt up the chain
  * to get the first occurance of that property it finds.</p>
  * <p><b>Example:</b></p><p>Creating data for a child SceneJS.Scale node, which has a callback to configure itself from
@@ -17839,7 +18395,7 @@ SceneJS.scalarInterpolator = function() {
  */
 SceneJS.WithData = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "withData";
+    this._nodeType = "with-data";
     this._data = {};
     this._childData = {};
     if (this._fixedParams) {
@@ -17896,7 +18452,7 @@ SceneJS.WithData.prototype._render = function(traversalContext, data) {
         }
     }
     if (this._memoLevel < 2) {
-        if (this._memoLevel == 1 && data.isFixed()) {
+        if (this._memoLevel == 1 && data.isFixed() && !SceneJS_instancingModule.instancing()) {
             this._memoLevel = 2;
         }
     }
@@ -18181,7 +18737,7 @@ var SceneJS_localityModule = new (function() {
  * level-of-detail culling.
  *
  * <p>The subgraphs of these are only traversed when the boundary intersect the current view frustum. When this node
- * is within the subgraph of a SceneJS.Locality node, it the boundary must also intersect the inner radius of the Locality.
+ * is within the subgraph of a {@link SceneJS.Locality} node, it the boundary must also intersect the inner radius of the Locality.
  * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.</p> 
  *  
  * <p>When configured with a projected size threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
@@ -18249,7 +18805,7 @@ var SceneJS_localityModule = new (function() {
  */
 SceneJS.BoundingBox = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType="boundingBox";
+    this._nodeType="bounding-box";
     this._xmin = 0;
     this._ymin = 0;
     this._zmin = 0;
@@ -18499,7 +19055,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
                         modelTransform.matrix,
                         this._objectCoords)
                 );
-        if (modelTransform.fixed && this._memoLevel == 1) {
+        if (modelTransform.fixed && this._memoLevel == 1 && (!SceneJS_instancingModule.instancing())) {
             this._objectCoords = null;
             this._memoLevel = 2;
         }
@@ -18550,7 +19106,7 @@ SceneJS.boundingBox = function() {
 };
 /**
  *@class A scene node that defines inner and outer spheres of locality centered about the viewpoint.
- *<p>The subgraphs of contained SceneJS.BoundingBox nodes will only be rendered when their boundaries intersect
+ *<p>The subgraphs of contained {@link SceneJS.BoundingBox} nodes will only be rendered when their boundaries intersect
  *the inner radius.</p><p>The outer radius is used internally by SceneJS to support content staging strategies.</p> 
  *<p>You can have as many of these as neccessary throughout your scene.</p>
  * <p>When you don't specify a Locality node, SceneJS has default inner and outer radii of 100000
@@ -18928,7 +19484,7 @@ var SceneJS_textureModule = new (function() {
     };
 })();
 /**
- @class A layer within a SceneJS.Texture node.
+ @class A layer within a {@link SceneJS.Texture} node.
 
  @constructor
  Create a new SceneJS.TextureLayer

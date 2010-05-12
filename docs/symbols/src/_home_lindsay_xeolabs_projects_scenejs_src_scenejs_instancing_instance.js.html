@@ -8,15 +8,15 @@
 	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
 <span class='line'>  2</span>  * @class A scene node that instantiates a previously-defined SceneJS.Symbol node.
 <span class='line'>  3</span>  *
-<span class='line'>  4</span>  * &lt;p>When rendered, a SceneJS.Symbol node registers its contents against a specified name, without rendering the
-<span class='line'>  5</span>  * content. Then when SceneJS then finds a SceneJS.Instance node that refers to the registered name,
+<span class='line'>  4</span>  * &lt;p>When rendered, a {@link SceneJS.Symbol} node registers its contents against a specified name, without rendering the
+<span class='line'>  5</span>  * content. Then when SceneJS then finds a {@link SceneJS.Instance} node that refers to the registered name,
 <span class='line'>  6</span>  * it will instantiate the Symbol's child nodes as if they were children of the Instance node.&lt;/p>
 <span class='line'>  7</span>  *
 <span class='line'>  8</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
-<span class='line'>  9</span>  * &lt;ul>&lt;li>&lt;a target = "other" href="http://bit.ly/9d8wLu">Example 1&lt;/a>&lt;/li>&lt;/ul>
+<span class='line'>  9</span>  * &lt;ul>&lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint&lt;/a>&lt;/li>&lt;/ul>
 <span class='line'> 10</span>  * &lt;p>&lt;b>Example Usage&lt;/b>&lt;/p>&lt;p>Here we're defining a Symbol in a Name, then instantiating it three times with
-<span class='line'> 11</span>  * Instance nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
-<span class='line'> 12</span>  * created by a Name node:&lt;/b>&lt;/p>&lt;pre>&lt;code>
+<span class='line'> 11</span>  * {@link SceneJS.Instance} nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
+<span class='line'> 12</span>  * created by a {@link SceneJS.Name} node:&lt;/b>&lt;/p>&lt;pre>&lt;code>
 <span class='line'> 13</span>  * var scene = new SceneJS.Scene(
 <span class='line'> 14</span>  *
 <span class='line'> 15</span>  *      // ...

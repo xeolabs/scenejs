@@ -24,7 +24,7 @@ var SceneJS_errorModule = new (function() {
     // @private
     this.error = function(e) {
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
-            exception: e,
+            exception: e.message ? e : new SceneJS.Exception(e),
             fatal: false
         });
     };

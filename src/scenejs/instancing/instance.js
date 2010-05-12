@@ -6,7 +6,7 @@
  * it will instantiate the Symbol's child nodes as if they were children of the Instance node.</p>
  *
  * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/9d8wLu">Example 1</a></li></ul>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint</a></li></ul>
  * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a Name, then instantiating it three times with
  * {@link SceneJS.Instance} nodes to show variations on how an Instance node can refer to a Symbol, relative to a namespace
  * created by a {@link SceneJS.Name} node:</b></p><pre><code>

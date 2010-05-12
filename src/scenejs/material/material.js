@@ -3,6 +3,18 @@
  * <p> These may be defined anywhere within a scene graph and may be nested. When nested, the properties on an inner material
  * node will override those on outer material nodes for the inner node's subgraph. These nodes are to be defined either
  * above or below {@link SceneJS.Lights} nodes, which provide light for geometry to reflect.</p>
+ * <p><b>Default Material</b></p>
+ * <p>When you have not specified any SceneJS.Material nodes in your scene, then SceneJS will apply these default
+ * material properties in order to make your geometry visible until you do:</p>
+ * <table>
+ * <tr><td>baseColor</td><td>{ r: 1.0, g: 1.0, b: 1.0 }</td></tr>
+ * <tr><td>specularColor</td><td>{ r: 1.0, g: 1.0, b: 1.0 }</td></tr>
+ * <tr><td>specular</td><td>0</td></tr>
+ * <tr><td>shine</td><td>0</td></tr>
+ * <tr><td>reflect</td><td>0</td></tr>
+ * <tr><td>alpha</td><td>1.0</td></tr>
+ * <tr><td>emit</td><td>1.0</td></tr>
+ * </table>
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-material-example">Example 1</a></li></ul>
  * <p><b>Usage Example</b></p><p>A cube illuminated by a directional light source and wrapped
@@ -212,7 +224,7 @@ SceneJS.Material.prototype.getAlpha = function() {
     return this._material.alpha;
 };
 
-  // @private
+// @private
 SceneJS.Material.prototype._init = function(params) {
     if (params.baseColor) {
         this.setBaseColor(params.baseColor);

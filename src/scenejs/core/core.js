@@ -7,7 +7,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.3',
+    VERSION: '0.7.4',
 
     /** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
      */
@@ -62,6 +62,15 @@ var SceneJS = {
                 return key;
             }
         }
+    } ,
+
+    /**
+     * Returns true if object is an array
+     * @private
+     */
+    _isArray : function(testObject) {
+        return testObject && !(testObject.propertyIsEnumerable('length')) 
+                && typeof testObject === 'object' && typeof testObject.length === 'number';
     }
 };
 

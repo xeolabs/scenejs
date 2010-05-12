@@ -62,7 +62,9 @@ SceneJS.ViewMatrix.prototype.getElements = function() {
 };
 
 SceneJS.ViewMatrix.prototype._init = function(params) {
-    this.setElements(params.elements);
+    if (params.elements) {
+        this.setElements(params.elements);
+    }
 };
 
 SceneJS.ViewMatrix.prototype._render = function(traversalContext, data) {

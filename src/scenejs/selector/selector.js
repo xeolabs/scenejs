@@ -3,8 +3,8 @@
  *
  * <p>This node is useful for dynamically controlling traversal within a scene graph.</p>
  * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="">Example 1 - Switching geometry</a></li></ul>
- * <ul><li><a target = "other" href="">Example 2 - Switching viewpoints</a></li></ul>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-teapot-select">Example 1 - Switching Geometry</a></li></ul>
+ * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 2 - Switchable Viewpoint</a></li></ul>
  * <p><b>Example Usage 1</b></p><p>This selector will allow only child nodes at indices 0 and 2 to be rendered,
  * which are the teapot and sphere. Child 1, a cube, is not selected and therefore won't be rendered.</p><pre><code>
  * var s = new SceneJS.Selector({ selection: [0, 2]},
@@ -75,6 +75,7 @@ SceneJS._inherit(SceneJS.Selector, SceneJS.Node);
  @returns {SceneJS.Selector} This Selector node
  */
 SceneJS.Selector.prototype.setSelection = function(selection) {
+    selection = selection || [];
     this._selection = selection;
     return this;
 };
@@ -86,7 +87,7 @@ SceneJS.Selector.prototype.setSelection = function(selection) {
  */
 SceneJS.Selector.prototype.getSelection = function() {
     var selection = new Array(this._selection.length);
-    for (var i = 0; i < this._selection; i++) {
+    for (var i = 0; i < this._selection.length; i++) {
         selection[i] = this._selection[i];
     }
     return selection;
