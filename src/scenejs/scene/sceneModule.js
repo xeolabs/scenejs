@@ -13,7 +13,7 @@ var SceneJS_sceneModule = new (function() {
     var viewMat;
     var picking;
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
                 scenes = {};
@@ -25,13 +25,13 @@ var SceneJS_sceneModule = new (function() {
     function updatePick() {
     }
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED,
             function(params) {
                 projMat = params.matrix;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
             function(params) {
                 viewMat = params.matrix;
@@ -153,7 +153,7 @@ var SceneJS_sceneModule = new (function() {
             SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         activeSceneId = sceneId;
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_ACTIVATED, { sceneId: sceneId });
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { sceneId: sceneId });
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_ACTIVATED, scene.canvas);
     };
 
@@ -207,7 +207,7 @@ var SceneJS_sceneModule = new (function() {
             SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_DEACTIVATED, scene.canvas);
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DEACTIVATED, {sceneId : sceneId });
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERED, {sceneId : sceneId });
         //SceneJS_loggingModule.info("Scene deactivated: " + sceneId);
     };
 

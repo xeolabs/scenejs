@@ -375,7 +375,7 @@ var SceneJS_rendererModule = new (function() {
 
     /* Activate initial defaults
      */
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
@@ -405,19 +405,19 @@ var SceneJS_rendererModule = new (function() {
                         currentProps);
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 loaded = false;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 loaded = false;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (!loaded) {

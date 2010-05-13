@@ -3,23 +3,42 @@
  *
  * <p>This is entry and exit point for execution when rendering one frame of a scene graph, which also configures certain
  * global scene parameters as listed below. </p>
- * <p><b>Binding to a Canvas</b></p>
- * <p>The Scene node can be configured with the ID of a WebGL compatible Canvas element for the scene to render to. When that
- * is omitted, it will look for one with ID "_scenejs-default-canvas" by default.</p>
- * <p><b>JSONP Proxy for Cross-Domain Content</b></p>
- * <p>The Scene node can be configured with a <b>proxy</b> property to specify the URL of a SceneJS JSON proxy server to enable
- * {@link SceneJS.Load} and {@link SceneJS.LoadCollada} nodes can do their content loading cross-domain. When that property
+ * <p><b>Binding to a canvas</b></p>
+ * <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
+ * element for the scene to render to. When that is omitted, the node will look for one with the default ID of
+ * "_scenejs-default-canvas".</p>
+ * <p><b>JSONP proxy for {@link SceneJS.Load} sub-nodes</b></p>
+ * <p>The Scene node can be configured with a <b>proxy</b> property to specify the URL of a SceneJS JSON proxy
+ * server to enable {@link SceneJS.Load} sub-nodes to perform their content loads cross-domain. When that property
  * is omitted, those nodes can only load their content from the local server domain in order to not violate the browser's
  * same-domain security policy. <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is
  * a download of </a>an example of a SceneJS JSONP proxy script written in Perl.</p>
- * <p><b>Usage Example:</b></p><p>A Scene bound to a canvas and specifying a JSONP proxy, that contains a LookAt node
- * whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada} node loads a Collada
- * model cross-domain through the proxy. When the Scene is rendered, a value for the {@link Scene.LookAt}'s property is
- * injected into it. The Scene will put the property on a data scope (which is implemented by a {@link SceneJS.Data})
- * that the {@link SceneJS.LookAt}'s config callback then accesses.</b></p><pre><code>
+ * <p><b>Timeout for {@link SceneJS.Load} sub-nodes</b></p>
+ * <p>The Scene node can be configured with a <b>loadTimeoutSecs</b> property to specify the number of seconds within
+ * which {@link SceneJS.Load} nodes within its subgraph must receive and parse their content. That may be overridden
+ * in the configs of individual {@link SceneJS.Load} nodes.
+ * <p><b>Usage Example:</b></p><p>Shown below is Scene bound to a canvas and specifying a JSONP proxy, that contains a
+ * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada} 
+ * node loads a Collada model cross-domain through the proxy. When the Scene is rendered, a value for the
+ * {@link Scene.LookAt}'s property is injected into it. The Scene will put the property on a data scope (which is
+ * implemented by a {@link SceneJS.Data}) that the {@link SceneJS.LookAt}'s config callback then accesses.</b></p>
+ * <pre><code>
  * var myScene = new SceneJS.Scene({
- *              canvasId: "myCanvas",
- *              proxy: "http://scenejs.org/cgi-bin/jsonp_proxy.pl"
+ *
+ *              // Bind scene to render to WebGL Canvas element with given ID.
+ *              // Default is "_scenejs-default-canvas"
+ *
+ *              canvasId:        "myCanvas",
+ *
+ *              // Location of JSONP proxy if the scene contains SceneJS.Load<xx>
+ *              // nodes that need to load cross-domain
+ *
+ *              proxy:    "http://scenejs.org/cgi-bin/jsonp_proxy.pl"
+ *
+ *              // Optional default timeout for SceneJS.Load<xxx> nodes, which may override
+ *              // it individually - default is 180 seconds
+ *
+ *              loadTimeoutSecs: 180
  *          },
  *
  *          new SceneJS.LookAt(
@@ -76,12 +95,12 @@ SceneJS.Scene.prototype.render = function(paramOverrides) {
         this._sceneId = SceneJS_sceneModule.createScene(this, this._getParams());
     }
     SceneJS_sceneModule.activateScene(this._sceneId);
-    if (this._params.proxy) {
-        SceneJS_loadModule.setProxy(this._params.proxy);
-    }
+    SceneJS_loadModule.setLoadProxyUri(this._params.proxy);  // null to specify none
+    SceneJS_loadModule.setLoadTimeoutSecs(this._params.loadTimeoutSecs);  // null to use default     
     var traversalContext = {};
     this._renderNodes(traversalContext, new SceneJS.Data(null, false, paramOverrides));
-    SceneJS_loadModule.setProxy(null);
+    SceneJS_loadModule.setLoadProxyUri(null);
+    SceneJS_loadModule.setLoadTimeoutSecs(null);
     SceneJS_sceneModule.deactivateScene();
     this._lastRenderedData = paramOverrides;
 };
@@ -104,12 +123,12 @@ SceneJS.Scene.prototype.render = function(paramOverrides) {
 //            }
 //            SceneJS_sceneModule.activateScene(this._sceneId);  // Also activates canvas
 //            SceneJS_pickModule.pick(canvasX, canvasY);
-//            if (this._params.proxy) {
-//                SceneJS_loadModule.setProxy(this._params.proxy);
+//            if (this._params.loadProxy) {
+//                SceneJS_loadModule.setLoadProxyUri(this._params.proxy);
 //            }
 //            var traversalContext = {};
 //            this._renderNodes(traversalContext, this._lastRenderedData);
-//            SceneJS_loadModule.setProxy(null);
+//            SceneJS_loadModule.setLoadProxyUri(null);
 //            var picked = SceneJS_pickModule.getPicked();
 //            SceneJS_sceneModule.deactivateScene();
 //            return picked;

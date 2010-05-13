@@ -1,7 +1,8 @@
 /**
- @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
- <p>Every node type has a specific type, which is its SceneJS-specific type name, along with methods for checking the
- * type like {@link #getType}. This is the list of all valid xtypes:</p>
+ * @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
+ *
+ * <p><b>Node Type ID</b></p>
+ * <p>Every node type has a SceneJS type ID, which may be got with {@link #getType}. This is the list of all valid xtypes:</p>
  *
  * <table>
  * <tr><td>type</td><td>Class</td></tr>
@@ -28,7 +29,7 @@
  * <tr><td>rotate</td><td>{@link SceneJS.Rotate}</td></tr>
  * <tr><td>scale</td><td>{@link SceneJS.Scale}</td></tr>
  * <tr><td>scene</td><td>{@link SceneJS.Scene}</td></tr>
- * <tr><td>scalar-interpolator</td><td>{@link SceneJS.ScalerInterpolator}</td></tr>
+ * <tr><td>scalar-interpolator</td><td>{@link SceneJS.ScalarInterpolator}</td></tr>
  * <tr><td>selector</td><td>{@link SceneJS.Selector}</td></tr>
  * <tr><td>sphere</td><td>{@link SceneJS.objects.Sphere}</td></tr>
  * <tr><td>stationary</td><td>{@link SceneJS.Stationary}</td></tr>
@@ -40,6 +41,27 @@
  * <tr><td>view-matrix</td><td>{@link SceneJS.ViewMatrix}</td></tr>
  * <tr><td>with-data</td><td>{@link SceneJS.WithData}</td></tr>
  * </table>
+ *
+ * <p><b>Events</b></p>
+ * <p>You can register listeners to handle events fired by each node type. For example, to handle a "state-changed"
+ * event from a {@link SceneJS.Load} node:</p>
+ * <pre><code>
+ * var myLoad = new SceneJS.Load({ uri: "http://foo.com/..." });
+ *
+ * var handler = function(node, params) {
+ *                  alert("Node " + node.getType() + " has changed state to " + node.getState());
+ *              };
+ *
+ * myLoad.addListener("state-changed", handler,
+ *
+ *              // Listener options
+ *              {
+ *                    scope: this   // Optional scope for handler call, defaults to this
+ *              });
+ *
+ * myLoad.removeListener("state-changed", handler);
+ * </code></pre>
+ *
  * @constructor
  * Create a new SceneJS.node
  * @param {SceneJS.node, ...} arguments Zero or more child nodes
@@ -49,6 +71,7 @@ SceneJS.Node = function() {
     this._children = [];
     this._fixedParams = true;
     this._parent = null;
+    this._listeners = {};
 
     /* Used by many node types to track the level at which they can
      * memoise internal state. When rendered, a node increments
@@ -235,7 +258,7 @@ SceneJS.Node.prototype.addNode = function(node) {
  */
 SceneJS.Node.prototype.insertNode = function(node, i) {
     if (node._parent != null) {
-         SceneJS_errorModule.fatalError(
+        SceneJS_errorModule.fatalError(
                 new SceneJS.InvalidSceneGraphException(
                         "Attempted to insert a child to a node without " +
                         "first removing the child from it's current parent"));
@@ -250,6 +273,93 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
     node._parent = this;
     node._resetMemoLevel();
     return node;
+};
+
+/**
+ * Registers a listener for a given event on this node. If the event type
+ * is not supported by this node type, then the listener will never be called.
+ * <p><b>Example:</b>
+ * <pre><code>
+ * var node = new SceneJS.Node();
+ *
+ * node.addListener(
+ *
+ *              // eventName
+ *              "some-event",
+ *
+ *              // handler
+ *              function(node,      // Node we are listening to
+ *                       params) {  // Whatever params accompany the event type
+ *
+ *                     // ...
+ *              },
+ *
+ *              // options
+ *              {
+ *                     // Optional scope on which handler is
+ *                     // called - default is this
+ *                     scope: this
+ *              }
+ * );
+ *
+ *
+ * </code></pre>
+ *
+ * @param {String} eventName One of the event types supported by this node
+ * @param handler - Handler function that be called as specified
+ * @param options - Optional options for the handler as specified
+ * @return {SceneJS.Node} this
+ */
+SceneJS.Node.prototype.addListener = function(eventName, handler, options) {
+    var list = this._listeners[eventName];
+    if (!list) {
+        list = [];
+        this._listeners[eventName] = list;
+    }
+    list.push({
+        eventName : eventName,
+        handler: handler,
+        options : options || {}
+    });
+    return this;
+};
+
+/**
+ * @private
+ */
+SceneJS.Node.prototype._fireEvent = function(eventName, params) {
+    var list = this._listeners[eventName];
+    if (list) {
+        if (!params) {
+            params = {};
+        }
+        for (var i = 0; i < list.length; i++) {
+            var handler = list[i];
+            handler.call(handler.options.scope || this, this, params);
+        }
+    }
+};
+
+/**
+ * Removes a handler that is registered for the given event on this node.
+ * Does nothing if no such handler registered.
+ *
+ * @param {String} eventName Event type that handler is registered for
+ * @param handler - Handler function that is registered for the event
+ * @return {function} The handler, or null if not registered
+ */
+SceneJS.Node.prototype.removeListener = function(eventName, handler) {
+    var list = this._listeners[eventName];
+    if (!list) {
+        return null;
+    }
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].handler == handler) {
+            list.splice(i, 1);
+            return handler;
+        }
+    }
+    return null;
 };
 
 /** Returns the parent node

@@ -8,7 +8,7 @@
  *
  */
 
-SceneJS.onEvent("error", function(e) {
+SceneJS.addListener("error", function(e) {
     alert(e.exception.message ? e.exception.message : e.exception);
 });
 

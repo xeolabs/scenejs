@@ -179,7 +179,7 @@ window.render = function() {
     exampleScene.render({dist: dist, yaw: yaw, pitch: pitch});
 };
 
-SceneJS.onEvent("error", function() {
+SceneJS.addListener("error", function() {
     window.clearInterval(pInterval);
 });
 

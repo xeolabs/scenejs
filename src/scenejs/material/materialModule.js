@@ -7,10 +7,10 @@
  * MATERIAL_EXPORTED to pass the material properties to the shading backend.
  *
  * Avoids redundant export of the material properties with a dirty flag; they are only exported when that is set, which
- * occurs when material is set by the SceneJS.material node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
+ * occurs when material is set by the SceneJS.material node, or on SCENE_RENDERING, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
- * Sets the properties to defaults on SCENE_ACTIVATED.
+ * Sets the properties to defaults on SCENE_RENDERING.
  *
  * Whenever a SceneJS.material sets the material properties, this backend publishes it with a MATERIAL_UPDATED to allow
  * other dependent backends to synchronise their resources. One such backend is the shader backend, which taylors the
@@ -23,8 +23,8 @@ var SceneJS_materialModule = new (function() {
     var material;
     var dirty;
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 material = {
                     baseColor : [ 1.0, 1.0, 1.0 ],
@@ -39,13 +39,13 @@ var SceneJS_materialModule = new (function() {
             });
 
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
@@ -56,7 +56,7 @@ var SceneJS_materialModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;

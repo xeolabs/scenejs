@@ -19,8 +19,8 @@ var SceneJS_localityModule = new (function() {
     var radii;
     var radii2;
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 eye = { x: 0, y: 0, z: 0 };
                 radii = {
@@ -33,7 +33,7 @@ var SceneJS_localityModule = new (function() {
                 };
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
             function(transform) {
                 if (transform.lookAt) {

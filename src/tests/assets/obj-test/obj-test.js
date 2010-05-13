@@ -7,7 +7,7 @@
  Demonstrates the import of an OBJ asset - an avatar model.
 
  */
-SceneJS.onEvent("error", function(e) {
+SceneJS.addListener("error", function(e) {
     alert(e.exception.message ? e.exception.message : e.exception);
 });
 
@@ -237,7 +237,7 @@ window.render = function() {
 
 };
 
-SceneJS.onEvent("error", function(e) {
+SceneJS.addListener("error", function(e) {
     window.clearInterval(pInterval);
     alert(e.exception.message ? e.exception.message : e.exception);
 });

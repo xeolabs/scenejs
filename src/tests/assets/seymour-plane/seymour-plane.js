@@ -12,7 +12,7 @@
 
  */
 
-SceneJS.onEvent("error", function(e) {
+SceneJS.addListener("error", function(e) {
     if (e.exception.message) {
         alert("Error: " + e.exception.message);
     } else {
@@ -153,19 +153,16 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-              var x = 0;
+
 window.render = function() {
-    if (++x == 20) {
-        clearInterval(pInterval);
-    }
     exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
-SceneJS.onEvent("error", function() {
+SceneJS.addListener("error", function() {
     window.clearInterval(pInterval);
 });
 
-SceneJS.onEvent("reset", function() {
+SceneJS.addListener("reset", function() {
     window.clearInterval(pInterval);
 });
 

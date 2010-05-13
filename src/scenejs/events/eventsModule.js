@@ -18,8 +18,8 @@ var SceneJS_eventModule = new (function() {
     this.RESET = 2;                          // SceneJS framework reset
     this.TIME_UPDATED = 3;                   // System time updated
     this.SCENE_CREATED = 4;                  // Scene has just been created
-    this.SCENE_ACTIVATED = 5;                // Scene about to be traversed
-    this.SCENE_DEACTIVATED = 6;              // Scene just been completely traversed
+    this.SCENE_RENDERING = 5;                // Scene about to be traversed
+    this.SCENE_RENDERED = 6;              // Scene just been completely traversed
     this.SCENE_DESTROYED = 7;                // Scene just been destroyed
     this.RENDERER_UPDATED = 8;                // Current WebGL context has been updated to the given state
     this.RENDERER_EXPORTED = 9;               // Export of the current WebGL context state
@@ -71,7 +71,7 @@ var SceneJS_eventModule = new (function() {
      * @param command - Handler function that will accept whatever parameter object accompanies the event
      * @param priority - Optional priority number (see above)
      */
-    this.onEvent = function(type, command, priority) {
+    this.addListener = function(type, command, priority) {
         var list = events[type];
         if (!list) {
             list = [];
@@ -107,11 +107,12 @@ var SceneJS_eventModule = new (function() {
 })();
 
 
+
 /** <p>Adds a listener to be notified when a given event occurs within SceneJS.</p>
  * <p><b>Supported events</b></p>
  * <p><b><em>error</em></b></p><p>An error has occurred either while defining or rendering a scene. These can be either fatal,
  * or errors that SceneJS can recover from.</p><p>Example:</p><pre><code>
- * SceneJS.onEvent("error", function(e) {
+ * SceneJS.addListener("error", function(e) {
  *     if (e.exception.message) {
  *         alert("Error: " + e.exception.message);
  *     } else {
@@ -120,35 +121,35 @@ var SceneJS_eventModule = new (function() {
  *  });
  * </pre></code>
  *
- * <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all SceneJS.Scene instances are destroyed and resources
- * held for them freed.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
+ * <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all {@link SceneJS.Scene} instances have
+ * been destroyed and resources held for them freed.</p><p>Example:</p><pre><code>
+ *  SceneJS.addListener(
  *      "reset",
  *      function(e) {
  *          alert("SceneJS has been reset");
  *      });
  * </pre></code>
 
- * <p><b><em>scene-created</em></b></p><p>A SceneJS.Scene has been defined.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
+ * <p><b><em>scene-created</em></b></p><p>A {@link SceneJS.Scene} has been defined.</p><p>Example:</p><pre><code>
+ *  SceneJS.addListener(
  *      "scene-created",
  *      function(e) {
  *          alert("A new Scene has been created - scene ID: " + e.sceneId);
  *      });
  * </pre></code>
  *
- * <p><b><em>scene-activated</em></b></p><p>Traversal (render) of a SceneJS.Scene has just begun.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
- *      "scene-activated",
+ * <p><b><em>scene-rendering</em></b></p><p>Traversal (render) of a {@link SceneJS.Scene} has just begun.</p><p>Example:</p><pre><code>
+ *  SceneJS.addListener(
+ *      "scene-rendering",
  *      function(e) {
  *          alert("Rendering of a new Scene has just begun - scene ID: " + e.sceneId);
  *      });
  * </pre></code>
  *
- * <p><b><em>canvas-activated</em></b></p><p>A canvas has just been activated for a Scene, where the Scene is about to start
- * rendering to it. This will come right after a "scene-activated" event, which will indicate which Scene is the one
- * about to do the rendering.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
+ * <p><b><em>canvas-activated</em></b></p><p>A canvas has just been activated for a {@link SceneJS.Scene}, where that
+ * node is about to start rendering to it. This will come right after a "scene-rendering" event, which will indicate which
+ * {@link SceneJS.Scene} is the one about to do the rendering.</p><p>Example:</p><pre><code>
+ *  SceneJS.addListener(
  *      "canvas-activated",
  *      function(e) {
  *          var canvas = e.canvas;
@@ -158,13 +159,11 @@ var SceneJS_eventModule = new (function() {
  *      });
  * </pre></code>
  *
- * <p><b><em>process-created</em></b></p><p>An asynchronous process has started within a Scene. Processes track the progress of
- * tasks such as the loading of remotely-stored content by SceneJS.Load and SceneJS.LoadCollada nodes. This event is
- * paticularly useful to monitor for content loading. Since loads are triggered in one scene traversal, and then loaded
- * content is integrated during a subsequent traversal, you might listen for this along with "process-killed" on a
- * non-animated scene to ensure that a final scene image is rendered once all loads have completed and content
- * integrated.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
+ * <p><b><em>process-created</em></b></p><p>An asynchronous process has started somewhere among the nodes wtihin a
+ * {@link SceneJS.Scene}. Processes track the progress of tasks such as the loading of remotely-stored content by
+ * {@link SceneJS.Load} nodes. This event is particularly useful to monitor for content loading. </p>
+ * <p>Example:</p><pre><code>
+ *  SceneJS.addListener(
  *      "process-created",
  *      function(e) {
  *          var sceneId = e.sceneId;
@@ -177,8 +176,9 @@ var SceneJS_eventModule = new (function() {
  *      });
  * </pre></code>
  *
- * <p><b><em>process-timed-out</em></b></p><p>An asynchronous process has timed out. This will be followed by a "process-killed" event.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
+ * <p><b><em>process-timed-out</em></b></p><p>An asynchronous process has timed out. This will be followed by
+ * a "process-killed" event.</p><p>Example:</p><pre><code>
+ *  SceneJS.addListener(
  *      "process-timed-out",
  *      function(e) {
  *          var sceneId = e.sceneId;
@@ -192,7 +192,7 @@ var SceneJS_eventModule = new (function() {
  * </pre></code>
  *
  * <p><b><em>process-killed</em></b></p><p>An asynchronous process has finished.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
+ *  SceneJS.addListener(
  *      "process-killed",
  *      function(e) {
  *          var sceneId = e.sceneId;
@@ -205,16 +205,16 @@ var SceneJS_eventModule = new (function() {
  *      });
  * </pre></code>
  *
- * <p><b><em>scene-deactivated</em></b></p><p>A SceneJS.Scene traversal has completed.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
- *      "scene-created",
+ * <p><b><em>scene-rendered</em></b></p><p>A render of a {@link SceneJS.Scene} has completed.</p><p>Example:</p><pre><code>
+ *  SceneJS.addListener(
+ *      "scene-rendered",
  *      function(e) {
  *          alert("Traversal completed for Scene - scene ID: " + e.sceneId);
  *      });
  * </pre></code>
  *
  * <p><b><em>scene-destroyed</em></b></b></p><p>A SceneJS.Scene traversal has been destroyed.</p><p>Example:</p><pre><code>
- *  SceneJS.onEvent(
+ *  SceneJS.addListener(
  *      "scene-destroyed",
  *      function(e) {
  *          alert("Scene has been destroyed - scene ID: " + e.sceneId);
@@ -223,7 +223,7 @@ var SceneJS_eventModule = new (function() {
  * @param name Event name
  * @param func Callback function
  */
-SceneJS.onEvent = function(name, func) {
+SceneJS.addListener = function(name, func) {
     switch (name) {
 
         /**
@@ -232,7 +232,7 @@ SceneJS.onEvent = function(name, func) {
          * widget that is using this Store as a Record cache should refresh its view.
          * @param {Store} this
          */
-        case "error" : SceneJS_eventModule.onEvent(
+        case "error" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.ERROR,
                 function(params) {
                     func({
@@ -242,14 +242,14 @@ SceneJS.onEvent = function(name, func) {
                 });
             break;
 
-        case "reset" : SceneJS_eventModule.onEvent(
+        case "reset" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.RESET,
                 function() {
                     func();
                 });
             break;
 
-        case "scene-created" : SceneJS_eventModule.onEvent(
+        case "scene-created" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.SCENE_CREATED,
                 function(params) {
                     func({
@@ -258,8 +258,8 @@ SceneJS.onEvent = function(name, func) {
                 });
             break;
 
-        case "scene-activated" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.SCENE_ACTIVATED,
+        case "scene-rendering" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.SCENE_RENDERING,
                 function(params) {
                     func({
                         sceneId : params.sceneId
@@ -267,7 +267,7 @@ SceneJS.onEvent = function(name, func) {
                 });
             break;
 
-        case "canvas-activated" : SceneJS_eventModule.onEvent(
+        case "canvas-activated" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.CANVAS_ACTIVATED,
                 function(params) {
                     func({
@@ -276,29 +276,29 @@ SceneJS.onEvent = function(name, func) {
                 });
             break;
 
-        case "process-created" : SceneJS_eventModule.onEvent(
+        case "process-created" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.PROCESS_CREATED,
                 function(params) {
                     func(params);
                 });
             break;
 
-        case "process-timed-out" : SceneJS_eventModule.onEvent(
+        case "process-timed-out" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.PROCESS_TIMED_OUT,
                 function(params) {
                     func(params);
                 });
             break;
 
-        case "process-killed" : SceneJS_eventModule.onEvent(
+        case "process-killed" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.PROCESS_KILLED,
                 function(params) {
                     func(params);
                 });
             break;
 
-        case "scene-deactivated" : SceneJS_eventModule.onEvent(
-                SceneJS_eventModule.SCENE_DEACTIVATED,
+        case "scene-rendered" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.SCENE_RENDERED,
                 function(params) {
                     func({
                         sceneId : params.sceneId
@@ -306,7 +306,7 @@ SceneJS.onEvent = function(name, func) {
                 });
             break;
 
-        case "scene-destroyed" : SceneJS_eventModule.onEvent(
+        case "scene-destroyed" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.SCENE_DESTROYED,
                 function(params) {
                     func({
@@ -316,7 +316,10 @@ SceneJS.onEvent = function(name, func) {
             break;
 
         default:
-            throw "SceneJS.onEvent - this event type not supported: '" + name + "'";
+            throw "SceneJS.addListener - this event type not supported: '" + name + "'";
     }
 };
 
+/** @deprecated - use {@link #addListener} instead. 
+ */
+SceneJS.onEvent = SceneJS.addListener;

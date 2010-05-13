@@ -4,7 +4,7 @@
  * a proxy is specified on the SceneJS.Scene node. When first visited during scene traversal, it will begin the load and
  * allow traversal to continue at its next sibling node. When on a subsequent visit its subgraph has been loaded, it
  * will then allow traversal to descend into that subgraph to render it.</p>
- * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.onEvent().</p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with SceneJS.addListener().</p>
  * <p><b>Usage Example</b></p><p>The SceneJS.LoadOBJ node shown below loads an .OBJ file "vacuum-cleaner.dae" stored
  * on a server at "foo.com". The transfer is routed via the JSONP proxy located by the <b>uri</b> property on the
  * SceneJS.Scene node.</b></p>

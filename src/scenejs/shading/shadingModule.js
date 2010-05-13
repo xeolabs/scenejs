@@ -51,13 +51,13 @@ var SceneJS_shaderModule = new (function() {
     var sceneHash;
 
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
                 for (var programId in programs) {  // Just free allocated programs
@@ -66,8 +66,8 @@ var SceneJS_shaderModule = new (function() {
                 programs = {};
             });
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 canvas = null;
                 rendererState = null;
@@ -82,7 +82,7 @@ var SceneJS_shaderModule = new (function() {
                 textureHash = "";
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
@@ -90,7 +90,7 @@ var SceneJS_shaderModule = new (function() {
                 sceneHash = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
@@ -98,7 +98,7 @@ var SceneJS_shaderModule = new (function() {
                 sceneHash = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RENDERER_UPDATED,
             function(_rendererState) {
                 rendererState = _rendererState;  // Canvas change will be signified by a CANVAS_UPDATED
@@ -106,7 +106,7 @@ var SceneJS_shaderModule = new (function() {
                 rendererHash = rendererState.enableTexture2D ? "t" : "f";
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RENDERER_EXPORTED,
             function(_rendererState) {
 
@@ -119,7 +119,7 @@ var SceneJS_shaderModule = new (function() {
                                 : [0, 0, 0]);
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.TEXTURES_UPDATED,
             function(stack) {
                 textureLayers = stack;
@@ -143,7 +143,7 @@ var SceneJS_shaderModule = new (function() {
                 textureHash = hash.join("");
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.TEXTURES_EXPORTED,
             function(stack) {
                 for (var i = 0; i < stack.length; i++) {
@@ -155,7 +155,7 @@ var SceneJS_shaderModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.LIGHTS_UPDATED,
             function(l) {
                 lights = l;
@@ -177,7 +177,7 @@ var SceneJS_shaderModule = new (function() {
                 lightsHash = hash.join("");
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.LIGHTS_EXPORTED,
             function(_lights) {
                 for (var i = 0; i < _lights.length; i++) {
@@ -207,14 +207,14 @@ var SceneJS_shaderModule = new (function() {
             });
 
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.MATERIAL_UPDATED,
             function(m) {
                 material = m;
                 sceneHash = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.MATERIAL_EXPORTED,
             function(m) {
                 activeProgram.setUniform("uMaterialBaseColor", m.baseColor);
@@ -226,7 +226,7 @@ var SceneJS_shaderModule = new (function() {
                 activeProgram.setUniform("uMaterialAlpha", m.alpha);
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.FOG_UPDATED,
             function(f) {
                 fog = f;
@@ -234,7 +234,7 @@ var SceneJS_shaderModule = new (function() {
                 fogHash = fog ? fog.mode : "";
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.FOG_EXPORTED,
             function(f) {
                 activeProgram.setUniform("uFogColor", f.color);
@@ -243,7 +243,7 @@ var SceneJS_shaderModule = new (function() {
                 activeProgram.setUniform("uFogEnd", f.end);
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.MODEL_TRANSFORM_EXPORTED,
             function(transform) {
 
@@ -252,20 +252,20 @@ var SceneJS_shaderModule = new (function() {
 
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.VIEW_TRANSFORM_EXPORTED,
             function(transform) {
                 activeProgram.setUniform("uVMatrix", transform.matrixAsArray);
                 activeProgram.setUniform("uVNMatrix", transform.normalMatrixAsArray);
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.PROJECTION_TRANSFORM_EXPORTED,
             function(transform) {
                 activeProgram.setUniform("uPMatrix", transform.matrixAsArray);
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.GEOMETRY_UPDATED,
             function(geo) {
                 geometry = geo;
@@ -276,7 +276,7 @@ var SceneJS_shaderModule = new (function() {
                     geometry.uvBuf2 ? "t" : "f"]).join("");
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.GEOMETRY_EXPORTED,
             function(geo) {
                 if (geo.vertexBuf) {
@@ -295,7 +295,7 @@ var SceneJS_shaderModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_ACTIVATE, // Request to activate a shader
             function() {
                 activateProgram();

@@ -5,19 +5,13 @@
     <property name="BUILD_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
-
     <property name="SRC_DIR" location="${basedir}/src"/>
-
     <property name="EXAMPLES_DIR" location="${basedir}/website"/>
-
     <property name="SCENEJS_JS_NAME" value="scenejs.js"/>
-
     <property name="SCENEJS_MIN_JS_NAME" value="scenejs.min.js"/>
-
     <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
-
     <property name="SCENEJS_NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
-
+    <property name="SCENEJS_LATEST_MIN_JS_NAME" value="scenejs-latest.min.js"/>
     <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SCENEJS_NAME}"/>
 
 
@@ -108,7 +102,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
     </path>
 
-    <target name="all" depends="archive"/>
+    <!--<target name="all" depends="archive"/>-->
 
     <target name="docs" description="Create JS Docs">
         <taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit">
@@ -167,18 +161,18 @@
     </target>
 
 
-    <target name="archive" depends="package" description="Create archives of downloads">
+    <!--<target name="archive" depends="package" description="Create archives of downloads">-->
 
-        <tar destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.tar.gz"
-             basedir="${DIST_CONTAINER_DIR}/extracted"
-             compression="gzip"/>
+        <!--<tar destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.tar.gz"-->
+             <!--basedir="${DIST_CONTAINER_DIR}/extracted"-->
+             <!--compression="gzip"/>-->
 
-        <zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
+        <!--<zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>-->
 
         <!-- Write version data to website -->
         <!--<echo file="website/data/version.js" append="false">{ version: "${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}" }-->
         <!--</echo>-->
-    </target>
+    <!--</target>-->
 
     <!-- Create compressed javascript lib -->
 
@@ -194,8 +188,11 @@
                 <include name="**/*.js"/>
             </fileset>
         </yuicompress>
-        <move file="${EXTRACTED_DIST_DIR}/${SCENEJS_JS_NAME}"
-              tofile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_MIN_JS_NAME}"/>
+        <copy file="${EXTRACTED_DIST_DIR}/${SCENEJS_JS_NAME}"
+              tofile="${EXTRACTED_DIST_DIR}/${SCENEJS_MIN_JS_NAME}"/>
+
+        <copy file="${EXTRACTED_DIST_DIR}/${SCENEJS_JS_NAME}"
+              tofile="${EXTRACTED_DIST_DIR}/${SCENEJS_LATEST_MIN_JS_NAME}"/>
     </target>
 
     <!-- Assemble javascript lib -->

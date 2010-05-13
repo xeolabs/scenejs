@@ -1,29 +1,38 @@
 /*
- Introductory SceneJS scene which renders the venerable OpenGL teapot.
+ Orthographic projection of the OpenGL Teapot
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
 
- To render the teapot, SceneJS will traverse the scene in depth-first order. Each node is a function
- that will set some WebGL state on entry, then un-set it again before exit. In this graph, the root
- scene node binds to a Canvas element, a renderer sets some rendering state, then the rest of the
- nodes specify various transforms, lights, material properties, all wrapping a teapot geometry node.
+ Orthographic, or parallel, projections consist of those that involve no perspective correction.
+ There is no adjustment for distance from the camera made in these projections, meaning objects on the screen
+ will appear the same size no matter how close or far away they are.
 
- This scene is interactive; to rotate the view, it takes two variables, "yaw" and "pitch", which are
- passed down via data "scopes". Take a close look at the rotate nodes, which use these variables, and
- the invocation of the "render" function near the bottom of this example, which passes them in.
+ This example assumes that you've looked at various other examples, and just serves to demonstrate
+ orthographic projection using the SceneJS.Ortho node.
 
  */
 
-SceneJS.onEvent("error", function(e) {
-    alert(e.exception.message ? e.exception.message : e.exception);
+SceneJS.addListener("error", function(e) {
+    alert(e.exception.message);
 });
 
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
-    /* Perspective transformation
+    /* Orthographic projection - left and right specify the x-coordinate clipping planes, 
+     * bottom and top specify the y-coordinate clipping planes, and near and far specify
+     * the distance to the z-coordinate clipping planes.
+     *
+     * Together these coordinates provide a box-shaped viewing volume.
      */
-        SceneJS.perspective({  fovy : 75.0, aspect : 1.0, near : 0.10, far : 300.0 },
+        SceneJS.ortho({
+            left: -5.0,
+            bottom : -5.0,
+            near : 0.1,
+            right : 5.0,
+            top : 5.0,
+            far : 1000.0
+        },
 
             /* Viewing transform specifies eye position, looking
              * at the origin by default
@@ -40,27 +49,27 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                      */
                         SceneJS.lights({
                             sources: [
-//                                {
-//                                    type:                   "dir",
-//                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
-//                                    diffuse:                true,
-//                                    specular:               true,
-//                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-//                                },
-//                                {
-//                                    type:                   "dir",
-//                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
-//                                    diffuse:                true,
-//                                    specular:               true,
-//                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-//                                },
-//                                {
-//                                    type:                   "dir",
-//                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
-//                                    diffuse:                true,
-//                                    specular:               true,
-//                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-//                                }
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                                },
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                                },
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                                }
                             ]},
 
                             /* Next, modelling transforms to orient our teapot
@@ -90,24 +99,24 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                             /* Specify the amounts of ambient, diffuse and specular
                                              * lights our teapot reflects
                                              */
-//                                                SceneJS.material({
-//                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-//                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-//                                                    specular:       0.9,
-//                                                    shine:          6.0
-//                                                },
+                                                SceneJS.material({
+                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                    specular:       0.9,
+                                                    shine:          6.0
+                                                },
 
                                                     /* Teapot's geometry
                                                      */
-                                                        SceneJS.scale({x:1.0,y:1.0,z:1.0},
-                                                                        SceneJS.objects.teapot.apply(this, [])
-                                                                )
-                                                        )
-                                              //  )
+
+                                                                SceneJS.objects.teapot()
+
+                                                        ) // material
+                                                ) // rotate
                                         ) // rotate
-                                ) // lookAt
-                        ) // perspective
-                ) // lights
+                                ) // lights
+                        ) // lookAt
+                ) // ortho
         ); // scene
 
 
@@ -156,7 +165,7 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 
-SceneJS.onEvent("error", function(e) {
+SceneJS.addListener("error", function(e) {
     alert(e.exception.message ? e.exception.message : e.exception);
 });
 

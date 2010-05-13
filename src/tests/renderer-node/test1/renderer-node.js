@@ -315,12 +315,12 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.onEvent("error", function(e) {
+SceneJS.addListener("error", function(e) {
    // alert(e.exception.message || e.exception);
     window.clearInterval(pInterval);
 });
 
-SceneJS.onEvent("reset", function() {
+SceneJS.addListener("reset", function() {
     window.clearInterval(pInterval);
 });
 

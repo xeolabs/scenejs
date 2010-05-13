@@ -1,0 +1,37 @@
+{#template MAIN}
+<ul class="sf-menu">
+    <li class="current">
+        <a href="#a">File</a>
+        <ul>
+            <li>
+                <a href="#aa">Download</a>
+            </li>
+            <li>
+                <a href="#ab">Credits</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="#">View</a>
+        <ul>
+            <li class="current">
+                <a href="#ab">Cameras</a>
+                <ul>
+                     {#foreach $T.cameras as camera}
+                    <!--<li><a href="javascript:activateCamera('{$T.camera.id}')">{$T.camera.id}</a></li>                    -->
+                    {#/for}
+                </ul>
+            </li>
+            <li>
+                <a href="#">Lights</a>
+                <ul>
+                    <li><a href="#">light1</a></li>
+                    <li><a href="#">light2</a></li>
+
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+{#/template MAIN}
+        

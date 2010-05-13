@@ -14,7 +14,7 @@ var SceneJS_pickModule = new (function() {
     var pickY;
     var canvas;
 
-    //            SceneJS_eventModule.onEvent(
+    //            SceneJS_eventModule.addListener(
     //                    SceneJS_eventModule.RESET,
     //                    function() {
     //                        pickInfo = [];
@@ -22,7 +22,7 @@ var SceneJS_pickModule = new (function() {
     //                        SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
     //                    });
     //
-    //            SceneJS_eventModule.onEvent(
+    //            SceneJS_eventModule.addListener(
     //                    SceneJS_eventModule.SCENE_CREATED,
     //                    function(params) {
     //                        pickInfo[params.sceneId] = {
@@ -30,25 +30,25 @@ var SceneJS_pickModule = new (function() {
     //                        };
     //                    });
     //
-    //            SceneJS_eventModule.onEvent(
-    //                    SceneJS_eventModule.SCENE_ACTIVATED,
+    //            SceneJS_eventModule.addListener(
+    //                    SceneJS_eventModule.SCENE_RENDERING,
     //                    function(params) {
     //                        currentPickInfo = pickInfo[params.sceneId];
     //                    });
     //
-    //            SceneJS_eventModule.onEvent(
+    //            SceneJS_eventModule.addListener(
     //                    SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED,
     //                    function(transform) {
     //                        currentPickInfo.projectionTransform = transform;
     //                    });
     //
-    //            SceneJS_eventModule.onEvent(
+    //            SceneJS_eventModule.addListener(
     //                    SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
     //                    function(transform) {
     //                        currentPickInfo.viewTransform = transform;
     //                    });
     //
-    //            SceneJS_eventModule.onEvent(
+    //            SceneJS_eventModule.addListener(
     //                    SceneJS_eventModule.CANVAS_ACTIVATED,
     //                    function(c) {
     //                        canvas = c;
@@ -57,7 +57,7 @@ var SceneJS_pickModule = new (function() {
     //                        }
     //                    });
     //
-    //            SceneJS_eventModule.onEvent(
+    //            SceneJS_eventModule.addListener(
     //                    SceneJS_eventModule.SCENE_DESTROYED,
     //                    function(params) {
     //                        pickInfo[params.sceneId] = null;

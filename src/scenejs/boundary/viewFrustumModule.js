@@ -21,29 +21,29 @@ var SceneJS_frustumModule = new (function() {
     var viewMat;
     var frustum;
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 projMat = viewMat = SceneJS_math_identityMat4();
                 viewport = [0,0,1,1];
                 frustum = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.VIEWPORT_UPDATED,
             function(v) {
                 viewport = [v.x, v.y, v.width, v.height];
                 frustum = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED,
             function(params) {
                 projMat = params.matrix;
                 frustum = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
             function(params) {
                 viewMat = params.matrix;

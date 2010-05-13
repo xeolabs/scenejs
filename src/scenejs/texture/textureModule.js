@@ -14,7 +14,7 @@
  * TEXTURES_EXPORTED to pass the entire layer stack to the shading backend.
  *
  * Avoids redundant export of the layers with a dirty flag; they are only exported when that is set, which occurs
- * when the stack is pushed or popped by the texture node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
+ * when the stack is pushed or popped by the texture node, or on SCENE_RENDERING, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
  * Whenever a texture node pushes or pops the stack, this backend publishes it with a TEXTURES_UPDATED to allow other
@@ -30,40 +30,40 @@ var SceneJS_textureModule = new (function() {
     var layerStack = [];
     var dirty;
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 layerStack = [];
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
@@ -75,7 +75,7 @@ var SceneJS_textureModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
@@ -106,7 +106,7 @@ var SceneJS_textureModule = new (function() {
         dirty = true;
     }
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET, // Framework reset - delete textures
             function() {
                 deleteTextures();

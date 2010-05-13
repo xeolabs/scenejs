@@ -62,8 +62,8 @@ var SceneJS_loggingModule = new (function() {
         }
     }
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED, // Set default logging for scene root
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING, // Set default logging for scene root
             function(params) {
                 activeSceneId = params.sceneId;
 
@@ -88,13 +88,13 @@ var SceneJS_loggingModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_DEACTIVATED, // Set default logging for scene root
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERED, // Set default logging for scene root
             function() {
                 activeSceneId = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
                 queues = {};

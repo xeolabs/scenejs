@@ -20,19 +20,19 @@ var SceneJS_memoryModule = new (function() {
     var evictors = [];          // Eviction function for each client
     var iEvictor = 0;           // Fair eviction policy - don't keep starting polling at first evictor
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
             });
 
-    SceneJS_eventModule.onEvent(// Framework reset - start next polling at first evictor
+    SceneJS_eventModule.addListener(// Framework reset - start next polling at first evictor
             SceneJS_eventModule.RESET,
             function() {
                 canvas = null;

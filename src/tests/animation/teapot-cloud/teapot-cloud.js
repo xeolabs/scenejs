@@ -117,11 +117,11 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.onEvent("error", function() {
+SceneJS.addListener("error", function() {
     window.clearInterval(pInterval);
 });
 
-SceneJS.onEvent("reset", function() {
+SceneJS.addListener("reset", function() {
     window.clearInterval(pInterval);
 });
 

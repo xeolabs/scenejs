@@ -19,7 +19,7 @@ var SceneJS_nameModule = new (function() {
     var greenCount = 0;
     var item = null;
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(_canvas) {
                 canvas = _canvas;
@@ -34,7 +34,7 @@ var SceneJS_nameModule = new (function() {
                 item = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 //  if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {

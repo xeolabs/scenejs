@@ -8,26 +8,26 @@
  */
 var SceneJS_loadModule = new (function() {
 
-    var time = (new Date()).getTime();
-    var proxyUri = null;
-    var assets = {};        // Asset content subgraphs for eviction, not reuse
+    var _time = (new Date()).getTime();
+    var _loadProxyUri = null;
+    var _loadTimeoutSecs = 180;
+    var _assets = {};        // Asset content subgraphs for eviction, not reuse
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.TIME_UPDATED,
             function(t) {
-                time = t;
+                _time = t;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
-                assets = {};
+                _assets = {};
             });
 
     /** @private */
     function _loadFile(url, onLoad, onError) {
         try {
-            var x;
             var request = new XMLHttpRequest();
             request.onreadystatechange = function() {
                 if (request.readyState == 4) {
@@ -47,7 +47,7 @@ var SceneJS_loadModule = new (function() {
     }
 
     /** @private */
-    function _loadAssetSameDomain(uri, assetId, parser, onSuccess, onError) { 
+    function _loadAssetSameDomain(uri, assetId, parser, onSuccess, onError) {
         _loadFile(uri,
                 function(data) {  // onLoad
                     if (!data) {
@@ -61,11 +61,11 @@ var SceneJS_loadModule = new (function() {
                         if (!assetNode) {
                             onError(new SceneJS.InternalException("parser returned null result"));
                         } else {
-                            assets[assetId] = {
+                            _assets[assetId] = {
                                 assetId: assetId,
                                 uri: uri,
                                 node: assetNode,
-                                lastUsed: time
+                                lastUsed: _time
                             };
                             onSuccess(assetNode);
                         }
@@ -98,7 +98,7 @@ var SceneJS_loadModule = new (function() {
      * @private
      */
     function _loadAssetCrossDomain(uri, assetId, serverParams, callbackName, parser, onSuccess, onError) {
-        var url = [proxyUri, "?callback=", callbackName , "&uri=" + uri];
+        var url = [_loadProxyUri, "?callback=", callbackName , "&uri=" + uri];
         for (var param in serverParams) { // TODO: memoize string portion that contains params
             url.push("&", param, "=", serverParams[param]);
         }
@@ -118,11 +118,11 @@ var SceneJS_loadModule = new (function() {
                         if (!assetNode) {
                             onError(new SceneJS.InternalException("parser returned null result"));
                         } else {
-                            assets[assetId] = {
+                            _assets[assetId] = {
                                 assetId: assetId,
                                 uri: uri,
                                 node: assetNode,
-                                lastUsed: time
+                                lastUsed: _time
                             };
                             onSuccess(assetNode);
                         }
@@ -131,17 +131,22 @@ var SceneJS_loadModule = new (function() {
     }
 
     // @private
-    this.setProxy = function(_proxyUri) {
-        proxyUri = _proxyUri;
+    this.setLoadProxyUri = function(loadProxyUri) {
+        _loadProxyUri = loadProxyUri;
+    };
+
+    // @private
+    this.setLoadTimeoutSecs = function(loadTimeoutSecs) {
+        _loadTimeoutSecs = loadTimeoutSecs || 180;
     };
 
     /** Attempts to get currently-loaded asset, which may have been evicted
      * @private
      */
     this.getAsset = function(handle) {
-        var asset = assets[handle.assetId];
+        var asset = _assets[handle.assetId];
         if (asset) {
-            asset.lastUsed = time;
+            asset.lastUsed = _time;
             return asset.node;
         }
         return null;
@@ -156,35 +161,32 @@ var SceneJS_loadModule = new (function() {
      *
      * @private
      * @uri Location of asset
+     * @loadTimeoutSecs Seconds after which response and parsing times out
      * @serverParams Request parameters for proxy
      * @parser Processes asset data on load
      * @onSuccess Callback through which processed asset data is returned
      * @onTimeout Callback invoked when no response from proxy
      * @onError Callback invoked when error reported by proxy
      */
-    this.loadAsset = function(uri, serverParams, parser, onSuccess, onTimeout, onError) {
-        //        if (!proxyUri) {
-        //            SceneJS_errorModule.fatalError(new SceneJS.ProxyNotSpecifiedException
-        //                    ("Scene definition error - SceneJS.load node expects a 'proxy' property on the SceneJS.scene node"));
-        //        }
-        if (proxyUri) {
+    this.loadAsset = function(uri, loadTimeoutSecs, serverParams, parser, onSuccess, onTimeout, onError) {
+        if (_loadProxyUri) {
             SceneJS_loggingModule.debug("Loading asset cross-domain from " + uri);
         } else {
             SceneJS_loggingModule.debug("Loading asset from local domain " + uri);
         }
-        var assetId = SceneJS._createKeyForMap(assets, "asset");
+        var assetId = SceneJS._createKeyForMap(_assets, "asset");
         var process = SceneJS_processModule.createProcess({
             onTimeout: function() {  // process killed automatically on timeout
                 SceneJS_loggingModule.error(
                         "Asset load failed - timed out waiting for a reply " +
-                        "(incorrect proxy URI?) - proxy: " + proxyUri +
+                        "(incorrect proxy URI?) - proxy: " + _loadProxyUri +
                         ", uri: " + uri);
                 onTimeout();
             },
-            description:"asset load: proxy = " + proxyUri + ", uri = " + uri,
-            timeoutSecs: 180 // Big timeout to allow files to parse
+            description:"asset load: proxy = " + _loadProxyUri + ", uri = " + uri,
+            timeoutSecs: loadTimeoutSecs || _loadTimeoutSecs
         });
-        if (proxyUri) {
+        if (_loadProxyUri) {
             var callbackName = "callback" + process.id; // Process ID is globally unique
             _loadAssetCrossDomain(
                     uri,

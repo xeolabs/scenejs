@@ -1,30 +1,42 @@
 /**
- * @class A scene node that asynchronously loads JavaScript content for its subgraph from a server.
- * <p>This node is configured with the
- * location of a JavaScript file containing a SceneJS definition of the subgraph. When first visited during scene
- * traversal, it will begin the load and allow traversal to continue at its next sibling node. When on a subsequent
- * visit its subgraph has been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
+ * @class A scene node that asynchronously loads its subgraph from a server.
+ * <p>This basic SceneJS.Load type loads a JavaScript file that decribes content through the SceneJS API.
+ * Subclasses of this (such as {@link SceneJS.LoadCollada} extend it to load other file types.</p>
+ * <p>The node has four states it can be in, which may be queried with {@link #getState}:</p>
+ * <ul><li>{@link #STATE_INITIAL} in which it is about to make an asynchronous request for the content.</li>
+ * <li>{@link #STATE_LOADING} in which it has made the request and is awaiting the response, which it will receive
+ * at any time, either within a scene render or between scene renders. In this state it has nothing to render
+ * and will pass scene traversal on to its next sibling.</li>
+ * <li>{@link #STATE_LOADED} in which it has successfully received and parsed a response and created its subgraph. In this state
+ * it may potentially transition to {@link #STATE_INITIAL} if it has been dormant too long and SceneJS has reclaimed
+ * memory by destroying the subgraph.</li>
+ * <li>{@link #STATE_ERROR} if SceneJS has permanently inactivated the node after load failed</li></ul>
  * <p><b>Loading Cross-Domain</b></p>
- * <p>When the {@link SceneJS.Scene} node is configured with the URL of a SceneJS JSON proxy server, you can perform the
- * load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
- * in order to not violate the browser' same-domain security policy.
- * <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
+ * <p>When the {@link SceneJS.Scene} node at the root of the scene graph is configured with the URL of a
+ * SceneJS JSON proxy server, this node can load content cross-domain. Otherwise, the URL of the content must be at the
+ * same domain as the scene definition's JavaScript file in order to not violate the browser's same-domain security
+ * policy. <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
  * JSONP proxy script written in Perl.</p>
- * <p><b>Monitoring Load Progress</b></p>
- * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with {@link SceneJS.onEvent()}.</p>
  * <p><b>Live Examples</b></p>
  * <li><a target = "other" href="http://bit.ly/scenejs-asset-load">Example 1</a></li>
  * </ul>
  * <p><b>Usage Example</b></p><p>The SceneJS.Load node shown below loads a fragment of JavaScript-defined scene
- * definition cross-domain, via the JSONP proxy located by the <b>uri</b> property on the {@link SceneJS.Scene} node.</b></p>
+ * definition cross-domain, via the JSONP proxy located by the <b>loadProxy</b> property on the {@link SceneJS.Scene} node.</b></p>
  * <pre><code>
  * var exampleScene = new SceneJS.Scene({
  *
  *       // JSONP proxy location - needed only for cros-domain load
- *       proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" });
+ *
+ *       loadProxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" });
  *
  *       new SceneJS.Load({
- *                 uri:"http://foo.com/my-asset.js"
+ *                 uri : "http://foo.com/my-asset.js",
+ *
+ *              // Optional timeout - falls back on any loadTimoutSecs that was configured on the
+ *              // SceneJS.Scene at the root of the scene graph, or the default 180 seconds if
+ *              // none configured there
+ *
+ *                 loadTimeoutSecs : 180
  *            })
  *  );
  *  </pre></code>
@@ -41,25 +53,43 @@ SceneJS.Load = function() {
     this._parser = null;
     this._assetNode = null;
     this._handle = null;
-    this._state = SceneJS.Load.prototype._STATE_INITIAL;
+    this._state = SceneJS.Load.prototype.STATE_INITIAL;
+    this._loadTimoutSecs = null;  // default while null
 };
 
 SceneJS._inherit(SceneJS.Load, SceneJS.Node);
 
-// @private
-SceneJS.Load.prototype._STATE_ERROR = -1;         // Asset load or texture creation failed
+/**
+ * State in which load has failed. This can be either due to HTTP error (eg. HTTP 404) or
+ * failure to parse the response. The node will now be permanently inactive and stuck in this state.
+ */
+SceneJS.Load.prototype.STATE_ERROR = -1;
 
-// @private
-SceneJS.Load.prototype._STATE_INITIAL = 0;        // Ready to start load
+/**
+ * State in which load is pending. This is either because 1) it has not been rendered yet and hence has
+ * not made its load request yet, or 2) has had its subgraph destroyed by SceneJS to reclaim memory after
+ * not having been rendered for some time (Eg. is within a {@link SceneJS.Boundary} that has
+ * not intersected the view frustum for a while, or perhaps within a {@link SceneJS.Selector} that has
+ * not selected it lately). When next rendered, it will then make (or repeat) its load request
+ * and transition to {@link #STATE_LOADING}.
+ */
+SceneJS.Load.prototype.STATE_INITIAL = 0;
 
-// @private
-SceneJS.Load.prototype._STATE_LOADING = 1;        // Load in progress
+/**
+ * State in which node is awaiting a response to its load request. When the response arrives (asyncronously, ie.
+ * either during or between scene renders), the node will then transition to  either {@link #STATE_LOADED}
+ * or {@link #STATE_ERROR}, depending on whether or not it successfully parses the response. If the
+ * response does not arrive or parse within the timeout period (180 seconds by default, unless configured) it will
+ * transition to {@link STATE_ERROR}.
+ */
+SceneJS.Load.prototype.STATE_LOADING = 1;
 
-// @private
-SceneJS.Load.prototype._STATE_LOADED = 2;         // Load completed
-
-// @private
-SceneJS.Load.prototype._STATE_ATTACHED = 3;       // Subgraph integrated
+/**
+ * State in which node has successfully received its content and parsed it into a subgraph.
+ * From here the node will transition back to {@link #STATE_INITIAL} as soon as it has not been rendered in
+ * a while and has then had its subgraph destroyed by SceneJS to reclaim memory.
+ */
+SceneJS.Load.prototype.STATE_LOADED = 2;
 
 // @private
 SceneJS.Load.prototype._init = function(params) {
@@ -68,6 +98,7 @@ SceneJS.Load.prototype._init = function(params) {
                 ("SceneJS.Load parameter expected: uri"));
     }
     this._uri = params.uri;
+    this._loadTimeoutSecs = params._loadTimeoutSecs;
 };
 
 // @private
@@ -107,54 +138,49 @@ SceneJS.Load.prototype._render = function(traversalContext, data) {
     if (!this._uri) {
         this._init(this._getParams(data));
     }
-    if (this._state == this._STATE_ATTACHED) {
+    if (this._state == this.STATE_LOADED) {
         if (!SceneJS_loadModule.getAsset(this._handle)) { // evicted from cache - must reload
-            this._state = this._STATE_INITIAL;
+            this._state = this.STATE_INITIAL;
         }
     }
     switch (this._state) {
-        case this._STATE_ATTACHED:
+
+        case this.STATE_LOADED:
             this._visitSubgraph(data);
             break;
 
-        case this._STATE_LOADING:
+        case this.STATE_LOADING:
             break;
 
-        case this._STATE_LOADED:
-            SceneJS_loadModule.assetLoaded(this._handle);  // Finish loading - kill process
-            this._state = this._STATE_ATTACHED;
-            this._visitSubgraph(data);
-            break;
 
-        case this._STATE_INITIAL:
-            this._state = this._STATE_LOADING;
-
-            /* Asset not currently loaded or loading - load it
-             */
+        case this.STATE_INITIAL:
+            this._state = this.STATE_LOADING;
             var _this = this;
             this._handle = SceneJS_loadModule.loadAsset(// Process killed automatically on error or abort
                     this._uri,
+                    this._loadTimeoutSecs, // default when null
                     this._serverParams || {
                         format: "scenejs"
                     },
                     this._parse,
                     function(asset) { // Success
-                        _this._assetNode = asset;   // Asset is wrapper created by SceneJS.createNode
-                        _this._state = _this._STATE_LOADED;
+                        _this._assetNode = asset;
+                        SceneJS_loadModule.assetLoaded(_this._handle);
+                        _this._state = _this.STATE_LOADED;
                     },
                     function() { // onTimeout
-                        _this._state = _this._STATE_ERROR;
+                        _this._state = _this.STATE_ERROR;
                         SceneJS_errorModule.error(
                                 new SceneJS.LoadTimeoutException("Load timed out - uri: " + _this._uri));
                     },
                     function(e) { // onError - SceneJS_loadModule has killed process
-                        _this._state = _this._STATE_ERROR;
+                        _this._state = _this.STATE_ERROR;
                         e.message = "Load failed - " + e.message + " - uri: " + _this._uri;
                         SceneJS_errorModule.error(e);
                     });
             break;
 
-        case this._STATE_ERROR:
+        case this.STATE_ERROR:
             break;
     }
 };

@@ -39,21 +39,21 @@ var SceneJS_geometryModule = new (function() {
     var currentGeoMap = null;
     var currentBoundGeoType;            // Type of geometry currently bound to shader
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 canvas = null;
                 currentGeoMap = null;
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 if (!geoMaps[c.canvasId]) {      // Lazy-create geometry map for canvas
@@ -64,7 +64,7 @@ var SceneJS_geometryModule = new (function() {
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
@@ -72,19 +72,19 @@ var SceneJS_geometryModule = new (function() {
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
                 for (var canvasId in geoMaps) {    // Destroy geometries on all canvases

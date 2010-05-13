@@ -12,7 +12,7 @@
  * LIGHTS_EXPORTED to pass the entire light stack to the shading backend.
  *
  * Avoids redundant export of the sources with a dirty flag; they are only exported when that is set, which occurs
- * when the stack is pushed or popped by the lights node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and
+ * when the stack is pushed or popped by the lights node, or on SCENE_RENDERING, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
  * Whenever a scene node pushes or pops the stack, this backend publishes it with a LIGHTS_UPDATED to allow other
@@ -27,33 +27,33 @@ var SceneJS_lightingModule = new (function() {
     var lightStack = [];
     var dirty;
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 modelMat = viewMat = SceneJS_math_identityMat4();
                 lightStack = [];
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
             function(params) {
                 viewMat = params.matrix;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.MODEL_TRANSFORM_UPDATED,
             function(params) {
                 modelMat = params.matrix;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
@@ -64,7 +64,7 @@ var SceneJS_lightingModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;

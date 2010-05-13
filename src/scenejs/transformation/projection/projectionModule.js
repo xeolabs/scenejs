@@ -10,7 +10,7 @@
  * The WebGLFloatArray is lazy-computed and cached on export to avoid repeatedly regenerating it.
  *
  * Avoids redundant export of the matrix with a dirty flag; the matrix is only exported when the flag is set, which
- * occurs when the matrix is set by scene node, or on SCENE_ACTIVATED, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
+ * occurs when the matrix is set by scene node, or on SCENE_RENDERING, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
  *
  * Whenever a scene node sets the matrix, this backend publishes it with a PROJECTION_TRANSFORM_UPDATED to allow other
  * dependent backends (such as "view-frustum") to synchronise their resources.
@@ -22,8 +22,8 @@ var SceneJS_projectionModule = new (function() {
     var transform;
     var dirty;
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 transform = {
                     matrix : SceneJS_math_identityMat4(),
@@ -32,13 +32,13 @@ var SceneJS_projectionModule = new (function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
@@ -52,7 +52,7 @@ var SceneJS_projectionModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;

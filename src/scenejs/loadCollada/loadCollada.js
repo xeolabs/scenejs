@@ -11,7 +11,7 @@
  * <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
  * JSONP proxy script written in Perl.</p>
  * <p><b>Monitoring Load Progress</b></p>
- * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with {@link SceneJS.onEvent()}.</p>
+ * <p>You can monitor loads by registering "process-started" and "process-killed" listeners with {@link SceneJS.addListener()}.</p>
  * <p><b>Live Examples</b></p>
  * <li><a target = "other" href="http://bit.ly/scenejs-collada-load-seymour">Seymour Plane</a></li>
  * <li><a target = "other" href="http://bit.ly/scenejs-tron-tank">Tron Tank</a></li>

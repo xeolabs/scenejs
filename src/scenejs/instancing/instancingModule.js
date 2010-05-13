@@ -9,7 +9,7 @@ var SceneJS_instancingModule = new (function() {
     var _nameSpace = null;
     var _countInstances = 0;
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
                 _symbols = {};
@@ -17,15 +17,15 @@ var SceneJS_instancingModule = new (function() {
                 _countInstances = 0;
             });
 
-    SceneJS_eventModule.onEvent(
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 _symbols = {};
                 _nameSpace = null;
                 _countInstances = 0;
             });
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.NAME_UPDATED,
             function(params) {
                 _nameSpace = params.path;

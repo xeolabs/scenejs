@@ -1,45 +1,45 @@
 /*
- Orthographic projection of the OpenGL Teapot
+ Perspective projection of the OpenGL Teapot using a Frustum node
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
 
- Orthographic, or parallel, projections consist of those that involve no perspective correction.
- There is no adjustment for distance from the camera made in these projections, meaning objects on the screen
- will appear the same size no matter how close or far away they are.
+ The SceneJS.Frustum node does the same thing as SceneJS.Projection, which implicitly specifies the frustum.
+ This node provides you with the ability to explicitly set the frustum, which can be useful if you want it to be
+ asymmetrical.
 
  This example assumes that you've looked at various other examples, and just serves to demonstrate
  orthographic projection using the SceneJS.Ortho node.
 
  */
 
-SceneJS.onEvent("error", function(e) {
-    alert(e.exception.message);
+SceneJS.addListener("error", function(e) {
+    alert(e.exception.message ? e.exception.message : e.exception);
 });
 
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
-    /* Orthographic projection - left and right specify the x-coordinate clipping planes, 
+    /* Perspective projection - left and right specify the x-coordinate clipping planes,
      * bottom and top specify the y-coordinate clipping planes, and near and far specify
      * the distance to the z-coordinate clipping planes.
      *
-     * Together these coordinates provide a box-shaped viewing volume.
+     * Together these coordinates provide a frustum-shaped viewing volume.
      */
-        SceneJS.ortho({
-            left: -5.0,
-            bottom : -5.0,
-            near : 0.1,
-            right : 5.0,
-            top : 5.0,
-            far : 1000.0
+        SceneJS.frustum({
+            left   :   -0.02,
+            bottom :   -0.02,
+            near   :    0.1,
+            right  :    0.02,
+            top    :    0.02,
+            far    : 1000.0
         },
 
             /* Viewing transform specifies eye position, looking
              * at the origin by default
              */
                 SceneJS.lookAt({
-                    eye : { x: 0.0, y: 10.0, z: -10 },
-                    look : { y:1.0 },
+                    eye : { x: 0.0, y: 10.0, z: -20 },
+                    look : { y:0.0 },
                     up : { y: 1.0 }
                 },
 
@@ -108,9 +108,9 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
 
                                                     /* Teapot's geometry
                                                      */
-
+                                                        SceneJS.scale({x:1.0,y:1.0,z:1.0},
                                                                 SceneJS.objects.teapot.apply(this, [])
-
+                                                                )
                                                         )
                                                 )
                                         ) // rotate
@@ -147,7 +147,7 @@ function mouseUp() {
     dragging = false;
 }
 
-/* On a mouse drag, we'll re-render the scene, passing in  
+/* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
 function mouseMove(event) {
@@ -165,7 +165,7 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 
-SceneJS.onEvent("error", function(e) {
+SceneJS.addListener("error", function(e) {
     alert(e.exception.message ? e.exception.message : e.exception);
 });
 

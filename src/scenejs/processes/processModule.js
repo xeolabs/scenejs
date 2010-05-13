@@ -15,13 +15,13 @@ var SceneJS_processModule = new (function() {
     var groups = {};                            // A process group for each existing scene
     var activeSceneId;                          // ID of currently-active scene
 
-    SceneJS_eventModule.onEvent(
+    SceneJS_eventModule.addListener(
             SceneJS_eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS_eventModule.onEvent(// Scene defined, create new process group for it
+    SceneJS_eventModule.addListener(// Scene defined, create new process group for it
             SceneJS_eventModule.SCENE_CREATED,
             function(params) {
                 var group = {   // IDEA like this
@@ -32,14 +32,14 @@ var SceneJS_processModule = new (function() {
                 groups[params.sceneId] = group;
             });
 
-    SceneJS_eventModule.onEvent(// Scene traversal begins
-            SceneJS_eventModule.SCENE_ACTIVATED,
+    SceneJS_eventModule.addListener(// Scene traversal begins
+            SceneJS_eventModule.SCENE_RENDERING,
             function(params) {
                 activeSceneId = params.sceneId;
             });
 
-    SceneJS_eventModule.onEvent(// Scene traversed - reap its dead and timed-out processes
-            SceneJS_eventModule.SCENE_DEACTIVATED,
+    SceneJS_eventModule.addListener(// Scene traversed - reap its dead and timed-out processes
+            SceneJS_eventModule.SCENE_RENDERED,
             function() {
                 var group = groups[activeSceneId];
                 var processes = group.processes;
@@ -84,13 +84,13 @@ var SceneJS_processModule = new (function() {
                 activeSceneId = null;
             });
 
-    SceneJS_eventModule.onEvent(// Scene destroyed - destroy its process group
+    SceneJS_eventModule.addListener(// Scene destroyed - destroy its process group
             SceneJS_eventModule.SCENE_DESTROYED,
             function(params) {
                 groups[params.sceneId] = undefined;
             });
 
-    SceneJS_eventModule.onEvent(// Framework reset - destroy all process groups
+    SceneJS_eventModule.addListener(// Framework reset - destroy all process groups
             SceneJS_eventModule.RESET,
             function(params) {
                 groups = {};
