@@ -352,6 +352,7 @@ var SceneJS_shaderModule = new (function() {
                 var vertexShaderSrc = composeVertexShader();
                 var fragmentShaderSrc = composeFragmentShader();
                 SceneJS_memoryModule.allocate(
+                        canvas.context,
                         "shader",
                         function() {
                             try {

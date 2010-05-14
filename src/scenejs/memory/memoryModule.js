@@ -10,32 +10,15 @@
  * process, polling a different evictor each time, until the callback succeeds. For fairness, the memory manager
  * remembers the last evictor it polled, to continue with the next one when it needs to evict something again.
  *
- * This module is to be used only when there is an active canvas.
- *
  *  @private
  */
 var SceneJS_memoryModule = new (function() {
-
-    var canvas;                 // Used for testing for error conditions
     var evictors = [];          // Eviction function for each client
     var iEvictor = 0;           // Fair eviction policy - don't keep starting polling at first evictor
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
-            function(c) {
-                canvas = c;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_DEACTIVATED,
-            function() {
-                canvas = null;
-            });
 
     SceneJS_eventModule.addListener(// Framework reset - start next polling at first evictor
             SceneJS_eventModule.RESET,
             function() {
-                canvas = null;
                 iEvictor = 0;
             });
 
@@ -88,17 +71,9 @@ var SceneJS_memoryModule = new (function() {
      * a closure, IE. not return it.
      * @private
      */
-    this.allocate = function(description, tryAllocate) {
+    this.allocate = function(context, description, tryAllocate) {
         // SceneJS_loggingModule.debug("Allocating memory for: " + description);
-        if (!canvas) {
-            SceneJS_errorModule.fatalError(new SceneJS.NoCanvasActiveException
-                    ("No canvas active - failed to allocate shader memory"));
-        }
         var maxTries = 10; // TODO: Heuristic for this? Does this really need be greater than one?
-        var context = canvas.context;
-        if (context.getError() == context.OUT_OF_MEMORY) {
-            outOfMemory(description);
-        }
         var tries = 0;
         while (true) {
             try {

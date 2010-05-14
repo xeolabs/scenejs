@@ -16,7 +16,7 @@
  */
 
 SceneJS.addListener("error", function(e) {
-    alert(e.exception.message ? e.exception.message : e.exception);
+    alert(e.exception.message);
 });
 
 var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
@@ -40,27 +40,27 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                      */
                         SceneJS.lights({
                             sources: [
-//                                {
-//                                    type:                   "dir",
-//                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
-//                                    diffuse:                true,
-//                                    specular:               true,
-//                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-//                                },
-//                                {
-//                                    type:                   "dir",
-//                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
-//                                    diffuse:                true,
-//                                    specular:               true,
-//                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-//                                },
-//                                {
-//                                    type:                   "dir",
-//                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
-//                                    diffuse:                true,
-//                                    specular:               true,
-//                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-//                                }
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                                },
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                                },
+                                {
+                                    type:                   "dir",
+                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                                }
                             ]},
 
                             /* Next, modelling transforms to orient our teapot
@@ -76,7 +76,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                              Further down you'll see how we inject that angle
                              variable when we render the scene.
                              */
-                                SceneJS.rotate(function(data) {
+                                SceneJS.rotate({ id: "xx" }, function(data) {
                                     return {
                                         angle: data.get('pitch'), x : 1.0
                                     };
@@ -90,12 +90,12 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                             /* Specify the amounts of ambient, diffuse and specular
                                              * lights our teapot reflects
                                              */
-//                                                SceneJS.material({
-//                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-//                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-//                                                    specular:       0.9,
-//                                                    shine:          6.0
-//                                                },
+                                                SceneJS.material({
+                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                    specular:       0.9,
+                                                    shine:          6.0
+                                                },
 
                                                     /* Teapot's geometry
                                                      */
@@ -103,7 +103,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas' },
                                                                         SceneJS.objects.teapot.apply(this, [])
                                                                 )
                                                         )
-                                              //  )
+                                                )
                                         ) // rotate
                                 ) // lookAt
                         ) // perspective

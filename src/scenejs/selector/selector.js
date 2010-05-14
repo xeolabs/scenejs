@@ -103,7 +103,7 @@ SceneJS.Selector.prototype._init = function(params) {
 // @private
 SceneJS.Selector.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
-        this._init(this._getParams(data));
+       this._init( this._getParams(data));
     }
     if (this._selection.length) {
         var children = [];

@@ -18,6 +18,7 @@ var SceneJS_errorModule = new (function() {
             exception: e,
             fatal: true
         });
+       // alert(e.message||e);
         throw e;
     };
 

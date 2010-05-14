@@ -1,6 +1,6 @@
 /**
  * @class A scene node that defines an orthographic projection transformation for the nodes within its subgraph.
- * 
+ *
  * <p>Orthographic, or parallel, projections consist of those that involve no perspective correction.
  * There is no adjustment for distance from the camera made in these projections, meaning objects on the screen
  * will appear the same size no matter how close or far away they are.</p>

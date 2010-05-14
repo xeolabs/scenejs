@@ -154,4 +154,4 @@ window.render = function() {
 
 /* Continue animation
  */
-var pInterval = setInterval("window.render()", 10);
+var pInterval = setInterval("window.render()", 30);

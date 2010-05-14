@@ -262,8 +262,6 @@ SceneJS.ScalarInterpolator.prototype._init = function(params) {
 // @private
 SceneJS.ScalarInterpolator.prototype._render = function(traversalContext, data) {
     if (!this.type) {
-        /* Allow one-shot dynamic config
-         */
         this._init(this._getParams(data));
     }
     var key = data.get(this._input);

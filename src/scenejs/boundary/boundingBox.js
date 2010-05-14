@@ -4,8 +4,8 @@
  *
  * <p>The subgraphs of these are only traversed when the boundary intersect the current view frustum. When this node
  * is within the subgraph of a {@link SceneJS.Locality} node, it the boundary must also intersect the inner radius of the Locality.
- * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.</p> 
- *  
+ * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.</p>
+ *
  * <p>When configured with a projected size threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
  * <p><b>Live Demo</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-lod-boundingbox-example">Level of Detail Example</a></li></ul>
@@ -71,7 +71,7 @@
  */
 SceneJS.BoundingBox = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType="bounding-box";
+    this._nodeType = "bounding-box";
     this._xmin = 0;
     this._ymin = 0;
     this._zmin = 0;
@@ -283,7 +283,7 @@ SceneJS.BoundingBox.prototype._init = function(params) {
 SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
-            this._init(this._getParams(data));
+            this._init( this._getParams(data));
         } else {
             this._memoLevel = 1;
         }

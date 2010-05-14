@@ -93,38 +93,26 @@ SceneJS.Geometry = function() {
 
 SceneJS._inherit(SceneJS.Geometry, SceneJS.Node);
 
+SceneJS.Geometry.prototype._init = function(params) {
+    this._type = params.type;       // Optional - can be null
+    if (params.create instanceof Function) {
+        this._create = params.create;
+    } else {
+        this._geo = {
+            positions : params.positions || [],
+            normals : params.normals || [],
+            colors : params.colors || [],
+            indices : params.indices || [],
+            uv : params.uv || [],
+            primitive : params.primitive || "triangles"
+        };
+    }
+};
+
 // @private
 SceneJS.Geometry.prototype._render = function(traversalContext, data) {
-    if (!this._geo && !this._create) {
-
-        /* This is a dynamically-configured node
-         */
-        var params = this._getParams(data);
-        if (this._init) {
-
-            /* Subclass implements an init method which will set
-             * _geo or _create on this node
-             */
-            this._init(params);
-        } else {
-
-            /* Geometry provided in params
-             */
-            this._type = params.type;                  // Optional - can be null
-            if (params.create instanceof Function) {
-                this._create = params.create;
-            } else {
-                this._geo = {
-                    positions : params.positions || [],
-                    normals : params.normals || [],
-                    colors : params.colors || [],
-                    indices : params.indices || [],
-                    uv : params.uv || [],
-                    primitive : params.primitive || "triangles"
-                };
-            }
-        }
-        this._handle = null;
+    if (!this._geo && !this._create) { // Dynamically configured
+        this._init( this._getParams(data));
     }
     if (this._handle) { // Was created before - test if not evicted since
         if (!SceneJS_geometryModule.testGeometryExists(this._handle)) {

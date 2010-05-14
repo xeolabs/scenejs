@@ -598,6 +598,7 @@ var SceneJS_colladaParserModule = new (function() {
                  */
                 if (materialData) {
                     sceneNode = SceneJS.material({
+                        // baseColor: {r:.1, g:.1,b:.1},
                         baseColor: materialData.baseColor,
                         specularColor: materialData.specularColor ,
                         shine: 10.0,

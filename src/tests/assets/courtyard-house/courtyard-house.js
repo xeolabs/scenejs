@@ -17,7 +17,7 @@
 
 
 SceneJS.addListener("error", function(e) {
-    alert(e.exception.message ? e.exception.message : e.exception);
+    alert(e.exception.message);
 });
 
 var exampleScene = SceneJS.scene({
@@ -75,11 +75,25 @@ var exampleScene = SceneJS.scene({
                                      * transforms are dynamically configured from data injected into the
                                      * scene graph when its rendered:
                                      */
-                                        SceneJS.rotate(function(data) {
-                                            return {
-                                                angle: data.get('pitch'), x : 1.0
-                                            };
+                                        SceneJS.rotate({
+                                            id: "xxx",
+                                            listeners: {
+                                                "state-changed" : {
+                                                    fn: function(node, params) {
+
+                                                    },
+                                                    options: {
+                                                        scope: this
+                                                    }
+                                                }
+                                            }
                                         },
+
+                                                function(data) {
+                                                    return {
+                                                        angle: data.get('pitch'), x : 1.0
+                                                    };
+                                                },
                                                 SceneJS.rotate(function(data) {
                                                     return {
                                                         angle: data.get('yaw'), y : 1.0
@@ -240,7 +254,7 @@ window.render = function() {
 
 SceneJS.addListener("error", function(e) {
     window.clearInterval(pInterval);
-    alert(e.exception.message ? e.exception.message : e.exception);
+    alert(e.exception.message);
 });
 
-pInterval = setInterval("window.render()", 50);
+pInterval = setInterval("window.render()", 10);

@@ -177,7 +177,7 @@ SceneJS.Fog.prototype._render = function(traversalContext, data) {
         this._renderNodes(traversalContext, data);
     } else {
         if (!this._fixedParams) {
-            this._init(this._getParams(data));
+            this._init( this._getParams(data));
         }
         var f = SceneJS_fogModule.getFog();
         SceneJS_fogModule.setFog({

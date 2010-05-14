@@ -89,7 +89,7 @@ SceneJS.Instance.prototype._init = function(params) {
 // @private
 SceneJS.Instance.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
-        this._init(this._getParams(data));
+       this._init( this._getParams(data));
     }
     var nameNode = SceneJS_instancingModule.acquireInstance(this._name);
     if (!nameNode) {

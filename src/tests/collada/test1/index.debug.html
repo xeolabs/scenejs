@@ -160,7 +160,14 @@
             uri: url,
             loadCameras: true,
             loadLights: true,
-            showBoundingBoxes: false // Set this true - see what happens!
+            showBoundingBoxes: false, // Set this true - see what happens!
+            listeners: {
+                "state-changed" : {
+                    handler: function(node, params) {
+                        alert("State changed");
+                    }
+                }
+            }
         });
         scene = new SceneJS.Scene({
             canvasId: 'theCanvas',
@@ -170,29 +177,29 @@
                     fovy : 65.0, aspect : 1.0, near : 0.40, far : 300.0
                 },
                         new SceneJS.LookAt({
-                            eye : { x: -1.0, y: 0.0, z: -15 },
+                            eye : { x: -1.0, y: 0.0, z: -150 },
                             look : { x: -1.0, y: 0, z: 0 },
                             up : { y: 1.0 }
                         },
-//                                new SceneJS.Lights({
-//                                    sources: [
-//                                        {
-//                                            type:                   "dir",
-//                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-//                                            dir:                    { x: 1.0, y: -1.0, z: 1.0 },
-//                                            diffuse:                true,
-//                                            specular:               true
-//                                        },
-//                                        {
-//                                            type:                   "dir",
-//                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-//                                            dir:                    { x: -1.0, y: -1.0, z: -3.0 },
-//                                            diffuse:                true,
-//                                            specular:               true
-//                                        }
-//                                    ]},
-                                        collada)
-                                //)
+                            //                                new SceneJS.Lights({
+                            //                                    sources: [
+                            //                                        {
+                            //                                            type:                   "dir",
+                            //                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            //                                            dir:                    { x: 1.0, y: -1.0, z: 1.0 },
+                            //                                            diffuse:                true,
+                            //                                            specular:               true
+                            //                                        },
+                            //                                        {
+                            //                                            type:                   "dir",
+                            //                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            //                                            dir:                    { x: -1.0, y: -1.0, z: -3.0 },
+                            //                                            diffuse:                true,
+                            //                                            specular:               true
+                            //                                        }
+                            //                                    ]},
+                                collada)
+                    //)
                         )
                 );
         var pInterval;
@@ -218,32 +225,34 @@
          * if pull-down menus not created yet, then create them from the
          * Collada metadata
          */
-        SceneJS.addListener(
-                "scene-rendered", // IE. a scene graph traversal has completed
-                function() {
+        collada.addListener(
+                "state-changed", // IE. a scene graph traversal has completed
+                function(node, params) {
                     if (!menuInitialised) {
-                        metadata = collada.getMetadata();
-                        if (metadata) {
+                        if (collada.getState() == SceneJS.Load.STATE_LOADED) {
+                            metadata = collada.getMetadata();
+                            if (metadata) {
 
-                            /* Create menu content in DOM
-                             */
-                            $("#menus").setTemplate($("#menus_template").html());
-                            $("#menus").processTemplate(metadata);
+                                /* Create menu content in DOM
+                                 */
+                                $("#menus").setTemplate($("#menus_template").html());
+                                $("#menus").processTemplate(metadata);
 
-                            /* Generate menu widget
-                             */
-                            $('ul.sf-menu').superfish({
-                                onBeforeShow: function() {
-                                    $('ul.sf-menu').css({top: $(this).parent().offset().top - $(this).height() });
-                                },
-                                delay:       1000,                            // one second delay on mouseout
-                                animation:   {opacity:'show',height:'show'},
-                                speed:       'fast',
-                                autoArrows:  true,
-                                dropShadows: true
-                            });
+                                /* Generate menu widget
+                                 */
+                                $('ul.sf-menu').superfish({
+                                    onBeforeShow: function() {
+                                        $('ul.sf-menu').css({top: $(this).parent().offset().top - $(this).height() });
+                                    },
+                                    delay:       1000,                            // one second delay on mouseout
+                                    animation:   {opacity:'show',height:'show'},
+                                    speed:       'fast',
+                                    autoArrows:  true,
+                                    dropShadows: true
+                                });
 
-                            menuInitialised = true; // true until we load a different Collada file
+                                menuInitialised = true; // true until we load a different Collada file
+                            }
                         }
                     }
                 });
@@ -254,7 +263,8 @@
     }
 
     $(document).ready(function() {
-        initScene("http://www.scenejs.org/library/v0.7/assets/examples/seymourplane_triangulate/seymourplane_triangulate.dae");
+        initScene("http://www.scenejs.org/library/v0.7/assets/examples/courtyard-house/models/model.dae");
+        //        initScene("http://www.scenejs.org/library/v0.7/assets/examples/seymourplane_triangulate/seymourplane_triangulate.dae");
         initUI();
     });
 </script>

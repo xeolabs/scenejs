@@ -31,6 +31,7 @@ SceneJS._inherit(SceneJS.objects.Cube, SceneJS.Geometry);
 
 // @private
 SceneJS.objects.Cube.prototype._init = function(params) {
+    SceneJS.Geometry.prototype._init.call(this, params);
     var x = params.xSize || 1;
     var y = params.ySize || 1;
     var z = params.zSize || 1;

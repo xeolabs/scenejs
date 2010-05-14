@@ -32,7 +32,7 @@
  *  );
  *  </pre></code>
  *
- * @extends SceneJS.load
+ * @extends SceneJS.Load
  */
 
 SceneJS.LoadCollada = function() {
@@ -45,10 +45,11 @@ SceneJS._inherit(SceneJS.LoadCollada, SceneJS.Load);
 
 // @private
 SceneJS.LoadCollada.prototype._init = function(params) {
-    if (!params.uri) {
+    if (!params.uri) {   // Already checked in SceneJS.Load - do it again here for explicit error message
         SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.LoadCollada parameter expected: uri"));
     }
+    SceneJS.Load.prototype._init.call(this, params);
     this._uri = params.uri;
     this._serverParams = {
         format: "xml"
@@ -73,6 +74,33 @@ SceneJS.LoadCollada.prototype._init = function(params) {
     };
 };
 
+/** Returns metadata on the loaded Collada content. This will only return a non-null value when the node's state is
+ * {@link SceneJS.Load.STATE_LOADED}, which you can check with a prior call to {@link SceneJS.Load#getState}.  Metadata
+ * is an object of the form shown in this example:
+ * <pre><code>
+ * {
+ *	cameras: [
+ *           {
+ *               id: "camera1"
+ *           },
+ *           {
+ *               id: "camera2"
+ *           }
+ *       ],
+ *
+ *       lights: [
+ *           {
+ *               id: "light1"
+ *           },
+ *           {
+ *               id: "light2"
+ *           }
+ *
+ *       ]
+* }
+ * </pre></code>
+ * @returns {int} The state
+ */
 SceneJS.LoadCollada.prototype.getMetadata = function() {
     return this._metadata;
 };

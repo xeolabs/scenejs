@@ -4,7 +4,7 @@
  * any location in a scene graph, to define multiple sources of light, the number of which is only limited
  * by video memory.</p>
  * <p>note that SceneJS does not create any default light sources for you, so if you have non-emissive
- * {@link SceneJS.Material}s with no lights you may not see anything in your scene until you add a light.</p>  
+ * {@link SceneJS.Material}s with no lights you may not see anything in your scene until you add a light.</p>
  * <p>Currently, two kinds of light are supported: point and directional. Point lights have a location, like a lightbulb,
  * while directional only have a vector that describes their direction, where they have no actual location since they
  * are an infinite distance away.</p>
@@ -37,7 +37,7 @@
  *              color: { r: 1.0, g: 1.0, b: 0.0 },
  *              diffuse: true,
  *              specular: true,
- *              dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction - default is { x: 0, y: 0, z: -1 } 
+ *              dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction - default is { x: 0, y: 0, z: -1 }
  *          }
  *      ]
  *  },

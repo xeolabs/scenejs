@@ -1,7 +1,97 @@
 /**
+ * A simple recursive descent parser to parse SceneJS's flexible node
+ * arguments.
+ *
+ * @private
+ */
+SceneJS._NodeArgParser = new (function() {
+
+    this.parseArgs = function(args, node) {
+        node._getParams = function() {
+            return {};
+        };
+        node._fixedParams = true;
+        node._config = {};
+        if (args.length > 0) {
+            var arg = args[0];
+            if (arg instanceof Function) {
+                this._parseConfigFunc(arg, args, 1, node);
+            } else if (arg._render) {
+                this._parseChild(arg, args, 1, node);
+            } else {
+                this._parseConfigObject(arg, args, 1, node);
+            }
+        }
+    };
+
+    this._parseConfigObject = function(arg, args, i, node) {
+        node._config = arg;
+        node._getParams = (function() {
+            var _config = node._config;
+            return function() {
+                return _config;
+            };
+        })();
+        if (i < args.length) {
+            arg = args[i];
+            if (arg instanceof Function) {
+                this._parseConfigFunc(arg, args, i + 1, node);
+            } else if (arg._render) {
+                this._parseChild(arg, args, i + 1, node);
+            } else {
+                SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                        ("Unexpected type for node argument " + i + " - expected a config function or a child node"));
+            }
+        }
+    };
+
+    this._parseConfigFunc = function(arg, args, i, node) {
+        node._getParams = (function() {
+            var _config = node._config;
+            var _arg = arg;
+            return function(data) {
+                var c = _arg.call(this, data);
+                for (var key in c) {
+                    if (c.hasOwnProperty(key)) {
+                        _config[key] = c[key];
+                    }
+                }
+                return _config;
+            };
+        })();
+        node._fixedParams = false;
+        if (i < args.length) {
+            arg = args[i];
+            if (arg._nodeType) {
+                this._parseChild(arg, args, i + 1, node);
+            } else {
+                SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                        ("Unexpected type for node argument " + i + " - expected a child node"));
+            }
+        }
+    };
+
+    this._parseChild = function(arg, args, i, node) {
+        node._children.push(arg);
+        arg._parent = node;
+        arg._memoLevel = 0;
+        if (i < args.length) {
+            arg = args[i];
+            if (arg._nodeType) {
+                this._parseChild(arg, args, i + 1, node);
+            } else {
+                SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                        ("Unexpected type for node argument " + i + " - expected a child node"));
+            }
+        }
+    };
+})();
+
+
+/**
  * @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
  *
- * <p><b>Node Type ID</b></p>
+ * <h1>Node Type ID</h1>
  * <p>Every node type has a SceneJS type ID, which may be got with {@link #getType}. This is the list of all valid xtypes:</p>
  *
  * <table>
@@ -42,9 +132,33 @@
  * <tr><td>with-data</td><td>{@link SceneJS.WithData}</td></tr>
  * </table>
  *
- * <p><b>Events</b></p>
- * <p>You can register listeners to handle events fired by each node type. For example, to handle a "state-changed"
- * event from a {@link SceneJS.Load} node:</p>
+ * <h2>Dynamic Configuration</h2>
+ * <p>The constructors of SceneJS node types may optionally take a callback function instead of an config object,
+ * to generate the node's configuration dynamically each time it is rendered.</p>
+ * <p>The example below shows scene graph that contains a dynamically-configured {@link SceneJS.Perspective} node that takes
+ * its field-of-view parameter through such a callback. Note how the parameter is injected into the scene when rendered.</p>
+ * <pre><code>
+ * var exampleScene = new SceneJS.Scene({ canvasId: 'theCanvas' },
+ *
+ *       new SceneJS.Perspective(
+ *                      function(data) {
+ *                            return {
+ *                                fovy : data.get("fovy"),
+ *                                aspect : 1.0,
+ *                                near : 0.10,
+ *                                far : 5000.0 };
+ *                      },
+ *                      // ... chld nodes ...
+ *                  );
+ *
+ * exampleScene.render({ fovy: 45.0 });
+ * </code></pre>
+ * <p>See the {@link SceneJS.WithData} node for more information on data flow.</p>
+ * <p>Note that {@link SceneJS.Node} does not actually have any use for dynamic configuration.</p>
+ *
+ * <h2>Events</h2>
+ * <p>You can register listeners to handle events fired by each node type.</p>
+ * <p>This example binds a listener for "state-changed" events on a {@link SceneJS.Load} node:</p>
  * <pre><code>
  * var myLoad = new SceneJS.Load({ uri: "http://foo.com/..." });
  *
@@ -61,6 +175,9 @@
  *
  * myLoad.removeListener("state-changed", handler);
  * </code></pre>
+ * <p>Listeners are only added through {@link #addListener} and not through the node's constructor. This way, if the
+ * constructor takes a dynamic config function (as described above) then the function does not have to redefine the
+ * listeners, which will not be affected by the function.</p>
  *
  * @constructor
  * Create a new SceneJS.node
@@ -84,50 +201,7 @@ SceneJS.Node = function() {
      * private
      */
     this._memoLevel = 0;
-
-    /* Configure from variable args
-     */
-    if (arguments.length > 0) {
-        for (var i = 0; i < arguments.length; i++) {
-            var arg = arguments[i];
-            if (arg._render) {                      // arg is node
-                this._children.push(arg);
-            } else if (i == 0) {                    // arg is config
-                if (arg instanceof Function) {      // arg is config function
-                    this._getParams = arg;
-                    this._fixedParams = false;
-                } else {
-                    var config = arg;               // arg is config object
-                    this._fixedParams = true;
-                    for (var key in arg) {
-                        if (arg.hasOwnProperty(key)) {
-                            if (this._fixedParams && arg[key] instanceof Function) {
-                                this._fixedParams = false;
-                            }
-                        }
-                    }
-                    this._getParams = function() {  // Wrap with function to return config object
-                        return config;
-                    };
-                }
-            } else {
-                SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException
-                        ("Invalid node parameters - config should be first, IE. node(config, node, node,...)"));
-            }
-        }
-        if (!this._getParams) {
-            this._getParams = function() {
-                return {
-                };
-            };
-        }
-    } else {
-        if (!this._getParams) {
-            this._getParams = function() {
-                return {};
-            };
-        }
-    }
+    SceneJS._NodeArgParser.parseArgs(arguments, this);
 };
 
 SceneJS.Node.prototype.constructor = SceneJS.Node;
@@ -182,6 +256,9 @@ SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
 
 /** @private */
 SceneJS.Node.prototype._render = function(traversalContext, data) {
+    if (!this._fixedParams) {
+        this._init(this._getParams(data));
+    }
     this._renderNodes(traversalContext, data);
 };
 
@@ -334,8 +411,8 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params) {
             params = {};
         }
         for (var i = 0; i < list.length; i++) {
-            var handler = list[i];
-            handler.call(handler.options.scope || this, this, params);
+            var listener = list[i];
+            listener.handler.call(listener.options.scope || this, this, params);
         }
     }
 };
@@ -403,3 +480,5 @@ SceneJS.node = function() {
     SceneJS.Node.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+

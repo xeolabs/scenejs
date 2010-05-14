@@ -18,7 +18,7 @@ SceneJS._inherit(SceneJS.Renderer, SceneJS.Node);
 
 // @private
 SceneJS.Renderer.prototype._render = function(traversalContext, data) {
-    if (this._memoLevel == 0) {
+    if (this._memoLevel == 0) {  // One-shot dynamic config               
         this._rendererState = SceneJS_rendererModule.createRendererState(this._getParams(data));
         if (this._fixedParams) {
             this._memoLevel = 1;

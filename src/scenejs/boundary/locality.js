@@ -1,7 +1,7 @@
 /**
  *@class A scene node that defines inner and outer spheres of locality centered about the viewpoint.
  *<p>The subgraphs of contained {@link SceneJS.BoundingBox} nodes will only be rendered when their boundaries intersect
- *the inner radius.</p><p>The outer radius is used internally by SceneJS to support content staging strategies.</p> 
+ *the inner radius.</p><p>The outer radius is used internally by SceneJS to support content staging strategies.</p>
  *<p>You can have as many of these as neccessary throughout your scene.</p>
  * <p>When you don't specify a Locality node, SceneJS has default inner and outer radii of 100000
  * and 200000, respectively.</p>
@@ -86,7 +86,7 @@ SceneJS.Locality.prototype._init = function(params) {
 // @private
 SceneJS.Locality.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
-        this._init(this._getParams(data));
+       this._init( this._getParams(data));
     }
     var prevRadii = SceneJS_localityModule.getRadii();
     SceneJS_localityModule.setRadii(this._radii);

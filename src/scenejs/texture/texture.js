@@ -129,185 +129,169 @@ SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
 };
 
 SceneJS.Texture.prototype._STATE_INITIAL = 0;            // Ready to get texture
-SceneJS.Texture.prototype._STATE_IMAGE_LOADING = 2;      // Texture image load in progress
-SceneJS.Texture.prototype._STATE_IMAGE_LOADED = 3;       // Texture image load completed
-SceneJS.Texture.prototype._STATE_TEXTURE_CREATED = 4;    // Texture created
+SceneJS.Texture.prototype._STATE_LOADING = 1;      // Texture image load in progress
+SceneJS.Texture.prototype._STATE_LOADED = 2;       // Texture image load completed
 SceneJS.Texture.prototype._STATE_ERROR = -1;             // Image load or texture creation failed
+
+
+// @private
+SceneJS.Texture.prototype._init = function(params) {
+    this._layers = [];
+    if (!params.layers) {
+        throw new SceneJS.NodeConfigExpectedException(
+                "SceneJS.Texture.layers is undefined");
+    }
+    for (var i = 0; i < params.layers.length; i++) {
+        var layerParam = params.layers[i];
+        if (!layerParam.uri) {
+            throw new SceneJS.NodeConfigExpectedException(
+                    "SceneJS.Texture.layers[" + i + "].uri is undefined");
+        }
+        if (layerParam.applyFrom) {
+            if (layerParam.applyFrom != "uv" &&
+                layerParam.applyFrom != "uv2" &&
+                layerParam.applyFrom != "normal" &&
+                layerParam.applyFrom != "geometry") {
+                SceneJS_errorModule.fatalError(
+                        new SceneJS.InvalidNodeConfigException(
+                                "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
+                                "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
+            }
+        }
+        if (layerParam.applyTo) {
+            if (layerParam.applyTo != "baseColor" && // Colour map
+                layerParam.applyTo != "diffuseColor") {
+                SceneJS_errorModule.fatalError(
+                        new SceneJS.InvalidNodeConfigException(
+                                "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
+                                "should be either 'baseColor', 'diffuseColor'"));
+            }
+        }
+        this._layers.push({
+            state : this._STATE_INITIAL,
+            process: null,                      // Image load process handle
+            image : null,                       // Initialised when state == IMAGE_LOADED
+            creationParams: layerParam,         // Create texture using this
+            texture: null,                      // Initialised when state == TEXTURE_LOADED
+            createMatrix : new (function() {
+                var translate = layerParam.translate;
+                var rotate = layerParam.rotate;
+                var scale = layerParam.scale;
+                var dynamic = ((translate instanceof Function) ||
+                               (rotate instanceof Function) ||
+                               (scale instanceof Function));
+                var defined = dynamic || translate || rotate || scale;
+                return function(data) {
+                    var matrix = null;
+                    if (defined && (dynamic || !matrix)) {
+                        matrix = SceneJS.Texture.prototype._getMatrix(
+                                (translate instanceof Function) ? translate(data) : translate,
+                                (rotate instanceof Function) ? rotate(data) : rotate,
+                                (scale instanceof Function) ? scale(data) : scale);
+                    }
+                    return matrix;
+                };
+            })(),
+            applyFrom: layerParam.applyFrom || "uv",
+            applyTo: layerParam.applyTo || "baseColor",
+            blendMode: layerParam.blendMode || "multiply"
+        });
+    }
+};
 
 SceneJS.Texture.prototype._render = function(traversalContext, data) {
     if (!this._layers) { // One-shot dynamic config
-        this._layers = [];
-        var params = this._getParams(data);
-        if (!params.layers) {
-            throw new SceneJS.NodeConfigExpectedException(
-                    "SceneJS.Texture.layers is undefined");
-        }
-        for (var i = 0; i < params.layers.length; i++) {
-            var layerParam = params.layers[i];
-            if (!layerParam.uri) {
-                throw new SceneJS.NodeConfigExpectedException(
-                        "SceneJS.Texture.layers[" + i + "].uri is undefined");
-            }
-            if (layerParam.applyFrom) {
-                if (layerParam.applyFrom != "uv" &&
-                    layerParam.applyFrom != "uv2" &&
-                    layerParam.applyFrom != "normal" &&
-                    layerParam.applyFrom != "geometry") {
-                    SceneJS_errorModule.fatalError(
-                            new SceneJS.InvalidNodeConfigException(
-                                    "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                    "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
-                }
-            }
-            if (layerParam.applyTo) {
-                if (layerParam.applyTo != "baseColor" && // Colour map
-                    layerParam.applyTo != "diffuseColor") {
-                    SceneJS_errorModule.fatalError(
-                            new SceneJS.InvalidNodeConfigException(
-                                    "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
-                                    "should be either 'baseColor', 'diffuseColor'"));
-                }
-            }
-
-            this._layers.push({
-                state : this._STATE_INITIAL,
-                process: null,                      // Image load process handle
-                image : null,                       // Initialised when state == IMAGE_LOADED
-                creationParams: layerParam,         // Create texture using this
-                texture: null,                      // Initialised when state == TEXTURE_LOADED
-                createMatrix : new (function() {
-                    var translate = layerParam.translate;
-                    var rotate = layerParam.rotate;
-                    var scale = layerParam.scale;
-                    var dynamic = ((translate instanceof Function) ||
-                                   (rotate instanceof Function) ||
-                                   (scale instanceof Function));
-                    var defined = dynamic || translate || rotate || scale;
-                    return function(data) {
-                        var matrix = null;
-                        if (defined && (dynamic || !matrix)) {
-                            matrix = SceneJS.Texture.prototype._getMatrix(
-                                    (translate instanceof Function) ? translate(data) : translate,
-                                    (rotate instanceof Function) ? rotate(data) : rotate,
-                                    (scale instanceof Function) ? scale(data) : scale);
-                        }
-                        return matrix;
-                    };
-                })(),
-                applyFrom: layerParam.applyFrom || "uv",
-                applyTo: layerParam.applyTo || "baseColor",
-                blendMode: layerParam.blendMode || "multiply"
-            });
-        }
+       this._init( this._getParams(data));
     }
 
-    /* Update state of each texture layer and
-     * count how many are created and ready to apply
-     */
+    /*-----------------------------------------------------
+     * On each render, update state of each texture layer
+     * and count how many are ready to apply
+     *-----------------------------------------------------*/
+
     var countLayersReady = 0;
     for (var i = 0; i < this._layers.length; i++) {
         var layer = this._layers[i];
-        if (layer.state == this._STATE_TEXTURE_CREATED) {
+
+        if (layer.state == this._STATE_LOADED) {
             if (!SceneJS_textureModule.textureExists(layer.texture)) {  // Texture evicted from cache
                 layer.state = this._STATE_INITIAL;
             }
         }
+
         switch (layer.state) {
-            case this._STATE_TEXTURE_CREATED:
+            case this._STATE_LOADED: // Layer ready to apply
                 countLayersReady++;
+
                 break;
 
-            case this._STATE_INITIAL:
-
-                /* Start loading image - in a new closure so that the right layer gets the process result.
-                 */
-                (function(l) {
+            case this._STATE_INITIAL: // Layer load to start
+                layer.state = this._STATE_LOADING;
+                (function(l) { // Closure allows this layer to receive results
                     var _this = this;
-                    l.state = this._STATE_IMAGE_LOADING;
-
-                    /* Logging each image load slows things down a lot
-                     */
-                    // loggingBackend.getLogger().info("SceneJS.texture image loading: "
-                    //  + _layer.creationParams.uri);
-
-                    SceneJS_textureModule.loadImage(
+                    SceneJS_textureModule.createTexture(
                             l.creationParams.uri,
-                            function(_image) {
+                            l.creationParams,
 
-                                /* Image loaded successfully. Note that this callback will
-                                 * be called in the idle period between render traversals (ie. scheduled by a
-                                 * setInterval), so we're not actually visiting this node at this point. We'll
-                                 * defer creation and application of the texture to the subsequent visit.
-                                 */
-                                l.image = _image;
-                                l.state = _this._STATE_IMAGE_LOADED;
+                            function(texture) { // Success
+                                l.texture = texture;
+                                l.state = _this._STATE_LOADED;
                             },
 
-                        /* General error, probably a 404
-                         */
-                            function() {
+                            function() { // General error, probably 404
                                 l.state = _this._STATE_ERROR;
                                 var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
                                 SceneJS_loggingModule.getLogger().warn(message);
-
-                                /* Currently recovering from failed texture load
-                                 */
-
-                               
                             },
 
-                        /* Load aborted - eg. user stopped browser
-                         */
-                            function() {
+                            function() { // Load aborted - user probably refreshed/stopped page
                                 SceneJS_loggingModule.getLogger().warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
                                 l.state = _this._STATE_ERROR;
                             });
                 }).call(this, layer);
                 break;
 
-            case this._STATE_IMAGE_LOADING:
-
-                /* Continue loading this texture layer
-                 */
+            case this._STATE_LOADING: // Layer still loading
                 break;
 
-            case this._STATE_IMAGE_LOADED:
-
-                /* Create this texture layer
-                 */
-                layer.texture = SceneJS_textureModule.createTexture(layer.image, layer.creationParams);
-                layer.state = this._STATE_TEXTURE_CREATED;
-                countLayersReady++;
-                break;
-
-            case this._STATE_ERROR:
-
-                /* Give up on this texture layer, but we'll keep updating the others
-                 * to at least allow diagnostics to log
-                 */
+            case this._STATE_ERROR: // Layer disabled
                 break;
         }
     }
 
+    /*------------------------------------------------
+     * Render this node
+     *-----------------------------------------------*/
+
     if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
     } else {
-        if ((countLayersReady == this._layers.length)) { // All or none - saves on generating/destroying shaders
+
+        /* Fastest strategy is to allow the complete set of layers to load
+         * before applying any of them. There would be a huge performance penalty
+         * if we were to apply the incomplete set as layers are still loading -
+         * SceneJS_shaderModule would then have to generate a new shader for each new
+         * layer loaded, which would become redundant as soon as the next layer is loaded.
+         */
+        if (countLayersReady == this._layers.length) {
             var countPushed = 0;
             for (var i = 0; i < this._layers.length; i++) {
                 var layer = this._layers[i];
-              //   if (layer.state == this._STATE_TEXTURE_CREATED) {
-                SceneJS_textureModule.pushLayer(layer.texture, {
-                    applyFrom : layer.applyFrom,
-                    applyTo : layer.applyTo,
-                    blendMode : layer.blendMode,
-                    matrix: layer.createMatrix(data)
-                });
-                countPushed++;
+                if (layer.state = this._STATE_LOADED) {
+                    SceneJS_textureModule.pushLayer(layer.texture, {
+                        applyFrom : layer.applyFrom,
+                        applyTo : layer.applyTo,
+                        blendMode : layer.blendMode,
+                        matrix: layer.createMatrix(data)
+                    });
+                    countPushed++;
                 }
-           // }
+            }
             this._renderNodes(traversalContext, data);
             SceneJS_textureModule.popLayers(countPushed);
+
+        } else {
+            this._renderNodes(traversalContext, data);
         }
     }
 };

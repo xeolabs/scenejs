@@ -32,10 +32,11 @@ SceneJS._inherit(SceneJS.LoadOBJ, SceneJS.Load);
 
 // @private
 SceneJS.LoadOBJ.prototype._init = function(params) {
-    if (!params.uri) {
+    if (!params.uri) {   // Already checked in SceneJS.Load - do it again here for explicit error message
         SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.LoadOBJ parameter expected: uri"));
     }
+    SceneJS.Load.prototype._init.call(this, params);
     this._uri = params.uri;
     this._serverParams = {
         format: "xml"

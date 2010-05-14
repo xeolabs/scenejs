@@ -89,7 +89,7 @@ SceneJS.WithData.prototype._init = function(params) {
 SceneJS.WithData.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
-            this._init(this._getParams(data));
+            this._init( this._getParams(data));                                    
         } else {
             this._memoLevel = 1;
         }

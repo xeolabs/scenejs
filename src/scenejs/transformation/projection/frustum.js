@@ -232,7 +232,7 @@ SceneJS.Frustum.prototype._render = function(traversalContext, data) {
                 this._bottom,
                 this._top,
                 this._near,
-                this._far);               
+                this._far);
         this._transform = {
             type: "frustum",
             matrix:tempMat

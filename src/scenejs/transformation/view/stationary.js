@@ -60,6 +60,7 @@ SceneJS.Stationary.prototype._render = function(traversalContext, data) {
     }
 };
 
+
 /** Function wrapper to support functional scene definition
  */
 SceneJS.stationary = function() {

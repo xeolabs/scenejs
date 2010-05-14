@@ -178,6 +178,7 @@ var SceneJS_geometryModule = new (function() {
     function createArrayBuffer(description, context, bufType, values, numItems, itemSize, usage) {
         var buf;
         SceneJS_memoryModule.allocate(
+                context,
                 description,
                 function() {
                     buf = new SceneJS_webgl_ArrayBuffer(context, bufType, values, numItems, itemSize, usage);
