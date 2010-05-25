@@ -52,7 +52,7 @@ SceneJS.LoggingToPage.prototype.setElementId = function(elementId) {
     elementId = elementId || "_scenejs-default-logging";
     var element = document.getElementById(elementId);
     if (!element) {
-        SceneJS_errorModule.fatalError(new SceneJS.DocumentElementNotFoundException
+        throw SceneJS_errorModule.fatalError(new SceneJS.DocumentElementNotFoundException
                 ("SceneJS.LoggingToPage cannot find document element with ID '"
                         + SceneJS.DEFAULT_LOGGING_DIV_ID + "'"));
     }

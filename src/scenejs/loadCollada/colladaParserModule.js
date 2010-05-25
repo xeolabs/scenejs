@@ -13,15 +13,7 @@ var SceneJS_colladaParserModule = new (function() {
     var idMap = {}; // Maps every DOM element by ID
     var sources = {};
     var modes = {};
-
-    /**
-     * Holds any data parsed from camera nodes, if requested, to create view a projection
-     * transform nodes with which to wrap the result subgraph with just before returning it
-     * from this parser.
-     */
-    var camerasData = [];
-
-    var lightsData = [];
+    var meta;
 
     /** Resets parser state
      * @private
@@ -30,7 +22,19 @@ var SceneJS_colladaParserModule = new (function() {
         xmlDoc = null;
         idMap = {};
         sources = {};
-        camerasData = [];
+        meta = {
+            contributor: {
+                author : "",
+                authoringTool :"",
+                comments : "",
+                copyright : "",
+                sourceData : ""
+            },
+            cameras: [],
+            lights: []  ,
+            volume : newExtents()
+        };
+
         modes = {};
     }
 
@@ -71,7 +75,18 @@ var SceneJS_colladaParserModule = new (function() {
      * @private
      */
     function parseDoc(rootId) {
+
+        /* Parse contributor info
+         */
+        var contributor = xmlDoc.getElementsByTagName("contributor");
+        if (contributor.length > 0) {
+            meta.contributor = parseContributor(contributor[0]);
+        }
+
         if (rootId) {
+
+            /* Parse target node
+             */
             SceneJS_loggingModule.info("Parsing Collada asset '" + rootId + "'");
             var root = idMap[rootId];
             if (root) {
@@ -81,6 +96,9 @@ var SceneJS_colladaParserModule = new (function() {
                         "SceneJS.assets.collada root not found in COLLADA document: '" + rootId + "'"));
             }
         } else {
+
+            /* Parse default node
+             */
             SceneJS_loggingModule.info("Parsing Collada scene. Asset: " + rootId ? "'" + rootId + "'" : "default");
             var scene = xmlDoc.getElementsByTagName("scene");
             if (scene.length > 0) {
@@ -346,7 +364,7 @@ var SceneJS_colladaParserModule = new (function() {
                         .nodeValue;
             }
         }
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.ColladaParseException
                         ("COLLADA element expected: "
                                 + profile.tagName
@@ -369,7 +387,7 @@ var SceneJS_colladaParserModule = new (function() {
                         .nodeValue;
             }
         }
-        SceneJS_errorModule.fatalError(new SceneJS.ColladaParseException
+        throw SceneJS_errorModule.fatalError(new SceneJS.ColladaParseException
                 ("COLLADA element expected: "
                         + profile.tagName
                         + "/newparam[sid == '"
@@ -646,8 +664,7 @@ var SceneJS_colladaParserModule = new (function() {
         var x = data[0];
         var y = data[1];
         var z = data[2];
-        //  SceneJS_loggingModule.warn("translate - x: " + x + ", y: " + y + ", z: " + z);
-        return SceneJS_math_translationMat4v(data);
+        return SceneJS_math_translationMat4c(x, y, z);
     }
 
     // @private
@@ -657,8 +674,22 @@ var SceneJS_colladaParserModule = new (function() {
         var y = data[1];
         var z = data[2];
         var angle = data[3];
-        //  SceneJS_loggingModule.warn("rotate - x: " + x + ", y: " + y + ", z: " + z + ", angle: " + angle);
         return SceneJS_math_rotationMat4c(angle * 0.017453278, x, y, z);
+    }
+
+    function parseContributor(contributor) {
+        var author = contributor.getElementsByTagName("author")[0];
+        var authoringTool = contributor.getElementsByTagName("authoring_tool")[0];
+        var comments = contributor.getElementsByTagName("comments")[0];
+        var copyright = contributor.getElementsByTagName("copyright")[0];
+        var sourceData = contributor.getElementsByTagName("source_data")[0];
+        return {
+            author : author ? author.textContent : null,
+            authoringTool : authoringTool ? authoringTool.textContent : null,
+            comments : comments ? comments.textContent.split(";").join("\n") : null,
+            copyright : copyright ? copyright.textContent : null,
+            sourceData : sourceData ? sourceData.textContent : null
+        };
     }
 
     /** Parses data from camera node
@@ -678,11 +709,12 @@ var SceneJS_colladaParserModule = new (function() {
             var zfar = perspective.getElementsByTagName("zfar")[0];
 
             cameraData = {
-                perspective: {
+                optics: {
+                    type: "perspective",
                     fovy: yfov ? parseFloat(yfov.textContent) : 60.0,
                     aspect: aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0,
                     near: znear ? parseFloat(znear.textContent) : 0.1,
-                    far: zfar ? parseFloat(zfar.textContent) : 10000.0
+                    far: zfar ? parseFloat(zfar.textContent) : 20000.0
                 }
             };
             return cameraData;
@@ -692,7 +724,8 @@ var SceneJS_colladaParserModule = new (function() {
             if (orthographic) {
 
                 cameraData = {
-                    orthographic: {
+                    optics: {
+                        type: "ortho",
                         left: -1,
                         right: 1,
                         bottom: -1,
@@ -712,14 +745,15 @@ var SceneJS_colladaParserModule = new (function() {
                 var ymagVal;
                 var aspect;
                 var near = znear ? parseFloat(znear.textContent) : 0.1;
-                var far = zfar ? parseFloat(zfar.textContent) : 10000.0;
+                var far = zfar ? parseFloat(zfar.textContent) : 50000.0;
 
                 if (xmag && ymag) { // Ignore aspect
 
                     xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
                     ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
                     cameraData = {
-                        orthographic: {
+                        optics: {
+                            type: "ortho",
                             left: -xmagVal,
                             right: xmagVal,
                             bottom: -ymagVal,
@@ -734,7 +768,8 @@ var SceneJS_colladaParserModule = new (function() {
                     xmagVal = xmag ? parseFloat(xmag.textContent) : 1.0;
                     aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
                     cameraData = {
-                        orthographic: {
+                        optics: {
+                            type: "ortho",
                             left: -xmagVal,
                             right: xmagVal,
                             bottom: -xmagVal * aspect,
@@ -748,7 +783,8 @@ var SceneJS_colladaParserModule = new (function() {
                     ymagVal = ymag ? parseFloat(ymag.textContent) : 1.0;
                     aspect = aspectRatio ? parseFloat(aspectRatio.textContent) : 1.0;
                     cameraData = {
-                        orthographic: {
+                        optics: {
+                            type: "ortho",
                             left: -ymagVal * aspect,
                             right: ymagVal * aspect,
                             bottom: -ymagVal,
@@ -767,6 +803,14 @@ var SceneJS_colladaParserModule = new (function() {
         return cameraData;
     }
 
+    function parseLookat(lookat) {
+        var data = parseFloatArray(lookat);
+        return {
+            eye: { x: data[0], y: data[1], z: data[2] },
+            look: { x: data[3], y: data[4], z: data[5] },
+            up: { x: data[6], y: data[7], z: data[8] }
+        };
+    }
 
     function parseLight(light) {
         var techniqueCommon = light.getElementsByTagName("technique_common")[0];
@@ -826,10 +870,11 @@ var SceneJS_colladaParserModule = new (function() {
 
         var cameraData = null;
         var lightData = null;
+        var lookatData = null;
 
         /* Matrix created from any transforms found
          */
-        var matrix = SceneJS_math_identityMat4();
+        var matrix = null;
 
         var child = node.firstChild;
 
@@ -854,7 +899,6 @@ var SceneJS_colladaParserModule = new (function() {
                         array[3],array[7],array[11],array[15]];
                     break;
 
-
                 case "translate":
                     matrix = matrix
                             ? SceneJS_math_mulMat4(matrix, parseTranslate(child))
@@ -865,6 +909,12 @@ var SceneJS_colladaParserModule = new (function() {
                     matrix = matrix
                             ? SceneJS_math_mulMat4(matrix, parseRotate(child))
                             : parseRotate(child);
+                    break;
+
+                case "lookat":
+                    if (modes.loadCameras) {
+                        lookatData = parseLookat(child);
+                    }
                     break;
 
                 case "instance_node":
@@ -896,10 +946,11 @@ var SceneJS_colladaParserModule = new (function() {
         var sceneNode = SceneJS.node.apply(this, sceneNodeParams);
 
         if (cameraData) {
-            camerasData.push({
+            meta.cameras.push({
                 id: node.getAttribute("id"),
-                cameraData : cameraData ,
-                matrix : SceneJS_math_inverseMat4(matrix) // Get view transform
+                optics: cameraData.optics,
+                lookat : lookatData,
+                matrix : matrix ? SceneJS_math_inverseMat4(matrix) : null // Get view transform
             });
 
         } else {
@@ -907,12 +958,18 @@ var SceneJS_colladaParserModule = new (function() {
             /* Modelling transform
              */
             if (matrix) {
-                sceneNode = SceneJS.modelMatrix({ elements: matrix }, sceneNode);
+                sceneNode = SceneJS.matrix({ elements: matrix }, sceneNode);
             }
         }
 
         if (lightData) {
+
+            lightData.id = node.getAttribute("id");
+            lightData.enabled = true;
+
             if (matrix) {
+
+                lightData.matrix = matrix;
 
                 /* Transform lights
                  */
@@ -924,10 +981,7 @@ var SceneJS_colladaParserModule = new (function() {
                     lightData.dir = { x: dir[0], y: dir[1], z: dir[2] };
                 }
             }
-            lightsData.push({
-                id: node.getAttribute("id"),
-                lightData : lightData
-            });
+            meta.lights.push(lightData);
         }
 
         return sceneNode;
@@ -942,7 +996,6 @@ var SceneJS_colladaParserModule = new (function() {
     this.parse = function(_uri, xml, rootId, _modes) {
 
         reset();
-
         uri = _uri;
         dirURI = _uri.substring(0, _uri.lastIndexOf("/") + 1);
         modes = _modes;
@@ -951,84 +1004,142 @@ var SceneJS_colladaParserModule = new (function() {
         buildIdMap();
 
         var root = parseDoc(rootId);
-        var metadata = {
-            cameras: [],
-            lights: []
+
+        var result = {
+            meta:  meta
         };
 
-        /* Selector node selects camera by Collada node ID
-         */
-        var cameraNameMap = { };
-        for (var i = 0; i < camerasData.length; i++) {
-            var camera = camerasData[i];
-            cameraNameMap[camera.id] = i;
-            metadata.cameras.push({
-                id: camera.id
-            });
+        if (result.meta.cameras.length > 0) {
+            result.meta.activeCamera = null;
+            result.meta.defaultCamera = {
+                lookat: {
+                    eye: { x: 0, y: 0, z: 1},
+                    look: { x: 0, y: 0, z: 0 },
+                    up: { x: 0, y: 1, z: 0}
+                },
+                optics: {
+                    type: "perspective",
+                    fovy : 60.0,
+                    aspect : 1.0,
+                    near : 0.10,
+                    far : 10000.0
+                }
+            };
         }
-        var defaultCamera = camerasData.length;
-        var selector = SceneJS.selector(
-                function(data) {
-                    var activeCamera = data.get("activeCamera");
-                    if (activeCamera) {
-                        var index = cameraNameMap[activeCamera] + 1;
-                        if (index) {
-                            return {
-                                selection: [index]
-                            };
+
+        //--------------------------------------------------------------------
+        // If any cameras were parsed then factor the content root out into
+        // a symbol, create a selector that switches between cameras that
+        // instance the symbol
+        //--------------------------------------------------------------------
+
+        if (result.meta.cameras.length > 0) {
+
+            /* Create map of indices to camera IDs, add each ID to result.metadata
+             */
+            var cameraNameMap = { };
+            for (var i = 0; i < result.meta.cameras.length; i++) {
+                cameraNameMap[result.meta.cameras[i].id] = i;
+            }
+
+            /* Define selector that activates subgraph corresponding to
+             * given camera ID
+             */
+            var selector = SceneJS.selector(
+                    function() {
+                        if (result.meta.activeCamera) {
+                            var index = cameraNameMap[result.meta.activeCamera] + 1;
+                            if (index) {
+                                return {
+                                    selection: [index]
+                                };
+                            }
                         }
-                    }
-                    return {
+                        return {
 
-                        /* Default selection is no camera
-                         */
-                        selection: [0]
-                    };
+                            /* Select default camera when none specified
+                             */
+                            selection: [0]
+                        };
+                    },
+
+                /* Default camera
+                 */
+                    SceneJS.lookAt(function() {
+                        return result.meta.defaultCamera.lookat;
+                    },
+                            SceneJS.camera(function() {
+                                return { optics: result.meta.defaultCamera.optics };
+                            },
+                                    SceneJS.instance({ name: "content" }))));
+
+
+            /* For each camera, define an instance child of the selector
+             * to instance the model
+             */
+
+            for (var i = 0; i < result.meta.cameras.length; i++) {
+                var camera = result.meta.cameras[i];
+
+                var node = SceneJS.instance({
+                    name: "content"
                 });
 
-        root = SceneJS.node(
-                SceneJS.symbol({ name: "content" }, root),
-                selector);
+                node = SceneJS.camera({
+                    optics: camera.optics
+                }, node);
 
-        /* Add scene instances to selector, each wrapped
-         * with projection and viewing transforms. Last scene
-         * instance has no camera, to rely on camera defined
-         * in surrounding scene.
-         */
-        selector.addNode(SceneJS.instance({ name: "content" }));
-        for (var i = 0; i < camerasData.length; i++) {
-            var camera = camerasData[i];
-            var node = SceneJS.instance({ name: "content" });
-            if (camera.matrix) {
-                node = SceneJS.viewMatrix({ elements: camera.matrix }, node);
+                if (camera.matrix) {
+                    node = SceneJS.matrix({
+                        elements: camera.matrix
+                    }, node);
+                }
+                if (camera.lookat) {
+                    node = SceneJS.lookAt(
+                            function() {
+                                return {
+                                    eye: camera.lookat.eye,
+                                    look: camera.lookat.look,
+                                    up: camera.lookat.up
+                                };
+                            }, node);
+                }
+
+                selector.addNode(node);
             }
-            if (camera.cameraData.perspective) {
-                node = SceneJS.perspective(camera.cameraData.perspective, node);
-            } else if (camera.cameraData.orthographic) {
-                node = SceneJS.ortho(camera.cameraData.orthographic, node);
-            }
-            selector.addNode(node);
+
+            root = SceneJS.node(
+                    SceneJS.symbol({
+                        name: "content"
+                    }, root), selector);
         }
 
-        /* If any lights were parsed, then wrap the root with a SceneJS.Lights node
-         */
-        if (lightsData.length > 0) {
-            var lightsNode = new SceneJS.Lights();
-            for (var i = 0; i < lightsData.length; i++) {
-                var light = lightsData[i];
-                lightsNode.addSource(new SceneJS.LightSource(light.lightData));
-                metadata.lights.push({
-                    id: light.id
-                });
-            }
-            lightsNode.addNode(root);
-            root = lightsNode;
+        //--------------------------------------------------------------------
+        // If any lights were parsed then wrap the content root with
+        // some light sources
+        //--------------------------------------------------------------------
+
+        if (result.meta.lights.length > 0) {
+            root = SceneJS.lights(function() {
+                var sources = [];
+                for (var i = 0; i < result.meta.lights.length; i++) {
+                    var light = result.meta.lights[i];
+                    if (light.enabled) {
+                        sources.push(light);
+                    }
+                }
+                return {
+                    sources: sources
+                };
+            }, root);
         }
 
         reset();
 
-        return { root: root,
-            metadata : metadata
-        };
+        result.root = root;
+        return result;
     };
-})();
+}
+
+        )
+        ();

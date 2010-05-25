@@ -3,7 +3,7 @@
 <html>
 <head>
     <title></title>
-    <script type="text/javascript" src="http://github.com/downloads/xeolabs/scenejs/scenejs.min.js"></script>
+   <script type="text/javascript" src="../../lib/scenejs.js"></script>
 </head>
 <body>
 <table>
@@ -16,11 +16,16 @@
             </canvas>
         </td>
         <td valign="top">
-            <div id="_scenejs-default-logging"></div>
+            <h1>Scene Graph Branching - Teapot Selector</h1>
+            <p>This scene contains a Selector node which currently selects three of its four sub-graphs to display
+                three Teapots. Try editing sourcecode - change the indices in the Selector's "selection" property to 
+                change which teapots are rendered.</p>
+            <a target="other" href="select-teapots.js">Source code</a>
+            <div id="theLoggingDiv"></div>
         </td>
     </tr>
 </table>
 
-<script type="text/javascript" src="renderer-node.js"></script>
+<script type="text/javascript" src="select-teapots.js"></script>
 </body>
 </html>

@@ -46,7 +46,7 @@ SceneJS._inherit(SceneJS.LoadCollada, SceneJS.Load);
 // @private
 SceneJS.LoadCollada.prototype._init = function(params) {
     if (!params.uri) {   // Already checked in SceneJS.Load - do it again here for explicit error message
-        SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+        throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.LoadCollada parameter expected: uri"));
     }
     SceneJS.Load.prototype._init.call(this, params);
@@ -60,16 +60,19 @@ SceneJS.LoadCollada.prototype._init = function(params) {
         createBoundingBoxes : params.createBoundingBoxes == undefined ? true : params.createBoundingBoxes,
         showBoundingBoxes : params.showBoundingBoxes
     };
+    if (params.loadCameras && SceneJS_modelViewTransformModule.isCameraActive()) {
+        SceneJS_loggingModule.warn("SceneJS.LoadCollada will not load cameras because it is defined within a SceneJS.Camera");
+    }
     var _this = this;
     this._parse = function(xml, onError) { // Override default SceneJS.Load._parse
         var result = SceneJS_colladaParserModule.parse(
                 params.uri, // Used in paths to texture images
                 xml,
-                //params.nodes || [], // Optional cherry-picked asset
+            //params.nodes || [], // Optional cherry-picked asset
                 params.node, // Optional cherry-picked asset
                 options
                 );
-        _this._metadata = result.metadata;
+        _this._metadata = result.meta;
         return result.root;
     };
 };
@@ -79,7 +82,7 @@ SceneJS.LoadCollada.prototype._init = function(params) {
  * is an object of the form shown in this example:
  * <pre><code>
  * {
- *	cameras: [
+ *    cameras: [
  *           {
  *               id: "camera1"
  *           },
@@ -97,7 +100,7 @@ SceneJS.LoadCollada.prototype._init = function(params) {
  *           }
  *
  *       ]
-* }
+ * }
  * </pre></code>
  * @returns {int} The state
  */

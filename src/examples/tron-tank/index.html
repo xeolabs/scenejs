@@ -3,24 +3,48 @@
 <html>
 <head>
     <title></title>
-    <script type="text/javascript" src="http://github.com/downloads/xeolabs/scenejs/scenejs.min.js"></script>
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
+    <script type="text/javascript" src="sylvester.js"></script>
 </head>
 <body>
 <table>
     <tr>
         <td valign="top">
-            <canvas id="theCanvas" width="600" height="600">
+            <canvas id="theCanvas" width="1000" height="1000">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
         <td valign="top">
-            <div id="_scenejs-default-logging"></div>
+            <h1>Cross-Domain Load and Animation of a COLLADA Tron Tank Model from SceneJS.org</h1>
+
+            <p>This scene contains the Tank Program from the 1982 Disney motion picture "Tron".
+
+            <p/>
+
+            <p>Take it for a drive - if you get stuck, just re-load the page to reset it.</p>
+
+            <p>Mouse wheel controls speed, left/right drag to steer, up/down drag to change viewpoint height.</p>
+
+            <p>This example loads the tank from three seperate "assets" defined within the same COLLADA file, then wraps
+                each within modelling transforms that are dynamically configured with parameters generated from mouse
+                input.</p>
+
+            <p>Tank model is courtesy of Abraham Katase, originally sourced from the Google 3D Warehouse <a
+                    href="http://tinyurl.com/y8oknya">here</a></p>
+            <ul>
+                <li><a target="other" href="tron-tank.js">Source code</a></li>
+                <li><a href="http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae">Tron Tank COLLADA
+                    model</a></li>
+            </ul>
+
+
+            <div id="theLoggingDiv"></div>
         </td>
     </tr>
 </table>
 
-<script type="text/javascript" src="text-poe-poem.js"></script>
+<script type="text/javascript" src="tron-tank.js"></script>
 </body>
 </html>

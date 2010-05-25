@@ -5,14 +5,14 @@
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-scalarinterpolator-example">Example 1</a></li></ul>
  * <p><b>Example Usage</b></p><p>This example defines a {@link SceneJS.objects.Cube} with rotation that is animated by
- * a SceneJS.ScalarInterpolator, which is in turn driven by an alpha value supplied by a higher {@link SceneJS.WithData}.
+ * a SceneJS.Interpolator, which is in turn driven by an alpha value supplied by a higher {@link SceneJS.WithData}.
  * If we thought of <em>alpha</em> as elapsed seconds, then this cube will rotate 360 degrees over one second, then
  * rotate 180 in the reverse direction over the next 0.5 seconds. In this example however, the alpha is actually fixed,
  * where the cube is stuck at 180 degrees - you would need to vary the "alpha" property on the WithData node to actually
  * animate it.</p><pre><code>
  * var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to 180 degrees
  *
- *      new SceneJS.ScalarInterpolator({
+ *      new SceneJS.Interpolator({
  *              type:"linear",   // or 'cosine', 'cubic' or 'constant'
  *              input:"alpha",
  *              output:"angle",
@@ -38,7 +38,7 @@
  * @extends SceneJS.Node
  * @since Version 0.7.4
  * @constructor
- * Create a new SceneJS.ScalarInterpolator
+ * Create a new SceneJS.Interpolator
  * @param {Object} [cfg] Static configuration object
  * @param {String} [cfg.type="linear"] Interpolation type - "linear", "cosine", "cubic" or "constant"
  * @param {String} cfg.input Name of property on {@link SceneJS.Data} scope that will supply the interpolation <em>alpha</em> value
@@ -48,7 +48,7 @@
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.ScalarInterpolator = function() {
+SceneJS.Interpolator = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "interpolator";
     this._input = null;
@@ -61,26 +61,26 @@ SceneJS.ScalarInterpolator = function() {
     this._type = null;
 };
 
-SceneJS._inherit(SceneJS.ScalarInterpolator, SceneJS.Node);
+SceneJS._inherit(SceneJS.Interpolator, SceneJS.Node);
 
-/* ScalarInterpolator attempts to track the pair of keys that enclose the current alpha value -
+/* Interpolator attempts to track the pair of keys that enclose the current alpha value -
  * these are the node's current states with regard to that:
  */
 
 // @private
-SceneJS.ScalarInterpolator.prototype._NOT_FOUND = 0;        // Alpha outside of key sequence
+SceneJS.Interpolator.prototype._NOT_FOUND = 0;        // Alpha outside of key sequence
 
 // @private
-SceneJS.ScalarInterpolator.prototype._BEFORE_FIRST = 1;     // Alpha before first key
+SceneJS.Interpolator.prototype._BEFORE_FIRST = 1;     // Alpha before first key
 
 // @private
-SceneJS.ScalarInterpolator.prototype._AFTER_LAST = 2;       // Alpha after last key
+SceneJS.Interpolator.prototype._AFTER_LAST = 2;       // Alpha after last key
 
 // @private
-SceneJS.ScalarInterpolator.prototype._FOUND = 3;            // Found keys before and after alpha
+SceneJS.Interpolator.prototype._FOUND = 3;            // Found keys before and after alpha
 
 // @private
-SceneJS.ScalarInterpolator.prototype._linearInterpolate = function(k) {
+SceneJS.Interpolator.prototype._linearInterpolate = function(k) {
     var u = this._keys[this._key2] - this._keys[this._key1];
     var v = k - this._keys[this._key1];
     var w = this._values[this._key2] - this._values[this._key1];
@@ -88,7 +88,7 @@ SceneJS.ScalarInterpolator.prototype._linearInterpolate = function(k) {
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._constantInterpolate = function(k) {
+SceneJS.Interpolator.prototype._constantInterpolate = function(k) {
     if (Math.abs((k - this._keys[this._key1])) < Math.abs((k - this._keys[this._key2]))) {
         return this._keys[this._key1];
     } else {
@@ -97,13 +97,13 @@ SceneJS.ScalarInterpolator.prototype._constantInterpolate = function(k) {
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._cosineInterpolate = function(k) {
+SceneJS.Interpolator.prototype._cosineInterpolate = function(k) {
     var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
     return (this._keys[this._key1] * (1 - mu2) + this._keys[this._key2] * mu2);
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._cubicInterpolate = function(k) {
+SceneJS.Interpolator.prototype._cubicInterpolate = function(k) {
     if (this._key1 == 0 || this._key2 == (this._keys.length - 1)) {
 
         /* Between first or last pair of keyframes - need four keyframes for cubic, so fall back on cosine
@@ -123,12 +123,14 @@ SceneJS.ScalarInterpolator.prototype._cubicInterpolate = function(k) {
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._slerp = function(k) {
-    return SceneJS_math_slerp(k, this._keys[this._key1], this._keys[this._key2]);
+SceneJS.Interpolator.prototype._slerp = function(k) {
+    var u = this._keys[this._key2] - this._keys[this._key1];
+    var v = k - this._keys[this._key1];  
+    return SceneJS_math_slerp((v / u), this._values[this._key1], this._values[this._key2]);
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._findEnclosingFrame = function(key) {
+SceneJS.Interpolator.prototype._findEnclosingFrame = function(key) {
     if (this._keys.length == 0) {
         return this._NOT_FOUND;
     }
@@ -150,7 +152,7 @@ SceneJS.ScalarInterpolator.prototype._findEnclosingFrame = function(key) {
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._interpolate = function(k) {
+SceneJS.Interpolator.prototype._interpolate = function(k) {
     switch (this._type) {
         case 'linear':
             return this._linearInterpolate(k);
@@ -163,14 +165,14 @@ SceneJS.ScalarInterpolator.prototype._interpolate = function(k) {
         case 'slerp':
             return this._slerp(k);
         default:
-            SceneJS_errorModule.fatalError(
-                    new SceneJS.InternalException("SceneJS.ScalarInterpolator internal error - interpolation type not switched: '"
+            throw SceneJS_errorModule.fatalError(
+                    new SceneJS.InternalException("SceneJS.Interpolator internal error - interpolation type not switched: '"
                             + this._type + "'"));
     }
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._update = function(key) {
+SceneJS.Interpolator.prototype._update = function(key) {
     switch (this._findEnclosingFrame(key)) {
         case this._NOT_FOUND:
             break;
@@ -188,23 +190,23 @@ SceneJS.ScalarInterpolator.prototype._update = function(key) {
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._init = function(params) {
+SceneJS.Interpolator.prototype._init = function(params) {
 
     /* Name of input property in data scope
      */
     if (!params.input) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.NodeConfigExpectedException(
-                        "SceneJS.ScalarInterpolator config property expected: input"));
+                        "SceneJS.Interpolator config property expected: input"));
     }
     this._input = params.input;
 
     /* Name of output property on child data scope
      */
     if (!params.output) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.NodeConfigExpectedException(
-                        "SceneJS.ScalarInterpolator config property expected: output"));
+                        "SceneJS.Interpolator config property expected: output"));
     }
     this._output = params.output;
     this._outputValue = null;
@@ -213,22 +215,22 @@ SceneJS.ScalarInterpolator.prototype._init = function(params) {
      */
     if (params.keys) {
         if (!params.values) {
-            SceneJS_errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     new SceneJS.InvalidNodeConfigException(
-                            "SceneJS.ScalarInterpolator configuration incomplete: " +
+                            "SceneJS.Interpolator configuration incomplete: " +
                             "keys supplied but no values - must supply a value for each key"));
         }
     } else if (params.values) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
-                        "SceneJS.ScalarInterpolator configuration incomplete: " +
+                        "SceneJS.Interpolator configuration incomplete: " +
                         "values supplied but no keys - must supply a key for each value"));
     }
     for (var i = 1; i < params.keys.length; i++) {
         if (params.keys[i - 1] >= params.keys[i]) {
-            SceneJS_errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     new SceneJS.InvalidNodeConfigException(
-                            "SceneJS.ScalarInterpolator configuration invalid: " +
+                            "SceneJS.Interpolator configuration invalid: " +
                             "two invalid keys found ("
                                     + i - 1 + " and " + i + ") - key list should contain distinct values in ascending order"));
         }
@@ -250,9 +252,9 @@ SceneJS.ScalarInterpolator.prototype._init = function(params) {
             break;
         case 'cubic':
             if (params.keys.length < 4) {
-                SceneJS_errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         new SceneJS.InvalidNodeConfigException(
-                                "SceneJS.ScalarInterpolator configuration invalid: minimum of four keyframes " +
+                                "SceneJS.Interpolator configuration invalid: minimum of four keyframes " +
                                 "required for cubic - only "
                                         + params.keys.length
                                         + " are specified"));
@@ -261,9 +263,9 @@ SceneJS.ScalarInterpolator.prototype._init = function(params) {
         case 'slerp':
             break;
         default:
-            SceneJS_errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     new SceneJS.InvalidNodeConfigException(
-                            "SceneJS.ScalarInterpolator configuration invalid:  type not supported - " +
+                            "SceneJS.Interpolator configuration invalid:  type not supported - " +
                             "only 'linear', 'cosine', 'cubic', 'constant' and 'slerp' are supported"));
         /*
 
@@ -276,15 +278,15 @@ SceneJS.ScalarInterpolator.prototype._init = function(params) {
 };
 
 // @private
-SceneJS.ScalarInterpolator.prototype._render = function(traversalContext, data) {
+SceneJS.Interpolator.prototype._render = function(traversalContext, data) {
     if (!this.type) {
         this._init(this._getParams(data));
     }
     var key = data.get(this._input);
     if (key == undefined || key == null) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.DataExpectedException(
-                        "SceneJS.ScalarInterpolator failed to find input on data: '" + params.input + "'"));
+                        "SceneJS.Interpolator failed to find input on data: '" + params.input + "'"));
     }
     this._update(key);
     var obj = {};
@@ -293,7 +295,7 @@ SceneJS.ScalarInterpolator.prototype._render = function(traversalContext, data) 
 };
 
 
-/** Returns a new SceneJS.ScalarInterpolator instance
+/** Returns a new SceneJS.Interpolator instance
  * @param {Object} [cfg] Static configuration object
  * @param {String} [cfg.type="linear"] Interpolation type - "linear", "cosine", "cubic" or "constant"
  * @param {String} cfg.input Name of property on {@link SceneJS.Data} scope that will supply the interpolation <em>alpha</em> value
@@ -302,12 +304,12 @@ SceneJS.ScalarInterpolator.prototype._render = function(traversalContext, data) 
  * @param {double[]} [cfg.values=[]] Output key values
  * @param {...SceneJS.Node} [childNodes] Child nodes
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
- * @returns {SceneJS.objects.ScalarInterpolator}
+ * @returns {SceneJS.objects.Interpolator}
  * @since Version 0.7.0
  */
-SceneJS.scalarInterpolator = function() {
-    var n = new SceneJS.ScalarInterpolator();
-    SceneJS.ScalarInterpolator.prototype.constructor.apply(n, arguments);
+SceneJS.interpolator = function() {
+    var n = new SceneJS.Interpolator();
+    SceneJS.Interpolator.prototype.constructor.apply(n, arguments);
     return n;
 };
 

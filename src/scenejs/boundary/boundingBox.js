@@ -65,9 +65,19 @@
  * )
  * </code></pre>
  * @extends SceneJS.Node
+ * @since Version 0.7.4
  * @constructor
- * Create a new SceneJS.boundingBox
- * @param {Object} config Configuration object, followed by zero or more child nodes
+ * Creates a new SceneJS.BoundingBox
+ * @param {Object} [cfg] Static configuration object
+ * @param {double} [cfg.xmin = -1.0] Minimum X-axis extent
+ * @param {double} [cfg.ymin = -1.0] Minimum Y-axis extent
+ * @param {double} [cfg.zmin = -1.0] Minimum Z-axis extent
+ * @param {double} [cfg.xmax = 1.0] Maximum X-axis extent
+ * @param {double} [cfg.ymax = 1.0] Maximum Y-axis extent
+ * @param {double} [cfg.zmax = 1.0] Maximum Z-axis extent
+ * @param {double[]} [cfg.levels] Projected size thresholds for level-of-detail culling
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.BoundingBox = function() {
     SceneJS.Node.apply(this, arguments);
@@ -91,10 +101,10 @@ SceneJS._inherit(SceneJS.BoundingBox, SceneJS.Node);
 
 /**
  * Sets the minimum X extent
- *
  * @function {SceneJS.BoundingBox} setXMin
- * @param {float} xmin Minimum X extent
+ * @param {double} xmin Minimum X extent
  * @returns {SceneJS.BoundingBox} this
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.setXMin = function(xmin) {
     this._xmin = xmin;
@@ -104,9 +114,9 @@ SceneJS.BoundingBox.prototype.setXMin = function(xmin) {
 
 /**
  * Gets the minimum X extent
- *
- * @function {float} getXMin
- * @returns {float} Minimum X extent
+ * @function {double} getXMin
+ * @returns {double} Minimum X extent
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.getXMin = function() {
     return this._xmin;
@@ -116,8 +126,9 @@ SceneJS.BoundingBox.prototype.getXMin = function() {
  * Sets the minimum Y extent
  *
  * @function  {SceneJS.BoundingBox} setYMin
- * @param {float} ymin Minimum Y extent
+ * @param {double} ymin Minimum Y extent
  * @returns {SceneJS.BoundingBox} this
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.setYMin = function(ymin) {
     this._ymin = ymin;
@@ -127,8 +138,9 @@ SceneJS.BoundingBox.prototype.setYMin = function(ymin) {
 
 /**
  * Gets the minimum Y extent
- * @function {float} getYMin
- * @returns {float} Minimum Y extent
+ * @function {double} getYMin
+ * @returns {double} Minimum Y extent
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.getYMin = function() {
     return this._ymin;
@@ -138,8 +150,9 @@ SceneJS.BoundingBox.prototype.getYMin = function() {
  * Sets the minimum Z extent
  *
  * @function {SceneJS.BoundingBox} setZMin
- * @param {float} zmin Minimum Z extent
+ * @param {double} zmin Minimum Z extent
  * @returns {SceneJS.BoundingBox} this
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.setZMin = function(zmin) {
     this._zmin = zmin;
@@ -149,8 +162,9 @@ SceneJS.BoundingBox.prototype.setZMin = function(zmin) {
 
 /**
  * Gets the minimum Z extent
- * @function {float} getZMin
- * @returns {float} Minimum Z extent
+ * @function {double} getZMin
+ * @returns {double} Minimum Z extent
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.getZMin = function() {
     return this._zmin;
@@ -160,8 +174,9 @@ SceneJS.BoundingBox.prototype.getZMin = function() {
  * Sets the maximum X extent
  *
  * @function  {SceneJS.BoundingBox} setXMax
- * @param {float} xmax Maximum X extent
+ * @param {double} xmax Maximum X extent
  * @returns {SceneJS.BoundingBox} this
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.setXMax = function(xmax) {
     this._xmax = xmax;
@@ -172,7 +187,8 @@ SceneJS.BoundingBox.prototype.setXMax = function(xmax) {
 /**
  * Gets the maximum X extent
  * @function  {SceneJS.BoundingBox} setXMax
- * @returns {float} Maximum X extent
+ * @returns {double} Maximum X extent
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.getXMax = function() {
     return this._xmax;
@@ -182,8 +198,9 @@ SceneJS.BoundingBox.prototype.getXMax = function() {
  * Sets the maximum Y extent
  *
  * @function {SceneJS.BoundingBox} setYMax
- * @param {float} ymax Maximum Y extent
+ * @param {double} ymax Maximum Y extent
  * @returns {SceneJS.BoundingBox} this
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.setYMax = function(ymax) {
     this._ymax = ymax;
@@ -193,8 +210,9 @@ SceneJS.BoundingBox.prototype.setYMax = function(ymax) {
 
 /**
  * Gets the maximum Y extent
- * @function {float} getYMax
- * @return {float} Maximum Y extent
+ * @function {double} getYMax
+ * @return {double} Maximum Y extent
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.getYMax = function() {
     return this._ymax;
@@ -204,8 +222,9 @@ SceneJS.BoundingBox.prototype.getYMax = function() {
  * Sets the maximum Z extent
  *
  * @function {SceneJS.BoundingBox} setZMax
- * @param {float} zmax Maximum Z extent
+ * @param {double} zmax Maximum Z extent
  * @returns {SceneJS.BoundingBox} this
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.setZMax = function(zmax) {
     this._zmax = zmax;
@@ -215,8 +234,9 @@ SceneJS.BoundingBox.prototype.setZMax = function(zmax) {
 
 /**
  * Gets the maximum Z extent
- * @function {float} getZMax
- * @returns {float} Maximum Z extent
+ * @function {double} getZMax
+ * @returns {double} Maximum Z extent
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.getZMax = function() {
     return this._zmax;
@@ -225,8 +245,15 @@ SceneJS.BoundingBox.prototype.getZMax = function() {
 /**
  * Sets all extents
  * @function {SceneJS.BoundingBox} setBoundary
- * @param {Object} boundary All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
+ * @param {Object} [boundary] Boundary extents
+ * @param {double} [boundary.xmin = -1.0] Minimum X-axis extent
+ * @param {double} [boundary.ymin = -1.0] Minimum Y-axis extent
+ * @param {double} [boundary.zmin = -1.0] Minimum Z-axis extent
+ * @param {double} [boundary.xmax = 1.0] Maximum X-axis extent
+ * @param {double} [boundary.ymax = 1.0] Maximum Y-axis extent
+ * @param {double} [boundary.zmax = 1.0] Maximum Z-axis extent
  * @returns {SceneJS.BoundingBox} this
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.setBoundary = function(boundary) {
     this._xmin = boundary.xmin || 0;
@@ -242,7 +269,8 @@ SceneJS.BoundingBox.prototype.setBoundary = function(boundary) {
 /**
  * Gets all extents
  * @function {Object} getBoundary
- * @returns {Object} All extents, Eg. { xmin: -1.0, ymin: -1.0, zmin: -1.0, xmax: 1.0, ymax: 1.0, zmax: 1.0}
+ * @returns {Object}  The boundary extents - {xmin: float, ymin: float, zmin: float, xmax: float, ymax: float, zmax: float}
+ * @since Version 0.7.4
  */
 SceneJS.BoundingBox.prototype.getBoundary = function() {
     return {
@@ -265,13 +293,13 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     this._zmax = params.zmax || 0;
     if (params.levels) {
         if (params.levels.length != this._children.length) {
-            SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+          throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                     ("SceneJS.boundingBox levels property should have a value for each child node"));
         }
 
         for (var i = 1; i < params.levels.length; i++) {
             if (params.levels[i - 1] >= params.levels[i]) {
-                SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+                throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                         ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
             }
         }
@@ -283,7 +311,7 @@ SceneJS.BoundingBox.prototype._init = function(params) {
 SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
-            this._init( this._getParams(data));
+            this._init(this._getParams(data));
         } else {
             this._memoLevel = 1;
         }
@@ -362,8 +390,18 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
 };
 
 /** Returns a new SceneJS.BoundingBox instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.BoundingBox constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {double} [cfg.xmin = -1.0] Minimum X-axis extent
+ * @param {double} [cfg.ymin = -1.0] Minimum Y-axis extent
+ * @param {double} [cfg.zmin = -1.0] Minimum Z-axis extent
+ * @param {double} [cfg.xmax = 1.0] Maximum X-axis extent
+ * @param {double} [cfg.ymax = 1.0] Maximum Y-axis extent
+ * @param {double} [cfg.zmax = 1.0] Maximum Z-axis extent
+ * @param {float[]} [cfg.levels] Projected size thresholds for level-of-detail culling
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.BoundingBox}
+ * @since Version 0.7.3
  */
 SceneJS.boundingBox = function() {
     var n = new SceneJS.BoundingBox();

@@ -18,7 +18,7 @@
  * which {@link SceneJS.Load} nodes within its subgraph must receive and parse their content. That may be overridden
  * in the configs of individual {@link SceneJS.Load} nodes.
  * <p><b>Usage Example:</b></p><p>Shown below is Scene bound to a canvas and specifying a JSONP proxy, that contains a
- * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada} 
+ * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada}
  * node loads a Collada model cross-domain through the proxy. When the Scene is rendered, a value for the
  * {@link Scene.LookAt}'s property is injected into it. The Scene will put the property on a data scope (which is
  * implemented by a {@link SceneJS.Data}) that the {@link SceneJS.LookAt}'s config callback then accesses.</b></p>
@@ -64,20 +64,28 @@ SceneJS.Scene = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "scene";
     if (!this._fixedParams) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException
                         ("Dynamic configuration of SceneJS.scene node is not supported"));
     }
     this._params = this._getParams();
     this._lastRenderedData = null;
     if (this._params.canvasId) {
-        this._canvasId = document.getElementById(this._params.canvasId) ? this._params.canvasId : SceneJS.DEFAULT_CANVAS_ID;
+        this._canvasId = document.getElementById(this._params.canvasId) ? this._params.canvasId : SceneJS.Scene.DEFAULT_CANVAS_ID;
     } else {
-        this._canvasId = SceneJS.DEFAULT_CANVAS_ID;
+        this._canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
     }
 };
 
 SceneJS._inherit(SceneJS.Scene, SceneJS.Node);
+
+/** ID of canvas SceneJS looks for when {@link SceneJS.Scene} node does not supply one
+ */
+SceneJS.Scene.DEFAULT_CANVAS_ID = "_scenejs-default-canvas";
+
+/** ID ("_scenejs-default-logging") of default element to which {@link SceneJS.Scene} node will log to, if found.
+ */
+SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID = "_scenejs-default-logging";
 
 /** Returns the ID of the canvas element that this scene is to bind to. When no canvasId was configured, it will be the
  * the default ID of "_scenejs-default-canvas".

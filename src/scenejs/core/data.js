@@ -2,11 +2,13 @@
  * @class Data scope that is passed as the single argument to the callback function that many scene node classes may be
  * dynamically configured through.
  * <p>These are created whenever data is generated within a scene graph, to transport the data down to sub-nodes.</p>
- * <p>Some nodes that create these are: SceneJS.Scene when rendered, SceneJs.WithData and SceneJS.ScalarInterpolator.</p>.
- * <p><b>Example:</b></p><p>Nested creation of these will form a linked chain of data scopes. The outer SceneJS.WithData
- * node creates one SceneJS.Data with "sizeX" and "sizeY" properties, then the inner SceneJS.WithData chains another SceneJS.Data
- * onto that with a "sizeZ" property. The dynamic config callback on the SceneJS.Scale node then hunts up the chain to
- * get the properties for its SceneJS.Scale node.</b></p><pre><code>
+ * <p>Methods and nodes that create instances of these include {@link SceneJS.Scene#render}, {@link SceneJS.WithData} and
+ * {@link SceneJS.ScalarInterpolator}.</p>.
+ * <p><b>Example:</b></p><p>The example below shows how nested creation of these will form a linked chain of data scopes.
+ * The outer {@link SceneJS.WithData} node creates one SceneJS.Data with "sizeX" and "sizeY" properties, then the inner
+ * {@link SceneJS.WithData} chains another SceneJS.Data to that, containing a "sizeZ" property. The dynamic config
+ * callback on the {@link SceneJS.Scale} node then hunts up the chain to get each of the properties for the
+ * configuration object it generates.</b></p><pre><code>
  *
  * var wd new SceneJS.WithData({
  *          sizeX: 5,
@@ -30,6 +32,7 @@
  *      )
  *  )
  * </code></pre>
+ *
  */
 SceneJS.Data = function(_parent, _fixed, _data) {
     this._parent = _parent;

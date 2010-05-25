@@ -3,24 +3,43 @@
 <html>
 <head>
     <title></title>
-    <script type="text/javascript" src="http://github.com/downloads/xeolabs/scenejs/scenejs.min.js"></script>
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
 </head>
 <body>
 <table>
     <tr>
         <td valign="top">
-            <canvas id="theCanvas" width="600" height="600">
+            <canvas id="theCanvas" width="1000" height="1000">
                 <p>This example requires a browser that supports the
                     <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                     &lt;canvas&gt; feature.</p>
             </canvas>
         </td>
         <td valign="top">
-            <div id="_scenejs-default-logging"></div>
+            <h1>Cross-Domain Load of a COLLADA House Model from SceneJS.org</h1>
+
+            <p>This is a larger COLLADA model than other examples, loaded cross-domain from SceneJS.org through a proxy
+                server. It has 149
+                texture images, so it may take some time to load, depending on your connection speed and how busy the
+                proxy is right now.</p>
+
+            <p>Model is courtesy of <a
+                    href="http://www.vastarchitecture.com/Projects_Residential/Courtyard/Courtyard.html">VaST
+                architecture</a>.</p>
+
+            <p>This scene is interactive; to rotate the view, it takes two variables, "yaw" and "pitch", which are
+                injected into the scene graph along with "dist" for the distance of the eye on the Z-axis. Take a close
+                look
+                at the lookAt and rotate nodes, which use these variables, and the invocation of the "render" function
+                near
+                the bottom of this example, which passes them in.</p>
+            <a target="other" href="courtyard-house.js">Source code</a>
+
+            <div id="theLoggingDiv"></div>
         </td>
     </tr>
 </table>
 
-<script type="text/javascript" src="animated-texture.js"></script>
+<script type="text/javascript" src="courtyard-house.js"></script>
 </body>
 </html>

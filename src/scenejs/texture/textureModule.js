@@ -154,7 +154,7 @@ var SceneJS_textureModule = new (function() {
         }
         var glName = SceneJS_webgl_enumMap[value];
         if (glName == undefined) {
-            SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+            throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                     "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'"));
         }
         var glValue = context[glName];
@@ -232,7 +232,7 @@ var SceneJS_textureModule = new (function() {
     // @private
     this.pushLayer = function(texture, params) {
         if (!textures[texture.textureId]) {
-            SceneJS_errorModule.fatalError("No such texture loaded \"" + texture.textureId + "\"");
+            throw SceneJS_errorModule.fatalError("No such texture loaded \"" + texture.textureId + "\"");
         }
         texture.lastUsed = time;
 

@@ -10,7 +10,7 @@
  *
  *        primitive: "triangles",
  *
- *        // Mandatory vertices - eight for our cube, each one spaining three array elements for X,Y and Z
+ *        // Mandatory 3D positions - eight for our cube, each one spaining three array elements for X,Y and Z
  *
  *        positions : [
  *
@@ -78,9 +78,19 @@
  * });
  *  </pre></code>
  * @extends SceneJS.Node
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.Geometry
- * @param {Object} config The config object, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} cfg.primitive The primitive type - "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
+ * @param {double[]} cfg.positions Flattened array of 3D coordinates, three elements each
+ * @param {double[]} [cfg.normals = []] Flattened array of 3D vertex normal vectors, three elements each
+ * @param {double[]} [cfg.uv = []] Flattened array of 2D UV-space coordinates for the first texture layer, two elements each
+ * @param {double[]} [cfg.uv2 = []] Flattened array of 2D UV-space coordinates for the second texture layer, two elements each
+ * @param {int[]} cfg.indices Flattened array of indices to index the other arrays per the specified primitive type
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
+ * @since Version 0.7.3
  */
 SceneJS.Geometry = function() {
     SceneJS.Node.apply(this, arguments);
@@ -112,7 +122,7 @@ SceneJS.Geometry.prototype._init = function(params) {
 // @private
 SceneJS.Geometry.prototype._render = function(traversalContext, data) {
     if (!this._geo && !this._create) { // Dynamically configured
-        this._init( this._getParams(data));
+        this._init(this._getParams(data));
     }
     if (this._handle) { // Was created before - test if not evicted since
         if (!SceneJS_geometryModule.testGeometryExists(this._handle)) {
@@ -131,8 +141,17 @@ SceneJS.Geometry.prototype._render = function(traversalContext, data) {
 };
 
 /** Returns a new SceneJS.Geometry instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Geometry constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} cfg.primitive The primitive type - "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
+ * @param {double[]} cfg.positions Flattened array of 3D coordinates, three elements each
+ * @param {double[]} [cfg.normals = []] Flattened array of 3D vertex normal vectors, three elements each
+ * @param {double[]} [cfg.uv = []] Flattened array of 2D UV-space coordinates for the first texture layer, two elements each
+ * @param {double[]} [cfg.uv2 = []] Flattened array of 2D UV-space coordinates for the second texture layer, two elements each
+ * @param {int[]} cfg.indices  Flattened array of indices to index the other arrays per the specified primitive type
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.Geometry}
+ * @since Version 0.7.1
  */
 SceneJS.geometry = function() {
     var n = new SceneJS.Geometry();

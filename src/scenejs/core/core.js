@@ -7,11 +7,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.4',
-
-    /** ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
-     */
-    DEFAULT_CANVAS_ID:"_scenejs-default-canvas",
+    VERSION: '0.7.5',
 
     /** Names of supported WebGL canvas contexts
      */

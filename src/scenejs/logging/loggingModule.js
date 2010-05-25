@@ -27,6 +27,11 @@ var SceneJS_loggingModule = new (function() {
     var indent = 0;
     var indentStr = "";
 
+    var logToConsole = (typeof console == "object") ? function(msg) {
+        console.log(msg);
+    } : function() {
+    };
+
     /**
      * @private
      */
@@ -34,6 +39,7 @@ var SceneJS_loggingModule = new (function() {
         message = activeSceneId
                 ? indentStr + activeSceneId + ": " + message
                 : indentStr + message;
+        logToConsole(message);
         var func = funcs ? funcs[channel] : null;
         if (func) {
             func(message);
@@ -63,11 +69,9 @@ var SceneJS_loggingModule = new (function() {
     }
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING, // Set default logging for scene root
+            SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED,
             function(params) {
-                activeSceneId = params.sceneId;
-
-                var element = document.getElementById(SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID);
+                var element = params.loggingElement;
                 if (element) {
                     funcs = {
                         warn : function log(msg) {
@@ -86,6 +90,12 @@ var SceneJS_loggingModule = new (function() {
                 } else {
                     funcs = null;
                 }
+            });
+
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING, // Set default logging for scene root
+            function(params) {
+                activeSceneId = params.sceneId;
             });
 
     SceneJS_eventModule.addListener(

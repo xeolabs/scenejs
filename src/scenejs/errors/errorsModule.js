@@ -14,19 +14,25 @@ var SceneJS_errorModule = new (function() {
 
     // @private
     this.fatalError = function(e) {
+        e = e.message ? e : new SceneJS.Exception(e);
+
+        /* Dont log because exception should be thrown        
+         */
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
             exception: e,
             fatal: true
         });
-       // alert(e.message||e);
-        throw e;
+        return e.message;
     };
 
     // @private
     this.error = function(e) {
+        e = e.message ? e : new SceneJS.Exception(e);
+        SceneJS_loggingModule.error(e.message);
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
-            exception: e.message ? e : new SceneJS.Exception(e),
+            exception: e,
             fatal: false
         });
+        return e.message;
     };
 })();

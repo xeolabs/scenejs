@@ -44,9 +44,13 @@
  * );
  * </pre></code>
  *  @extends SceneJS.Node
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.Instance
- * @param {Object} config  Config object or function, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} [cfg.name="unnamed"]
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.Instance = function() {
     SceneJS.Node.apply(this, arguments);
@@ -60,10 +64,11 @@ SceneJS.Instance = function() {
 SceneJS._inherit(SceneJS.Instance, SceneJS.Node);
 
 /**
- Sets the name of the symbol to instance. The name will be "unnamed" if none is specified.
- @function setName
- @param {string} name
- @returns {SceneJS.Instance} This instance node
+ * Sets the name of the symbol to instance. The name will be "unnamed" if none is specified.
+ * @function setName
+ * @param {string} [name="unnamed"]
+ * @returns {SceneJS.Instance} This instance node
+ * @since Version 0.7.4
  */
 SceneJS.Instance.prototype.setName = function(name) {
     this._name = name || "unnamed";
@@ -71,9 +76,10 @@ SceneJS.Instance.prototype.setName = function(name) {
 };
 
 /**
- Returns the name of the instanced symbol. The name will be "unnamed" if none is specified.
- @function {string} getName
- @returns {string} The name
+ * Returns the name of the instanced symbol. The name will be "unnamed" if none is specified.
+ * @function {string} getName
+ * @returns {string} The name
+ * @since Version 0.7.4
  */
 SceneJS.Instance.prototype.getName = function() {
     return this._name;
@@ -89,22 +95,37 @@ SceneJS.Instance.prototype._init = function(params) {
 // @private
 SceneJS.Instance.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
-       this._init( this._getParams(data));
+        this._init(this._getParams(data));
     }
-    var nameNode = SceneJS_instancingModule.acquireInstance(this._name);
-    if (!nameNode) {
-        SceneJS_errorModule.fatalError(
+    var symbol = SceneJS_instancingModule.acquireInstance(this._name);
+    if (!symbol) {
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.SymbolNotFoundException
                         ("SceneJS.Instance could not find SceneJS.Symbol to instance: '" + this._name + "'"));
     } else {
-        nameNode._renderNodes(traversalContext, data);
+
+        /* After completion of the right-to-left, depth-first traversal of the Symbol's children,
+         * we'll render as an appendum the children of this node. So we'll configure the traversal context
+         * (which tracks various states during scene traversal) with the appended children, and an initial
+         * flag that will be false as soon as the Symbol's children are all rendered.
+         * See _renderNodes for more details on how all that works.
+         */
+        var traversalContext = {
+            appendix : this._children,
+            insideRightFringe: symbol._children.length > 1
+        };
+        symbol._renderNodes(traversalContext, data);
         SceneJS_instancingModule.releaseInstance();
     }
 };
 
 /** Returns a new SceneJS.Instance instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Instance constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} [cfg.name="unnamed"]
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.Instance}
+ * @since Version 0.7.4
  */
 SceneJS.instance = function() {
     var n = new SceneJS.Instance();

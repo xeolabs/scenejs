@@ -48,11 +48,11 @@ SceneJS._inherit(SceneJS.Name, SceneJS.Node);
  */
 SceneJS.Name.prototype.setName = function(name) {
     if (!name) {
-        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.name name is undefined"));
+        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.name name is undefined"));
     }
     name = name.replace(/^\s+|\s+$/g, ''); // Trim
     if (name.length == 0) {
-        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
+        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.name name cannot be empty string"));
     }
     this._name = name;
     return this;

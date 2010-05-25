@@ -50,7 +50,7 @@ SceneJS._inherit(SceneJS.LookAt, SceneJS.Node);
 SceneJS.LookAt.prototype.setEye = function(eye) {
     this._eyeX = eye.x || 0;
     this._eyeY = eye.y || 0;
-    this._eyeZ = eye.z || 0;
+    this._eyeZ = eye.z || 1;
     this._memoLevel = 0;
     return this;
 };
@@ -102,7 +102,7 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     var y = up.y || 0;
     var z = up.z || 0;
     if (x + y + z == 0) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
                         "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero"));
     }
@@ -150,7 +150,7 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
                 this._lookX, this._lookY, this._lookZ,
                 this._upX, this._upY, this._upZ);
     }
-    var superXform = SceneJS_viewTransformModule.getTransform();
+    var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
@@ -167,9 +167,9 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
             this._memoLevel = 2;
         }
     }
-    SceneJS_viewTransformModule.setTransform(this._xform);
+    SceneJS_modelViewTransformModule.setTransform(this._xform);
     this._renderNodes(traversalContext, data);
-    SceneJS_viewTransformModule.setTransform(superXform);
+    SceneJS_modelViewTransformModule.setTransform(superXform);
 };
 
 /** Function wrapper to support functional scene definition

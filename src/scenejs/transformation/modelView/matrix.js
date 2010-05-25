@@ -1,5 +1,5 @@
 /**
- * @class A scene node that defines a sixteen-element matrix to transform the nodes within its subgraph.
+ * @class A scene node that defines a 4x4 matrix to transform the nodes within its subgraph.
  * @extends SceneJS.Node
  * <p><b>Example</b></p><p>A cube translated along the X, Y and Z axis.</b></p><pre><code>
  * var mat = new SceneJS.Matrix({
@@ -37,10 +37,10 @@ SceneJS._inherit(SceneJS.Matrix, SceneJS.Node);
  */
 SceneJS.Matrix.prototype.setElements = function(elements) {
     if (!elements) {
-        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements undefined"));
+        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements undefined"));
     }
     if (elements.length != 16) {
-        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements should number 16"));
+        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements should number 16"));
     }
     for (var i = 0; i < 16; i++) {
         this._mat[i] = elements[i];
@@ -94,7 +94,7 @@ SceneJS.Matrix.prototype._render = function(traversalContext, data) {
 
 /** Function wrapper to support functional scene definition
  */
-SceneJS.Matrix = function() {
+SceneJS.matrix = function() {
     var n = new SceneJS.Matrix();
     SceneJS.Matrix.prototype.constructor.apply(n, arguments);
     return n;

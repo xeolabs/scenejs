@@ -180,12 +180,19 @@ var SceneJS_shaderModule = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.LIGHTS_EXPORTED,
             function(_lights) {
+                var ambient;
                 for (var i = 0; i < _lights.length; i++) {
                     var light = _lights[i];
                     activeProgram.setUniform("uLightColor" + i, light._color);
                     activeProgram.setUniform("uLightDiffuse" + i, light._diffuse);
                     if (light._type == "dir") {
                         activeProgram.setUniform("uLightDir" + i, light._viewDir);
+                    } else if (light.type == "ambient") {
+                        ambient = ambient ? [
+                            ambient[0] + light._color[0],
+                            ambient[1] + light._color[1],
+                            ambient[2] + light._color[2]
+                        ] : light._color;
                     } else {
                         if (light._type == "point") {
                             activeProgram.setUniform("uLightPos" + i, light._viewPos);
@@ -203,6 +210,9 @@ var SceneJS_shaderModule = new (function() {
                                     light._quadraticAttenuation
                                 ]);
                     }
+                }
+                if (ambient) {
+                    //activeProgram.setUniform("uLightPos" + i, light._viewPos);
                 }
             });
 
@@ -332,7 +342,7 @@ var SceneJS_shaderModule = new (function() {
      */
     function activateProgram() {
         if (!canvas) {
-            SceneJS_errorModule.fatalError(new SceneJS.NoCanvasActiveException("No canvas active"));
+            throw SceneJS_errorModule.fatalError(new SceneJS.NoCanvasActiveException("No canvas active"));
         }
 
         if (!sceneHash) {
@@ -363,13 +373,13 @@ var SceneJS_shaderModule = new (function() {
                                         [vertexShaderSrc],
                                         [fragmentShaderSrc],
                                         SceneJS_loggingModule);
-                                SceneJS_loggingModule.info("OK - Created shader: '" + sceneHash + "'");
+                                //  SceneJS_loggingModule.info("OK - Created shader: '" + sceneHash + "'");
                             } catch (e) {
                                 SceneJS_loggingModule.debug("Vertex shader:");
                                 SceneJS_loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
                                 SceneJS_loggingModule.debug("Fragment shader:");
                                 SceneJS_loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-                                SceneJS_errorModule.fatalError(e);
+                                throw SceneJS_errorModule.fatalError(e);
                             }
                         });
             }

@@ -8,7 +8,7 @@
  * chain on which SceneJS.WithData nodes will push and pop as they are visited and departed from during scene traversal.</p>
  * <p>When some node, or node config callback, looks for a property on its local SceneJS.Data, it will hunt up the chain
  * to get the first occurance of that property it finds.</p>
- * <p><b>Example:</b></p><p>Creating data for a child SceneJS.Scale node, which has a callback to configure itself from
+ * <p><b>Example:</b></p><p>Creating data for a child {@link SceneJS.Scale} node, which has a callback to configure itself from
  * the data:</b></p><pre><code>
  * var wd = new SceneJS.WithData({
  *         sizeX: 5,
@@ -33,8 +33,10 @@
  * </code></pre>
  * @constructor
  * Create a new SceneJS.WithData
- * @param {Object} config The config object, followed by zero or more child nodes
- *
+ * @param {Object} [cfg] Static configuration object containing whatever is to be set on the child data scope
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning whatever is to be set on
+ * the child data scope
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.WithData = function() {
     SceneJS.Node.apply(this, arguments);
@@ -89,7 +91,7 @@ SceneJS.WithData.prototype._init = function(params) {
 SceneJS.WithData.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
-            this._init( this._getParams(data));                                    
+            this._init(this._getParams(data));
         } else {
             this._memoLevel = 1;
         }
@@ -102,7 +104,14 @@ SceneJS.WithData.prototype._render = function(traversalContext, data) {
     this._renderNodes(traversalContext, new SceneJS.Data(data, this._fixedParams, this._data));
 };
 
-/** Function wrapper to support functional scene definition
+/**
+ *  Returns a new SceneJS.WithData
+ * @param {Object} [cfg] Static configuration object containing whatever is to be set on the child data scope
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning whatever is to be set on
+ * the child data scope
+ * @param {...SceneJS.Node} [childNodes] Child nodes
+ * @returns {SceneJS.WithData}
+ * @since Version 0.7.4
  */
 SceneJS.withData = function() {
     var n = new SceneJS.WithData();

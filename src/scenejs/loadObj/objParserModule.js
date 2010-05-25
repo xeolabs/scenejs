@@ -1,5 +1,6 @@
 /**
- * Backend that parses a .OBJ files into a SceneJS nodes.
+ * Backend that parses an .OBJ file into a SceneJS subgraph.
+ *
  * @private
  */
 var SceneJS_objParserModule = new (function() {
@@ -7,9 +8,10 @@ var SceneJS_objParserModule = new (function() {
     var positions = [];
     var uv = [];
     var normals = [];
-    var objects = [];
-    var indices = [];
     var group = null;
+    var index = 0;
+    var indexMap = [];
+    var mtllib;
 
     function openGroup(name, textureGroup) {
         group = {
@@ -18,151 +20,127 @@ var SceneJS_objParserModule = new (function() {
             positions: [],
             uv: [],
             normals: [],
-            indices : []
+            indices : [],
+            materialName : null
         };
+        //  indexMap = [];
+        index = 0;
+
     }
 
+    /**
+     * Closes group if open; adds a subgraph to the output, containing
+     * a geometry wrapped in a name. If the group has a material, then
+     * the geometry is also wrapped in an instance that refers to the
+     * material.
+     */
     function closeGroup() {
         if (group) {
-
-            /* Create a geometry node, wrapped in a name node corresponding to the group
-             */
             var name = new SceneJS.Name({
                 name: group.name
             });
-
-            //            var rotate = new SceneJS.rotate({angle : 45, z: 1 });
-            //
-            //            name.addNode(rotate);
-
-            //   alert(group.name);
-            name.addNode(new SceneJS.Geometry({
+            var geometry = new SceneJS.Geometry({
                 primitive: "triangles",
                 positions: group.positions,
                 normals: group.normals,
                 indices: group.indices,
                 uv: group.uv
-            }));
+            });
+            if (group.materialName) {
+
+                /* If group has material then, assuming that an MTL file has been loaded,
+                 * define geometry within an instance of the corresponding Material node
+                 * that will (should) have been defined (within a Symbol node) when the
+                 * MTL file was parsed.
+                 */
+                name.addNode(
+                        new SceneJS.Instance({
+                            name: "../" + group.materialName },  // Back up a level out of group's Name 
+                                geometry));
+            } else {
+                name.addNode(geometry);
+            }
             node.addNode(name);
         }
     }
 
-    function getLines(text) {
-        var tokens = text.split("\n");
-        var n = tokens.length;
-        var line = null;
-        var lines = [ ];
-        for (var i = 0; i < n; ++i) {
-            line = tokens[i].replace(/[ \t]+/g, " ").replace(/\s\s*$/, "");
-            if (line.length > 0) {
-                lines.push(line);
-            }
-        }
-        return lines;
-    }
-
-    function parseArray(str) {
-        return str.replace(/\s+/g, " ").replace(/^\s+/g, "").split(" ");
-    }
-
-    function faceNormal(ai, bi, ci) {
-
-        var a = [group.positions[ai], group.positions[ai + 1], group.positions[ai + 2]];
-        var b = [group.positions[bi], group.positions[bi + 1], group.positions[bi + 2]];
-        var c = [group.positions[ci], group.positions[ci + 1], group.positions[ci + 2]];
-        var dir = SceneJS_math_cross3Vec3(SceneJS_math_subVec3(b, a), SceneJS_math_subVec3(c, a));
-        return SceneJS_math_normalizeVec3(dir);
-    }
-
     function parseFace(tokens) {
-        var verts = [];
-        for (var i = 1; i < tokens.length; i++) {
-            var triple = tokens[i].split("/");
+        var vert = null;             // Array of refs to pos/tex/normal for a vertex
+        var pos = 0;
+        var tex = 0;
+        var nor = 0;
+        var x = 0.0;
+        var y = 0.0;
+        var z = 0.0;
 
+        var indices = [];
+        for (var i = 1; i < tokens.length; ++i) {
+            if (!(tokens[i] in indexMap)) {
+                vert = tokens[i].split("/");
 
-            /* Position
-             */
-            var vertIndex = parseInt(triple[0]) - 1;
-            group.positions.push(positions[vertIndex * 3]);
-            group.positions.push(positions[(vertIndex * 3) + 1]);
-            group.positions.push(positions[(vertIndex * 3) + 2]);
+                if (vert.length == 1) {
+                    pos = parseInt(vert[0]) - 1;
+                    tex = pos;
+                    nor = pos;
+                }
+                else if (vert.length == 3) {
+                    pos = parseInt(vert[0]) - 1;
+                    tex = parseInt(vert[1]) - 1;
+                    nor = parseInt(vert[2]) - 1;
+                }
+                else {
+                    return;
+                }
 
-            verts.push((group.positions.length / 3) - 1);
+                x = 0.0;
+                y = 0.0;
+                z = 0.0;
+                if ((pos * 3 + 2) < positions.length) {
+                    x = positions[pos * 3];
+                    y = positions[pos * 3 + 1];
+                    z = positions[pos * 3 + 2];
+                }
+                group.positions.push(x);
+                group.positions.push(y);
+                group.positions.push(z);
 
-            /* Normal
-             */
-            if (triple[2].length > 0) {
-                var normalIndex = parseInt(triple[2]) - 1;
-                var a = normals[normalIndex * 3];
-                var b = normals[(normalIndex * 3) + 1];
-                var c = normals[(normalIndex * 3) + 2];
+                x = 0.0;
+                y = 0.0;
+                if ((tex * 2 + 1) < uv.length) {
+                    x = uv[tex * 2];
+                    y = uv[tex * 2 + 1];
+                }
+                group.uv.push(x);
+                group.uv.push(y);
 
-//                group.normals.push(-a);
-//                group.normals.push(-b);
-//                group.normals.push(-c);
+                x = 0.0;
+                y = 0.0;
+                z = 1.0;
+                if ((nor * 3 + 2) < normals.length) {
+                    x = normals[nor * 3];
+                    y = normals[nor * 3 + 1];
+                    z = normals[nor * 3 + 2];
+                }
+                group.normals.push(x);
+                group.normals.push(y);
+                group.normals.push(z);
+
+                indexMap[tokens[i]] = index++;
             }
-            //
-            //
-
-
-            //            /* UV
-            //             */
-            //            if (triple[1].length > 0) {
-            //                var uvIndex = parseInt(triple[1]) - 1;
-            //                //  alert("UV: " + uvIndex);
-            //                if (!group.uvMap[uvIndex]) {
-            //                    //  alert("not indexed");
-            //                    group.uv.push(uv[uvIndex*2]);
-            //                    group.uv.push(uv[uvIndex*2 + 1]);
-            //                    group.uvMap[uvIndex] = (group.uv.length / 2) - 1;
-            //                } else {
-            //                    //  alert("indexed");
-            //                }
-            //                vert.texture = group.uvMap[uvIndex];
-            //            }
-            //
-
-            //            /* Normal
-            //             */
-            //            if (triple[2].length > 0) {
-            //                var normalIndex = parseInt(triple[2]) - 1;
-            //                if (!group.normalsMap[normalIndex]) {
-            //                    group.normals.push(normals[normalIndex * 3]);
-            //                    group.normals.push(normals[normalIndex * 3 + 1]);
-            //                    group.normals.push(normals[normalIndex * 3 + 2]);
-            //                    group.normalsMap[normalIndex] = (group.normals.length / 3) - 1;
-            //                }
-            //                vert.normal = group.normalsMap[normalIndex];
-            //            }
+            indices.push(indexMap[tokens[i]]);
         }
 
+        if (indices.length == 3) {
 
-        if (verts.length == 3) {
-            var normal = faceNormal(verts[0], verts[1], verts[2]);
-            for (var i = 0; i < 3; i++) {
-                //                group.normals.push(normal[2]);
-                //                group.normals.push(normal[1]);
-                //                group.normals.push(normal[0]);
-            }
+            /* Triangle
+             */
+            group.indices.push(indices[0]);
+            group.indices.push(indices[1]);
+            group.indices.push(indices[2]);
 
-            group.indices.push(verts[2]);
-            group.indices.push(verts[1]);
-            group.indices.push(verts[0]);
+        } else if (indices.length == 4) {
 
-        }
-        else if (verts.length == 4) {
-            var normal = faceNormal(verts[0], verts[1], verts[2]);
-            for (var i = 0; i < 6; i++) {
-                //                group.normals.push(normal[0]);
-                //                group.normals.push(normal[1]);
-                //                group.normals.push(normal[2]);
-            }
-            group.indices.push(verts[2]);
-            group.indices.push(verts[1]);
-            group.indices.push(verts[0]);
-//            group.indices.push(verts[2]);
-//            group.indices.push(verts[0]);
-//            group.indices.push(verts[3]);
+            // TODO: Triangulate quads
         }
     }
 
@@ -170,42 +148,53 @@ var SceneJS_objParserModule = new (function() {
      * @param text File content
      * @private
      */
-    this.parse = function(text) {
+    this.parse = function(uri, text) {
+        var dirURI = uri.substring(0, uri.lastIndexOf("/") + 1);
+
         node = new SceneJS.Node();
-        var lines = getLines(text);
+        var lines = text.split("\n");
         var tokens;
 
-        for (var i = 0; i < lines.length; i++) {
+        for (var i in lines) {
             var line = lines[i];
             if (line.length > 0) {
-                tokens = parseArray(line);
+                line = lines[i].replace(/[ \t]+/g, " ").replace(/\s\s*$/, "");
+                tokens = line.split(" ");
                 if (tokens.length > 0) {
-                    var token0 = tokens[0];
 
-                    if (token0 == "v") { // vertex
+                    if (tokens[0] == "mtllib") { // Name of auxiliary MTL file
+                        mtllib = tokens[1];
+                    }
+                    if (tokens[0] == "usemtl") { // Name of auxiliary MTL file
+                        group.materialName = tokens[1];
+                    }
+                    if (tokens[0] == "v") { // vertex
                         positions.push(parseFloat(tokens[1]));
                         positions.push(parseFloat(tokens[2]));
                         positions.push(parseFloat(tokens[3]));
                     }
-                    if (token0 == "vt") {
+                    if (tokens[0] == "vt") {
                         uv.push(parseFloat(tokens[1]));
                         uv.push(parseFloat(tokens[2]));
                     }
 
-                    if (token0 == "vn") {
-//                        normals.push(parseFloat(tokens[1]));
-//                        normals.push(parseFloat(tokens[2]));
-//                        normals.push(parseFloat(tokens[3]));
+                    if (tokens[0] == "vn") {
+                        normals.push(parseFloat(tokens[1]));
+                        normals.push(parseFloat(tokens[2]));
+                        normals.push(parseFloat(tokens[3]));
                     }
 
-                    if (token0 == "g") {
+                    if (tokens[0] == "g") {
                         closeGroup();
                         var name = tokens[1];
                         var textureGroup = tokens[2];
                         openGroup(name, textureGroup);
                     }
 
-                    if (token0 == "f") { // TODO: Triangulate polygon in OBJ parser
+                    if (tokens[0] == "f") {
+                        if (!group) {
+                            openGroup(null, null); // Default group - no name or texture group
+                        }
                         parseFace(tokens);
                     }
                 }
@@ -213,6 +202,41 @@ var SceneJS_objParserModule = new (function() {
         }
 
         closeGroup();
-        return node;
+
+        if (mtllib) {
+
+            /* If an MTL file is referenced, then add a LoadMTL node to the result subgraph,
+             * to load the material file. Attach a handler to the LoadMTL to attach the
+             * OBJ subgraph as its next sibling when the LoadMTL has finished loading.
+             * This is neccessary to ensure that the Instance nodes in the OBJ subgraph
+             * don't try to reference Symbols in the MTL subgraph before they are defined.
+             */
+
+            //  alert(dirURI + mtllib)
+            var root = new SceneJS.Node();
+
+            root.addNode(new SceneJS.LoadMTL({
+                uri: dirURI + mtllib, // Path to MTL
+                listeners: {
+                    "state-changed" : {
+                        fn: (function() {
+                            var added = false;
+                            var _root = root;
+                            var _node = node;
+                            return function(loadMTL) {
+                                if (loadMTL.getState() == SceneJS.Load.STATE_RENDERED && !added) {
+                                    _root.addNode(_node);
+                                    added = true;
+                                }
+                            };
+                        })()
+                    }
+                }
+            })
+                    );
+            return root;
+        } else {
+            return node;
+        }
     };
 })();

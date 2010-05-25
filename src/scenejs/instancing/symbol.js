@@ -55,13 +55,19 @@
  * );
  * </pre></code>
  *  @extends SceneJS.Node
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.Symbol
- * @param {Object} config  Config object or function, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} [cfg.name="unnamed"]
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
+ * @returns {SceneJS.Instance}
  */
 SceneJS.Symbol = function() {
     SceneJS.Node.apply(this, arguments);
     this._name = "unnamed";
+    this._nodeType = "symbol";
     if (this._fixedParams) {
         this._init(this._getParams());
     }
@@ -70,10 +76,11 @@ SceneJS.Symbol = function() {
 SceneJS._inherit(SceneJS.Symbol, SceneJS.Node);
 
 /**
- Sets the symbol name. When the given value is undefined, the name will default to "unnamed".
- @function setName
- @param {string} name
- @returns {SceneJS.Symbol} This symbol node
+ * Sets the symbol name. When the given value is undefined, the name will default to "unnamed".
+ * @function setName
+ * @param {string}  [name="unnamed"]
+ * @returns {SceneJS.Symbol} This symbol node
+ * @since Version 0.7.4
  */
 SceneJS.Symbol.prototype.setName = function(name) {
     this._name = name || "unnamed";
@@ -84,6 +91,7 @@ SceneJS.Symbol.prototype.setName = function(name) {
  * Returns the symbol name. The name will be "unnamed" if none is specified.
  * @function {string} getName
  * @returns {string} The symbol name
+ * @since Version 0.7.4
  */
 SceneJS.Symbol.prototype.getName = function() {
     return this._name;
@@ -104,9 +112,13 @@ SceneJS.Symbol.prototype._render = function(traversalContext, data) {
     SceneJS_instancingModule.createSymbol(this._name, this);
 };
 
-/** Returns a new SceneJS.Symbol symbol
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Symbol constructor
+/** Returns a new SceneJS.Symbol
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} [cfg.name="unnamed"]
+ * @param {...SceneJS.Node} [childNodes] Child nodes
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @returns {SceneJS.Symbol}
+ * @since Version 0.7.4
  */
 SceneJS.symbol = function() {
     var n = new SceneJS.Symbol();

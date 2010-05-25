@@ -15,9 +15,15 @@ SceneJS._namespace("SceneJS.objects");
  *     })
  * </pre></code>
  * @extends SceneJS.Geometry
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.objects.Cube
- * @param {Object} config  Config object or function, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {float} [cfg.xSize=1.0] Half-width on X-axis
+ * @param {float} [cfg.ySize=1.0] Half-width on Y-axis
+ * @param {float} [cfg.zSize=1.0] Half-width on Z-axis
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.objects.Cube = function() {
     SceneJS.Geometry.apply(this, arguments);
@@ -31,7 +37,6 @@ SceneJS._inherit(SceneJS.objects.Cube, SceneJS.Geometry);
 
 // @private
 SceneJS.objects.Cube.prototype._init = function(params) {
-    SceneJS.Geometry.prototype._init.call(this, params);
     var x = params.xSize || 1;
     var y = params.ySize || 1;
     var z = params.zSize || 1;
@@ -173,7 +178,13 @@ SceneJS.objects.Cube.prototype._init = function(params) {
 };
 
 /** Returns a new SceneJS.objects.Cube instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.objects.Cube constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {float} [cfg.xSize=1.0] Half-width on X-axis
+ * @param {float} [cfg.ySize=1.0] Half-width on Y-axis
+ * @param {float} [cfg.zSize=1.0] Half-width on Z-axis
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
+ * @since Version 0.7.0
  * @returns {SceneJS.objects.Cube}
  */
 SceneJS.objects.cube = function() {

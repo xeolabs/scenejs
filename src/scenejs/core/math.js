@@ -412,32 +412,45 @@ function SceneJS_math_determinantMat4(m) {
 
 /** @private */
 function SceneJS_math_inverseMat4(m) {
-    var t = SceneJS_math_mat4();
+    var m0 = m[ 0], m1 = m[ 1], m2 = m[ 2], m3 = m[ 3],
+            m4 = m[ 4], m5 = m[ 5], m6 = m[ 6], m7 = m[ 7],
+            m8 = m[ 8], m9 = m[ 9], m10 = m[10], m11 = m[11],
+            m12 = m[12], m13 = m[13], m14 = m[14], m15 = m[15]  ;
 
-    var f = SceneJS_math_getCellMat4;
+    var n = SceneJS_math_identityMat4();
 
-    t[0] = f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 1) - f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 1) + f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 2) - f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 2) - f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 3) + f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 3);
-    t[1] = f(m, 1, 3) * f(m, 2, 2) * f(m, 3, 0) - f(m, 1, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 2) + f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 2) + f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 3) - f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 3);
-    t[2] = f(m, 1, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 1, 3) * f(m, 2, 1) * f(m, 3, 0) + f(m, 1, 3) * f(m, 2, 0) * f(m, 3, 1) - f(m, 1, 0) * f(m, 2, 3) * f(m, 3, 1) - f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 3) + f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 3);
-    t[3] = f(m, 1, 2) * f(m, 2, 1) * f(m, 3, 0) - f(m, 1, 1) * f(m, 2, 2) * f(m, 3, 0) - f(m, 1, 2) * f(m, 2, 0) * f(m, 3, 1) + f(m, 1, 0) * f(m, 2, 2) * f(m, 3, 1) + f(m, 1, 1) * f(m, 2, 0) * f(m, 3, 2) - f(m, 1, 0) * f(m, 2, 1) * f(m, 3, 2);
+    n[ 0] = (m9 * m14 * m7 - m13 * m10 * m7 + m13 * m6 * m11 - m5 * m14 * m11 - m9 * m6 * m15 + m5 * m10 * m15);
+    n[ 1] = (m13 * m10 * m3 - m9 * m14 * m3 - m13 * m2 * m11 + m1 * m14 * m11 + m9 * m2 * m15 - m1 * m10 * m15);
+    n[ 2] = (m5 * m14 * m3 - m13 * m6 * m3 + m13 * m2 * m7 - m1 * m14 * m7 - m5 * m2 * m15 + m1 * m6 * m15);
+    n[ 3] = (m9 * m6 * m3 - m5 * m10 * m3 - m9 * m2 * m7 + m1 * m10 * m7 + m5 * m2 * m11 - m1 * m6 * m11);
 
-    t[4] = f(m, 0, 3) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 2) * f(m, 2, 3) * f(m, 3, 1) - f(m, 0, 3) * f(m, 2, 1) * f(m, 3, 2) + f(m, 0, 1) * f(m, 2, 3) * f(m, 3, 2) + f(m, 0, 2) * f(m, 2, 1) * f(m, 3, 3) - f(m, 0, 1) * f(m, 2, 2) * f(m, 3, 3);
-    t[5] = f(m, 0, 2) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 2, 2) * f(m, 3, 0) + f(m, 0, 3) * f(m, 2, 0) * f(m, 3, 2) - f(m, 0, 0) * f(m, 2, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 2, 0) * f(m, 3, 3) + f(m, 0, 0) * f(m, 2, 2) * f(m, 3, 3);
-    t[6] = f(m, 0, 3) * f(m, 2, 1) * f(m, 3, 0) - f(m, 0, 1) * f(m, 2, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 2, 0) * f(m, 3, 1) + f(m, 0, 0) * f(m, 2, 3) * f(m, 3, 1) + f(m, 0, 1) * f(m, 2, 0) * f(m, 3, 3) - f(m, 0, 0) * f(m, 2, 1) * f(m, 3, 3);
-    t[7] = f(m, 0, 1) * f(m, 2, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 2, 1) * f(m, 3, 0) + f(m, 0, 2) * f(m, 2, 0) * f(m, 3, 1) - f(m, 0, 0) * f(m, 2, 2) * f(m, 3, 1) - f(m, 0, 1) * f(m, 2, 0) * f(m, 3, 2) + f(m, 0, 0) * f(m, 2, 1) * f(m, 3, 2);
+    n[ 4] = (m12 * m10 * m7 - m8 * m14 * m7 - m12 * m6 * m11 + m4 * m14 * m11 + m8 * m6 * m15 - m4 * m10 * m15);
+    n[ 5] = (m8 * m14 * m3 - m12 * m10 * m3 + m12 * m2 * m11 - m0 * m14 * m11 - m8 * m2 * m15 + m0 * m10 * m15);
+    n[ 6] = (m12 * m6 * m3 - m4 * m14 * m3 - m12 * m2 * m7 + m0 * m14 * m7 + m4 * m2 * m15 - m0 * m6 * m15);
+    n[ 7] = (m4 * m10 * m3 - m8 * m6 * m3 + m8 * m2 * m7 - m0 * m10 * m7 - m4 * m2 * m11 + m0 * m6 * m11);
 
-    t[8] = f(m, 0, 2) * f(m, 1, 3) * f(m, 3, 1) - f(m, 0, 3) * f(m, 1, 2) * f(m, 3, 1) + f(m, 0, 3) * f(m, 1, 1) * f(m, 3, 2) - f(m, 0, 1) * f(m, 1, 3) * f(m, 3, 2) - f(m, 0, 2) * f(m, 1, 1) * f(m, 3, 3) + f(m, 0, 1) * f(m, 1, 2) * f(m, 3, 3);
-    t[9] = f(m, 0, 3) * f(m, 1, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 0) * f(m, 3, 2) + f(m, 0, 0) * f(m, 1, 3) * f(m, 3, 2) + f(m, 0, 2) * f(m, 1, 0) * f(m, 3, 3) - f(m, 0, 0) * f(m, 1, 2) * f(m, 3, 3);
-    t[10] = f(m, 0, 1) * f(m, 1, 3) * f(m, 3, 0) - f(m, 0, 3) * f(m, 1, 1) * f(m, 3, 0) + f(m, 0, 3) * f(m, 1, 0) * f(m, 3, 1) - f(m, 0, 0) * f(m, 1, 3) * f(m, 3, 1) - f(m, 0, 1) * f(m, 1, 0) * f(m, 3, 3) + f(m, 0, 0) * f(m, 1, 1) * f(m, 3, 3);
-    t[11] = f(m, 0, 2) * f(m, 1, 1) * f(m, 3, 0) - f(m, 0, 1) * f(m, 1, 2) * f(m, 3, 0) - f(m, 0, 2) * f(m, 1, 0) * f(m, 3, 1) + f(m, 0, 0) * f(m, 1, 2) * f(m, 3, 1) + f(m, 0, 1) * f(m, 1, 0) * f(m, 3, 2) - f(m, 0, 0) * f(m, 1, 1) * f(m, 3, 2);
+    n[ 8] = (m8 * m13 * m7 - m12 * m9 * m7 + m12 * m5 * m11 - m4 * m13 * m11 - m8 * m5 * m15 + m4 * m9 * m15);
+    n[ 9] = (m12 * m9 * m3 - m8 * m13 * m3 - m12 * m1 * m11 + m0 * m13 * m11 + m8 * m1 * m15 - m0 * m9 * m15);
+    n[10] = (m4 * m13 * m3 - m12 * m5 * m3 + m12 * m1 * m7 - m0 * m13 * m7 - m4 * m1 * m15 + m0 * m5 * m15);
+    n[11] = (m8 * m5 * m3 - m4 * m9 * m3 - m8 * m1 * m7 + m0 * m9 * m7 + m4 * m1 * m11 - m0 * m5 * m11);
 
-    t[12] = f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 1) - f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 1) - f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 2) + f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 2) + f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 3) - f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 3);
-    t[13] = f(m, 0, 2) * f(m, 1, 3) * f(m, 2, 0) - f(m, 0, 3) * f(m, 1, 2) * f(m, 2, 0) + f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 2) - f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 2) - f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 3) + f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 3);
-    t[14] = f(m, 0, 3) * f(m, 1, 1) * f(m, 2, 0) - f(m, 0, 1) * f(m, 1, 3) * f(m, 2, 0) - f(m, 0, 3) * f(m, 1, 0) * f(m, 2, 1) + f(m, 0, 0) * f(m, 1, 3) * f(m, 2, 1) + f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 3) - f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 3);
-    t[15] = f(m, 0, 1) * f(m, 1, 2) * f(m, 2, 0) - f(m, 0, 2) * f(m, 1, 1) * f(m, 2, 0) + f(m, 0, 2) * f(m, 1, 0) * f(m, 2, 1) - f(m, 0, 0) * f(m, 1, 2) * f(m, 2, 1) - f(m, 0, 1) * f(m, 1, 0) * f(m, 2, 2) + f(m, 0, 0) * f(m, 1, 1) * f(m, 2, 2);
+    n[12] = (m12 * m9 * m6 - m8 * m13 * m6 - m12 * m5 * m10 + m4 * m13 * m10 + m8 * m5 * m14 - m4 * m9 * m14);
+    n[13] = (m8 * m13 * m2 - m12 * m9 * m2 + m12 * m1 * m10 - m0 * m13 * m10 - m8 * m1 * m14 + m0 * m9 * m14);
+    n[14] = (m12 * m5 * m2 - m4 * m13 * m2 - m12 * m1 * m6 + m0 * m13 * m6 + m4 * m1 * m14 - m0 * m5 * m14);
+    n[15] = (m4 * m9 * m2 - m8 * m5 * m2 + m8 * m1 * m6 - m0 * m9 * m6 - m4 * m1 * m10 + m0 * m5 * m10);
 
-    var s = 1.0 / SceneJS_math_determinantMat4(m);
-    return SceneJS_math_mulMat4s(t, s);
+    var s = 1.0 / (
+            m12 * m9 * m6 * m3 - m8 * m13 * m6 * m3 - m12 * m5 * m10 * m3 + m4 * m13 * m10 * m3 +
+            m8 * m5 * m14 * m3 - m4 * m9 * m14 * m3 - m12 * m9 * m2 * m7 + m8 * m13 * m2 * m7 +
+            m12 * m1 * m10 * m7 - m0 * m13 * m10 * m7 - m8 * m1 * m14 * m7 + m0 * m9 * m14 * m7 +
+            m12 * m5 * m2 * m11 - m4 * m13 * m2 * m11 - m12 * m1 * m6 * m11 + m0 * m13 * m6 * m11 +
+            m4 * m1 * m14 * m11 - m0 * m5 * m14 * m11 - m8 * m5 * m2 * m15 + m4 * m9 * m2 * m15 +
+            m8 * m1 * m6 * m15 - m0 * m9 * m6 * m15 - m4 * m1 * m10 * m15 + m0 * m5 * m10 * m15
+            );
+    for (var i = 0; i < 16; ++i) {
+        n[i] *= s;
+    }
+    return n;
 }
 
 /** @private */
@@ -1048,5 +1061,145 @@ function SceneJS_math_Frustum(viewMatrix, projectionMatrix, viewport) {
     };
 }
 
+function SceneJS_math_identityQuaternion() {
+    return [ 0.0, 0.0, 0.0, 1.0 ];
+}
+
+function SceneJS_math_angleAxisQuaternion(x, y, z, degrees) {
+    var angleRad = (degrees / 180.0) * Math.PI;
+    //var angleRad = degrees;
+    var halfAngle = angleRad / 2.0;
+    var fsin = Math.sin(halfAngle);
+    return [
+        fsin * x,
+        fsin * y,
+        fsin * z,
+        Math.cos(halfAngle)
+    ];
+}
+
+function SceneJS_math_mulQuaternions(p, q) {
+    return [
+        p[3] * q[0] + p[0] * q[3] + p[1] * q[2] - p[2] * q[1],
+        p[3] * q[1] + p[1] * q[3] + p[2] * q[0] - p[0] * q[2],
+        p[3] * q[2] + p[2] * q[3] + p[0] * q[1] - p[1] * q[0],
+        p[3] * q[3] - p[0] * q[0] - p[1] * q[1] - p[2] * q[2]
+    ];
+}
+
+function SceneJS_math_newMat4FromQuaternion(q) {
+    var tx = 2.0 * q[0];
+    var ty = 2.0 * q[1];
+    var tz = 2.0 * q[2];
+    var twx = tx * q[3];
+    var twy = ty * q[3];
+    var twz = tz * q[3];
+    var txx = tx * q[0];
+    var txy = ty * q[0];
+    var txz = tz * q[0];
+    var tyy = ty * q[1];
+    var tyz = tz * q[1];
+    var tzz = tz * q[2];
+    var m = SceneJS_math_identityMat4();
+    SceneJS_math_setCellMat4(m, 0, 0, 1.0 - (tyy + tzz));
+    SceneJS_math_setCellMat4(m, 0, 1, txy - twz);
+    SceneJS_math_setCellMat4(m, 0, 2, txz + twy);
+    SceneJS_math_setCellMat4(m, 1, 0, txy + twz);
+    SceneJS_math_setCellMat4(m, 1, 1, 1.0 - (txx + tzz));
+    SceneJS_math_setCellMat4(m, 1, 2, tyz - twx);
+    SceneJS_math_setCellMat4(m, 2, 0, txz - twy);
+    SceneJS_math_setCellMat4(m, 2, 1, tyz + twx);
+    SceneJS_math_setCellMat4(m, 2, 2, 1.0 - (txx + tyy));
+    return m;
+}
 
 
+/**
+ * Interpolates between two quaternions using spherical linear interpolation (SLERP).
+ * @param {float} t Interpolation factor
+ * @param {float[4]} q1 Quaternion to interpolate from
+ * @param {float[4]} q2 Quaternion to interpolate to
+ */
+//function SceneJS_math_slerp(t, q1, q2) {
+//    var result = SceneJS_math_identityQuaternion();
+//    var cosHalfAngle = q1[3] * q2[3] + q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2];
+//    if (Math.abs(cosHalfAngle) >= 1) {
+//        return [ q1[0],q1[1], q1[2], q1[3] ];
+//    } else {
+//        var halfAngle = Math.acos(cosHalfAngle);
+//        var sinHalfAngle = Math.sqrt(1 - cosHalfAngle * cosHalfAngle);
+//        if (Math.abs(sinHalfAngle) < 0.001) {
+//            return [
+//                q1[0] * 0.5 + q2[0] * 0.5,
+//                q1[1] * 0.5 + q2[1] * 0.5,
+//                q1[2] * 0.5 + q2[2] * 0.5,
+//                q1[3] * 0.5 + q2[3] * 0.5
+//            ];
+//        } else {
+//            var a = Math.sin((1 - t) * halfAngle) / sinHalfAngle;
+//            var b = Math.sin(t * halfAngle) / sinHalfAngle;
+//            return [
+//                q1[0] * a + q2[0] * b,
+//                q1[1] * a + q2[1] * b,
+//                q1[2] * a + q2[2] * b,
+//                q1[3] * a + q2[3] * b
+//            ];
+//        }
+//    }
+//}
+
+function SceneJS_math_slerp(t, q1, q2) {
+    var result = SceneJS_math_identityQuaternion();
+    var q13 = q1[3] * 0.0174532925;
+    var q23 = q2[3] * 0.0174532925;
+    var cosHalfAngle = q13 * q23 + q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2];
+    if (Math.abs(cosHalfAngle) >= 1) {
+        return [ q1[0],q1[1], q1[2], q1[3] ];
+    } else {
+        var halfAngle = Math.acos(cosHalfAngle);
+        var sinHalfAngle = Math.sqrt(1 - cosHalfAngle * cosHalfAngle);
+        if (Math.abs(sinHalfAngle) < 0.001) {
+            return [
+                q1[0] * 0.5 + q2[0] * 0.5,
+                q1[1] * 0.5 + q2[1] * 0.5,
+                q1[2] * 0.5 + q2[2] * 0.5,
+                q1[3] * 0.5 + q2[3] * 0.5
+            ];
+        } else {
+            var a = Math.sin((1 - t) * halfAngle) / sinHalfAngle;
+            var b = Math.sin(t * halfAngle) / sinHalfAngle;
+            return [
+                q1[0] * a + q2[0] * b,
+                q1[1] * a + q2[1] * b,
+                q1[2] * a + q2[2] * b,
+                (q13 * a + q23 * b) * 57.295779579
+            ];
+        }
+    }
+}
+
+function SceneJS_math_normalizeQuaternion(q) {
+    var len = SceneJS_math_lenVec3([q[0], q[1], q[2]]);
+    return [ q[0] / len, q[1] / len, q[2] / len, q[3] / len ];
+}
+
+function SceneJS_math_angleAxisFromQuaternion(q) {
+    q = SceneJS_math_normalizeQuaternion(q);
+    var angle = 2 * Math.acos(q[3]);
+    var s = Math.sqrt(1 - q[3] * q[3]);
+    if (s < 0.001) { // test to avoid divide by zero, s is always positive due to sqrt
+        return {
+            x : q[0],
+            y : q[1],
+            z : q[2],
+            angle: angle
+        };
+    } else {
+        return {
+            x : q[0] / s,
+            y : q[1] / s,
+            z : q[2] / s,
+            angle: angle
+        };
+    }
+}

@@ -3,7 +3,7 @@
 <html>
 <head>
     <title></title>
-    <script type="text/javascript" src="http://github.com/downloads/xeolabs/scenejs/scenejs.min.js"></script>
+   <script type="text/javascript" src="../../lib/scenejs.js"></script>
 </head>
 <body>
 <table>
@@ -16,11 +16,18 @@
             </canvas>
         </td>
         <td valign="top">
-            <div id="_scenejs-default-logging"></div>
+            <h1>Cross-Domain Load of a COLLADA Airplane Model from SceneJS.org</h1>
+            <p>In this example a SceneJS.LoadCollada node loads a COLLADA file cross-domain from SceneJS.org, parsing it
+                to create this airplane.</p>
+            <ul>
+                <li><a target="other" href="seymour-plane.js">Scene source code</a> </li>
+                <li><a target="other" href="http://www.scenejs.org/library/v0.7/assets/examples/seymourplane_triangulate/seymourplane_triangulate.dae">COLLADA model</a> </li>
+                </ul>
+            <div id="theLoggingDiv"></div>
         </td>
     </tr>
 </table>
 
-<script type="text/javascript" src="select-view.js"></script>
+<script type="text/javascript" src="seymour-plane.js"></script>
 </body>
 </html>

@@ -150,7 +150,7 @@ SceneJS.Rotate.prototype._render = function(traversalContext, data) {
         }
         this._mat = SceneJS_math_rotationMat4v(this._angle * Math.PI / 180.0, [this._x, this._y, this._z]);
     }
-    var superXform = SceneJS_modelTransformModule.getTransform();
+    var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
         var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);

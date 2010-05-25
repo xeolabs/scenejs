@@ -3,7 +3,7 @@
 <html>
 <head>
     <title></title>
-    <script type="text/javascript" src="http://github.com/downloads/xeolabs/scenejs/scenejs.min.js"></script>
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
 </head>
 <body>
 <table>
@@ -16,11 +16,30 @@
             </canvas>
         </td>
         <td valign="top">
-            <div id="_scenejs-default-logging"></div>
+                 <h1>Scene Graph Branching - Teapot Selector</h1>
+            <p>Although SceneJS manages WebGL state settings for you automatically, the SceneJS.Renderer node
+                allows you to set them explicitly for portions of your scene graph, perhaps to optimise its performance
+                or do some special rendering effect.</p>
+
+            <p>Use it to explicitly set things for subgraphs, such as the current viewport extents, scissoring,
+                enable/disable shading, backface culling, and so on.</p>
+
+            <p>Normally you wouldn't need to use renderer nodes, but you can insert them throughout your
+                scene when you want more control over WebGL, perhaps to optimise your scene graph.</p>
+
+            <p>They can also be nested, where the inner renderers will override the effects of the outer ones.</p>
+
+            <p>This example is taken from one of the COLLADA test examples, but with a renderer node inserted
+                with all its properties set to defaults. When you omit a renderer node, SceneJS will effectively
+                provide this renderer by default.</p>
+
+            <a target="other" href="renderer-node.js">Source code</a>
+
+            <div id="theLoggingDiv"></div>
         </td>
     </tr>
 </table>
 
-<script type="text/javascript" src="pouring-teapot.js"></script>
+<script type="text/javascript" src="renderer-node.js"></script>
 </body>
 </html>

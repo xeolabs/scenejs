@@ -1,5 +1,5 @@
 /**
- * SceneJS Example - Importing a remote SceneJS teapot asset into a scene
+ * SceneJS Example - Importing a SceneJS teapot from the local file system
  *
  * Lindsay Kay
  * lindsay.kay@xeolabs.com
@@ -13,12 +13,10 @@
  * across the network. Being JavaScript, they evaluate straight into the
  * browser with no expensive parsing.
  *
- * This example loads an orange teapot from the asset repository
- * at SceneJS.com.
+ * This example loads an orange teapot from the the local file system.
  *
- * When the scene is first rendered, the SceneJS.load node will make a
- * JSONP request of the repository, which will respond with the fragment,
- * which it will then evaluate into a subgraph of scene content.
+ * When the scene is first rendered, the SceneJS.load node will load the
+ * JavsScript file, which it will then evaluate into a subgraph of scene content.
  *
  * The SceneJS.load's request will always be asynchronous. This means
  * that when SceneJS renders the SceneJS.load, it's not going to wait
@@ -28,18 +26,17 @@
  * image. But if you keep rendering the scene for a few frames like
  * in this example, as you would when animating, it will magically appear
  * once loaded.
- *
- * SceneJS tracks each these load as a process - you can tell if any loads
- * are still in progress by querying the number of scene processes, as
- * demonstrated in this example.
  */
 
 var exampleScene = SceneJS.scene({
-    canvasId: 'theCanvas',
 
-    /* Proxy that will mediate cross-domain asset loads.
+    /* Bind scene to a WebGL canvas:
      */
-    proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" },
+    canvasId: "theCanvas",
+
+    /* You can optionally write logging to a DIV - scene will log to the console as well.
+     */
+    loggingElementId: "theLoggingDiv" },
 
         SceneJS.lookAt({
             eye : { x: 0.0, y: 20.0, z: -20},
@@ -86,8 +83,7 @@ var exampleScene = SceneJS.scene({
                             /** Load the asset
                              */
                                 SceneJS.load({
-                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                        "examples/orange-teapot/orange-teapot.js"
+                                    uri:"orange-teapot.js"
                                 })
 
                                 )
@@ -105,9 +101,6 @@ window.render = function() {
     exampleScene.render();
 };
 
-/* Render loop until error or reset 
- * (which IDE does whenever you hit that run again button)
- */
 var pInterval;
 
 SceneJS.addListener("error", function() {

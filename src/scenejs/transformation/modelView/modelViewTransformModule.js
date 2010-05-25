@@ -19,6 +19,10 @@ var SceneJS_modelViewTransformModule = new (function() {
                 viewSpaceActive = t.isDefault;
             });
 
+    this.isCameraActive = function() {
+        return !viewSpaceActive;
+    };
+
     this.setTransform = function(t) {
         if (viewSpaceActive) {
             SceneJS_viewTransformModule.setTransform(t);

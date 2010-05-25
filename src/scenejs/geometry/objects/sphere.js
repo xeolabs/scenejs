@@ -13,9 +13,14 @@ SceneJS._namespace("SceneJS.objects");
  *     })
  * </pre></code>
 * @extends SceneJS.Geometry
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.objects.Sphere
- * @param {Object} config  Config object or function, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {float} [cfg.slices=30] Number of longitudinal slices
+ * @param {float} [cfg.rings=30] Number of longitudinal slices
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.objects.Sphere = function() {
     SceneJS.Geometry.apply(this, arguments);
@@ -95,8 +100,13 @@ SceneJS.objects.Sphere.prototype._init = function(params) {
 
 
 /** Returns a new SceneJS.objects.Sphere instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.objects.Sphere constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {float} [cfg.slices=30] Number of longitudinal slices
+ * @param {float} [cfg.rings=30] Number of longitudinal slices
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.objects.Sphere}
+ * @since Version 0.7.0
  */
 SceneJS.objects.sphere = function() {
     var n = new SceneJS.objects.Sphere();

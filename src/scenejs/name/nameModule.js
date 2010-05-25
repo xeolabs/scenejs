@@ -44,28 +44,28 @@ var SceneJS_nameModule = new (function() {
                 //}
             });
 
-//    ctx.names = {
-//
-//        getItemByColor: function(color) {
-//            if (!canvas) {
-//                return null;
-//            }
-//            var key = color[0] + "." + color[1] + "." + color[2];
-//            return namesByColor[key];
-//        },
-//
-//        getItemByPath: function(path) {
-//            if (!canvas) {
-//                return null;
-//            }
-//            return namesByPath[path];
-//        }
-//        //                ,
-//        //
-//        //                getCurrentItem: function() {
-//        //                    return item;
-//        //                }
-//    };
+    //    ctx.names = {
+    //
+    //        getItemByColor: function(color) {
+    //            if (!canvas) {
+    //                return null;
+    //            }
+    //            var key = color[0] + "." + color[1] + "." + color[2];
+    //            return namesByColor[key];
+    //        },
+    //
+    //        getItemByPath: function(path) {
+    //            if (!canvas) {
+    //                return null;
+    //            }
+    //            return namesByPath[path];
+    //        }
+    //        //                ,
+    //        //
+    //        //                getCurrentItem: function() {
+    //        //                    return item;
+    //        //                }
+    //    };
 
     /** @private */
     function nextColor() {
@@ -90,13 +90,14 @@ var SceneJS_nameModule = new (function() {
     /** @private */
     this.pushName = function(name, node) {
         if (!canvas) {
-            SceneJS_errorModule.fatalError("No canvas active");
+            throw SceneJS_errorModule.fatalError("No canvas active");
         }
         nameStack.push(name);
         namePath = nameStack.join("/");
         item = namesByPath[namePath];
         if (!item) {
             item = {
+                stack : nameStack.slice(0),
                 path : namePath,
                 node: node,
                 color: nextColor()
@@ -107,7 +108,7 @@ var SceneJS_nameModule = new (function() {
                 SceneJS_eventModule.NAME_UPDATED,
                 item);
     };
-    
+
     /** @private */
     this.popName = function() {
         nameStack.pop();
@@ -116,5 +117,5 @@ var SceneJS_nameModule = new (function() {
                 SceneJS_eventModule.NAME_UPDATED,
                 namesByPath[namePath]); // Can be null
     };
-    
+
 })();

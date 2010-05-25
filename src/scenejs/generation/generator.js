@@ -42,13 +42,15 @@
  *            )
  *         )
  *   );
- *  </pre></code>
- *  @extends SceneJS.Node
+ * </pre></code>
+ * @extends SceneJS.Node
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.Generator
- * @param {Object} func  Config function, followed by one or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-
 SceneJS.Generator = function(cfg) {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "generator";
@@ -59,7 +61,7 @@ SceneJS._inherit(SceneJS.Generator, SceneJS.Node);
 // @private
 SceneJS.Generator.prototype._render = function(traversalContext, data) {
     if (this._fixedParams) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException
                         ("SceneJS.Generator may only be configured with a function"));
     }
@@ -71,8 +73,11 @@ SceneJS.Generator.prototype._render = function(traversalContext, data) {
 };
 
 /** Returns a new SceneJS.Generator instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Generator constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.Generator}
+ *  @since Version 0.7.2
  */
 SceneJS.generator = function() {
     var n = new SceneJS.Generator();

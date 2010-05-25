@@ -99,7 +99,9 @@
  * @extends SceneJS.Node
  * @constructor
  * Create a new SceneJS.Lights
- * @param {Object} cfg  Config object or function, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object (see class overview comments)
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.Lights = function() {
     SceneJS.Node.apply(this, arguments);
@@ -194,12 +196,14 @@ SceneJS.Lights.prototype._render = function(traversalContext, data) {
         }
         SceneJS_lightingModule.pushLightSources(this._sources);
         this._renderNodes(traversalContext, data);
-        SceneJS_lightingModule.popLightSources(this._sources.length);
+       // SceneJS_lightingModule.popLightSources(this._sources.length);
     }
 };
 
 /** Returns a new SceneJS.Lights instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Lights constructor
+ * @param {Object} [cfg] Static configuration object (see class overview comments)
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.Lights}
  */
 SceneJS.lights = function() {

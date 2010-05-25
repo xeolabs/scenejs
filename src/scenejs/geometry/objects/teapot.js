@@ -7,9 +7,12 @@ SceneJS._namespace("SceneJS.objects");
  * var c = new SceneJS.objects.Teapot(); // Requires no parameters
  * </pre></code>
  * @extends SceneJS.Geometry
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.objects.Teapot
- * @param {Object} config  Config object or function, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.objects.Teapot = function() {
     SceneJS.Geometry.apply(this, arguments);
@@ -5825,8 +5828,11 @@ SceneJS.objects.Teapot = function() {
 SceneJS._inherit(SceneJS.objects.Teapot, SceneJS.Geometry);
 
 /** Returns a new SceneJS.objects.Teapot instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.objects.Teapot constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.objects.Teapot}
+ * @since Version 0.7.4
  */
 SceneJS.objects.teapot = function() {
     return new SceneJS.objects.Teapot();

@@ -37,36 +37,68 @@ var SceneJS_sceneModule = new (function() {
                 viewMat = params.matrix;
             });
 
+    /** Locates element in DOM to write logging to
+     * @private
+     */
+    function findLoggingElement(loggingElementId) {
+        var element;
+        if (!loggingElementId) {
+            element = document.getElementById(SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID);
+            if (!element) {
+                SceneJS_loggingModule.info("SceneJS.Scene config 'loggingElementId' omitted and failed to find default logging element with ID '"
+                        + SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID + "' - that's OK, logging to browser console instead");
+            }
+        } else {
+            element = document.getElementById(loggingElementId);
+            if (!element) {
+                element = document.getElementById(SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID);
+                if (!element) {
+                    SceneJS_loggingModule.info("SceneJS.Scene config 'loggingElementId' unresolved and failed to find default logging element with ID '"
+                            + SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID + "' - that's OK, logging to browser console instead");
+                } else {
+                    SceneJS_loggingModule.info("SceneJS.Scene config 'loggingElementId' unresolved - found default logging element with ID '"
+                            + SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID + "' - logging to browser console also");
+                }
+            } else {
+                  SceneJS_loggingModule.info("SceneJS.Scene logging to element with ID '"
+                            + loggingElementId + "' - logging to browser console also");
+            }
+        }
+        return element;
+    }
+
     /** Locates canvas in DOM, finds WebGL context on it,
      *  sets some default state on the context, then returns
      *  canvas, canvas ID and context wrapped up in an object.
      *
-     * If canvasId is null, will fall back on SceneJS.DEFAULT_CANVAS_ID
+     * If canvasId is null, will fall back on SceneJS.Scene.DEFAULT_CANVAS_ID
      * @private
      */
-    var findCanvas = function(canvasId) {
+    function findCanvas(canvasId) {
         var canvas;
         if (!canvasId) {
-            SceneJS_loggingModule.info("SceneJS.scene config 'canvasId' omitted - looking for default canvas with ID '"
-                    + SceneJS.DEFAULT_CANVAS_ID + "'");
-            canvasId = SceneJS.DEFAULT_CANVAS_ID;
+            SceneJS_loggingModule.info("SceneJS.Scene config 'canvasId' omitted - looking for default canvas with ID '"
+                    + SceneJS.Scene.DEFAULT_CANVAS_ID + "'");
+            canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
             canvas = document.getElementById(canvasId);
             if (!canvas) {
-                SceneJS_errorModule.fatalError(new SceneJS.CanvasNotFoundException
-                        ("SceneJS.Scene config 'canvasId' omitted and could not find default canvas with ID '"
-                                + SceneJS.DEFAULT_CANVAS_ID + "'"));
+                throw SceneJS_errorModule.fatalError(new SceneJS.CanvasNotFoundException
+                        ("SceneJS.Scene failed to find default canvas with ID '"
+                                + SceneJS.Scene.DEFAULT_CANVAS_ID + "'"));
             }
         } else {
             canvas = document.getElementById(canvasId);
-            if (!canvas) {
-                SceneJS_loggingModule.info("SceneJS.scene config 'canvasId' unresolved - looking for default canvas with " +
-                                           "ID '" + SceneJS.DEFAULT_CANVAS_ID + "'");
-                canvasId = SceneJS.DEFAULT_CANVAS_ID;
+            if (canvas) {
+                SceneJS_loggingModule.info("SceneJS.Scene binding to canvas '" + canvasId + "'");
+            } else {
+                SceneJS_loggingModule.info("SceneJS.Scene config 'canvasId' unresolved - looking for default canvas with " +
+                                           "ID '" + SceneJS.Scene.DEFAULT_CANVAS_ID + "'");
+                canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
                 canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    SceneJS_errorModule.fatalError(new SceneJS.CanvasNotFoundException
+                    throw SceneJS_errorModule.fatalError(new SceneJS.CanvasNotFoundException
                             ("SceneJS.Scene config 'canvasId' does not match any elements in the page and no " +
-                             "default canvas found with ID '" + SceneJS.DEFAULT_CANVAS_ID + "'"));
+                             "default canvas found with ID '" + SceneJS.Scene.DEFAULT_CANVAS_ID + "'"));
                 }
             }
         }
@@ -77,7 +109,7 @@ var SceneJS_sceneModule = new (function() {
 
                 context = canvas.getContext(contextNames[i]);
 
-//
+                //
                 //                                                                                        alert("WebGL Trace enabled");
                 //                                                                                        context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
                 //                                                                                        context.setTracing(true);
@@ -86,7 +118,7 @@ var SceneJS_sceneModule = new (function() {
             }
         }
         if (!context) {
-            SceneJS_errorModule.fatalError(new SceneJS.WebGLNotSupportedException
+            throw SceneJS_errorModule.fatalError(new SceneJS.WebGLNotSupportedException
                     ('Canvas document element with ID \''
                             + canvasId
                             + '\' failed to provide a supported WebGL context'));
@@ -103,7 +135,9 @@ var SceneJS_sceneModule = new (function() {
             context: context,
             canvasId : canvasId
         };
-    };
+    }
+
+    ;
 
     /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
      * @private
@@ -114,11 +148,13 @@ var SceneJS_sceneModule = new (function() {
             SceneJS_eventModule.fireEvent(SceneJS_eventModule.INIT);
         }
         var canvas = findCanvas(params.canvasId); // canvasId can be null
+        var loggingElement = findLoggingElement(params.loggingElementId); // loggingElementId can be null
         var sceneId = SceneJS._createKeyForMap(scenes, "scene");
         scenes[sceneId] = {
             sceneId: sceneId,
             scene:scene,
-            canvas: canvas
+            canvas: canvas,
+            loggingElement: loggingElement
         };
         nScenes++;
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_CREATED, {sceneId : sceneId });
@@ -150,11 +186,13 @@ var SceneJS_sceneModule = new (function() {
     this.activateScene = function(sceneId) {
         var scene = scenes[sceneId];
         if (!scene) {
-            SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         activeSceneId = sceneId;
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { sceneId: sceneId });
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_ACTIVATED, scene.canvas);
+
     };
 
     /** Returns the canvas element the given scene is bound to
@@ -163,7 +201,7 @@ var SceneJS_sceneModule = new (function() {
     this.getSceneCanvas = function(sceneId) {
         var scene = scenes[sceneId];
         if (!scene) {
-            SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         return scene.canvas.canvas;
     };
@@ -198,17 +236,20 @@ var SceneJS_sceneModule = new (function() {
      */
     this.deactivateScene = function() {
         if (!activeSceneId) {
-            SceneJS_errorModule.fatalError("Internal error: no scene active");
+            throw SceneJS_errorModule.fatalError("Internal error: no scene active");
         }
         var sceneId = activeSceneId;
         activeSceneId = null;
         var scene = scenes[sceneId];
         if (!scene) {
-            SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_DEACTIVATED, scene.canvas);
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERED, {sceneId : sceneId });
         //SceneJS_loggingModule.info("Scene deactivated: " + sceneId);
     };
 
-})();
+}
+
+        )
+        ();

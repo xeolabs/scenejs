@@ -7,9 +7,13 @@
  *     })
  * </pre></code>
  * @extends SceneJS.Geometry
+ * @since Version 0.7.4
  * @constructor
  * Create a new SceneJS.Text
- * @param {Object} config  Config object or function, followed by zero or more child nodes
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} cfg.text The string of text
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.Text = function() {
     SceneJS.Geometry.apply(this, arguments);
@@ -40,8 +44,12 @@ SceneJS.Text.prototype._init = function(params) {
 };
 
 /** Returns a new SceneJS.Text instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Text constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} cfg.text The string of text
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.Text}
+ *  @since Version 0.7.3
  */
 SceneJS.text = function() {
     var n = new SceneJS.Text();

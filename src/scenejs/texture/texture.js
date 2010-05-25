@@ -152,7 +152,7 @@ SceneJS.Texture.prototype._init = function(params) {
                 layerParam.applyFrom != "uv2" &&
                 layerParam.applyFrom != "normal" &&
                 layerParam.applyFrom != "geometry") {
-                SceneJS_errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         new SceneJS.InvalidNodeConfigException(
                                 "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
                                 "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
@@ -161,7 +161,7 @@ SceneJS.Texture.prototype._init = function(params) {
         if (layerParam.applyTo) {
             if (layerParam.applyTo != "baseColor" && // Colour map
                 layerParam.applyTo != "diffuseColor") {
-                SceneJS_errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         new SceneJS.InvalidNodeConfigException(
                                 "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
                                 "should be either 'baseColor', 'diffuseColor'"));

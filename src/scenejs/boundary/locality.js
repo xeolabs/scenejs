@@ -14,10 +14,15 @@
  *      // ... child nodes containing SceneJS.BoundingBox nodes ...
  *  )
  *</pre></code>
- *  @extends SceneJS.Node
- *@constructor
- *Create a new SceneJS.Locality
- * @param {Object} cfg  Config object or function, followed by zero or more child nodes
+ * @extends SceneJS.Node
+ * @since Version 0.7.3
+ * @constructor
+ * Create a new SceneJS.Locality
+ * @param {Object} [cfg] Static configuration object
+ * @param {double} [cfg.inner = 100000] Inner radius
+ * @param {double} [cfg.outer = 200000] Outer radius
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.Locality = function() {
     SceneJS.Node.apply(this, arguments);
@@ -38,6 +43,7 @@ SceneJS._inherit(SceneJS.Locality, SceneJS.Node);
  @function setInner
  @param {double} inner
  @returns {SceneJS.Locality} this
+ @since Version 0.7.4
  */
 SceneJS.Locality.prototype.setInner = function(inner) {
     this._radii.inner = inner;
@@ -48,6 +54,7 @@ SceneJS.Locality.prototype.setInner = function(inner) {
  Returns the inner radius
  @function {double} getInner
  @returns {double} Inner radius
+ @since Version 0.7.4
  */
 SceneJS.Locality.prototype.getInner = function() {
     return this._radii.inner;
@@ -56,8 +63,9 @@ SceneJS.Locality.prototype.getInner = function() {
 /**
  Sets the outer radius
  @function setOuter
- @param {int} outer
+ @param {double} outer
  @returns {SceneJS.Locality} this
+ @since Version 0.7.4
  */
 SceneJS.Locality.prototype.setOuter = function(outer) {
     this._radii.outer = outer;
@@ -68,6 +76,7 @@ SceneJS.Locality.prototype.setOuter = function(outer) {
  Returns the outer radius
  @function {double} getOuter
  @returns {double} Outer radius
+ @since Version 0.7.4
  */
 SceneJS.Locality.prototype.getOuter = function() {
     return this._radii.outer;
@@ -86,7 +95,7 @@ SceneJS.Locality.prototype._init = function(params) {
 // @private
 SceneJS.Locality.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
-       this._init( this._getParams(data));
+        this._init(this._getParams(data));
     }
     var prevRadii = SceneJS_localityModule.getRadii();
     SceneJS_localityModule.setRadii(this._radii);
@@ -95,8 +104,13 @@ SceneJS.Locality.prototype._render = function(traversalContext, data) {
 };
 
 /** Returns a new SceneJS.Locality instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Locality constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {double} [cfg.inner = 100000] Inner radius
+ * @param {double} [cfg.outer = 200000] Outer radius
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.Locality}
+ * @since Version 0.7.3
  */
 SceneJS.locality = function() {
     var n = new SceneJS.Locality();

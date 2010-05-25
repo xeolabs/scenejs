@@ -3,7 +3,7 @@
 <html>
 <head>
     <title></title>
-   <script type="text/javascript" src="../../lib/scenejs.js"></script>
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
 </head>
 <body>
 <table>
@@ -16,7 +16,25 @@
             </canvas>
         </td>
         <td valign="top">
-            <div id="_scenejs-default-logging"></div>
+            <h1>Loading a Subgraph Containing a Teapot Model from the Local File System</h1>
+
+            <p>SceneJS is geared to composition of scenes from re-usable, parameterised fragments. It can automatically
+                manage a lean set of in-memory fragments by loading them cross-domain on demand, while evicting them
+                following a least-recently-used policy to maintain the pool of free memory. Its terse API means that
+                fragments are compact, allowing them to propagate rapidly across the network. Being JavaScript, they
+                evaluate straight into the browser with no expensive parsing.</p>
+
+            <p>This example loads an orange teapot from the the local file system.</p>
+
+            <p>When the scene is first rendered, the SceneJS.load node will perform a GET for the file, which
+                will then evaluate into a subgraph of scene content.</p>
+
+            <ul>
+                <li><a target="other" href="teapot-load-local.js">Scene source code</a></li>
+                <li><a target="other" href="orange-teapot.js">Teapot source code</a></li>
+            </ul>
+
+            <div id="theLoggingDiv"></div>
         </td>
     </tr>
 </table>

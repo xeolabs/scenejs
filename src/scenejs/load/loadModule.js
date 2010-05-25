@@ -28,14 +28,15 @@ var SceneJS_loadModule = new (function() {
     /** @private */
     function _loadFile(url, onLoad, onError) {
         try {
+
             var request = new XMLHttpRequest();
             request.onreadystatechange = function() {
                 if (request.readyState == 4) {
-                    if (request.status == 200) {
+                   // if (request.status == 200) {
                         onLoad(request.responseText);
-                    } else {
-                        onError(request.status, request.statusText);
-                    }
+//                    } else {
+//                        onError(request.status, request.statusText);
+//                    }
                 }
             };
             request.open("GET", url, true);

@@ -33,7 +33,7 @@ SceneJS._inherit(SceneJS.LoadOBJ, SceneJS.Load);
 // @private
 SceneJS.LoadOBJ.prototype._init = function(params) {
     if (!params.uri) {   // Already checked in SceneJS.Load - do it again here for explicit error message
-        SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+        throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.LoadOBJ parameter expected: uri"));
     }
     SceneJS.Load.prototype._init.call(this, params);
@@ -41,8 +41,10 @@ SceneJS.LoadOBJ.prototype._init = function(params) {
     this._serverParams = {
         format: "xml"
     };
-    this._parser = function(text, onError) {
-        return SceneJS_objParserModule.parse(text);
+    this._parse = function(text, onError) {
+        return SceneJS_objParserModule.parse(
+                params.uri, // Base path for auxiliary resources
+                text);
     };
 };
 

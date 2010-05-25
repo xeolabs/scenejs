@@ -22,10 +22,18 @@
  *     // ... child nodes
  * )
  * </pre></code>
- *  @extends SceneJS.Node
+ * @extends SceneJS.Node
+ * @since Version 0.7.4
  * @constructor
- * Create a new SceneJS.Fog
- * @param {Object} config  Config object or function, followed by zero or more child nodes
+ * Creates a new SceneJS.Fog
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} [cfg.mode = "linear"] The fog mode - "disabled", "exp", "exp2" or "linear"
+ * @param {Object} [cfg.color = {r: 0.5, g: 0.5, b: 0.5 } The fog color
+ * @param {double} [cfg.density = 1.0] The fog density factor
+ * @param {double} [cfg.start = 1.0] Point on Z-axis at which fog effect begins
+ * @param {double} [cfg.end = 1.0] Point on Z-axis at which fog effect ends
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.Fog = function() {
     SceneJS.Node.apply(this, arguments);
@@ -47,10 +55,11 @@ SceneJS._inherit(SceneJS.Fog, SceneJS.Node);
  @function setMode
  @param {string} mode - "disabled", "exp", "exp2" or "linear"
  @returns {SceneJS.Fog} This fog node
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setMode = function(mode) {
     if (mode != "disabled" && mode != "exp" && mode != "exp2" && mode != "linear") {
-        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                 "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'none', 'exp', 'exp2' or 'linear'"));
     }
     this._mode = mode;
@@ -61,6 +70,7 @@ SceneJS.Fog.prototype.setMode = function(mode) {
  Returns fogging mode
  @function {string} getMode
  @returns {string} The fog mode - "disabled", "exp", "exp2" or "linear"
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getMode = function() {
     return this._mode;
@@ -71,6 +81,7 @@ SceneJS.Fog.prototype.getMode = function() {
  @function setColor
  @param {object} color - eg. bright red: {r: 1.0, g: 0, b: 0 }
  @returns {SceneJS.Fog} This fog node
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setColor = function(color) {
     this._color.r = color.r != undefined ? color.r : 0.5;
@@ -83,6 +94,7 @@ SceneJS.Fog.prototype.setColor = function(color) {
  Returns the fog color
  @function getColor
  @returns {object} Fog color - eg. bright red: {r: 1.0, g: 0, b: 0 }
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getColor = function() {
     return {
@@ -97,6 +109,7 @@ SceneJS.Fog.prototype.getColor = function() {
  @function setDensity
  @param {double} density - density factor
  @returns {SceneJS.Fog} This fog node
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setDensity = function(density) {
     this._density = density || 1.0;
@@ -107,6 +120,7 @@ SceneJS.Fog.prototype.setDensity = function(density) {
  Returns the fog density
  @function {double} getDensity
  @returns {double} Fog density factor
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getDensity = function() {
     return this._density;
@@ -117,6 +131,7 @@ SceneJS.Fog.prototype.getDensity = function() {
  @function setStart
  @param {double} start - location on Z-axis
  @returns {SceneJS.Fog} This fog node
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setStart = function(start) {
     this._start = start || 0;
@@ -127,6 +142,7 @@ SceneJS.Fog.prototype.setStart = function(start) {
  Returns the near point on the Z view-axis at which fog begins
  @function {double} getStart
  @returns {double} Position on Z view axis
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getStart = function() {
     return this._start;
@@ -137,6 +153,7 @@ SceneJS.Fog.prototype.getStart = function() {
  @function setEnd
  @param {double} end - location on Z-axis
  @returns {SceneJS.Fog} This fog node
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setEnd = function(end) {
     this._end = end || 1000.0;
@@ -147,6 +164,7 @@ SceneJS.Fog.prototype.setEnd = function(end) {
  Returns the far point on the Z view-axis at which fog ends
  @function {double} getEnd
  @returns {double} Position on Z view axis
+ @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getEnd = function() {
     return this._end;
@@ -177,7 +195,7 @@ SceneJS.Fog.prototype._render = function(traversalContext, data) {
         this._renderNodes(traversalContext, data);
     } else {
         if (!this._fixedParams) {
-            this._init( this._getParams(data));
+            this._init(this._getParams(data));
         }
         var f = SceneJS_fogModule.getFog();
         SceneJS_fogModule.setFog({
@@ -193,8 +211,16 @@ SceneJS.Fog.prototype._render = function(traversalContext, data) {
 };
 
 /** Returns a new SceneJS.Fog instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Fog constructor
+ * @param {Object} [cfg] Static configuration object
+ * @param {String} [cfg.mode = "linear"] The fog mode - "disabled", "exp", "exp2" or "linear"
+ * @param {Object} [cfg.color = {r: 0.5, g: 0.5, b: 0.5 } The fog color
+ * @param {double} [cfg.density = 1.0] The fog density factor
+ * @param {double} [cfg.start = 1.0] Point on Z-axis at which fog effect begins
+ * @param {double} [cfg.end = 1.0] Point on Z-axis at which fog effect ends
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+ * @param {...SceneJS.Node} [childNodes] Child nodes
  * @returns {SceneJS.Fog}
+ * @since Version 0.7.3
  */
 SceneJS.fog = function() {
     var n = new SceneJS.Fog();

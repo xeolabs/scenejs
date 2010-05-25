@@ -29,8 +29,8 @@ SceneJS.LightSource = function(cfg) {
  */
 SceneJS.LightSource.prototype.setType = function(type) {
     if (type != "dir" && type != "point") {
-        SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
-                "SceneJS.LightSource unsupported type - should be 'dir' or 'point'"));
+        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+                "SceneJS.LightSource unsupported type - should be 'dir' or 'point' or 'ambient'"));
     }
     this._type = type;
     return this;

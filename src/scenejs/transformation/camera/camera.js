@@ -102,7 +102,7 @@ SceneJS.Camera = function() {
         fovy : 60.0,
         aspect : 1.0,
         near : 0.10,
-        far : 1000.0
+        far : 5000.0
     };
     if (this._fixedParams) {
         this._init(this._getParams());
@@ -126,7 +126,7 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
             near : optics.near || 0.1,
             right : optics.right || 1.00,
             top : optics.top || 1.0,
-            far : optics.far || 1000.0
+            far : optics.far || 5000.0
         };
     } else if (optics.type == "frustum") {
         this._optics = {
@@ -136,7 +136,7 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
             near : optics.near || 0.1,
             right : optics.right || 1.00,
             top : optics.top || 1.0,
-            far : optics.far || 1000.0
+            far : optics.far || 5000.0
         };
     } else  if (optics.type == "perspective") {
         this._optics = {
@@ -144,15 +144,15 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
             fovy : optics.fovy || 60.0,
             aspect: optics.aspect || 1.0,
             near : optics.near || 0.1,
-            far : optics.far || 1000.0
+            far : optics.far || 5000.0
         };
     } else if (!optics.type) {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
                         "SceneJS.Camera configuration invalid: optics type not specified - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'"));
     } else {
-        SceneJS_errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
                         "SceneJS.Camera configuration invalid: optics type not supported - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'"));
