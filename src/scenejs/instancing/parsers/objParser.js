@@ -201,6 +201,36 @@ var SceneJS_objParserModule = new (function() {
             }
         }
 
+//        calculate_normals : function(verts) {
+//202	    var norms = [];
+//203	    for (var i=0; i<verts.length; i+=9) {
+//204	      var normal = this.find_normal(
+//205	        verts[i  ], verts[i+1], verts[i+2],
+//206	        verts[i+3], verts[i+4], verts[i+5],
+//207	        verts[i+6], verts[i+7], verts[i+8]);
+//208	      for (var j=0; j<3; j++) {
+//209	        norms.push(normal[0]);
+//210	        norms.push(normal[1]);
+//211	        norms.push(normal[2]);
+//212	      }
+//213	    }
+//214	    return norms;
+//215	  },
+//216
+//217	  find_normal : function(x0,y0,z0, x1,y1,z1, x2,y2,z2) {
+//218	    var u = [x0-x1, y0-y1, z0-z1];
+//219	    var v = [x1-x2, y1-y2, z1-z2];
+//220	    var w = [x2-x0, y2-y0, z2-z0];
+//221	    var n = Vec3.cross(u,v);
+//222	    if (Vec3.lengthSquare(n) == 0)
+//223	      n = Vec3.cross(v,w);
+//224	    if (Vec3.lengthSquare(n) == 0)
+//225	      n = Vec3.cross(w,u);
+//226	    if (Vec3.lengthSquare(n) == 0)
+//227	      n = [0,0,1];
+//228	    return Vec3.normalize(n);
+//229	  }
+//230
         closeGroup();
 
         if (mtllib) {
@@ -224,7 +254,7 @@ var SceneJS_objParserModule = new (function() {
                             var _root = root;
                             var _node = node;
                             return function(loadMTL) {
-                                if (loadMTL.getState() == SceneJS.Load.STATE_RENDERED && !added) {
+                                if (loadMTL.getState() == SceneJS.Instance.STATE_RENDERED && !added) {
                                     _root.addNode(_node);
                                     added = true;
                                 }
