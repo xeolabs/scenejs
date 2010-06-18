@@ -1,5 +1,5 @@
 /**
- * SceneJS Example - Importing a SceneJS teapot from the local file system
+ * SceneJS Example - Importing a remotely-stored SceneJS teapot into a scene
  *
  * Lindsay Kay
  * lindsay.kay@xeolabs.com
@@ -13,10 +13,12 @@
  * across the network. Being JavaScript, they evaluate straight into the
  * browser with no expensive parsing.
  *
- * This example loads an orange teapot from the the local file system.
+ * This example loads an orange teapot from the asset repository
+ * at SceneJS.com.
  *
- * When the scene is first rendered, the SceneJS.instance node will load the
- * JavsScript file, which it will then evaluate into a subgraph of scene content.
+ * When the scene is first rendered, the SceneJS.instance node will make a
+ * JSONP request of the repository, which will respond with the fragment,
+ * which it will then evaluate into a subgraph of scene content.
  *
  * The SceneJS.instance's request will always be asynchronous. This means
  * that when SceneJS renders the SceneJS.instance, it's not going to wait
@@ -27,6 +29,21 @@
  * in this example, as you would when animating, it will magically appear
  * once loaded.
  */
+
+/*
+ * To enable the teapot to load cross-domain, we'll first configure SceneJS with a strategy to allow it
+ * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
+ * create the request URL for the service, and another to extract the data from the response.
+ */
+SceneJS.setJSONPStrategy({
+    request : function(url, format, callback) {
+        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
+    },
+
+    response : function(data) {  // Our proxy service does no fancy data packaging
+        return data;
+    }
+});
 
 var exampleScene = SceneJS.scene({
 
@@ -83,13 +100,24 @@ var exampleScene = SceneJS.scene({
                             /** Load the asset
                              */
                                 SceneJS.instance({
-                                    uri:"orange-teapot.js"
+                                    uri:"http://scenejs.org/library/v0.7/assets/examples/orange-teapot/orange-teapot.js"
                                 })
 
                                 )
                         )
                 )
         );
+
+
+SceneJS.setJSONPStrategy({
+    request : function(url, format, callback) {
+        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
+    },
+
+    response : function(data) {
+        return data;
+    }
+});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and process query stuff follows
@@ -101,6 +129,9 @@ window.render = function() {
     exampleScene.render();
 };
 
+/* Render loop until error or reset 
+ * (which IDE does whenever you hit that run again button)
+ */
 var pInterval;
 
 SceneJS.addListener("error", function() {

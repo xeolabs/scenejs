@@ -24,99 +24,100 @@ var exampleScene = SceneJS.scene({
      */
     loggingElementId: "theLoggingDiv" },
 
-    /* Viewing transform specifies eye position, looking
-     * at the origin by default
-     */
-        SceneJS.lookAt({
-            eye : { x: 0.0, y: 10.0, z: -15 },
-            look : { y:1.0 },
-            up : { y: 1.0 }
+        SceneJS.withConfigs({
+
+            "#viewpoint": {
+                eye: { x: 0.0, y: 10.0, z: -15 },
+                look : { y:1.0 },
+                up : { y: 1.0 },
+
+                "#pitch": {
+                    angle: 20,
+
+                    "#yaw" : {
+                        angle: 200
+                    }
+                }
+            }
         },
-            /* Camera describes the projection
+
+            /* Viewing transform specifies eye position, looking
+             * at the origin by default
              */
-                SceneJS.camera({
-                    optics: {
-                        type: "perspective",
-                        fovy : 25.0,
-                        aspect : 1.0,
-                        near : 0.10,
-                        far : 300.0  }
+                SceneJS.lookAt({
+
+                    gid: "viewpoint",
+
+                    eye : { x: 0.0, y: 10.0, z: -15 },
+                    look : { y:1.0 },
+                    up : { y: 1.0 }
                 },
-
-                    /* A lights node inserts  point lights into the world-space.
-                     * You can have many of these, nested within modelling transforms
-                     * if you want to move them around.
+                    /* Camera describes the projection
                      */
-                        SceneJS.lights({
-                            sources: [
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                                }
-                            ]},
+                        SceneJS.camera({
+                            optics: {
+                                type: "perspective",
+                                fovy : 25.0,
+                                aspect : 1.0,
+                                near : 0.10,
+                                far : 300.0  }
+                        },
 
-                            /* Next, modelling transforms to orient our teapot
-                             by a given angle.  See how these rotate nodes take a
-                             function which creates its configuration object?
-
-                             You can do that when you want a node's configuration to be
-                             evaluated dynamically at traversal-time. The function
-                             takes a scope, which is SceneJS's mechanism for passing
-                             variables down into a scene graph. Using the angle
-                             variable on the scope, the function creates a
-                             configuration that specifies a rotation about the X-axis.
-                             Further down you'll see how we inject that angle
-                             variable when we render the scene.
+                            /* A lights node inserts  point lights into the world-space.
+                             * You can have many of these, nested within modelling transforms
+                             * if you want to move them around.
                              */
-                                SceneJS.rotate(function(data) {
-                                    return {
-                                        angle: data.get('pitch'), x : 1.0
-                                    };
-                                },
-                                        SceneJS.rotate(function(data) {
-                                            return {
-                                                angle: data.get('yaw'), y : 1.0
-                                            };
+                                SceneJS.lights({
+                                    sources: [
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
                                         },
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                                        },
+                                        {
+                                            type:                   "dir",
+                                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
+                                            diffuse:                true,
+                                            specular:               true,
+                                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                                        }
+                                    ]},
 
-                                            /* Specify the amounts of ambient, diffuse and specular
-                                             * lights our teapot reflects
-                                             */
-                                                SceneJS.material({
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:       0.9,
-                                                    shine:          6.0
-                                                },
+                                        SceneJS.rotate({ gid: "pitch", angle: 30, x : 1.0  },
 
-                                                    /* Teapot's geometry
+                                                SceneJS.rotate({ gid: "yaw", angle: 0, y : 1.0 },
+
+                                                    /* Specify the amounts of ambient, diffuse and specular
+                                                     * lights our teapot reflects
                                                      */
-                                                        SceneJS.scale({x:1.0,y:1.0,z:1.0},
-                                                                SceneJS.objects.teapot()
+                                                        SceneJS.material({
+                                                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                            specular:       0.9,
+                                                            shine:          6.0
+                                                        },
+
+                                                            /* Teapot's geometry
+                                                             */
+                                                                SceneJS.scale({x:1.0,y:1.0,z:1.0},
+                                                                        SceneJS.objects.teapot()
+                                                                        )
                                                                 )
                                                         )
-                                                )
-                                        ) // rotate
-                                ) // lookAt
-                        ) // perspective
-                ) // lights
+                                                ) // rotate
+                                        ) // lookAt
+                                ) // perspective
+                        ) // lights
+                ) // withConfigs
         ); // scene
 
 
