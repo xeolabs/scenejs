@@ -149,7 +149,7 @@ var SceneJS_sceneModule = new (function() {
         }
         var canvas = findCanvas(params.canvasId); // canvasId can be null
         var loggingElement = findLoggingElement(params.loggingElementId); // loggingElementId can be null
-        var sceneId = SceneJS._createKeyForMap(scenes, "scene");
+        var sceneId = SceneJS._createKeyForMap(scenes, "s");
         scenes[sceneId] = {
             sceneId: sceneId,
             scene:scene,

@@ -210,7 +210,7 @@ SceneJS.Fog.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Returns a new SceneJS.Fog instance
+/** Factory function that returns a new {@link SceneJS.Fog} instance
  * @param {Object} [cfg] Static configuration object
  * @param {String} [cfg.mode = "linear"] The fog mode - "disabled", "exp", "exp2" or "linear"
  * @param {Object} [cfg.color = {r: 0.5, g: 0.5, b: 0.5 } The fog color

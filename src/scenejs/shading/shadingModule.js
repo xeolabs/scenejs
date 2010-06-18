@@ -810,10 +810,10 @@ var SceneJS_shaderModule = new (function() {
             src.push("gl_FragColor = fragColor;");
         }
 
-        // src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+      // src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         src.push("}");
 
-        // SceneJS_loggingModule.info(getShaderLoggingSource(src));
+      //  SceneJS_loggingModule.info(getShaderLoggingSource(src));
         return src.join("\n");
     }
 })();

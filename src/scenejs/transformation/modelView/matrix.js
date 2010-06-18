@@ -69,7 +69,7 @@ SceneJS.Matrix.prototype._init = function(params) {
 SceneJS.Matrix.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
-           this._init( this._getParams(data));
+            this._init(this._getParams(data));
         } else {
             this._memoLevel = 1;
         }
@@ -77,7 +77,15 @@ SceneJS.Matrix.prototype._render = function(traversalContext, data) {
     var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
         var instancing = SceneJS_instancingModule.instancing();
-        var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
+
+        /* When building a view transform, apply the inverse of the matrix
+         * to correctly transform the SceneJS.Camera
+         */
+        var mat = SceneJS_modelViewTransformModule.isBuildingViewTransform()
+                ? SceneJS_math_inverseMat4(this._mat)
+                : this._mat;
+        
+        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
@@ -92,7 +100,7 @@ SceneJS.Matrix.prototype._render = function(traversalContext, data) {
     SceneJS_modelViewTransformModule.setTransform(superXform);
 };
 
-/** Function wrapper to support functional scene definition
+/** Factory function that returns a new {@link SceneJS.Matrix} instance
  */
 SceneJS.matrix = function() {
     var n = new SceneJS.Matrix();

@@ -77,12 +77,12 @@ SceneJS.Name.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
         this._init(this._getParams(data));
     }
-    SceneJS_nameModule.pushName(this._name);
+    SceneJS_nameModule.pushName(this._name, this);
     this._renderNodes(traversalContext, data);
     SceneJS_nameModule.popName();
 };
 
-/** Returns a new SceneJS.Name instance
+/** Factory function that returns a new {@link SceneJS.Name} instance
  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Name constructor
  * @returns {SceneJS.Name}
  */

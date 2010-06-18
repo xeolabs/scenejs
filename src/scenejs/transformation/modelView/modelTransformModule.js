@@ -13,7 +13,7 @@
  * Avoids redundant export of the matrices with a dirty flag; they are only exported when that is set, which occurs
  * when transform is set by scene node, or on SCENE_RENDERING, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
  *
- * Whenever a scene node sets the matrix, this backend publishes it with a PROJECTION_TRANSFORM_UPDATED to allow other
+ * Whenever a scene node sets the matrix, this backend publishes it with a MODEL_TRANSFORM_UPDATED to allow other
  * dependent backends to synchronise their resources.
  *
  *  @private

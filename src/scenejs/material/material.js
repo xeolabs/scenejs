@@ -76,9 +76,9 @@ SceneJS._inherit(SceneJS.Material, SceneJS.Node);
  */
 SceneJS.Material.prototype.setBaseColor = function(color) {
     this._material.baseColor = [
-        color.r != undefined ? color.r : 0.0,
-        color.g != undefined ? color.g : 0.0,
-        color.b != undefined ? color.b : 0.0
+        color.r != undefined && color.r != null ? color.r : 0.0,
+        color.g != undefined && color.g != null ? color.g : 0.0,
+        color.b != undefined && color.b != null ? color.b : 0.0
     ];
     return this;
 };
@@ -90,9 +90,9 @@ SceneJS.Material.prototype.setBaseColor = function(color) {
  */
 SceneJS.Material.prototype.getBaseColor = function() {
     return {
-        r: this._material.baseColor,
-        g: this._material.baseColor,
-        b: this._material.baseColor
+        r: this._material.baseColor[0],
+        g: this._material.baseColor[1],
+        b: this._material.baseColor[2]
     };
 };
 
@@ -104,9 +104,9 @@ SceneJS.Material.prototype.getBaseColor = function() {
  */
 SceneJS.Material.prototype.setSpecularColor = function(color) {
     this._material.specularColor = [
-        color.r != undefined ? color.r : 0.5,
-        color.g != undefined ? color.g : 0.5,
-        color.b != undefined ? color.b : 0.5
+        color.r != undefined && color.r != null ? color.r : 0.5,
+        color.g != undefined && color.g != null ? color.g : 0.5,
+        color.b != undefined && color.b != null ? color.b : 0.5
     ];
     return this;
 };
@@ -264,7 +264,7 @@ SceneJS.Material.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Returns a new SceneJS.Material instance
+/** Factory function that returns a new {@link SceneJS.Material} instance
  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Material constructor
  * @returns {SceneJS.Material}
  */

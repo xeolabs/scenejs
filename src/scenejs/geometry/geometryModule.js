@@ -231,7 +231,7 @@ var SceneJS_geometryModule = new (function() {
      */
     this.createGeometry = function(type, data) {
         if (!type) {
-            type = SceneJS._createKeyForMap(currentGeoMap, "type");
+            type = SceneJS._createKeyForMap(currentGeoMap, "t");
         }
 
         //   SceneJS_loggingModule.debug("Creating geometry: '" + type + "'");

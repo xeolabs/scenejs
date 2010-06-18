@@ -4,11 +4,11 @@
  * <p>This node type is useful for keeping scene size small, while also simplifying editing of a scene; when you edit
  * content within a Symbol, all instances of the Symbol update to reflect the edits.</p>
  *
- * <p>When rendered, SceneJS registers this node against its specified name and prevents SceneJS from traversing
+ * <p>When rendered, SceneJS registers this node against its sub-identifier (SID) and prevents SceneJS from traversing
  * into its subgraph. The content defined within the Symbol will therefore only be rendered when it is instanced.
- * The registered name will be actually be the concatenation of the specified name with the namespace formed by
- * any enclosing {@link SceneJS.Name} nodes. When SceneJS then finds a {@link SceneJS.Instance} node that refers to the
- * registered name, it will instantiate the Symbol's child nodes as if they were children of the {@link SceneJS.Instance}
+ * The registered identity will be actually be the concatenation of the SID with the namespace formed by the SIDs
+ * any enclosing nodes. When SceneJS then finds a {@link SceneJS.Instance} node with a URL that refers to the
+ * registered identity, it will instantiate the Symbol's child nodes as if they were children of the {@link SceneJS.Instance}
  *  node.</p>
  *
  * <p>Beware potential performance penalties for using Symbols and {@link SceneJS.Instances}. Within every subgraph, SceneJS
@@ -18,19 +18,18 @@
  *
  * <p><b>Live Examples</b></p>
  * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint</a></li></ul>
- * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a {@link SceneJS.Name}, then instantiating it three times with
- * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to a namespace
- * created by a {@link SceneJS.Name} node:</b></p><pre><code>
+ * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a {@link SceneJS.Node}, then instantiating it three times with
+ * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to
+ * a namespace created by a {@link SceneJS.Node}:</b></p><pre><code>
  * var scene = new SceneJS.Scene(
  *
  *      // ...
  *
  *      // Define a "teapot" symbol inside a namespace.
- *      // Note that the Name is not mandatory.
  *
- *      new SceneJS.Name({name: "mySymbols"},
+ *      new SceneJS.Node({ sid: "mySymbols"},
  *
- *          new SceneJS.Symbol({ name: "teapot" },
+ *          new SceneJS.Symbol({ sid: "teapot" },
  *              new SceneJS.objects.Teapot()
  *          ),
  *
@@ -38,18 +37,18 @@
  *          // See how the symbol reference is relative, where it
  *          // does not start with a '/'.
  *
- *          new SceneJS.Instance({name: "teapot" })
+ *          new SceneJS.Instance({ uri: "teapot" })
  *      ),
  *
  *      // Instance the teapot Symbol again, from outside the namespace
  *
- *      new SceneJS.Instance({name: "mySymbols/teapot"}),
+ *      new SceneJS.Instance({ uri: "mySymbols/teapot"}),
  *
  *      // Instance the teapot Symbol one more time from outside the
  *      // namespace to show how an absolute path can be specified to
  *      // the Symbol
  *
- *      new SceneJS.Instance({name: "/mySymbols/teapot"})
+ *      new SceneJS.Instance({ uri: "/mySymbols/teapot" })
  *
  *      // ...
  * );
@@ -66,53 +65,23 @@
  */
 SceneJS.Symbol = function() {
     SceneJS.Node.apply(this, arguments);
-    this._name = "unnamed";
     this._nodeType = "symbol";
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
 };
 
 SceneJS._inherit(SceneJS.Symbol, SceneJS.Node);
 
-/**
- * Sets the symbol name. When the given value is undefined, the name will default to "unnamed".
- * @function setName
- * @param {string}  [name="unnamed"]
- * @returns {SceneJS.Symbol} This symbol node
- * @since Version 0.7.4
- */
-SceneJS.Symbol.prototype.setName = function(name) {
-    this._name = name || "unnamed";
-    return this;
-};
-
-/**
- * Returns the symbol name. The name will be "unnamed" if none is specified.
- * @function {string} getName
- * @returns {string} The symbol name
- * @since Version 0.7.4
- */
-SceneJS.Symbol.prototype.getName = function() {
-    return this._name;
-};
-
-// @private
-SceneJS.Symbol.prototype._init = function(params) {
-    if (params.name) {
-        this.setName(params.name);
-    }
-};
-
 // @private
 SceneJS.Symbol.prototype._render = function(traversalContext, data) {
-    if (!this._fixedParams) {
-        this._init(this._getParams(data));
+    if (!this._sid) {
+        throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+                ("SceneJS.Symbol parameter expected: sid"));
     }
-    SceneJS_instancingModule.createSymbol(this._name, this);
+    this._sidPath = SceneJS_instancingModule.getName();  // Path to this Symbol, without this Symbol's SID
+    SceneJS_instancingModule.createSymbol(this._sid, this);
 };
 
-/** Returns a new SceneJS.Symbol
+
+/**  Factory function that returns a new {@link SceneJS.Symbol}
  * @param {Object} [cfg] Static configuration object
  * @param {String} [cfg.name="unnamed"]
  * @param {...SceneJS.Node} [childNodes] Child nodes

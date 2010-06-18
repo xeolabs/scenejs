@@ -185,44 +185,50 @@ var SceneJS_textureModule = new (function() {
         var image = new Image();
         var _canvas = canvas;
         var _context = canvas.context;
+        var process = SceneJS_processModule.createProcess({ // To support monitor of image loads through SceneJS events
+            description:"creating texture: uri = " + uri,
+            timeoutSecs: -1 // Relying on Image object for timeout
+        });
         image.onload = function() {
-            var textureId = SceneJS._createKeyForMap(textures, "tex");
+            var textureId = SceneJS._createKeyForMap(textures, "t");
             SceneJS_memoryModule.allocate(
                     _context,
                     "texture '" + textureId + "'",
                     function() {
                         try {
-                        textures[textureId] = new SceneJS_webgl_Texture2D(_context, {
-                            textureId : textureId,
-                            canvas: _canvas,
-                            image : image,
-                            texels :cfg.texels,
-                            minFilter : getGLOption("minFilter", _context, cfg, _context.LINEAR),
-                            magFilter :  getGLOption("magFilter", _context, cfg, _context.LINEAR),
-                            wrapS : getGLOption("wrapS", _context, cfg, _context.CLAMP_TO_EDGE),
-                            wrapT :   getGLOption("wrapT", _context, cfg, _context.CLAMP_TO_EDGE),
-                            isDepth :  getOption(cfg.isDepth, false),
-                            depthMode : getGLOption("depthMode", _context, cfg, _context.LUMINANCE),
-                            depthCompareMode : getGLOption("depthCompareMode", _context, cfg, _context.COMPARE_R_TO_TEXTURE),
-                            depthCompareFunc : getGLOption("depthCompareFunc", _context, cfg, _context.LEQUAL),
-                            flipY : getOption(cfg.flipY, true),
-                            width: getOption(cfg.width, 1),
-                            height: getOption(cfg.height, 1),
-                            internalFormat : getGLOption("internalFormat", _context, cfg, _context.LEQUAL),
-                            sourceFormat : getGLOption("sourceType", _context, cfg, _context.ALPHA),
-                            sourceType : getGLOption("sourceType", _context, cfg, _context.UNSIGNED_BYTE),
-                            logging: SceneJS_loggingModule
-                        });
+                            textures[textureId] = new SceneJS_webgl_Texture2D(_context, {
+                                textureId : textureId,
+                                canvas: _canvas,
+                                image : image,
+                                texels :cfg.texels,
+                                minFilter : getGLOption("minFilter", _context, cfg, _context.LINEAR),
+                                magFilter :  getGLOption("magFilter", _context, cfg, _context.LINEAR),
+                                wrapS : getGLOption("wrapS", _context, cfg, _context.CLAMP_TO_EDGE),
+                                wrapT :   getGLOption("wrapT", _context, cfg, _context.CLAMP_TO_EDGE),
+                                isDepth :  getOption(cfg.isDepth, false),
+                                depthMode : getGLOption("depthMode", _context, cfg, _context.LUMINANCE),
+                                depthCompareMode : getGLOption("depthCompareMode", _context, cfg, _context.COMPARE_R_TO_TEXTURE),
+                                depthCompareFunc : getGLOption("depthCompareFunc", _context, cfg, _context.LEQUAL),
+                                flipY : getOption(cfg.flipY, true),
+                                width: getOption(cfg.width, 1),
+                                height: getOption(cfg.height, 1),
+                                internalFormat : getGLOption("internalFormat", _context, cfg, _context.LEQUAL),
+                                sourceFormat : getGLOption("sourceType", _context, cfg, _context.ALPHA),
+                                sourceType : getGLOption("sourceType", _context, cfg, _context.UNSIGNED_BYTE),
+                                logging: SceneJS_loggingModule
+                            });
                         } catch (e) {
-                            alert(e.message || e);
                         }
                     });
+            SceneJS_processModule.killProcess(process);
             onSuccess(textures[textureId]);
         };
         image.onerror = function() {
+            SceneJS_processModule.killProcess(process);
             onError();
         };
         image.onabort = function() {
+            SceneJS_processModule.killProcess(process);
             onAbort();
         };
         image.src = uri;  // Starts image load

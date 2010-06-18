@@ -389,7 +389,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Returns a new SceneJS.BoundingBox instance
+/** Factory function that returns a new {@link SceneJS.BoundingBox} instance
  * @param {Object} [cfg] Static configuration object
  * @param {double} [cfg.xmin = -1.0] Minimum X-axis extent
  * @param {double} [cfg.ymin = -1.0] Minimum Y-axis extent

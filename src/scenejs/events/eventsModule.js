@@ -162,7 +162,7 @@ var SceneJS_eventModule = new (function() {
  *
  * <p><b><em>process-created</em></b></p><p>An asynchronous process has started somewhere among the nodes wtihin a
  * {@link SceneJS.Scene}. Processes track the progress of tasks such as the loading of remotely-stored content by
- * {@link SceneJS.Load} nodes. This event is particularly useful to monitor for content loading. </p>
+ * {@link SceneJS.Instance} nodes. This event is particularly useful to monitor for content loading. </p>
  * <p>Example:</p><pre><code>
  *  SceneJS.addListener(
  *      "process-created",

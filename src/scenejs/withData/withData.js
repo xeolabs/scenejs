@@ -105,7 +105,7 @@ SceneJS.WithData.prototype._render = function(traversalContext, data) {
 };
 
 /**
- *  Returns a new SceneJS.WithData
+ * Factory function that returns a new {@link SceneJS.WithData} instance
  * @param {Object} [cfg] Static configuration object containing whatever is to be set on the child data scope
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning whatever is to be set on
  * the child data scope

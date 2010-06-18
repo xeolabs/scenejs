@@ -87,11 +87,35 @@ var SceneJS_nameModule = new (function() {
         return [redCount, greenCount, blueCount];
     }
 
+    this.getName = function() {
+        return {
+            nameStack : nameStack,
+            namePath : namePath
+        };
+    };
+
+    this.clearName = function() {
+        nameStack = [];
+        namePath = "";
+        SceneJS_eventModule.fireEvent(
+                SceneJS_eventModule.NAME_UPDATED, {
+            stack : nameStack.slice(0),
+            path : namePath
+        });
+    };
+
+    this.restoreName = function(restore) {
+        nameStack = restore.nameStack;
+        namePath = restore.namePath;
+        SceneJS_eventModule.fireEvent(
+                SceneJS_eventModule.NAME_UPDATED, {
+            stack : nameStack.slice(0),
+            path : namePath
+        });
+    };
+
     /** @private */
     this.pushName = function(name, node) {
-        if (!canvas) {
-            throw SceneJS_errorModule.fatalError("No canvas active");
-        }
         nameStack.push(name);
         namePath = nameStack.join("/");
         item = namesByPath[namePath];

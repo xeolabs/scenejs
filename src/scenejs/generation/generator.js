@@ -72,7 +72,7 @@ SceneJS.Generator.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Returns a new SceneJS.Generator instance
+/** Factory function that returns a new {@link SceneJS.Generator} instance
  * @param {Object} [cfg] Static configuration object
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes

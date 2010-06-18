@@ -125,7 +125,15 @@ SceneJS.Translate.prototype._render = function(traversalContext, data) {
         } else {
             this._memoLevel = 1;
         }
-        this._mat = SceneJS_math_translationMat4v([this._x, this._y, this._z]);
+        if (SceneJS_modelViewTransformModule.isBuildingViewTransform()) {
+
+            /* When building a view transform, apply the negated translation vector
+             * to correctly transform the SceneJS.Camera
+             */
+            this._mat = SceneJS_math_translationMat4v([-this._x, -this._y, -this._z]);
+        } else {
+            this._mat = SceneJS_math_translationMat4v([this._x, this._y, this._z]);
+        }
     }
     var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
@@ -145,7 +153,7 @@ SceneJS.Translate.prototype._render = function(traversalContext, data) {
     SceneJS_modelViewTransformModule.setTransform(superXform);
 };
 
-/** Function wrapper to support functional scene definition
+/** Factory function that returns a new {@link SceneJS.Translate} instance
  */
 SceneJS.translate = function() {
     var n = new SceneJS.Translate();

@@ -200,7 +200,7 @@ SceneJS.Lights.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Returns a new SceneJS.Lights instance
+/** Factory function that returns a new {@link SceneJS.Lights} instance
  * @param {Object} [cfg] Static configuration object (see class overview comments)
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes

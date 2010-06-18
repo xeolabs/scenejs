@@ -89,10 +89,10 @@ SceneJS.DocumentElementNotFoundException = function(msg, cause) {
     this.cause = cause;
 };
 
-/** @class  Exception thrown by a {@link SceneJS.LoadCollada} node when parsing of a Collada file fails for some reason.
+/** @class  Exception thrown by a {@link SceneJS.Instance} node when parsing of a file fails for some reason.
  */
-SceneJS.ColladaParseException = function(msg, cause) {
-    this.message="SceneJS.ColladaParseException: " + msg ;
+SceneJS.ParseException = function(msg, cause) {
+    this.message="SceneJS.ParseException: " + msg ;
     this.cause = cause;
 };
 
@@ -115,7 +115,7 @@ SceneJS.ColladaRootRequiredException = function(msg, cause) {
 /**
  * @class  Exception thrown when you have attempted to make a cross-domain load without specify the proxy to mediate the transfer. The
  * URL of the proxy must be specified with a 'proxy' configuration property on either the {@link SceneJS.Scene} node or the node
- * that does the load  (eg. {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
+ * that does the load  (eg. {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
     this.message="SceneJS.ProxyNotSpecifiedException: " + msg ;
@@ -124,7 +124,7 @@ SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
 
 /**
  * @class  Exception thrown to signify an error response from the proxy configured for cross-domain loads
- * (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
+ * (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyErrorResponseException = function(msg, cause) {
     this.message="SceneJS.ProxyErrorResponseException: " + msg ;
@@ -133,7 +133,7 @@ SceneJS.ProxyErrorResponseException = function(msg, cause) {
 
 /**
  * @class  Exception thrown to signify an empty response from the proxy configured for cross-domain loads
- * (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
+ * (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyEmptyResponseException = function(msg, cause) {
     this.message="SceneJS.ProxyEmptyResponseException: " + msg ;
@@ -141,7 +141,7 @@ SceneJS.ProxyEmptyResponseException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown to signify that empty content was loaded (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
+ * @class  Exception thrown to signify that empty content was loaded (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.EmptyResponseException = function(msg, cause) {
     this.message="SceneJS.EmptyResponseException: " + msg ;
@@ -149,7 +149,7 @@ SceneJS.EmptyResponseException = function(msg, cause) {
 };
 
 /**
- * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by {@link SceneJS.Load}, {@link SceneJS.LoadCollada} etc).
+ * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.HttpException = function(msg, cause) {
     this.message="SceneJS.HttpException: " + msg ;

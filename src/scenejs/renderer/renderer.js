@@ -29,7 +29,7 @@ SceneJS.Renderer.prototype._render = function(traversalContext, data) {
     SceneJS_rendererModule.undoRendererState(this._rendererState);
 };
 
-/** Returns a new SceneJS.Renderer instance
+/** Factory function that returns a new {@link SceneJS.Renderer} instance
  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Renderer constructor
  * @returns {SceneJS.Renderer}
  */

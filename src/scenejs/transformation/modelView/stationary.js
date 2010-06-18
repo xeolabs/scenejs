@@ -61,7 +61,7 @@ SceneJS.Stationary.prototype._render = function(traversalContext, data) {
 };
 
 
-/** Function wrapper to support functional scene definition
+/** Factory function that returns a new {@link SceneJS.Stationary} instance
  */
 SceneJS.stationary = function() {
     var n = new SceneJS.Stationary();

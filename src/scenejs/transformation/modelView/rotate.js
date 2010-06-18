@@ -144,11 +144,22 @@ SceneJS.Rotate.prototype._init = function(params) {
 SceneJS.Rotate.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
-         this._init( this._getParams(data));
+            this._init(this._getParams(data));
         } else {
             this._memoLevel = 1;
         }
-        this._mat = SceneJS_math_rotationMat4v(this._angle * Math.PI / 180.0, [this._x, this._y, this._z]);
+        if (this._x + this._y + this._z > 0) {
+
+            /* When building a view transform, apply the negated rotation angle
+             * to correctly transform the SceneJS.Camera
+             */
+            var angle = SceneJS_modelViewTransformModule.isBuildingViewTransform()
+                    ? -this._angle
+                    : this._angle;
+            this._mat = SceneJS_math_rotationMat4v(angle * Math.PI / 180.0, [this._x, this._y, this._z]);
+        } else {
+            this._mat = SceneJS_math_identityMat4();
+        }
     }
     var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
@@ -168,7 +179,7 @@ SceneJS.Rotate.prototype._render = function(traversalContext, data) {
     SceneJS_modelViewTransformModule.setTransform(superXform);
 };
 
-/** Function wrapper to support functional scene definition
+/** Factory function that returns a new {@link SceneJS.Rotate} instance
  */
 SceneJS.rotate = function() {
     var n = new SceneJS.Rotate();

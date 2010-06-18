@@ -145,7 +145,7 @@ SceneJS.Scale.prototype._render = function(traversalContext, data) {
     SceneJS_modelViewTransformModule.setTransform(superXform);
 };
 
-/** Function wrapper to support functional scene definition
+/** Factory function that returns a new {@link SceneJS.Scale} instance
  */
 SceneJS.scale = function() {
     var n = new SceneJS.Scale();

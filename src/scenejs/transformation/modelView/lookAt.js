@@ -172,7 +172,7 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
     SceneJS_modelViewTransformModule.setTransform(superXform);
 };
 
-/** Function wrapper to support functional scene definition
+/** Factory function that returns a new {@link SceneJS.LookAt} instance
  */
 SceneJS.lookAt = function() {
     var n = new SceneJS.LookAt();

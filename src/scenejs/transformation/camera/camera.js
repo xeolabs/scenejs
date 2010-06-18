@@ -230,7 +230,7 @@ SceneJS.Camera.prototype._init = function(params) {
     }
 };
 
-/** Returns a new {@link SceneJS.Camera} instance
+/** Factory function that returns a new {@link SceneJS.Camera} instance
  * @param {Arguments} args Variable arguments that are passed to the {@link SceneJS.Camera} constructor
  * @returns {SceneJS.Camera}
  */

@@ -241,11 +241,11 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                             function() { // General error, probably 404
                                 l.state = _this._STATE_ERROR;
                                 var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
-                                SceneJS_loggingModule.getLogger().warn(message);
+                                SceneJS_loggingModule.warn(message);
                             },
 
                             function() { // Load aborted - user probably refreshed/stopped page
-                                SceneJS_loggingModule.getLogger().warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
+                                SceneJS_loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
                                 l.state = _this._STATE_ERROR;
                             });
                 }).call(this, layer);
@@ -297,7 +297,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
 };
 
 
-/** Function wrapper to support functional scene definition
+/** Factory function that returns a new {@link SceneJS.Texture} instance
  */
 SceneJS.texture = function() {
     var n = new SceneJS.Texture();

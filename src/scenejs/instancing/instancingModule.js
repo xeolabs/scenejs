@@ -5,39 +5,87 @@
  */
 var SceneJS_instancingModule = new (function() {
 
-    var _symbols = {};
-    var _nameStack = [];
-    var _namePath = null;
-    var _countInstances = 0;
+    this._symbols = {};
+    this._nameStack = [];
+    this._namePath = null;
+    var countInstances = 0;
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
-                _symbols = {};
-                _nameStack = [];
-                _namePath = null;
-                _countInstances = 0;
+                this._symbols = {};
+                this._nameStack = [];
+                this._namePath = null;
+                countInstances = 0;
             });
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
             function() {
-                _symbols = {};
-                _nameStack = [];
-                _namePath = null;
-                _countInstances = 0;
+                this._symbols = {};
+                this._nameStack = [];
+                this._namePath = null;
+                countInstances = 0;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.NAME_UPDATED,
-            function(params) {
-                _nameStack = params.stack;
-                _namePath = params.path;
-            });
+    this.clearName = function() {
+        this._nameStack = [];
+        this._namePath = null;
+    };
 
-    /** @private */
+    this.setName = function(restore) {
+        this._nameStack = restore.nameStack.slice(0);
+        this._namePath = restore.namePath;
+    };
+
+    this.pushName = function(name, node) {
+        this._nameStack.push(name);
+        this._namePath = null;
+    };
+
+    this.getName = function() {
+        return {
+            nameStack : this._nameStack.slice(0),
+            namePath : this._namePath
+        };
+    };
+
     this.createSymbol = function(name, symbol) {
-        _symbols[_namePath ? _namePath + "/" + name : name] = symbol;
+        if (!this._namePath) {
+            this._namePath = this._nameStack.join("/");
+        }
+        this._symbols[this._namePath ? this._namePath + "/" + name : name] = symbol;
+    };
+
+    this.getSymbol = function(name) {
+        if (!this._namePath) {
+            this._namePath = this._nameStack.join("/");
+        }
+        return this._symbols[getPath(this._namePath, name)];
+    };
+
+    this.acquireInstance = function(name) {
+        if (!this._namePath) {
+            this._namePath = this._nameStack.join("/");
+        }
+        var symbol = this._symbols[getPath(this._namePath, name)];
+        if (symbol) {
+            countInstances++;
+        }
+        return symbol;
+    };
+
+    this.instancing = function() {
+        return countInstances > 0;
+    };
+
+    this.releaseInstance = function() {
+        countInstances--;
+    };
+
+    this.popName = function() {
+        this._nameStack.pop();
+        this._namePath = null;
     };
 
     /**
@@ -73,25 +121,5 @@ var SceneJS_instancingModule = new (function() {
         } else {
             return name;
         }
-    }   
-
-    /** @private */
-    this.acquireInstance = function(name) {
-  
-        var symbol = _symbols[getPath(_namePath, name)];
-        if (symbol) {
-            _countInstances++;
-        }
-        return symbol;
-    };
-
-    /** @private */
-    this.instancing = function() {
-        return _countInstances > 0;
-    };
-
-    /** @private */
-    this.releaseInstance = function() {
-        _countInstances--;
-    };
+    }
 })();

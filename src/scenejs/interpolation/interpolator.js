@@ -295,7 +295,7 @@ SceneJS.Interpolator.prototype._render = function(traversalContext, data) {
 };
 
 
-/** Returns a new SceneJS.Interpolator instance
+/**  Factory function that returns a new {@link SceneJS.Interpolator} instance
  * @param {Object} [cfg] Static configuration object
  * @param {String} [cfg.type="linear"] Interpolation type - "linear", "cosine", "cubic" or "constant"
  * @param {String} cfg.input Name of property on {@link SceneJS.Data} scope that will supply the interpolation <em>alpha</em> value

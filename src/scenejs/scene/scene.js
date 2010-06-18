@@ -7,16 +7,10 @@
  * <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
  * element for the scene to render to. When that is omitted, the node will look for one with the default ID of
  * "_scenejs-default-canvas".</p>
- * <p><b>JSONP proxy for {@link SceneJS.Load} sub-nodes</b></p>
- * <p>The Scene node can be configured with a <b>proxy</b> property to specify the URL of a SceneJS JSON proxy
- * server to enable {@link SceneJS.Load} sub-nodes to perform their content loads cross-domain. When that property
- * is omitted, those nodes can only load their content from the local server domain in order to not violate the browser's
- * same-domain security policy. <a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is
- * a download of </a>an example of a SceneJS JSONP proxy script written in Perl.</p>
- * <p><b>Timeout for {@link SceneJS.Load} sub-nodes</b></p>
+ * <p><b>Timeout for {@link SceneJS.Instance} sub-nodes</b></p>
  * <p>The Scene node can be configured with a <b>loadTimeoutSecs</b> property to specify the number of seconds within
- * which {@link SceneJS.Load} nodes within its subgraph must receive and parse their content. That may be overridden
- * in the configs of individual {@link SceneJS.Load} nodes.
+ * which {@link SceneJS.Instance} nodes within its subgraph must receive and parse their content. That may be overridden
+ * in the configs of individual {@link SceneJS.Instance} nodes.
  * <p><b>Usage Example:</b></p><p>Shown below is Scene bound to a canvas and specifying a JSONP proxy, that contains a
  * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada}
  * node loads a Collada model cross-domain through the proxy. When the Scene is rendered, a value for the
@@ -30,12 +24,11 @@
  *
  *              canvasId:        "myCanvas",
  *
- *              // Location of JSONP proxy if the scene contains SceneJS.Load<xx>
- *              // nodes that need to load cross-domain
+ *              // Optionally write scene logging to a DIV:
  *
- *              proxy:    "http://scenejs.org/cgi-bin/jsonp_proxy.pl"
+ *              loggingElementId: "myLoggingDiv",
  *
- *              // Optional default timeout for SceneJS.Load<xxx> nodes, which may override
+ *              // Optional default timeout for SceneJS.Instance<xxx> nodes, which may override
  *              // it individually - default is 180 seconds
  *
  *              loadTimeoutSecs: 180
@@ -103,11 +96,9 @@ SceneJS.Scene.prototype.render = function(paramOverrides) {
         this._sceneId = SceneJS_sceneModule.createScene(this, this._getParams());
     }
     SceneJS_sceneModule.activateScene(this._sceneId);
-    SceneJS_loadModule.setLoadProxyUri(this._params.proxy);  // null to specify none
     SceneJS_loadModule.setLoadTimeoutSecs(this._params.loadTimeoutSecs);  // null to use default     
     var traversalContext = {};
     this._renderNodes(traversalContext, new SceneJS.Data(null, false, paramOverrides));
-    SceneJS_loadModule.setLoadProxyUri(null);
     SceneJS_loadModule.setLoadTimeoutSecs(null);
     SceneJS_sceneModule.deactivateScene();
     this._lastRenderedData = paramOverrides;
@@ -177,7 +168,7 @@ SceneJS.Scene.prototype.isActive = function() {
     return (this._sceneId != null);
 };
 
-/** Returns a new SceneJS.Scene instance
+/** Factory function that returns a new {@link SceneJS.Scene} instance
  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Scene constructor
  * @returns {SceneJS.Scene}
  */

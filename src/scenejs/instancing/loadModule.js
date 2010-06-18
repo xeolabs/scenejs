@@ -12,7 +12,9 @@ var SceneJS_loadModule = new (function() {
     var jsonpStrategy = null;
     var defaultLoadTimeoutSecs = 180;
     var assets = {};
-    var pInterval;
+    var sceneLibraries = {}; // Library asset set for each active scene
+    var sceneLibrary;  // Library of currently active scene
+    var pInterval; // For polling SceneJS.Asset to update their statii
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.TIME_UPDATED,
@@ -20,6 +22,8 @@ var SceneJS_loadModule = new (function() {
                 time = t;
             });
 
+    /* When SceneJS initialised, start the assets status update loop
+     */
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.INIT,
             function() {
@@ -29,13 +33,49 @@ var SceneJS_loadModule = new (function() {
                 }
             });
 
+    /* When SceneJS reset, destroy all assets
+     */
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
                 assets = {};
-                if (!pInterval) {
-                    pInterval = setInterval("SceneJS_loadModule._updateSceneJSLoads()", 100);
+                //                if (!pInterval) {
+                //                    pInterval = setInterval("SceneJS_loadModule._updateSceneJSLoads()", 100);
+                //                }
+            });
+
+    /* When scene created, define a map of library assets for it
+     */
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_CREATED,
+            function(params) {
+                sceneLibraries[params.sceneId] = {};
+            });
+
+    /* When scene begins rendering, activate its library and render the library's assets to define their Symbols
+     */
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
+            function(params) {
+                sceneLibrary = sceneLibraries[params.sceneId];
+                var dummyTraversalContext = {};
+                var dummyData = new SceneJS.Data(null, false, {});
+                for (var key in sceneLibrary) {
+                    if (sceneLibrary.hasOwnProperty(key)) {
+                        var asset = sceneLibrary[key];
+                        if (asset.status == SceneJS.Asset.STATUS_LOADED) {
+                            asset.assetNode._render(dummyTraversalContext, dummyData);
+                        }
+                    }
                 }
+            });
+
+    /* When scene destroyed, destroy its library assets
+     */
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_DESTROYED,
+            function(params) {
+                sceneLibraries[params.sceneId] = null;
             });
 
     /**
@@ -44,13 +84,13 @@ var SceneJS_loadModule = new (function() {
      */
     this._updateSceneJSLoads = function() {
         var asset;
-        for (var url in assets) {
+        for (var url in assets) { // TODO: remove from this list when loaded
             if (assets.hasOwnProperty(url)) {
                 asset = assets[url];
                 if (asset) {
                     asset.poll();
-                    if (asset.status == SceneJS.Asset.STATUS_ERROR
-                            || asset.status == SceneJS.Asset.STATUS_TIMED_OUT) {
+                    if (asset.status == SceneJS.Asset.STATUS_ERROR ||
+                        asset.status == SceneJS.Asset.STATUS_TIMED_OUT) {
                         assets[url] = null;
                     }
                 }
@@ -72,23 +112,29 @@ var SceneJS_loadModule = new (function() {
         return parsers[ext.toLowerCase()] || defaultParser;
     }
 
-    function defaultParser(cfg) {
-        if (cfg.data._render) {  // Cross-domain JSONP
-            return cfg.data;
-        }
-//        if (data.error) {
-//            cfg.onError(cfg.data.error);
-//        }
-        try {
-            var evalData = eval(cfg.data);  // Same-domain
-            if (evalData.error) {           // TODO: This is specific to the old SceneJS proxy - remove?
-                cfg.onError(evalData.error);
+    var defaultParser = new (function() {
+        this.parse = function(cfg) {
+            if (cfg.data._render) {  // Cross-domain JSONP
+                return cfg.data;
             }
-            return evalData;
-        } catch (e) {
-            cfg.onError(new SceneJS.ParseException("Error parsing response: " + e));
-        }
-    }
+            //        if (data.error) {
+            //            cfg.onError(cfg.data.error);
+            //        }
+            try {
+                var evalData = eval(cfg.data);  // Same-domain
+                if (evalData.error) {           // TODO: This is specific to the old SceneJS proxy - remove?
+                    // TODO: Throw
+                    //cfg.onError(evalData.error);
+                }
+                return evalData;
+            } catch (e) {
+                cfg.onError(new SceneJS.ParseException("Error parsing response: " + e));
+            }
+        };
+        this.serverParams = {
+            format: "json"
+        };
+    })();
 
     this.setLoadTimeoutSecs = function(loadTimeoutSecs) {
         defaultLoadTimeoutSecs = loadTimeoutSecs || 180;
@@ -98,7 +144,7 @@ var SceneJS_loadModule = new (function() {
      */
     this.getAsset = function(uri) {
         var asset = assets[uri];
-        if (asset) {
+        if (asset && asset.status == SceneJS.Asset.STATUS_LOADED) {
             asset.lastUsed = time;
             return asset.assetNode;
         }
@@ -106,7 +152,7 @@ var SceneJS_loadModule = new (function() {
     };
 
     /**
-     * Triggers asynchronous JSONP load of asset, creates new process and handle; callback
+     * Triggers asynchronous JSONP load of asset, creates new process; callback
      * will fire with new child for the  client asset node. The asset node will have to then call assetLoaded
      * to notify the backend that the asset has loaded and allow backend to kill the process.
      *
@@ -118,27 +164,40 @@ var SceneJS_loadModule = new (function() {
      * @onLoaded Callback through which processed asset data is returned
      * @onTimeout Callback invoked when no response from proxy
      * @onError Callback invoked when error reported by proxy
+     * @isLibrary True to indicate that asset is a library subgraph containing Symbols
      */
-    this.loadAsset = function(uri, loadTimeoutSecs, onLoaded, onTimeout, onError) {
+    this.loadAsset = function(uri, loadTimeoutSecs, onLoaded, onTimeout, onError, isLibrary) {
         uri = getBaseURL(uri);
         var asset = assets[uri];
         if (asset) {
             if (asset.status == SceneJS.Asset.STATUS_LOADING) {
                 asset.addListener({ onLoaded : onLoaded, onTimeout: onTimeout, onError : onError });
             }
-            return uri;
+        } else {
+            asset = new SceneJS.Asset({
+                time: time,
+                timeoutSecs: loadTimeoutSecs || defaultLoadTimeoutSecs,
+                uri: uri,
+                jsonpStrategy: jsonpStrategy,
+                parser: getParserForURL(uri),
+                onLoaded: onLoaded,
+                onTimeout: onTimeout,
+                onError: onError,
+                isLibrary : isLibrary
+            });
+            assets[uri] = asset;
         }
-        assets[uri] = new SceneJS.Asset({
-            time: time,
-            timeoutSecs: loadTimeoutSecs || defaultLoadTimeoutSecs,
-            uri: uri,
-            jsonpStrategy: jsonpStrategy,
-            parser: getParserForURL(uri),
-            onLoaded: onLoaded,
-            onTimeout: onTimeout,
-            onError: onError
-        });
-        return uri;
+        if (isLibrary) {
+
+            /* Register library asset for rendering at the
+             * beginning of next scene render as soon as it
+             * is at status Asset.STATUS_LOADED, so that it
+             * may render its Symbol nodes.
+             */
+            if (!sceneLibrary[uri]) {
+                sceneLibrary[uri] = asset;
+            }
+        }
     };
 
     function getBaseURL(url) {
@@ -191,6 +250,7 @@ SceneJS.Asset = function(cfg) {
     this.exception = null;
     this.addListener({ onLoaded: cfg.onLoaded, onError: cfg.onError, onTimeout: cfg.onTimeout });
     this.status = SceneJS.Asset.STATUS_LOADING;
+    this.isLibrary = cfg.isLibrary;
     this._load();
 };
 

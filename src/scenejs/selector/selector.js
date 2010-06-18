@@ -117,7 +117,7 @@ SceneJS.Selector.prototype._render = function(traversalContext, data) {
     }
 };
 
-/** Returns a new SceneJS.Selector Selector
+/** Factory function that returns a new {@link SceneJS.Selector} instance
  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Selector constructor
  * @returns {SceneJS.Selector}
  */

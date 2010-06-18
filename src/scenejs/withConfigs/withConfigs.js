@@ -1,94 +1,88 @@
 /**
- * @class A scene node that creates data in a scope for its subgraph.
- * @extends SceneJS.Node
- * <p>This node provides a simple yet flexible mechanism for passing data down into a scene graph at runtime, analogous to
- * creation of a closure's data scope in JavaScript .</p>.
- * <p>The data scope is implemented by a {@link SceneJS.Data} instance. On each render a {@link SceneJS.Scene} creates a global
- * SceneJS.Data populated with any properties that were given to the SceneJS.Scene's render method. That Data forms a
- * chain on which SceneJS.WithData nodes will push and pop as they are visited and departed from during scene traversal.</p>
- * <p>When some node, or node config callback, looks for a property on its local SceneJS.Data, it will hunt up the chain
- * to get the first occurance of that property it finds.</p>
- * <p><b>Example:</b></p><p>Creating data for a child {@link SceneJS.Scale} node, which has a callback to configure itself from
- * the data:</b></p><pre><code>
- * var wd = new SceneJS.WithData({
- *         sizeX: 5,
- *         sizeY: 10,
- *         sizeZ: 2
+ * @class A scene node that specifies values to set on nodes in it's subgraph as they are rendered .
+ * <p>This node provides a simple yet flexible mechanism for pushing data down during scene traversal
+ * into the setter methods of the nodes in its subgraph.</p>.
+ * <p>The configuration for a {@link SceneJS.WithConfigs} is a hierarchical map of values for the setter methods of
+ * nodes in the subgraph. As shown in the example below, its hierarchy maps to that of the subgraph. The keys beginning
+ * with "#" map to the SIDs of nodes, while other keys map to setter methods on those nodes. </p>.
+ *
+ * <p><b>Example:</b></p><p>Configuring {@link SceneJS.Translation} and {@link SceneJS.Scale} nodes in the subgraph:</b></p><pre><code>
+ * var wd = new SceneJS.WithConfigs({
+ *
+ *         "#myTranslate" : {    // Selects the SceneJS.Scale
+ *              x: 5,            // Invokes the setX, setY and setZ methods of the SceneJS.Translate
+ *              y: 10,
+ *              z: 2,
+ *
+ *              "#myScale" : {   // Selects the SceneJS.Scale
+ *                  x: 2.0,      // Invokes the setX and setY methods of the SceneJS.Scale
+ *                  z: 1.5
+ *               }
+ *          }
  *      },
- *      new SceneJS.Translate({ x: 100 },
  *
- *          new SceneJS.Scale(function(data) {        // Function in this case, instead of a config object
- *                   return {
- *                       x: data.get("sizeX"),
- *                       y: data.get("sizeY"),
- *                       z: data.get("sizeZ")
- *                   }
- *          },
+ *      new SceneJS.Translate({
+ *                     sid: "myTranslate",
+ *                     x: 100,
+ *                     y: 20,
+ *                     z: 15
+ *                  },
  *
- *              new SceneJS.objects.Cube()
+ *          new SceneJS.Scale({
+ *                        sid: "myScale",
+ *                        x : 1.0
+ *                     },
+ *
+ *                new SceneJS.objects.Cube()
  *          )
  *      )
  *  )
  *
  * </code></pre>
+ * @extends SceneJS.Node
+ * @since Version 0.7.6
  * @constructor
- * Create a new SceneJS.WithData
- * @param {Object} [cfg] Static configuration object containing whatever is to be set on the child data scope
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning whatever is to be set on
- * the child data scope
+ * Create a new SceneJS.WithConfigs
+ * @param {Object} [cfg] Static configuration object containing hierarchical map of values for sub-nodes
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning the hierarchical map
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.WithData = function() {
+SceneJS.WithConfigs = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "with-data";
-    this._data = {};
-    this._childData = {};
+    this._nodeType = "with-configs";
+    this._configs = {};
     if (this._fixedParams) {
         this._init(this._getParams());
     }
 };
 
-SceneJS._inherit(SceneJS.WithData, SceneJS.Node);
+SceneJS._inherit(SceneJS.WithConfigs, SceneJS.Node);
 
 /**
- Sets a property
- @param {String} key Name of property
- @param {Object} value Value of property
- @returns {SceneJS.WithData} this
+ Sets the configs map
+ @param {Object} configs The configs map
+ @returns {SceneJS.WithConfigs} this
  */
-SceneJS.WithData.prototype.setProperty = function(key, value) {
-    this._data[key] = value;
+SceneJS.WithConfigs.prototype.setConfigs = function(configs) {
+    this._configs = configs;
     this._memoLevel = 0;
     return this;
 };
 
 /**
- * Returns the value of a property
+ * Returns the configs map
  *
- * @param {String} key Name of property
- * @returns {Object} Value of property
+ * @returns {Object} The configs map
  */
-SceneJS.WithData.prototype.getProperty = function(key) {
-    return this._data[key];
+SceneJS.WithConfigs.prototype.getConfigs = function() {
+    return this._configs;
 };
 
-
-/** Clears all properties
- *@returns {SceneJS.WithData} this
- */
-SceneJS.WithData.prototype.clearProperties = function() {
-    this._data = {};
-    this._memoLevel = 0;
-    return this;
+SceneJS.WithConfigs.prototype._init = function(params) {
+    this._configs = params;
 };
 
-SceneJS.WithData.prototype._init = function(params) {
-    for (var key in params) {
-        this._data[key] = params[key];
-    }
-};
-
-SceneJS.WithData.prototype._render = function(traversalContext, data) {
+SceneJS.WithConfigs.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
@@ -101,20 +95,24 @@ SceneJS.WithData.prototype._render = function(traversalContext, data) {
             this._memoLevel = 2;
         }
     }
+    traversalContext = {
+        appendix : traversalContext.appendix,
+        insideRightFringe: this._children.length > 1,
+        configs : this._configs
+    };
     this._renderNodes(traversalContext, new SceneJS.Data(data, this._fixedParams, this._data));
 };
 
 /**
- * Factory function that returns a new {@link SceneJS.WithData} instance
- * @param {Object} [cfg] Static configuration object containing whatever is to be set on the child data scope
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning whatever is to be set on
- * the child data scope
+ * Factory function that returns a new {@link SceneJS.WithConfigs} instance
+ * @param {Object} [cfg] Static config map object
+ * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning the config map
  * @param {...SceneJS.Node} [childNodes] Child nodes
- * @returns {SceneJS.WithData}
- * @since Version 0.7.4
+ * @returns {SceneJS.WithConfigs}
+ * @since Version 0.7.6
  */
-SceneJS.withData = function() {
-    var n = new SceneJS.WithData();
-    SceneJS.WithData.prototype.constructor.apply(n, arguments);
+SceneJS.withConfigs = function() {
+    var n = new SceneJS.WithConfigs();
+    SceneJS.WithConfigs.prototype.constructor.apply(n, arguments);
     return n;
 };
