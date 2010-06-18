@@ -197,8 +197,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
 	
-	<li><a href="../symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
-	
 	<li><a href="../symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
@@ -210,6 +208,8 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
 	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -223,15 +223,17 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></li>
+	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Inverse.html">SceneJS.Inverse</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
-	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
-	
-	<li><a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	<li><a href="../symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="../symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
@@ -245,7 +247,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Material.html">SceneJS.Material</a></li>
 	
-	<li><a href="../symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></li>
+	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
@@ -261,7 +263,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
-	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	<li><a href="../symbols/SceneJS.ParseException.html">SceneJS.ParseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
 	
@@ -269,11 +271,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
+	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
 	<li><a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></li>
-	
-	<li><a href="../symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a></li>
 	
@@ -295,11 +297,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
-	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -370,9 +372,9 @@ SceneJS name space
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								SceneJS.<b><a href="../symbols/SceneJS.html#.DEFAULT_CANVAS_ID">DEFAULT_CANVAS_ID</a></b>
+								SceneJS.<b><a href="../symbols/SceneJS.html#.onEvent">onEvent</a></b>
 								</div>
-								<div class="description">ID of canvas SceneJS looks for when SceneJS.scene node does not supply one</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -420,54 +422,81 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.boundingBox">boundingBox</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.addListener">addListener</a></b>(name, func)
 								</div>
-								<div class="description">Returns a new SceneJS.BoundingBox instance</div>
+								<div class="description"><p>Adds a listener to be notified when a given event occurs within SceneJS.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.fog">fog</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.boundingBox">boundingBox</a></b>(cfg, fn, childNodes)
 								</div>
-								<div class="description">Returns a new SceneJS.Fog instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.BoundingBox.html">SceneJS.BoundingBox</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.generator">generator</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.fog">fog</a></b>(cfg, , fn, childNodes)
 								</div>
-								<div class="description">Returns a new SceneJS.Generator instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.geometry">geometry</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.generator">generator</a></b>(cfg, fn, childNodes)
 								</div>
-								<div class="description">Returns a new SceneJS.Geometry instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.instance">instance</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.geometry">geometry</a></b>(cfg, fn, childNodes)
 								</div>
-								<div class="description">Returns a new SceneJS.Instance instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.lights">lights</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.instance">instance</a></b>(cfg, fn, childNodes)
 								</div>
-								<div class="description">Returns a new SceneJS.Lights instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.interpolator">interpolator</a></b>(cfg, childNodes, fn)
+								</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a> instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.inverse">inverse</a></b>()
+								</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Inverse.html">SceneJS.Inverse</a> instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.lights">lights</a></b>(cfg, fn, childNodes)
+								</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a> instance</div>
 							</td>
 						</tr>
 					
@@ -483,25 +512,7 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.load">load</a></b>(args)
-								</div>
-								<div class="description">Returns a new SceneJS.Load instance</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.loadCollada">loadCollada</a></b>(args)
-								</div>
-								<div class="description">Returns a new SceneJS.LoadCollada instance</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.locality">locality</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.locality">locality</a></b>(cfg, fn, childNodes)
 								</div>
 								<div class="description">Returns a new SceneJS.Locality instance</div>
 							</td>
@@ -530,7 +541,7 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.lookAt">lookAt</a></b>()
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a> instance</div>
 							</td>
 						</tr>
 					
@@ -539,16 +550,16 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.material">material</a></b>(args)
 								</div>
-								<div class="description">Returns a new SceneJS.Material instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Material.html">SceneJS.Material</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.modelMatrix">modelMatrix</a></b>()
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.matrix">matrix</a></b>()
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a> instance</div>
 							</td>
 						</tr>
 					
@@ -557,34 +568,25 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.name">name</a></b>(args)
 								</div>
-								<div class="description">Returns a new SceneJS.Name instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Name.html">SceneJS.Name</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.node">node</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.node">node</a></b>(cfg, fn, arguments)
 								</div>
-								<div class="description">Returns a new SceneJS.Node instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.onEvent">onEvent</a></b>(name, func)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.quaternion">quaternion</a></b>()
 								</div>
-								<div class="description"><p>Adds a listener to be notified when a given event occurs within SceneJS.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.perspective">perspective</a></b>()
-								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a> instance</div>
 							</td>
 						</tr>
 					
@@ -593,7 +595,7 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.renderer">renderer</a></b>(args)
 								</div>
-								<div class="description">Returns a new SceneJS.Renderer instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a> instance</div>
 							</td>
 						</tr>
 					
@@ -611,16 +613,7 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.rotate">rotate</a></b>()
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.scalarInterpolator">scalarInterpolator</a></b>(args)
-								</div>
-								<div class="description">Returns a new SceneJS.ScalarInterpolator instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a> instance</div>
 							</td>
 						</tr>
 					
@@ -629,7 +622,7 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.scale">scale</a></b>()
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a> instance</div>
 							</td>
 						</tr>
 					
@@ -638,7 +631,7 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.scene">scene</a></b>(args)
 								</div>
-								<div class="description">Returns a new SceneJS.Scene instance</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> instance</div>
 							</td>
 						</tr>
 					
@@ -647,7 +640,17 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.selector">selector</a></b>(args)
 								</div>
-								<div class="description">Returns a new SceneJS.Selector Selector</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a> instance</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.setJSONPStrategy">setJSONPStrategy</a></b>(strategy)
+								</div>
+								<div class="description">Configures SceneJS with a strategy to allow it to use a particular Web service to proxy cross-domain requests
+by nodes such as <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> when their URIs are not in the local domain.</div>
 							</td>
 						</tr>
 					
@@ -656,23 +659,23 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.stationary">stationary</a></b>()
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.symbol">symbol</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.symbol">symbol</a></b>(cfg, childNodes, fn)
 								</div>
-								<div class="description">Returns a new SceneJS.Symbol symbol</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.text">text</a></b>(args)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.text">text</a></b>(cfg, fn, childNodes)
 								</div>
 								<div class="description">Returns a new SceneJS.Text instance</div>
 							</td>
@@ -683,7 +686,7 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.texture">texture</a></b>()
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Texture.html">SceneJS.Texture</a> instance</div>
 							</td>
 						</tr>
 					
@@ -692,25 +695,25 @@ SceneJS name space
 							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.translate">translate</a></b>()
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.viewMatrix">viewMatrix</a></b>()
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.withConfigs">withConfigs</a></b>(cfg, fn, childNodes)
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> instance</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.withData">withData</a></b>()
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.withData">withData</a></b>(cfg, fn, childNodes)
 								</div>
-								<div class="description">Function wrapper to support functional scene definition</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a> instance</div>
 							</td>
 						</tr>
 					
@@ -759,21 +762,31 @@ SceneJS name space
 					Field Detail
 				</div>
 				
-					<a name=".DEFAULT_CANVAS_ID"> </a>
+					<a name=".onEvent"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">SceneJS.</span><b>DEFAULT_CANVAS_ID</b>
+					<span class="light">SceneJS.</span><b>onEvent</b>
 					
 					</div>
 					<div class="description">
-						ID of canvas SceneJS looks for when SceneJS.scene node does not supply one
+						
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_events_eventsModule.js.html">eventsModule.js</a>.
 						
 						
 					</div>
 					
 					
 
+						
+							<dl class="detailList">
+							<dt class="heading">Deprecated:</dt>
+							<dt>
+								- use <a href="#addListener">#addListener</a> instead.
+							</dt>
+							</dl>
 						
 						
 						
@@ -833,15 +846,170 @@ SceneJS name space
 					Method Detail
 				</div>
 				
+					<a name=".addListener"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">SceneJS.</span><b>addListener</b>(name, func)
+					
+					</div>
+					<div class="description">
+						<p>Adds a listener to be notified when a given event occurs within SceneJS.</p>
+<p><b>Supported events</b></p>
+<p><b><em>error</em></b></p><p>An error has occurred either while defining or rendering a scene. These can be either fatal,
+or errors that SceneJS can recover from.</p><p>Example:</p><pre><code>
+SceneJS.addListener("error", function(e) {
+    if (e.exception.message) {
+        alert("Error: " + e.exception.message);
+    } else {
+        alert("Error: " + e.exception);
+    }
+ });
+</pre></code>
+
+<p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> instances have
+been destroyed and resources held for them freed.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "reset",
+     function(e) {
+         alert("SceneJS has been reset");
+     });
+</pre></code>
+<p><b><em>scene-created</em></b></p><p>A <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> has been defined.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "scene-created",
+     function(e) {
+         alert("A new Scene has been created - scene ID: " + e.sceneId);
+     });
+</pre></code>
+
+<p><b><em>scene-rendering</em></b></p><p>Traversal (render) of a <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> has just begun.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "scene-rendering",
+     function(e) {
+         alert("Rendering of a new Scene has just begun - scene ID: " + e.sceneId);
+     });
+</pre></code>
+
+<p><b><em>canvas-activated</em></b></p><p>A canvas has just been activated for a <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a>, where that
+node is about to start rendering to it. This will come right after a "scene-rendering" event, which will indicate which
+<a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> is the one about to do the rendering.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "canvas-activated",
+     function(e) {
+         var canvas = e.canvas;
+         var context = e.context;
+         var canvasId = e.canvasId;
+         alert("Canvas is about to be rendered to : " + canvasId);
+     });
+</pre></code>
+
+<p><b><em>process-created</em></b></p><p>An asynchronous process has started somewhere among the nodes wtihin a
+<a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a>. Processes track the progress of tasks such as the loading of remotely-stored content by
+<a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> nodes. This event is particularly useful to monitor for content loading. </p>
+<p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "process-created",
+     function(e) {
+         var sceneId = e.sceneId;
+         var processId = e.process.id;
+         var timeStarted = e.process.timeStarted;
+         var description = e.process.description;
+         var timeoutSecs = e.process.timeoutSecs;
+
+         // ...
+     });
+</pre></code>
+
+<p><b><em>process-timed-out</em></b></p><p>An asynchronous process has timed out. This will be followed by
+a "process-killed" event.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "process-timed-out",
+     function(e) {
+         var sceneId = e.sceneId;
+         var processId = e.process.id;
+         var timeStarted = e.process.timeStarted;
+         var description = e.process.description;
+         var timeoutSecs = e.process.timeoutSecs;
+
+         // ...
+     });
+</pre></code>
+
+<p><b><em>process-killed</em></b></p><p>An asynchronous process has finished.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "process-killed",
+     function(e) {
+         var sceneId = e.sceneId;
+         var processId = e.process.id;
+         var timeStarted = e.process.timeStarted;
+         var description = e.process.description;
+         var timeoutSecs = e.process.timeoutSecs;
+
+         // ...
+     });
+</pre></code>
+
+<p><b><em>scene-rendered</em></b></p><p>A render of a <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> has completed.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "scene-rendered",
+     function(e) {
+         alert("Traversal completed for Scene - scene ID: " + e.sceneId);
+     });
+</pre></code>
+
+<p><b><em>scene-destroyed</em></b></b></p><p>A SceneJS.Scene traversal has been destroyed.</p><p>Example:</p><pre><code>
+ SceneJS.addListener(
+     "scene-destroyed",
+     function(e) {
+         alert("Scene has been destroyed - scene ID: " + e.sceneId);
+     });
+</pre></code>
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_events_eventsModule.js.html">eventsModule.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>name</b>
+									
+								</dt>
+								<dd>Event name</dd>
+							
+								<dt>
+									<b>func</b>
+									
+								</dt>
+								<dd>Callback function</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".boundingBox"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.BoundingBox.html">SceneJS.BoundingBox</a>}</span>
-					<span class="light">SceneJS.</span><b>boundingBox</b>(args)
+					<span class="light">SceneJS.</span><b>boundingBox</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.BoundingBox instance
+						Factory function that returns a new <a href="../symbols/SceneJS.BoundingBox.html">SceneJS.BoundingBox</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_boundary_boundingBox.js.html">boundingBox.js</a>.
@@ -856,14 +1024,74 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.BoundingBox constructor</dd>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.xmin</b>
+									<i>Optional, Default:  -1.0</i>
+								</dt>
+								<dd>Minimum X-axis extent</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.ymin</b>
+									<i>Optional, Default:  -1.0</i>
+								</dt>
+								<dd>Minimum Y-axis extent</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.zmin</b>
+									<i>Optional, Default:  -1.0</i>
+								</dt>
+								<dd>Minimum Z-axis extent</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.xmax</b>
+									<i>Optional, Default:  1.0</i>
+								</dt>
+								<dd>Maximum X-axis extent</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.ymax</b>
+									<i>Optional, Default:  1.0</i>
+								</dt>
+								<dd>Maximum Y-axis extent</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.zmax</b>
+									<i>Optional, Default:  1.0</i>
+								</dt>
+								<dd>Maximum Z-axis extent</dd>
+							
+								<dt>
+									<span class="light fixedFont">{float[]}</span> <b>cfg.levels</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Projected size thresholds for level-of-detail culling</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.3</dd>
+							</dl>
+							</dl>
 						
 						
 						
@@ -883,11 +1111,11 @@ SceneJS name space
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a>}</span>
-					<span class="light">SceneJS.</span><b>fog</b>(args)
+					<span class="light">SceneJS.</span><b>fog</b>(cfg, , fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Fog instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_fog_fog.js.html">fog.js</a>.
@@ -902,14 +1130,62 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.mode</b>
+									<i>Optional, Default:  "linear"</i>
+								</dt>
+								<dd>The fog mode - "disabled", "exp", "exp2" or "linear"</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b></b>
 									
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Fog constructor</dd>
+								<dd>[cfg.color = {r: 0.5, g: 0.5, b: 0.5 } The fog color</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.density</b>
+									<i>Optional, Default:  1.0</i>
+								</dt>
+								<dd>The fog density factor</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.start</b>
+									<i>Optional, Default:  1.0</i>
+								</dt>
+								<dd>Point on Z-axis at which fog effect begins</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.end</b>
+									<i>Optional, Default:  1.0</i>
+								</dt>
+								<dd>Point on Z-axis at which fog effect ends</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.3</dd>
+							</dl>
+							</dl>
 						
 						
 						
@@ -929,11 +1205,11 @@ SceneJS name space
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a>}</span>
-					<span class="light">SceneJS.</span><b>generator</b>(args)
+					<span class="light">SceneJS.</span><b>generator</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Generator instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_generation_generator.js.html">generator.js</a>.
@@ -948,14 +1224,32 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Generator constructor</dd>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.2</dd>
+							</dl>
+							</dl>
 						
 						
 						
@@ -975,11 +1269,11 @@ SceneJS name space
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a>}</span>
-					<span class="light">SceneJS.</span><b>geometry</b>(args)
+					<span class="light">SceneJS.</span><b>geometry</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Geometry instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Geometry.html">SceneJS.Geometry</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_geometry_geometry.js.html">geometry.js</a>.
@@ -994,14 +1288,68 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.primitive</b>
 									
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Geometry constructor</dd>
+								<dd>The primitive type - "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double[]}</span> <b>cfg.positions</b>
+									
+								</dt>
+								<dd>Flattened array of 3D coordinates, three elements each</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double[]}</span> <b>cfg.normals</b>
+									<i>Optional, Default:  []</i>
+								</dt>
+								<dd>Flattened array of 3D vertex normal vectors, three elements each</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double[]}</span> <b>cfg.uv</b>
+									<i>Optional, Default:  []</i>
+								</dt>
+								<dd>Flattened array of 2D UV-space coordinates for the first texture layer, two elements each</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double[]}</span> <b>cfg.uv2</b>
+									<i>Optional, Default:  []</i>
+								</dt>
+								<dd>Flattened array of 2D UV-space coordinates for the second texture layer, two elements each</dd>
+							
+								<dt>
+									<span class="light fixedFont">{int[]}</span> <b>cfg.indices</b>
+									
+								</dt>
+								<dd>Flattened array of indices to index the other arrays per the specified primitive type</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.1</dd>
+							</dl>
+							</dl>
 						
 						
 						
@@ -1021,11 +1369,11 @@ SceneJS name space
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a>}</span>
-					<span class="light">SceneJS.</span><b>instance</b>(args)
+					<span class="light">SceneJS.</span><b>instance</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Instance instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_instance.js.html">instance.js</a>.
@@ -1040,10 +1388,35 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.uri</b>
 									
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Instance constructor</dd>
+								<dd>URI of file to load</dd>
+							
+								<dt>
+									<span class="light fixedFont">{int}</span> <b>cfg.timeoutSecs</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Timeout - falls back on any loadTimoutSecs that was configured on the <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a>
+at the root of the scene graph, or the default 180 seconds if none configured there</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
@@ -1063,15 +1436,137 @@ SceneJS name space
 
 					<hr />
 				
+					<a name=".interpolator"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{SceneJS.objects.Interpolator}</span>
+					<span class="light">SceneJS.</span><b>interpolator</b>(cfg, childNodes, fn)
+					
+					</div>
+					<div class="description">
+						Factory function that returns a new <a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a> instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_interpolation_interpolator.js.html">interpolator.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.type</b>
+									<i>Optional, Default: "linear"</i>
+								</dt>
+								<dd>Interpolation type - "linear", "cosine", "cubic" or "constant"</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.input</b>
+									
+								</dt>
+								<dd>Name of property on <a href="../symbols/SceneJS.Data.html">SceneJS.Data</a> scope that will supply the interpolation <em>alpha</em> value</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.output</b>
+									
+								</dt>
+								<dd>Name of property to create on child <a href="../symbols/SceneJS.Data.html">SceneJS.Data</a> scope that provide the output value</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double[]}</span> <b>cfg.keys</b>
+									<i>Optional, Default: []</i>
+								</dt>
+								<dd>Alpha key values</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double[]}</span> <b>cfg.values</b>
+									<i>Optional, Default: []</i>
+								</dt>
+								<dd>Output key values</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+							</dl>
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.0</dd>
+							</dl>
+							</dl>
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{SceneJS.objects.Interpolator}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".inverse"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">SceneJS.</span><b>inverse</b>()
+					
+					</div>
+					<div class="description">
+						Factory function that returns a new <a href="../symbols/SceneJS.Inverse.html">SceneJS.Inverse</a> instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_inverse.js.html">inverse.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".lights"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a>}</span>
-					<span class="light">SceneJS.</span><b>lights</b>(args)
+					<span class="light">SceneJS.</span><b>lights</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Lights instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_lighting_lights.js.html">lights.js</a>.
@@ -1086,10 +1581,22 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Lights constructor</dd>
+								<dd>Static configuration object (see class overview comments)</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
@@ -1137,103 +1644,11 @@ SceneJS name space
 
 					<hr />
 				
-					<a name=".load"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{<a href="../symbols/SceneJS.Load.html">SceneJS.Load</a>}</span>
-					<span class="light">SceneJS.</span><b>load</b>(args)
-					
-					</div>
-					<div class="description">
-						Returns a new SceneJS.Load instance
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_load_load.js.html">load.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
-								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Load constructor</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Load.html">SceneJS.Load</a>}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".loadCollada"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{<a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a>}</span>
-					<span class="light">SceneJS.</span><b>loadCollada</b>(args)
-					
-					</div>
-					<div class="description">
-						Returns a new SceneJS.LoadCollada instance
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_loadCollada_loadCollada.js.html">loadCollada.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
-								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.LoadCollada constructor</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a>}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
 					<a name=".locality"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Locality.html">SceneJS.Locality</a>}</span>
-					<span class="light">SceneJS.</span><b>locality</b>(args)
+					<span class="light">SceneJS.</span><b>locality</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
@@ -1252,14 +1667,44 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Locality constructor</dd>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.inner</b>
+									<i>Optional, Default:  100000</i>
+								</dt>
+								<dd>Inner radius</dd>
+							
+								<dt>
+									<span class="light fixedFont">{double}</span> <b>cfg.outer</b>
+									<i>Optional, Default:  200000</i>
+								</dt>
+								<dd>Outer radius</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.3</dd>
+							</dl>
+							</dl>
 						
 						
 						
@@ -1375,10 +1820,10 @@ SceneJS name space
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_view_lookAt.js.html">lookAt.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_lookAt.js.html">lookAt.js</a>.
 						
 						
 					</div>
@@ -1403,7 +1848,7 @@ SceneJS name space
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Material instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Material.html">SceneJS.Material</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_material_material.js.html">material.js</a>.
@@ -1441,18 +1886,18 @@ SceneJS name space
 
 					<hr />
 				
-					<a name=".modelMatrix"> </a>
+					<a name=".matrix"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">SceneJS.</span><b>modelMatrix</b>()
+					<span class="light">SceneJS.</span><b>matrix</b>()
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_model_modelMatrix.js.html">modelMatrix.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_matrix.js.html">matrix.js</a>.
 						
 						
 					</div>
@@ -1477,7 +1922,7 @@ SceneJS name space
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Name instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Name.html">SceneJS.Name</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_name_name.js.html">name.js</a>.
@@ -1519,11 +1964,11 @@ SceneJS name space
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
-					<span class="light">SceneJS.</span><b>node</b>(args)
+					<span class="light">SceneJS.</span><b>node</b>(cfg, fn, arguments)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Node instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_node_node.js.html">node.js</a>.
@@ -1538,10 +1983,22 @@ SceneJS name space
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/SceneJS.html#.node">SceneJS.node</a>|...}</span> <b>arguments</b>
 									
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Node constructor</dd>
+								<dd>Zero or more child nodes</dd>
 							
 							</dl>
 						
@@ -1561,174 +2018,18 @@ SceneJS name space
 
 					<hr />
 				
-					<a name=".onEvent"> </a>
+					<a name=".quaternion"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">SceneJS.</span><b>onEvent</b>(name, func)
+					<span class="light">SceneJS.</span><b>quaternion</b>()
 					
 					</div>
 					<div class="description">
-						<p>Adds a listener to be notified when a given event occurs within SceneJS.</p>
-<p><b>Supported events</b></p>
-<p><b><em>error</em></b></p><p>An error has occurred either while defining or rendering a scene. These can be either fatal,
-or errors that SceneJS can recover from.</p><p>Example:</p><pre><code>
-SceneJS.onEvent("error", function(e) {
-    if (e.exception.message) {
-        alert("Error: " + e.exception.message);
-    } else {
-        alert("Error: " + e.exception);
-    }
- });
-</pre></code>
-
-<p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all SceneJS.Scene instances are destroyed and resources
-held for them freed.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "reset",
-     function(e) {
-         alert("SceneJS has been reset");
-     });
-</pre></code>
-<p><b><em>scene-created</em></b></p><p>A SceneJS.Scene has been defined.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "scene-created",
-     function(e) {
-         alert("A new Scene has been created - scene ID: " + e.sceneId);
-     });
-</pre></code>
-
-<p><b><em>scene-activated</em></b></p><p>Traversal (render) of a SceneJS.Scene has just begun.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "scene-activated",
-     function(e) {
-         alert("Rendering of a new Scene has just begun - scene ID: " + e.sceneId);
-     });
-</pre></code>
-
-<p><b><em>canvas-activated</em></b></p><p>A canvas has just been activated for a Scene, where the Scene is about to start
-rendering to it. This will come right after a "scene-activated" event, which will indicate which Scene is the one
-about to do the rendering.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "canvas-activated",
-     function(e) {
-         var canvas = e.canvas;
-         var context = e.context;
-         var canvasId = e.canvasId;
-         alert("Canvas is about to be rendered to : " + canvasId);
-     });
-</pre></code>
-
-<p><b><em>process-created</em></b></p><p>An asynchronous process has started within a Scene. Processes track the progress of
-tasks such as the loading of remotely-stored content by SceneJS.Load and SceneJS.LoadCollada nodes. This event is
-paticularly useful to monitor for content loading. Since loads are triggered in one scene traversal, and then loaded
-content is integrated during a subsequent traversal, you might listen for this along with "process-killed" on a
-non-animated scene to ensure that a final scene image is rendered once all loads have completed and content
-integrated.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "process-created",
-     function(e) {
-         var sceneId = e.sceneId;
-         var processId = e.process.id;
-         var timeStarted = e.process.timeStarted;
-         var description = e.process.description;
-         var timeoutSecs = e.process.timeoutSecs;
-
-         // ...
-     });
-</pre></code>
-
-<p><b><em>process-timed-out</em></b></p><p>An asynchronous process has timed out. This will be followed by a "process-killed" event.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "process-timed-out",
-     function(e) {
-         var sceneId = e.sceneId;
-         var processId = e.process.id;
-         var timeStarted = e.process.timeStarted;
-         var description = e.process.description;
-         var timeoutSecs = e.process.timeoutSecs;
-
-         // ...
-     });
-</pre></code>
-
-<p><b><em>process-killed</em></b></p><p>An asynchronous process has finished.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "process-killed",
-     function(e) {
-         var sceneId = e.sceneId;
-         var processId = e.process.id;
-         var timeStarted = e.process.timeStarted;
-         var description = e.process.description;
-         var timeoutSecs = e.process.timeoutSecs;
-
-         // ...
-     });
-</pre></code>
-
-<p><b><em>scene-deactivated</em></b></p><p>A SceneJS.Scene traversal has completed.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "scene-created",
-     function(e) {
-         alert("Traversal completed for Scene - scene ID: " + e.sceneId);
-     });
-</pre></code>
-
-<p><b><em>scene-destroyed</em></b></b></p><p>A SceneJS.Scene traversal has been destroyed.</p><p>Example:</p><pre><code>
- SceneJS.onEvent(
-     "scene-destroyed",
-     function(e) {
-         alert("Scene has been destroyed - scene ID: " + e.sceneId);
-     });
-</pre></code>
+						Factory function that returns a new <a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_events_eventsModule.js.html">eventsModule.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<b>name</b>
-									
-								</dt>
-								<dd>Event name</dd>
-							
-								<dt>
-									<b>func</b>
-									
-								</dt>
-								<dd>Callback function</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".perspective"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">SceneJS.</span><b>perspective</b>()
-					
-					</div>
-					<div class="description">
-						Function wrapper to support functional scene definition
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_projection_perspective.js.html">perspective.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_quaternion.js.html">quaternion.js</a>.
 						
 						
 					</div>
@@ -1753,7 +2054,7 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Renderer instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_renderer_renderer.js.html">renderer.js</a>.
@@ -1827,10 +2128,10 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_model_rotate.js.html">rotate.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_rotate.js.html">rotate.js</a>.
 						
 						
 					</div>
@@ -1841,52 +2142,6 @@ integrated.</p><p>Example:</p><pre><code>
 						
 						
 						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".scalarInterpolator"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{SceneJS.objects.ScalarInterpolator}</span>
-					<span class="light">SceneJS.</span><b>scalarInterpolator</b>(args)
-					
-					</div>
-					<div class="description">
-						Returns a new SceneJS.ScalarInterpolator instance
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_interpolation_scalarInterpolator.js.html">scalarInterpolator.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
-								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.ScalarInterpolator constructor</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{SceneJS.objects.ScalarInterpolator}</span> </dd>
-							
-							</dl>
 						
 						
 						
@@ -1901,10 +2156,10 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_model_scale.js.html">scale.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_scale.js.html">scale.js</a>.
 						
 						
 					</div>
@@ -1929,7 +2184,7 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Scene instance
+						Factory function that returns a new <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_scene_scene.js.html">scene.js</a>.
@@ -1975,7 +2230,7 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Selector Selector
+						Factory function that returns a new <a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_selector_selector.js.html">selector.js</a>.
@@ -2013,6 +2268,61 @@ integrated.</p><p>Example:</p><pre><code>
 
 					<hr />
 				
+					<a name=".setJSONPStrategy"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">SceneJS.</span><b>setJSONPStrategy</b>(strategy)
+					
+					</div>
+					<div class="description">
+						Configures SceneJS with a strategy to allow it to use a particular Web service to proxy cross-domain requests
+by nodes such as <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> when their URIs are not in the local domain. As shown in the example below,
+the strategy must implement two methods, one to create the request URL and another to extract a string of data
+from the response.
+<p><b>Example strategy- </b>specifying a JSONP handler for the Yahoo! Query Language (YQL) API:</p>
+<pre><code>
+SceneJS.setJSONPStrategy({
+         request : function(url, format, callback) {
+                 return "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20" + format + "%20where%20url='"
+                                  + url + "'&format=" + format + "&callback=" + callback;
+          },
+
+         response : function(data) {
+                 return data.results[0];
+         }
+ });
+</code></pre>
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_loadModule.js.html">loadModule.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>strategy</b>
+									
+								</dt>
+								<dd>{{request:function(url:String, format:String, callback:String), String response: function(data:String) }}</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".stationary"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -2021,10 +2331,10 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_view_stationary.js.html">stationary.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_stationary.js.html">stationary.js</a>.
 						
 						
 					</div>
@@ -2045,11 +2355,11 @@ integrated.</p><p>Example:</p><pre><code>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a>}</span>
-					<span class="light">SceneJS.</span><b>symbol</b>(args)
+					<span class="light">SceneJS.</span><b>symbol</b>(cfg, childNodes, fn)
 					
 					</div>
 					<div class="description">
-						Returns a new SceneJS.Symbol symbol
+						Factory function that returns a new <a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a>
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_symbol.js.html">symbol.js</a>.
@@ -2064,14 +2374,38 @@ integrated.</p><p>Example:</p><pre><code>
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Symbol constructor</dd>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.name</b>
+									<i>Optional, Default: "unnamed"</i>
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
 							
 							</dl>
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.4</dd>
+							</dl>
+							</dl>
 						
 						
 						
@@ -2091,7 +2425,7 @@ integrated.</p><p>Example:</p><pre><code>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{<a href="../symbols/SceneJS.Text.html">SceneJS.Text</a>}</span>
-					<span class="light">SceneJS.</span><b>text</b>(args)
+					<span class="light">SceneJS.</span><b>text</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
@@ -2110,14 +2444,38 @@ integrated.</p><p>Example:</p><pre><code>
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static configuration object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>cfg.text</b>
 									
 								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Text constructor</dd>
+								<dd>The string of text</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
 							
 							</dl>
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.3</dd>
+							</dl>
+							</dl>
 						
 						
 						
@@ -2141,7 +2499,7 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.Texture.html">SceneJS.Texture</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_texture_texture.js.html">texture.js</a>.
@@ -2169,10 +2527,10 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_model_translate.js.html">translate.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_modelView_translate.js.html">translate.js</a>.
 						
 						
 					</div>
@@ -2189,18 +2547,18 @@ integrated.</p><p>Example:</p><pre><code>
 
 					<hr />
 				
-					<a name=".viewMatrix"> </a>
+					<a name=".withConfigs"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					
-					<span class="light">SceneJS.</span><b>viewMatrix</b>()
+					<span class="light">{<a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a>}</span>
+					<span class="light">SceneJS.</span><b>withConfigs</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> instance
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_transformation_view_viewMatrix.js.html">viewMatrix.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_withConfigs_withConfigs.js.html">withConfigs.js</a>.
 						
 						
 					</div>
@@ -2208,9 +2566,45 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					
 						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static config map object</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function returning the config map</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
+							
+							</dl>
 						
 						
 						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.6</dd>
+							</dl>
+							</dl>
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a>}</span> </dd>
+							
+							</dl>
 						
 						
 						
@@ -2220,12 +2614,12 @@ integrated.</p><p>Example:</p><pre><code>
 					<a name=".withData"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					
-					<span class="light">SceneJS.</span><b>withData</b>()
+					<span class="light">{<a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a>}</span>
+					<span class="light">SceneJS.</span><b>withData</b>(cfg, fn, childNodes)
 					
 					</div>
 					<div class="description">
-						Function wrapper to support functional scene definition
+						Factory function that returns a new <a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a> instance
 						
 							<br />
 							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_withData_withData.js.html">withData.js</a>.
@@ -2236,9 +2630,46 @@ integrated.</p><p>Example:</p><pre><code>
 					
 					
 						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Static configuration object containing whatever is to be set on the child data scope</dd>
+							
+								<dt>
+									<span class="light fixedFont">{function(SceneJS.Data):Object}</span> <b>fn</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Dynamic configuration function returning whatever is to be set on
+the child data scope</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...SceneJS.Node}</span> <b>childNodes</b>
+									<i>Optional</i>
+								</dt>
+								<dd>Child nodes</dd>
+							
+							</dl>
 						
 						
 						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.4</dd>
+							</dl>
+							</dl>
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a>}</span> </dd>
+							
+							</dl>
 						
 						
 						
@@ -2257,7 +2688,7 @@ integrated.</p><p>Example:</p><pre><code>
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:51 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:20 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

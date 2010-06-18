@@ -197,8 +197,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
 	
-	<li><a href="../symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
-	
 	<li><a href="../symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
@@ -210,6 +208,8 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
 	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -223,15 +223,17 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></li>
+	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Inverse.html">SceneJS.Inverse</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
-	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
-	
-	<li><a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	<li><a href="../symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="../symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
@@ -245,7 +247,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Material.html">SceneJS.Material</a></li>
 	
-	<li><a href="../symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></li>
+	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
@@ -261,7 +263,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
-	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	<li><a href="../symbols/SceneJS.ParseException.html">SceneJS.ParseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
 	
@@ -269,11 +271,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
+	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
 	<li><a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></li>
-	
-	<li><a href="../symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a></li>
 	
@@ -295,11 +297,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
-	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -327,11 +329,11 @@ ul.inheritsList
 <p>This node type is useful for keeping scene size small, while also simplifying editing of a scene; when you edit
 content within a Symbol, all instances of the Symbol update to reflect the edits.</p>
 
-<p>When rendered, SceneJS registers this node against its specified name and prevents SceneJS from traversing
+<p>When rendered, SceneJS registers this node against its sub-identifier (SID) and prevents SceneJS from traversing
 into its subgraph. The content defined within the Symbol will therefore only be rendered when it is instanced.
-The registered name will be actually be the concatenation of the specified name with the namespace formed by
-any enclosing <a href="../symbols/SceneJS.Name.html">SceneJS.Name</a> nodes. When SceneJS then finds a <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> node that refers to the
-registered name, it will instantiate the Symbol's child nodes as if they were children of the <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a>
+The registered identity will be actually be the concatenation of the SID with the namespace formed by the SIDs
+any enclosing nodes. When SceneJS then finds a <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> node with a URL that refers to the
+registered identity, it will instantiate the Symbol's child nodes as if they were children of the <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a>
  node.</p>
 
 <p>Beware potential performance penalties for using Symbols and SceneJS.Instances. Within every subgraph, SceneJS
@@ -341,19 +343,18 @@ the different scene locations it which it is instanced.</p>
 
 <p><b>Live Examples</b></p>
 <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint</a></li></ul>
-<p><b>Example Usage</b></p><p>Here we're defining a Symbol in a <a href="../symbols/SceneJS.Name.html">SceneJS.Name</a>, then instantiating it three times with
-<a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> nodes to show variations on how an <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> node can refer to a Symbol, relative to a namespace
-created by a <a href="../symbols/SceneJS.Name.html">SceneJS.Name</a> node:</b></p><pre><code>
+<p><b>Example Usage</b></p><p>Here we're defining a Symbol in a <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>, then instantiating it three times with
+<a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> nodes to show variations on how an <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> node can refer to a Symbol, relative to
+a namespace created by a <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>:</b></p><pre><code>
 var scene = new SceneJS.Scene(
 
      // ...
 
      // Define a "teapot" symbol inside a namespace.
-     // Note that the Name is not mandatory.
 
-     new SceneJS.Name({name: "mySymbols"},
+     new SceneJS.Node({ sid: "mySymbols"},
 
-         new SceneJS.Symbol({ name: "teapot" },
+         new SceneJS.Symbol({ sid: "teapot" },
              new SceneJS.objects.Teapot()
          ),
 
@@ -361,18 +362,18 @@ var scene = new SceneJS.Scene(
          // See how the symbol reference is relative, where it
          // does not start with a '/'.
 
-         new SceneJS.Instance({name: "teapot" })
+         new SceneJS.Instance({ uri: "teapot" })
      ),
 
      // Instance the teapot Symbol again, from outside the namespace
 
-     new SceneJS.Instance({name: "mySymbols/teapot"}),
+     new SceneJS.Instance({ uri: "mySymbols/teapot"}),
 
      // Instance the teapot Symbol one more time from outside the
      // namespace to show how an absolute path can be specified to
      // the Symbol
 
-     new SceneJS.Instance({name: "/mySymbols/teapot"})
+     new SceneJS.Instance({ uri: "/mySymbols/teapot" })
 
      // ...
 );
@@ -398,7 +399,7 @@ var scene = new SceneJS.Scene(
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/SceneJS.Symbol.html#constructor">SceneJS.Symbol</a></b>(config)
+								<b><a href="../symbols/SceneJS.Symbol.html#constructor">SceneJS.Symbol</a></b>(cfg, fn, childNodes)
 							</div>
 							<div class="description"></div>
 						</td>
@@ -414,41 +415,10 @@ var scene = new SceneJS.Scene(
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class SceneJS.Symbol.">
-					<caption>Method Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Method Attributes</th>
-							<th scope="col">Method Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/SceneJS.Symbol.html#getName">getName</a></b>()
-								</div>
-								<div class="description">Returns the symbol name.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/SceneJS.Symbol.html#setName">setName</a></b>(name)
-								</div>
-								<div class="description">Sets the symbol name.</div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
 				</dl>
 				
 			
@@ -463,7 +433,7 @@ var scene = new SceneJS.Scene(
 				</div>
 				
 				<div class="fixedFont">
-						<b>SceneJS.Symbol</b>(config)
+						<b>SceneJS.Symbol</b>(cfg, fn, childNodes)
 				</div>
 				
 				<div class="description">
@@ -479,16 +449,46 @@ var scene = new SceneJS.Scene(
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{Object}</span>  <b>config</b>
-								
+								<span class="light fixedFont">{Object}</span>  <b>cfg</b>
+								<i>Optional</i>
 							</dt>
-								<dd>Config object or function, followed by zero or more child nodes</dd>
+								<dd>Static configuration object</dd>
+						
+							<dt>
+								<span class="light fixedFont">{String}</span>  <b>cfg.name</b>
+								<i>Optional, Default: "unnamed"</i>
+							</dt>
+								<dd></dd>
+						
+							<dt>
+								<span class="light fixedFont">{function(SceneJS.Data):Object}</span>  <b>fn</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Dynamic configuration function</dd>
+						
+							<dt>
+								<span class="light fixedFont">{...SceneJS.Node}</span>  <b>childNodes</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Child nodes</dd>
 						
 						</dl>
 					
 					
 					
+						<dl class="detailList">
+						<dt class="heading">Since:</dt>
+							<dd>Version 0.7.4</dd>
+						</dl>
 					
+					
+					
+						<dl class="detailList">
+						<dt class="heading">Returns:</dt>
+						
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a>}</span> </dd>
+						
+						</dl>
 					
 					
 					
@@ -501,86 +501,6 @@ var scene = new SceneJS.Scene(
 
 <!-- ============================== method details ========================= -->		
 			
-				<div class="sectionTitle">
-					Method Detail
-				</div>
-				
-					<a name="getName"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{string}</span>
-					<b>getName</b>()
-					
-					</div>
-					<div class="description">
-						Returns the symbol name. The name will be "unnamed" if none is specified.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{string}</span> The symbol name</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name="setName"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{<a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a>}</span>
-					<b>setName</b>(name)
-					
-					</div>
-					<div class="description">
-						Sets the symbol name. When the given value is undefined, the name will default to "unnamed".
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{string}</span> <b>name</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a>}</span> This symbol node</dd>
-							
-							</dl>
-						
-						
-						
-
-					
-				
-			
 			
 <!-- ============================== event details ========================= -->		
 			
@@ -592,7 +512,7 @@ var scene = new SceneJS.Scene(
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:52 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:22 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

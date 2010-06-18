@@ -25,7 +25,7 @@
 <span class='line'> 18</span> 
 <span class='line'> 19</span> </span><span class="COMM">// @private</span><span class="WHIT">
 <span class='line'> 20</span> </span><span class="NAME">SceneJS.Renderer.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 21</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">  </span><span class="COMM">// One-shot dynamic config               </span><span class="WHIT">
 <span class='line'> 22</span> </span><span class="WHIT">        </span><span class="NAME">this._rendererState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_rendererModule.createRendererState</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 23</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'> 24</span> </span><span class="WHIT">            </span><span class="NAME">this._memoLevel</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
@@ -36,7 +36,7 @@
 <span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS_rendererModule.undoRendererState</span><span class="PUNC">(</span><span class="NAME">this._rendererState</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 30</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 31</span> 
-<span class='line'> 32</span> </span><span class="COMM">/** Returns a new SceneJS.Renderer instance
+<span class='line'> 32</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Renderer} instance
 <span class='line'> 33</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Renderer constructor
 <span class='line'> 34</span>  * @returns {SceneJS.Renderer}
 <span class='line'> 35</span>  */</span><span class="WHIT">

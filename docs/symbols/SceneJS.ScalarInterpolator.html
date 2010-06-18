@@ -211,7 +211,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
+	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
+	
+	<li><a href="../symbols/SceneJS.Frustum.html">SceneJS.Frustum</a></li>
 	
 	<li><a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a></li>
 	
@@ -228,6 +232,8 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
+	
+	<li><a href="../symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
 	
@@ -259,6 +265,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.objects.Teapot.html">SceneJS.objects.Teapot</a></li>
 	
+	<li><a href="../symbols/SceneJS.Ortho.html">SceneJS.Ortho</a></li>
+	
 	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
@@ -268,6 +276,8 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.ProxyErrorResponseException.html">SceneJS.ProxyErrorResponseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
 	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
@@ -328,7 +338,7 @@ for nodes in its subgraph to configure themselves with.</p>
 <p><b>Live Examples</b></p>
 <ul><li><a target = "other" href="http://bit.ly/scenejs-scalarinterpolator-example">Example 1</a></li></ul>
 <p><b>Example Usage</b></p><p>This example defines a <a href="../symbols/SceneJS.objects.Cube.html">SceneJS.objects.Cube</a> with rotation that is animated by
-a SceneJS.ScalarInterpolator, which isin turn driven by an alpha value supplied by a higher <a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a>.
+a SceneJS.ScalarInterpolator, which is in turn driven by an alpha value supplied by a higher <a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a>.
 If we thought of <em>alpha</em> as elapsed seconds, then this cube will rotate 360 degrees over one second, then
 rotate 180 in the reverse direction over the next 0.5 seconds. In this example however, the alpha is actually fixed,
 where the cube is stuck at 180 degrees - you would need to vary the "alpha" property on the WithData node to actually
@@ -378,7 +388,7 @@ var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/SceneJS.ScalarInterpolator.html#constructor">SceneJS.ScalarInterpolator</a></b>(config)
+								<b><a href="../symbols/SceneJS.ScalarInterpolator.html#constructor">SceneJS.ScalarInterpolator</a></b>(cfg, fn, childNodes)
 							</div>
 							<div class="description"></div>
 						</td>
@@ -397,7 +407,7 @@ var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></dd>
 				</dl>
 				
 			
@@ -412,7 +422,7 @@ var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to
 				</div>
 				
 				<div class="fixedFont">
-						<b>SceneJS.ScalarInterpolator</b>(config)
+						<b>SceneJS.ScalarInterpolator</b>(cfg, fn, childNodes)
 				</div>
 				
 				<div class="description">
@@ -428,14 +438,61 @@ var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{Object}</span>  <b>config</b>
+								<span class="light fixedFont">{Object}</span>  <b>cfg</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Static configuration object</dd>
+						
+							<dt>
+								<span class="light fixedFont">{String}</span>  <b>cfg.type</b>
+								<i>Optional, Default: "linear"</i>
+							</dt>
+								<dd>Interpolation type - "linear", "cosine", "cubic" or "constant"</dd>
+						
+							<dt>
+								<span class="light fixedFont">{String}</span>  <b>cfg.input</b>
 								
 							</dt>
-								<dd>The config object, followed by zero or more child nodes</dd>
+								<dd>Name of property on <a href="../symbols/SceneJS.Data.html">SceneJS.Data</a> scope that will supply the interpolation <em>alpha</em> value</dd>
+						
+							<dt>
+								<span class="light fixedFont">{String}</span>  <b>cfg.output</b>
+								
+							</dt>
+								<dd>Name of property to create on child <a href="../symbols/SceneJS.Data.html">SceneJS.Data</a> scope that provide the output value</dd>
+						
+							<dt>
+								<span class="light fixedFont">{double[]}</span>  <b>cfg.keys</b>
+								<i>Optional, Default: []</i>
+							</dt>
+								<dd>Alpha key values</dd>
+						
+							<dt>
+								<span class="light fixedFont">{double[]}</span>  <b>cfg.values</b>
+								<i>Optional, Default: []</i>
+							</dt>
+								<dd>Output key values</dd>
+						
+							<dt>
+								<span class="light fixedFont">{function(SceneJS.Data):Object}</span>  <b>fn</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Dynamic configuration function</dd>
+						
+							<dt>
+								<span class="light fixedFont">{...SceneJS.Node}</span>  <b>childNodes</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Child nodes</dd>
 						
 						</dl>
 					
 					
+					
+						<dl class="detailList">
+						<dt class="heading">Since:</dt>
+							<dd>Version 0.7.4</dd>
+						</dl>
 					
 					
 					
@@ -461,7 +518,7 @@ var wd = new SceneJS.WithData({ "alpha" : 0.5 }, // Interpolates the rotation to
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:52 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Mon May 17 2010 14:46:40 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

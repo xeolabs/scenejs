@@ -197,8 +197,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
 	
-	<li><a href="../symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
-	
 	<li><a href="../symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
@@ -210,6 +208,8 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
 	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -223,15 +223,17 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></li>
+	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Inverse.html">SceneJS.Inverse</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
-	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
-	
-	<li><a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	<li><a href="../symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="../symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
@@ -245,7 +247,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Material.html">SceneJS.Material</a></li>
 	
-	<li><a href="../symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></li>
+	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
@@ -261,7 +263,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
-	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	<li><a href="../symbols/SceneJS.ParseException.html">SceneJS.ParseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
 	
@@ -269,11 +271,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
+	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
 	<li><a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></li>
-	
-	<li><a href="../symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a></li>
 	
@@ -295,11 +297,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
-	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -333,6 +335,51 @@ ul.inheritsList
 
 <!-- ============================== methods summary ======================== -->
 			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class _global_.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#getAsset">getAsset</a></b>(uri)
+								</div>
+								<div class="description">Attempts to get currently-loaded asset, which may have been evicted</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#parseArgs">parseArgs</a></b>(args, node)
+								</div>
+								<div class="description">Entry point - parse first argument in variable argument list</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/_global_.html#registerParser">registerParser</a></b>(fileExtension, parser)
+								</div>
+								<div class="description">Registers a parser function to handle a file of the given extension type</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -343,6 +390,140 @@ ul.inheritsList
 			
 
 <!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="getAsset"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>getAsset</b>(uri)
+					
+					</div>
+					<div class="description">
+						Attempts to get currently-loaded asset, which may have been evicted
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_loadModule.js.html">loadModule.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>uri</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="parseArgs"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>parseArgs</b>(args, node)
+					
+					</div>
+					<div class="description">
+						Entry point - parse first argument in variable argument list
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_node_node.js.html">node.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>args</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>node</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="registerParser"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>registerParser</b>(fileExtension, parser)
+					
+					</div>
+					<div class="description">
+						Registers a parser function to handle a file of the given extension type
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_loadModule.js.html">loadModule.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>fileExtension</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>parser</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
 			
 			
 <!-- ============================== event details ========================= -->		
@@ -355,7 +536,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:51 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:20 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

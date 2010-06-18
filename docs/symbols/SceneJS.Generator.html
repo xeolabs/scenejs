@@ -197,8 +197,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
 	
-	<li><a href="../symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
-	
 	<li><a href="../symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
@@ -210,6 +208,8 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
 	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -223,15 +223,17 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></li>
+	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Inverse.html">SceneJS.Inverse</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
-	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
-	
-	<li><a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	<li><a href="../symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="../symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
@@ -245,7 +247,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Material.html">SceneJS.Material</a></li>
 	
-	<li><a href="../symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></li>
+	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
@@ -261,7 +263,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
-	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	<li><a href="../symbols/SceneJS.ParseException.html">SceneJS.ParseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
 	
@@ -269,11 +271,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
+	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
 	<li><a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></li>
-	
-	<li><a href="../symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a></li>
 	
@@ -295,11 +297,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
-	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -365,7 +367,7 @@ var g = new SceneJS.Generator(
            )
         )
   );
- </pre></code>
+</pre></code>
 				
 				
 					<br /><i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_generation_generator.js.html">generator.js</a>.
@@ -387,7 +389,7 @@ var g = new SceneJS.Generator(
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/SceneJS.Generator.html#constructor">SceneJS.Generator</a></b>(func)
+								<b><a href="../symbols/SceneJS.Generator.html#constructor">SceneJS.Generator</a></b>(cfg, fn, childNodes)
 							</div>
 							<div class="description"></div>
 						</td>
@@ -406,7 +408,7 @@ var g = new SceneJS.Generator(
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
 				</dl>
 				
 			
@@ -421,7 +423,7 @@ var g = new SceneJS.Generator(
 				</div>
 				
 				<div class="fixedFont">
-						<b>SceneJS.Generator</b>(func)
+						<b>SceneJS.Generator</b>(cfg, fn, childNodes)
 				</div>
 				
 				<div class="description">
@@ -437,14 +439,31 @@ var g = new SceneJS.Generator(
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{Object}</span>  <b>func</b>
-								
+								<span class="light fixedFont">{Object}</span>  <b>cfg</b>
+								<i>Optional</i>
 							</dt>
-								<dd>Config function, followed by one or more child nodes</dd>
+								<dd>Static configuration object</dd>
+						
+							<dt>
+								<span class="light fixedFont">{function(SceneJS.Data):Object}</span>  <b>fn</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Dynamic configuration function</dd>
+						
+							<dt>
+								<span class="light fixedFont">{...SceneJS.Node}</span>  <b>childNodes</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Child nodes</dd>
 						
 						</dl>
 					
 					
+					
+						<dl class="detailList">
+						<dt class="heading">Since:</dt>
+							<dd>Version 0.7.4</dd>
+						</dl>
 					
 					
 					
@@ -470,7 +489,7 @@ var g = new SceneJS.Generator(
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:51 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:20 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

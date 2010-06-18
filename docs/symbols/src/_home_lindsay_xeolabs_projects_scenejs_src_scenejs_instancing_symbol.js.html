@@ -11,11 +11,11 @@
 <span class='line'>  4</span>  * &lt;p>This node type is useful for keeping scene size small, while also simplifying editing of a scene; when you edit
 <span class='line'>  5</span>  * content within a Symbol, all instances of the Symbol update to reflect the edits.&lt;/p>
 <span class='line'>  6</span>  *
-<span class='line'>  7</span>  * &lt;p>When rendered, SceneJS registers this node against its specified name and prevents SceneJS from traversing
+<span class='line'>  7</span>  * &lt;p>When rendered, SceneJS registers this node against its sub-identifier (SID) and prevents SceneJS from traversing
 <span class='line'>  8</span>  * into its subgraph. The content defined within the Symbol will therefore only be rendered when it is instanced.
-<span class='line'>  9</span>  * The registered name will be actually be the concatenation of the specified name with the namespace formed by
-<span class='line'> 10</span>  * any enclosing {@link SceneJS.Name} nodes. When SceneJS then finds a {@link SceneJS.Instance} node that refers to the
-<span class='line'> 11</span>  * registered name, it will instantiate the Symbol's child nodes as if they were children of the {@link SceneJS.Instance}
+<span class='line'>  9</span>  * The registered identity will be actually be the concatenation of the SID with the namespace formed by the SIDs
+<span class='line'> 10</span>  * any enclosing nodes. When SceneJS then finds a {@link SceneJS.Instance} node with a URL that refers to the
+<span class='line'> 11</span>  * registered identity, it will instantiate the Symbol's child nodes as if they were children of the {@link SceneJS.Instance}
 <span class='line'> 12</span>  *  node.&lt;/p>
 <span class='line'> 13</span>  *
 <span class='line'> 14</span>  * &lt;p>Beware potential performance penalties for using Symbols and {@link SceneJS.Instances}. Within every subgraph, SceneJS
@@ -25,99 +25,80 @@
 <span class='line'> 18</span>  *
 <span class='line'> 19</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
 <span class='line'> 20</span>  * &lt;ul>&lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint&lt;/a>&lt;/li>&lt;/ul>
-<span class='line'> 21</span>  * &lt;p>&lt;b>Example Usage&lt;/b>&lt;/p>&lt;p>Here we're defining a Symbol in a {@link SceneJS.Name}, then instantiating it three times with
-<span class='line'> 22</span>  * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to a namespace
-<span class='line'> 23</span>  * created by a {@link SceneJS.Name} node:&lt;/b>&lt;/p>&lt;pre>&lt;code>
+<span class='line'> 21</span>  * &lt;p>&lt;b>Example Usage&lt;/b>&lt;/p>&lt;p>Here we're defining a Symbol in a {@link SceneJS.Node}, then instantiating it three times with
+<span class='line'> 22</span>  * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to
+<span class='line'> 23</span>  * a namespace created by a {@link SceneJS.Node}:&lt;/b>&lt;/p>&lt;pre>&lt;code>
 <span class='line'> 24</span>  * var scene = new SceneJS.Scene(
 <span class='line'> 25</span>  *
 <span class='line'> 26</span>  *      // ...
 <span class='line'> 27</span>  *
 <span class='line'> 28</span>  *      // Define a "teapot" symbol inside a namespace.
-<span class='line'> 29</span>  *      // Note that the Name is not mandatory.
-<span class='line'> 30</span>  *
-<span class='line'> 31</span>  *      new SceneJS.Name({name: "mySymbols"},
-<span class='line'> 32</span>  *
-<span class='line'> 33</span>  *          new SceneJS.Symbol({ name: "teapot" },
-<span class='line'> 34</span>  *              new SceneJS.objects.Teapot()
-<span class='line'> 35</span>  *          ),
-<span class='line'> 36</span>  *
-<span class='line'> 37</span>  *          // Instance the teapot Symbol from inside the namespace.
-<span class='line'> 38</span>  *          // See how the symbol reference is relative, where it
-<span class='line'> 39</span>  *          // does not start with a '/'.
-<span class='line'> 40</span>  *
-<span class='line'> 41</span>  *          new SceneJS.Instance({name: "teapot" })
-<span class='line'> 42</span>  *      ),
-<span class='line'> 43</span>  *
-<span class='line'> 44</span>  *      // Instance the teapot Symbol again, from outside the namespace
-<span class='line'> 45</span>  *
-<span class='line'> 46</span>  *      new SceneJS.Instance({name: "mySymbols/teapot"}),
-<span class='line'> 47</span>  *
-<span class='line'> 48</span>  *      // Instance the teapot Symbol one more time from outside the
-<span class='line'> 49</span>  *      // namespace to show how an absolute path can be specified to
-<span class='line'> 50</span>  *      // the Symbol
-<span class='line'> 51</span>  *
-<span class='line'> 52</span>  *      new SceneJS.Instance({name: "/mySymbols/teapot"})
-<span class='line'> 53</span>  *
-<span class='line'> 54</span>  *      // ...
-<span class='line'> 55</span>  * );
-<span class='line'> 56</span>  * &lt;/pre>&lt;/code>
-<span class='line'> 57</span>  *  @extends SceneJS.Node
+<span class='line'> 29</span>  *
+<span class='line'> 30</span>  *      new SceneJS.Node({ sid: "mySymbols"},
+<span class='line'> 31</span>  *
+<span class='line'> 32</span>  *          new SceneJS.Symbol({ sid: "teapot" },
+<span class='line'> 33</span>  *              new SceneJS.objects.Teapot()
+<span class='line'> 34</span>  *          ),
+<span class='line'> 35</span>  *
+<span class='line'> 36</span>  *          // Instance the teapot Symbol from inside the namespace.
+<span class='line'> 37</span>  *          // See how the symbol reference is relative, where it
+<span class='line'> 38</span>  *          // does not start with a '/'.
+<span class='line'> 39</span>  *
+<span class='line'> 40</span>  *          new SceneJS.Instance({ uri: "teapot" })
+<span class='line'> 41</span>  *      ),
+<span class='line'> 42</span>  *
+<span class='line'> 43</span>  *      // Instance the teapot Symbol again, from outside the namespace
+<span class='line'> 44</span>  *
+<span class='line'> 45</span>  *      new SceneJS.Instance({ uri: "mySymbols/teapot"}),
+<span class='line'> 46</span>  *
+<span class='line'> 47</span>  *      // Instance the teapot Symbol one more time from outside the
+<span class='line'> 48</span>  *      // namespace to show how an absolute path can be specified to
+<span class='line'> 49</span>  *      // the Symbol
+<span class='line'> 50</span>  *
+<span class='line'> 51</span>  *      new SceneJS.Instance({ uri: "/mySymbols/teapot" })
+<span class='line'> 52</span>  *
+<span class='line'> 53</span>  *      // ...
+<span class='line'> 54</span>  * );
+<span class='line'> 55</span>  * &lt;/pre>&lt;/code>
+<span class='line'> 56</span>  *  @extends SceneJS.Node
+<span class='line'> 57</span>  * @since Version 0.7.4
 <span class='line'> 58</span>  * @constructor
 <span class='line'> 59</span>  * Create a new SceneJS.Symbol
-<span class='line'> 60</span>  * @param {Object} config  Config object or function, followed by zero or more child nodes
-<span class='line'> 61</span>  */</span><span class="WHIT">
-<span class='line'> 62</span> </span><span class="NAME">SceneJS.Symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="NAME">this._name</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"unnamed"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 68</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 69</span> 
-<span class='line'> 70</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Symbol</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 71</span> 
-<span class='line'> 72</span> </span><span class="COMM">/**
-<span class='line'> 73</span>  Sets the symbol name. When the given value is undefined, the name will default to "unnamed".
-<span class='line'> 74</span>  @function setName
-<span class='line'> 75</span>  @param {string} name
-<span class='line'> 76</span>  @returns {SceneJS.Symbol} This symbol node
-<span class='line'> 77</span>  */</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="NAME">SceneJS.Symbol.prototype.setName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="NAME">this._name</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">name</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="STRN">"unnamed"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span>  * @param {Object} [cfg] Static configuration object
+<span class='line'> 61</span>  * @param {String} [cfg.name="unnamed"]
+<span class='line'> 62</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+<span class='line'> 63</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
+<span class='line'> 64</span>  * @returns {SceneJS.Instance}
+<span class='line'> 65</span>  */</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="NAME">SceneJS.Symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"symbol"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 70</span> 
+<span class='line'> 71</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Symbol</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> 
+<span class='line'> 73</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="NAME">SceneJS.Symbol.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._sid</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.NodeConfigExpectedException</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">                </span><span class="PUNC">(</span><span class="STRN">"SceneJS.Symbol parameter expected: sid"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="NAME">this._sidPath</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_instancingModule.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">  </span><span class="COMM">// Path to this Symbol, without this Symbol's SID</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS_instancingModule.createSymbol</span><span class="PUNC">(</span><span class="NAME">this._sid</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 81</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 82</span> 
-<span class='line'> 83</span> </span><span class="COMM">/**
-<span class='line'> 84</span>  * Returns the symbol name. The name will be "unnamed" if none is specified.
-<span class='line'> 85</span>  * @function {string} getName
-<span class='line'> 86</span>  * @returns {string} The symbol name
-<span class='line'> 87</span>  */</span><span class="WHIT">
-<span class='line'> 88</span> </span><span class="NAME">SceneJS.Symbol.prototype.getName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 89</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._name</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 91</span> 
-<span class='line'> 92</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="NAME">SceneJS.Symbol.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.name</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 95</span> </span><span class="WHIT">        </span><span class="NAME">this.setName</span><span class="PUNC">(</span><span class="NAME">params.name</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 97</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 98</span> 
-<span class='line'> 99</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'>100</span> </span><span class="NAME">SceneJS.Symbol.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>101</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>102</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>103</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>104</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS_instancingModule.createSymbol</span><span class="PUNC">(</span><span class="NAME">this._name</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>105</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>106</span> 
-<span class='line'>107</span> </span><span class="COMM">/** Returns a new SceneJS.Symbol symbol
-<span class='line'>108</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Symbol constructor
-<span class='line'>109</span>  * @returns {SceneJS.Symbol}
-<span class='line'>110</span>  */</span><span class="WHIT">
-<span class='line'>111</span> </span><span class="NAME">SceneJS.symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>112</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Symbol</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>113</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Symbol.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>114</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>115</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>116</span> </span></pre></body></html>
+<span class='line'> 83</span> 
+<span class='line'> 84</span> </span><span class="COMM">/**  Factory function that returns a new {@link SceneJS.Symbol}
+<span class='line'> 85</span>  * @param {Object} [cfg] Static configuration object
+<span class='line'> 86</span>  * @param {String} [cfg.name="unnamed"]
+<span class='line'> 87</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
+<span class='line'> 88</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+<span class='line'> 89</span>  * @returns {SceneJS.Symbol}
+<span class='line'> 90</span>  * @since Version 0.7.4
+<span class='line'> 91</span>  */</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="NAME">SceneJS.symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Symbol</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Symbol.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 97</span> </span></pre></body></html>

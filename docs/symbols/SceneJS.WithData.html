@@ -197,8 +197,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
 	
-	<li><a href="../symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
-	
 	<li><a href="../symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
@@ -210,6 +208,8 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
+	<li><a href="../symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
 	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -223,15 +223,17 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></li>
+	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Inverse.html">SceneJS.Inverse</a></li>
+	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
-	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
-	
-	<li><a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	<li><a href="../symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="../symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
@@ -245,7 +247,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Material.html">SceneJS.Material</a></li>
 	
-	<li><a href="../symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></li>
+	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
@@ -261,7 +263,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
-	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	<li><a href="../symbols/SceneJS.ParseException.html">SceneJS.ParseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
 	
@@ -269,11 +271,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
+	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
 	<li><a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></li>
-	
-	<li><a href="../symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a></li>
 	
@@ -295,11 +297,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
-	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -327,7 +329,7 @@ SceneJS.Data populated with any properties that were given to the SceneJS.Scene'
 chain on which SceneJS.WithData nodes will push and pop as they are visited and departed from during scene traversal.</p>
 <p>When some node, or node config callback, looks for a property on its local SceneJS.Data, it will hunt up the chain
 to get the first occurance of that property it finds.</p>
-<p><b>Example:</b></p><p>Creating data for a child SceneJS.Scale node, which has a callback to configure itself from
+<p><b>Example:</b></p><p>Creating data for a child {@link SceneJS.Scale} node, which has a callback to configure itself from
 the data:</b></p><pre><code>
 var wd = new SceneJS.WithData({
         sizeX: 5,
@@ -374,7 +376,7 @@ var wd = new SceneJS.WithData({
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/SceneJS.WithData.html#constructor">SceneJS.WithData</a></b>(config)
+								<b><a href="../symbols/SceneJS.WithData.html#constructor">SceneJS.WithData</a></b>(cfg, fn, childNodes)
 							</div>
 							<div class="description"></div>
 						</td>
@@ -444,7 +446,7 @@ var wd = new SceneJS.WithData({
 				</div>
 				
 				<div class="fixedFont">
-						<b>SceneJS.WithData</b>(config)
+						<b>SceneJS.WithData</b>(cfg, fn, childNodes)
 				</div>
 				
 				<div class="description">
@@ -460,10 +462,23 @@ var wd = new SceneJS.WithData({
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{Object}</span>  <b>config</b>
-								
+								<span class="light fixedFont">{Object}</span>  <b>cfg</b>
+								<i>Optional</i>
 							</dt>
-								<dd>The config object, followed by zero or more child nodes</dd>
+								<dd>Static configuration object containing whatever is to be set on the child data scope</dd>
+						
+							<dt>
+								<span class="light fixedFont">{function(SceneJS.Data):Object}</span>  <b>fn</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Dynamic configuration function returning whatever is to be set on
+the child data scope</dd>
+						
+							<dt>
+								<span class="light fixedFont">{...SceneJS.Node}</span>  <b>childNodes</b>
+								<i>Optional</i>
+							</dt>
+								<dd>Child nodes</dd>
 						
 						</dl>
 					
@@ -622,7 +637,7 @@ var wd = new SceneJS.WithData({
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:52 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:22 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

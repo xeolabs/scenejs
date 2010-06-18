@@ -211,6 +211,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
+	
 	<li><a href="../symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
 	<li><a href="../symbols/SceneJS.Generator.html">SceneJS.Generator</a></li>
@@ -223,11 +225,15 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></li>
+	
 	<li><a href="../symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
+	
+	<li><a href="../symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="../symbols/SceneJS.Load.html">SceneJS.Load</a></li>
 	
@@ -245,7 +251,7 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Material.html">SceneJS.Material</a></li>
 	
-	<li><a href="../symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></li>
+	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
 	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
@@ -261,19 +267,17 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
-	<li><a href="../symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
-	
 	<li><a href="../symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyErrorResponseException.html">SceneJS.ProxyErrorResponseException</a></li>
 	
 	<li><a href="../symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
+	<li><a href="../symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
+	
 	<li><a href="../symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
 	<li><a href="../symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></li>
-	
-	<li><a href="../symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></li>
 	
 	<li><a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a></li>
 	
@@ -295,11 +299,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="../symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
-	
 	<li><a href="../symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -319,37 +323,30 @@ ul.inheritsList
 			<p class="description">
 				
 				<br />Extends
-					<a href="../symbols/SceneJS.html#.load">SceneJS.load</a>.<br />
+					<a href="../symbols/SceneJS.Load.html">SceneJS.Load</a>.<br />
 				
 			
 				A scene node that asynchronously loads its subgraph from a COLLADA file.
-<p>This node is configured with the location of the COLLADA file, which it can load-cross domain when a proxy is
-provided. When first visited during scene traversal, it will
+<p>This node is configured with the location of the COLLADA file. When first visited during scene traversal, it will
 begin the load and allow traversal to continue at its next sibling node. When on a subsequent visit its subgraph has
 been loaded, it will then allow traversal to descend into that subgraph to render it.</p>
 <p><b>Loading Cross-Domain</b></p>
-<p>When the <a href="../symbols/SceneJS.Scene.html">SceneJS.Scene</a> node is configured with the URL of a SceneJS JSON proxy server, you can perform the
+<p>When SceneJS is configured with a JSONP strategy via <a href="../symbols/SceneJS.html#.setJSONPStrategy">SceneJS.setJSONPStrategy</a>, you can perform the
 load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
 in order to not violate the browser' same-domain security policy.
-<a target="other" href="http://scenejs.org/library/v0.7/proxies/jsonp_proxy.pl">Here is a download of </a>an example of a SceneJS
-JSONP proxy script written in Perl.</p>
 <p><b>Monitoring Load Progress</b></p>
-<p>You can monitor loads by registering "process-started" and "process-killed" listeners with <a href="../symbols/SceneJS.html#.onEvent">SceneJS.onEvent</a>().</p>
+<p>You can monitor loads by registering "process-started" and "process-killed" listeners with <a href="../symbols/SceneJS.html#.addListener">SceneJS.addListener</a>().</p>
 <p><b>Live Examples</b></p>
 <li><a target = "other" href="http://bit.ly/scenejs-collada-load-seymour">Seymour Plane</a></li>
 <li><a target = "other" href="http://bit.ly/scenejs-tron-tank">Tron Tank</a></li>
 </ul>
-<p><b>Usage Example</b></p><p>The SceneJS.LoadCollada node shown below loads a target asset cross-domain, from
-the <node> with ID "propeller" in a Collada file "airplane.dae" stored on a server at "foo.com". The transfer is
-routed via the JSONP proxy located by the <b>uri</b> property on the SceneJS.Scene node.</b></p>
+<p><b>Usage Example</b></p><p>The SceneJS.LoadCollada node shown below loads a target asset from
+the <node> with ID "propeller" in a Collada file "airplane.dae" stored on the local domain.</b></p>
 <pre><code>
 var exampleScene = new SceneJS.Scene({
 
-      // JSONP proxy location - needed only for cros-domain load
-      proxy:"http://scenejs.org/cgi-bin/jsonp_proxy.pl" });
-
       new SceneJS.LoadCollada({
-                 uri: "http://foo.com/airplane.dae",
+                 uri: "airplane.dae",
                  node: "propeller"
            })
  );
@@ -389,6 +386,39 @@ var exampleScene = new SceneJS.Scene({
 
 <!-- ============================== methods summary ======================== -->
 			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class SceneJS.LoadCollada.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.LoadCollada.html#getConfig">getConfig</a></b>()
+								</div>
+								<div class="description">Returns an object (owned by the <a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> node) through you can access the configuration of various nodes
+(such as lights and cameras) that the <a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> has created from the Collada file, along with some
+read-only contributor data on the file.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+				<dl class="inheritsList">
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Load.html">SceneJS.Load</a>: </dt><dd><a href="../symbols/SceneJS.Load.html#getState">getState</a></dd><dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a></dd>
+				</dl>
+				
+			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -427,6 +457,186 @@ var exampleScene = new SceneJS.Scene({
 
 <!-- ============================== method details ========================= -->		
 			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="getConfig"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{int}</span>
+					<b>getConfig</b>()
+					
+					</div>
+					<div class="description">
+						Returns an object (owned by the <a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> node) through you can access the configuration of various nodes
+(such as lights and cameras) that the <a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> has created from the Collada file, along with some
+read-only contributor data on the file.
+
+<p>You can walk the object to find out what nodes were created, and set properties within it to configure their state
+when they are next rendered. Each camera and light will have a unique ID. The object provides a property through
+which you can select which camera is currently active (see below).</p>
+
+<p>Various sub-objects provide data to dynamic configuration functions on the nodes (see how those functions work
+in <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>). Therefore, the object works as efficient read/write access to their render-time
+configuration.</p>
+
+<p>Since the object is generated while creating nodes as the Collada file is loaded, this function will only return it when the
+<a href="../symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a>'s state is <a href="../symbols/SceneJS.Load.html#.STATE_LOADED">SceneJS.Load.STATE_LOADED</a> or <a href="../symbols/SceneJS.Load.html#.STATE_RENDERED">SceneJS.Load.STATE_RENDERED</a>, which
+you can check with a prior call to <a href="../symbols/SceneJS.Load.html#getState">SceneJS.Load#getState</a>.</p>
+
+<p>Shown below is the config object's general structure. When cameras are loaded, it contains an array of camera configurations,
+each with properties pertaining to the camera type, plus a configuration for a default camera. When lights are loaded,
+it contains an array of light configurations, again with pertenant properties for each of those. When caneras are loaded,
+the activeCamera property may be set to a camera's ID to activate it.</p>
+
+<pre><code>
+{
+  contributor: {
+      author        : "Jane Doe",
+      authoringTool : "",
+      comments      : String,
+      copyright     : String,
+      sourceData    : String
+  },
+
+  // Set this to the ID of one of the cameras (see below) to activate it.
+
+  // When undefined
+
+  activeCamera: String,
+
+  // A configuration for each <camera> parsed:
+
+  cameras: [
+      {
+          // Uniquely identifies camera in .dae file
+
+          id: String,
+
+
+          // Camera projection configuration. There are two types, each of which
+          // will have different properties.
+
+          optics: {
+
+              type: String,       // "ortho" or "perspective"
+
+
+              // Properties when optics type is "ortho":
+
+              left: Number,
+              right: Number,
+              bottom: Number,
+              top: Number,
+              near: Number,
+              far: Number,
+
+
+              // Properties when optics type is "perspective":
+
+              fovy: Number,
+              aspect: Number,
+              near: Number,
+              far: Number
+          },
+
+
+          // When the camera is instanced by a <lookat> transform, there will
+          // also be a lookat property:
+
+          lookat: {
+              eye: {
+                  x: Number,
+                  y: Number,
+                  z: Number
+              },
+
+              look: {
+                  x: Number,
+                  y: Number,
+                  z: Number
+              },
+
+              up: {
+                  x: Number,
+                  y: Number,
+                  z: Number
+              }
+          }
+      }
+  ],
+
+  // The default camera which will be active when no <camera> elements
+  // were loaded, or when activeCamera does not resolve to any of the
+  // loaded cameras' IDs:
+
+  defaultCamera : {
+      lookat: {
+          eye: { x: 0, y: 0, z: 1},
+          look: { x: 0, y: 0, z: 0 },
+          up: { x: 0, y: 1, z: 0}
+      },
+      optics: {
+          type: "perspective",
+          fovy : 60.0,
+          aspect : 1.0,
+          near : 0.10,
+          far : 10000.0
+      }
+  },
+
+  // A configuration for each <light>. Each light configuration
+  // identifies it's type, for which it will have the pertenant
+  // properties.
+
+  lights: [
+
+      // A point light:
+
+      {
+          type: "point",
+          pos: { x: Number, y: Number, z: Number },
+          color: { r : Number, g: Number, b: Number },
+          constantAttenuation : Number,
+          linearAttenuation : Number,
+          quadraticAttenuation : Number
+      },
+
+      // A directional light:
+
+      {
+          type: "dir",
+          dir: { x: Number, y: Number, z: Number },
+          color: { r : Number, g: Number, b: Number }
+      }
+  ]
+}
+</pre></code>
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{int}</span> The state</dd>
+							
+							</dl>
+						
+						
+						
+
+					
+				
+			
 			
 <!-- ============================== event details ========================= -->		
 			
@@ -438,7 +648,7 @@ var exampleScene = new SceneJS.Scene({
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:51 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Mon Jun 07 2010 12:41:56 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

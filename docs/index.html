@@ -192,8 +192,6 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></li>
 	
-	<li><a href="symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></li>
-	
 	<li><a href="symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></li>
 	
 	<li><a href="symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></li>
@@ -205,6 +203,8 @@ ul.inheritsList
 	<li><a href="symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></li>
 	
 	<li><a href="symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></li>
+	
+	<li><a href="symbols/SceneJS.Exception.html">SceneJS.Exception</a></li>
 	
 	<li><a href="symbols/SceneJS.Fog.html">SceneJS.Fog</a></li>
 	
@@ -218,15 +218,17 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></li>
 	
+	<li><a href="symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></li>
+	
 	<li><a href="symbols/SceneJS.InvalidNodeConfigException.html">SceneJS.InvalidNodeConfigException</a></li>
 	
 	<li><a href="symbols/SceneJS.InvalidSceneGraphException.html">SceneJS.InvalidSceneGraphException</a></li>
 	
+	<li><a href="symbols/SceneJS.Inverse.html">SceneJS.Inverse</a></li>
+	
 	<li><a href="symbols/SceneJS.Lights.html">SceneJS.Lights</a></li>
 	
-	<li><a href="symbols/SceneJS.Load.html">SceneJS.Load</a></li>
-	
-	<li><a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></li>
+	<li><a href="symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></li>
 	
 	<li><a href="symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></li>
 	
@@ -240,7 +242,7 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Material.html">SceneJS.Material</a></li>
 	
-	<li><a href="symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></li>
+	<li><a href="symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
 	<li><a href="symbols/SceneJS.Name.html">SceneJS.Name</a></li>
 	
@@ -256,7 +258,7 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.OutOfVRAMException.html">SceneJS.OutOfVRAMException</a></li>
 	
-	<li><a href="symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></li>
+	<li><a href="symbols/SceneJS.ParseException.html">SceneJS.ParseException</a></li>
 	
 	<li><a href="symbols/SceneJS.ProxyEmptyResponseException.html">SceneJS.ProxyEmptyResponseException</a></li>
 	
@@ -264,11 +266,11 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.ProxyNotSpecifiedException.html">SceneJS.ProxyNotSpecifiedException</a></li>
 	
+	<li><a href="symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></li>
+	
 	<li><a href="symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></li>
 	
 	<li><a href="symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></li>
-	
-	<li><a href="symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></li>
 	
 	<li><a href="symbols/SceneJS.Scale.html">SceneJS.Scale</a></li>
 	
@@ -290,11 +292,11 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Translate.html">SceneJS.Translate</a></li>
 	
-	<li><a href="symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></li>
-	
 	<li><a href="symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></li>
 	
 	<li><a href="symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
+	
+	<li><a href="symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
 	
 	<li><a href="symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -329,26 +331,20 @@ level-of-detail culling.
 			<div>
 				<h2><a href="symbols/SceneJS.CanvasNotFoundException.html">SceneJS.CanvasNotFoundException</a></h2>
 				Exception thrown when a <a href="symbols/SceneJS.Scene.html">SceneJS.Scene</a> 'canvasId' configuration does not match any elements in the page and no
-default canvas was found with the ID specified in SceneJS.Scene.DEFAULT_CANVAS_ID.
-			</div>
-			<hr />
-			
-			<div>
-				<h2><a href="symbols/SceneJS.ColladaParseException.html">SceneJS.ColladaParseException</a></h2>
-				Exception thrown by a <a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> node when parsing of a Collada file fails for some reason.
+default canvas was found with the ID specified in <a href="symbols/SceneJS.Scene.html#.DEFAULT_CANVAS_ID">SceneJS.Scene.DEFAULT_CANVAS_ID</a>.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.ColladaRootNotFoundException.html">SceneJS.ColladaRootNotFoundException</a></h2>
-				Exception thrown by a <a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> node when the element ID given in its 'node' configuration does not match the ID
+				Exception thrown by a SceneJS.LoadCollada node when the element ID given in its 'node' configuration does not match the ID
 of any node in the Collada document.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.ColladaRootRequiredException.html">SceneJS.ColladaRootRequiredException</a></h2>
-				Exception thrown by a <a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> node when it could not find the default Collada node ("asset) to parse and needs you to
+				Exception thrown by a SceneJS.LoadCollada node when it could not find the default Collada node ("asset) to parse and needs you to
 explicitly provide the ID of a target asset through a 'node' configuration property.
 			</div>
 			<hr />
@@ -362,7 +358,7 @@ dynamically configured through.
 			
 			<div>
 				<h2><a href="symbols/SceneJS.DataExpectedException.html">SceneJS.DataExpectedException</a></h2>
-				Exception thrown when a node (such as SceneJs.ScalarInterpolator) expects to find some element of data on the current
+				Exception thrown when a node (such as SceneJs.Interpolator) expects to find some element of data on the current
 data scope (SceneJS.Data).
 			</div>
 			<hr />
@@ -370,13 +366,19 @@ data scope (SceneJS.Data).
 			<div>
 				<h2><a href="symbols/SceneJS.DocumentElementNotFoundException.html">SceneJS.DocumentElementNotFoundException</a></h2>
 				Exception thrown when a <a href="symbols/SceneJS.LoggingToPage.html">SceneJS.LoggingToPage</a> 'elementId' configuration does not match any elements in the page and no
-default DIV was found with the ID specified in <a href="symbols/SceneJS.LoggingToPage.html#.DEFAULT_LOGGING_DIV_ID">SceneJS.LoggingToPage.DEFAULT_LOGGING_DIV_ID</a>.
+default DIV was found with the ID specified in <a href="symbols/SceneJS.Scene.html#.DEFAULT_LOGGING_ELEMENT_ID">SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID</a>.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.EmptyResponseException.html">SceneJS.EmptyResponseException</a></h2>
 				Exception thrown to signify that empty content was loaded (eg.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.Exception.html">SceneJS.Exception</a></h2>
+				Wrapper for an exception not recognised by SceneJS.
 			</div>
 			<hr />
 			
@@ -407,13 +409,19 @@ in a loop within a scene traversal, while varying the data available to them in 
 			
 			<div>
 				<h2><a href="symbols/SceneJS.Instance.html">SceneJS.Instance</a></h2>
-				A scene node that instantiates a previously-defined SceneJS.Symbol node.
+				Causes an instance of a resource to be inserted into a scene graph.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.InternalException.html">SceneJS.InternalException</a></h2>
 				Exception thrown to signify a general internal SceneJS exception, ie.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.Interpolator.html">SceneJS.Interpolator</a></h2>
+				A scene node that animates interpolates a scalar value by interpolating within a sequence of key values.
 			</div>
 			<hr />
 			
@@ -431,26 +439,28 @@ a <a href="symbols/SceneJS.Symbol.html">SceneJS.Symbol</a> to instance
 			<hr />
 			
 			<div>
+				<h2><a href="symbols/SceneJS.Inverse.html">SceneJS.Inverse</a></h2>
+				A scene node that inverts the transformations (IE.
+			</div>
+			<hr />
+			
+			<div>
 				<h2><a href="symbols/SceneJS.Lights.html">SceneJS.Lights</a></h2>
 				A scene node that defines a set of light sources for its subgraph.
 			</div>
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.Load.html">SceneJS.Load</a></h2>
-				A scene node that asynchronously loads JavaScript content for its subgraph from a server.
-			</div>
-			<hr />
-			
-			<div>
-				<h2><a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a></h2>
-				A scene node that asynchronously loads its subgraph from a COLLADA file.
+				<h2><a href="symbols/SceneJS.LightSource.html">SceneJS.LightSource</a></h2>
+				SceneJS.LightSource
+
+ A light source for containment within a @link SceneJS.Lights} node.
 			</div>
 			<hr />
 			
 			<div>
 				<h2><a href="symbols/SceneJS.LoadTimeoutException.html">SceneJS.LoadTimeoutException</a></h2>
-				Exception thrown by nodes such as SceneJs.Load and <a href="symbols/SceneJS.LoadCollada.html">SceneJS.LoadCollada</a> when they timeout waiting for their content to load.
+				Exception thrown by nodes such as SceneJs.Load and SceneJS.LoadCollada when they timeout waiting for their content to load.
 			</div>
 			<hr />
 			
@@ -487,8 +497,8 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.ModelMatrix.html">SceneJS.ModelMatrix</a></h2>
-				A scene node that applies a model-space transform to the nodes within its subgraph.
+				<h2><a href="symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></h2>
+				A scene node that defines a 4x4 matrix to transform the nodes within its subgraph.
 			</div>
 			<hr />
 			
@@ -535,8 +545,8 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.Perspective.html">SceneJS.Perspective</a></h2>
-				A scene node that defines a perspective transformation for the nodes within its subgraph.
+				<h2><a href="symbols/SceneJS.ParseException.html">SceneJS.ParseException</a></h2>
+				Exception thrown by a <a href="symbols/SceneJS.Instance.html">SceneJS.Instance</a> node when parsing of a file fails for some reason.
 			</div>
 			<hr />
 			
@@ -561,6 +571,12 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
+				<h2><a href="symbols/SceneJS.Quaternion.html">SceneJS.Quaternion</a></h2>
+				Scene node that provides a quaternion-encoded rotation.
+			</div>
+			<hr />
+			
+			<div>
 				<h2><a href="symbols/SceneJS.Renderer.html">SceneJS.Renderer</a></h2>
 				A scene node that sets WebGL state for nodes in its subtree.
 			</div>
@@ -569,12 +585,6 @@ at, and the direction of "up".
 			<div>
 				<h2><a href="symbols/SceneJS.Rotate.html">SceneJS.Rotate</a></h2>
 				A scene node that applies a model-space rotation transform to the nodes within its subgraph.
-			</div>
-			<hr />
-			
-			<div>
-				<h2><a href="symbols/SceneJS.ScalarInterpolator.html">SceneJS.ScalarInterpolator</a></h2>
-				A scene node that animates interpolates a scalar value by interpolating within a sequence of key values.
 			</div>
 			<hr />
 			
@@ -640,12 +650,6 @@ a <a href="symbols/SceneJS.Symbol.html">SceneJS.Symbol</a> to instance
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.ViewMatrix.html">SceneJS.ViewMatrix</a></h2>
-				A scene node that applies a model-space transform to the nodes within its subgraph.
-			</div>
-			<hr />
-			
-			<div>
 				<h2><a href="symbols/SceneJS.WebGLNotSupportedException.html">SceneJS.WebGLNotSupportedException</a></h2>
 				Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a <a href="symbols/SceneJS.Scene.html">SceneJS.Scene</a>.
 			</div>
@@ -659,6 +663,12 @@ a specified config value.
 			<hr />
 			
 			<div>
+				<h2><a href="symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></h2>
+				A scene node that specifies values to set on nodes in it's subgraph as they are rendered .
+			</div>
+			<hr />
+			
+			<div>
 				<h2><a href="symbols/SceneJS.WithData.html">SceneJS.WithData</a></h2>
 				A scene node that creates data in a scope for its subgraph.
 			</div>
@@ -668,7 +678,7 @@ a specified config value.
 		</div>
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Sat May 08 2010 22:54:52 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:22 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>
