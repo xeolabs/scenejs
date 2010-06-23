@@ -60,8 +60,8 @@ var SceneJS_sceneModule = new (function() {
                             + SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID + "' - logging to browser console also");
                 }
             } else {
-                  SceneJS_loggingModule.info("SceneJS.Scene logging to element with ID '"
-                            + loggingElementId + "' - logging to browser console also");
+                SceneJS_loggingModule.info("SceneJS.Scene logging to element with ID '"
+                        + loggingElementId + "' - logging to browser console also");
             }
         }
         return element;
@@ -106,13 +106,21 @@ var SceneJS_sceneModule = new (function() {
         var contextNames = SceneJS.SUPPORTED_WEBGL_CONTEXT_NAMES;
         for (var i = 0; (!context) && i < contextNames.length; i++) {
             try {
-
-                context = canvas.getContext(contextNames[i]);
-
-                //
-                //                                                                                        alert("WebGL Trace enabled");
-                //                                                                                        context = WebGLDebugUtils.makeDebugContext(canvas.getContext(contextNames[i]));
-                //                                                                                        context.setTracing(true);
+                if (SceneJS_debugModule.getConfigs("webgl.logTrace") == true) {
+                    context = canvas.getContext(contextNames[i]);
+                    if (context) {
+                        context = WebGLDebugUtils.makeDebugContext(
+                                context,
+                                function(err, functionName, args) {
+                                    SceneJS_loggingModule.error(
+                                            "WebGL error calling " + functionName +
+                                            " on WebGL canvas context - see console log for details");
+                                });
+                        context.setTracing(true);
+                    }
+                } else {
+                    context = canvas.getContext(contextNames[i]);
+                }
             } catch (e) {
 
             }

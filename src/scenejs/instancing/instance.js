@@ -253,6 +253,10 @@ SceneJS.Instance.prototype._render = function(traversalContext, data) {
 
     } else if (this._uriFragment) {
         this._instanceSymbol(this._uriFragment, traversalContext, data);
+    } else {
+        throw SceneJS_errorModule.fatalError(
+                new SceneJS.InvalidNodeConfigException(
+                        "SceneJS.instance uri not defined"));
     }
 };
 
@@ -330,6 +334,7 @@ SceneJS.Instance.prototype._changeState = function(newState) {
  * @private
  */
 SceneJS.Instance.prototype._renderAssetNode = function(traversalContext, data) {
+
     if (this._uriFragment) {
 
         /* Instancing a Symbol - fragment is an absolute SID path
@@ -451,6 +456,11 @@ SceneJS.Instance.prototype._instanceSymbol = function(symbolSIDPath, traversalCo
         SceneJS_instancingModule.releaseInstance();
     }
 };
+
+
+//SceneJS.Instance.prototype.getSymbol = function() {
+//
+//};
 
 /** Factory function that returns a new {@link SceneJS.Instance} instance
  *  @param {Object} [cfg] Static configuration object

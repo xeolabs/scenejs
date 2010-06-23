@@ -27,19 +27,25 @@ var SceneJS_loggingModule = new (function() {
     var indent = 0;
     var indentStr = "";
 
-    var logToConsole = (typeof console == "object") ? function(msg) {
-        console.log(msg);
-    } : function() {
-    };
-
     /**
      * @private
      */
     function log(channel, message) {
+        if (SceneJS._isArray(message)) {
+            _logHTML(channel, arrayToHTML(message));
+            for (var i = 0; i < message.length; i++) {
+                _logToConsole(message[i]);
+            }
+        } else {
+            _logHTML(channel, message);
+            _logToConsole(message);
+        }
+    }
+
+    function _logHTML(channel, message) {
         message = activeSceneId
                 ? indentStr + activeSceneId + ": " + message
                 : indentStr + message;
-        logToConsole(message);
         var func = funcs ? funcs[channel] : null;
         if (func) {
             func(message);
@@ -49,6 +55,31 @@ var SceneJS_loggingModule = new (function() {
                 queue = queues[channel] = [];
             }
             queue.push(message);
+        }
+    }
+
+    function _logToConsole(message) {
+        if (typeof console == "object") {
+            message = activeSceneId
+                    ? indentStr + activeSceneId + ": " + message
+                    : indentStr + message;
+            console.log(message);
+        }
+    }
+
+    function arrayToHTML(array) {
+        var array2 = [];
+        for (var i = 0; i < array.length; i++) {
+            var padding = (i < 10) ? "&nbsp;&nbsp;&nbsp;" : ((i < 100) ? "&nbsp;&nbsp;" : (i < 1000 ? "&nbsp;" : ""));
+            array2.push(i + padding + ": " + array[i]);
+        }
+        return array2.join("<br/>");
+    }
+
+
+    function logScript(src) {
+        for (var i = 0; i < src.length; i++) {
+            logToConsole(src[i]);
         }
     }
 
@@ -111,6 +142,7 @@ var SceneJS_loggingModule = new (function() {
                 funcs = null;
             },
             100000);  // Really low priority - must be reset last
+
 
     // @private
     this.setIndent = function(_indent) {

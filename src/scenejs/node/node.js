@@ -483,7 +483,7 @@ SceneJS.Node.prototype._setConfigs = function(childConfigs, child, data) {
                 handle.setterFuncs.push(setterFunc);                       // Save setter
                 config = childConfigs[key];
                 if (config instanceof Function) {
-                    setterFunc.call(child, config.call(data));
+                    setterFunc.call(child, config.call(child, data));
                 } else {
                     setterFunc.call(child, config);
                 }

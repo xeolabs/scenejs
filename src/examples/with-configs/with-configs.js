@@ -133,7 +133,9 @@ var dragging = false;
 /* Throw the switch, Igor!
  * We render the scene, injecting the initial angles for the rotate nodes.
  */
-exampleScene.render({yaw: yaw, pitch: pitch});
+exampleScene
+        .setData({yaw: yaw, pitch: pitch})
+        .render();
 
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified

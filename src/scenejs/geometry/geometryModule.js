@@ -62,7 +62,7 @@ var SceneJS_geometryModule = new (function() {
                 canvas = c;
                 currentGeoMap = geoMaps[c.canvasId];
                 currentBoundGeoType = null;
-            });
+            }); 
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_DEACTIVATED,

@@ -125,7 +125,9 @@ window.render = function() {
     } else {
         zpos += 2.0;
 
-        exampleScene.render({z:(zpos == 0 ? 0.1 : zpos)}); // Don't allow lookAt node's 'look' to equal its 'at'
+        exampleScene
+                .setData({z:(zpos == 0 ? 0.1 : zpos)})// Don't allow lookAt node's 'look' to equal its 'at'
+                .render();
     }
 };
 

@@ -409,12 +409,13 @@ var SceneJS_shaderModule = new (function() {
      * @private
      */
     function getShaderLoggingSource(src) {
-        var src2 = [];
-        for (var i = 0; i < src.length; i++) {
-            var padding = (i < 10) ? "&nbsp;&nbsp;&nbsp;" : ((i < 100) ? "&nbsp;&nbsp;" : (i < 1000 ? "&nbsp;" : ""));
-            src2.push(i + padding + ": " + src[i]);
-        }
-        return src2.join("<br/>");
+        //        var src2 = [];
+        //        for (var i = 0; i < src.length; i++) {
+        //            var padding = (i < 10) ? "&nbsp;&nbsp;&nbsp;" : ((i < 100) ? "&nbsp;&nbsp;" : (i < 1000 ? "&nbsp;" : ""));
+        //            src2.push(i + padding + ": " + src[i]);
+        //        }
+        //       // return src2.join("<br/>");
+        return src.join("");
     }
 
     /**
@@ -468,6 +469,7 @@ var SceneJS_shaderModule = new (function() {
 
         return src;
     }
+
 
     /**
      * @private
@@ -569,10 +571,11 @@ var SceneJS_shaderModule = new (function() {
             }
         }
         src.push("}");
-        //      SceneJS_loggingModule.info(getShaderLoggingSource(src));
+        if (SceneJS_debugModule.getConfigs("shading.logScripts") == true) {
+            SceneJS_loggingModule.info(src);
+        }
         return src.join("\n");
     }
-
 
     /**
      * @private
@@ -809,11 +812,13 @@ var SceneJS_shaderModule = new (function() {
         } else {
             src.push("gl_FragColor = fragColor;");
         }
-
-      // src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+        if (SceneJS_debugModule.getConfigs("shading.whitewash") == true) {
+            src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+        }
         src.push("}");
-
-      //  SceneJS_loggingModule.info(getShaderLoggingSource(src));
+        if (SceneJS_debugModule.getConfigs("shading.logScripts") == true) {
+            SceneJS_loggingModule.info(src);
+        }
         return src.join("\n");
     }
 })();

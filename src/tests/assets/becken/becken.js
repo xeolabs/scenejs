@@ -12,33 +12,47 @@
 
  */
 
+SceneJS.addListener("error", function(e) {
+    if (e.exception.message) {
+        alert("Error: " + e.exception.message);
+    } else {
+        alert("Error: " + e.exception);
+    }
+});
+
+SceneJS.setJSONPStrategy({
+    request : function(url, format, callback) {
+        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" +
+               url + "&format=" + format + "&callback=" + callback;
+    },
+
+    response : function(data) {
+        return data;
+    }
+});
+
+
 var exampleScene = SceneJS.scene({
 
-    /* Bind scene to a WebGL canvas:
+    /* Bind to a WebGL canvas:
      */
-    canvasId: "theCanvas",
+    canvasId: 'theCanvas' },
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
 
     /* Viewing transform:
      */
         SceneJS.lookAt({
-            eye : { x: -1.0, y: 0.0, z: 15 },
+            eye : { x: -1.0, y: 0.0, z: -25 },
             look : { x: -1.0, y: 0, z: 0 },
             up : { y: 1.0 }
         },
 
-            /* Perspective camera
-             */
                 SceneJS.camera({
-                    optics: {
-                        type: "perspective",
+                    optics: { type: "perspective",
                         fovy : 55.0,
                         aspect : 1.0,
                         near : 0.10,
-                        far : 300.0  }
+                        far : 5000.0 }
                 },
 
                     /* A lights node inserts lights into the world-space.  You can have as many
@@ -77,46 +91,32 @@ var exampleScene = SceneJS.scene({
                                             };
                                         },
 
-                                            /* Instance our COLLADA airplane model. This will instance the
-                                             * "ViaualSceneNode" scene as defined by the <scene> tag, IE.
-                                             * 
-                                             * <scene>
-                                             *      <instance_visual_scene url="#VisualSceneNode"/>
-                                             * </scene>
+                                            /* Load our COLLADA airplane model:
                                              */
+                                            //                                                SceneJS.material({
+                                            //                                                                                                baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                            //                                                                                                specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                            //                                                                                                specular:       0.9,
+                                            //                                                                                                shine:          6.0
+                                            //                                                                                            },
+                                            //                                                        SceneJS.objects.teapot()
+
                                                 SceneJS.instance({
                                                     uri: "http://www.scenejs.org/library/v0.7/assets/" +
                                                          "examples/seymourplane_triangulate/" +
-                                                         "seymourplane_triangulate.dae"
-                                                }))
-                                        )
+                                                         "seymourplane_triangulate.dae",
+
+
+
+                                                    showBoundingBoxes: false // Set this true - see what happens!
+                                                })
+                                                ))
+                            //)
                                 )
                         )
                 )
         );
 
-/*--------------------------------------------------------------------------------------------------------------------
- * To enable the COLLADA model to load cross-domain, we'll first configure SceneJS with a strategy to allow it
- * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
- * create the request URL for the service, and another to extract the data from the response.
- *------------------------------------------------------------------------------------------------------------------*/
- 
-SceneJS.setJSONPStrategy({
-    request : function(url, format, callback) {
-        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
-    },
-
-    response : function(data) {
-
-        /* The SceneJS proxy will provide an error message like this when
-         * it fails to service the request
-         */
-        if (data.error) {
-            throw "Proxy server responded with error: " + data.error;
-        }
-        return data;
-    }
-});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -133,6 +133,7 @@ var dragging = false;
  * can't find the one specified
  */
 var canvas = document.getElementById(exampleScene.getCanvasId());
+;
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -160,10 +161,9 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
+
 window.render = function() {
-    exampleScene
-            .setData({yaw: yaw, pitch: pitch})
-            .render();
+    exampleScene.render({yaw: yaw, pitch: pitch});
 };
 
 SceneJS.addListener("error", function() {

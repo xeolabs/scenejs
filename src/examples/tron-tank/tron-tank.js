@@ -1,4 +1,4 @@
-/* SceneJS COLLADA import example - the Tank Program from the 1982 Disney motion picture "Tron".
+/* First SceneJS COLLADA import example - the Tank Program from the 1982 Disney motion picture "Tron".
  *
  * Take it for a drive - if you get stuck, just re-run the scene to reset it.
  *
@@ -16,31 +16,12 @@
  *
  */
 
-/*
- * To enable the COLLADA content to load cross-domain, we'll first configure SceneJS with a strategy to allow it
- * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
- * create the request URL for the service, and another to extract the data from the response.
- */
-SceneJS.setJSONPStrategy({
-    request : function(url, format, callback) {
-        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
-    },
 
-    response : function(data) {  // Our proxy service does no fancy data packaging
-        return data;
-    }
-});
+const COLLADA_TANK_URL = "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank_V2.dae";
 
 var exampleScene = SceneJS.scene({
+    canvasId: 'theCanvas' },
 
-
-    /* Bind scene to a WebGL canvas:
-     */
-    canvasId: "theCanvas",
-
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
 
     /* Some fog for fun
      */
@@ -63,16 +44,10 @@ var exampleScene = SceneJS.scene({
                         up : { x: 0, y: 1, z: .0 }
                     };
                 },
+
                     /* Perspective camera
                      */
-                        SceneJS.camera({
-                            optics: {
-                                type: "perspective",
-                                fovy : 40.0,
-                                aspect : 1.0,
-                                near : 0.10,
-                                far : 7000.0  }
-                        },
+                        SceneJS.camera({ optics: { type: "perspective", fovy : 40.0, aspect : 1.0, near : 0.10, far : 7000.0 }},
 
                             /* Lighting
                              */
@@ -81,7 +56,6 @@ var exampleScene = SceneJS.scene({
                                         {
                                             type:                   "dir",
                                             color:                  { r: 1.0, g: 1.0, b: 0.5 },
-                                            // Yellowish
                                             diffuse:                true,
                                             specular:               true,
                                             dir:                    { x: 0.0, y: -1, z: -1.0 }
@@ -102,64 +76,44 @@ var exampleScene = SceneJS.scene({
                                         }
                                     ]},
 
-                                    /* The Tron Tank - this is composed of three assets loaded from the same
-                                     * COLLADA file: "Tank", "Gun" and "Pilot1" (the red chevron
-                                     * symbol on he tank's bonnet). The assets are each wrapped in modelling
-                                     * transforms to position and orient them within the scene. Some of the
-                                     * transforms are dynamically configured with positions and angles that
-                                     * are  injected into the scene when rendered, which is generated
-                                     * from mouse input.
-                                     *
-                                     */
-                                        SceneJS.translate(
-                                                function(data) {
-                                                    return {
-                                                        x: data.get("tron.tank.pos.x") || 0,
-                                                        y: data.get("tron.tank.pos.y") || 5,
-                                                        z: data.get("tron.tank.pos.z") || 0
-                                                    };
-                                                },
+                                        SceneJS.withConfigs({
 
-                                                SceneJS.rotate(
-                                                        function(data) {
-                                                            return {y: 1, angle: data.get("tron.tank.yaw") + 180 || 180 };
+                                            "#Group1" : {
+
+                                                "#translate" : {
+
+                                                    x: function (data) {
+                                                        return data.get("tron.tank.pos.x");
+                                                    },
+
+                                                    y: function (data) {
+                                                        return data.get("tron.tank.pos.y");
+                                                    },
+
+                                                    z: function (data) {
+                                                        return data.get("tron.tank.pos.z");
+                                                    },
+
+                                                    "#rotateY": {
+                                                        angle: function(data) {
+                                                            return data.get("tron.tank.yaw") + 180 || 180;
                                                         },
-                                                        SceneJS.translate({ x:8, y: -5,z: 10},
-                                                                SceneJS.rotate({x: 1, angle: 270 },
-                                                                        SceneJS.scale({x:.1, y: .1, z: .1},
 
-                                                                            /* Tank body asset
-                                                                             */
-                                                                                SceneJS.instance({
-                                                                                    uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
-                                                                                    node:"Tank"
-                                                                                }),
-                                                                                SceneJS.translate({x:-50, y: 160, z: 5},
-                                                                                        SceneJS.instance({
-                                                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
-                                                                                            node:"Pilot1"
-                                                                                        })),
+                                                        "#Gun1" : {
+                                                            "#rotateZ": {
+                                                                angle: function(data) {
+                                                                    return -data.get("tron.tank.yaw");
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                                SceneJS.instance({
+                                                    uri: COLLADA_TANK_URL + "#SketchUpScene"
+                                                })),
 
-                                                                            /* Gun asset
-                                                                             */
-                                                                                SceneJS.translate({x:-57, y: 63, z: 0},
-                                                                                        SceneJS.rotate(
-                                                                                                function(data) {
-                                                                                                    return {z:1, angle: data.get("tron.tank.gun.yaw") || 0};
-                                                                                                },
-                                                                                                SceneJS.translate({x:39.0, y: -76.5, z: 52},
-
-                                                                                                        SceneJS.instance({
-                                                                                                            uri: "http://www.scenejs.org/library/v0.7/assets/examples/tank/models/Tank.dae",
-                                                                                                            node:"Gun"
-                                                                                                        }))
-                                                                                                )
-                                                                                        )
-                                                                                )
-                                                                        )
-                                                                )
-                                                        )
-                                                ),
 
                                     /* Tiled floor, loaded from the SceneJS asset library
                                      */
@@ -207,9 +161,33 @@ var exampleScene = SceneJS.scene({
         );
 
 
+/*------------------------------------------------------------------------------------------------------------------
+ * To enable the tank model to load cross-domain, we'll configure SceneJS with a strategy to allow it
+ * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
+ * create the request URL for the service, and another to extract the data from the response.
+ *----------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setJSONPStrategy({
+    request : function(url, format, callback) {
+        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
+    },
+
+    response : function(data) {
+
+        /* The SceneJS proxy will provide an error message like this when
+         * it fails to service the request
+         */
+        if (data.error) {
+            throw "Proxy server responded with error: " + data.error;
+        }
+        return data;
+    }
+});
+
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
+
 var timeStarted = new Date().getTime();
 
 var speed = 0;
@@ -249,7 +227,6 @@ function mouseDown(event) {
 
 function mouseUp() {
     dragging = false;
-
     tankYawInc = 0;
     pitchInc = 0;
 }
@@ -294,70 +271,74 @@ canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 
 
+var x = 0;
 window.render = function() {
-    try {
-        pitch += pitchInc;
+    x++;
+    if (x == 10) {
+        //  clearInterval(pInterval);
+    }
 
-        if (pitch < 1) {
-            pitch = 1;
-        }
+    pitch += pitchInc;
 
-        if (pitch > 80) {
-            pitch = 80;
-        }
+    if (pitch < 1) {
+        pitch = 1;
+    }
 
-        tankYaw += tankYawInc;
-        var tankYawMat = Matrix.Rotation(tankYaw * 0.0174532925, $V([0,1,0]));
+    if (pitch > 80) {
+        pitch = 80;
+    }
 
-        var moveVec = [0,0,1];
+    tankYaw += tankYawInc;
+    var tankYawMat = Matrix.Rotation(tankYaw * 0.0174532925, $V([0,1,0]));
 
-        moveVec = tankYawMat.multiply($V(moveVec)).elements;
+    var moveVec = [0,0,1];
 
-        var trailVec = [0,0, -1 - (pitch * 0.02)];
+    moveVec = tankYawMat.multiply($V(moveVec)).elements;
 
-        var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1,0,0]));
-        var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0,1,0]));
+    var trailVec = [0,0, -1 - (pitch * 0.02)];
 
-        trailVec = trailPitchMat.multiply($V(trailVec)).elements;
-        trailVec = trailYawMat.multiply($V(trailVec)).elements;
+    var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1,0,0]));
+    var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0,1,0]));
 
-        if (speed) {
-            tankPos.x += moveVec[0] * speed;
-            tankPos.y += moveVec[1] * speed;
-            tankPos.z += moveVec[2] * speed;
-        }
+    trailVec = trailPitchMat.multiply($V(trailVec)).elements;
+    trailVec = trailYawMat.multiply($V(trailVec)).elements;
 
-        if (eye.y > 100.0) {
-            eye.y = 100.0;
-        }
+    if (speed) {
+        tankPos.x += moveVec[0] * speed;
+        tankPos.y += moveVec[1] * speed;
+        tankPos.z += moveVec[2] * speed;
+    }
 
-        if (eye.y < 20.0) {
-            eye.y = 20.0;
-        }
+    if (eye.y > 100.0) {
+        eye.y = 100.0;
+    }
 
-        eye.x = tankPos.x + (trailVec[0] * 35);
-        eye.y = tankPos.y + (trailVec[1] * 35);
-        eye.z = tankPos.z + (trailVec[2] * 35);
+    if (eye.y < 20.0) {
+        eye.y = 20.0;
+    }
 
-        var timeSeconds = (new Date().getTime() - timeStarted) / 1000;
-        exampleScene.render({
-            eye : eye,
-            look: { x: tankPos.x, y: tankPos.y, z : tankPos.z },
-            "tron.tank.pos.x" : tankPos.x,
-            "tron.tank.pos.z" : tankPos.z,
-            "tron.tank.yaw" : tankYaw,
-            "tron.tank.gun.yaw" : -tankYaw,
+    eye.x = tankPos.x + (trailVec[0] * 35);
+    eye.y = tankPos.y + (trailVec[1] * 35);
+    eye.z = tankPos.z + (trailVec[2] * 35);
 
-            timeSeconds: timeSeconds});
+    var timeSeconds = (new Date().getTime() - timeStarted) / 1000;
 
-        if (trailYaw > tankYaw) {
-            trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
-        } else if (trailYaw < tankYaw) {
-            trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
-        }
-    } catch (e) {
-        clearInterval(pInterval);
-        throw e;
+    exampleScene.setData({
+        eye : eye,
+        look: { x: tankPos.x, y: tankPos.y, z : tankPos.z },
+        "tron.tank.pos.x" : tankPos.x,
+        "tron.tank.pos.z" : tankPos.z,
+        "tron.tank.yaw" : tankYaw,
+        "tron.tank.gun.yaw" : -tankYaw,
+
+        timeSeconds: timeSeconds});
+
+    exampleScene.render();
+
+    if (trailYaw > tankYaw) {
+        trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
+    } else if (trailYaw < tankYaw) {
+        trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
     }
 };
 
@@ -366,7 +347,8 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.addListener("error", function() {
+SceneJS.addListener("error", function(e) {
+    alert(e);
     window.clearInterval(pInterval);
 });
 

@@ -169,22 +169,24 @@ function mouseMove(event) {
     if (dragging) {
         roty = (event.clientX - lastX);
         rotx = (event.clientY - lastY) * -1;
+
         if (Math.abs(roty) > Math.abs(rotx)) {
-            exampleScene.render({rotations: [
+
+            exampleScene.setData({rotations: [
                 {
                     y: 1,
                     angle: roty
                 }
-            ] });
+            ] }).render();
         } else {
-            exampleScene.render({rotations: [
+
+            exampleScene.setData({rotations: [
                 {
                     x: 1,
                     angle: rotx
                 }
-            ]});
+            ]}).render();
         }
-        exampleScene.render();
         lastX = event.clientX;
         lastY = event.clientY;
     }

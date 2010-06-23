@@ -52,12 +52,21 @@ var SceneJS_loadModule = new (function() {
                 sceneLibraries[params.sceneId] = {};
             });
 
-    /* When scene begins rendering, activate its library and render the library's assets to define their Symbols
+
+    /* When scene activated, activate the current scene library
      */
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
             function(params) {
                 sceneLibrary = sceneLibraries[params.sceneId];
+            });
+
+    /* When canvas activated, render the library's assets to define their Symbols.
+     * Note we must have a canvas, so we can drive WebGL
+     */
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_ACTIVATED,
+            function() {
                 var dummyTraversalContext = {};
                 var dummyData = new SceneJS.Data(null, false, {});
                 for (var key in sceneLibrary) {
@@ -68,7 +77,7 @@ var SceneJS_loadModule = new (function() {
                         }
                     }
                 }
-            });
+            }, 10000);
 
     /* When scene destroyed, destroy its library assets
      */
@@ -294,6 +303,12 @@ SceneJS.Asset.prototype._loadCrossDomain = function() {
         } catch(e) {
         }
         head.removeChild(script);          // Remove script
+        try {
+            data = self._jsonpStrategy.response(data);
+        } catch (e) {
+            self._handleException(new SceneJS.ProxyErrorResponseException(e));
+            return;
+        }
         self.assetNode = self._parser.parse({
             uri: self.uri,
             data: data,
@@ -301,10 +316,12 @@ SceneJS.Asset.prototype._loadCrossDomain = function() {
                 self._handleException(new SceneJS.EmptyResponseException(msg));
             }
         });
-        if (!self.assetNode) {
-            self._handleException(new SceneJS.InternalException("parser returned null result"));
-        } else {
-            self._handleSuccess();
+        if (this.status != SceneJS.Asset.STATUS_ERROR) {
+            if (!self.assetNode) {
+                self._handleException(new SceneJS.InternalException("parser returned null result"));
+            } else {              
+                self._handleSuccess();
+            }
         }
     };
     head.appendChild(script);
@@ -327,10 +344,12 @@ SceneJS.Asset.prototype._loadLocal = function() {
                             self._handleException(new SceneJS.EmptyResponseException(msg));
                         }
                     });
-                    if (!self._assetNode) {
-                        self._handleException(new SceneJS.InternalException("parser returned null result"));
-                    } else {
-                        self._handleSuccess();
+                    if (this.status != SceneJS.Asset.STATUS_ERROR) {
+                        if (!self._assetNode) {
+                            self._handleException(new SceneJS.InternalException("parser returned null result"));
+                        } else {
+                            self._handleSuccess();
+                        }
                     }
                 }
             }

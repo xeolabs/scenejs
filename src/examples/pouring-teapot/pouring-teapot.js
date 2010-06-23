@@ -112,7 +112,10 @@ window.render = function() {
         exampleScene.destroy();
     } else {
         alpha += 0.002;
-        exampleScene.render({"alpha":alpha});
+
+        exampleScene
+                .setData({"alpha":alpha})
+                .render();
     }
 };
 

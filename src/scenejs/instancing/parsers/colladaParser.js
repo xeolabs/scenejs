@@ -4,6 +4,7 @@
  * @private
  */
 (function() {
+    var debugCfg = {};
     var rootSID = null;
     var sidMap = {}; // Map of all IDs generated to ensure their uniqueness
     var xmlDoc; // Holds DOM parsed from XML string
@@ -28,6 +29,7 @@
 
         parse: function(cfg) {
             reset();
+            debugCfg = SceneJS_debugModule.getConfigs("instancing.collada") || {};
             uri = cfg.uri;
             rootSID = uri;
             dirURI = cfg.uri.substring(0, cfg.uri.lastIndexOf("/") + 1);
@@ -42,6 +44,7 @@
      * Resets parser state
      */
     function reset() {
+        debugCfg = {};
         rootSID = null;
         sidMap = {};
         xmlDoc = null;
@@ -61,9 +64,11 @@
     /** Logs that the given tag is parsed
      */
     function logTag(tag) {
-        //        var id = tag.getAttribute("id");
-        //        var sid = tag.getAttribute("sid");
-        //        SceneJS_loggingModule.info("Parsing <" + tag.tagName + " id: '" + id + "' sid: '" + sid + "'>");
+        if (debugCfg.logTags) {
+            var id = tag.getAttribute("id");
+            var sid = tag.getAttribute("sid");
+            SceneJS_loggingModule.info("Parsing <" + tag.tagName + " id: '" + id + "' sid: '" + sid + "'>");
+        }
     }
 
     /**
@@ -138,7 +143,9 @@
         var i, j, symbolTags, symbolTag, symbol, libraryTag;
         for (i = 0; i < libraryTags.length; i++) {
             libraryTag = libraryTags[i];
+
             logTag(libraryTag);
+
             symbolTags = libraryTag.getElementsByTagName(symbolTagName);
             for (j = 0; j < symbolTags.length; j++) {
                 symbolTag = symbolTags[j];
@@ -1030,11 +1037,10 @@
 
     function parseScene() {
         var sceneTag = xmlDoc.getElementsByTagName("scene")[0];
-        var scene = new SceneJS.Node({
-            sid: "scene"
+        var scene = new SceneJS.Symbol({
+            sid: "__SceneJS_default_scene"
         });
-        var meta = {};
-        var ivsTags = sceneTag.getElementsByTagName("instance-visual-scene");
+        var ivsTags = sceneTag.getElementsByTagName("instance_visual_scene");
         for (var i = 0; i < ivsTags.length; i++) {
             scene.addNode(parseInstanceVisualScene(ivsTags[i]));
         }
@@ -1043,8 +1049,11 @@
 
     function parseInstanceVisualScene(instanceVisualSceneTag) {
         var sid = instanceVisualSceneTag.getAttribute("sid") || randomSID();
-        var target = instanceVisualSceneTag.getAttribute("target"); // Non-null for instance tags
-        return new SceneJS.Instance({ sid: sid, uri : target });
+        var target = instanceVisualSceneTag.getAttribute("url").substr(1); // Non-null for instance tags
+        return new SceneJS.Instance({
+            sid: sid,
+            uri : "../" + target
+        });
 
     }
 })();

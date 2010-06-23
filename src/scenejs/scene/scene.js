@@ -1,54 +1,76 @@
 /**
  *@class Root node of a SceneJS scene graph.
  *
- * <p>This is entry and exit point for execution when rendering one frame of a scene graph, which also configures certain
- * global scene parameters as listed below. </p>
+ * <p>This is entry and exit point for execution when rendering one frame of a scene graph, while also providing
+ * the means to configure global data scope values and configurations for each frame. </p>
  * <p><b>Binding to a canvas</b></p>
  * <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
  * element for the scene to render to. When that is omitted, the node will look for one with the default ID of
  * "_scenejs-default-canvas".</p>
  * <p><b>Timeout for {@link SceneJS.Instance} sub-nodes</b></p>
  * <p>The Scene node can be configured with a <b>loadTimeoutSecs</b> property to specify the number of seconds within
- * which {@link SceneJS.Instance} nodes within its subgraph must receive and parse their content. That may be overridden
- * in the configs of individual {@link SceneJS.Instance} nodes.
+ * which {@link SceneJS.Instance} nodes within its subgraph must receive and parse content when they load it from files.
+ * That may be overridden in the configs of individual {@link SceneJS.Instance} nodes.
  * <p><b>Usage Example:</b></p><p>Shown below is Scene bound to a canvas and specifying a JSONP proxy, that contains a
- * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.LoadCollada}
+ * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.Instance}
  * node loads a Collada model cross-domain through the proxy. When the Scene is rendered, a value for the
  * {@link Scene.LookAt}'s property is injected into it. The Scene will put the property on a data scope (which is
  * implemented by a {@link SceneJS.Data}) that the {@link SceneJS.LookAt}'s config callback then accesses.</b></p>
  * <pre><code>
+ *
+ * // To enable the COLLADA content to load cross-domain, we'll first configure SceneJS with a strategy to allow it
+ * // to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
+ * // create the request URL for the service, and another to extract the data from the response.
+ *
+ * SceneJS.setJSONPStrategy({
+ *     request : function(url, format, callback) {
+ *        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
+ *     },
+ *
+ *    response : function(data) {
+ *
+ *        // The SceneJS proxy will provide an error message like this when
+ *        // it fails to service the request
+ *
+ *        if (data.error) {
+ *            throw "Proxy server responded with error: " + data.error;
+ *        }
+ *        return data;
+ *    }
+ * });
+ *
  * var myScene = new SceneJS.Scene({
  *
- *              // Bind scene to render to WebGL Canvas element with given ID.
- *              // Default is "_scenejs-default-canvas"
+ *         // Bind scene to render to WebGL Canvas element with given ID.
+ *         // Default is "_scenejs-default-canvas"
  *
- *              canvasId:        "myCanvas",
+ *         canvasId:        "myCanvas",
  *
- *              // Optionally write scene logging to a DIV:
+ *         // Optionally write scene logging to a DIV:
  *
- *              loggingElementId: "myLoggingDiv",
+ *        loggingElementId: "myLoggingDiv",
  *
- *              // Optional default timeout for SceneJS.Instance<xxx> nodes, which may override
- *              // it individually - default is 180 seconds
+ *        // Optional default timeout for SceneJS.Instance<xxx> nodes, which may override
+ *        // it individually - default is 180 seconds
  *
- *              loadTimeoutSecs: 180
- *          },
+ *       loadTimeoutSecs: 180
+ *   },
  *
- *          new SceneJS.LookAt(
- *              function(data) {
- *                  return {
- *                      eye: data.get("eye")
- *                  };
- *              },
+ *   new SceneJS.LookAt(
+ *       function(data) {
+ *           return {
+ *              eye: data.get("eye")
+ *          };
+ *       },
  *
- *              new SceneJS.LoadCollada("http://foo.com/models/myModel.dae")
- *      );
+ *       new SceneJS.Instance({ uri: "http://foo.com/models/myModel.dae" })
+ * );
  *
- * myScene.render({
+ * myScene.setData({
  *          eye: {
  *             x: 0, y: 0, z: -100
  *          }
- *      });
+ *      }).render();
  *
  * </pre></code>
  * @extends SceneJS.Node
@@ -62,6 +84,8 @@ SceneJS.Scene = function() {
                         ("Dynamic configuration of SceneJS.scene node is not supported"));
     }
     this._params = this._getParams();
+    this._data = {};
+    this._configs = {};
     this._lastRenderedData = null;
     if (this._params.canvasId) {
         this._canvasId = document.getElementById(this._params.canvasId) ? this._params.canvasId : SceneJS.Scene.DEFAULT_CANVAS_ID;
@@ -88,20 +112,63 @@ SceneJS.Scene.prototype.getCanvasId = function() {
 };
 
 /**
- * Renders the scene, passing in any properties required for dynamic configuration of its contained nodes.
- *
+ * Sets a map of values to set on the global scene data scope. This data will then be available
+ * to any configuration callbacks that are used to configure nodes. The map is the same as that
+ * configured on a {@link SceneJS.WithData} and works the same way. The given values will be forgotten
+ * when the scene is next rendered with {@link #render}.
+ * @param {object} values Values for the global scene data scope, same format as that given to {@link SceneJS.WithData}
  */
-SceneJS.Scene.prototype.render = function(paramOverrides) {
+SceneJS.Scene.prototype.setData = function(values) {
+    this._data = values || {};
+    return this;
+};
+
+/**
+ * Returns any data values map previously set with {@link #setData} since the last call to {@link #render}.
+ *
+ * @returns {Object} The data values map
+ */
+SceneJS.Scene.prototype.getData = function() {
+    return this._configs;
+};
+
+/**
+ * Sets a map of values to set on nodes in the scene graph as they are rendered. The map is the same as that
+ * configured on a {@link SceneJS.WithConfigs} and works the same way. The given values will be forgotten
+ * when the scene is next rendered with {@link #render}.
+ * @param {object} values Map of values, same format as that given to {@link SceneJS.WithConfigs}
+ */
+SceneJS.Scene.prototype.setConfigs = function(values) {
+    this._configs = values || {};
+    return this;
+};
+
+/**
+ * Returns any config values map previously set with {@link #setConfigs} since the last call to {@link #render}.
+ *
+ * @returns {Object} The config values map
+ */
+SceneJS.Scene.prototype.getConfigs = function() {
+    return this._configs;
+};
+
+/**
+ * Renders the scene, applying any config and data scope values given to {@link #setData} and {#link setConfigs},
+ * then clearing those values afterwards.
+ */
+SceneJS.Scene.prototype.render = function() {
     if (!this._sceneId) {
         this._sceneId = SceneJS_sceneModule.createScene(this, this._getParams());
     }
     SceneJS_sceneModule.activateScene(this._sceneId);
     SceneJS_loadModule.setLoadTimeoutSecs(this._params.loadTimeoutSecs);  // null to use default     
     var traversalContext = {};
-    this._renderNodes(traversalContext, new SceneJS.Data(null, false, paramOverrides));
+    this._renderNodes(traversalContext, new SceneJS.Data(null, false, this._data));
     SceneJS_loadModule.setLoadTimeoutSecs(null);
     SceneJS_sceneModule.deactivateScene();
-    this._lastRenderedData = paramOverrides;
+    this._lastRenderedData = this._data;
+    this._data = {};
+    this._configs = {};
 };
 
 /**

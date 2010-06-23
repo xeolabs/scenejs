@@ -65,9 +65,27 @@ var SceneJS = {
      * @private
      */
     _isArray : function(testObject) {
-        return testObject && !(testObject.propertyIsEnumerable('length')) 
+        return testObject && !(testObject.propertyIsEnumerable('length'))
                 && typeof testObject === 'object' && typeof testObject.length === 'number';
-    }
+    }//,
+
+//    _debugEnabled : {},
+//
+//    /**
+//     * Enables of disables debugging mode
+//     * @param enabled
+//     */
+//    setDebugging : function(key, enabled) {
+//        this._debugEnabled[key] = enabled;
+//    },
+//
+//    /** Gets whether debug mode is enabled or not
+//     * @returns {boolean} True if debugging enabled else false
+//     */
+//    getDebugging : function(key) {
+//        return this._debugEnabled[key];
+//    }
+
 };
 
 SceneJS._namespace("SceneJS");

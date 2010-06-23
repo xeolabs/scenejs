@@ -209,11 +209,13 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
     var timeNow = (new Date()).getTime();
-    exampleScene.render({
+
+    exampleScene.setData({
         yaw: yaw,
         pitch: pitch,
         time : timeNow - timeLast
-    });
+    }).render();
+
     timeLast = timeNow;
 };
 

@@ -14,21 +14,6 @@
  * with different parameters for number of steps, appearance etc.
  */
 
-/*
- * To enable the assets to load cross-domain, we'll first configure SceneJS with a strategy to allow it
- * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
- * create the request URL for the service, and another to extract the data from the response.
- */
-SceneJS.setJSONPStrategy({
-    request : function(url, format, callback) {
-        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
-    },
-
-    response : function(data) {  // Our proxy service does no fancy data packaging
-        return data;
-    }
-});
-
 var exampleScene = SceneJS.scene({
 
     /* Bind scene to a WebGL canvas:
@@ -224,6 +209,30 @@ var exampleScene = SceneJS.scene({
                 )
         );
 
+
+/*---------------------------------------------------------------------------------------------------------------------
+ * To enable the assets to load cross-domain, we'll first configure SceneJS with a strategy to allow it
+ * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
+ * create the request URL for the service, and another to extract the data from the response.
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setJSONPStrategy({
+    request : function(url, format, callback) {
+        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
+    },
+
+    response : function(data) {
+
+        /* The SceneJS proxy will provide an error message like this when
+         * it fails to service the request
+         */
+        if (data.error) {
+            throw "Proxy server responded with error: " + data.error;
+        }
+        return data;
+    }
+});
+
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
@@ -309,7 +318,9 @@ window.render = function() {
         eye.x += moveVec[0] * speed;
         eye.z += moveVec[2] * speed;
     }
-    exampleScene.render({ eye : eye, look: { x: eye.x + moveVec[0], y: eye.y, z : eye.z + moveVec[2] }});
+    exampleScene
+            .setData({ eye : eye, look: { x: eye.x + moveVec[0], y: eye.y, z : eye.z + moveVec[2] }})
+            .render();
 };
 
 /* Render loop until error or reset

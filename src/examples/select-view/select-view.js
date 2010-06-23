@@ -100,11 +100,15 @@ var exampleScene = SceneJS.scene({
 var activeView = 0;
 var canvas = document.getElementById(exampleScene.getCanvasId());
 
-exampleScene.render({activeView: activeView });
+exampleScene
+        .setData({activeView: activeView })
+        .render();
 
 function mouseClick() {
     activeView = (activeView + 1) % 3;
-    exampleScene.render({activeView: activeView});
+    exampleScene
+            .setData({activeView: activeView})
+            .render();
 }
 
 canvas.addEventListener('click', mouseClick, true);
