@@ -33,6 +33,7 @@
     <path id="sourcefiles">
         <fileset dir="${basedir}" includes="license.txt"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
@@ -117,6 +118,7 @@
                 template="jsdoc"
                 outputdir="${basedir}/docs/">
             <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/core/data.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
@@ -216,6 +218,7 @@
     </target>
 
     <target name="create-dist-directories">
+        <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
         <delete includeemptydirs="true">
             <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
         </delete>
