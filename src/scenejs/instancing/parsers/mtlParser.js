@@ -2,89 +2,36 @@
  * Backend that parses a .MTL files into a SceneJS.Material nodes
  * @private
  */
-var SceneJS_mtlParserModule = new (function() {
+(function() {
+
+    var uri;
     var dirURI;
+    var options;
+    var debugCfg;
     var materialData;
     var node = null;
     var tokens;
     var line;
     var lineNum;
 
+
+    SceneJS._loadModule.registerParser("mtl", {
+
+        serverParams: {
+            format: "xml" // IE. text
+        },
+
+        parse: function(cfg) {
+            reset();
+            uri = cfg.uri;
+            dirURI = cfg.uri.substring(0, cfg.uri.lastIndexOf("/") + 1);
+            options = cfg.options;
+            debugCfg = SceneJS._debugModule.getConfigs("instancing.mtl") || {};
+            return _parse(cfg.data);
+        }
+    });
+
     function reset() {
-        materialData = null;
-    }
-
-    function parseColor(tokens) {
-        return { r: parseFloat(tokens[1]), g: parseFloat(tokens[2]), b: parseFloat(tokens[3]) };
-    }
-
-    function unsupported(msg) {
-        SceneJS_loggingModule.warn("Unsupported .MTL file feature on line " + lineNum + ": " + msg);
-    }
-
-    function openMaterial() {
-        if (materialData) {
-            closeMaterial();
-        }
-        materialData = {
-            name: tokens[1],
-            cfg : {},
-            textureLayers: []
-        };
-    }
-
-    function parseTexture(applyTo) {
-        var textureLayer = {
-            uri: dirURI + tokens[tokens.length - 1] ,
-            applyto: applyTo
-        };
-        var tok;
-        for (var i = 1; i < tokens.length - 1; i++) {
-            tok = tokens[i];
-            if (tok.charAt(0) == "-") {
-
-                /* Texture option
-                 */
-                if (tok == "-blendu") {
-
-                } else if (tok == "-blendv") {
-
-                } else if (tok == "-blendu") {
-
-                } else if (tok == "-cc") {
-
-                } else if (tok == "-clamp") {
-
-                } else if (tok == "-mm") {
-
-                } else if (tok == "-o") {
-
-                } else if (tok == "-s") {
-
-                } else if (tok == "-t") {
-
-                } else if (tok == "-texres") {
-
-                } else {
-                    unsupported(tokens[0] + " option '" + tok + "'");
-                }
-            }
-        }
-        materialData.textureLayers.push(textureLayer);
-    }
-
-    function closeMaterial() { 
-        var symbol = new SceneJS.Symbol({
-            name: materialData.name
-        });
-        var material = new SceneJS.Material(materialData.cfg);
-        if (materialData.textureLayers.length > 0) {
-            material.addNode(new SceneJS.Texture({
-                layers: materialData.textureLayers
-            }));
-        }
-        symbol.addNode(material);
-        node.addNode(symbol);
         materialData = null;
     }
 
@@ -212,22 +159,88 @@ var SceneJS_mtlParserModule = new (function() {
         }
     };
 
-    /**
-     * @param text File content
-     * @private
-     */
-    this.parse = function(uri, text) {
+    function parseColor(tokens) {
+        return { r: parseFloat(tokens[1]), g: parseFloat(tokens[2]), b: parseFloat(tokens[3]) };
+    }
 
-        reset();
+    function unsupported(msg) {
+        SceneJS._loggingModule.warn("Unsupported .MTL file feature on line " + lineNum + ": " + msg);
+    }
 
-        /* Find path to container directory, in which we'll look for texture files etc.
-         */
-        dirURI = uri.substring(0, uri.lastIndexOf("/") + 1);
+    function openMaterial() {
+        if (materialData) {
+            closeMaterial();
+        }
+        materialData = {
+            symbolSID: tokens[1],
+            cfg : {
+            },
+            textureLayers: []
+        };
+    }
 
+    function parseTexture(applyTo) {
+        var textureLayer = {
+            uri: dirURI + tokens[tokens.length - 1] ,
+            applyto: applyTo
+        };
+        var tok;
+        for (var i = 1; i < tokens.length - 1; i++) {
+            tok = tokens[i];
+            if (tok.charAt(0) == "-") {
+
+                /* Texture option
+                 */
+                if (tok == "-blendu") {
+
+                } else if (tok == "-blendv") {
+
+                } else if (tok == "-blendu") {
+
+                } else if (tok == "-cc") {
+
+                } else if (tok == "-clamp") {
+
+                } else if (tok == "-mm") {
+
+                } else if (tok == "-o") {
+
+                } else if (tok == "-s") {
+
+                } else if (tok == "-t") {
+
+                } else if (tok == "-texres") {
+
+                } else {
+                    unsupported(tokens[0] + " option '" + tok + "'");
+                }
+            }
+        }
+        materialData.textureLayers.push(textureLayer);
+    }
+
+    function closeMaterial() {
+        var symbol = new SceneJS.Symbol({
+            info: "symbol_material",
+            sid: materialData.symbolSID
+        });
+        materialData.cfg.info = "material";
+        var material = new SceneJS.Material(materialData.cfg);
+        if (materialData.textureLayers.length > 0) {
+            material.addNode(new SceneJS.Texture({
+                info: "texture",
+                layers: materialData.textureLayers
+            }));
+        }
+        symbol.addNode(material);
+        node.addNode(symbol);
+        materialData = null;
+    }
+
+    function _parse(text) {
         node = new SceneJS.Node();
         var lines = text.split("\n");
         var handler;
-
         for (var i in lines) {
             lineNum = i + 1;
             line = lines[i];
@@ -244,11 +257,9 @@ var SceneJS_mtlParserModule = new (function() {
                 }
             }
         }
-
         if (materialData) {
             closeMaterial();
         }
-
         return node;
-    };
+    }
 })();

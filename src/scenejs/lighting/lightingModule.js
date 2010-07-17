@@ -20,52 +20,52 @@
  *
  *  @private
  */
-var SceneJS_lightingModule = new (function() {
+SceneJS._lightingModule = new (function() {
 
     var viewMat;
     var modelMat;
     var lightStack = [];
     var dirty;
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
-                modelMat = viewMat = SceneJS_math_identityMat4();
+                modelMat = viewMat = SceneJS._math_identityMat4();
                 lightStack = [];
                 dirty = true;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
             function(params) {
                 viewMat = params.matrix;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.MODEL_TRANSFORM_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.MODEL_TRANSFORM_UPDATED,
             function(params) {
                 modelMat = params.matrix;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS_eventModule.fireEvent(
-                            SceneJS_eventModule.LIGHTS_EXPORTED,
+                    SceneJS._eventModule.fireEvent(
+                            SceneJS._eventModule.LIGHTS_EXPORTED,
                             lightStack);
                     dirty = false;
                 }
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -77,9 +77,9 @@ var SceneJS_lightingModule = new (function() {
         for (var i = 0; i < sources.length; i++) {
             var source = sources[i];
             if (source._type == "point") {
-                source._viewPos =  SceneJS_math_transformPoint3(viewMat, SceneJS_math_transformPoint3(modelMat, source._pos));
+                source._viewPos =  SceneJS._math_transformPoint3(viewMat, SceneJS._math_transformPoint3(modelMat, source._pos));
             } else if (source._type == "dir") {
-                source._viewDir = SceneJS_math_transformVector3(viewMat, SceneJS_math_transformVector3(modelMat, source._dir));
+                source._viewDir = SceneJS._math_transformVector3(viewMat, SceneJS._math_transformVector3(modelMat, source._dir));
             }
         }
     };
@@ -91,8 +91,8 @@ var SceneJS_lightingModule = new (function() {
             lightStack.push(sources[i]);
         }
         dirty = true;
-        SceneJS_eventModule.fireEvent(
-                SceneJS_eventModule.LIGHTS_UPDATED,
+        SceneJS._eventModule.fireEvent(
+                SceneJS._eventModule.LIGHTS_UPDATED,
                 lightStack);
     };
 
@@ -102,8 +102,8 @@ var SceneJS_lightingModule = new (function() {
             lightStack.pop();
         }
         dirty = true;
-        SceneJS_eventModule.fireEvent(
-                SceneJS_eventModule.LIGHTS_UPDATED,
+        SceneJS._eventModule.fireEvent(
+                SceneJS._eventModule.LIGHTS_UPDATED,
                 lightStack);
     };
 })();

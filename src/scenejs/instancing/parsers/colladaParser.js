@@ -1,5 +1,5 @@
 /**
- * Installs a Collada parser into the SceneJS_loadModule, to be parse files that that have the ".dae" extension.
+ * Installs a Collada parser into the SceneJS._loadModule, to be parse files that that have the ".dae" extension.
  *
  * @private
  */
@@ -21,7 +21,7 @@
      * and returns a scene subgraph
      * @param cfg
      */
-    SceneJS_loadModule.registerParser("dae", {
+    SceneJS._loadModule.registerParser("dae", {
 
         serverParams: {
             format: "xml"
@@ -29,7 +29,7 @@
 
         parse: function(cfg) {
             reset();
-            debugCfg = SceneJS_debugModule.getConfigs("instancing.collada") || {};
+            debugCfg = SceneJS._debugModule.getConfigs("instancing.collada") || {};
             uri = cfg.uri;
             rootSID = uri;
             dirURI = cfg.uri.substring(0, cfg.uri.lastIndexOf("/") + 1);
@@ -67,7 +67,7 @@
         if (debugCfg.logTags) {
             var id = tag.getAttribute("id");
             var sid = tag.getAttribute("sid");
-            SceneJS_loggingModule.info("Parsing <" + tag.tagName + " id: '" + id + "' sid: '" + sid + "'>");
+            SceneJS._loggingModule.info("Parsing <" + tag.tagName + " id: '" + id + "' sid: '" + sid + "'>");
         }
     }
 
@@ -138,7 +138,7 @@
      * @private
      */
     function parseLibrary(libraryTagName, symbolTagName, parseTag) {
-        var library = new SceneJS.Node({ info: "<" + libraryTagName + ">" });
+        var library = new SceneJS.Node({ info: libraryTagName});
         var libraryTags = xmlDoc.getElementsByTagName(libraryTagName);
         var i, j, symbolTags, symbolTag, symbol, libraryTag;
         for (i = 0; i < libraryTags.length; i++) {
@@ -151,8 +151,9 @@
                 symbolTag = symbolTags[j];
                 logTag(symbolTag);
                 symbol = new SceneJS.Symbol({
-                    info: "<" + symbolTagName + ">",
-                    sid: symbolTag.getAttribute("id") });
+                    info: "symbol_" + symbolTagName,
+                    sid: symbolTag.getAttribute("id")
+                });
                 symbol.addNode(parseTag(symbolTag));
                 library.addNode(symbol);
             }
@@ -173,6 +174,7 @@
             var zfar = perspectiveTag.getElementsByTagName("zfar")[0];
 
             return new SceneJS.Camera({
+                info: "camera",
                 sid: cameraTag.getAttribute("id"),
                 optics: {
                     type: "perspective",
@@ -188,7 +190,7 @@
                 return new SceneJS.Node(); // TODO: ortho camera
             }
         }
-        SceneJS_loggingModule.warn("camera.technique_common.optics - neither perspective nor perspective found");
+        SceneJS._loggingModule.warn("camera.technique_common.optics - neither perspective nor perspective found");
         return new SceneJS.Node();   // Fallback - a "null" camera
     }
 
@@ -206,6 +208,7 @@
         var directionalTag = techniqueCommonTag.getElementsByTagName("directional")[0];
         if (directionalTag) {
             return new SceneJS.Lights({
+                info: "light",
                 sid: lightTag.getAttribute("id"),
                 sources : [
                     {
@@ -221,6 +224,7 @@
             var linearAttenuation = pointTag.getElementsByTagName("linear_attenuation")[0];
             var quadraticAttenuation = pointTag.getElementsByTagName("quadratic_attenuation")[0];
             return new SceneJS.Lights({
+                info: "light",
                 sid: lightTag.getAttribute("id"),
                 sources : [
                     {
@@ -241,6 +245,7 @@
             var falloffAngle = spot.getElementsByTagName("falloff_angle")[0];
             var falloffExponent = spot.getElementsByTagName("falloff_exponent")[0];
             return new SceneJS.Lights({
+                info: "light",
                 sid: lightTag.getAttribute("id"),
                 sources : [
                     {
@@ -255,7 +260,7 @@
                     }
                 ]});
         }
-        SceneJS_loggingModule.warn("light.technique_common - neither dir, point nor spot found");
+        SceneJS._loggingModule.warn("light.technique_common - neither dir, point nor spot found");
         return new SceneJS.Node(); // Fallback - a "null" light
     }
 
@@ -297,6 +302,7 @@
         //        }
 
         var material = new SceneJS.Material({  // Static node configuration object
+            info: "material",
             sid: effectId,
             baseColor:     materialData.baseColor,
             specularColor: materialData.specularColor ,
@@ -397,7 +403,7 @@
             do{
                 switch (child.tagName) {
                     case "texture":
-                        SceneJS_loggingModule.warn("Collada bump mapping not supported yet");
+                        SceneJS._loggingModule.warn("Collada bump mapping not supported yet");
                         break;
                 }
             } while (child = child.nextSibling);
@@ -430,7 +436,7 @@
                         .nodeValue;
             }
         }
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.ParseException
                         ("COLLADA element expected: "
                                 + profileTag.tagName
@@ -450,7 +456,7 @@
                         .nodeValue;
             }
         }
-        throw SceneJS_errorModule.fatalError(new SceneJS.ParseException
+        throw SceneJS._errorModule.fatalError(new SceneJS.ParseException
                 ("COLLADA element expected: "
                         + profileTag.tagName
                         + "/newparam[sid == '"
@@ -474,7 +480,10 @@
         //        return new SceneJS.WithData({
         //            specularColor: { r: 1, g: 0 }
         //        },
-        return new SceneJS.Instance({ uri: effectId }
+        return new SceneJS.Instance({
+            info: "instance_effect",
+            uri: effectId
+        }
             //)
                 );
     }
@@ -548,6 +557,7 @@
             }
 
             var geometry = new SceneJS.Geometry({
+                info: "geometry",
                 positions: outputData.VERTEX,
                 normals: outputData.NORMAL,
                 uv : outputData.TEXCOORD0,
@@ -723,7 +733,7 @@
 
     // @private
     function parseLibraryVisualScenes() {
-        var libraryVisualScenesTag = new SceneJS.Node({ info: "<library_visual_scenes>" });
+        var libraryVisualScenesTag = new SceneJS.Node({ info: "library_visual_scenes" });
         var libraryTags = xmlDoc.getElementsByTagName("library_visual_scenes");
         var i, j, symbolTags, symbolTag, symbol, libraryTag;
         for (i = 0; i < libraryTags.length; i++) {
@@ -733,7 +743,10 @@
             for (j = 0; j < symbolTags.length; j++) {
                 symbolTag = symbolTags[j];
                 logTag(symbolTag);
-                symbol = new SceneJS.Symbol({ sid: symbolTag.getAttribute("id") });
+                symbol = new SceneJS.Symbol({
+                    info : "symbol_visual_scene",
+                    sid: symbolTag.getAttribute("id")
+                });
                 libraryVisualScenesTag.addNode(parseVisualScene(symbolTag));
             }
         }
@@ -747,7 +760,7 @@
     function parseVisualScene(visualSceneTag) {
         logTag(visualSceneTag);
 
-        var root = new SceneJS.Node({ info: "<visual_scene>" }); // Root of subgraph created by this method
+        var root = new SceneJS.Node({ info: "visual_scene" }); // Root of subgraph created by this method
 
         /* Attach to root a Symbol subgraph that contains the model proper, which client may instance explicitly
          * when they want to provide their own camera. This Symbol subgraph will also be instanced within each
@@ -1025,7 +1038,7 @@
             params[material.getAttribute("symbol")] = "../" + material.getAttribute("target").substr(1);
         }
         var geometryInstance = new SceneJS.Instance({
-            info: "<instance_geometry>",
+            info: "instance_geometry",
             uri : path + instanceGeometryTag.getAttribute("url").substr(1)
         });
         if (params) {
@@ -1038,7 +1051,8 @@
     function parseScene() {
         var sceneTag = xmlDoc.getElementsByTagName("scene")[0];
         var scene = new SceneJS.Symbol({
-            sid: "__SceneJS_default_scene"
+            info: "scene-symbol",
+            sid: "__SceneJS._default_scene"
         });
         var ivsTags = sceneTag.getElementsByTagName("instance_visual_scene");
         for (var i = 0; i < ivsTags.length; i++) {
@@ -1051,6 +1065,7 @@
         var sid = instanceVisualSceneTag.getAttribute("sid") || randomSID();
         var target = instanceVisualSceneTag.getAttribute("url").substr(1); // Non-null for instance tags
         return new SceneJS.Instance({
+            info: "scene-instance",
             sid: sid,
             uri : "../" + target
         });

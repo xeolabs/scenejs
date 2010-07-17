@@ -1,30 +1,38 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-
-<h1>SceneJS</h1>
-SceneJS is a JavaScript framework that allows you to create interactive 3D scenes on WebGL using a terse and flexible
-API that caters to both object-oriented and functional programming styles.
+&nbsp;Beta</h1>
+<p>SceneJS is a JavaScript framework that allows you to create interactive 3D scenes on WebGL using a terse and flexible
+    API that caters to both object-oriented and functional programming styles.</p>
 
 <ul>
     <li><span><a href="http://scenejs.org">Project Home</a></span></li>
+    <li><span><a href="http://scenejs.wikispaces.com"><b>Wiki</b></a></span></li>
     <li><span><a href="http://www.retaggr.com/page/LindsayStanleyKay">Contact the Author</a></span></li>
     <li><span><a href="http://scenejs.org/releases.html">Latest Releases</a></span></li>
-    <li><span><a href="http://www.scenejs.org/load-ide.html">Online IDE</a></span></li>
+    <li><span><a href="http://www.scenejs.org/load-ide.html">Live Examples in the Online IDE</a></span></li>
     <li><span><a href="http://www.youtube.com/user/xeolabs">Movies on YouTube</a></span></li>
-    <li><span><a href="http://twitter.com/xeolabs">Twitter Feed</a></span></li>
+    <li><span><a href="http://twitter.com/xeolabs">Twitter</a></span></li>
     <li><span><a href="http://groups.google.co.nz/group/scenejs?lnk=gcimh">Google Group</a></span></li>
+    <li><span><a href="http://www.facebook.com/group.php?gid=350488973712">FaceBook Group</a></span></li>
     <li><span><a href="http://bit.ly/9Cpzi0">Issue Tracker</a></span></li>
 </ul>
+<h3>Pre-Parsed COLLADA Content</h3>
+<p>One major change in V0.7.6 is the removal of COLLADA parsing from the core framework. That could still be done in the
+    browser using a parser utility, but for speed and efficiency you would probably want to pre-generate a SceneJS
+    JSON content module and load that into your scene. You can do that online with this new tool:</p>
+<ul>
+    <li><span><a href="http://scenejs.org/tools/collada-translator/collada-translator.html">Online COLLADA-to-SceneJS
+        Translator</a></span></li>
+</ul>
+<h3>More Data Flow Capabilities</h3>
+<p>V0.7.6 introduces a new <a target="other" href="http://scenejs.wikispaces.com/SceneJS.WithConfigs">SceneJS.WithConfigs</a>
+    node, which features in many of the budled examples. This node provides a data flow mechanism that is geared
+    towards enabling a server to create/delete/manipulate a client scene graph through the new
+    <a target="other" href="http://scenejs.wikispaces.com/SceneJS.Socket">SceneJS.Socket</a> node.</p>
 <hr>
-<h2>Contents</h2>
 
+<h2>Contents</h2>
 <p>Note that SceneJS has an object-oriented core API, with a layer of factory functions on top which provide a handy
-    functional API. Therefore, you have the choice of using the framework in either an object-oriented or functional style.
+    functional API. Therefore, you have the choice of using the framework in either an object-oriented or functional
+    style.
     The examples in the API documentation are in the object-oriented style, while many of the examples use the factory
     functions for brevity. Mentally translating between the two styles is actually quite trivial.</p>
 <ul>
@@ -34,7 +42,12 @@ API that caters to both object-oriented and functional programming styles.
     <li><span><a href="./lib/scenejs.js">scenejs.js - Uncompressed Library</a></span></li>
 
 </ul>
-<h3>Examples</h3>
+<h3>Selected Examples</h3>
+<p>These are also runnable <a target="other" href="http://www.scenejs.org/load-ide.html">online in the IDE</a>, where
+    you can edit them live.</p>
+
+<h4>Core Elements</h4>
+
 <ul>
     <li><a href="examples/hello-teapot/index.html">First Example - Hello, Teapot!</a></li>
     <li><a href="examples/custom-geometry/index.html">Custom Geometry - Definition of a Textured Cube</a></li>
@@ -45,23 +58,25 @@ API that caters to both object-oriented and functional programming styles.
     <li><a href="examples/pouring-teapot/index.html">Animation using Interpolators - Pouring Teapot Example</a></li>
     <li><a href="examples/animated-texture/index.html">Animated Texture - Kneel Before Zod!</a></li>
     <li><a href="examples/spiral-staircase/index.html">Procedural Scene Generation - Staircase from Cubes</a></li>
-    <li><a href="examples/teapot-cloud/index.html">Fog - Teapot Cloud Example</a></li>
+    <li><a href="examples/teapot-cloud/index.html">Fog and Procedural Scene Generation - Teapot Cloud Example</a></li>
     <li><a href="examples/select-teapots/index.html">Scene Graph Branching - Teapot Selector</a></li>
     <li><a href="examples/select-view/index.html">Instancing and Branching - Switchable Viewpoint Example</a></li>
-    <li><a href="examples/teapot-load-local/index.html">Loading a Subgraph Containing a Teapot Model from the Local File
-        System</a></li>
-    <li><a href="examples/teapot-load-cross-domain/index.html">Cross-Domain Load of a Subgraph Containing a Teapot Model
-        from SceneJS.org</a></li>
-    <li><a href="examples/seymour-plane/index.html">Cross-Domain Load of a COLLADA Airplane Model from SceneJS.org </a>
+    <li><a href="examples/with-configs-set/index.html">Data Flow - Configuring Elements within a Subgraph</a></li>
+    <li><a href="examples/with-configs-add/index.html">Data Flow - Adding Elements within a Subgraph</a></li>
+    <li><a href="examples/with-configs-remove/index.html">Data Flow - Removing Elements within a Subgraph</a></li>
+</ul>
+
+<h4>Instancing</h4>
+<ul>
+    <li><a href="examples/tron-tank/index.html">Import and animation of a Tron Tank model that was translated from
+        COLLADA</a></li>
+    <li><a href="examples/house/index.html">Import of a house model that was translated from COLLADA</a>
     </li>
-    <li><a href="examples/tron-tank/index.html">Cross-Domain Load and Animation of a COLLADA Tron Tank Model from
-        SceneJS.org</a></li>
-    <li><a href="examples/courtyard-house/index.html">Cross-Domain Load of a COLLADA House Model from SceneJS.org</a>
-    </li>
-    <li><a href="examples/oo-api-intro/index.html">Object-Oriented API - Cross-Domain Load of COLLADA Airplane Model
-        from SceneJS.org</a></li>
-    <li><a href="examples/lod-staircase-with-tiles/index.html">Level-of-Detail Selection - Staircase with Multiple
-        Levels of Detail</a></li>
+    <li><a href="examples/oo-api-intro/index.html">Object-Oriented API - import of an airplane that was translated from
+        COLLADA</a></li>
+    <li><a href="examples/lod-staircase-with-tiles/index.html">Level-of-Detail Selection - staircase with multiple
+        levels of detail</a></li>
+    <li><a href="examples/renderer-node/index.html">Tweaking WebGL State - demo of the SceneJS.Renderer node</a></li>
 </ul>
 
 </body>

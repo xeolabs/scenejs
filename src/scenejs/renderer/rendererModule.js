@@ -2,7 +2,7 @@
  * Manages a stack of WebGL state frames that may be pushed and popped by SceneJS.renderer nodes.
  *  @private
  */
-var SceneJS_rendererModule = new (function() {
+SceneJS._rendererModule = new (function() {
 
     var canvas;  // Currently active canvas
     var stateStack;     // Stack of WebGL state frames
@@ -15,17 +15,17 @@ var SceneJS_rendererModule = new (function() {
      */
     var glEnum = function(context, name) {
         if (!name) {
-            throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+            throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                     "Null SceneJS.renderer node config: \"" + name + "\""));
         }
-        var result = SceneJS_webgl_enumMap[name];
+        var result = SceneJS._webgl_enumMap[name];
         if (!result) {
-            throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+            throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                     "Unrecognised SceneJS.renderer node config value: \"" + name + "\""));
         }
         var value = context[result];
         if (!value) {
-            throw SceneJS_errorModule.fatalError(new SceneJS.WebGLUnsupportedNodeConfigException(
+            throw SceneJS._errorModule.fatalError(new SceneJS.WebGLUnsupportedNodeConfigException(
                     "This browser's WebGL does not support renderer node config value: \"" + name + "\""));
         }
         return value;
@@ -209,16 +209,6 @@ var SceneJS_rendererModule = new (function() {
             currentProps.lineWidth = width;
         },
 
-        enableTexture2D: function(context, flag) {
-            if (flag) {
-                context.enable(context.TEXTURE_2D);
-            } else {
-                flag = false;
-                context.disable(context.TEXTURE_2D);
-            }
-            currentProps.enableTexture2D = flag;
-        },
-
         enableScissorTest: function(context, flag) {
             if (flag) {
                 context.enable(context.SCISSOR_TEST);
@@ -256,7 +246,7 @@ var SceneJS_rendererModule = new (function() {
             };
             currentProps.viewport = v;
             context.viewport(v.x, v.y, v.width, v.height);
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, v);
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, v);
         },
 
         /** Sets scissor region on the given context
@@ -320,8 +310,8 @@ var SceneJS_rendererModule = new (function() {
             glStateSetters.clear(context, props.clear);
         }
 
-        SceneJS_eventModule.fireEvent(
-                SceneJS_eventModule.RENDERER_UPDATED,
+        SceneJS._eventModule.fireEvent(
+                SceneJS._eventModule.RENDERER_UPDATED,
                 currentProps);
 
         loaded = false;
@@ -352,8 +342,8 @@ var SceneJS_rendererModule = new (function() {
             glStateSetters.clear(context, props.scissor);
         }
 
-        SceneJS_eventModule.fireEvent(
-                SceneJS_eventModule.RENDERER_UPDATED,
+        SceneJS._eventModule.fireEvent(
+                SceneJS._eventModule.RENDERER_UPDATED,
                 currentProps);
 
         loaded = false;
@@ -375,8 +365,8 @@ var SceneJS_rendererModule = new (function() {
 
     /* Activate initial defaults
      */
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
                 currentProps = {
@@ -385,7 +375,6 @@ var SceneJS_rendererModule = new (function() {
                     clearDepth: 1.0,
                     enableDepthTest:true,
                     enableCullFace: false,
-                    enableTexture2D: true,
                     depthRange: { zNear: 0, zFar: 1},
                     enableScissorTest: false,
                     viewport:{ x : 1, y : 1, width: c.canvas.width, height: canvas.canvas.height}
@@ -400,29 +389,29 @@ var SceneJS_rendererModule = new (function() {
 
                 setProperties(canvas.context, currentProps);
 
-                SceneJS_eventModule.fireEvent(
-                        SceneJS_eventModule.RENDERER_UPDATED,
+                SceneJS._eventModule.fireEvent(
+                        SceneJS._eventModule.RENDERER_UPDATED,
                         currentProps);
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
                 loaded = false;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_DEACTIVATED,
             function() {
                 loaded = false;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (!loaded) {
-                    SceneJS_eventModule.fireEvent(
-                            SceneJS_eventModule.RENDERER_EXPORTED,
+                    SceneJS._eventModule.fireEvent(
+                            SceneJS._eventModule.RENDERER_EXPORTED,
                             currentProps);
                     loaded = true;
                 }

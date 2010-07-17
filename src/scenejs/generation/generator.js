@@ -61,7 +61,7 @@ SceneJS._inherit(SceneJS.Generator, SceneJS.Node);
 // @private
 SceneJS.Generator.prototype._render = function(traversalContext, data) {
     if (this._fixedParams) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException
                         ("SceneJS.Generator may only be configured with a function"));
     }

@@ -20,7 +20,7 @@
 SceneJS.Inverse = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "inverse";
-    this._mat = SceneJS_math_identityMat4();
+    this._mat = SceneJS._math_identityMat4();
     this._xform = null;
 };
 
@@ -30,10 +30,10 @@ SceneJS.Inverse.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         this._memoLevel = 1; // For consistency with other transform nodes
     }
-    var superXform = SceneJS_modelViewTransformModule.getTransform();
+    var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
-        var instancing = SceneJS_instancingModule.instancing();
-        var tempMat = SceneJS_math_inverseMat4(superXform.matrix, this._mat);
+        var instancing = SceneJS._instancingModule.instancing();
+        var tempMat = SceneJS._math_inverseMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
@@ -43,9 +43,9 @@ SceneJS.Inverse.prototype._render = function(traversalContext, data) {
             this._memoLevel = 2;
         }
     }
-    SceneJS_modelViewTransformModule.setTransform(this._xform);
+    SceneJS._modelViewTransformModule.setTransform(this._xform);
     this._renderNodes(traversalContext, data);
-    SceneJS_modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.setTransform(superXform);
 };
 
 /** Factory function that returns a new {@link SceneJS.Inverse} instance

@@ -249,7 +249,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
-	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
+	<li><a href="../symbols/SceneJS.ModuleInstallFailureException.html">SceneJS.ModuleInstallFailureException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleLoadTimeoutException.html">SceneJS.ModuleLoadTimeoutException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleNotFoundException.html">SceneJS.ModuleNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Node.html">SceneJS.Node</a></li>
 	
@@ -283,6 +287,14 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a></li>
 	
+	<li><a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketErrorException.html">SceneJS.SocketErrorException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketNotSupportedException.html">SceneJS.SocketNotSupportedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketServerErrorException.html">SceneJS.SocketServerErrorException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
 	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
@@ -302,6 +314,10 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -412,14 +428,17 @@ which may be queried through the Instance's <a href="#getState">#getState</a> me
 <li><a href="#STATE_LOADING">#STATE_LOADING</a> in which it has made the request and is awaiting the response, which it will receive
 at any time, either within a scene render or between scene renders. In this state it has nothing to render
 and will pass scene traversal on to its next sibling.</li>
-<li><a href="#STATE_LOADED">#STATE_LOADED</a> in which it has successfully received its content and parsed it into a subgraph.
+<li><a href="#STATE_READY">#STATE_READY</a> in which it has successfully received its content and parsed it into a subgraph.
 From here the node will transition to <a href="#STATE_RENDERED">#STATE_RENDERED</a> as soon as the subgraph has been rendered
 and traversal has arrived back at this node on the way back up the graph. It may instead transition back
 to <a href="#STATE_INITIAL">#STATE_INITIAL</a> as soon as it has not been rendered in a while and has then had its subgraph destroyed
 by SceneJS to reclaim memory.</li>
-<li><a href="#STATE_RENDERED">#STATE_RENDERED</a> in which it has successfully received its content, parsed it into a subgraph, and been rendered
-at least once. From here the node will transition back to <a href="#STATE_INITIAL">#STATE_INITIAL</a> as soon as it has not been rendered in
-a while and has then had its subgraph destroyed by SceneJS to reclaim memory.</li>
+ * <li><a href="#STATE_RENDERING">#STATE_RENDERING</a> in which it has successfully loaded and parsed its target file or resolved its
+target symbol and is about to render (instance) that target. From here the node will transition to
+<a href="#STATE_RENDERED">#STATE_RENDERED</a> as soon as rendered its target.</li>
+<li><a href="#STATE_RENDERED">#STATE_RENDERED</a> in which it has successfully rendered its target at least once. If the target is a file,
+then from here the node will transition back to <a href="#STATE_INITIAL">#STATE_INITIAL</a> as soon as the target has not been rendered in
+a while and has been destroyed by SceneJS to reclaim memory.</li>
 <li><a href="#STATE_FREED">#STATE_FREED</a> in which it has been dormant too long and SceneJS has reclaimed memory by destroying
 the subgraph. When next rendered, it will then repeat its load request and transition
 to <a href="#STATE_LOADING">#STATE_LOADING</a>.</li>
@@ -428,7 +447,7 @@ to <a href="#STATE_LOADING">#STATE_LOADING</a>.</li>
 directly to <a href="#STATE_RENDERED">#STATE_RENDERED</a>.<p>
 
 <p><b>Loading Cross-Domain</b></p>
-<p>When SceneJS is configured with a JSONP strategy via <a href="../symbols/SceneJS.html#.setJSONPStrategy">SceneJS.setJSONPStrategy</a>, you can perform the
+<p>When SceneJS is configured with a JSONP strategy via SceneJS.setJSONPStrategy, you can perform the
 load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
 in order to not violate the browser' same-domain security policy.
 
@@ -485,18 +504,7 @@ in order to not violate the browser' same-domain security policy.
 								<div class="fixedFont">
 								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_ERROR">STATE_ERROR</a></b>
 								</div>
-								<div class="description">State in which load has failed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_FREED">STATE_FREED</a></b>
-								</div>
-								<div class="description">State in which load is pending after node has had its subgraph destroyed by SceneJS to reclaim memory after
-not having been rendered for some time (Eg.</div>
+								<div class="description">State of a local or remote-mode Instance in which instantiation has failed.</div>
 							</td>
 						</tr>
 					
@@ -506,8 +514,8 @@ not having been rendered for some time (Eg.</div>
 								<div class="fixedFont">
 								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_INITIAL">STATE_INITIAL</a></b>
 								</div>
-								<div class="description">State in which load is pending because node has not been rendered yet and hence has
-not made its load request yet.</div>
+								<div class="description">Initial state of a remote Instance, in which it has not been rendered yet and thus loading of its target file has not
+yet begun.</div>
 							</td>
 						</tr>
 					
@@ -515,9 +523,9 @@ not made its load request yet.</div>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_LOADED">STATE_LOADED</a></b>
+								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_READY">STATE_READY</a></b>
 								</div>
-								<div class="description">State in which node has successfully received its content and parsed it into a subgraph.</div>
+								<div class="description">State of a local or remote Instance in which it will attempt to instantiate its target when next rendered.</div>
 							</td>
 						</tr>
 					
@@ -525,20 +533,9 @@ not made its load request yet.</div>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_LOADING">STATE_LOADING</a></b>
+								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_RENDERING">STATE_RENDERING</a></b>
 								</div>
-								<div class="description">State in which node is awaiting a response to its load request.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								SceneJS.Instance.<b><a href="../symbols/SceneJS.Instance.html#.STATE_RENDERED">STATE_RENDERED</a></b>
-								</div>
-								<div class="description">State in which node has successfully received its content, parsed it into a subgraph, and been rendered
-at least once.</div>
+								<div class="description">State of a local or remote Instance in which it is rendering its target.</div>
 							</td>
 						</tr>
 					
@@ -576,13 +573,31 @@ at least once.</div>
 							</td>
 						</tr>
 					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Instance.html#getTarget">getTarget</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Instance.html#getURI">getURI</a></b>()
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
 					</tbody>
 				</table>
 				
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNode">getNode</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeListeners">removeListeners</a>, <a href="../symbols/SceneJS.Node.html#removeNode">removeNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
 				</dl>
 				
 			
@@ -669,34 +684,12 @@ at the root of the scene graph, or the default 180 seconds if none configured th
 					
 					</div>
 					<div class="description">
-						State in which load has failed. This can be either due to HTTP error (eg. HTTP 404) or
-failure to parse the response. The node will now be permanently inactive and stuck in this state.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".STATE_FREED"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">SceneJS.Instance.</span><b>STATE_FREED</b>
-					
-					</div>
-					<div class="description">
-						State in which load is pending after node has had its subgraph destroyed by SceneJS to reclaim memory after
-not having been rendered for some time (Eg. is within a SceneJS.Boundary that has
-not intersected the view frustum for a while, or perhaps within a <a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a> that has
-not selected it lately). When next rendered, it will then repeat its load request and transition
-to <a href="#STATE_LOADING">#STATE_LOADING</a>.
+						State of a local or remote-mode Instance in which instantiation has failed. For a remote instance this can be either
+due to HTTP error (eg. HTTP 404) or failure to parse the response; in the assumption that the file is unavailable for
+the remainder of the lifetime of the scene graph, a remote Instance will then remain fixed in this state. For a local
+instance, this condition might be temporary (eg. the target Symbol is just not being rendered yet for some reason),
+so a local Instance will then try instancing again when next rendered, transitioning to STATE_RENDERING when
+that succeeds.
 						
 						
 					</div>
@@ -718,9 +711,8 @@ to <a href="#STATE_LOADING">#STATE_LOADING</a>.
 					
 					</div>
 					<div class="description">
-						State in which load is pending because node has not been rendered yet and hence has
-not made its load request yet. When next rendered, it will then make its load request
-and transition to <a href="#STATE_LOADING">#STATE_LOADING</a>.
+						Initial state of a remote Instance, in which it has not been rendered yet and thus loading of its target file has not
+yet begun. From here a remote Instance will transition to <a href="#STATE_LOADING">#STATE_LOADING</a> as soon as it is first rendered.
 						
 						
 					</div>
@@ -734,17 +726,21 @@ and transition to <a href="#STATE_LOADING">#STATE_LOADING</a>.
 
 					<hr />
 				
-					<a name=".STATE_LOADED"> </a>
+					<a name=".STATE_READY"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">SceneJS.Instance.</span><b>STATE_LOADED</b>
+					<span class="light">SceneJS.Instance.</span><b>STATE_READY</b>
 					
 					</div>
 					<div class="description">
-						State in which node has successfully received its content and parsed it into a subgraph.
-From here the node will transition to <a href="#STATE_RENDERED">#STATE_RENDERED</a> as soon as the subgraph has been rendered
-and traversal has arrived back at this node on the way back up the graph.
+						State of a local or remote Instance in which it will attempt to instantiate its target when next rendered. For a
+remote Instance, this is when it has successfully loaded its target file and parsed it into a subgraph. For a local
+Instance, this is when it is ready to attempt aquisition of its target Symbol. From here, a remote node will
+transition to <a href="#STATE_RENDERING">#STATE_RENDERING</a> and instantiates its target when next rendered. A local Instance will do
+the same when next rendered, providing it succeeds in finding its target Symbol, otherwise the local Instance will
+transition to <a href="#STATE_ERROR">#STATE_ERROR</a>.
+target.
 						
 						
 					</div>
@@ -758,43 +754,17 @@ and traversal has arrived back at this node on the way back up the graph.
 
 					<hr />
 				
-					<a name=".STATE_LOADING"> </a>
+					<a name=".STATE_RENDERING"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">SceneJS.Instance.</span><b>STATE_LOADING</b>
+					<span class="light">SceneJS.Instance.</span><b>STATE_RENDERING</b>
 					
 					</div>
 					<div class="description">
-						State in which node is awaiting a response to its load request. When the response arrives (asyncronously, ie.
-either during or between scene renders), the node will then transition to  either <a href="#STATE_LOADED">#STATE_LOADED</a>
-or <a href="#STATE_ERROR">#STATE_ERROR</a>, depending on whether or not it successfully parses the response. If the
-response does not arrive or parse within the timeout period (180 seconds by default, unless configured) it will
-transition to STATE_ERROR.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name=".STATE_RENDERED"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">SceneJS.Instance.</span><b>STATE_RENDERED</b>
-					
-					</div>
-					<div class="description">
-						State in which node has successfully received its content, parsed it into a subgraph, and been rendered
-at least once. From here the node will transition back to <a href="#STATE_INITIAL">#STATE_INITIAL</a> as soon as it has not been rendered in
-a while and has then had its subgraph destroyed by SceneJS to reclaim memory.
+						State of a local or remote Instance in which it is rendering its target. While in this state, you can
+obtain its target subgraph through its getTarget() method. From this state, the Instance will transition to
+<a href="#STATE_READY">#STATE_READY</a> once it has completed rendering the target.
 						
 						
 					</div>
@@ -824,8 +794,8 @@ a while and has then had its subgraph destroyed by SceneJS to reclaim memory.
 					
 					</div>
 					<div class="description">
-						Returns the node's current state. Possible states are <a href="#STATE_INITIAL">#STATE_INITIAL</a>, <a href="#STATE_LOADING">#STATE_LOADING</a>,
-<a href="#STATE_LOADED">#STATE_LOADED</a>, <a href="#STATE_FREED">#STATE_FREED</a> and <a href="#STATE_ERROR">#STATE_ERROR</a>.
+						Returns the node's current state. Possible states are <a href="#STATE_INITIAL">#STATE_INITIAL</a>,
+<a href="#STATE_READY">#STATE_READY</a> and <a href="#STATE_ERROR">#STATE_ERROR</a>.
 						
 						
 					</div>
@@ -847,6 +817,56 @@ a while and has then had its subgraph destroyed by SceneJS to reclaim memory.
 						
 						
 
+					<hr />
+				
+					<a name="getTarget"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>getTarget</b>()
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getURI"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>getURI</b>()
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
 					
 				
 			
@@ -861,7 +881,7 @@ a while and has then had its subgraph destroyed by SceneJS to reclaim memory.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:21 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat Jul 17 2010 23:39:59 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

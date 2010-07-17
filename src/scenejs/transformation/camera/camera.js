@@ -147,12 +147,12 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
             far : optics.far || 5000.0
         };
     } else if (!optics.type) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
                         "SceneJS.Camera configuration invalid: optics type not specified - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'"));
     } else {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
                         "SceneJS.Camera configuration invalid: optics type not supported - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'"));
@@ -187,7 +187,7 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
         if (this._optics.type == "ortho") {
             this._transform = {
                 type: this._optics.type,
-                matrix:SceneJS_math_orthoMat4c(
+                matrix:SceneJS._math_orthoMat4c(
                         this._optics.left,
                         this._optics.right,
                         this._optics.bottom,
@@ -198,7 +198,7 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
         } else if (this._optics.type == "frustum") {
             this._transform = {
                 type: this._optics.type,
-                matrix:SceneJS_math_frustumMatrix4(
+                matrix:SceneJS._math_frustumMatrix4(
                         this._optics.left,
                         this._optics.right,
                         this._optics.bottom,
@@ -209,7 +209,7 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
         } else if (this._optics.type == "perspective") {
             this._transform = {
                 type: this._optics.type,
-                matrix:SceneJS_math_perspectiveMatrix4(
+                matrix:SceneJS._math_perspectiveMatrix4(
                         this._optics.fovy * Math.PI / 180.0,
                         this._optics.aspect,
                         this._optics.near,
@@ -217,10 +217,10 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
             };
         }
     }
-    var prevTransform = SceneJS_projectionModule.getTransform();
-    SceneJS_projectionModule.setTransform(this._transform);
+    var prevTransform = SceneJS._projectionModule.getTransform();
+    SceneJS._projectionModule.setTransform(this._transform);
     this._renderNodes(traversalContext, data);
-    SceneJS_projectionModule.setTransform(prevTransform);
+    SceneJS._projectionModule.setTransform(prevTransform);
 };
 
 // @private

@@ -1,0 +1,218 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @class Binds its subgraph to a WebSocket, providing a server with the ability to add, remove and manipulate content within the subgraph
+<span class='line'>  3</span>  *
+<span class='line'>  4</span>  * &lt;p>The SceneJS.Socket node enables a server to dynamically participate in the construction, destruction and
+<span class='line'>  5</span>  * configuration of its subgraph. It binds the subgraph to a WebSocket through which it exchanges JSON message objects
+<span class='line'>  6</span>  * with a server, sending messages on events within its subgraph, while receiving messages containing updates to apply
+<span class='line'>  7</span>  * to its subnodes.&lt;/p>
+<span class='line'>  8</span>  * &lt;p>When a SceneJS.Socket processes incoming messages, it works in a similar manner to a {@link SceneJS.WithConfigs}
+<span class='line'>  9</span>  * node, pushing configurations from the message body down into the setter methods of identified nodes in the subgraph.&lt;/p>
+<span class='line'> 10</span>  *
+<span class='line'> 11</span>  * &lt;p>While the format of incoming messages must be a {@link SceneJS.WithConfigs} configuration object, &lt;b>the outgoing
+<span class='line'> 12</span>  * message format is not part of the SceneJS specification&lt;/b> and can be whatever JSON objects the server on the other
+<span class='line'> 13</span>  * end expects. As for when messages are sent by the scene, that can be triggered by SceneJS node listeners, eg. where a
+<span class='line'> 14</span>  * Socket node can be configured to send messages as it transitions through the various stages of its life cycle.&lt;/p>
+<span class='line'> 15</span>  *
+<span class='line'> 16</span>  * &lt;p>You can have multiple Sockets scattered through a scene graph, and may even nest them. This enables you to do some
+<span class='line'> 17</span>  * fancy things, like have "live assets" that are controlled by the servers that they are downloaded from. Imagine a
+<span class='line'> 18</span>  * subgraph defining an airplane, that relies on its server to manage its complex physics computations, for example.&lt;/p>
+<span class='line'> 19</span>  *
+<span class='line'> 20</span>  * &lt;h2>Message Protocol&lt;/h2>
+<span class='line'> 21</span>  *
+<span class='line'> 22</span>  * &lt;pre>&lt;code>
+<span class='line'> 23</span>  * {
+<span class='line'> 24</span>  *     error : {String} or undefined when no error,
+<span class='line'> 25</span>  *     body  : {
+<span class='line'> 26</span>  *         /* Response from server - either a JSON SceneJS subgraph or a configuration map
+<span class='line'> 27</span>  *     }
+<span class='line'> 28</span>  * }
+<span class='line'> 29</span>  * &lt;/code>&lt;/pre>
+<span class='line'> 30</span>  */</span><span class="WHIT">
+<span class='line'> 31</span> </span><span class="NAME">SceneJS.Socket</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"socket"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">    </span><span class="NAME">this._uri</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="WHIT">    </span><span class="NAME">this._autoOpen</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT">    </span><span class="NAME">this._socketId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">    </span><span class="NAME">this._outMessages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">    </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Socket.STATE_INITIAL</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="WHIT">    </span><span class="NAME">this._configsModes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 40</span> </span><span class="WHIT">        </span><span class="NAME">strictProperties</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 41</span> </span><span class="WHIT">        </span><span class="NAME">strictNodes</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 46</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 47</span> 
+<span class='line'> 48</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 49</span> 
+<span class='line'> 50</span> </span><span class="COMM">/**
+<span class='line'> 51</span>  */</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="NAME">SceneJS.Socket.STATE_INITIAL</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 53</span> 
+<span class='line'> 54</span> </span><span class="COMM">/**
+<span class='line'> 55</span>  */</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="NAME">SceneJS.Socket.STATE_CONNECTING</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 57</span> 
+<span class='line'> 58</span> </span><span class="COMM">/**
+<span class='line'> 59</span>  */</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="NAME">SceneJS.Socket.STATE_OPEN</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> 
+<span class='line'> 62</span> </span><span class="COMM">/**
+<span class='line'> 63</span>  * State of Socket in which it re-open is pending after it has been closed by SceneJS or server, perhaps due to
+<span class='line'> 64</span>  * lack of recent use. When next rendered, the Socket will then attempt to reopen and transition to
+<span class='line'> 65</span>  * {@link #STATE_CONNECTING}.
+<span class='line'> 66</span>  * @const
+<span class='line'> 67</span>  */</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="NAME">SceneJS.Socket.STATE_CLOSED</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 69</span> 
+<span class='line'> 70</span> </span><span class="COMM">/**
+<span class='line'> 71</span>  */</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="NAME">SceneJS.Socket.STATE_ERROR</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> 
+<span class='line'> 74</span> 
+<span class='line'> 75</span> </span><span class="COMM">/** Enqeues an outgoing message to send when the Socket is next rendered.
+<span class='line'> 76</span>  *
+<span class='line'> 77</span>  * @param message
+<span class='line'> 78</span>  * @returns {this}
+<span class='line'> 79</span>  */</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="NAME">SceneJS.Socket.prototype.addMessage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">message</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">    </span><span class="NAME">this._outMessages.push</span><span class="PUNC">(</span><span class="NAME">message</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 84</span> 
+<span class='line'> 85</span> </span><span class="COMM">/** Clears outgoing message queue.
+<span class='line'> 86</span>  * @returns {this}
+<span class='line'> 87</span>  */</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="NAME">SceneJS.Socket.prototype.removeMessages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">    </span><span class="NAME">this._outMessages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 92</span> 
+<span class='line'> 93</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="NAME">SceneJS.Socket.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="NAME">this._uri</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.messages</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">        </span><span class="NAME">this._outMessages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.messages</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>100</span> 
+<span class='line'>101</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="NAME">SceneJS.Socket.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._uri</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">SceneJS._errorModule.fatalError</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.InvalidNodeConfigException</span><span class="PUNC">(</span><span class="STRN">"SceneJS.Socket uri property not defined"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>110</span> 
+<span class='line'>111</span> </span><span class="WHIT">    </span><span class="COMM">/* Socket can close after lack of use, in which case
+<span class='line'>112</span>      * the node would have to re-open it
+<span class='line'>113</span>      */</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.Socket.STATE_OPEN</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">SceneJS._SocketModule.acquireSocket</span><span class="PUNC">(</span><span class="NAME">this._socketId</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">            </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket.STATE_CLOSED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>119</span> 
+<span class='line'>120</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.Socket.STATE_OPEN</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// Still open, and socket was acquired above</span><span class="WHIT">
+<span class='line'>121</span> 
+<span class='line'>122</span> </span><span class="WHIT">        </span><span class="COMM">/* Process next incoming message then send pending outgoing messages
+<span class='line'>123</span>          */</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._SocketModule.getNextMessage</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">exception</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onerror</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">                    </span><span class="NAME">_self._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket.STATE_ERROR</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">                    </span><span class="NAME">SceneJS._errorModule.error</span><span class="PUNC">(</span><span class="NAME">exception</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">message</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">message.error</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS._errorModule.error</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">                        </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.SocketServerErrorException</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">                                </span><span class="STRN">"SceneJS.Socket server responded with error: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">message.error</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">", "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">message.body</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">message.body</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">                </span><span class="COMM">// alert(message.body);</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">                </span><span class="NAME">traversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">                    </span><span class="NAME">appendix</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.appendix</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">                    </span><span class="NAME">insideRightFringe</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this._children.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">                    </span><span class="NAME">configs</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">message.body</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">                    </span><span class="NAME">configsModes</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this._configsModes</span><span class="WHIT"> </span><span class="COMM">// TODO configsModes in message?</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">                </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Data</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._fixedParams</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="WHIT">        </span><span class="NAME">this._sendMessages</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._SocketModule.releaseSocket</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.Socket.STATE_INITIAL</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.Socket.STATE_CLOSED</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>151</span> 
+<span class='line'>152</span> </span><span class="WHIT">            </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket.STATE_CONNECTING</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">            </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">_self</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// Closure allows this node to receive results</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">                </span><span class="NAME">SceneJS._SocketModule.openSocket</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">uri</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_self._uri</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">                        </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">socketId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onopen</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">                            </span><span class="NAME">_self._socketId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">socketId</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">                            </span><span class="NAME">_self._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket.STATE_OPEN</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">                        </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onclose</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="WHIT">                            </span><span class="NAME">_self._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket.STATE_CLOSED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>161</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>162</span> </span><span class="WHIT">                        </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">exception</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onerror</span><span class="WHIT">
+<span class='line'>163</span> </span><span class="WHIT">                            </span><span class="NAME">_self._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket.STATE_ERROR</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>164</span> </span><span class="WHIT">                            </span><span class="NAME">SceneJS._errorModule.error</span><span class="PUNC">(</span><span class="NAME">exception</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>165</span> </span><span class="WHIT">                        </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>166</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">this._STATE_ERROR</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// Socket disabled - TODO: retry?</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// We're assuming socket wont open instantly, ie. during this node visit</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>173</span> 
+<span class='line'>174</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="NAME">SceneJS.Socket.prototype._changeState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">newState</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">    </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">    </span><span class="NAME">params.oldState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._state</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">    </span><span class="NAME">params.newState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">    </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._listeners</span><span class="PUNC">[</span><span class="STRN">"state-changed"</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// Optimisation</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">        </span><span class="NAME">this._fireEvent</span><span class="PUNC">(</span><span class="STRN">"state-changed"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> 
+<span class='line'>185</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="NAME">SceneJS.Socket.prototype._sendMessages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._outMessages.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._SocketModule.sendMessages</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="WHIT">                </span><span class="NAME">this._outMessages</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">exception</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onerror</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">                    </span><span class="NAME">_self._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Socket.STATE_ERROR</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">                </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">  </span><span class="COMM">// onsuccess</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">                    </span><span class="NAME">this._outMessages</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> 
+<span class='line'>198</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>200</span> 
+<span class='line'>201</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Socket} instance
+<span class='line'>202</span>  * @param {Object} [cfg] Static configuration object
+<span class='line'>203</span> 
+<span class='line'>204</span>  * @returns {SceneJS.Socket}
+<span class='line'>205</span>  * @since Version 0.7.6
+<span class='line'>206</span>  */</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="NAME">SceneJS.socket</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Socket</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Socket.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>

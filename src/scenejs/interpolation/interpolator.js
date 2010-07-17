@@ -126,7 +126,7 @@ SceneJS.Interpolator.prototype._cubicInterpolate = function(k) {
 SceneJS.Interpolator.prototype._slerp = function(k) {
     var u = this._keys[this._key2] - this._keys[this._key1];
     var v = k - this._keys[this._key1];  
-    return SceneJS_math_slerp((v / u), this._values[this._key1], this._values[this._key2]);
+    return SceneJS._math_slerp((v / u), this._values[this._key1], this._values[this._key2]);
 };
 
 // @private
@@ -165,7 +165,7 @@ SceneJS.Interpolator.prototype._interpolate = function(k) {
         case 'slerp':
             return this._slerp(k);
         default:
-            throw SceneJS_errorModule.fatalError(
+            throw SceneJS._errorModule.fatalError(
                     new SceneJS.InternalException("SceneJS.Interpolator internal error - interpolation type not switched: '"
                             + this._type + "'"));
     }
@@ -195,7 +195,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
     /* Name of input property in data scope
      */
     if (!params.input) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.NodeConfigExpectedException(
                         "SceneJS.Interpolator config property expected: input"));
     }
@@ -204,7 +204,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
     /* Name of output property on child data scope
      */
     if (!params.output) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.NodeConfigExpectedException(
                         "SceneJS.Interpolator config property expected: output"));
     }
@@ -215,20 +215,20 @@ SceneJS.Interpolator.prototype._init = function(params) {
      */
     if (params.keys) {
         if (!params.values) {
-            throw SceneJS_errorModule.fatalError(
+            throw SceneJS._errorModule.fatalError(
                     new SceneJS.InvalidNodeConfigException(
                             "SceneJS.Interpolator configuration incomplete: " +
                             "keys supplied but no values - must supply a value for each key"));
         }
     } else if (params.values) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
                         "SceneJS.Interpolator configuration incomplete: " +
                         "values supplied but no keys - must supply a key for each value"));
     }
     for (var i = 1; i < params.keys.length; i++) {
         if (params.keys[i - 1] >= params.keys[i]) {
-            throw SceneJS_errorModule.fatalError(
+            throw SceneJS._errorModule.fatalError(
                     new SceneJS.InvalidNodeConfigException(
                             "SceneJS.Interpolator configuration invalid: " +
                             "two invalid keys found ("
@@ -252,7 +252,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
             break;
         case 'cubic':
             if (params.keys.length < 4) {
-                throw SceneJS_errorModule.fatalError(
+                throw SceneJS._errorModule.fatalError(
                         new SceneJS.InvalidNodeConfigException(
                                 "SceneJS.Interpolator configuration invalid: minimum of four keyframes " +
                                 "required for cubic - only "
@@ -263,7 +263,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
         case 'slerp':
             break;
         default:
-            throw SceneJS_errorModule.fatalError(
+            throw SceneJS._errorModule.fatalError(
                     new SceneJS.InvalidNodeConfigException(
                             "SceneJS.Interpolator configuration invalid:  type not supported - " +
                             "only 'linear', 'cosine', 'cubic', 'constant' and 'slerp' are supported"));
@@ -284,7 +284,7 @@ SceneJS.Interpolator.prototype._render = function(traversalContext, data) {
     }
     var key = data.get(this._input);
     if (key == undefined || key == null) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.DataExpectedException(
                         "SceneJS.Interpolator failed to find input on data: '" + params.input + "'"));
     }

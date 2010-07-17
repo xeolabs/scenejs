@@ -10,6 +10,9 @@ http://www.retaggr.com/page/LindsayStanleyKay
 Live examples:
 http://www.scenejs.org/load-ide.html
 
+Wiki:
+http://scenejs.wikispaces.com/
+
 Facebook Group:
 http://www.facebook.com/group.php?gid=350488973712
 

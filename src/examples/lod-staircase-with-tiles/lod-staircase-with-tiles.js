@@ -10,9 +10,15 @@
  * This scene contains a staircase model that switches representations as a function of the
  * projected size of it's extents. The switching is done by a SceneJS.BoundingBox, which selects
  * an appropriate model for its cuuernt projected size from among its child nodes. The child nodes
- * include SceneJS.Instance nodes that each load a staircase asset from the SceneJS library, each
+ * include SceneJS.Load nodes that each load a staircase asset from the SceneJS library, each
  * with different parameters for number of steps, appearance etc.
  */
+
+/* Load content modules for sky, tiled floor and staircase
+ */
+SceneJS.requireModule("modules/milkyway/milkyway.js");
+SceneJS.requireModule("modules/tiles/tiles.js");
+SceneJS.requireModule("modules/staircase/staircase.js");
 
 var exampleScene = SceneJS.scene({
 
@@ -59,8 +65,8 @@ var exampleScene = SceneJS.scene({
 
                             /* A starry sky for fun!
                              */
-                                SceneJS.instance({
-                                    uri:"http://scenejs.org/library/v0.7/assets/backgrounds/starry-sky/starry-sky.js"
+                                SceneJS.useModule({
+                                    name: "milkyway"
                                 }),
 
                             /* Lighting
@@ -85,9 +91,8 @@ var exampleScene = SceneJS.scene({
 
                                     /* Tiled floor asset from the SceneJS library
                                      */
-                                        SceneJS.instance({
-                                            uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                "examples/tiled-floor/tiled-floor.js"
+                                        SceneJS.useModule({
+                                            name: "tiles"
                                         }),
 
                                     /* Our spiral staircase, wrapped with some material colour
@@ -142,10 +147,10 @@ var exampleScene = SceneJS.scene({
                                                             numSteps:12,
                                                             stepAngle:80 },
 
-                                                                SceneJS.instance({
-                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                SceneJS.useModule({
+                                                                    name: "staircase"
                                                                 })),
+
 
                                                     /* Level 3 - more detail; staircase with 24 chunky
                                                      *  steps and no texture - the same parameterised asset
@@ -160,9 +165,8 @@ var exampleScene = SceneJS.scene({
                                                             numSteps:24,       // Half the number of steps, less coarse
                                                             stepAngle:40 },
 
-                                                                SceneJS.instance({
-                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                SceneJS.useModule({
+                                                                    name: "staircase"
                                                                 })),
 
                                                     /* Level 4 - yet more detail; staircase with 48 fine
@@ -178,9 +182,8 @@ var exampleScene = SceneJS.scene({
                                                             numSteps:48,
                                                             stepAngle:20 },
 
-                                                                SceneJS.instance({
-                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                SceneJS.useModule({
+                                                                    name: "staircase"
                                                                 })),
 
                                                     /* Level 5 - maximum detail; textured staircase with
@@ -197,9 +200,8 @@ var exampleScene = SceneJS.scene({
                                                             numSteps:48,
                                                             stepAngle:20 },
 
-                                                                SceneJS.instance({
-                                                                    uri:"http://scenejs.org/library/v0.7/assets/" +
-                                                                        "examples/spiral-staircase/spiral-staircase.js"
+                                                                SceneJS.useModule({
+                                                                    name: "staircase"
                                                                 }))
                                                         )
                                                 )
@@ -208,30 +210,6 @@ var exampleScene = SceneJS.scene({
                         )
                 )
         );
-
-
-/*---------------------------------------------------------------------------------------------------------------------
- * To enable the assets to load cross-domain, we'll first configure SceneJS with a strategy to allow it
- * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
- * create the request URL for the service, and another to extract the data from the response.
- *--------------------------------------------------------------------------------------------------------------------*/
-
-SceneJS.setJSONPStrategy({
-    request : function(url, format, callback) {
-        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
-    },
-
-    response : function(data) {
-
-        /* The SceneJS proxy will provide an error message like this when
-         * it fails to service the request
-         */
-        if (data.error) {
-            throw "Proxy server responded with error: " + data.error;
-        }
-        return data;
-    }
-});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -324,15 +302,21 @@ window.render = function() {
 };
 
 /* Render loop until error or reset
+ * (which IDE does whenever you hit that run again button)
  */
 var pInterval;
 
-SceneJS.addListener("error", function() {
+SceneJS.addListener("error", function(e) {
+    alert(e.exception.message);
     window.clearInterval(pInterval);
 });
 
+SceneJS.addListener("reset", function() {
+    window.clearInterval(pInterval);
+});
 
 pInterval = window.setInterval("window.render()", 10);
+
 
 
 

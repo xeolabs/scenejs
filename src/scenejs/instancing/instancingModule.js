@@ -3,15 +3,14 @@
  * fragments called "symbols".
  *  @private
  */
-var SceneJS_instancingModule = new (function() {
-
+SceneJS._instancingModule = new function() {
     this._symbols = {};
     this._nameStack = [];
     this._namePath = null;
     var countInstances = 0;
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RESET,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.RESET,
             function() {
                 this._symbols = {};
                 this._nameStack = [];
@@ -19,22 +18,17 @@ var SceneJS_instancingModule = new (function() {
                 countInstances = 0;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 this._symbols = {};
                 this._nameStack = [];
                 this._namePath = null;
                 countInstances = 0;
             });
-
-    this.clearName = function() {
-        this._nameStack = [];
-        this._namePath = null;
-    };
 
     this.setName = function(restore) {
-        this._nameStack = restore.nameStack.slice(0);
+         this._nameStack = restore.nameStack.slice(0);
         this._namePath = restore.namePath;
     };
 
@@ -122,4 +116,4 @@ var SceneJS_instancingModule = new (function() {
             return name;
         }
     }
-})();
+}();

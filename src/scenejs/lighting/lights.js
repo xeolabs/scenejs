@@ -194,9 +194,9 @@ SceneJS.Lights.prototype._render = function(traversalContext, data) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
         }
-        SceneJS_lightingModule.pushLightSources(this._sources);
+        SceneJS._lightingModule.pushLightSources(this._sources);
         this._renderNodes(traversalContext, data);
-       // SceneJS_lightingModule.popLightSources(this._sources.length);
+       // SceneJS._lightingModule.popLightSources(this._sources.length);
     }
 };
 

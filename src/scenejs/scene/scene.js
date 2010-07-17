@@ -79,7 +79,7 @@ SceneJS.Scene = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "scene";
     if (!this._fixedParams) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException
                         ("Dynamic configuration of SceneJS.scene node is not supported"));
     }
@@ -158,14 +158,12 @@ SceneJS.Scene.prototype.getConfigs = function() {
  */
 SceneJS.Scene.prototype.render = function() {
     if (!this._sceneId) {
-        this._sceneId = SceneJS_sceneModule.createScene(this, this._getParams());
+        this._sceneId = SceneJS._sceneModule.createScene(this, this._getParams());
     }
-    SceneJS_sceneModule.activateScene(this._sceneId);
-    SceneJS_loadModule.setLoadTimeoutSecs(this._params.loadTimeoutSecs);  // null to use default     
+    SceneJS._sceneModule.activateScene(this._sceneId);
     var traversalContext = {};
     this._renderNodes(traversalContext, new SceneJS.Data(null, false, this._data));
-    SceneJS_loadModule.setLoadTimeoutSecs(null);
-    SceneJS_sceneModule.deactivateScene();
+    SceneJS._sceneModule.deactivateScene();
     this._lastRenderedData = this._data;
     this._data = {};
     this._configs = {};
@@ -187,16 +185,16 @@ SceneJS.Scene.prototype.render = function() {
 //                throw new SceneJS.PickWithoutRenderedException
 //                        ("Scene not rendered - need to render before picking");
 //            }
-//            SceneJS_sceneModule.activateScene(this._sceneId);  // Also activates canvas
-//            SceneJS_pickModule.pick(canvasX, canvasY);
+//            SceneJS._sceneModule.activateScene(this._sceneId);  // Also activates canvas
+//            SceneJS._pickModule.pick(canvasX, canvasY);
 //            if (this._params.loadProxy) {
-//                SceneJS_loadModule.setLoadProxyUri(this._params.proxy);
+//                SceneJS._loadModule.setLoadProxyUri(this._params.proxy);
 //            }
 //            var traversalContext = {};
 //            this._renderNodes(traversalContext, this._lastRenderedData);
-//            SceneJS_loadModule.setLoadProxyUri(null);
-//            var picked = SceneJS_pickModule.getPicked();
-//            SceneJS_sceneModule.deactivateScene();
+//            SceneJS._loadModule.setLoadProxyUri(null);
+//            var picked = SceneJS._pickModule.getPicked();
+//            SceneJS._sceneModule.deactivateScene();
 //            return picked;
 //        } finally {
 //            SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
@@ -213,7 +211,7 @@ SceneJS.Scene.prototype.render = function() {
  * a race condition.
  */
 SceneJS.Scene.prototype.getNumProcesses = function() {
-    return (this._sceneId) ? SceneJS_processModule.getNumProcesses(this._sceneId) : 0;
+    return (this._sceneId) ? SceneJS._processModule.getNumProcesses(this._sceneId) : 0;
 };
 
 /** Destroys this scene. You should destroy
@@ -223,7 +221,7 @@ SceneJS.Scene.prototype.getNumProcesses = function() {
  */
 SceneJS.Scene.prototype.destroy = function() {
     if (this._sceneId) {
-        SceneJS_sceneModule.destroyScene(this._sceneId); // Last one fires RESET command
+        SceneJS._sceneModule.destroyScene(this._sceneId); // Last one fires RESET command
         this._sceneId = null;
     }
 };
@@ -248,7 +246,7 @@ SceneJS.scene = function() {
 /** Total SceneJS reset - destroys all scenes and cached resources.
  */
 SceneJS.reset = function() {
-    var scenes = SceneJS_sceneModule.getAllScenes();
+    var scenes = SceneJS._sceneModule.getAllScenes();
     var temp = [];
     for (var i = 0; i < scenes.length; i++) {
         temp.push(scenes[i]);
@@ -262,3 +260,34 @@ SceneJS.reset = function() {
     }
 };
 
+//
+//SceneJS._Visitor = (function() {
+//    this._nodeStack = new Object[5000];
+//    this._nStack = 0;
+//
+//
+//    this.visit = function(node, tc, data) {
+//        this._nodeStack[this._nStack++] = node;
+//        while (this._nStack > 0) {
+//            node = this._nodeStack[--this._nStack];
+//            node._visited = true;
+//            node._preRender(tc, data);
+//            for (var i = 0; i < node._children.length; i++) {
+//
+//            }
+//
+//        }
+//
+//
+//        node._preRender(tc, data);
+//        node._render(tc, data);
+//        node._postRender(tc, data);
+//    };
+//
+//    this.visitChildren = function(children, tc, data) {
+//        node._preRender(tc, data);
+//        node._render(tc, data);
+//
+//        node._postRender(tc, data);
+//    };
+//});

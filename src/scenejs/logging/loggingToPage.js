@@ -52,7 +52,7 @@ SceneJS.LoggingToPage.prototype.setElementId = function(elementId) {
     if (elementId) {
         var element = document.getElementById(elementId);
         if (!element) {
-            throw SceneJS_errorModule.fatalError(new SceneJS.DocumentElementNotFoundException
+            throw SceneJS._errorModule.fatalError(new SceneJS.DocumentElementNotFoundException
                     ("SceneJS.LoggingToPage cannot find document element with ID '" + elementId + "'"));
         }
         this._elementId = elementId;
@@ -101,10 +101,10 @@ SceneJS.LoggingToPage.prototype._render = function(traversalContext, data) {
         };
     }
     if (this._element) {
-        var prevFuncs = SceneJS_loggingModule.getFuncs();
-        SceneJS_loggingModule.setFuncs(this._funcs);
+        var prevFuncs = SceneJS._loggingModule.getFuncs();
+        SceneJS._loggingModule.setFuncs(this._funcs);
         this._renderNodes(traversalContext, data);
-        SceneJS_loggingModule.setFuncs(prevFuncs);
+        SceneJS._loggingModule.setFuncs(prevFuncs);
     } else {
         this._renderNodes(traversalContext, data);
     }

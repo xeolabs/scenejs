@@ -3,7 +3,7 @@
  *
  * @private
  */
-var SceneJS_debugModule = new (function() {
+SceneJS._debugModule = new (function() {
 
     this.configs = {};
 
@@ -16,7 +16,7 @@ var SceneJS_debugModule = new (function() {
             for (var i = 0; cfg && i < parts.length; i++) {
                 cfg = cfg[parts[i]];
             }
-            return cfg;
+            return cfg || {};
         }
     };
 
@@ -46,9 +46,9 @@ var SceneJS_debugModule = new (function() {
  */
 SceneJS.setDebugConfigs = function () {
     if (arguments.length == 1) {
-        SceneJS_debugModule.setConfigs(null, arguments[0]);
+        SceneJS._debugModule.setConfigs(null, arguments[0]);
     } else if (arguments.length == 2) {
-        SceneJS_debugModule.setConfigs(arguments[0], arguments[1]);
+        SceneJS._debugModule.setConfigs(arguments[0], arguments[1]);
     } else {
         throw "Illegal arguments given to SceneJS.setDebugs - should be either ({String}:name, {Object}:cfg) or ({Object}:cfg)";
     }
@@ -57,6 +57,6 @@ SceneJS.setDebugConfigs = function () {
 /** Gets debugging configurations
  */
 SceneJS.getDebugConfigs = function (path) {
-    return SceneJS_debugModule.getConfigs(path);
+    return SceneJS._debugModule.getConfigs(path);
 };
 

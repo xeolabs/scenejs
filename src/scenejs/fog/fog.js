@@ -59,7 +59,7 @@ SceneJS._inherit(SceneJS.Fog, SceneJS.Node);
  */
 SceneJS.Fog.prototype.setMode = function(mode) {
     if (mode != "disabled" && mode != "exp" && mode != "exp2" && mode != "linear") {
-        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+        throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
                 "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'none', 'exp', 'exp2' or 'linear'"));
     }
     this._mode = mode;
@@ -197,8 +197,8 @@ SceneJS.Fog.prototype._render = function(traversalContext, data) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
         }
-        var f = SceneJS_fogModule.getFog();
-        SceneJS_fogModule.setFog({
+        var f = SceneJS._fogModule.getFog();
+        SceneJS._fogModule.setFog({
             mode: this._mode,
             color: this._color,
             density: this._density,
@@ -206,7 +206,7 @@ SceneJS.Fog.prototype._render = function(traversalContext, data) {
             end: this._end
         });
         this._renderNodes(traversalContext, data);
-        SceneJS_fogModule.setFog(f);
+        SceneJS._fogModule.setFog(f);
     }
 };
 

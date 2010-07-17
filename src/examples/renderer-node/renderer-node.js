@@ -20,15 +20,14 @@
 
  */
 
+SceneJS.requireModule("modules/seymourplane/seymourplane.js");
+
+
 var exampleScene = SceneJS.scene({
 
     /* Bind scene to a WebGL canvas:
      */
-    canvasId: "theCanvas",
-
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
+    canvasId: "theCanvas" },
 
     /*==================================================================================
      * Our renderer node, with default values defined for all properties.
@@ -181,15 +180,7 @@ var exampleScene = SceneJS.scene({
 
             /* Specify front/back-facing mode. Accepted values are cw or ccw
              */
-            frontFace: "ccw",
-
-            /*----------------------------------------
-             Textures
-             -----------------------------------------*/
-
-            /* Enable/disable texturing
-             */
-            enableTexture2D: true
+            frontFace: "ccw"
         },
 
             /*==================================================================================
@@ -205,8 +196,6 @@ var exampleScene = SceneJS.scene({
                         height: 600
                     }
                 },
-
-
                     //----------------------------------------------------------
                     // The rest of the scene is just copied from the COLLADA
                     // Seymour Plane test example
@@ -256,10 +245,10 @@ var exampleScene = SceneJS.scene({
                                                                 angle: data.get('pitch'), x : 1.0
                                                             };
                                                         },
-                                                                SceneJS.instance({
-                                                                    uri: "http://www.scenejs.org/library/v0.7/assets/" +
-                                                                         "examples/seymourplane_triangulate/" +
-                                                                         "seymourplane_triangulate.dae"
+                                                            /* Use our airplane model:
+                                                             */
+                                                                SceneJS.useModule({
+                                                                    name: "seymour-plane"
                                                                 }))
                                                         )
                                                 )
@@ -268,29 +257,6 @@ var exampleScene = SceneJS.scene({
                         )
                 )
         );
-
-/*--------------------------------------------------------------------------------------------------------------------
- * To enable the COLLADA model to load cross-domain, we'll first configure SceneJS with a strategy to allow it
- * to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
- * create the request URL for the service, and another to extract the data from the response.
- *------------------------------------------------------------------------------------------------------------------*/
- 
-SceneJS.setJSONPStrategy({
-    request : function(url, format, callback) {
-        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
-    },
-
-    response : function(data) {
-
-        /* The SceneJS proxy will provide an error message like this when
-         * it fails to service the request
-         */
-        if (data.error) {
-            throw "Proxy server responded with error: " + data.error;
-        }
-        return data;
-    }
-});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -344,7 +310,8 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.addListener("error", function() {
+SceneJS.addListener("error", function(event) {
+    alert(event.exception.message);
     window.clearInterval(pInterval);
 });
 

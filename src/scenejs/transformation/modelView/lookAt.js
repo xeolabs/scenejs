@@ -102,7 +102,7 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     var y = up.y || 0;
     var z = up.z || 0;
     if (x + y + z == 0) {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
                         "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero"));
     }
@@ -145,14 +145,14 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
         } else {
             this._memoLevel = 1;
         }
-        this._mat = SceneJS_math_lookAtMat4c(
+        this._mat = SceneJS._math_lookAtMat4c(
                 this._eyeX, this._eyeY, this._eyeZ,
                 this._lookX, this._lookY, this._lookZ,
                 this._upX, this._upY, this._upZ);
     }
-    var superXform = SceneJS_modelViewTransformModule.getTransform();
+    var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
-        var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
+        var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             type: "lookat",
             matrix: tempMat,
@@ -163,13 +163,13 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
             },
             fixed: superXform.fixed && this._fixedParams
         };
-        if (this._memoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !SceneJS._instancingModule.instancing()) {   // Bump up memoization level if space fixed
             this._memoLevel = 2;
         }
     }
-    SceneJS_modelViewTransformModule.setTransform(this._xform);
+    SceneJS._modelViewTransformModule.setTransform(this._xform);
     this._renderNodes(traversalContext, data);
-    SceneJS_modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.setTransform(superXform);
 };
 
 /** Factory function that returns a new {@link SceneJS.LookAt} instance

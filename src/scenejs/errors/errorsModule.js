@@ -3,13 +3,13 @@
  *
  * @private
  */
-var SceneJS_errorModule = new (function() {
+SceneJS._errorModule = new (function() {
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 var time = (new Date()).getTime();
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.TIME_UPDATED, time);
+                SceneJS._eventModule.fireEvent(SceneJS._eventModule.TIME_UPDATED, time);
             });
 
     // @private
@@ -18,7 +18,7 @@ var SceneJS_errorModule = new (function() {
 
         /* Dont log because exception should be thrown        
          */
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
             exception: e,
             fatal: true
         });
@@ -28,8 +28,8 @@ var SceneJS_errorModule = new (function() {
     // @private
     this.error = function(e) {
         e = e.message ? e : new SceneJS.Exception(e);
-        SceneJS_loggingModule.error(e.message);
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
+        SceneJS._loggingModule.error(e.message);
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
             exception: e,
             fatal: false
         });

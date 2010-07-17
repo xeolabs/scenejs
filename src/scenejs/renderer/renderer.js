@@ -9,9 +9,6 @@
 SceneJS.Renderer = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "renderer";
-    this._params = this._getParams();
-    this._sceneId = null; // lazy-set on render
-    this._lastRenderedData = null;
 };
 
 SceneJS._inherit(SceneJS.Renderer, SceneJS.Node);
@@ -19,14 +16,14 @@ SceneJS._inherit(SceneJS.Renderer, SceneJS.Node);
 // @private
 SceneJS.Renderer.prototype._render = function(traversalContext, data) {
     if (this._memoLevel == 0) {  // One-shot dynamic config               
-        this._rendererState = SceneJS_rendererModule.createRendererState(this._getParams(data));
+        this._rendererState = SceneJS._rendererModule.createRendererState(this._getParams(data));
         if (this._fixedParams) {
             this._memoLevel = 1;
         }
     }
-    SceneJS_rendererModule.setRendererState(this._rendererState);
+    SceneJS._rendererModule.setRendererState(this._rendererState);
     this._renderNodes(traversalContext, data);
-    SceneJS_rendererModule.undoRendererState(this._rendererState);
+    SceneJS._rendererModule.undoRendererState(this._rendererState);
 };
 
 /** Factory function that returns a new {@link SceneJS.Renderer} instance

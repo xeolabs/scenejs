@@ -14,37 +14,37 @@
  *  @private
  *
  */
-var SceneJS_frustumModule = new (function() {
+SceneJS._frustumModule = new (function() {
 
     var viewport;
     var projMat;
     var viewMat;
     var frustum;
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
-                projMat = viewMat = SceneJS_math_identityMat4();
+                projMat = viewMat = SceneJS._math_identityMat4();
                 viewport = [0,0,1,1];
                 frustum = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.VIEWPORT_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.VIEWPORT_UPDATED,
             function(v) {
                 viewport = [v.x, v.y, v.width, v.height];
                 frustum = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED,
             function(params) {
                 projMat = params.matrix;
                 frustum = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
             function(params) {
                 viewMat = params.matrix;
                 frustum = null;
@@ -55,7 +55,7 @@ var SceneJS_frustumModule = new (function() {
      */
     var getFrustum = function() {
         if (!frustum) {
-            frustum = new SceneJS_math_Frustum(viewMat, projMat, viewport);
+            frustum = new SceneJS._math_Frustum(viewMat, projMat, viewport);
         }
         return frustum;
     };

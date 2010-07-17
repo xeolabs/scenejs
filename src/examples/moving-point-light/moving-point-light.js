@@ -190,4 +190,8 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
+SceneJS.addListener("error", function(e) {
+    alert(e.exception.message);
+});
+
 

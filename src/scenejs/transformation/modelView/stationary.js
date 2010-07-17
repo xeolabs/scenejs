@@ -34,27 +34,27 @@ SceneJS.Stationary = function() {
 SceneJS._inherit(SceneJS.Stationary, SceneJS.Node);
 
 SceneJS.Stationary.prototype._render = function(traversalContext, data) {
-    var superXform = SceneJS_viewTransformModule.getTransform();
+    var superXform = SceneJS._viewTransformModule.getTransform();
     var lookAt = superXform.lookAt;
     if (lookAt) {
         if (this._memoLevel == 0) {
             this._xform = {
-                matrix: SceneJS_math_mulMat4(
+                matrix: SceneJS._math_mulMat4(
                         superXform.matrix,
-                        SceneJS_math_translationMat4c(
+                        SceneJS._math_translationMat4c(
                                 lookAt.eye.x,
                                 lookAt.eye.y,
                                 lookAt.eye.z)),
                 lookAt: lookAt,
                 fixed: superXform.fixed
             };
-            if (superXform.fixed && !SceneJS_instancingModule.instancing()) {
+            if (superXform.fixed && !SceneJS._instancingModule.instancing()) {
                 this._memoLevel = 1;
             }
         }
-        SceneJS_viewTransformModule.setTransform(this._xform);
+        SceneJS._viewTransformModule.setTransform(this._xform);
         this._renderNodes(traversalContext, data);
-        SceneJS_viewTransformModule.setTransform(superXform);
+        SceneJS._viewTransformModule.setTransform(superXform);
     } else {
         this._renderNodes(traversalContext, data);
     }

@@ -132,18 +132,18 @@ SceneJS.Geometry.prototype._render = function(traversalContext, data) {
         this._init(this._getParams(data));
     }
     if (this._handle) { // Was created before - test if not evicted since
-        if (!SceneJS_geometryModule.testGeometryExists(this._handle)) {
+        if (!SceneJS._geometryModule.testGeometryExists(this._handle)) {
             this._handle = null;
         }
     }
     if (!this._handle) { // Either not created yet or has been evicted
         if (this._create) { // Use callback to create
-            this._handle = SceneJS_geometryModule.createGeometry(this._type, this._create());
+            this._handle = SceneJS._geometryModule.createGeometry(this._type, this._create());
         } else { // Or supply arrays
-            this._handle = SceneJS_geometryModule.createGeometry(this._type, this._geo);
+            this._handle = SceneJS._geometryModule.createGeometry(this._type, this._geo);
         }
     }
-    SceneJS_geometryModule.drawGeometry(this._handle);
+    SceneJS._geometryModule.drawGeometry(this._handle);
     this._renderNodes(traversalContext, data);
 };
 

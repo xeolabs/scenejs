@@ -9,20 +9,20 @@
  *
  *  @private
  */
-var SceneJS_processModule = new (function() {
+SceneJS._processModule = new (function() {
 
     var time = (new Date()).getTime();          // System time
     var groups = {};                            // A process group for each existing scene
     var activeSceneId;                          // ID of currently-active scene
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.TIME_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS_eventModule.addListener(// Scene defined, create new process group for it
-            SceneJS_eventModule.SCENE_CREATED,
+    SceneJS._eventModule.addListener(// Scene defined, create new process group for it
+            SceneJS._eventModule.SCENE_CREATED,
             function(params) {
                 var group = {   // IDEA like this
                     sceneId : params.sceneId,
@@ -32,14 +32,14 @@ var SceneJS_processModule = new (function() {
                 groups[params.sceneId] = group;
             });
 
-    SceneJS_eventModule.addListener(// Scene traversal begins
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(// Scene traversal begins
+            SceneJS._eventModule.SCENE_RENDERING,
             function(params) {
                 activeSceneId = params.sceneId;
             });
 
-    SceneJS_eventModule.addListener(// Scene traversed - reap its dead and timed-out processes
-            SceneJS_eventModule.SCENE_RENDERED,
+    SceneJS._eventModule.addListener(// Scene traversed - reap its dead and timed-out processes
+            SceneJS._eventModule.SCENE_RENDERED,
             function() {
                 var group = groups[activeSceneId];
                 var processes = group.processes;
@@ -53,13 +53,13 @@ var SceneJS_processModule = new (function() {
                             var elapsed = time - process.timeStarted;
                             if ((process.timeoutSecs > -1) && (elapsed > (process.timeoutSecs * 1000))) {
 
-                                SceneJS_loggingModule.warn("Process timed out after " +
+                                SceneJS._loggingModule.warn("Process timed out after " +
                                                            process.timeoutSecs +
                                                            " seconds: " + process.description);
 
                                 /* Process timed out - notify listeners
                                  */
-                                SceneJS_eventModule.fireEvent(SceneJS_eventModule.PROCESS_TIMED_OUT, {
+                                SceneJS._eventModule.fireEvent(SceneJS._eventModule.PROCESS_TIMED_OUT, {
                                     sceneId: activeSceneId,
                                     process: {
                                         id: process.id,
@@ -84,14 +84,14 @@ var SceneJS_processModule = new (function() {
                 activeSceneId = null;
             });
 
-    SceneJS_eventModule.addListener(// Scene destroyed - destroy its process group
-            SceneJS_eventModule.SCENE_DESTROYED,
+    SceneJS._eventModule.addListener(// Scene destroyed - destroy its process group
+            SceneJS._eventModule.SCENE_DESTROYED,
             function(params) {
                 groups[params.sceneId] = undefined;
             });
 
-    SceneJS_eventModule.addListener(// Framework reset - destroy all process groups
-            SceneJS_eventModule.RESET,
+    SceneJS._eventModule.addListener(// Framework reset - destroy all process groups
+            SceneJS._eventModule.RESET,
             function(params) {
                 groups = {};
                 activeSceneId = null;
@@ -117,7 +117,7 @@ var SceneJS_processModule = new (function() {
      */
     this.createProcess = function(cfg) {
         if (!activeSceneId) {
-            throw SceneJS_errorModule.fatalError(new SceneJS.NoSceneActiveException("No scene active - can't create process"));
+            throw SceneJS._errorModule.fatalError(new SceneJS.NoSceneActiveException("No scene active - can't create process"));
         }
         var group = groups[activeSceneId];
         var i = 0;
@@ -141,7 +141,7 @@ var SceneJS_processModule = new (function() {
 
                 /* Notify listeners
                  */
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.PROCESS_CREATED, {
+                SceneJS._eventModule.fireEvent(SceneJS._eventModule.PROCESS_CREATED, {
                     sceneId: activeSceneId,
                     process: {
                         id: process.id,
@@ -168,7 +168,7 @@ var SceneJS_processModule = new (function() {
 
             /* Notify listeners
              */
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.PROCESS_KILLED, {
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.PROCESS_KILLED, {
                 sceneId: activeSceneId,
                 process: {
                     id: process.id,

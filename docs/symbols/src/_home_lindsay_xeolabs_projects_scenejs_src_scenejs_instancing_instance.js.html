@@ -94,383 +94,288 @@
 <span class='line'> 87</span>  * &lt;li>{@link #STATE_LOADING} in which it has made the request and is awaiting the response, which it will receive
 <span class='line'> 88</span>  * at any time, either within a scene render or between scene renders. In this state it has nothing to render
 <span class='line'> 89</span>  * and will pass scene traversal on to its next sibling.&lt;/li>
-<span class='line'> 90</span>  * &lt;li>{@link #STATE_LOADED} in which it has successfully received its content and parsed it into a subgraph.
+<span class='line'> 90</span>  * &lt;li>{@link #STATE_READY} in which it has successfully received its content and parsed it into a subgraph.
 <span class='line'> 91</span>  * From here the node will transition to {@link #STATE_RENDERED} as soon as the subgraph has been rendered
 <span class='line'> 92</span>  * and traversal has arrived back at this node on the way back up the graph. It may instead transition back
 <span class='line'> 93</span>  * to {@link #STATE_INITIAL} as soon as it has not been rendered in a while and has then had its subgraph destroyed
 <span class='line'> 94</span>  * by SceneJS to reclaim memory.&lt;/li>
-<span class='line'> 95</span>  * &lt;li>{@link #STATE_RENDERED} in which it has successfully received its content, parsed it into a subgraph, and been rendered
-<span class='line'> 96</span>  * at least once. From here the node will transition back to {@link #STATE_INITIAL} as soon as it has not been rendered in
-<span class='line'> 97</span>  * a while and has then had its subgraph destroyed by SceneJS to reclaim memory.&lt;/li>
-<span class='line'> 98</span>  * &lt;li>{@link #STATE_FREED} in which it has been dormant too long and SceneJS has reclaimed memory by destroying
-<span class='line'> 99</span>  * the subgraph. When next rendered, it will then repeat its load request and transition
-<span class='line'>100</span>  * to {@link #STATE_LOADING}.&lt;/li>
-<span class='line'>101</span>  * &lt;li>{@link #STATE_ERROR} if SceneJS has permanently inactivated the node after load failed&lt;/li>&lt;/ul>
-<span class='line'>102</span>  * &lt;p>Note that when instantiating from a file that has been previously loaded by another Instance, it will transition
-<span class='line'>103</span>  * directly to {@link #STATE_RENDERED}.&lt;p>
-<span class='line'>104</span>  *
-<span class='line'>105</span>  * &lt;p>&lt;b>Loading Cross-Domain&lt;/b>&lt;/p>
-<span class='line'>106</span>  * &lt;p>When SceneJS is configured with a JSONP strategy via {@link SceneJS.setJSONPStrategy}, you can perform the
-<span class='line'>107</span>  * load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
-<span class='line'>108</span>  * in order to not violate the browser' same-domain security policy.
-<span class='line'>109</span>  *
-<span class='line'>110</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
-<span class='line'>111</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-asset-load">Example 1&lt;/a>&lt;/li>
-<span class='line'>112</span>  * &lt;/ul>
-<span class='line'>113</span>  *
-<span class='line'>114</span>  * @events
-<span class='line'>115</span>  * @extends SceneJS.Node
-<span class='line'>116</span>  * @constructor
-<span class='line'>117</span>  * Creates a new SceneJS.Instance
-<span class='line'>118</span>  *  @param {Object} [cfg] Static configuration object
-<span class='line'>119</span>  * @param {String} cfg.uri URI of file to load
-<span class='line'>120</span>  * @param {int} [cfg.timeoutSecs] Timeout - falls back on any loadTimoutSecs that was configured on the {@link SceneJS.Scene}
-<span class='line'>121</span>  * at the root of the scene graph, or the default 180 seconds if none configured there
-<span class='line'>122</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
-<span class='line'>123</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
-<span class='line'>124</span>  */</span><span class="WHIT">
-<span class='line'>125</span> </span><span class="NAME">SceneJS.Instance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>126</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>127</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"instance"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>128</span> 
-<span class='line'>129</span> </span><span class="WHIT">    </span><span class="COMM">/* Absolute URI part - eg. http://example.com/models/mdel.dae
-<span class='line'>130</span>      */</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="WHIT">    </span><span class="NAME">this._absoluteURI</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>132</span> 
-<span class='line'>133</span> </span><span class="WHIT">    </span><span class="COMM">/*  URI fragment part - eg. "foo/bar/wibble"
-<span class='line'>134</span>      */</span><span class="WHIT">
-<span class='line'>135</span> </span><span class="WHIT">    </span><span class="NAME">this._uriFragment</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>136</span> 
-<span class='line'>137</span> </span><span class="WHIT">    </span><span class="COMM">/* Subgraph parsed from instanced model file - null when instancing a predefined Symbol
-<span class='line'>138</span>      */</span><span class="WHIT">
-<span class='line'>139</span> </span><span class="WHIT">    </span><span class="NAME">this._assetNode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 95</span>  *  * &lt;li>{@link #STATE_RENDERING} in which it has successfully loaded and parsed its target file or resolved its
+<span class='line'> 96</span>  * target symbol and is about to render (instance) that target. From here the node will transition to
+<span class='line'> 97</span>  * {@link #STATE_RENDERED} as soon as rendered its target.&lt;/li>
+<span class='line'> 98</span>  * &lt;li>{@link #STATE_RENDERED} in which it has successfully rendered its target at least once. If the target is a file,
+<span class='line'> 99</span>  * then from here the node will transition back to {@link #STATE_INITIAL} as soon as the target has not been rendered in
+<span class='line'>100</span>  * a while and has been destroyed by SceneJS to reclaim memory.&lt;/li>
+<span class='line'>101</span>  * &lt;li>{@link #STATE_FREED} in which it has been dormant too long and SceneJS has reclaimed memory by destroying
+<span class='line'>102</span>  * the subgraph. When next rendered, it will then repeat its load request and transition
+<span class='line'>103</span>  * to {@link #STATE_LOADING}.&lt;/li>
+<span class='line'>104</span>  * &lt;li>{@link #STATE_ERROR} if SceneJS has permanently inactivated the node after load failed&lt;/li>&lt;/ul>
+<span class='line'>105</span>  * &lt;p>Note that when instantiating from a file that has been previously loaded by another Instance, it will transition
+<span class='line'>106</span>  * directly to {@link #STATE_RENDERED}.&lt;p>
+<span class='line'>107</span>  *
+<span class='line'>108</span>  * &lt;p>&lt;b>Loading Cross-Domain&lt;/b>&lt;/p>
+<span class='line'>109</span>  * &lt;p>When SceneJS is configured with a JSONP strategy via {@link SceneJS.setJSONPStrategy}, you can perform the
+<span class='line'>110</span>  * load cross-domain. Otherwise, the URL of the content must be at the same domain as the scene definition's JavaScript file
+<span class='line'>111</span>  * in order to not violate the browser' same-domain security policy.
+<span class='line'>112</span>  *
+<span class='line'>113</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
+<span class='line'>114</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-asset-load">Example 1&lt;/a>&lt;/li>
+<span class='line'>115</span>  * &lt;/ul>
+<span class='line'>116</span>  *
+<span class='line'>117</span>  * @events
+<span class='line'>118</span>  * @extends SceneJS.Node
+<span class='line'>119</span>  * @constructor
+<span class='line'>120</span>  * Creates a new SceneJS.Instance
+<span class='line'>121</span>  *  @param {Object} [cfg] Static configuration object
+<span class='line'>122</span>  * @param {String} cfg.uri URI of file to load
+<span class='line'>123</span>  * @param {int} [cfg.timeoutSecs] Timeout - falls back on any loadTimoutSecs that was configured on the {@link SceneJS.Scene}
+<span class='line'>124</span>  * at the root of the scene graph, or the default 180 seconds if none configured there
+<span class='line'>125</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+<span class='line'>126</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
+<span class='line'>127</span>  */</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="NAME">SceneJS.Instance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"instance"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">    </span><span class="NAME">this._uri</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">    </span><span class="NAME">this._symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">    </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_INITIAL</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> 
+<span class='line'>139</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>140</span> 
-<span class='line'>141</span> </span><span class="WHIT">    </span><span class="COMM">/* Load state for when instancing a model file
-<span class='line'>142</span>      */</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="WHIT">    </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_INITIAL</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>144</span> </span><span class="WHIT">    </span><span class="NAME">this._loadTimoutSecs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">  </span><span class="COMM">// default while null</span><span class="WHIT">
-<span class='line'>145</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>147</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>148</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>149</span> 
-<span class='line'>150</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>151</span> 
-<span class='line'>152</span> </span><span class="COMM">/**
-<span class='line'>153</span>  * State in which load has failed. This can be either due to HTTP error (eg. HTTP 404) or
-<span class='line'>154</span>  * failure to parse the response. The node will now be permanently inactive and stuck in this state.
+<span class='line'>141</span> </span><span class="COMM">/**
+<span class='line'>142</span>  * Initial state of a remote Instance, in which it has not been rendered yet and thus loading of its target file has not
+<span class='line'>143</span>  * yet begun. From here a remote Instance will transition to {@link #STATE_LOADING} as soon as it is first rendered.
+<span class='line'>144</span>  * @const
+<span class='line'>145</span>  */</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="NAME">SceneJS.Instance.STATE_INITIAL</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> 
+<span class='line'>148</span> </span><span class="COMM">/**
+<span class='line'>149</span>  * State of a local or remote-mode Instance in which instantiation has failed. For a remote instance this can be either
+<span class='line'>150</span>  * due to HTTP error (eg. HTTP 404) or failure to parse the response; in the assumption that the file is unavailable for
+<span class='line'>151</span>  * the remainder of the lifetime of the scene graph, a remote Instance will then remain fixed in this state. For a local
+<span class='line'>152</span>  * instance, this condition might be temporary (eg. the target Symbol is just not being rendered yet for some reason),
+<span class='line'>153</span>  * so a local Instance will then try instancing again when next rendered, transitioning to {@link STATE_RENDERING} when
+<span class='line'>154</span>  * that succeeds.
 <span class='line'>155</span>  * @const
 <span class='line'>156</span>  */</span><span class="WHIT">
 <span class='line'>157</span> </span><span class="NAME">SceneJS.Instance.STATE_ERROR</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>158</span> 
 <span class='line'>159</span> </span><span class="COMM">/**
-<span class='line'>160</span>  * State in which load is pending because node has not been rendered yet and hence has
-<span class='line'>161</span>  * not made its load request yet. When next rendered, it will then make its load request
-<span class='line'>162</span>  * and transition to {@link #STATE_LOADING}.
-<span class='line'>163</span>  * @const
-<span class='line'>164</span>  */</span><span class="WHIT">
-<span class='line'>165</span> </span><span class="NAME">SceneJS.Instance.STATE_INITIAL</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>166</span> 
-<span class='line'>167</span> </span><span class="COMM">/**
-<span class='line'>168</span>  * State in which node is awaiting a response to its load request. When the response arrives (asyncronously, ie.
-<span class='line'>169</span>  * either during or between scene renders), the node will then transition to  either {@link #STATE_LOADED}
-<span class='line'>170</span>  * or {@link #STATE_ERROR}, depending on whether or not it successfully parses the response. If the
-<span class='line'>171</span>  * response does not arrive or parse within the timeout period (180 seconds by default, unless configured) it will
-<span class='line'>172</span>  * transition to {@link STATE_ERROR}.
-<span class='line'>173</span>  * @const
-<span class='line'>174</span>  */</span><span class="WHIT">
-<span class='line'>175</span> </span><span class="NAME">SceneJS.Instance.STATE_LOADING</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>176</span> 
-<span class='line'>177</span> </span><span class="COMM">/**
-<span class='line'>178</span>  * State in which node has successfully received its content and parsed it into a subgraph.
-<span class='line'>179</span>  * From here the node will transition to {@link #STATE_RENDERED} as soon as the subgraph has been rendered
-<span class='line'>180</span>  * and traversal has arrived back at this node on the way back up the graph.
-<span class='line'>181</span>  * @const
-<span class='line'>182</span>  */</span><span class="WHIT">
-<span class='line'>183</span> </span><span class="NAME">SceneJS.Instance.STATE_LOADED</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>184</span> 
-<span class='line'>185</span> </span><span class="COMM">/**
-<span class='line'>186</span>  * State in which node has successfully received its content, parsed it into a subgraph, and been rendered
-<span class='line'>187</span>  * at least once. From here the node will transition back to {@link #STATE_INITIAL} as soon as it has not been rendered in
-<span class='line'>188</span>  * a while and has then had its subgraph destroyed by SceneJS to reclaim memory.
-<span class='line'>189</span>  * @const
-<span class='line'>190</span>  */</span><span class="WHIT">
-<span class='line'>191</span> </span><span class="NAME">SceneJS.Instance.STATE_RENDERED</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>192</span> 
-<span class='line'>193</span> </span><span class="COMM">/**
-<span class='line'>194</span>  * State in which load is pending after node has had its subgraph destroyed by SceneJS to reclaim memory after
-<span class='line'>195</span>  * not having been rendered for some time (Eg. is within a {@link SceneJS.Boundary} that has
-<span class='line'>196</span>  * not intersected the view frustum for a while, or perhaps within a {@link SceneJS.Selector} that has
-<span class='line'>197</span>  * not selected it lately). When next rendered, it will then repeat its load request and transition
-<span class='line'>198</span>  * to {@link #STATE_LOADING}.
-<span class='line'>199</span>  * @const
-<span class='line'>200</span>  */</span><span class="WHIT">
-<span class='line'>201</span> </span><span class="NAME">SceneJS.Instance.STATE_FREED</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">4</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>202</span> 
-<span class='line'>203</span> </span><span class="COMM">/**
-<span class='line'>204</span>  * Returns the node's current state. Possible states are {@link #STATE_INITIAL}, {@link #STATE_LOADING},
-<span class='line'>205</span>  * {@link #STATE_LOADED}, {@link #STATE_FREED} and {@link #STATE_ERROR}.
-<span class='line'>206</span>  * @returns {int} The state
-<span class='line'>207</span>  */</span><span class="WHIT">
-<span class='line'>208</span> </span><span class="NAME">SceneJS.Instance.prototype.getState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>209</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._state</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>160</span>  * State of a local or remote Instance in which it will attempt to instantiate its target when next rendered. For a
+<span class='line'>161</span>  * remote Instance, this is when it has successfully loaded its target file and parsed it into a subgraph. For a local
+<span class='line'>162</span>  * Instance, this is when it is ready to attempt aquisition of its target Symbol. From here, a remote node will
+<span class='line'>163</span>  * transition to {@link #STATE_RENDERING} and instantiates its target when next rendered. A local Instance will do
+<span class='line'>164</span>  * the same when next rendered, providing it succeeds in finding its target Symbol, otherwise the local Instance will
+<span class='line'>165</span>  * transition to {@link #STATE_ERROR}.
+<span class='line'>166</span>  * target.
+<span class='line'>167</span>  * @const
+<span class='line'>168</span>  */</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="NAME">SceneJS.Instance.STATE_READY</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">2</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>170</span> 
+<span class='line'>171</span> 
+<span class='line'>172</span> </span><span class="COMM">/**
+<span class='line'>173</span>  * State of a local or remote Instance in which it is rendering its target. While in this state, you can
+<span class='line'>174</span>  * obtain its target subgraph through its getTarget() method. From this state, the Instance will transition to
+<span class='line'>175</span>  * {@link #STATE_READY} once it has completed rendering the target.
+<span class='line'>176</span>  * @const
+<span class='line'>177</span>  */</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="NAME">SceneJS.Instance.STATE_RENDERING</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">3</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>179</span> 
+<span class='line'>180</span> </span><span class="COMM">/**
+<span class='line'>181</span>  * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
+<span class='line'>182</span>  * {@link #STATE_READY} and {@link #STATE_ERROR}.
+<span class='line'>183</span>  * @returns {int} The state
+<span class='line'>184</span>  */</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="NAME">SceneJS.Instance.prototype.getState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._state</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>188</span> 
+<span class='line'>189</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="NAME">SceneJS.Instance.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.uri</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">        </span><span class="NAME">this._uri</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">        </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_READY</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">        </span><span class="NAME">this._mustExist</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.mustExist</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> 
+<span class='line'>198</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="NAME">SceneJS.Instance.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._uri</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">        </span><span class="NAME">this._instanceSymbol</span><span class="PUNC">(</span><span class="NAME">this._uri</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">SceneJS._errorModule.fatalError</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.InvalidNodeConfigException</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">                        </span><span class="STRN">"SceneJS.instance uri property not defined"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>210</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>211</span> 
 <span class='line'>212</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'>213</span> </span><span class="NAME">SceneJS.Instance.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>214</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.uri</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>215</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.uri.substr</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">5</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">"http:"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>216</span> 
-<span class='line'>217</span> </span><span class="WHIT">            </span><span class="COMM">/* Absolute URI
-<span class='line'>218</span>              */</span><span class="WHIT">
-<span class='line'>219</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri.indexOf</span><span class="PUNC">(</span><span class="STRN">"#"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>220</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>221</span> 
-<span class='line'>222</span> </span><span class="WHIT">                </span><span class="COMM">/* Absolute URI with no fragment - references an entire model file
-<span class='line'>223</span>                  */</span><span class="WHIT">
-<span class='line'>224</span> </span><span class="WHIT">                </span><span class="NAME">this._absoluteURI</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>225</span> </span><span class="WHIT">                </span><span class="NAME">this._uriFragment</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>226</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>227</span> 
-<span class='line'>228</span> </span><span class="WHIT">                </span><span class="COMM">/* Absolute URI with fragment - references an asset within a model file
-<span class='line'>229</span>                  */</span><span class="WHIT">
-<span class='line'>230</span> </span><span class="WHIT">                </span><span class="NAME">this._absoluteURI</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri.substr</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>231</span> </span><span class="WHIT">                </span><span class="NAME">this._uriFragment</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri.substr</span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>232</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>233</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>234</span> 
-<span class='line'>235</span> </span><span class="WHIT">            </span><span class="COMM">/* Relative URI - just the fragment - references a Symbol in this scene graph
-<span class='line'>236</span>              */</span><span class="WHIT">
-<span class='line'>237</span> </span><span class="WHIT">            </span><span class="NAME">this._absoluteURI</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>238</span> </span><span class="WHIT">            </span><span class="NAME">this._uriFragment</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.uri.substr</span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>239</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>240</span> </span><span class="WHIT">        </span><span class="NAME">this._loadTimeoutSecs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params._loadTimeoutSecs</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>241</span> </span><span class="WHIT">        </span><span class="NAME">this._mustExist</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params.mustExist</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>242</span> </span><span class="WHIT">        </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_INITIAL</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>243</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>244</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>245</span> 
-<span class='line'>246</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'>247</span> </span><span class="NAME">SceneJS.Instance.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>248</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>249</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>250</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>251</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._absoluteURI</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>252</span> </span><span class="WHIT">        </span><span class="NAME">this._instanceFile</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="NAME">SceneJS.Instance.prototype._changeState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">newState</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">oldState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._state</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="WHIT">    </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>216</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._listeners</span><span class="PUNC">[</span><span class="STRN">"state-changed"</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// Optimisation</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">        </span><span class="NAME">this._fireEvent</span><span class="PUNC">(</span><span class="STRN">"state-changed"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">oldState</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">oldState</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">exception</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>220</span> 
+<span class='line'>221</span> </span><span class="COMM">/* Returns a traversal context for traversal of the children of the given target node.
+<span class='line'>222</span>  *
+<span class='line'>223</span>  * If this Instance has children then it will have a callback that will render them after the last of
+<span class='line'>224</span>  * the target's sub-nodes have rendered, as effectively the children of that last node. The callback will
+<span class='line'>225</span>  * create a traversal context for the sub-nodes that will:
+<span class='line'>226</span>  *
+<span class='line'>227</span>  * - initially flag the traversal as inside the right fringe if the there are more than one child
+<span class='line'>228</span>  * - pass on any callback that was passed in on the traversal context to this Instance
+<span class='line'>229</span>  * - pass on any WithConfigs configs that were passed in on the traversal context to this Instance
+<span class='line'>230</span>  */</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="NAME">SceneJS.Instance.prototype._createTargetTraversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>232</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>233</span> </span><span class="WHIT">    </span><span class="NAME">this._superCallback</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">traversalContext.callback</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>234</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_this</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>235</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">        </span><span class="NAME">this._callback</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>237</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">subTraversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">                </span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_this._superCallback</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="WHIT">                </span><span class="NAME">insideRightFringe</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_this._children.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">                </span><span class="NAME">configs</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">                </span><span class="NAME">configsModes</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.configsModes</span><span class="WHIT">
+<span class='line'>242</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="WHIT">            </span><span class="NAME">_this._renderNodes</span><span class="PUNC">(</span><span class="NAME">subTraversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>244</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>245</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>246</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>247</span> </span><span class="WHIT">        </span><span class="NAME">callback</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">this._callback</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>248</span> </span><span class="WHIT">        </span><span class="NAME">insideRightFringe</span><span class="PUNC">:</span><span class="WHIT">  </span><span class="NAME">target._children.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>249</span> </span><span class="WHIT">        </span><span class="NAME">configs</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>250</span> </span><span class="WHIT">        </span><span class="NAME">configsModes</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.configsModes</span><span class="WHIT">
+<span class='line'>251</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>252</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>253</span> 
-<span class='line'>254</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._uriFragment</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>255</span> </span><span class="WHIT">        </span><span class="NAME">this._instanceSymbol</span><span class="PUNC">(</span><span class="NAME">this._uriFragment</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>256</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>257</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>258</span> 
-<span class='line'>259</span> </span><span class="COMM">/** Instances a model defined in a file - will instance a particular resource if a fragment was provided on the URI
-<span class='line'>260</span>  *
-<span class='line'>261</span>  * @private
-<span class='line'>262</span>  */</span><span class="WHIT">
-<span class='line'>263</span> </span><span class="NAME">SceneJS.Instance.prototype._instanceFile</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>264</span> 
-<span class='line'>265</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_LOADED</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_RENDERED</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>266</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">SceneJS_loadModule.getAsset</span><span class="PUNC">(</span><span class="NAME">this._absoluteURI</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// evicted from cache - must reload</span><span class="WHIT">
-<span class='line'>267</span> </span><span class="WHIT">            </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_FREED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>268</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>269</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>270</span> </span><span class="WHIT">    </span><span class="KEYW">switch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._state</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>271</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_RENDERED</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>272</span> </span><span class="WHIT">            </span><span class="NAME">this._renderAssetNode</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>273</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>274</span> 
-<span class='line'>275</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_LOADED</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>276</span> </span><span class="WHIT">            </span><span class="NAME">this._renderAssetNode</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>277</span> </span><span class="WHIT">            </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_RENDERED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>278</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>279</span> 
-<span class='line'>280</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_LOADING</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>281</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>254</span> </span><span class="COMM">/**
+<span class='line'>255</span>  * Recursively renders the subtrees (child nodes) of the Instance in left-to-right, depth-first order. As the recursion
+<span class='line'>256</span>  * descends, the traversalContext tracks whether the current node is inside the right fringe of the right-most subtree.
+<span class='line'>257</span>  * As soon as the current node is at the right fringe and has no children, then it is the last node to render among all
+<span class='line'>258</span>  * the sub-nodes (the "terminal node"). If a callback is then present on the traversalContext, then that means that this
+<span class='line'>259</span>  * Instance is actually within a subtree of a Symbol node that is being instanced by another super-Instance. The
+<span class='line'>260</span>  * callback is then invoked, which causes the traversal of the super-Instance's subtree as if it were a child of the
+<span class='line'>261</span>  * terminal node.
+<span class='line'>262</span>  *
+<span class='line'>263</span>  * @param traversalContext
+<span class='line'>264</span>  * @param data
+<span class='line'>265</span>  */</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="NAME">SceneJS.Instance.prototype._renderNodes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">numChildren</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._children.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>268</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">child</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>269</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">childConfigs</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>270</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">configUnsetters</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>271</span> 
+<span class='line'>272</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">numChildren</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>273</span> 
+<span class='line'>274</span> </span><span class="WHIT">        </span><span class="COMM">/* Instance has no child nodes - render super-Instance's child nodes
+<span class='line'>275</span>          * through callback if one is passed in
+<span class='line'>276</span>          */</span><span class="WHIT">
+<span class='line'>277</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">traversalContext.callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>278</span> </span><span class="WHIT">            </span><span class="NAME">traversalContext.callback</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>279</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>280</span> 
+<span class='line'>281</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>282</span> 
-<span class='line'>283</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_INITIAL</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>284</span> </span><span class="WHIT">            </span><span class="NAME">this._assetNode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_loadModule.getAsset</span><span class="PUNC">(</span><span class="NAME">this._absoluteURI</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>285</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._assetNode</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>286</span> </span><span class="WHIT">                </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_RENDERED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>287</span> </span><span class="WHIT">                </span><span class="NAME">this._renderAssetNode</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>288</span> </span><span class="WHIT">                </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>289</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="COMM">// else fall through</span><span class="WHIT">
-<span class='line'>290</span> 
-<span class='line'>291</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_FREED</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>292</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_this</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>293</span> </span><span class="WHIT">            </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_LOADING</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>294</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">isLibrary</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._uriFragment</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>295</span> 
-<span class='line'>296</span> </span><span class="WHIT">            </span><span class="NAME">SceneJS_loadModule.loadAsset</span><span class="PUNC">(</span><span class="COMM">// Process killed automatically on error or abort</span><span class="WHIT">
-<span class='line'>297</span> </span><span class="WHIT">                    </span><span class="NAME">this._absoluteURI</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>298</span> </span><span class="WHIT">                    </span><span class="NAME">this._loadTimeoutSecs</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">// default when null</span><span class="WHIT">
-<span class='line'>299</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">asset</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onLoaded</span><span class="WHIT">
-<span class='line'>300</span> </span><span class="WHIT">                        </span><span class="NAME">_this._assetNode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">asset</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>301</span> </span><span class="WHIT">                        </span><span class="NAME">_this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_LOADED</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>302</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>303</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onTimeout</span><span class="WHIT">
-<span class='line'>304</span> </span><span class="WHIT">                        </span><span class="NAME">_this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_ERROR</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>305</span> </span><span class="WHIT">                        </span><span class="NAME">SceneJS_errorModule.error</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.LoadTimeoutException</span><span class="PUNC">(</span><span class="STRN">"Load timed out - uri: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_this._absoluteURI</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>306</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>307</span> </span><span class="WHIT">                    </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">exception</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">// onError</span><span class="WHIT">
-<span class='line'>308</span> </span><span class="WHIT">                        </span><span class="NAME">_this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_ERROR</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>309</span> </span><span class="WHIT">                        </span><span class="NAME">exception.message</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"Load failed - "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">exception.message</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">" - uri: "</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">_this._absoluteURI</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>310</span> </span><span class="WHIT">                        </span><span class="NAME">SceneJS_errorModule.error</span><span class="PUNC">(</span><span class="NAME">exception</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>311</span> </span><span class="WHIT">                    </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>312</span> </span><span class="WHIT">                    </span><span class="NAME">isLibrary</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>313</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="WHIT">        </span><span class="COMM">/* Instance has child nodes - last node in Instance's subtree will invoke
+<span class='line'>284</span>          * the callback, if any (from within its SceneJS.Node#_renderNodes)
+<span class='line'>285</span>          */</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">numChildren</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">            </span><span class="NAME">child</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._children</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>288</span> 
+<span class='line'>289</span> </span><span class="WHIT">            </span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="WHIT">            </span><span class="NAME">configUnsetters</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>291</span> 
+<span class='line'>292</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">child._sid</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">                </span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="PUNC">[</span><span class="STRN">"#"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">child._sid</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">childConfigs</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>295</span> </span><span class="WHIT">                    </span><span class="NAME">configUnsetters</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._setConfigs</span><span class="PUNC">(</span><span class="NAME">childConfigs</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">child</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>296</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>298</span> 
+<span class='line'>299</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">childTraversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="WHIT">                </span><span class="NAME">insideRightFringe</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">numChildren</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">                </span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.callback</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="WHIT">                </span><span class="NAME">configs</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="WHIT">                </span><span class="NAME">configsModes</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.configsModes</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>305</span> 
+<span class='line'>306</span> </span><span class="WHIT">            </span><span class="NAME">child._render.call</span><span class="PUNC">(</span><span class="NAME">child</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">childTraversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>307</span> 
+<span class='line'>308</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">configUnsetters</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">                </span><span class="NAME">this._unsetConfigs</span><span class="PUNC">(</span><span class="NAME">configUnsetters</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>311</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>312</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>313</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>314</span> 
-<span class='line'>315</span> </span><span class="WHIT">        </span><span class="KEYW">case</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_ERROR</span><span class="PUNC">:</span><span class="WHIT">
-<span class='line'>316</span> </span><span class="WHIT">            </span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>317</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>318</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>319</span> 
-<span class='line'>320</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'>321</span> </span><span class="NAME">SceneJS.Instance.prototype._changeState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">newState</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>322</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">oldState</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._state</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>323</span> </span><span class="WHIT">    </span><span class="NAME">this._state</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>324</span> </span><span class="WHIT">    </span><span class="NAME">this._fireEvent</span><span class="PUNC">(</span><span class="STRN">"state-changed"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">oldState</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">oldState</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">newState</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>325</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>326</span> 
-<span class='line'>327</span> </span><span class="COMM">/**
-<span class='line'>328</span>  * Instances either a loaded subgraph, or a Symbol in a loaded subgraph.
-<span class='line'>329</span>  *
-<span class='line'>330</span>  * @private
-<span class='line'>331</span>  */</span><span class="WHIT">
-<span class='line'>332</span> </span><span class="NAME">SceneJS.Instance.prototype._renderAssetNode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>333</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._uriFragment</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>334</span> 
-<span class='line'>335</span> </span><span class="WHIT">        </span><span class="COMM">/* Instancing a Symbol - fragment is an absolute SID path
-<span class='line'>336</span>          */</span><span class="WHIT">
-<span class='line'>337</span> </span><span class="WHIT">        </span><span class="NAME">this._instanceSymbol</span><span class="PUNC">(</span><span class="STRN">"/"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this._assetNode.getSID</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"/"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this._uriFragment</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>338</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>339</span> </span><span class="WHIT">        </span><span class="NAME">this._assetNode._render</span><span class="PUNC">(</span><span class="NAME">this._createTargetTraversalContext</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._assetNode</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>340</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>341</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="COMM">/** Instances a Symbol that is currently defined after being rendered prior to this Instance
+<span class='line'>316</span>  *
+<span class='line'>317</span>  * @private
+<span class='line'>318</span>  * @param symbolSIDPath Path to Symbol, relative to this Instance
+<span class='line'>319</span>  * @param traversalContext
+<span class='line'>320</span>  * @param data
+<span class='line'>321</span>  */</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="NAME">SceneJS.Instance.prototype._instanceSymbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">symbolSIDPath</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">    </span><span class="NAME">this._symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._instancingModule.acquireInstance</span><span class="PUNC">(</span><span class="NAME">symbolSIDPath</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._symbol</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">        </span><span class="COMM">//SceneJS._loggingModule.info("SceneJS.Instance could not find SceneJS.Symbol to instance: '" + symbolSIDPath + "'");</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._mustExist</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>327</span> </span><span class="WHIT">            </span><span class="NAME">SceneJS._instancingModule.releaseInstance</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>328</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">SceneJS._errorModule.fatalError</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>329</span> </span><span class="WHIT">                    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.SymbolNotFoundException</span><span class="WHIT">
+<span class='line'>330</span> </span><span class="WHIT">                            </span><span class="PUNC">(</span><span class="STRN">"SceneJS.Instance could not find SceneJS.Symbol to instance: '"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">symbolSIDPath</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"'"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>331</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">        </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_ERROR</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>333</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>334</span> </span><span class="WHIT">        </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_RENDERING</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>335</span> </span><span class="WHIT">        </span><span class="NAME">this._symbol._renderNodes</span><span class="PUNC">(</span><span class="NAME">this._createTargetTraversalContext</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._symbol</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>336</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._instancingModule.releaseInstance</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>337</span> </span><span class="WHIT">        </span><span class="NAME">this._changeState</span><span class="PUNC">(</span><span class="NAME">SceneJS.Instance.STATE_READY</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>338</span> </span><span class="WHIT">        </span><span class="NAME">this._symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>339</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>340</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>341</span> 
 <span class='line'>342</span> 
-<span class='line'>343</span> </span><span class="COMM">/* Returns a traversal context for traversal of the children of the given target node.
+<span class='line'>343</span> </span><span class="COMM">/**
 <span class='line'>344</span>  *
-<span class='line'>345</span>  * If this Instance has children then it will have a callback that will render them after the last of
-<span class='line'>346</span>  * the target's sub-nodes have rendered, as effectively the children of that last node. The callback will
-<span class='line'>347</span>  * create a traversal context for the sub-nodes that will:
-<span class='line'>348</span>  *
-<span class='line'>349</span>  * - initially flag the traversal as inside the right fringe if the there are more than one child
-<span class='line'>350</span>  * - pass on any callback that was passed in on the traversal context to this Instance
-<span class='line'>351</span>  * - pass on any WithConfigs configs that were passed in on the traversal context to this Instance
-<span class='line'>352</span>  */</span><span class="WHIT">
-<span class='line'>353</span> </span><span class="NAME">SceneJS.Instance.prototype._createTargetTraversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">target</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>354</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>355</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_superCallback</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">traversalContext.callback</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>356</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_this</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>357</span> </span><span class="WHIT">    </span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>358</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">subTraversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>359</span> </span><span class="WHIT">            </span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_superCallback</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>360</span> </span><span class="WHIT">            </span><span class="NAME">insideRightFringe</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">_this._children.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>361</span> </span><span class="WHIT">            </span><span class="NAME">configs</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="WHIT">
-<span class='line'>362</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>363</span> </span><span class="WHIT">        </span><span class="NAME">_this._renderNodes</span><span class="PUNC">(</span><span class="NAME">subTraversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>364</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>365</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>366</span> </span><span class="WHIT">        </span><span class="NAME">callback</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">callback</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>367</span> </span><span class="WHIT">        </span><span class="NAME">insideRightFringe</span><span class="PUNC">:</span><span class="WHIT">  </span><span class="NAME">target._children.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>368</span> </span><span class="WHIT">        </span><span class="NAME">configs</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="WHIT">
-<span class='line'>369</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>370</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>371</span> 
-<span class='line'>372</span> </span><span class="COMM">/**
-<span class='line'>373</span>  * Recursively renders the subtrees (child nodes) of the Instance in left-to-right, depth-first order. As the recursion
-<span class='line'>374</span>  * descends, the traversalContext tracks whether the current node is inside the right fringe of the right-most subtree.
-<span class='line'>375</span>  * As soon as the current node is at the right fringe and has no children, then it is the last node to render among all
-<span class='line'>376</span>  * the sub-nodes (the "terminal node"). If a callback is then present on the traversalContext, then that means that this
-<span class='line'>377</span>  * Instance is actually within a subtree of a Symbol node that is being instanced by another super-Instance. The
-<span class='line'>378</span>  * callback is then invoked, which causes the traversal of the super-Instance's subtree as if it were a child of the
-<span class='line'>379</span>  * terminal node.
-<span class='line'>380</span>  *
-<span class='line'>381</span>  * @param traversalContext
-<span class='line'>382</span>  * @param data
-<span class='line'>383</span>  */</span><span class="WHIT">
-<span class='line'>384</span> </span><span class="NAME">SceneJS.Instance.prototype._renderNodes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>385</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">numChildren</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._children.length</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>386</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">child</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>387</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">childConfigs</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>388</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">configUnsetters</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>389</span> 
-<span class='line'>390</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">numChildren</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>391</span> 
-<span class='line'>392</span> </span><span class="WHIT">        </span><span class="COMM">/* Instance has no child nodes - render super-Instance's child nodes
-<span class='line'>393</span>          * through callback if one is passed in
-<span class='line'>394</span>          */</span><span class="WHIT">
-<span class='line'>395</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">traversalContext.callback</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>396</span> </span><span class="WHIT">            </span><span class="NAME">traversalContext.callback</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>397</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>398</span> 
-<span class='line'>399</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>400</span> 
-<span class='line'>401</span> </span><span class="WHIT">        </span><span class="COMM">/* Instance has child nodes - last node in Instance's subtree will invoke
-<span class='line'>402</span>          * the callback, if any (from within its SceneJS.Node#_renderNodes)
-<span class='line'>403</span>          */</span><span class="WHIT">
-<span class='line'>404</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">numChildren</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>405</span> </span><span class="WHIT">            </span><span class="NAME">child</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._children</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>406</span> 
-<span class='line'>407</span> </span><span class="WHIT">            </span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>408</span> </span><span class="WHIT">            </span><span class="NAME">configUnsetters</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>409</span> 
-<span class='line'>410</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">child._sid</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>411</span> </span><span class="WHIT">                </span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="PUNC">[</span><span class="STRN">"#"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">child._sid</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>412</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">childConfigs</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>413</span> </span><span class="WHIT">                    </span><span class="NAME">configUnsetters</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._setConfigs</span><span class="PUNC">(</span><span class="NAME">childConfigs</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">child</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>414</span> </span><span class="WHIT">                </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>415</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>416</span> 
-<span class='line'>417</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">childTraversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>418</span> </span><span class="WHIT">                </span><span class="NAME">insideRightFringe</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">numChildren</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>419</span> </span><span class="WHIT">                </span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">traversalContext.callback</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>420</span> </span><span class="WHIT">                </span><span class="NAME">configs</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">childConfigs</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">traversalContext.configs</span><span class="WHIT">
-<span class='line'>421</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>422</span> 
-<span class='line'>423</span> </span><span class="WHIT">            </span><span class="NAME">child._render.call</span><span class="PUNC">(</span><span class="NAME">child</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">childTraversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>424</span> 
-<span class='line'>425</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">configUnsetters</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>426</span> </span><span class="WHIT">                </span><span class="NAME">this._unsetConfigs</span><span class="PUNC">(</span><span class="NAME">configUnsetters</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>427</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>428</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>429</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>430</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>431</span> 
-<span class='line'>432</span> </span><span class="COMM">/** Instances a Symbol that is currently defined after being rendered prior to this Instance
-<span class='line'>433</span>  *
-<span class='line'>434</span>  * @private
-<span class='line'>435</span>  * @param symbolSIDPath Path to Symbol, relative to this Instance
-<span class='line'>436</span>  * @param traversalContext
-<span class='line'>437</span>  * @param data
-<span class='line'>438</span>  */</span><span class="WHIT">
-<span class='line'>439</span> </span><span class="NAME">SceneJS.Instance.prototype._instanceSymbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">symbolSIDPath</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>440</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">symbol</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_instancingModule.acquireInstance</span><span class="PUNC">(</span><span class="NAME">symbolSIDPath</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>441</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">symbol</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>442</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_loggingModule.info</span><span class="PUNC">(</span><span class="STRN">"SceneJS.Instance could not find SceneJS.Symbol to instance: '"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">symbolSIDPath</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"'"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>443</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._mustExist</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>444</span> </span><span class="WHIT">            </span><span class="NAME">SceneJS_instancingModule.releaseInstance</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>445</span> </span><span class="WHIT">            </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">SceneJS_errorModule.fatalError</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'>446</span> </span><span class="WHIT">                    </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.SymbolNotFoundException</span><span class="WHIT">
-<span class='line'>447</span> </span><span class="WHIT">                            </span><span class="PUNC">(</span><span class="STRN">"SceneJS.Instance could not find SceneJS.Symbol to instance: '"</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">symbolSIDPath</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"'"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>448</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>449</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>450</span> </span><span class="WHIT">        </span><span class="NAME">symbol._renderNodes</span><span class="PUNC">(</span><span class="NAME">this._createTargetTraversalContext</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">symbol</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>451</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_instancingModule.releaseInstance</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>452</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>453</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>454</span> 
-<span class='line'>455</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Instance} instance
-<span class='line'>456</span>  *  @param {Object} [cfg] Static configuration object
-<span class='line'>457</span>  * @param {String} cfg.uri URI of file to load
-<span class='line'>458</span>  * @param {int} [cfg.timeoutSecs] Timeout - falls back on any loadTimoutSecs that was configured on the {@link SceneJS.Scene}
-<span class='line'>459</span>  * at the root of the scene graph, or the default 180 seconds if none configured there
-<span class='line'>460</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
-<span class='line'>461</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
-<span class='line'>462</span>  * @returns {SceneJS.Instance}
-<span class='line'>463</span>  */</span><span class="WHIT">
-<span class='line'>464</span> </span><span class="NAME">SceneJS.instance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>465</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>466</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Instance.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>467</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>468</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>469</span> </span></pre></body></html>
+<span class='line'>345</span>  */</span><span class="WHIT">
+<span class='line'>346</span> </span><span class="NAME">SceneJS.Instance.prototype.getTarget</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>347</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.state</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance.STATE_RENDERING</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>348</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>349</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>350</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._symbol</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>351</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>352</span> 
+<span class='line'>353</span> </span><span class="COMM">/**
+<span class='line'>354</span>  *
+<span class='line'>355</span>  */</span><span class="WHIT">
+<span class='line'>356</span> </span><span class="NAME">SceneJS.Instance.prototype.getURI</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>357</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._uri</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>358</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>359</span> 
+<span class='line'>360</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Instance} instance
+<span class='line'>361</span>  *  @param {Object} [cfg] Static configuration object
+<span class='line'>362</span>  * @param {String} cfg.uri URI of file to load
+<span class='line'>363</span>  * @param {int} [cfg.timeoutSecs] Timeout - falls back on any loadTimoutSecs that was configured on the {@link SceneJS.Scene}
+<span class='line'>364</span>  * at the root of the scene graph, or the default 180 seconds if none configured there
+<span class='line'>365</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+<span class='line'>366</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
+<span class='line'>367</span>  * @returns {SceneJS.Instance}
+<span class='line'>368</span>  */</span><span class="WHIT">
+<span class='line'>369</span> </span><span class="NAME">SceneJS.instance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>370</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Instance</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>371</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Instance.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>372</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>373</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>374</span> </span></pre></body></html>

@@ -244,7 +244,11 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
-	<li><a href="symbols/SceneJS.Name.html">SceneJS.Name</a></li>
+	<li><a href="symbols/SceneJS.ModuleInstallFailureException.html">SceneJS.ModuleInstallFailureException</a></li>
+	
+	<li><a href="symbols/SceneJS.ModuleLoadTimeoutException.html">SceneJS.ModuleLoadTimeoutException</a></li>
+	
+	<li><a href="symbols/SceneJS.ModuleNotFoundException.html">SceneJS.ModuleNotFoundException</a></li>
 	
 	<li><a href="symbols/SceneJS.Node.html">SceneJS.Node</a></li>
 	
@@ -278,6 +282,14 @@ ul.inheritsList
 	
 	<li><a href="symbols/SceneJS.Selector.html">SceneJS.Selector</a></li>
 	
+	<li><a href="symbols/SceneJS.Socket.html">SceneJS.Socket</a></li>
+	
+	<li><a href="symbols/SceneJS.SocketErrorException.html">SceneJS.SocketErrorException</a></li>
+	
+	<li><a href="symbols/SceneJS.SocketNotSupportedException.html">SceneJS.SocketNotSupportedException</a></li>
+	
+	<li><a href="symbols/SceneJS.SocketServerErrorException.html">SceneJS.SocketServerErrorException</a></li>
+	
 	<li><a href="symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
 	<li><a href="symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
@@ -297,6 +309,10 @@ ul.inheritsList
 	<li><a href="symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
 	
 	<li><a href="symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
+	
+	<li><a href="symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a></li>
+	
+	<li><a href="symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a></li>
 	
 	<li><a href="symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -503,8 +519,21 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
-				<h2><a href="symbols/SceneJS.Name.html">SceneJS.Name</a></h2>
-				A scene node that specifies a name for the nodes in its subgraph.
+				<h2><a href="symbols/SceneJS.ModuleInstallFailureException.html">SceneJS.ModuleInstallFailureException</a></h2>
+				Exception thrown by SceneJS#installModule when a module caused an exception while installing.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.ModuleLoadTimeoutException.html">SceneJS.ModuleLoadTimeoutException</a></h2>
+				Exception thrown by SceneJS#requireModule when a module does not load within timeout interval.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.ModuleNotFoundException.html">SceneJS.ModuleNotFoundException</a></h2>
+				Exception thrown by SceneJS.UseModule when it cannot find a module matching it's name configuration
+property.
 			</div>
 			<hr />
 			
@@ -607,6 +636,33 @@ at, and the direction of "up".
 			<hr />
 			
 			<div>
+				<h2><a href="symbols/SceneJS.Socket.html">SceneJS.Socket</a></h2>
+				Binds its subgraph to a WebSocket, providing a server with the ability to add, remove and manipulate content within the subgraph
+
+<p>The SceneJS.Socket node enables a server to dynamically participate in the construction, destruction and
+configuration of its subgraph.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.SocketErrorException.html">SceneJS.SocketErrorException</a></h2>
+				Exception thrown to signify error condition on a Socket
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.SocketNotSupportedException.html">SceneJS.SocketNotSupportedException</a></h2>
+				Exception thrown to signify that browser does not support the Socket node (ie.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.SocketServerErrorException.html">SceneJS.SocketServerErrorException</a></h2>
+				Exception thrown to signify error response by socket server.
+			</div>
+			<hr />
+			
+			<div>
 				<h2><a href="symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></h2>
 				A Scene node that defines a region within a <a href="symbols/SceneJS.LookAt.html">SceneJS.LookAt</a> in which the translations specified by that node have no effect.
 			</div>
@@ -664,7 +720,22 @@ a specified config value.
 			
 			<div>
 				<h2><a href="symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></h2>
-				A scene node that specifies values to set on nodes in it's subgraph as they are rendered .
+				Invokes addXXX, removeXXX and setXXX methods on the nodes in its subgraph during traversal to set, delete or add
+elements on them.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a></h2>
+				Exception thrown by <a href="symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> when in strictNodes mode and a node reference
+on its configuration map could not be resolved to any nodes in it's subgraph.
+			</div>
+			<hr />
+			
+			<div>
+				<h2><a href="symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a></h2>
+				Exception thrown by <a href="symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> when in strictProperties mode and a property reference
+on its configuration map could not be resolved to any methods on a specified target node in it's subgraph.
 			</div>
 			<hr />
 			
@@ -678,7 +749,7 @@ a specified config value.
 		</div>
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:22 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blankt">JsDoc Toolkit</a> 2.3.2 on Sat Jul 17 2010 23:40:01 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

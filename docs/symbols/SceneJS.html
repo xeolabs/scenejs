@@ -249,7 +249,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
-	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
+	<li><a href="../symbols/SceneJS.ModuleInstallFailureException.html">SceneJS.ModuleInstallFailureException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleLoadTimeoutException.html">SceneJS.ModuleLoadTimeoutException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleNotFoundException.html">SceneJS.ModuleNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Node.html">SceneJS.Node</a></li>
 	
@@ -283,6 +287,14 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a></li>
 	
+	<li><a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketErrorException.html">SceneJS.SocketErrorException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketNotSupportedException.html">SceneJS.SocketNotSupportedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketServerErrorException.html">SceneJS.SocketServerErrorException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
 	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
@@ -302,6 +314,10 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -467,6 +483,15 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.getDebugConfigs">getDebugConfigs</a></b>(path)
+								</div>
+								<div class="description">Gets debugging configurations</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.instance">instance</a></b>(cfg, fn, childNodes)
 								</div>
 								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> instance</div>
@@ -566,15 +591,6 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.name">name</a></b>(args)
-								</div>
-								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Name.html">SceneJS.Name</a> instance</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
 								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.node">node</a></b>(cfg, fn, arguments)
 								</div>
 								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a> instance</div>
@@ -647,10 +663,18 @@ SceneJS name space
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.setJSONPStrategy">setJSONPStrategy</a></b>(strategy)
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.setDebugConfigs">setDebugConfigs</a></b>()
 								</div>
-								<div class="description">Configures SceneJS with a strategy to allow it to use a particular Web service to proxy cross-domain requests
-by nodes such as <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> when their URIs are not in the local domain.</div>
+								<div class="description">Sets debugging configurations.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">SceneJS.<b><a href="../symbols/SceneJS.html#.socket">socket</a></b>(cfg)
+								</div>
+								<div class="description">Factory function that returns a new <a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a> instance</div>
 							</td>
 						</tr>
 					
@@ -1365,6 +1389,45 @@ a "process-killed" event.</p><p>Example:</p><pre><code>
 
 					<hr />
 				
+					<a name=".getDebugConfigs"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">SceneJS.</span><b>getDebugConfigs</b>(path)
+					
+					</div>
+					<div class="description">
+						Gets debugging configurations
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_debug_debugModule.js.html">debugModule.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>path</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".instance"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1914,52 +1977,6 @@ at the root of the scene graph, or the default 180 seconds if none configured th
 
 					<hr />
 				
-					<a name=".name"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{<a href="../symbols/SceneJS.Name.html">SceneJS.Name</a>}</span>
-					<span class="light">SceneJS.</span><b>name</b>(args)
-					
-					</div>
-					<div class="description">
-						Factory function that returns a new <a href="../symbols/SceneJS.Name.html">SceneJS.Name</a> instance
-						
-							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_name_name.js.html">name.js</a>.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Arguments}</span> <b>args</b>
-									
-								</dt>
-								<dd>Variable arguments that are passed to the SceneJS.Name constructor</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Name.html">SceneJS.Name</a>}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
 					<a name=".node"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -2268,34 +2285,46 @@ at the root of the scene graph, or the default 180 seconds if none configured th
 
 					<hr />
 				
-					<a name=".setJSONPStrategy"> </a>
+					<a name=".setDebugConfigs"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">SceneJS.</span><b>setJSONPStrategy</b>(strategy)
+					<span class="light">SceneJS.</span><b>setDebugConfigs</b>()
 					
 					</div>
 					<div class="description">
-						Configures SceneJS with a strategy to allow it to use a particular Web service to proxy cross-domain requests
-by nodes such as <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> when their URIs are not in the local domain. As shown in the example below,
-the strategy must implement two methods, one to create the request URL and another to extract a string of data
-from the response.
-<p><b>Example strategy- </b>specifying a JSONP handler for the Yahoo! Query Language (YQL) API:</p>
-<pre><code>
-SceneJS.setJSONPStrategy({
-         request : function(url, format, callback) {
-                 return "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20" + format + "%20where%20url='"
-                                  + url + "'&format=" + format + "&callback=" + callback;
-          },
-
-         response : function(data) {
-                 return data.results[0];
-         }
- });
-</code></pre>
+						Sets debugging configurations.
 						
 							<br />
-							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_instancing_loadModule.js.html">loadModule.js</a>.
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_debug_debugModule.js.html">debugModule.js</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".socket"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{<a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a>}</span>
+					<span class="light">SceneJS.</span><b>socket</b>(cfg)
+					
+					</div>
+					<div class="description">
+						Factory function that returns a new <a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a> instance
+						
+							<br />
+							<i>Defined in: </i> <a href="../symbols/src/_home_lindsay_xeolabs_projects_scenejs_src_scenejs_socket_socket.js.html">socket.js</a>.
 						
 						
 					</div>
@@ -2307,16 +2336,29 @@ SceneJS.setJSONPStrategy({
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>strategy</b>
-									
+									<span class="light fixedFont">{Object}</span> <b>cfg</b>
+									<i>Optional</i>
 								</dt>
-								<dd>{{request:function(url:String, format:String, callback:String), String response: function(data:String) }}</dd>
+								<dd>Static configuration object</dd>
 							
 							</dl>
 						
 						
 						
+							<dl class="detailList">
+							<dt class="heading">Since:</dt>
+								<dd>Version 0.7.6</dd>
+							</dl>
+							</dl>
 						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a>}</span> </dd>
+							
+							</dl>
 						
 						
 						
@@ -2688,7 +2730,7 @@ the child data scope</dd>
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:20 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat Jul 17 2010 23:39:58 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

@@ -17,11 +17,7 @@ var exampleScene = SceneJS.scene({
 
     /* Bind to a WebGL canvas:
      */
-    canvasId: "theCanvas",
-
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
+    canvasId: "theCanvas" },
 
         SceneJS.lookAt({
             eye : { x: 0.0, y: 0.0, z: -10},
@@ -84,7 +80,7 @@ var exampleScene = SceneJS.scene({
                                              */
                                             layers: [
                                                 {
-                                                    uri:"http://scenejs.org/library/textures/misc/general-zod.jpg",
+                                                    uri:"general-zod.jpg",
                                                     minFilter: "linear",
                                                     magFilter: "linear",
                                                     wrapS: "repeat",
@@ -209,17 +205,21 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
     var timeNow = (new Date()).getTime();
-
-    exampleScene.setData({
-        yaw: yaw,
-        pitch: pitch,
-        time : timeNow - timeLast
-    }).render();
-
+    exampleScene
+        .setData({
+            yaw: yaw,
+            pitch: pitch,
+            time : timeNow - timeLast
+        })
+            .render();
     timeLast = timeNow;
 };
 
 SceneJS.addListener("error", function() {
+    window.clearInterval(pInterval);
+});
+
+SceneJS.addListener("reset", function() {
     window.clearInterval(pInterval);
 });
 

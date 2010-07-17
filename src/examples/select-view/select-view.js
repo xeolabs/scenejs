@@ -73,6 +73,7 @@ var exampleScene = SceneJS.scene({
 
         SceneJS.selector(function(data) {
             return {
+
                 selection: [data.get("activeView")]
             };
         },

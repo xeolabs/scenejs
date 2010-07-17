@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project relativePaths="false" version="4">
+  <component name="ChangeListManager">
+    <list default="true" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/bvhParser.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/pick/pickModule.js" afterPath="$PROJECT_DIR$/src/scenejs/pick/pickModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/seymourplane_triangulate.dae" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/processes/processModule.js" afterPath="$PROJECT_DIR$/src/scenejs/processes/processModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/hello-teapot/index.html" afterPath="$PROJECT_DIR$/src/examples/hello-teapot/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/withData/withData.js" afterPath="$PROJECT_DIR$/src/scenejs/withData/withData.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lightingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lightingModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/select-view/index.html" afterPath="$PROJECT_DIR$/src/examples/select-view/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/lookAt.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/lookAt.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/debug/debugModule.js" afterPath="$PROJECT_DIR$/src/scenejs/debug/debugModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js" afterPath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/tron-tank/index.html" afterPath="$PROJECT_DIR$/src/examples/tron-tank/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/text/vectorTextModule.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/text/vectorTextModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/becken/index.debug.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/courtyard-house/index.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-cross-domain/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/inverse.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/inverse.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/logging.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/logging.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/generation/generator.js" afterPath="$PROJECT_DIR$/src/scenejs/generation/generator.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/parsers/mtlParser.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/mtlParser.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/text/text.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/text/text.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/camera/projectionModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/camera/projectionModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/seymour-plane/index.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/tron-tank/Tank.dae" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/viewLocalityModule.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/viewLocalityModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/seymour-plane/seymour-plane.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/billboard.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/billboard.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/index.html" afterPath="$PROJECT_DIR$/src/examples/oo-api-intro/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/errors/errorsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/errors/errorsModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/animated-texture/animated-texture.js" afterPath="$PROJECT_DIR$/src/examples/animated-texture/animated-texture.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/rotate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/rotate.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/src/org/scenejs/proxy/AssetServlet.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" afterPath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/material/materialModule.js" afterPath="$PROJECT_DIR$/src/scenejs/material/materialModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/core/test.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/body.html" afterPath="$PROJECT_DIR$/resources/body.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/objParserOLD.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/with-configs/with-configs.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/locality.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/locality.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/custom-geometry/index.html" afterPath="$PROJECT_DIR$/src/examples/custom-geometry/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/interpolation/interpolator.js" afterPath="$PROJECT_DIR$/src/scenejs/interpolation/interpolator.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/renderer-node/renderer-node.js" afterPath="$PROJECT_DIR$/src/examples/renderer-node/renderer-node.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/animated-texture/index.html" afterPath="$PROJECT_DIR$/src/examples/animated-texture/index.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/tron-tank/tron-tank-old.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/camera/camera.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/camera/camera.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/webgl-trace.js" afterPath="$PROJECT_DIR$/src/scenejs/core/webgl-trace.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/core.js" afterPath="$PROJECT_DIR$/src/scenejs/core/core.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-add/with-configs-add.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/schema/collada_schema_1_4.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/oo-api-intro.js" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/socket/socket.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/select-view/select-view.js" afterPath="$PROJECT_DIR$/src/examples/select-view/select-view.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-local/teapot-load-local.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/material/material.js" afterPath="$PROJECT_DIR$/src/scenejs/material/material.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/trackball.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/trackball.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/parsers/objParser.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/objParser.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-local/orange-teapot.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/becken/becken.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/parameterised-collada-instance/parameterised-collada-instance.js" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/tron-tank/tron-tank-scene.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/moving-point-light/moving-point-light.js" afterPath="$PROJECT_DIR$/src/examples/moving-point-light/moving-point-light.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/web/WEB-INF/web.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/index.html" afterPath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/viewTransformModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/viewTransformModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/viewFrustumModule.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/viewFrustumModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/translate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/translate.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/courtyard-house/courtyard-house.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/src/org/scenejs/proxy/Parser.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/node/node.js" afterPath="$PROJECT_DIR$/src/scenejs/node/node.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/memory/memoryModule.js" afterPath="$PROJECT_DIR$/src/scenejs/memory/memoryModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/web/index.jsp" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelTransformModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelTransformModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/texture.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/texture.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/sceneModule.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/sceneModule.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-remove/with-configs-remove.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/scale.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/scale.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/quaternion.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/quaternion.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.txt" afterPath="$PROJECT_DIR$/README.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/moving-dir-light/moving-dir-light.js" afterPath="$PROJECT_DIR$/src/examples/moving-dir-light/moving-dir-light.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/matrix.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/matrix.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/math.js" afterPath="$PROJECT_DIR$/src/scenejs/core/math.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js" afterPath="$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/header.html" afterPath="$PROJECT_DIR$/resources/header.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/rendererModule.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/rendererModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/textureModule.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/textureModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/time/timeModule.js" afterPath="$PROJECT_DIR$/src/scenejs/time/timeModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/proxy.iml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/webgl.js" afterPath="$PROJECT_DIR$/src/scenejs/core/webgl.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/stationary.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/stationary.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/name/name.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-local/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" afterPath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/socket/socketModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/scene.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/scene.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/fog/fog.js" afterPath="$PROJECT_DIR$/src/scenejs/fog/fog.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelViewTransformModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelViewTransformModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/module/module.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-remove/index.html" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-cross-domain/teapot-load-cross-domain.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/parsers/colladaParser.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/colladaParser.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/loadModule.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/loadModule.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-add/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/custom-geometry/custom-geometry.js" afterPath="$PROJECT_DIR$/src/examples/custom-geometry/custom-geometry.js" />
+    </list>
+    <list name="Not to commit" comment="" />
+    <ignored path="scenejs.iws" />
+    <ignored path=".idea/workspace.xml" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="Commander">
+    <leftPanel />
+    <rightPanel />
+    <splitter proportion="0.5" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+    <option name="REVERSE_PATCH" value="false" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DebuggerManager">
+    <breakpoint_any>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
+    <breakpoint_rules />
+    <ui_properties />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="scenejs" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/animated-texture/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="body.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/body.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="6" column="61" selection-start="359" selection-end="359" vertical-scroll-proportion="-4.25">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="socket.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/socket/socket.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="39" selection-start="3" selection-end="3" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.txt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="13" column="30" selection-start="331" selection-end="331" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="withConfigs.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1" column="1" selection-start="5" selection-end="5" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1279364430000" expanded="true" signature="0:6763" placeholder="/**...*/" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/scenejs/logging/logging.js" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="#JAVA_INTERNAL" />
+  </component>
+  <component name="ModuleEditorState">
+    <option name="LAST_EDITED_MODULE_NAME" />
+    <option name="LAST_EDITED_TAB_NAME" />
+  </component>
+  <component name="NamedScopeManager">
+    <scope name="Unnamed" pattern="!file[scenejs]:docs//*" />
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="2" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectPane">
+    <subPane>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="scenejs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="diagrams" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+    </subPane>
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="0.5" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages ProjectPane="false" />
+      <abbreviatePackageNames />
+      <showStructure ProjectPane="false" />
+      <autoscrollToSource ProjectPane="true" />
+      <autoscrollFromSource ProjectPane="true" />
+      <sortByType />
+    </navigator>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.lastSelected" value="com.intellij.javascript.debugger.settings.JSDebuggerConfigurable" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false" runner="emma">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false" runner="emma">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
+      <JSDebuggerConfigurationSettings>
+        <option name="fileUrl" />
+      </JSDebuggerConfigurationSettings>
+    </configuration>
+    <list size="0" />
+    <configuration name="&lt;template&gt;" type="JUnit" default="true" selected="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="StructureViewFactory">
+    <option name="AUTOSCROLL_MODE" value="true" />
+    <option name="AUTOSCROLL_FROM_SOURCE" value="false" />
+    <option name="ACTIVE_ACTIONS" value="" />
+  </component>
+  <component name="SvnConfiguration">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="UPDATE_RUN_STATUS" value="false" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <configuration useDefault="true">/home/lindsay/.subversion</configuration>
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1921" y="26" width="1919" height="1068" extended-state="1" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.02631579" sideWeight="0.5" order="7" side_tool="false" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32922733" sideWeight="0.5" order="1" side_tool="false" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" />
+      <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32923076" sideWeight="0.5" order="8" side_tool="false" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.05039194" sideWeight="0.5" order="9" side_tool="false" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24330118" sideWeight="0.9" order="0" side_tool="false" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" />
+    </layout>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="PERFORM_UPDATE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_COMMIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_CHECKOUT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="Beginnings of OBJ+MTL import; &#10;Added support for &quot;../&quot; in relative SceneJS.Instance name config; &#10;Fixed type missing in SceneJS.Symbol; &#10;New STATE_RENDRED state for SceneJS.Load nodes; &#10;New STATE_FREED state for SceneJS.Load nodes;" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
+    <option name="ACTIVE_VCS_NAME" />
+    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
+    <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
+    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
+    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="https://xeolabs.lighthouseapp.com/projects/50643/tickets/75-remove-scenejsscenegetnumprocesses&#10;https://xeolabs.lighthouseapp.com/projects/50643/tickets/74-rename-scenejs-global-events-scene-activated-and-scene-deactivated&#10;https://xeolabs.lighthouseapp.com/projects/50643/tickets/71-ability-to-configure-timeouts-for-scenejsloadxxxs&#10;https://xeolabs.lighthouseapp.com/projects/50643/tickets/70-expose-state-of-scenejsloadxx-nodes-through-api&#10;https://xeolabs.lighthouseapp.com/projects/50643/tickets/73-node-event-listeners&#10;https://xeolabs.lighthouseapp.com/projects/50643/tickets/52-import-collada-camera-and-lights" />
+    <MESSAGE value="Extended node config signature, asynch texture load, minor refactorings" />
+    <MESSAGE value="Beginnings of OBJ+MTL import; &#10;Added support for &quot;../&quot; in relative SceneJS.Instance name config; &#10;Fixed type missing in SceneJS.Symbol; &#10;New STATE_RENDRED state for SceneJS.Load nodes; &#10;New STATE_FREED state for SceneJS.Load nodes;" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/examples/moving-point-light/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/moving-dir-light/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/house/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="38" selection-start="1773" selection-end="1773" vertical-scroll-proportion="-26.916666">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/hello-teapot/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="38" selection-start="964" selection-end="964" vertical-scroll-proportion="-17.708334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/custom-geometry/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/animated-texture/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/body.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="61" selection-start="359" selection-end="359" vertical-scroll-proportion="-4.25">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="1" selection-start="5" selection-end="5" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1279364430000" expanded="true" signature="0:6763" placeholder="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/socket/socket.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="39" selection-start="3" selection-end="3" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="30" selection-start="331" selection-end="331" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <option name="states">
+      <map>
+        <entry key="Copyright.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl />
+              </option>
+            </UIState>
+          </value>
+        </entry>
+        <entry key="Errors.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
+              </option>
+              <option name="lastEditedConfigurable" value="IDE Profiles" />
+            </UIState>
+          </value>
+        </entry>
+        <entry key="ProjectJDKs.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
+              </option>
+              <option name="lastEditedConfigurable" value="1.6" />
+            </UIState>
+          </value>
+        </entry>
+        <entry key="ScopeChooserConfigurable.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl />
+              </option>
+            </UIState>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="myStates">
+      <map>
+        <entry key="Copyright.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl />
+              </option>
+            </UIState>
+          </value>
+        </entry>
+        <entry key="Errors.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
+              </option>
+              <option name="lastEditedConfigurable" value="IDE Profiles" />
+            </UIState>
+          </value>
+        </entry>
+        <entry key="ProjectJDKs.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl>
+                  <option name="proportions">
+                    <list>
+                      <option value="0.2" />
+                    </list>
+                  </option>
+                </SplitterProportionsDataImpl>
+              </option>
+              <option name="lastEditedConfigurable" value="1.6" />
+            </UIState>
+          </value>
+        </entry>
+        <entry key="ScopeChooserConfigurable.UI">
+          <value>
+            <UIState>
+              <option name="proportions">
+                <SplitterProportionsDataImpl />
+              </option>
+            </UIState>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
+

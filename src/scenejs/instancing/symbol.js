@@ -73,11 +73,11 @@ SceneJS._inherit(SceneJS.Symbol, SceneJS.Node);
 // @private
 SceneJS.Symbol.prototype._render = function(traversalContext, data) {
     if (!this._sid) {
-        throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+        throw SceneJS._errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                 ("SceneJS.Symbol parameter expected: sid"));
     }
-    this._sidPath = SceneJS_instancingModule.getName();  // Path to this Symbol, without this Symbol's SID
-    SceneJS_instancingModule.createSymbol(this._sid, this);
+    this._sidPath = SceneJS._instancingModule.getName();  // Path to this Symbol, without this Symbol's SID
+    SceneJS._instancingModule.createSymbol(this._sid, this);
 };
 
 

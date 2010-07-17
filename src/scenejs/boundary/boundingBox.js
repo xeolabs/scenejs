@@ -293,13 +293,13 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     this._zmax = params.zmax || 0;
     if (params.levels) {
         if (params.levels.length != this._children.length) {
-          throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+          throw SceneJS._errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                     ("SceneJS.boundingBox levels property should have a value for each child node"));
         }
 
         for (var i = 1; i < params.levels.length; i++) {
             if (params.levels[i - 1] >= params.levels[i]) {
-                throw SceneJS_errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+                throw SceneJS._errorModule.fatalError(new SceneJS.NodeConfigExpectedException
                         ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
             }
         }
@@ -315,7 +315,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
         } else {
             this._memoLevel = 1;
         }
-        var modelTransform = SceneJS_modelTransformModule.getTransform();
+        var modelTransform = SceneJS._modelTransformModule.getTransform();
         if (!modelTransform.identity) {
 
             /* Model transform exists
@@ -343,25 +343,25 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
     }
 
     if (this._memoLevel < 2) {
-        var modelTransform = SceneJS_modelTransformModule.getTransform();
-        this._viewBox = new SceneJS_math_Box3().fromPoints(
-                SceneJS_math_transformPoints3(
+        var modelTransform = SceneJS._modelTransformModule.getTransform();
+        this._viewBox = new SceneJS._math_Box3().fromPoints(
+                SceneJS._math_transformPoints3(
                         modelTransform.matrix,
                         this._objectCoords)
                 );
-        if (modelTransform.fixed && this._memoLevel == 1 && (!SceneJS_instancingModule.instancing())) {
+        if (modelTransform.fixed && this._memoLevel == 1 && (!SceneJS._instancingModule.instancing())) {
             this._objectCoords = null;
             this._memoLevel = 2;
         }
     }
-    if (SceneJS_localityModule.testAxisBoxIntersectOuterRadius(this._viewBox)) {
-        if (SceneJS_localityModule.testAxisBoxIntersectInnerRadius(this._viewBox)) {
-            var result = SceneJS_frustumModule.testAxisBoxIntersection(this._viewBox);
+    if (SceneJS._localityModule.testAxisBoxIntersectOuterRadius(this._viewBox)) {
+        if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(this._viewBox)) {
+            var result = SceneJS._frustumModule.testAxisBoxIntersection(this._viewBox);
             switch (result) {
-                case SceneJS_math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
-                case SceneJS_math_INSIDE_FRUSTUM:
+                case SceneJS._math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                case SceneJS._math_INSIDE_FRUSTUM:
                     if (this._levels) { // Level-of-detail mode
-                        var size = SceneJS_frustumModule.getProjectedSize(this._viewBox);
+                        var size = SceneJS._frustumModule.getProjectedSize(this._viewBox);
                         for (var i = this._levels.length - 1; i >= 0; i--) {
                             if (this._levels[i] <= size) {
                                 var state = this._states[i];
@@ -374,7 +374,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
                     }
                     break;
 
-                case SceneJS_math_OUTSIDE_FRUSTUM:
+                case SceneJS._math_OUTSIDE_FRUSTUM:
                     break;
             }
         } else {
@@ -408,3 +408,5 @@ SceneJS.boundingBox = function() {
     SceneJS.BoundingBox.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+

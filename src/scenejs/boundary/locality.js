@@ -97,10 +97,10 @@ SceneJS.Locality.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
         this._init(this._getParams(data));
     }
-    var prevRadii = SceneJS_localityModule.getRadii();
-    SceneJS_localityModule.setRadii(this._radii);
+    var prevRadii = SceneJS._localityModule.getRadii();
+    SceneJS._localityModule.setRadii(this._radii);
     this._renderNodes(traversalContext, data);
-    SceneJS_localityModule.setRadii(prevRadii);
+    SceneJS._localityModule.setRadii(prevRadii);
 };
 
 /** Returns a new SceneJS.Locality instance

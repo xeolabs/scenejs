@@ -3,7 +3,7 @@
  *
  * @private
  */
-var SceneJS_fogModule = new (function() {
+SceneJS._fogModule = new (function() {
 
     var fog;
     var dirty;
@@ -43,32 +43,32 @@ var SceneJS_fogModule = new (function() {
         }
     }
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 _createFog({});
                 dirty = true;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS_eventModule.fireEvent(
-                            SceneJS_eventModule.FOG_EXPORTED,
+                    SceneJS._eventModule.fireEvent(
+                            SceneJS._eventModule.FOG_EXPORTED,
                             fog);
                     dirty = false;
                 }
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -81,8 +81,8 @@ var SceneJS_fogModule = new (function() {
     this.setFog = function(f) {
         fog = f ? _createFog(f) : null;
         dirty = true;
-        SceneJS_eventModule.fireEvent(
-                SceneJS_eventModule.FOG_UPDATED,
+        SceneJS._eventModule.fireEvent(
+                SceneJS._eventModule.FOG_UPDATED,
                 fog);
     };
 

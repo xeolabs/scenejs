@@ -16,10 +16,10 @@
  * derives from the current collective scene state; on a SHADER_ACTIVATE event, it will attempt to reuse a shader
  * cached for the hash of the current scene state.
  *
- * Shader allocation and LRU cache eviction is mediated by SceneJS_memoryModule.
+ * Shader allocation and LRU cache eviction is mediated by SceneJS._memoryModule.
  *  @private
  */
-var SceneJS_shaderModule = new (function() {
+SceneJS._shaderModule = new (function() {
 
     var time = (new Date()).getTime();      // For LRU caching
 
@@ -51,14 +51,14 @@ var SceneJS_shaderModule = new (function() {
     var sceneHash;
 
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.TIME_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RESET,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.RESET,
             function() {
                 for (var programId in programs) {  // Just free allocated programs
                     programs[programId].destroy();
@@ -66,8 +66,8 @@ var SceneJS_shaderModule = new (function() {
                 programs = {};
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 canvas = null;
                 rendererState = null;
@@ -82,32 +82,32 @@ var SceneJS_shaderModule = new (function() {
                 textureHash = "";
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
                 activeProgram = null;
                 sceneHash = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
                 activeProgram = null;
                 sceneHash = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RENDERER_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.RENDERER_UPDATED,
             function(_rendererState) {
                 rendererState = _rendererState;  // Canvas change will be signified by a CANVAS_UPDATED
                 sceneHash = null;
-                rendererHash = rendererState.enableTexture2D ? "t" : "f";
+                rendererHash = "";
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RENDERER_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.RENDERER_EXPORTED,
             function(_rendererState) {
 
                 /* Default ambient material colour is taken from canvas clear colour
@@ -119,8 +119,8 @@ var SceneJS_shaderModule = new (function() {
                                 : [0, 0, 0]);
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.TEXTURES_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.TEXTURES_UPDATED,
             function(stack) {
                 textureLayers = stack;
                 sceneHash = null;
@@ -143,20 +143,20 @@ var SceneJS_shaderModule = new (function() {
                 textureHash = hash.join("");
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.TEXTURES_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.TEXTURES_EXPORTED,
             function(stack) {
                 for (var i = 0; i < stack.length; i++) {
                     var layer = stack[i];
                     activeProgram.bindTexture("uSampler" + i, layer.texture, i);
                     if (layer.params.matrixAsArray) {
                         activeProgram.setUniform("uLayer" + i + "Matrix", layer.params.matrixAsArray);
-                    }
+                    }           
                 }
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.LIGHTS_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.LIGHTS_UPDATED,
             function(l) {
                 lights = l;
                 sceneHash = null;
@@ -177,8 +177,8 @@ var SceneJS_shaderModule = new (function() {
                 lightsHash = hash.join("");
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.LIGHTS_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.LIGHTS_EXPORTED,
             function(_lights) {
                 var ambient;
                 for (var i = 0; i < _lights.length; i++) {
@@ -217,15 +217,15 @@ var SceneJS_shaderModule = new (function() {
             });
 
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.MATERIAL_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.MATERIAL_UPDATED,
             function(m) {
                 material = m;
                 sceneHash = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.MATERIAL_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.MATERIAL_EXPORTED,
             function(m) {
                 activeProgram.setUniform("uMaterialBaseColor", m.baseColor);
                 activeProgram.setUniform("uMaterialSpecularColor", m.specularColor);
@@ -236,16 +236,16 @@ var SceneJS_shaderModule = new (function() {
                 activeProgram.setUniform("uMaterialAlpha", m.alpha);
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.FOG_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.FOG_UPDATED,
             function(f) {
                 fog = f;
                 sceneHash = null;
                 fogHash = fog ? fog.mode : "";
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.FOG_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.FOG_EXPORTED,
             function(f) {
                 activeProgram.setUniform("uFogColor", f.color);
                 activeProgram.setUniform("uFogDensity", f.density);
@@ -253,8 +253,8 @@ var SceneJS_shaderModule = new (function() {
                 activeProgram.setUniform("uFogEnd", f.end);
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.MODEL_TRANSFORM_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.MODEL_TRANSFORM_EXPORTED,
             function(transform) {
 
                 activeProgram.setUniform("uMMatrix", transform.matrixAsArray);
@@ -262,21 +262,21 @@ var SceneJS_shaderModule = new (function() {
 
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.VIEW_TRANSFORM_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.VIEW_TRANSFORM_EXPORTED,
             function(transform) {
                 activeProgram.setUniform("uVMatrix", transform.matrixAsArray);
                 activeProgram.setUniform("uVNMatrix", transform.normalMatrixAsArray);
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.PROJECTION_TRANSFORM_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.PROJECTION_TRANSFORM_EXPORTED,
             function(transform) {
                 activeProgram.setUniform("uPMatrix", transform.matrixAsArray);
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.GEOMETRY_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.GEOMETRY_UPDATED,
             function(geo) {
                 geometry = geo;
                 sceneHash = null;
@@ -286,8 +286,8 @@ var SceneJS_shaderModule = new (function() {
                     geometry.uvBuf2 ? "t" : "f"]).join("");
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.GEOMETRY_EXPORTED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.GEOMETRY_EXPORTED,
             function(geo) {
                 if (geo.vertexBuf) {
                     activeProgram.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
@@ -295,7 +295,7 @@ var SceneJS_shaderModule = new (function() {
                 if (geo.normalBuf) {
                     activeProgram.bindFloatArrayBuffer("aNormal", geo.normalBuf);
                 }
-                if (textureLayers.length > 0 && rendererState.enableTexture2D) {
+                if (textureLayers.length > 0) {
                     if (geo.uvBuf) {
                         activeProgram.bindFloatArrayBuffer("aUVCoord", geo.uvBuf);
                     }
@@ -305,13 +305,13 @@ var SceneJS_shaderModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATE, // Request to activate a shader
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_ACTIVATE, // Request to activate a shader
             function() {
                 activateProgram();
             });
 
-    SceneJS_memoryModule.registerEvictor(
+    SceneJS._memoryModule.registerEvictor(
             function() {
                 var earliest = time;
                 var programToEvict;
@@ -329,7 +329,7 @@ var SceneJS_shaderModule = new (function() {
                     }
                 }
                 if (programToEvict) { // Delete LRU program's shaders and deregister program
-                    //  SceneJS_loggingModule.info("Evicting shader: " + hash);
+                    //  SceneJS._loggingModule.info("Evicting shader: " + hash);
                     programToEvict.destroy();
                     programs[programToEvict.hash] = null;
                     return true;
@@ -342,7 +342,7 @@ var SceneJS_shaderModule = new (function() {
      */
     function activateProgram() {
         if (!canvas) {
-            throw SceneJS_errorModule.fatalError(new SceneJS.NoCanvasActiveException("No canvas active"));
+            throw SceneJS._errorModule.fatalError(new SceneJS.NoCanvasActiveException("No canvas active"));
         }
 
         if (!sceneHash) {
@@ -354,42 +354,42 @@ var SceneJS_shaderModule = new (function() {
                 canvas.context.flush();
                 activeProgram.unbind();
                 activeProgram = null;
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.SHADER_DEACTIVATED);
+                SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_DEACTIVATED);
             }
 
             if (!programs[sceneHash]) {
-                SceneJS_loggingModule.info("Creating shader: '" + sceneHash + "'");
+                SceneJS._loggingModule.info("Creating shader: '" + sceneHash + "'");
                 var vertexShaderSrc = composeVertexShader();
                 var fragmentShaderSrc = composeFragmentShader();
-                SceneJS_memoryModule.allocate(
+                SceneJS._memoryModule.allocate(
                         canvas.context,
                         "shader",
                         function() {
                             try {
-                                programs[sceneHash] = new SceneJS_webgl_Program(
+                                programs[sceneHash] = new SceneJS._webgl_Program(
                                         sceneHash,
                                         time,
                                         canvas.context,
                                         [vertexShaderSrc],
                                         [fragmentShaderSrc],
-                                        SceneJS_loggingModule);
-                                //  SceneJS_loggingModule.info("OK - Created shader: '" + sceneHash + "'");
+                                        SceneJS._loggingModule);
+                                //  SceneJS._loggingModule.info("OK - Created shader: '" + sceneHash + "'");
                             } catch (e) {
-                                SceneJS_loggingModule.debug("Vertex shader:");
-                                SceneJS_loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
-                                SceneJS_loggingModule.debug("Fragment shader:");
-                                SceneJS_loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-                                throw SceneJS_errorModule.fatalError(e);
+                                SceneJS._loggingModule.debug("Vertex shader:");
+                                SceneJS._loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
+                                SceneJS._loggingModule.debug("Fragment shader:");
+                                SceneJS._loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
+                                throw SceneJS._errorModule.fatalError(e);
                             }
                         });
             }
             activeProgram = programs[sceneHash];
             activeProgram.lastUsed = time;
             activeProgram.bind();
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.SHADER_ACTIVATED);
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_ACTIVATED);
         }
 
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SHADER_RENDERING);
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
     }
 
     /**
@@ -402,7 +402,7 @@ var SceneJS_shaderModule = new (function() {
         } else {
             sceneHash = ([canvas.canvasId, rendererHash, fogHash, lightsHash, textureHash, geometryHash]).join(";");
         }
-        //      SceneJS_loggingModule.debug("Scene shading hash:" + sceneHash);
+        //      SceneJS._loggingModule.debug("Scene shading hash:" + sceneHash);
     }
 
     /**
@@ -476,7 +476,7 @@ var SceneJS_shaderModule = new (function() {
      */
     function composeRenderingVertexShader() {
 
-        var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
+        var texturing = textureLayers.length > 0 && (geometry.uvBuf || geometry.uvBuf2);
         var lighting = (lights.length > 0 && geometry.normalBuf);
 
         var src = ["\n"];
@@ -571,8 +571,8 @@ var SceneJS_shaderModule = new (function() {
             }
         }
         src.push("}");
-        if (SceneJS_debugModule.getConfigs("shading.logScripts") == true) {
-            SceneJS_loggingModule.info(src);
+        if (SceneJS._debugModule.getConfigs("shading.logScripts") == true) {
+            SceneJS._loggingModule.info(src);
         }
         return src.join("\n");
     }
@@ -581,7 +581,7 @@ var SceneJS_shaderModule = new (function() {
      * @private
      */
     function composeRenderingFragmentShader() {
-        var texturing = textureLayers.length > 0 && rendererState.enableTexture2D && (geometry.uvBuf || geometry.uvBuf2);
+        var texturing = textureLayers.length > 0  && (geometry.uvBuf || geometry.uvBuf2);
         var lighting = (lights.length > 0 && geometry.normalBuf);
 
         var src = ["\n"];
@@ -677,7 +677,7 @@ var SceneJS_shaderModule = new (function() {
                     if (geometry.normalBuf) {
                         src.push("texturePos=vec4(vNormal.xyz, 1.0);");
                     } else {
-                        SceneJS_loggingModule.warn("Texture layer applyFrom='normal' but geometry has no normal vectors");
+                        SceneJS._loggingModule.warn("Texture layer applyFrom='normal' but geometry has no normal vectors");
                         continue;
                     }
                 }
@@ -685,7 +685,7 @@ var SceneJS_shaderModule = new (function() {
                     if (geometry.uvBuf) {
                         src.push("texturePos = vec4(vUVCoord.s, vUVCoord.t, 1.0, 1.0);");
                     } else {
-                        SceneJS_loggingModule.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
+                        SceneJS._loggingModule.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
                         continue;
                     }
                 }
@@ -693,7 +693,7 @@ var SceneJS_shaderModule = new (function() {
                     if (geometry.uvBuf2) {
                         src.push("texturePos = vec4(vUVCoord2.s, vUVCoord2.t, 1.0, 1.0);");
                     } else {
-                        SceneJS_loggingModule.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
+                        SceneJS._loggingModule.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
                         continue;
                     }
                 }
@@ -812,12 +812,12 @@ var SceneJS_shaderModule = new (function() {
         } else {
             src.push("gl_FragColor = fragColor;");
         }
-        if (SceneJS_debugModule.getConfigs("shading.whitewash") == true) {
+        if (SceneJS._debugModule.getConfigs("shading.whitewash") == true) {
             src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         }
         src.push("}");
-        if (SceneJS_debugModule.getConfigs("shading.logScripts") == true) {
-            SceneJS_loggingModule.info(src);
+        if (SceneJS._debugModule.getConfigs("shading.logScripts") == true) {
+            SceneJS._loggingModule.info(src);
         }
         return src.join("\n");
     }

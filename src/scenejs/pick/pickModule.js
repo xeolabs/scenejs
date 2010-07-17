@@ -5,7 +5,7 @@
  *
  *  @private
  */
-var SceneJS_pickModule = new (function() {
+SceneJS._pickModule = new (function() {
 
     var pickInfo = [];          // Entry for each scene
     var currentPickInfo;        // Entry for current active scene
@@ -14,42 +14,42 @@ var SceneJS_pickModule = new (function() {
     var pickY;
     var canvas;
 
-    //            SceneJS_eventModule.addListener(
-    //                    SceneJS_eventModule.RESET,
+    //            SceneJS._eventModule.addListener(
+    //                    SceneJS._eventModule.RESET,
     //                    function() {
     //                        pickInfo = [];
     //                        currentPickInfo = null;
     //                        SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
     //                    });
     //
-    //            SceneJS_eventModule.addListener(
-    //                    SceneJS_eventModule.SCENE_CREATED,
+    //            SceneJS._eventModule.addListener(
+    //                    SceneJS._eventModule.SCENE_CREATED,
     //                    function(params) {
     //                        pickInfo[params.sceneId] = {
     //                            sceneId: params.sceneId
     //                        };
     //                    });
     //
-    //            SceneJS_eventModule.addListener(
-    //                    SceneJS_eventModule.SCENE_RENDERING,
+    //            SceneJS._eventModule.addListener(
+    //                    SceneJS._eventModule.SCENE_RENDERING,
     //                    function(params) {
     //                        currentPickInfo = pickInfo[params.sceneId];
     //                    });
     //
-    //            SceneJS_eventModule.addListener(
-    //                    SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED,
+    //            SceneJS._eventModule.addListener(
+    //                    SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED,
     //                    function(transform) {
     //                        currentPickInfo.projectionTransform = transform;
     //                    });
     //
-    //            SceneJS_eventModule.addListener(
-    //                    SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
+    //            SceneJS._eventModule.addListener(
+    //                    SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
     //                    function(transform) {
     //                        currentPickInfo.viewTransform = transform;
     //                    });
     //
-    //            SceneJS_eventModule.addListener(
-    //                    SceneJS_eventModule.CANVAS_ACTIVATED,
+    //            SceneJS._eventModule.addListener(
+    //                    SceneJS._eventModule.CANVAS_ACTIVATED,
     //                    function(c) {
     //                        canvas = c;
     //                        if (!currentPickInfo.pickBuffer) {
@@ -57,8 +57,8 @@ var SceneJS_pickModule = new (function() {
     //                        }
     //                    });
     //
-    //            SceneJS_eventModule.addListener(
-    //                    SceneJS_eventModule.SCENE_DESTROYED,
+    //            SceneJS._eventModule.addListener(
+    //                    SceneJS._eventModule.SCENE_DESTROYED,
     //                    function(params) {
     //                        pickInfo[params.sceneId] = null;
     //                    });
@@ -122,13 +122,13 @@ var SceneJS_pickModule = new (function() {
 
         /* Get camera space coordinates
          */
-        var xcoord = -( ( ( 2 * x ) / canvas.canvas.width ) - 1 ) / SceneJS_math_getCellMat4(viewTransform.matrix, 1, 1);
-        var ycoord = ( ( ( 2 * y ) / canvas.canvas.height ) - 1 ) / SceneJS_math_getCellMat4(projTransform.matrix, 2, 2);
+        var xcoord = -( ( ( 2 * x ) / canvas.canvas.width ) - 1 ) / SceneJS._math_getCellMat4(viewTransform.matrix, 1, 1);
+        var ycoord = ( ( ( 2 * y ) / canvas.canvas.height ) - 1 ) / SceneJS._math_getCellMat4(projTransform.matrix, 2, 2);
         var zcoord = 1;
 
         if (projTransform.type == "perspective") {
-            var coord = SceneJS_math_transformPoint3(
-                    SceneJS_math_inverseMat4(viewTransform.matrix),
+            var coord = SceneJS._math_transformPoint3(
+                    SceneJS._math_inverseMat4(viewTransform.matrix),
                     [xcoord,ycoord,zcoord,0]);
 
             var cameraPos = viewTransform.lookAt.eye;
@@ -203,7 +203,7 @@ var SceneJS_pickModule = new (function() {
         //                        data = data.data; // TODO: hack for firefox
         //                    }
         //
-        //                    SceneJS_loggingModule.info(pickX + ", " + pickY + ": " + data[0] + ", " + data[1] + "," + data[2]);
+        //                    SceneJS._loggingModule.info(pickX + ", " + pickY + ": " + data[0] + ", " + data[1] + "," + data[2]);
         //
         //                    var id = data[0] + data[1] * 256;
         //

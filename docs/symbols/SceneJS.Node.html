@@ -249,7 +249,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
-	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
+	<li><a href="../symbols/SceneJS.ModuleInstallFailureException.html">SceneJS.ModuleInstallFailureException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleLoadTimeoutException.html">SceneJS.ModuleLoadTimeoutException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleNotFoundException.html">SceneJS.ModuleNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Node.html">SceneJS.Node</a></li>
 	
@@ -283,6 +287,14 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a></li>
 	
+	<li><a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketErrorException.html">SceneJS.SocketErrorException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketNotSupportedException.html">SceneJS.SocketNotSupportedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketServerErrorException.html">SceneJS.SocketServerErrorException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
 	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
@@ -302,6 +314,10 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -579,9 +595,18 @@ myLoad.removeListener("state-changed", handler);
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#getNode">getNode</a></b>(sid)
+								</div>
+								<div class="description">Returns child node with the given SID (structure identifier).</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a></b>(index)
 								</div>
-								<div class="description">Returns child node at given index</div>
+								<div class="description">Returns child node at given index.</div>
 							</td>
 						</tr>
 					
@@ -646,6 +671,24 @@ of the parent node.</div>
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a></b>(eventName, fn)
 								</div>
 								<div class="description">Removes a handler that is registered for the given event on this node.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#removeListeners">removeListeners</a></b>()
+								</div>
+								<div class="description">Removes all listeners registered on this node.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Node.html#removeNode">removeNode</a></b>(sid)
+								</div>
+								<div class="description">Removes the child node with the given SID (structural identifier) string.</div>
 							</td>
 						</tr>
 					
@@ -944,15 +987,16 @@ node.addListener(
 
 					<hr />
 				
-					<a name="getNodeAt"> </a>
+					<a name="getNode"> </a>
 					<div class="fixedFont">
 					
 					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
-					<b>getNodeAt</b>(index)
+					<b>getNode</b>(sid)
 					
 					</div>
 					<div class="description">
-						Returns child node at given index
+						Returns child node with the given SID (structure identifier).
+Returns null if no such child node found.
 						
 						
 					</div>
@@ -964,10 +1008,10 @@ node.addListener(
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>index</b>
+									<span class="light fixedFont">{String}</span> <b>sid</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>The child's SID</dd>
 							
 							</dl>
 						
@@ -978,7 +1022,50 @@ node.addListener(
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> Child node</dd>
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> Child node, or null if not found</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getNodeAt"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
+					<b>getNodeAt</b>(index)
+					
+					</div>
+					<div class="description">
+						Returns child node at given index. Returns null if no node at that index.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>index</b>
+									
+								</dt>
+								<dd>The child index</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> Child node, or null if not found</dd>
 							
 							</dl>
 						
@@ -1248,10 +1335,85 @@ Does nothing if no such handler registered.
 
 					<hr />
 				
+					<a name="removeListeners"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
+					<b>removeListeners</b>()
+					
+					</div>
+					<div class="description">
+						Removes all listeners registered on this node.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> this</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="removeNode"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
+					<b>removeNode</b>(sid)
+					
+					</div>
+					<div class="description">
+						Removes the child node with the given SID (structural identifier) string.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>sid</b>
+									
+								</dt>
+								<dd>The target child node's SID</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> The removed child node if located, else null</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="removeNodeAt"> </a>
 					<div class="fixedFont">
 					
-					
+					<span class="light">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span>
 					<b>removeNodeAt</b>(index)
 					
 					</div>
@@ -1278,6 +1440,13 @@ Does nothing if no such handler registered.
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>}</span> The removed child node if located, else null</dd>
+							
+							</dl>
 						
 						
 						
@@ -1332,7 +1501,7 @@ Does nothing if no such handler registered.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:21 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat Jul 17 2010 23:40:00 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

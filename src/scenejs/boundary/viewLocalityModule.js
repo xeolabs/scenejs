@@ -13,14 +13,14 @@
  *
  * @private
  */
-var SceneJS_localityModule = new (function() {
+SceneJS._localityModule = new (function() {
 
     var eye;
     var radii;
     var radii2;
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 eye = { x: 0, y: 0, z: 0 };
                 radii = {
@@ -33,8 +33,8 @@ var SceneJS_localityModule = new (function() {
                 };
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.VIEW_TRANSFORM_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
             function(transform) {
                 if (transform.lookAt) {
                     var e = transform.lookAt.eye;

@@ -2,7 +2,7 @@
  * @class Wrapper for an exception not recognised by SceneJS.
  */
 SceneJS.Exception = function(msg, cause) {
-    this.message="SceneJS.Exception: " + msg;
+    this.message = "SceneJS.Exception: " + msg;
     this.cause = cause;
 };
 
@@ -10,7 +10,7 @@ SceneJS.Exception = function(msg, cause) {
  * @class Exception thrown by SceneJS when a recognised WebGL context could not be found on the canvas specified to a {@link SceneJS.Scene}.
  */
 SceneJS.WebGLNotSupportedException = function(msg, cause) {
-    this.message="SceneJS.WebGLNotSupportedException: " + msg;
+    this.message = "SceneJS.WebGLNotSupportedException: " + msg;
     this.cause = cause;
 };
 
@@ -18,7 +18,7 @@ SceneJS.WebGLNotSupportedException = function(msg, cause) {
  * @class Exception thrown by {@link SceneJS.Node} or subtypes when a mandatory configuration was not supplied
  */
 SceneJS.NodeConfigExpectedException = function(msg, cause) {
-    this.message="SceneJS.NodeConfigExpectedException: " + msg;
+    this.message = "SceneJS.NodeConfigExpectedException: " + msg;
     this.cause = cause;
 };
 
@@ -26,7 +26,7 @@ SceneJS.NodeConfigExpectedException = function(msg, cause) {
  * @private
  */
 SceneJS.ShaderCompilationFailureException = function(msg, cause) {
-    this.message="SceneJS.ShaderCompilationFailureException: " + msg ;
+    this.message = "SceneJS.ShaderCompilationFailureException: " + msg;
     this.cause = cause;
 };
 
@@ -34,7 +34,7 @@ SceneJS.ShaderCompilationFailureException = function(msg, cause) {
  * @private
  */
 SceneJS.ShaderLinkFailureException = function(msg, cause) {
-    this.message="SceneJS.ShaderLinkFailureException: " + msg ;
+    this.message = "SceneJS.ShaderLinkFailureException: " + msg;
     this.cause = cause;
 };
 
@@ -42,7 +42,7 @@ SceneJS.ShaderLinkFailureException = function(msg, cause) {
  * @private
  */
 SceneJS.NoSceneActiveException = function(msg, cause) {
-    this.message="SceneJS.NoSceneActiveException: " + msg ;
+    this.message = "SceneJS.NoSceneActiveException: " + msg;
     this.cause = cause;
 };
 
@@ -50,7 +50,7 @@ SceneJS.NoSceneActiveException = function(msg, cause) {
  * @private
  */
 SceneJS.NoCanvasActiveException = function(msg, cause) {
-    this.message="SceneJS.NoCanvasActiveException: " + msg ;
+    this.message = "SceneJS.NoCanvasActiveException: " + msg;
     this.cause = cause;
 };
 
@@ -59,7 +59,7 @@ SceneJS.NoCanvasActiveException = function(msg, cause) {
  * default canvas was found with the ID specified in {@link SceneJS.Scene.DEFAULT_CANVAS_ID}.
  */
 SceneJS.CanvasNotFoundException = function(msg, cause) {
-    this.message="SceneJS.CanvasNotFoundException: " + msg ;
+    this.message = "SceneJS.CanvasNotFoundException: " + msg;
     this.cause = cause;
 };
 
@@ -67,7 +67,7 @@ SceneJS.CanvasNotFoundException = function(msg, cause) {
  * @class Exception thrown by SceneJS node classes when configuration property is invalid.
  */
 SceneJS.InvalidNodeConfigException = function(msg, cause) {
-    this.message="SceneJS.InvalidNodeConfigException: " + msg ;
+    this.message = "SceneJS.InvalidNodeConfigException: " + msg;
     this.cause = cause;
 };
 
@@ -77,7 +77,7 @@ SceneJS.InvalidNodeConfigException = function(msg, cause) {
  * OS/OpenGL/WebGL stack, so there are no guarantees that SceneJS will warn you with one of these.</p.
  */
 SceneJS.OutOfVRAMException = function(msg, cause) {
-    this.message="SceneJS.OutOfVRAMException: " + msg ;
+    this.message = "SceneJS.OutOfVRAMException: " + msg;
     this.cause = cause;
 };
 
@@ -85,14 +85,14 @@ SceneJS.OutOfVRAMException = function(msg, cause) {
  * default DIV was found with the ID specified in {@link SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID}.
  */
 SceneJS.DocumentElementNotFoundException = function(msg, cause) {
-    this.message="SceneJS.DocumentElementNotFoundException: " + msg ;
+    this.message = "SceneJS.DocumentElementNotFoundException: " + msg;
     this.cause = cause;
 };
 
 /** @class  Exception thrown by a {@link SceneJS.Instance} node when parsing of a file fails for some reason.
  */
 SceneJS.ParseException = function(msg, cause) {
-    this.message="SceneJS.ParseException: " + msg ;
+    this.message = "SceneJS.ParseException: " + msg;
     this.cause = cause;
 };
 
@@ -100,7 +100,7 @@ SceneJS.ParseException = function(msg, cause) {
  * of any node in the Collada document.
  */
 SceneJS.ColladaRootNotFoundException = function(msg, cause) {
-    this.message="SceneJS.ColladaRootNotFoundException: " + msg ;
+    this.message = "SceneJS.ColladaRootNotFoundException: " + msg;
     this.cause = cause;
 };
 
@@ -108,7 +108,7 @@ SceneJS.ColladaRootNotFoundException = function(msg, cause) {
  * explicitly provide the ID of a target asset through a 'node' configuration property.
  */
 SceneJS.ColladaRootRequiredException = function(msg, cause) {
-    this.message="SceneJS.ColladaRootRequiredException: " + msg ;
+    this.message = "SceneJS.ColladaRootRequiredException: " + msg;
     this.cause = cause;
 };
 
@@ -118,7 +118,7 @@ SceneJS.ColladaRootRequiredException = function(msg, cause) {
  * that does the load  (eg. {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
-    this.message="SceneJS.ProxyNotSpecifiedException: " + msg ;
+    this.message = "SceneJS.ProxyNotSpecifiedException: " + msg;
     this.cause = cause;
 };
 
@@ -127,7 +127,7 @@ SceneJS.ProxyNotSpecifiedException = function(msg, cause) {
  * (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyErrorResponseException = function(msg, cause) {
-    this.message="SceneJS.ProxyErrorResponseException: " + msg ;
+    this.message = "SceneJS.ProxyErrorResponseException: " + msg;
     this.cause = cause;
 };
 
@@ -136,7 +136,7 @@ SceneJS.ProxyErrorResponseException = function(msg, cause) {
  * (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.ProxyEmptyResponseException = function(msg, cause) {
-    this.message="SceneJS.ProxyEmptyResponseException: " + msg ;
+    this.message = "SceneJS.ProxyEmptyResponseException: " + msg;
     this.cause = cause;
 };
 
@@ -144,7 +144,7 @@ SceneJS.ProxyEmptyResponseException = function(msg, cause) {
  * @class  Exception thrown to signify that empty content was loaded (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.EmptyResponseException = function(msg, cause) {
-    this.message="SceneJS.EmptyResponseException: " + msg ;
+    this.message = "SceneJS.EmptyResponseException: " + msg;
     this.cause = cause;
 };
 
@@ -152,7 +152,7 @@ SceneJS.EmptyResponseException = function(msg, cause) {
  * @class  Exception thrown to signify that an HTTP error occured while attempting to load content (eg. by {@link SceneJS.Instance}, {@link SceneJS.LoadCollada} etc).
  */
 SceneJS.HttpException = function(msg, cause) {
-    this.message="SceneJS.HttpException: " + msg ;
+    this.message = "SceneJS.HttpException: " + msg;
     this.cause = cause;
 };
 
@@ -161,13 +161,13 @@ SceneJS.HttpException = function(msg, cause) {
  * a specified config value.
  */
 SceneJS.WebGLUnsupportedNodeConfigException = function(msg, cause) {
-    this.message="SceneJS.WebGLUnsupportedNodeConfigException: " + msg ;
+    this.message = "SceneJS.WebGLUnsupportedNodeConfigException: " + msg;
     this.cause = cause;
 };
 
 /** @private */
 SceneJS.PickWithoutRenderedException = function(msg, cause) {
-    this.message="SceneJS.PickWithoutRenderedException: " + msg ;
+    this.message = "SceneJS.PickWithoutRenderedException: " + msg;
     this.cause = cause;
 };
 
@@ -176,7 +176,7 @@ SceneJS.PickWithoutRenderedException = function(msg, cause) {
  * data scope (SceneJS.Data).
  */
 SceneJS.DataExpectedException = function(msg, cause) {
-    this.message="SceneJS.DataExpectedException: " + msg ;
+    this.message = "SceneJS.DataExpectedException: " + msg;
     this.cause = cause;
 };
 
@@ -184,7 +184,7 @@ SceneJS.DataExpectedException = function(msg, cause) {
  * @class  Exception thrown by nodes such as {@link SceneJs.Load} and {@link SceneJS.LoadCollada} when they timeout waiting for their content to load.
  */
 SceneJS.LoadTimeoutException = function(msg, cause) {
-    this.message="SceneJS.LoadTimeoutException: " + msg ;
+    this.message = "SceneJS.LoadTimeoutException: " + msg;
     this.cause = cause;
 };
 
@@ -192,7 +192,7 @@ SceneJS.LoadTimeoutException = function(msg, cause) {
  * @class  Exception thrown to signify a general internal SceneJS exception, ie. a SceneJS implementation bug.
  */
 SceneJS.InternalException = function(msg, cause) {
-    this.message="SceneJS.InternalException: " + msg ;
+    this.message = "SceneJS.InternalException: " + msg;
     this.cause = cause;
 };
 
@@ -201,7 +201,7 @@ SceneJS.InternalException = function(msg, cause) {
  * a {@link SceneJS.Symbol} to instance
  */
 SceneJS.SymbolNotFoundException = function(msg, cause) {
-    this.message="SceneJS.SymbolNotFoundException: " + msg ;
+    this.message = "SceneJS.SymbolNotFoundException: " + msg;
     this.cause = cause;
 };
 
@@ -210,11 +210,78 @@ SceneJS.SymbolNotFoundException = function(msg, cause) {
  * a {@link SceneJS.Symbol} to instance
  */
 SceneJS.InvalidSceneGraphException = function(msg, cause) {
-    this.message="SceneJS.InvalidSceneGraphException: " + msg ;
+    this.message = "SceneJS.InvalidSceneGraphException: " + msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify that browser does not support the Socket node (ie. WebSockets not supported)
+ */
+SceneJS.SocketNotSupportedException = function(msg, cause) {
+    this.message = "SceneJS.SocketNotSupportedException: " + msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify error condition on a Socket
+ */
+SceneJS.SocketErrorException = function(msg, cause) {
+    this.message = "SceneJS.SocketErrorException: " + msg;
     this.cause = cause;
 };
 
 
+/**
+ * @class  Exception thrown to signify error response by socket server. TODO: Expand this to other types
+ */
+SceneJS.SocketServerErrorException = function(msg, cause) {
+    this.message = "SceneJS.SocketServerErrorException: " + msg;
+    this.cause = cause;
+};
+
+
+/**
+ * @class Exception thrown by {@link SceneJS.WithConfigs} when in strictNodes mode and a node reference
+ * on its configuration map could not be resolved to any nodes in it's subgraph.
+ */
+SceneJS.WithConfigsNodeNotFoundException = function(msg, cause) {
+    this.message = "SceneJS.WithConfigsNodeNotFoundException: " + msg;
+    this.cause = cause;
+};
+
+/**
+ * @class Exception thrown by {@link SceneJS.WithConfigs} when in strictProperties mode and a property reference
+ * on its configuration map could not be resolved to any methods on a specified target node in it's subgraph.
+ */
+SceneJS.WithConfigsPropertyNotFoundException = function(msg, cause) {
+    this.message = "SceneJS.WithConfigsPropertyNotFoundException: " + msg;
+    this.cause = cause;
+};
+
+/**
+ * @class Exception thrown by {@link SceneJS.UseModule} when it cannot find a module matching it's name configuration
+ * property. This is likely to be because you didn't load any module of that name with SceneJS.requireModule().
+ */
+SceneJS.ModuleNotFoundException = function(msg, cause) {
+    this.message = "SceneJS.ModuleNotFoundException: " + msg;
+    this.cause = cause;
+};
+
+/**
+ * @class Exception thrown by {@link SceneJS#requireModule} when a module does not load within timeout interval.
+ */
+SceneJS.ModuleLoadTimeoutException = function(msg, cause) {
+    this.message = "SceneJS.ModuleLoadTimeoutException: " + msg;
+    this.cause = cause;
+};
+
+/**
+ * @class Exception thrown by {@link SceneJS#installModule} when a module caused an exception while installing.
+ */
+SceneJS.ModuleInstallFailureException = function(msg, cause) {
+    this.message = "SceneJS.ModuleInstallFailureException: " + msg;
+    this.cause = cause;
+};
 
 
 

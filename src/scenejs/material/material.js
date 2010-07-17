@@ -258,10 +258,10 @@ SceneJS.Material.prototype._render = function(traversalContext, data) {
             this._init(this._getParams(data));
         }
 
-        var saveMaterial = SceneJS_materialModule.getMaterial();
-        SceneJS_materialModule.setMaterial(this._material);
+        var saveMaterial = SceneJS._materialModule.getMaterial();
+        SceneJS._materialModule.setMaterial(this._material);
         this._renderNodes(traversalContext, data);
-        SceneJS_materialModule.setMaterial(saveMaterial);
+        SceneJS._materialModule.setMaterial(saveMaterial);
     }
 };
 

@@ -264,21 +264,22 @@
 <span class='line'>257</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>258</span> </span><span class="WHIT">            </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>259</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>260</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">saveMaterial</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS_materialModule.getMaterial</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>261</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_materialModule.setMaterial</span><span class="PUNC">(</span><span class="NAME">this._material</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>262</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>263</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS_materialModule.setMaterial</span><span class="PUNC">(</span><span class="NAME">saveMaterial</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>264</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>265</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>266</span> 
-<span class='line'>267</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Material} instance
-<span class='line'>268</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Material constructor
-<span class='line'>269</span>  * @returns {SceneJS.Material}
-<span class='line'>270</span>  */</span><span class="WHIT">
-<span class='line'>271</span> </span><span class="NAME">SceneJS.material</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>272</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Material</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>273</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Material.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>274</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>275</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>276</span> 
-<span class='line'>277</span> </span></pre></body></html>
+<span class='line'>260</span> 
+<span class='line'>261</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">saveMaterial</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._materialModule.getMaterial</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>262</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._materialModule.setMaterial</span><span class="PUNC">(</span><span class="NAME">this._material</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>263</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._materialModule.setMaterial</span><span class="PUNC">(</span><span class="NAME">saveMaterial</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>267</span> 
+<span class='line'>268</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Material} instance
+<span class='line'>269</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Material constructor
+<span class='line'>270</span>  * @returns {SceneJS.Material}
+<span class='line'>271</span>  */</span><span class="WHIT">
+<span class='line'>272</span> </span><span class="NAME">SceneJS.material</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>273</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Material</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>274</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Material.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>277</span> 
+<span class='line'>278</span> </span></pre></body></html>

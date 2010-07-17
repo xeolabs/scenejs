@@ -12,12 +12,12 @@
  *
  *  @private
  */
-var SceneJS_memoryModule = new (function() {
+SceneJS._memoryModule = new (function() {
     var evictors = [];          // Eviction function for each client
     var iEvictor = 0;           // Fair eviction policy - don't keep starting polling at first evictor
 
-    SceneJS_eventModule.addListener(// Framework reset - start next polling at first evictor
-            SceneJS_eventModule.RESET,
+    SceneJS._eventModule.addListener(// Framework reset - start next polling at first evictor
+            SceneJS._eventModule.RESET,
             function() {
                 iEvictor = 0;
             });
@@ -37,7 +37,7 @@ var SceneJS_memoryModule = new (function() {
                 iEvictor = 0;
             }
             if (evictors[iEvictor++]()) {
-                SceneJS_loggingModule.warn("Evicted least-used item from memory");
+                SceneJS._loggingModule.warn("Evicted least-used item from memory");
                 return true;
             } else {
                 tries++;
@@ -50,8 +50,8 @@ var SceneJS_memoryModule = new (function() {
 
     // @private
     function outOfMemory(description) {
-        SceneJS_loggingModule.error("Memory allocation failed");
-        throw SceneJS_errorModule.fatalError(new SceneJS.OutOfVRAMException(
+        SceneJS._loggingModule.error("Memory allocation failed");
+        throw SceneJS._errorModule.fatalError(new SceneJS.OutOfVRAMException(
                 "Out of memory - failed to allocate memory for " + description));
     }
 
@@ -72,7 +72,7 @@ var SceneJS_memoryModule = new (function() {
      * @private
      */
     this.allocate = function(context, description, tryAllocate) {
-        // SceneJS_loggingModule.debug("Allocating memory for: " + description);
+        // SceneJS._loggingModule.debug("Allocating memory for: " + description);
         var maxTries = 10; // TODO: Heuristic for this? Does this really need be greater than one?
         var tries = 0;
         while (true) {
@@ -84,7 +84,7 @@ var SceneJS_memoryModule = new (function() {
                 return; // No errors, must have worked
             } catch (e) {
                 if (context.getError() != context.OUT_OF_MEMORY) {
-                    SceneJS_loggingModule.error(e.message || e);
+                    SceneJS._loggingModule.error(e.message || e);
                     throw e; // We only handle out-of-memory error here
                 }
                 if (++tries > maxTries || !evict()) { // Too many tries or no cacher wants to evict

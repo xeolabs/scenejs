@@ -249,7 +249,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
-	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
+	<li><a href="../symbols/SceneJS.ModuleInstallFailureException.html">SceneJS.ModuleInstallFailureException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleLoadTimeoutException.html">SceneJS.ModuleLoadTimeoutException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleNotFoundException.html">SceneJS.ModuleNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Node.html">SceneJS.Node</a></li>
 	
@@ -283,6 +287,14 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a></li>
 	
+	<li><a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketErrorException.html">SceneJS.SocketErrorException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketNotSupportedException.html">SceneJS.SocketNotSupportedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketServerErrorException.html">SceneJS.SocketServerErrorException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
 	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
@@ -302,6 +314,10 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -326,54 +342,76 @@ ul.inheritsList
 			
 				Root node of a SceneJS scene graph.
 
-<p>This is entry and exit point for execution when rendering one frame of a scene graph, which also configures certain
-global scene parameters as listed below. </p>
+<p>This is entry and exit point for execution when rendering one frame of a scene graph, while also providing
+the means to configure global data scope values and configurations for each frame. </p>
 <p><b>Binding to a canvas</b></p>
 <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
 element for the scene to render to. When that is omitted, the node will look for one with the default ID of
 "_scenejs-default-canvas".</p>
 <p><b>Timeout for <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> sub-nodes</b></p>
 <p>The Scene node can be configured with a <b>loadTimeoutSecs</b> property to specify the number of seconds within
-which <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> nodes within its subgraph must receive and parse their content. That may be overridden
-in the configs of individual <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> nodes.
+which <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> nodes within its subgraph must receive and parse content when they load it from files.
+That may be overridden in the configs of individual <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a> nodes.
 <p><b>Usage Example:</b></p><p>Shown below is Scene bound to a canvas and specifying a JSONP proxy, that contains a
-<a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a> node whose "eye" property is dynamically configured with a callback. A SceneJS.LoadCollada
+<a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a> node whose "eye" property is dynamically configured with a callback. A <a href="../symbols/SceneJS.Instance.html">SceneJS.Instance</a>
 node loads a Collada model cross-domain through the proxy. When the Scene is rendered, a value for the
 Scene.LookAt's property is injected into it. The Scene will put the property on a data scope (which is
 implemented by a <a href="../symbols/SceneJS.Data.html">SceneJS.Data</a>) that the <a href="../symbols/SceneJS.LookAt.html">SceneJS.LookAt</a>'s config callback then accesses.</b></p>
 <pre><code>
+
+// To enable the COLLADA content to load cross-domain, we'll first configure SceneJS with a strategy to allow it
+// to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
+// create the request URL for the service, and another to extract the data from the response.
+
+SceneJS.setJSONPStrategy({
+    request : function(url, format, callback) {
+       return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
+    },
+
+   response : function(data) {
+
+       // The SceneJS proxy will provide an error message like this when
+       // it fails to service the request
+
+       if (data.error) {
+           throw "Proxy server responded with error: " + data.error;
+       }
+       return data;
+   }
+});
+
 var myScene = new SceneJS.Scene({
 
-             // Bind scene to render to WebGL Canvas element with given ID.
-             // Default is "_scenejs-default-canvas"
+        // Bind scene to render to WebGL Canvas element with given ID.
+        // Default is "_scenejs-default-canvas"
 
-             canvasId:        "myCanvas",
+        canvasId:        "myCanvas",
 
-             // Optionally write scene logging to a DIV:
+        // Optionally write scene logging to a DIV:
 
-             loggingElementId: "myLoggingDiv",
+       loggingElementId: "myLoggingDiv",
 
-             // Optional default timeout for SceneJS.Instance<xxx> nodes, which may override
-             // it individually - default is 180 seconds
+       // Optional default timeout for SceneJS.Instance<xxx> nodes, which may override
+       // it individually - default is 180 seconds
 
-             loadTimeoutSecs: 180
-         },
+      loadTimeoutSecs: 180
+  },
 
-         new SceneJS.LookAt(
-             function(data) {
-                 return {
-                     eye: data.get("eye")
-                 };
-             },
+  new SceneJS.LookAt(
+      function(data) {
+          return {
+             eye: data.get("eye")
+         };
+      },
 
-             new SceneJS.LoadCollada("http://foo.com/models/myModel.dae")
-     );
+      new SceneJS.Instance({ uri: "http://foo.com/models/myModel.dae" })
+);
 
-myScene.render({
+myScene.setData({
          eye: {
             x: 0, y: 0, z: -100
          }
-     });
+     }).render();
 
 </pre></code>
 				
@@ -486,6 +524,24 @@ myScene.render({
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Scene.html#getConfigs">getConfigs</a></b>()
+								</div>
+								<div class="description">Returns any config values map previously set with <a href="#setConfigs">#setConfigs</a> since the last call to <a href="#render">#render</a>.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Scene.html#getData">getData</a></b>()
+								</div>
+								<div class="description">Returns any data values map previously set with <a href="#setData">#setData</a> since the last call to <a href="#render">#render</a>.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.Scene.html#getNumProcesses">getNumProcesses</a></b>()
 								</div>
 								<div class="description">Returns count of active processes.</div>
@@ -504,9 +560,28 @@ myScene.render({
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/SceneJS.Scene.html#render">render</a></b>(paramOverrides)
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Scene.html#render">render</a></b>()
 								</div>
-								<div class="description">Renders the scene, passing in any properties required for dynamic configuration of its contained nodes.</div>
+								<div class="description">Renders the scene, applying any config and data scope values given to <a href="#setData">#setData</a> and {#link setConfigs},
+then clearing those values afterwards.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Scene.html#setConfigs">setConfigs</a></b>(values)
+								</div>
+								<div class="description">Sets a map of values to set on nodes in the scene graph as they are rendered.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.Scene.html#setData">setData</a></b>(values)
+								</div>
+								<div class="description">Sets a map of values to set on the global scene data scope.</div>
 							</td>
 						</tr>
 					
@@ -516,7 +591,7 @@ myScene.render({
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNode">getNode</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeListeners">removeListeners</a>, <a href="../symbols/SceneJS.Node.html#removeNode">removeNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
 				</dl>
 				
 			
@@ -665,6 +740,70 @@ the default ID of "_scenejs-default-canvas".
 
 					<hr />
 				
+					<a name="getConfigs"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Object}</span>
+					<b>getConfigs</b>()
+					
+					</div>
+					<div class="description">
+						Returns any config values map previously set with <a href="#setConfigs">#setConfigs</a> since the last call to <a href="#render">#render</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> The config values map</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getData"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Object}</span>
+					<b>getData</b>()
+					
+					</div>
+					<div class="description">
+						Returns any data values map previously set with <a href="#setData">#setData</a> since the last call to <a href="#render">#render</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> The data values map</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="getNumProcesses"> </a>
 					<div class="fixedFont">
 					
@@ -724,11 +863,39 @@ when you render it.
 					<div class="fixedFont">
 					
 					
-					<b>render</b>(paramOverrides)
+					<b>render</b>()
 					
 					</div>
 					<div class="description">
-						Renders the scene, passing in any properties required for dynamic configuration of its contained nodes.
+						Renders the scene, applying any config and data scope values given to <a href="#setData">#setData</a> and {#link setConfigs},
+then clearing those values afterwards.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setConfigs"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setConfigs</b>(values)
+					
+					</div>
+					<div class="description">
+						Sets a map of values to set on nodes in the scene graph as they are rendered. The map is the same as that
+configured on a <a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> and works the same way. The given values will be forgotten
+when the scene is next rendered with <a href="#render">#render</a>.
 						
 						
 					</div>
@@ -740,10 +907,49 @@ when you render it.
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>paramOverrides</b>
+									<span class="light fixedFont">{object}</span> <b>values</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>Map of values, same format as that given to <a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setData"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setData</b>(values)
+					
+					</div>
+					<div class="description">
+						Sets a map of values to set on the global scene data scope. This data will then be available
+to any configuration callbacks that are used to configure nodes. The map is the same as that
+configured on a <a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a> and works the same way. The given values will be forgotten
+when the scene is next rendered with <a href="#render">#render</a>.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{object}</span> <b>values</b>
+									
+								</dt>
+								<dd>Values for the global scene data scope, same format as that given to <a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></dd>
 							
 							</dl>
 						
@@ -768,7 +974,7 @@ when you render it.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:21 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat Jul 17 2010 23:40:00 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

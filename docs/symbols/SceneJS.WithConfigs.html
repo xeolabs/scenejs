@@ -249,7 +249,11 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Matrix.html">SceneJS.Matrix</a></li>
 	
-	<li><a href="../symbols/SceneJS.Name.html">SceneJS.Name</a></li>
+	<li><a href="../symbols/SceneJS.ModuleInstallFailureException.html">SceneJS.ModuleInstallFailureException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleLoadTimeoutException.html">SceneJS.ModuleLoadTimeoutException</a></li>
+	
+	<li><a href="../symbols/SceneJS.ModuleNotFoundException.html">SceneJS.ModuleNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.Node.html">SceneJS.Node</a></li>
 	
@@ -283,6 +287,14 @@ ul.inheritsList
 	
 	<li><a href="../symbols/SceneJS.Selector.html">SceneJS.Selector</a></li>
 	
+	<li><a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketErrorException.html">SceneJS.SocketErrorException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketNotSupportedException.html">SceneJS.SocketNotSupportedException</a></li>
+	
+	<li><a href="../symbols/SceneJS.SocketServerErrorException.html">SceneJS.SocketServerErrorException</a></li>
+	
 	<li><a href="../symbols/SceneJS.Stationary.html">SceneJS.Stationary</a></li>
 	
 	<li><a href="../symbols/SceneJS.Symbol.html">SceneJS.Symbol</a></li>
@@ -302,6 +314,10 @@ ul.inheritsList
 	<li><a href="../symbols/SceneJS.WebGLUnsupportedNodeConfigException.html">SceneJS.WebGLUnsupportedNodeConfigException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a></li>
+	
+	<li><a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a></li>
 	
 	<li><a href="../symbols/SceneJS.WithData.html">SceneJS.WithData</a></li>
 	
@@ -324,25 +340,52 @@ ul.inheritsList
 					<a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>.<br />
 				
 			
-				A scene node that specifies values to set on nodes in it's subgraph as they are rendered .
-<p>This node provides a simple yet flexible mechanism for pushing data down during scene traversal
-into the setter methods of the nodes in its subgraph.</p>.
-<p>The configuration for a <a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> is a hierarchical map of values for the setter methods of
-nodes in the subgraph. As shown in the example below, its hierarchy maps to that of the subgraph. The keys beginning
-with "#" map to the SIDs of nodes, while other keys map to setter methods on those nodes. </p>.
+				Invokes addXXX, removeXXX and setXXX methods on the nodes in its subgraph during traversal to set, delete or add
+elements on them.</p>.
+<p>The configuration for a <a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> is a hierarchical map of values for methods on
+nodes in the subgraph. As shown in the examples below, its hierarchy maps to that of the subgraph. The keys beginning
+with "#" map to the SIDs of nodes. In the first example, we have property keys that map to setter methods on
+those nodes. In the second example we have a property key prefixed with "+", which maps it to a method beginning
+with "add" (addNode). In the third example, we have a property key prefixed with "-", which maps it to a method
+beginning with "remove" (removeNode).</p>.
 
-<p><b>Example:</b></p><p>Configuring SceneJS.Translation and <a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a> nodes in the subgraph:</b></p><pre><code>
-var wd = new SceneJS.WithConfigs({
+<p>The functionality of <a href="../symbols/SceneJS.WithConfigs.html">SceneJS.WithConfigs</a> is also provided in the <a href="../symbols/SceneJS.Socket.html">SceneJS.Socket</a> node, which allows
+a server to push a configuration map onto a scene subgraph through a WebSocket.</p>
 
-        "#myTranslate" : {    // Selects the SceneJS.Scale
-             x: 5,            // Invokes the setX, setY and setZ methods of the SceneJS.Translate
-             y: 10,
-             z: 2,
+<p>Note that configs are applied to nodes just before they are rendered, so as long as your config map
+resolves correctly, the nodes don't have to have initial configurations wherever you have specified them for "setXXX"
+methods in the config map.</p>
 
-             "#myScale" : {   // Selects the SceneJS.Scale
-                 x: 2.0,      // Invokes the setX and setY methods of the SceneJS.Scale
-                 z: 1.5
-              }
+<h2>Example 1: Setting properties on subnodes</h2>
+<p><b>Example 1:</b></p><p>Configuring properties on SceneJS.Translation and <a href="../symbols/SceneJS.Scale.html">SceneJS.Scale</a> nodes in the subgraph:</b></p><pre><code>
+var wc = new SceneJS.WithConfigs({
+
+        // Have the WithConfigs throw a SceneJS.WithConfigsNodeNotFoundException if any target node
+        // is not found at exactly the hierarchy position specified in our configs map.
+        //
+        // Default is false, which would allow unmatched nodes to be simply skipped as traversal
+        // descends into the subgraph.
+        //
+        strictNodes : true,       // Default is false
+
+        // Have the WithConfigs throw a SceneJS.WithConfigsPropertyNotFoundException if any target property
+        // is not found on its target node.
+        //
+        // Default is true.
+        //
+        strictProperties : true,  // Default is true
+
+        configs: {
+            "#myTranslate" : {    // Selects the SceneJS.Scale
+                 x: 5,            // Invokes the setX, setY and setZ methods of the SceneJS.Translate
+                 y: 10,
+                 z: 2,
+
+                 "#myScale" : {   // Selects the SceneJS.Scale
+                     x: 2.0,      // Invokes the setX and setY methods of the SceneJS.Scale
+                     z: 1.5
+                  }
+            }
          }
      },
 
@@ -362,7 +405,73 @@ var wd = new SceneJS.WithConfigs({
          )
      )
  )
+</code></pre>
 
+<h2>Adding elements to subnodes</h2>
+<p><b>Example:</b></p><p>In this example we're using a WithConfigs node to attach a subgraph to a target node
+within it's own subgraph. Abstractly, a teapot is being attached to a chair at a table in a cafe. Note
+the "+node" key in the map for the "chair2" node, which maps to the "addNode" method on that node.</b></p><pre><code>
+var wc = SceneJS.withConfigs({
+        strictNodes : true,       // Target node must exist - default is false
+        strictProperties : true,  // Function addNode must exist on target node - default is true
+        configs: {
+            "#cafe": {
+                 "#table5" : {
+                     "#chair2" : {
+
+                         // Content we're attaching. "+node" directs the WithConfig
+                         // to call the "addNode" method on the Node at the attachment
+                         // point to attach the object
+                         //
+                         "+node" :
+                              SceneJS.rotate({ // The object to attach - imagine
+                                        angle: 0,    // this teapot is a person!
+                                        y : 1.0
+                                   },
+                                   SceneJS.objects.teapot())
+                              }
+                         }
+                     }
+                 }
+            },
+            SceneJS.node({ sid: "cafe" },
+                 SceneJS.translate({ x: -1, y: 0, z: -1},
+                     SceneJS.node({ sid: "table5" },
+                         SceneJS.translate({ x: 1, y: 0, z: 1},
+
+                            // Attachment point
+
+                            SceneJS.node({ sid: "chair2" }))))))
+</code></pre>
+
+<h2>Removing elements from subnodes</h2>
+<p><b>Example:</b></p><p>In this example we're using a WithConfigs node to delete a subgraph from a target node.
+Abstractly, a chair is being removed from a table in a cafe. Note the "-node" key in the map for the "chair2" node,
+which maps to the "removeNode" method on that node, and the value, which is the SID of the node to remove.</b></p><pre><code>
+var wc = SceneJS.withConfigs({
+        strictNodes : true,        // Target node must exist - default is false
+        strictProperties : true,   // Function addNode must exist on target node - default is true
+        configs: {
+            "#cafe": {
+                 "#table5" : {
+
+                     // Content we're removing. "-node" directs the WithConfig
+                     // to call the "removeNode" method on the "table5" target Node
+                     //
+                     "-node" : "#chair2"
+                 }
+            },
+            SceneJS.node({ sid: "cafe" },
+                 SceneJS.translate({ x: -1, y: 0, z: -1},
+
+                     // Target node
+
+                     SceneJS.node({ sid: "table5" },
+                         SceneJS.translate({ x: 1, y: 0, z: 1},
+
+                            // Removing this subnode:
+
+                            SceneJS.node({ sid: "chair2" }))))))
 </code></pre>
 				
 				
@@ -423,9 +532,49 @@ var wd = new SceneJS.WithConfigs({
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.WithConfigs.html#getStrictNodes">getStrictNodes</a></b>()
+								</div>
+								<div class="description">Returns whether or not a <a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a> exception will be raised when
+a node reference on the WithConfigs config map cannot be resolved to its target node in the subgraph.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.WithConfigs.html#getStrictProperties">getStrictProperties</a></b>()
+								</div>
+								<div class="description">Returns whether or not a <a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a> will be raised when
+a property reference on the WithConfigs config map cannot be resolved to any method on a target node.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/SceneJS.WithConfigs.html#setConfigs">setConfigs</a></b>(configs)
 								</div>
 								<div class="description">Sets the configs map</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.WithConfigs.html#setStrictNodes">setStrictNodes</a></b>(value)
+								</div>
+								<div class="description">Specifies whether or not a <a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a> exception is to be raised when
+a node reference in the WithConfigs config map cannot be resolved to its target node in the subgraph.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/SceneJS.WithConfigs.html#setStrictProperties">setStrictProperties</a></b>(value)
+								</div>
+								<div class="description">Specifies whether or not a <a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a> is to be raised when
+a property reference on the WithConfigs config map cannot be resolved to any method on a target node.</div>
 							</td>
 						</tr>
 					
@@ -435,7 +584,7 @@ var wd = new SceneJS.WithConfigs({
 				
 				
 				<dl class="inheritsList">
-				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
+				<dt>Methods borrowed from class <a href="../symbols/SceneJS.Node.html">SceneJS.Node</a>: </dt><dd><a href="../symbols/SceneJS.Node.html#addListener">addListener</a>, <a href="../symbols/SceneJS.Node.html#addNode">addNode</a>, <a href="../symbols/SceneJS.Node.html#findNodesByType">findNodesByType</a>, <a href="../symbols/SceneJS.Node.html#getInfo">getInfo</a>, <a href="../symbols/SceneJS.Node.html#getNode">getNode</a>, <a href="../symbols/SceneJS.Node.html#getNodeAt">getNodeAt</a>, <a href="../symbols/SceneJS.Node.html#getNodes">getNodes</a>, <a href="../symbols/SceneJS.Node.html#getNumNodes">getNumNodes</a>, <a href="../symbols/SceneJS.Node.html#getParent">getParent</a>, <a href="../symbols/SceneJS.Node.html#getSID">getSID</a>, <a href="../symbols/SceneJS.Node.html#getType">getType</a>, <a href="../symbols/SceneJS.Node.html#insertNode">insertNode</a>, <a href="../symbols/SceneJS.Node.html#removeListener">removeListener</a>, <a href="../symbols/SceneJS.Node.html#removeListeners">removeListeners</a>, <a href="../symbols/SceneJS.Node.html#removeNode">removeNode</a>, <a href="../symbols/SceneJS.Node.html#removeNodeAt">removeNodeAt</a>, <a href="../symbols/SceneJS.Node.html#setInfo">setInfo</a></dd>
 				</dl>
 				
 			
@@ -541,6 +690,72 @@ var wd = new SceneJS.WithConfigs({
 
 					<hr />
 				
+					<a name="getStrictNodes"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>getStrictNodes</b>()
+					
+					</div>
+					<div class="description">
+						Returns whether or not a <a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a> exception will be raised when
+a node reference on the WithConfigs config map cannot be resolved to its target node in the subgraph.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> When true, exception is enabled</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getStrictProperties"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>getStrictProperties</b>()
+					
+					</div>
+					<div class="description">
+						Returns whether or not a <a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a> will be raised when
+a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> When true, exception is enabled</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="setConfigs"> </a>
 					<div class="fixedFont">
 					
@@ -582,6 +797,80 @@ var wd = new SceneJS.WithConfigs({
 						
 						
 
+					<hr />
+				
+					<a name="setStrictNodes"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setStrictNodes</b>(value)
+					
+					</div>
+					<div class="description">
+						Specifies whether or not a <a href="../symbols/SceneJS.WithConfigsNodeNotFoundException.html">SceneJS.WithConfigsNodeNotFoundException</a> exception is to be raised when
+a node reference in the WithConfigs config map cannot be resolved to its target node in the subgraph.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Boolean}</span> <b>value</b>
+									
+								</dt>
+								<dd>When true, enables exception</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setStrictProperties"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setStrictProperties</b>(value)
+					
+					</div>
+					<div class="description">
+						Specifies whether or not a <a href="../symbols/SceneJS.WithConfigsPropertyNotFoundException.html">SceneJS.WithConfigsPropertyNotFoundException</a> is to be raised when
+a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Boolean}</span> <b>value</b>
+									
+								</dt>
+								<dd>When true, enables exception</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
 					
 				
 			
@@ -596,7 +885,7 @@ var wd = new SceneJS.WithConfigs({
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Fri Jun 18 2010 22:54:22 GMT+1200 (NZST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.3.2 on Sat Jul 17 2010 23:40:01 GMT+1200 (NZST)
 		</div>
 	</body>
 </html>

@@ -105,33 +105,48 @@ SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
     var matrix = null;
     var t;
     if (translate) {
-        matrix = SceneJS_math_translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
+        matrix = SceneJS._math_translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
     }
     if (scale) {
-        t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
-        matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
+        t = SceneJS._math_scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
+        matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
     }
     if (rotate) {
         if (rotate.x) {
-            t = SceneJS_math_rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
+            t = SceneJS._math_rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
+            matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
         }
         if (rotate.y) {
-            t = SceneJS_math_rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
+            t = SceneJS._math_rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
+            matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
         }
         if (rotate.z) {
-            t = SceneJS_math_rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
+            t = SceneJS._math_rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
+            matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
         }
     }
     return matrix;
 };
 
-SceneJS.Texture.prototype._STATE_INITIAL = 0;            // Ready to get texture
-SceneJS.Texture.prototype._STATE_LOADING = 1;      // Texture image load in progress
-SceneJS.Texture.prototype._STATE_LOADED = 2;       // Texture image load completed
-SceneJS.Texture.prototype._STATE_ERROR = -1;             // Image load or texture creation failed
+/** Ready to create texture layer
+ *  @private
+ */
+SceneJS.Texture._STATE_INITIAL = 0;
+
+/** Texture layer image load in progress
+ *  @private
+ */
+SceneJS.Texture._STATE_LOADING = 1;
+
+/** Texture layer image load completed
+ *  @private
+ */
+SceneJS.Texture._STATE_LOADED = 2;
+
+/** Texture layer creation or image load failed
+ * @private
+ */
+SceneJS.Texture._STATE_ERROR = -1;
 
 
 // @private
@@ -152,7 +167,7 @@ SceneJS.Texture.prototype._init = function(params) {
                 layerParam.applyFrom != "uv2" &&
                 layerParam.applyFrom != "normal" &&
                 layerParam.applyFrom != "geometry") {
-                throw SceneJS_errorModule.fatalError(
+                throw SceneJS._errorModule.fatalError(
                         new SceneJS.InvalidNodeConfigException(
                                 "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
                                 "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
@@ -161,14 +176,14 @@ SceneJS.Texture.prototype._init = function(params) {
         if (layerParam.applyTo) {
             if (layerParam.applyTo != "baseColor" && // Colour map
                 layerParam.applyTo != "diffuseColor") {
-                throw SceneJS_errorModule.fatalError(
+                throw SceneJS._errorModule.fatalError(
                         new SceneJS.InvalidNodeConfigException(
                                 "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
                                 "should be either 'baseColor', 'diffuseColor'"));
             }
         }
         this._layers.push({
-            state : this._STATE_INITIAL,
+            state : SceneJS.Texture._STATE_INITIAL,
             process: null,                      // Image load process handle
             image : null,                       // Initialised when state == IMAGE_LOADED
             creationParams: layerParam,         // Create texture using this
@@ -201,7 +216,7 @@ SceneJS.Texture.prototype._init = function(params) {
 
 SceneJS.Texture.prototype._render = function(traversalContext, data) {
     if (!this._layers) { // One-shot dynamic config
-       this._init( this._getParams(data));
+        this._init(this._getParams(data));
     }
 
     /*-----------------------------------------------------
@@ -213,48 +228,49 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
     for (var i = 0; i < this._layers.length; i++) {
         var layer = this._layers[i];
 
-        if (layer.state == this._STATE_LOADED) {
-            if (!SceneJS_textureModule.textureExists(layer.texture)) {  // Texture evicted from cache
-                layer.state = this._STATE_INITIAL;
+        if (layer.state == SceneJS.Texture._STATE_LOADED) {
+            if (!SceneJS._textureModule.textureExists(layer.texture)) {  // Texture evicted from cache
+                layer.state = SceneJS.Texture._STATE_INITIAL;
+
             }
         }
 
-        switch (layer.state) {
-            case this._STATE_LOADED: // Layer ready to apply
-                countLayersReady++;
 
+        switch (layer.state) {
+
+            case SceneJS.Texture._STATE_LOADED: // Layer ready to apply
+                countLayersReady++;
                 break;
 
-            case this._STATE_INITIAL: // Layer load to start
-                layer.state = this._STATE_LOADING;
+            case SceneJS.Texture._STATE_INITIAL: // Layer load to start
+                layer.state = SceneJS.Texture._STATE_LOADING;
                 (function(l) { // Closure allows this layer to receive results
-                    var _this = this;
-                    SceneJS_textureModule.createTexture(
+                    SceneJS._textureModule.createTexture(
                             l.creationParams.uri,
                             l.creationParams,
 
                             function(texture) { // Success
                                 l.texture = texture;
-                                l.state = _this._STATE_LOADED;
+                                l.state = SceneJS.Texture._STATE_LOADED;                                
                             },
 
                             function() { // General error, probably 404
-                                l.state = _this._STATE_ERROR;
+                                l.state = SceneJS.Texture._STATE_ERROR;
                                 var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
-                                SceneJS_loggingModule.warn(message);
+                                SceneJS._loggingModule.warn(message);
                             },
 
                             function() { // Load aborted - user probably refreshed/stopped page
-                                SceneJS_loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
-                                l.state = _this._STATE_ERROR;
+                                SceneJS._loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
+                                l.state = SceneJS.Texture._STATE_ERROR;
                             });
                 }).call(this, layer);
                 break;
 
-            case this._STATE_LOADING: // Layer still loading
+            case SceneJS.Texture._STATE_LOADING: // Layer still loading
                 break;
 
-            case this._STATE_ERROR: // Layer disabled
+            case SceneJS.Texture._STATE_ERROR: // Layer disabled
                 break;
         }
     }
@@ -270,15 +286,17 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
         /* Fastest strategy is to allow the complete set of layers to load
          * before applying any of them. There would be a huge performance penalty
          * if we were to apply the incomplete set as layers are still loading -
-         * SceneJS_shaderModule would then have to generate a new shader for each new
+         * SceneJS._shaderModule would then have to generate a new shader for each new
          * layer loaded, which would become redundant as soon as the next layer is loaded.
          */
+
         if (countLayersReady == this._layers.length) {
             var countPushed = 0;
             for (var i = 0; i < this._layers.length; i++) {
                 var layer = this._layers[i];
-                if (layer.state = this._STATE_LOADED) {
-                    SceneJS_textureModule.pushLayer(layer.texture, {
+
+                if (layer.state = SceneJS.Texture._STATE_LOADED) {
+                    SceneJS._textureModule.pushLayer(layer.texture, {
                         applyFrom : layer.applyFrom,
                         applyTo : layer.applyTo,
                         blendMode : layer.blendMode,
@@ -288,7 +306,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                 }
             }
             this._renderNodes(traversalContext, data);
-            SceneJS_textureModule.popLayers(countPushed);
+            SceneJS._textureModule.popLayers(countPushed);
 
         } else {
             this._renderNodes(traversalContext, data);

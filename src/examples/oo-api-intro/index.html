@@ -16,8 +16,7 @@
             </canvas>
         </td>
         <td valign="top">
-            <h1>Object-Oriented API - Cross-Domain Load of COLLADA Airplane Model
-                from SceneJS.org</h1>
+            <h1>Object-Oriented API - Importing a COLLADA Airplane Content Module</h1>
 
             <p>SceneJS has had an object-oriented core API since V0.7.3. Layered on top of that is a thin layer of
                 <b>factory functions</b>. Therefore, you have the choice of using the framework in either an
@@ -25,18 +24,25 @@
                     documentation</a> are in the object-oriented
                 style, while many of the examples here use the factory functions for brevity.</p>
 
-            <p>Here's the equivalent to the earler <a href="../seymour-plane/index.html">Seymour plane example</a>, this
-                time with most of the scene constructed through the composition of objects using the object-oriented
+            <p>Most of this scene is constructed through the composition of objects using the object-oriented
                 API. Note that towards the end of this example we start using the original functional API again, to show
                 how they can be mixed.</p>
 
-            <a target="other" href="oo-api-intro.js">Source code</a>
+            <ul>
+                <li><a target="other" href="oop-seymourplane.js">Scene source code</a></li>
+                <li><a target="other" href="modules/seymourplane/seymourplane.js">Airplane's JSON content module</a>
+                </li>
+                <li><a target="other" href="modules/seymourplane/seymourplane.dae">Airplane's original COLLADA file</a>
+                </li>
+                <li><a target="other" href="http://scenejs.wikispaces.com/SceneJS.UseModule">Wiki article on SceneJS
+                    modules</a></li>
+            </ul>
 
             <div id="theLoggingDiv"></div>
         </td>
     </tr>
 </table>
 
-<script type="text/javascript" src="oo-api-intro.js"></script>
+<script type="text/javascript" src="oop-seymourplane.js"></script>
 </body>
 </html>

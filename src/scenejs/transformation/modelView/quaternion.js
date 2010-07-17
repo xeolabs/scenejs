@@ -76,7 +76,7 @@ SceneJS.Quaternion = function() {
     this._nodeType = "quaternion";
     this._mat = null;
     this._xform = null;
-    this._q = SceneJS_math_identityQuaternion();
+    this._q = SceneJS._math_identityQuaternion();
     if (this._fixedParams) {
         this._init(this._getParams());
     }
@@ -124,7 +124,7 @@ SceneJS._inherit(SceneJS.Quaternion, SceneJS.Node);
 // * @returns {SceneJS.Quaternion} this
 // */
 //SceneJS.Quaternion.prototype.multiply = function(q) {
-//    this._q = SceneJS_math_mulQuaternions(SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
+//    this._q = SceneJS._math_mulQuaternions(SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
 //    this._memoLevel = 0;
 //    return this;
 //};
@@ -142,7 +142,7 @@ SceneJS._inherit(SceneJS.Quaternion, SceneJS.Node);
  */
 SceneJS.Quaternion.prototype.setRotation = function(q) {
     q = q || {};
-    this._q = SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
+    this._q = SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
     this._memoLevel = 0;
     return this;
 };
@@ -152,7 +152,7 @@ SceneJS.Quaternion.prototype.setRotation = function(q) {
  * @returns {{ x: float, y: float, z: float, angle: float }} Quaternion properties as rotation axis and angle
  */
 SceneJS.Quaternion.prototype.getRotation = function() {
-    return SceneJS_math_angleAxisFromQuaternion(this._q);
+    return SceneJS._math_angleAxisFromQuaternion(this._q);
 };
 
 /**
@@ -167,7 +167,7 @@ SceneJS.Quaternion.prototype.getRotation = function() {
  * @returns {SceneJS.Quaternion} this
  */
 SceneJS.Quaternion.prototype.rotate = function(q) {
-    this._q = SceneJS_math_mulQuaternions(SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
+    this._q = SceneJS._math_mulQuaternions(SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
     this._memoLevel = 0;
     return this;
 };
@@ -177,7 +177,7 @@ SceneJS.Quaternion.prototype.rotate = function(q) {
  *
  */
 SceneJS.Quaternion.prototype.getMatrix = function() {
-    return SceneJS_math_newMat4FromQuaternion(this._q)
+    return SceneJS._math_newMat4FromQuaternion(this._q)
 };
 
 
@@ -186,7 +186,7 @@ SceneJS.Quaternion.prototype.getMatrix = function() {
  * @returns {SceneJS.Quaternion} this
  */
 SceneJS.Quaternion.prototype.normalize = function() {
-    this._q = SceneJS_math_normalizeQuaternion(this._q);
+    this._q = SceneJS._math_normalizeQuaternion(this._q);
     this._memoLevel = 0;
     return this;
 };
@@ -209,12 +209,12 @@ SceneJS.Quaternion.prototype._render = function(traversalContext, data) {
         } else {
             this._memoLevel = 1;
         }
-        this._mat = SceneJS_math_newMat4FromQuaternion(this._q);
+        this._mat = SceneJS._math_newMat4FromQuaternion(this._q);
     }
-    var superXform = SceneJS_modelViewTransformModule.getTransform();
+    var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
-        var instancing = SceneJS_instancingModule.instancing();
-        var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
+        var instancing = SceneJS._instancingModule.instancing();
+        var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
@@ -224,9 +224,9 @@ SceneJS.Quaternion.prototype._render = function(traversalContext, data) {
             this._memoLevel = 2;
         }
     }
-    SceneJS_modelViewTransformModule.setTransform(this._xform);
+    SceneJS._modelViewTransformModule.setTransform(this._xform);
     this._renderNodes(traversalContext, data);
-    SceneJS_modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.setTransform(superXform);
 };
 
 /**Factory function that returns a new {@link SceneJS.Quaternion} instance

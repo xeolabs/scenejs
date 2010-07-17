@@ -21,7 +21,7 @@
 SceneJS.Matrix = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "matrix";
-    this._mat = SceneJS_math_identityMat4();
+    this._mat = SceneJS._math_identityMat4();
     this._xform = null;
     if (this._fixedParams) {
         this._init(this._getParams());
@@ -37,10 +37,10 @@ SceneJS._inherit(SceneJS.Matrix, SceneJS.Node);
  */
 SceneJS.Matrix.prototype.setElements = function(elements) {
     if (!elements) {
-        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements undefined"));
+        throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements undefined"));
     }
     if (elements.length != 16) {
-        throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements should number 16"));
+        throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException("SceneJS.Matrix elements should number 16"));
     }
     for (var i = 0; i < 16; i++) {
         this._mat[i] = elements[i];
@@ -74,18 +74,18 @@ SceneJS.Matrix.prototype._render = function(traversalContext, data) {
             this._memoLevel = 1;
         }
     }
-    var superXform = SceneJS_modelViewTransformModule.getTransform();
+    var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
-        var instancing = SceneJS_instancingModule.instancing();
+        var instancing = SceneJS._instancingModule.instancing();
 
         /* When building a view transform, apply the inverse of the matrix
          * to correctly transform the SceneJS.Camera
          */
-        var mat = SceneJS_modelViewTransformModule.isBuildingViewTransform()
-                ? SceneJS_math_inverseMat4(this._mat)
+        var mat = SceneJS._modelViewTransformModule.isBuildingViewTransform()
+                ? SceneJS._math_inverseMat4(this._mat)
                 : this._mat;
         
-        var tempMat = SceneJS_math_mulMat4(superXform.matrix, mat);
+        var tempMat = SceneJS._math_mulMat4(superXform.matrix, mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
@@ -95,9 +95,9 @@ SceneJS.Matrix.prototype._render = function(traversalContext, data) {
             this._memoLevel = 2;
         }
     }
-    SceneJS_modelViewTransformModule.setTransform(this._xform);
+    SceneJS._modelViewTransformModule.setTransform(this._xform);
     this._renderNodes(traversalContext, data);
-    SceneJS_modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.setTransform(superXform);
 };
 
 /** Factory function that returns a new {@link SceneJS.Matrix} instance

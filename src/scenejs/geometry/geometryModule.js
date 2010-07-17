@@ -31,7 +31,7 @@
  *  @private
 
  */
-var SceneJS_geometryModule = new (function() {
+SceneJS._geometryModule = new (function() {
 
     var time = (new Date()).getTime();  // For LRU caching
     var canvas;
@@ -39,22 +39,22 @@ var SceneJS_geometryModule = new (function() {
     var currentGeoMap = null;
     var currentBoundGeoType;            // Type of geometry currently bound to shader
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.TIME_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 canvas = null;
                 currentGeoMap = null;
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CANVAS_ACTIVATED,
             function(c) {
                 if (!geoMaps[c.canvasId]) {      // Lazy-create geometry map for canvas
                     geoMaps[c.canvasId] = {};
@@ -64,28 +64,28 @@ var SceneJS_geometryModule = new (function() {
                 currentBoundGeoType = null;
             }); 
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
                 currentGeoMap = null;
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_DEACTIVATED,
             function() {
                 currentBoundGeoType = null;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RESET,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.RESET,
             function() {
                 for (var canvasId in geoMaps) {    // Destroy geometries on all canvases
                     var geoMap = geoMaps[canvasId];
@@ -106,7 +106,7 @@ var SceneJS_geometryModule = new (function() {
      * @private
      */
     function destroyGeometry(geo) {
-        //  SceneJS_loggingModule.debug("Destroying geometry : '" + geo.type + "'");
+        //  SceneJS._loggingModule.debug("Destroying geometry : '" + geo.type + "'");
         if (geo.type == currentBoundGeoType) {
             currentBoundGeoType = null;
         }
@@ -137,7 +137,7 @@ var SceneJS_geometryModule = new (function() {
      * Volunteer to attempt to destroy a geometry when asked to by memory module
      *
      */
-    SceneJS_memoryModule.registerEvictor(
+    SceneJS._memoryModule.registerEvictor(
             function() {
                 var earliest = time;
                 var evictee;
@@ -157,7 +157,7 @@ var SceneJS_geometryModule = new (function() {
                     }
                 }
                 if (evictee) {
-                    SceneJS_loggingModule.warn("Evicting geometry from memory: " + evictee.type);
+                    SceneJS._loggingModule.warn("Evicting geometry from memory: " + evictee.type);
                     destroyGeometry(evictee);
                     return true;
                 }
@@ -177,11 +177,11 @@ var SceneJS_geometryModule = new (function() {
      */
     function createArrayBuffer(description, context, bufType, values, numItems, itemSize, usage) {
         var buf;
-        SceneJS_memoryModule.allocate(
+        SceneJS._memoryModule.allocate(
                 context,
                 description,
                 function() {
-                    buf = new SceneJS_webgl_ArrayBuffer(context, bufType, values, numItems, itemSize, usage);
+                    buf = new SceneJS._webgl_ArrayBuffer(context, bufType, values, numItems, itemSize, usage);
                 });
         return buf;
     }
@@ -207,7 +207,7 @@ var SceneJS_geometryModule = new (function() {
             case "triangle-fan":
                 return context.TRIANGLE_FAN;
             default:
-                throw SceneJS_errorModule.fatalError(new SceneJS.InvalidNodeConfigException(// Logs and throws
+                throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException(// Logs and throws
                         "SceneJS.geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
@@ -234,10 +234,10 @@ var SceneJS_geometryModule = new (function() {
             type = SceneJS._createKeyForMap(currentGeoMap, "t");
         }
 
-        //   SceneJS_loggingModule.debug("Creating geometry: '" + type + "'");
+        //   SceneJS._loggingModule.debug("Creating geometry: '" + type + "'");
 
         if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
-            throw SceneJS_errorModule.fatalError(
+            throw SceneJS._errorModule.fatalError(
                     new SceneJS.NodeConfigExpectedException(
                             "SceneJS.geometry node property expected : primitive"));
         }
@@ -322,17 +322,17 @@ var SceneJS_geometryModule = new (function() {
      */
     this.drawGeometry = function(type) {
         if (!canvas) {
-            throw SceneJS_errorModule.fatalError(SceneJS.NoCanvasActiveException("No canvas active"));
+            throw SceneJS._errorModule.fatalError(SceneJS.NoCanvasActiveException("No canvas active"));
         }       
         var geo = currentGeoMap[type];
 
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.GEOMETRY_UPDATED, geo);  // Gives shader backend a chance to generate a shader
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.GEOMETRY_UPDATED, geo);  // Gives shader backend a chance to generate a shader
 
         /* Prompt shader backend to in turn prompt for exports from all backends.
          * This backend exports proactively however (see below), since it is the one
          * which prompted the shader backend.
          */
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SHADER_ACTIVATE);
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_ACTIVATE);
 
         geo.lastUsed = time;  // Geometry now not evictable in this scene traversal
 
@@ -345,8 +345,8 @@ var SceneJS_geometryModule = new (function() {
             for (var i = 0; i < 8; i++) {
                 context.disableVertexAttribArray(i);
             }
-            SceneJS_eventModule.fireEvent(
-                    SceneJS_eventModule.GEOMETRY_EXPORTED,
+            SceneJS._eventModule.fireEvent(
+                    SceneJS._eventModule.GEOMETRY_EXPORTED,
                     geo);
 
             geo.indexBuf.bind(); // Bind index buffer

@@ -18,13 +18,13 @@
  *
  *  @private
  */
-var SceneJS_materialModule = new (function() {
+SceneJS._materialModule = new (function() {
 
     var material;
     var dirty;
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 material = {
                     baseColor : [ 0.5, 0.5, 0.5 ],
@@ -39,25 +39,25 @@ var SceneJS_materialModule = new (function() {
             });
 
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS_eventModule.fireEvent(
-                            SceneJS_eventModule.MATERIAL_EXPORTED,
+                    SceneJS._eventModule.fireEvent(
+                            SceneJS._eventModule.MATERIAL_EXPORTED,
                             material);
                     dirty = false;
                 }
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -65,8 +65,8 @@ var SceneJS_materialModule = new (function() {
     // @private
     this.setMaterial = function(m) {
         material = m;
-        SceneJS_eventModule.fireEvent(
-                SceneJS_eventModule.MATERIAL_UPDATED,
+        SceneJS._eventModule.fireEvent(
+                SceneJS._eventModule.MATERIAL_UPDATED,
                 material);
         dirty = true;
     };

@@ -153,30 +153,32 @@ SceneJS.Rotate.prototype._render = function(traversalContext, data) {
             /* When building a view transform, apply the negated rotation angle
              * to correctly transform the SceneJS.Camera
              */
-            var angle = SceneJS_modelViewTransformModule.isBuildingViewTransform()
+            var angle = SceneJS._modelViewTransformModule.isBuildingViewTransform()
                     ? -this._angle
                     : this._angle;
-            this._mat = SceneJS_math_rotationMat4v(angle * Math.PI / 180.0, [this._x, this._y, this._z]);
+            this._mat = SceneJS._math_rotationMat4v(angle * Math.PI / 180.0, [this._x, this._y, this._z]);
         } else {
-            this._mat = SceneJS_math_identityMat4();
+            this._mat = SceneJS._math_identityMat4();
         }
     }
-    var superXform = SceneJS_modelViewTransformModule.getTransform();
+    this._superXForm = SceneJS._modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
-        var instancing = SceneJS_instancingModule.instancing();
-        var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
+        var instancing = SceneJS._instancingModule.instancing();
+        var tempMat = SceneJS._math_mulMat4(this._superXForm.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams && !instancing
+            fixed: this._superXForm.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && this._superXForm.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
-    SceneJS_modelViewTransformModule.setTransform(this._xform);
+    SceneJS._modelViewTransformModule.setTransform(this._xform);
+
     this._renderNodes(traversalContext, data);
-    SceneJS_modelViewTransformModule.setTransform(superXform);
+    
+    SceneJS._modelViewTransformModule.setTransform(this._superXForm);
 };
 
 /** Factory function that returns a new {@link SceneJS.Rotate} instance

@@ -58,8 +58,31 @@ var SceneJS = {
                 return key;
             }
         }
-    } ,
+    },
 
+    /** Applies properties on o2 to o1 where not already on o1
+     *
+     * @param o1
+     * @param o2
+     * @private
+     */
+    _applyIf : function(o1, o2) {
+        for (var key in o2) {
+            if (!o1[key]) {
+                o1[key] = o2[key];
+            }
+        }
+        return o1;
+    },
+
+    _getBaseURL : function(url) {
+        var i = url.lastIndexOf("/");
+        if (i == 0 || i == -1) {
+            return "";
+        }
+        return url.substr(0, i+1);
+    },
+    
     /**
      * Returns true if object is an array
      * @private
@@ -67,26 +90,34 @@ var SceneJS = {
     _isArray : function(testObject) {
         return testObject && !(testObject.propertyIsEnumerable('length'))
                 && typeof testObject === 'object' && typeof testObject.length === 'number';
-    }//,
+    }
+    //,
 
-//    _debugEnabled : {},
-//
-//    /**
-//     * Enables of disables debugging mode
-//     * @param enabled
-//     */
-//    setDebugging : function(key, enabled) {
-//        this._debugEnabled[key] = enabled;
-//    },
-//
-//    /** Gets whether debug mode is enabled or not
-//     * @returns {boolean} True if debugging enabled else false
-//     */
-//    getDebugging : function(key) {
-//        return this._debugEnabled[key];
-//    }
+    //    _debugEnabled : {},
+    //
+    //    /**
+    //     * Enables of disables debugging mode
+    //     * @param enabled
+    //     */
+    //    setDebugging : function(key, enabled) {
+    //        this._debugEnabled[key] = enabled;
+    //    },
+    //
+    //    /** Gets whether debug mode is enabled or not
+    //     * @returns {boolean} True if debugging enabled else false
+    //     */
+    //    getDebugging : function(key) {
+    //        return this._debugEnabled[key];
+    //    }
 
-};
+}
+        ;
 
 SceneJS._namespace("SceneJS");
+
+
+
+
+window["SceneJS"] = SceneJS;
+
 

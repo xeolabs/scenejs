@@ -17,44 +17,44 @@
  *
  *  @private
  */
-var SceneJS_projectionModule = new (function() {
+SceneJS._projectionModule = new (function() {
 
     var transform;
     var dirty;
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 transform = {
-                    matrix : SceneJS_math_identityMat4(),
+                    matrix : SceneJS._math_identityMat4(),
                     isDefault : true,
                     fixed: true
                 };
                 dirty = true;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (!transform.matrixAsArray) {
                         transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
                     }
-                    SceneJS_eventModule.fireEvent(
-                            SceneJS_eventModule.PROJECTION_TRANSFORM_EXPORTED,
+                    SceneJS._eventModule.fireEvent(
+                            SceneJS._eventModule.PROJECTION_TRANSFORM_EXPORTED,
                             transform);
                     dirty = false;
                 }
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -62,8 +62,8 @@ var SceneJS_projectionModule = new (function() {
     this.setTransform = function(t) {
         transform = t;
         dirty = true;
-        SceneJS_eventModule.fireEvent(
-                SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED,
+        SceneJS._eventModule.fireEvent(
+                SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED,
                 transform);
     };
 

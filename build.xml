@@ -6,12 +6,12 @@
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
     <property name="SRC_DIR" location="${basedir}/src"/>
-    <property name="SCENEJS_JS_NAME" value="scenejs.js"/>
-    <property name="SCENEJS_MIN_JS_NAME" value="scenejs.min.js"/>
+    <property name="SceneJS._JS_NAME" value="scenejs.js"/>
+    <property name="SceneJS._MIN_JS_NAME" value="scenejs.min.js"/>
     <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
-    <property name="SCENEJS_NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
-    <property name="SCENEJS_LATEST_MIN_JS_NAME" value="scenejs-latest.min.js"/>
-    <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SCENEJS_NAME}"/>
+    <property name="SceneJS._NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
+    <property name="SceneJS._LATEST_MIN_JS_NAME" value="scenejs-latest.min.js"/>
+    <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SceneJS._NAME}"/>
 
 
     <path id="yuicompressor.classpath">
@@ -39,8 +39,8 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/data.js"/>
-
         <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
@@ -48,15 +48,9 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/name/nameModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/name/name.js"/>
-
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/loadModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/parsers/colladaParser.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
-
         <fileset dir="${SRC_DIR}" includes="scenejs/selector/selector.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/processes/processModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneModule.js"/>
@@ -102,6 +96,8 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/socket/socketModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/socket/socket.js"/>
     </path>
 
     <target name="all" depends="archive"/>
@@ -122,11 +118,11 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/core/data.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/name/name.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/instancing/loadModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/selector/selector.js"/>
@@ -159,15 +155,16 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/socket/socket.js"/>
         </jsdoctoolkit>
     </target>
 
     <target name="archive" depends="package">
-        <tar destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.tar.gz"
+        <tar destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.tar.gz"
              basedir="${DIST_CONTAINER_DIR}/extracted"
              compression="gzip"/>
 
-        <zip destfile="${DIST_CONTAINER_DIR}/${SCENEJS_NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
+        <zip destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
 
 
     </target>
@@ -186,12 +183,12 @@
                 <include name="**/*.js"/>
             </fileset>
         </yuicompress>
-        <move file="${EXTRACTED_DIST_DIR}/${SCENEJS_JS_NAME}"
-              tofile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_MIN_JS_NAME}"/>
+        <move file="${EXTRACTED_DIST_DIR}/${SceneJS._JS_NAME}"
+              tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}"/>
     </target>
 
     <target name="assemble-lib" depends="create-dist-directories">
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SCENEJS_JS_NAME}">
+        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._JS_NAME}">
             <path refid="sourcefiles"/>
         </concat>
     </target>

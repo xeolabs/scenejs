@@ -87,14 +87,17 @@
  * <li>{@link #STATE_LOADING} in which it has made the request and is awaiting the response, which it will receive
  * at any time, either within a scene render or between scene renders. In this state it has nothing to render
  * and will pass scene traversal on to its next sibling.</li>
- * <li>{@link #STATE_LOADED} in which it has successfully received its content and parsed it into a subgraph.
+ * <li>{@link #STATE_READY} in which it has successfully received its content and parsed it into a subgraph.
  * From here the node will transition to {@link #STATE_RENDERED} as soon as the subgraph has been rendered
  * and traversal has arrived back at this node on the way back up the graph. It may instead transition back
  * to {@link #STATE_INITIAL} as soon as it has not been rendered in a while and has then had its subgraph destroyed
  * by SceneJS to reclaim memory.</li>
- * <li>{@link #STATE_RENDERED} in which it has successfully received its content, parsed it into a subgraph, and been rendered
- * at least once. From here the node will transition back to {@link #STATE_INITIAL} as soon as it has not been rendered in
- * a while and has then had its subgraph destroyed by SceneJS to reclaim memory.</li>
+ *  * <li>{@link #STATE_RENDERING} in which it has successfully loaded and parsed its target file or resolved its
+ * target symbol and is about to render (instance) that target. From here the node will transition to
+ * {@link #STATE_RENDERED} as soon as rendered its target.</li>
+ * <li>{@link #STATE_RENDERED} in which it has successfully rendered its target at least once. If the target is a file,
+ * then from here the node will transition back to {@link #STATE_INITIAL} as soon as the target has not been rendered in
+ * a while and has been destroyed by SceneJS to reclaim memory.</li>
  * <li>{@link #STATE_FREED} in which it has been dormant too long and SceneJS has reclaimed memory by destroying
  * the subgraph. When next rendered, it will then repeat its load request and transition
  * to {@link #STATE_LOADING}.</li>
@@ -125,23 +128,9 @@
 SceneJS.Instance = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "instance";
-
-    /* Absolute URI part - eg. http://example.com/models/mdel.dae
-     */
-    this._absoluteURI = null;
-
-    /*  URI fragment part - eg. "foo/bar/wibble"
-     */
-    this._uriFragment = null;
-
-    /* Subgraph parsed from instanced model file - null when instancing a predefined Symbol
-     */
-    this._assetNode = null;
-
-    /* Load state for when instancing a model file
-     */
+    this._uri = null;
+    this._symbol = null;
     this._state = SceneJS.Instance.STATE_INITIAL;
-    this._loadTimoutSecs = null;  // default while null
     if (this._fixedParams) {
         this._init(this._getParams());
     }
@@ -150,59 +139,47 @@ SceneJS.Instance = function() {
 SceneJS._inherit(SceneJS.Instance, SceneJS.Node);
 
 /**
- * State in which load has failed. This can be either due to HTTP error (eg. HTTP 404) or
- * failure to parse the response. The node will now be permanently inactive and stuck in this state.
- * @const
- */
-SceneJS.Instance.STATE_ERROR = -1;
-
-/**
- * State in which load is pending because node has not been rendered yet and hence has
- * not made its load request yet. When next rendered, it will then make its load request
- * and transition to {@link #STATE_LOADING}.
+ * Initial state of a remote Instance, in which it has not been rendered yet and thus loading of its target file has not
+ * yet begun. From here a remote Instance will transition to {@link #STATE_LOADING} as soon as it is first rendered.
  * @const
  */
 SceneJS.Instance.STATE_INITIAL = 0;
 
 /**
- * State in which node is awaiting a response to its load request. When the response arrives (asyncronously, ie.
- * either during or between scene renders), the node will then transition to  either {@link #STATE_LOADED}
- * or {@link #STATE_ERROR}, depending on whether or not it successfully parses the response. If the
- * response does not arrive or parse within the timeout period (180 seconds by default, unless configured) it will
- * transition to {@link STATE_ERROR}.
+ * State of a local or remote-mode Instance in which instantiation has failed. For a remote instance this can be either
+ * due to HTTP error (eg. HTTP 404) or failure to parse the response; in the assumption that the file is unavailable for
+ * the remainder of the lifetime of the scene graph, a remote Instance will then remain fixed in this state. For a local
+ * instance, this condition might be temporary (eg. the target Symbol is just not being rendered yet for some reason),
+ * so a local Instance will then try instancing again when next rendered, transitioning to {@link STATE_RENDERING} when
+ * that succeeds.
  * @const
  */
-SceneJS.Instance.STATE_LOADING = 1;
+SceneJS.Instance.STATE_ERROR = -1;
 
 /**
- * State in which node has successfully received its content and parsed it into a subgraph.
- * From here the node will transition to {@link #STATE_RENDERED} as soon as the subgraph has been rendered
- * and traversal has arrived back at this node on the way back up the graph.
+ * State of a local or remote Instance in which it will attempt to instantiate its target when next rendered. For a
+ * remote Instance, this is when it has successfully loaded its target file and parsed it into a subgraph. For a local
+ * Instance, this is when it is ready to attempt aquisition of its target Symbol. From here, a remote node will
+ * transition to {@link #STATE_RENDERING} and instantiates its target when next rendered. A local Instance will do
+ * the same when next rendered, providing it succeeds in finding its target Symbol, otherwise the local Instance will
+ * transition to {@link #STATE_ERROR}.
+ * target.
  * @const
  */
-SceneJS.Instance.STATE_LOADED = 2;
+SceneJS.Instance.STATE_READY = 2;
+
 
 /**
- * State in which node has successfully received its content, parsed it into a subgraph, and been rendered
- * at least once. From here the node will transition back to {@link #STATE_INITIAL} as soon as it has not been rendered in
- * a while and has then had its subgraph destroyed by SceneJS to reclaim memory.
+ * State of a local or remote Instance in which it is rendering its target. While in this state, you can
+ * obtain its target subgraph through its getTarget() method. From this state, the Instance will transition to
+ * {@link #STATE_READY} once it has completed rendering the target.
  * @const
  */
-SceneJS.Instance.STATE_RENDERED = 3;
+SceneJS.Instance.STATE_RENDERING = 3;
 
 /**
- * State in which load is pending after node has had its subgraph destroyed by SceneJS to reclaim memory after
- * not having been rendered for some time (Eg. is within a {@link SceneJS.Boundary} that has
- * not intersected the view frustum for a while, or perhaps within a {@link SceneJS.Selector} that has
- * not selected it lately). When next rendered, it will then repeat its load request and transition
- * to {@link #STATE_LOADING}.
- * @const
- */
-SceneJS.Instance.STATE_FREED = 4;
-
-/**
- * Returns the node's current state. Possible states are {@link #STATE_INITIAL}, {@link #STATE_LOADING},
- * {@link #STATE_LOADED}, {@link #STATE_FREED} and {@link #STATE_ERROR}.
+ * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
+ * {@link #STATE_READY} and {@link #STATE_ERROR}.
  * @returns {int} The state
  */
 SceneJS.Instance.prototype.getState = function() {
@@ -212,34 +189,9 @@ SceneJS.Instance.prototype.getState = function() {
 // @private
 SceneJS.Instance.prototype._init = function(params) {
     if (params.uri) {
-        if (params.uri.substr(0, 5) == "http:") {
-
-            /* Absolute URI
-             */
-            var i = params.uri.indexOf("#");
-            if (i == -1) {
-
-                /* Absolute URI with no fragment - references an entire model file
-                 */
-                this._absoluteURI = params.uri;
-                this._uriFragment = null;
-            } else {
-
-                /* Absolute URI with fragment - references an asset within a model file
-                 */
-                this._absoluteURI = params.uri.substr(0, i);
-                this._uriFragment = params.uri.substr(i + 1);
-            }
-        } else {
-
-            /* Relative URI - just the fragment - references a Symbol in this scene graph
-             */
-            this._absoluteURI = null;
-            this._uriFragment = params.uri.substr(i);
-        }
-        this._loadTimeoutSecs = params._loadTimeoutSecs;
+        this._uri = params.uri;
+        this._state = SceneJS.Instance.STATE_READY;
         this._mustExist = params.mustExist;
-        this._state = SceneJS.Instance.STATE_INITIAL;
     }
 };
 
@@ -248,100 +200,21 @@ SceneJS.Instance.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
         this._init(this._getParams(data));
     }
-    if (this._absoluteURI) {
-        this._instanceFile(traversalContext, data);
-
-    } else if (this._uriFragment) {
-        this._instanceSymbol(this._uriFragment, traversalContext, data);
+    if (this._uri) {
+        this._instanceSymbol(this._uri, traversalContext, data);
     } else {
-        throw SceneJS_errorModule.fatalError(
+        throw SceneJS._errorModule.fatalError(
                 new SceneJS.InvalidNodeConfigException(
-                        "SceneJS.instance uri not defined"));
-    }
-};
-
-/** Instances a model defined in a file - will instance a particular resource if a fragment was provided on the URI
- *
- * @private
- */
-SceneJS.Instance.prototype._instanceFile = function(traversalContext, data) {
-
-    if (this._state == SceneJS.Instance.STATE_LOADED || this._state == SceneJS.Instance.STATE_RENDERED) {
-        if (!SceneJS_loadModule.getAsset(this._absoluteURI)) { // evicted from cache - must reload
-            this._changeState(SceneJS.Instance.STATE_FREED);
-        }
-    }
-    switch (this._state) {
-        case SceneJS.Instance.STATE_RENDERED:
-            this._renderAssetNode(traversalContext, data);
-            break;
-
-        case SceneJS.Instance.STATE_LOADED:
-            this._renderAssetNode(traversalContext, data);
-            this._changeState(SceneJS.Instance.STATE_RENDERED);
-            break;
-
-        case SceneJS.Instance.STATE_LOADING:
-            break;
-
-        case SceneJS.Instance.STATE_INITIAL:
-            this._assetNode = SceneJS_loadModule.getAsset(this._absoluteURI);
-            if (this._assetNode) {
-                this._changeState(SceneJS.Instance.STATE_RENDERED);
-                this._renderAssetNode(traversalContext, data);
-                break;
-            } // else fall through
-
-        case SceneJS.Instance.STATE_FREED:
-            var _this = this;
-            this._changeState(SceneJS.Instance.STATE_LOADING);
-            var isLibrary = (this._uriFragment != null);
-
-            SceneJS_loadModule.loadAsset(// Process killed automatically on error or abort
-                    this._absoluteURI,
-                    this._loadTimeoutSecs, // default when null
-                    function(asset) { // onLoaded
-                        _this._assetNode = asset;
-                        _this._changeState(SceneJS.Instance.STATE_LOADED);
-                    },
-                    function() { // onTimeout
-                        _this._changeState(SceneJS.Instance.STATE_ERROR);
-                        SceneJS_errorModule.error(new SceneJS.LoadTimeoutException("Load timed out - uri: " + _this._absoluteURI));
-                    },
-                    function(exception) { // onError
-                        _this._changeState(SceneJS.Instance.STATE_ERROR);
-                        exception.message = "Load failed - " + exception.message + " - uri: " + _this._absoluteURI;
-                        SceneJS_errorModule.error(exception);
-                    },
-                    isLibrary);
-            break;
-
-        case SceneJS.Instance.STATE_ERROR:
-            break;
+                        "SceneJS.instance uri property not defined"));
     }
 };
 
 // @private
-SceneJS.Instance.prototype._changeState = function(newState) {
+SceneJS.Instance.prototype._changeState = function(newState, exception) {
     var oldState = this._state;
     this._state = newState;
-    this._fireEvent("state-changed", { oldState: oldState, newState: newState });
-};
-
-/**
- * Instances either a loaded subgraph, or a Symbol in a loaded subgraph.
- *
- * @private
- */
-SceneJS.Instance.prototype._renderAssetNode = function(traversalContext, data) {
-
-    if (this._uriFragment) {
-
-        /* Instancing a Symbol - fragment is an absolute SID path
-         */
-        this._instanceSymbol("/" + this._assetNode.getSID() + "/" + this._uriFragment, traversalContext, data);
-    } else {
-        this._assetNode._render(this._createTargetTraversalContext(traversalContext, this._assetNode), data);
+    if (this._listeners["state-changed"]) { // Optimisation
+        this._fireEvent("state-changed", { oldState: oldState, newState: newState, exception : exception });
     }
 };
 
@@ -357,20 +230,24 @@ SceneJS.Instance.prototype._renderAssetNode = function(traversalContext, data) {
  */
 SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalContext, target) {
     var callback;
-    var _superCallback = traversalContext.callback;
+    this._superCallback = traversalContext.callback;
     var _this = this;
-    callback = function(traversalContext, data) {
-        var subTraversalContext = {
-            callback : _superCallback,
-            insideRightFringe : _this._children.length > 1,
-            configs: traversalContext.configs
+    if (!this._callback) {
+        this._callback = function(traversalContext, data) {
+            var subTraversalContext = {
+                callback : _this._superCallback,
+                insideRightFringe : _this._children.length > 1,
+                configs: traversalContext.configs,
+                configsModes: traversalContext.configsModes
+            };
+            _this._renderNodes(subTraversalContext, data);
         };
-        _this._renderNodes(subTraversalContext, data);
-    };
+    }
     return {
-        callback: callback,
+        callback: this._callback,
         insideRightFringe:  target._children.length > 1,
-        configs: traversalContext.configs
+        configs: traversalContext.configs,
+        configsModes: traversalContext.configsModes
     };
 };
 
@@ -422,7 +299,8 @@ SceneJS.Instance.prototype._renderNodes = function(traversalContext, data) {
             var childTraversalContext = {
                 insideRightFringe : (i < numChildren - 1),
                 callback : traversalContext.callback,
-                configs : childConfigs || traversalContext.configs
+                configs : childConfigs || traversalContext.configs,
+                configsModes : traversalContext.configsModes
             };
 
             child._render.call(child, childTraversalContext, data);
@@ -442,25 +320,42 @@ SceneJS.Instance.prototype._renderNodes = function(traversalContext, data) {
  * @param data
  */
 SceneJS.Instance.prototype._instanceSymbol = function(symbolSIDPath, traversalContext, data) {
-    var symbol = SceneJS_instancingModule.acquireInstance(symbolSIDPath);
-    if (!symbol) {
-        SceneJS_loggingModule.info("SceneJS.Instance could not find SceneJS.Symbol to instance: '" + symbolSIDPath + "'");
+    this._symbol = SceneJS._instancingModule.acquireInstance(symbolSIDPath);
+    if (!this._symbol) {
+        //SceneJS._loggingModule.info("SceneJS.Instance could not find SceneJS.Symbol to instance: '" + symbolSIDPath + "'");
         if (this._mustExist) {
-            SceneJS_instancingModule.releaseInstance();
-            throw SceneJS_errorModule.fatalError(
+            SceneJS._instancingModule.releaseInstance();
+            throw SceneJS._errorModule.fatalError(
                     new SceneJS.SymbolNotFoundException
                             ("SceneJS.Instance could not find SceneJS.Symbol to instance: '" + symbolSIDPath + "'"));
         }
+        this._changeState(SceneJS.Instance.STATE_ERROR);
     } else {
-        symbol._renderNodes(this._createTargetTraversalContext(traversalContext, symbol), data);
-        SceneJS_instancingModule.releaseInstance();
+        this._changeState(SceneJS.Instance.STATE_RENDERING);
+        this._symbol._renderNodes(this._createTargetTraversalContext(traversalContext, this._symbol), data);
+        SceneJS._instancingModule.releaseInstance();
+        this._changeState(SceneJS.Instance.STATE_READY);
+        this._symbol = null;
     }
 };
 
 
-//SceneJS.Instance.prototype.getSymbol = function() {
-//
-//};
+/**
+ *
+ */
+SceneJS.Instance.prototype.getTarget = function() {
+    if (this.state != SceneJS.Instance.STATE_RENDERING) {
+        return null;
+    }
+    return this._symbol;
+};
+
+/**
+ *
+ */
+SceneJS.Instance.prototype.getURI = function() {
+    return this._uri;
+};
 
 /** Factory function that returns a new {@link SceneJS.Instance} instance
  *  @param {Object} [cfg] Static configuration object

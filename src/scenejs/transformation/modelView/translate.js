@@ -125,32 +125,33 @@ SceneJS.Translate.prototype._render = function(traversalContext, data) {
         } else {
             this._memoLevel = 1;
         }
-        if (SceneJS_modelViewTransformModule.isBuildingViewTransform()) {
+        if (SceneJS._modelViewTransformModule.isBuildingViewTransform()) {
 
             /* When building a view transform, apply the negated translation vector
              * to correctly transform the SceneJS.Camera
              */
-            this._mat = SceneJS_math_translationMat4v([-this._x, -this._y, -this._z]);
+            this._mat = SceneJS._math_translationMat4v([-this._x, -this._y, -this._z]);
         } else {
-            this._mat = SceneJS_math_translationMat4v([this._x, this._y, this._z]);
+            this._mat = SceneJS._math_translationMat4v([this._x, this._y, this._z]);
         }
     }
-    var superXform = SceneJS_modelViewTransformModule.getTransform();
+    this._superXForm = SceneJS._modelViewTransformModule.getTransform();
     if (this._memoLevel < 2) {
-        var instancing = SceneJS_instancingModule.instancing();
-        var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
+        var instancing = SceneJS._instancingModule.instancing();
+        
+        var tempMat = SceneJS._math_mulMat4(this._superXForm.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams && !instancing
+            fixed: this._superXForm.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
+        if (this._memoLevel == 1 && this._superXForm.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
-    SceneJS_modelViewTransformModule.setTransform(this._xform);
+    SceneJS._modelViewTransformModule.setTransform(this._xform);
     this._renderNodes(traversalContext, data);
-    SceneJS_modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.setTransform(this._superXForm);
 };
 
 /** Factory function that returns a new {@link SceneJS.Translate} instance

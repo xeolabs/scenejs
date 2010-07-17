@@ -13,6 +13,8 @@
  this file and I'll guide you from there.
 
  */
+
+
 var exampleScene = SceneJS.scene({
 
     /* Bind scene to a WebGL canvas:

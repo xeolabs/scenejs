@@ -90,10 +90,10 @@ SceneJS.Logging.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
         this._init(this._getParams(data));
     }
-    var prevFuncs = SceneJS_loggingModule.getFuncs();
-    SceneJS_loggingModule.setFuncs(this._funcs);
+    var prevFuncs = SceneJS._loggingModule.getFuncs();
+    SceneJS._loggingModule.setFuncs(this._funcs);
     this._renderNodes(traversalContext, data);
-    SceneJS_loggingModule.setFuncs(prevFuncs);
+    SceneJS._loggingModule.setFuncs(prevFuncs);
 };
 
 /** Returns a new SceneJS.Logging instance

@@ -6,7 +6,7 @@
  *
  *  @private
  */
-var SceneJS_loadModule = new (function() {
+SceneJS._loadModule = new (function() {
     var parsers = {};
     var time = (new Date()).getTime();
     var jsonpStrategy = null;
@@ -16,38 +16,38 @@ var SceneJS_loadModule = new (function() {
     var sceneLibrary;  // Library of currently active scene
     var pInterval; // For polling SceneJS.Asset to update their statii
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.TIME_UPDATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
     /* When SceneJS initialised, start the assets status update loop
      */
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.INIT,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.INIT,
             function() {
                 assets = {};
                 if (!pInterval) {
-                    pInterval = setInterval("SceneJS_loadModule._updateSceneJSLoads()", 100);
+                    pInterval = setInterval("SceneJS._loadModule._updateSceneJSLoads()", 100);
                 }
             });
 
     /* When SceneJS reset, destroy all assets
      */
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RESET,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.RESET,
             function() {
                 assets = {};
                 //                if (!pInterval) {
-                //                    pInterval = setInterval("SceneJS_loadModule._updateSceneJSLoads()", 100);
+                //                    pInterval = setInterval("SceneJS._loadModule._updateSceneJSLoads()", 100);
                 //                }
             });
 
     /* When scene created, define a map of library assets for it
      */
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_CREATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_CREATED,
             function(params) {
                 sceneLibraries[params.sceneId] = {};
             });
@@ -55,8 +55,8 @@ var SceneJS_loadModule = new (function() {
 
     /* When scene activated, activate the current scene library
      */
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_RENDERING,
             function(params) {
                 sceneLibrary = sceneLibraries[params.sceneId];
             });
@@ -64,8 +64,8 @@ var SceneJS_loadModule = new (function() {
     /* When canvas activated, render the library's assets to define their Symbols.
      * Note we must have a canvas, so we can drive WebGL
      */
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CANVAS_ACTIVATED,
             function() {
                 var dummyTraversalContext = {};
                 var dummyData = new SceneJS.Data(null, false, {});
@@ -81,8 +81,8 @@ var SceneJS_loadModule = new (function() {
 
     /* When scene destroyed, destroy its library assets
      */
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_DESTROYED,
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_DESTROYED,
             function(params) {
                 sceneLibraries[params.sceneId] = null;
             });
@@ -244,7 +244,7 @@ var SceneJS_loadModule = new (function() {
  * @param strategy {{request:function(url:String, format:String, callback:String), String response: function(data:String) }}
  */
 SceneJS.setJSONPStrategy = function(strategy) {
-    SceneJS_loadModule.setJSONPStrategy(strategy);
+    SceneJS._loadModule.setJSONPStrategy(strategy);
 };
 
 
@@ -272,9 +272,9 @@ SceneJS.Asset.prototype._load = function() {
     var description = this._jsonpStrategy
             ? "Instancing scene content cross-domain from " + this.uri
             : "Instancing scene content at local domain " + this.uri;
-    SceneJS_loggingModule.debug(description);
+    SceneJS._loggingModule.debug(description);
     var self = this;
-    this._process = SceneJS_processModule.createProcess({
+    this._process = SceneJS._processModule.createProcess({
         onTimeout: function() {  // process killed automatically on timeout
             self._handleTimeout();
         },
@@ -370,22 +370,22 @@ SceneJS.Asset.prototype._handleException = function(e) {
     this.status = SceneJS.Asset.STATUS_ERROR;
     this.exception = e;
     if (this._process) {
-        SceneJS_processModule.killProcess(this._process);
+        SceneJS._processModule.killProcess(this._process);
     }
 };
 
 SceneJS.Asset.prototype._handleSuccess = function() {
     this.status = SceneJS.Asset.STATUS_LOADED;
-    SceneJS_processModule.killProcess(this._process);
+    SceneJS._processModule.killProcess(this._process);
 };
 
 SceneJS.Asset.prototype._handleTimeout = function() {
     this.status = SceneJS.Asset.STATUS_TIMED_OUT;
     if (this._jsonpStrategy) {
-        SceneJS_loggingModule.error(
+        SceneJS._loggingModule.error(
                 "Load failed - timed out waiting for a reply from JSONP proxy for content at uri: " + this.uri);
     } else {
-        SceneJS_loggingModule.error(
+        SceneJS._loggingModule.error(
                 "Load failed - timed out waiting for content at uri: " + this.uri);
     }
 };
