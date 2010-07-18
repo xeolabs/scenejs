@@ -9,127 +9,125 @@
 <span class='line'>  2</span>  * @class A scene branch node that selects which among its children are currently active.
 <span class='line'>  3</span>  *
 <span class='line'>  4</span>  * &lt;p>This node is useful for dynamically controlling traversal within a scene graph.&lt;/p>
-<span class='line'>  5</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
-<span class='line'>  6</span>  * &lt;ul>&lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-teapot-select">Example 1 - Switching Geometry&lt;/a>&lt;/li>&lt;/ul>
-<span class='line'>  7</span>  * &lt;ul>&lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-view-select">Example 2 - Switchable Viewpoint&lt;/a>&lt;/li>&lt;/ul>
-<span class='line'>  8</span>  * &lt;p>&lt;b>Example Usage 1&lt;/b>&lt;/p>&lt;p>This selector will allow only child nodes at indices 0 and 2 to be rendered,
-<span class='line'>  9</span>  * which are the teapot and sphere. Child 1, a cube, is not selected and therefore won't be rendered.&lt;/p>&lt;pre>&lt;code>
-<span class='line'> 10</span>  * var s = new SceneJS.Selector({ selection: [0, 2]},
+<span class='line'>  5</span> 
+<span class='line'>  6</span>  * &lt;p>&lt;b>Example Usage 1&lt;/b>&lt;/p>&lt;p>This selector will allow only child nodes at indices 0 and 2 to be rendered,
+<span class='line'>  7</span>  * which are the teapot and sphere. Child 1, a cube, is not selected and therefore won't be rendered.&lt;/p>&lt;pre>&lt;code>
+<span class='line'>  8</span>  * var s = new SceneJS.Selector({ selection: [0, 2]},
+<span class='line'>  9</span>  *
+<span class='line'> 10</span>  *      new SceneJS.objects.teapot(),   // Child 0
 <span class='line'> 11</span>  *
-<span class='line'> 12</span>  *      new SceneJS.objects.teapot(),   // Child 0
+<span class='line'> 12</span>  *      new SceneJS.objects.cube(),     // Child 1
 <span class='line'> 13</span>  *
-<span class='line'> 14</span>  *      new SceneJS.objects.cube(),     // Child 1
+<span class='line'> 14</span>  *      new SceneJS.objects.sphere())   // Child 2
 <span class='line'> 15</span>  *
-<span class='line'> 16</span>  *      new SceneJS.objects.sphere())   // Child 2
+<span class='line'> 16</span>  * s.setSelection([0,1,2]);  // Select all three child nodes
 <span class='line'> 17</span>  *
-<span class='line'> 18</span>  * s.setSelection([0,1,2]);  // Select all three child nodes
-<span class='line'> 19</span>  *
-<span class='line'> 20</span>  * &lt;/pre>&lt;/code>
-<span class='line'> 21</span>  * &lt;p>&lt;b>Example Usage 2&lt;/b>&lt;/p>&lt;p>A more advanced example - the selector in this example switches between three
-<span class='line'> 22</span>  * viewpoints of the scene content. The content is instanced within each child of the Selector using Instance and Symbol
-<span class='line'> 23</span>  * nodes. When we render the scene, we can pass in the selection.&lt;/p>&lt;pre>&lt;code>
-<span class='line'> 24</span>  * var myScene = new SceneJS.Scene({ ... },
-<span class='line'> 25</span>  *
-<span class='line'> 26</span>  *       new SceneJS.symbol({ name: "theScene" },
-<span class='line'> 27</span>  *           new SceneJS.objects.Teapot()
-<span class='line'> 28</span>  *       ),
-<span class='line'> 29</span>  *
-<span class='line'> 30</span>  *       new SceneJS.Selector(
-<span class='line'> 31</span>  *               function(data) {   // Child index as a dynamic config
-<span class='line'> 32</span>  *                   return {
-<span class='line'> 33</span>  *                       selection: [data.get("activeCamera")]  // Selection
-<span class='line'> 34</span>  *                   };
-<span class='line'> 35</span>  *               },
-<span class='line'> 36</span>  *
-<span class='line'> 37</span>  *           new SceneJS.LookAt({ eye : { z: 10.0 } },
-<span class='line'> 38</span>  *                new SceneJS.Instance({ name: "theScene"})),
-<span class='line'> 39</span>  *
-<span class='line'> 40</span>  *           new SceneJS.LookAt({ eye : { x: 10.0 }},
-<span class='line'> 41</span>  *                new SceneJS.Instance({ name: "theScene"})),
-<span class='line'> 42</span>  *
-<span class='line'> 43</span>  *           new SceneJS.LookAt({ eye : { x: -5.0, y: 5, z: 5 }},
-<span class='line'> 44</span>  *                new SceneJS.Instance({ name: "theScene" })
-<span class='line'> 45</span>  *           )
-<span class='line'> 46</span>  *       )
-<span class='line'> 47</span>  *   );
-<span class='line'> 48</span>  *
-<span class='line'> 49</span>  * myScene.render({ activeCamera: 0 });  // Render scene for first viewpoint
-<span class='line'> 50</span>  * myScene.render({ activeCamera: 1 });  // Once more for second viewpoint
+<span class='line'> 18</span>  * &lt;/pre>&lt;/code>
+<span class='line'> 19</span>  * &lt;p>&lt;b>Example Usage 2&lt;/b>&lt;/p>&lt;p>A more advanced example - the selector in this example switches between three
+<span class='line'> 20</span>  * viewpoints of the scene content. The content is instanced within each child of the Selector using Instance and Symbol
+<span class='line'> 21</span>  * nodes. When we render the scene, we can pass in the selection.&lt;/p>&lt;pre>&lt;code>
+<span class='line'> 22</span>  * var myScene = new SceneJS.Scene({ ... },
+<span class='line'> 23</span>  *
+<span class='line'> 24</span>  *       new SceneJS.symbol({ name: "theScene" },
+<span class='line'> 25</span>  *           new SceneJS.objects.Teapot()
+<span class='line'> 26</span>  *       ),
+<span class='line'> 27</span>  *
+<span class='line'> 28</span>  *       new SceneJS.Selector(
+<span class='line'> 29</span>  *               function(data) {   // Child index as a dynamic config
+<span class='line'> 30</span>  *                   return {
+<span class='line'> 31</span>  *                       selection: [data.get("activeCamera")]  // Selection
+<span class='line'> 32</span>  *                   };
+<span class='line'> 33</span>  *               },
+<span class='line'> 34</span>  *
+<span class='line'> 35</span>  *           new SceneJS.LookAt({ eye : { z: 10.0 } },
+<span class='line'> 36</span>  *                new SceneJS.Instance({ name: "theScene"})),
+<span class='line'> 37</span>  *
+<span class='line'> 38</span>  *           new SceneJS.LookAt({ eye : { x: 10.0 }},
+<span class='line'> 39</span>  *                new SceneJS.Instance({ name: "theScene"})),
+<span class='line'> 40</span>  *
+<span class='line'> 41</span>  *           new SceneJS.LookAt({ eye : { x: -5.0, y: 5, z: 5 }},
+<span class='line'> 42</span>  *                new SceneJS.Instance({ name: "theScene" })
+<span class='line'> 43</span>  *           )
+<span class='line'> 44</span>  *       )
+<span class='line'> 45</span>  *   );
+<span class='line'> 46</span>  *
+<span class='line'> 47</span>  * myScene.render({ activeCamera: 0 });  // Render scene for first viewpoint
+<span class='line'> 48</span>  * myScene.render({ activeCamera: 1 });  // Once more for second viewpoint
+<span class='line'> 49</span>  *
+<span class='line'> 50</span>  * &lt;/pre>&lt;/code>
 <span class='line'> 51</span>  *
-<span class='line'> 52</span>  * &lt;/pre>&lt;/code>
-<span class='line'> 53</span>  *
-<span class='line'> 54</span>  *
-<span class='line'> 55</span>  * @extends SceneJS.Node
-<span class='line'> 56</span>  * @constructor
-<span class='line'> 57</span>  * Create a new SceneJS.Selector
-<span class='line'> 58</span>  * @param {Object} config  Config object or function, followed by zero or more child nodes
-<span class='line'> 59</span>  */</span><span class="WHIT">
-<span class='line'> 60</span> </span><span class="NAME">SceneJS.Selector</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 62</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"selector"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="NAME">this._selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 65</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 66</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 67</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span>  *
+<span class='line'> 53</span>  * @extends SceneJS.Node
+<span class='line'> 54</span>  * @constructor
+<span class='line'> 55</span>  * Create a new SceneJS.Selector
+<span class='line'> 56</span>  * @param {Object} config  Config object or function, followed by zero or more child nodes
+<span class='line'> 57</span>  */</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="NAME">SceneJS.Selector</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"selector"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">    </span><span class="NAME">this._selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> 
+<span class='line'> 67</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Selector</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 68</span> 
-<span class='line'> 69</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Selector</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 70</span> 
-<span class='line'> 71</span> </span><span class="COMM">/**
-<span class='line'> 72</span>  Sets the indices of selected children. When the value is undefined or an empty array, then no children will be selected.
-<span class='line'> 73</span>  @function setSelection
-<span class='line'> 74</span>  @param {int []} selection
-<span class='line'> 75</span>  @returns {SceneJS.Selector} This Selector node
-<span class='line'> 76</span>  */</span><span class="WHIT">
-<span class='line'> 77</span> </span><span class="NAME">SceneJS.Selector.prototype.setSelection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">selection</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="NAME">selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="NAME">this._selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 81</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 82</span> 
-<span class='line'> 83</span> </span><span class="COMM">/**
-<span class='line'> 84</span>  * Returns the indices of the selected child. The result will be an empty array if none are currently selected.
-<span class='line'> 85</span>  * @function {int []} getSelection
-<span class='line'> 86</span>  * @returns {int []} Array containing indices of selected children.
-<span class='line'> 87</span>  */</span><span class="WHIT">
-<span class='line'> 88</span> </span><span class="NAME">SceneJS.Selector.prototype.getSelection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 89</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Array</span><span class="PUNC">(</span><span class="NAME">this._selection.length</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._selection.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="NAME">selection</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._selection</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 95</span> 
-<span class='line'> 96</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'> 97</span> </span><span class="NAME">SceneJS.Selector.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 98</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.selection</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 99</span> </span><span class="WHIT">        </span><span class="NAME">this.setSelection</span><span class="PUNC">(</span><span class="NAME">params.selection</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>100</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>101</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>102</span> 
-<span class='line'>103</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'>104</span> </span><span class="NAME">SceneJS.Selector.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>105</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>106</span> </span><span class="WHIT">       </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>107</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>108</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._selection.length</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>109</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">children</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>110</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._selection.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>111</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._selection</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>112</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._children.length</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>113</span> </span><span class="WHIT">                </span><span class="NAME">children.push</span><span class="PUNC">(</span><span class="NAME">this._children</span><span class="PUNC">[</span><span class="NAME">j</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>114</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>115</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>116</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">children</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>117</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>118</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>119</span> 
-<span class='line'>120</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Selector} instance
-<span class='line'>121</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Selector constructor
-<span class='line'>122</span>  * @returns {SceneJS.Selector}
-<span class='line'>123</span>  */</span><span class="WHIT">
-<span class='line'>124</span> </span><span class="NAME">SceneJS.selector</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>125</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Selector</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>126</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Selector.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>127</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>128</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'> 69</span> </span><span class="COMM">/**
+<span class='line'> 70</span>  Sets the indices of selected children. When the value is undefined or an empty array, then no children will be selected.
+<span class='line'> 71</span>  @function setSelection
+<span class='line'> 72</span>  @param {int []} selection
+<span class='line'> 73</span>  @returns {SceneJS.Selector} This Selector node
+<span class='line'> 74</span>  */</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="NAME">SceneJS.Selector.prototype.setSelection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">selection</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">    </span><span class="NAME">selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">    </span><span class="NAME">this._selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 80</span> 
+<span class='line'> 81</span> </span><span class="COMM">/**
+<span class='line'> 82</span>  * Returns the indices of the selected child. The result will be an empty array if none are currently selected.
+<span class='line'> 83</span>  * @function {int []} getSelection
+<span class='line'> 84</span>  * @returns {int []} Array containing indices of selected children.
+<span class='line'> 85</span>  */</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="NAME">SceneJS.Selector.prototype.getSelection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 87</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Array</span><span class="PUNC">(</span><span class="NAME">this._selection.length</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._selection.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">        </span><span class="NAME">selection</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._selection</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">selection</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 93</span> 
+<span class='line'> 94</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="NAME">SceneJS.Selector.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.selection</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">        </span><span class="NAME">this.setSelection</span><span class="PUNC">(</span><span class="NAME">params.selection</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>100</span> 
+<span class='line'>101</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="NAME">SceneJS.Selector.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">       </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._selection.length</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">        </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">children</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._selection.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._selection</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">&lt;=</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">j</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._children.length</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">                </span><span class="NAME">children.push</span><span class="PUNC">(</span><span class="NAME">this._children</span><span class="PUNC">[</span><span class="NAME">j</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">            </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">children</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> 
+<span class='line'>118</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Selector} instance
+<span class='line'>119</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Selector constructor
+<span class='line'>120</span>  * @returns {SceneJS.Selector}
+<span class='line'>121</span>  */</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="NAME">SceneJS.selector</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Selector</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Selector.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>

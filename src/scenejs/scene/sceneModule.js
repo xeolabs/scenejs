@@ -82,7 +82,7 @@ SceneJS._sceneModule = new (function() {
             canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
             canvas = document.getElementById(canvasId);
             if (!canvas) {
-                throw SceneJS._errorModule.fatalError(new SceneJS.CanvasNotFoundException
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.CanvasNotFoundException
                         ("SceneJS.Scene failed to find default canvas with ID '"
                                 + SceneJS.Scene.DEFAULT_CANVAS_ID + "'"));
             }
@@ -96,7 +96,7 @@ SceneJS._sceneModule = new (function() {
                 canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
                 canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw SceneJS._errorModule.fatalError(new SceneJS.CanvasNotFoundException
+                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.CanvasNotFoundException
                             ("SceneJS.Scene config 'canvasId' does not match any elements in the page and no " +
                              "default canvas found with ID '" + SceneJS.Scene.DEFAULT_CANVAS_ID + "'"));
                 }
@@ -126,7 +126,7 @@ SceneJS._sceneModule = new (function() {
             }
         }
         if (!context) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.WebGLNotSupportedException
+            throw SceneJS._errorModule.fatalError(new SceneJS.errors.WebGLNotSupportedException
                     ('Canvas document element with ID \''
                             + canvasId
                             + '\' failed to provide a supported WebGL context'));

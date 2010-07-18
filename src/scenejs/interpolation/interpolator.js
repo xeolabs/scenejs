@@ -2,8 +2,6 @@
  * @class A scene node that animates interpolates a scalar value by interpolating within a sequence of key values.
  * <p>This nodes reads an <i>alpha</i> value from the current data scope and writes the output to a child data scope
  * for nodes in its subgraph to configure themselves with.</p>
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-scalarinterpolator-example">Example 1</a></li></ul>
  * <p><b>Example Usage</b></p><p>This example defines a {@link SceneJS.objects.Cube} with rotation that is animated by
  * a SceneJS.Interpolator, which is in turn driven by an alpha value supplied by a higher {@link SceneJS.WithData}.
  * If we thought of <em>alpha</em> as elapsed seconds, then this cube will rotate 360 degrees over one second, then
@@ -166,7 +164,7 @@ SceneJS.Interpolator.prototype._interpolate = function(k) {
             return this._slerp(k);
         default:
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.InternalException("SceneJS.Interpolator internal error - interpolation type not switched: '"
+                    new SceneJS.errors.InternalException("SceneJS.Interpolator internal error - interpolation type not switched: '"
                             + this._type + "'"));
     }
 };
@@ -196,7 +194,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
      */
     if (!params.input) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.NodeConfigExpectedException(
+                new SceneJS.errors.NodeConfigExpectedException(
                         "SceneJS.Interpolator config property expected: input"));
     }
     this._input = params.input;
@@ -205,7 +203,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
      */
     if (!params.output) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.NodeConfigExpectedException(
+                new SceneJS.errors.NodeConfigExpectedException(
                         "SceneJS.Interpolator config property expected: output"));
     }
     this._output = params.output;
@@ -216,20 +214,20 @@ SceneJS.Interpolator.prototype._init = function(params) {
     if (params.keys) {
         if (!params.values) {
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.InvalidNodeConfigException(
+                    new SceneJS.errors.InvalidNodeConfigException(
                             "SceneJS.Interpolator configuration incomplete: " +
                             "keys supplied but no values - must supply a value for each key"));
         }
     } else if (params.values) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidNodeConfigException(
+                new SceneJS.errors.InvalidNodeConfigException(
                         "SceneJS.Interpolator configuration incomplete: " +
                         "values supplied but no keys - must supply a key for each value"));
     }
     for (var i = 1; i < params.keys.length; i++) {
         if (params.keys[i - 1] >= params.keys[i]) {
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.InvalidNodeConfigException(
+                    new SceneJS.errors.InvalidNodeConfigException(
                             "SceneJS.Interpolator configuration invalid: " +
                             "two invalid keys found ("
                                     + i - 1 + " and " + i + ") - key list should contain distinct values in ascending order"));
@@ -253,7 +251,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
         case 'cubic':
             if (params.keys.length < 4) {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.InvalidNodeConfigException(
+                        new SceneJS.errors.InvalidNodeConfigException(
                                 "SceneJS.Interpolator configuration invalid: minimum of four keyframes " +
                                 "required for cubic - only "
                                         + params.keys.length
@@ -264,7 +262,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
             break;
         default:
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.InvalidNodeConfigException(
+                    new SceneJS.errors.InvalidNodeConfigException(
                             "SceneJS.Interpolator configuration invalid:  type not supported - " +
                             "only 'linear', 'cosine', 'cubic', 'constant' and 'slerp' are supported"));
         /*
@@ -285,7 +283,7 @@ SceneJS.Interpolator.prototype._render = function(traversalContext, data) {
     var key = data.get(this._input);
     if (key == undefined || key == null) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.DataExpectedException(
+                new SceneJS.errors.DataExpectedException(
                         "SceneJS.Interpolator failed to find input on data: '" + params.input + "'"));
     }
     this._update(key);

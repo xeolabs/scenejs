@@ -103,7 +103,7 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     var z = up.z || 0;
     if (x + y + z == 0) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidNodeConfigException(
+                new SceneJS.errors.InvalidNodeConfigException(
                         "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero"));
     }
     this._upX = x;

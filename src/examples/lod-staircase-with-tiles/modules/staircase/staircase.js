@@ -59,7 +59,7 @@
                                     break;
 
                                 default:
-                                    throw new SceneJS.exceptions.InvalidNodeConfigException
+                                    throw new SceneJS.errors.InvalidNodeConfigException
                                             ("Unsupported value for staircase asset 'stepTexture' parameter: '" + data.get("stepTexture") + "'");
                             }
                             return {

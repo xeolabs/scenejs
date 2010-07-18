@@ -14,7 +14,7 @@ SceneJS._errorModule = new (function() {
 
     // @private
     this.fatalError = function(e) {
-        e = e.message ? e : new SceneJS.Exception(e);
+        e = e.message ? e : new SceneJS.errors.Exception(e);
 
         /* Dont log because exception should be thrown        
          */
@@ -27,7 +27,7 @@ SceneJS._errorModule = new (function() {
 
     // @private
     this.error = function(e) {
-        e = e.message ? e : new SceneJS.Exception(e);
+        e = e.message ? e : new SceneJS.errors.Exception(e);
         SceneJS._loggingModule.error(e.message);
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
             exception: e,

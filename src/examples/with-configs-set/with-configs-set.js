@@ -34,13 +34,13 @@ var exampleScene = SceneJS.scene({
 
         SceneJS.withConfigs({
 
-            /* Raise a SceneJS.WithConfigsPropertyNotFoundException when a property
+            /* Raise a SceneJS.errors.WithConfigsPropertyNotFoundException when a property
              * reference on the WithConfigs configuration map cannot be resolved to
              * any method on a target node.
              */
             strictProperties: true,  // Default is true
 
-            /* Raise a SceneJS.WithConfigsNodeNotFoundException exception when a node
+            /* Raise a SceneJS.errors.WithConfigsNodeNotFoundException exception when a node
              * reference in the WithConfigs configuration map cannot be resolved to its
              * target node in the subgraph.
              */
@@ -55,7 +55,7 @@ var exampleScene = SceneJS.scene({
                     up : { y: 1.0 },
 
                     "#pitch": {
-                        angle: 20,
+                        angle: 180,  // <--------- Causes the teapot to flip upside down
 
                         "#yaw" : {
                             angle: 200

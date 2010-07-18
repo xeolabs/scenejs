@@ -137,7 +137,7 @@ SceneJS._loadModule = new (function() {
                 }
                 return evalData;
             } catch (e) {
-                cfg.onError(new SceneJS.ParseException("Error parsing response: " + e));
+                cfg.onError(new SceneJS.errors.ParseException("Error parsing response: " + e));
             }
         };
         this.serverParams = {
@@ -313,12 +313,12 @@ SceneJS.Asset.prototype._loadCrossDomain = function() {
             uri: self.uri,
             data: data,
             onError: function(msg) { ////////// TODO: Needed?
-                self._handleException(new SceneJS.EmptyResponseException(msg));
+                self._handleException(new SceneJS.errors.EmptyResponseException(msg));
             }
         });
         if (this.status != SceneJS.Asset.STATUS_ERROR) {
             if (!self.assetNode) {
-                self._handleException(new SceneJS.InternalException("parser returned null result"));
+                self._handleException(new SceneJS.errors.InternalException("parser returned null result"));
             } else {              
                 self._handleSuccess();
             }
@@ -336,17 +336,17 @@ SceneJS.Asset.prototype._loadLocal = function() {
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
                 if (!request.responseText) {
-                    self.handleError(new SceneJS.EmptyResponseException("response content is empty"));
+                    self.handleError(new SceneJS.errors.EmptyResponseException("response content is empty"));
                 } else {
                     self._assetNode = self._parser.parse({
                         data: request.responseText,
                         onError: function(msg) { ////////// TODO: Needed?
-                            self._handleException(new SceneJS.EmptyResponseException(msg));
+                            self._handleException(new SceneJS.errors.EmptyResponseException(msg));
                         }
                     });
                     if (this.status != SceneJS.Asset.STATUS_ERROR) {
                         if (!self._assetNode) {
-                            self._handleException(new SceneJS.InternalException("parser returned null result"));
+                            self._handleException(new SceneJS.errors.InternalException("parser returned null result"));
                         } else {
                             self._handleSuccess();
                         }

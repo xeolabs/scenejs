@@ -3,30 +3,103 @@
  *
  * <p>The SceneJS.Socket node enables a server to dynamically participate in the construction, destruction and
  * configuration of its subgraph. It binds the subgraph to a WebSocket through which it exchanges JSON message objects
- * with a server, sending messages on events within its subgraph, while receiving messages containing updates to apply
- * to its subnodes.</p>
- * <p>When a SceneJS.Socket processes incoming messages, it works in a similar manner to a {@link SceneJS.WithConfigs}
- * node, pushing configurations from the message body down into the setter methods of identified nodes in the subgraph.</p>
+ * with a server.</p>
  *
- * <p>While the format of incoming messages must be a {@link SceneJS.WithConfigs} configuration object, <b>the outgoing
- * message format is not part of the SceneJS specification</b> and can be whatever JSON objects the server on the other
- * end expects. As for when messages are sent by the scene, that can be triggered by SceneJS node listeners, eg. where a
- * Socket node can be configured to send messages as it transitions through the various stages of its life cycle.</p>
+ * <h2>Message Format</h2>
+ * <p>Incoming messages from a server are either error responses, like that shown below, or configuration maps
+ * exactly like those specified with a {@link SceneJS.WithConfigs}. On receipt of a configuration map, a Socket
+ * automatically applies the map to its subgraph in the same way that a {@link SceneJS.WithConfigs} does.</p>
+ * <p>An error response object has two parts: the error code, either a string or number, and a message.</p>
+ * <p>Below is an example of an HTTP 404 error response:</p>
+ * <pre><code>
+ * {
+ *     error : 404,
+ *     body  : "Could not find asset 'foobar'
+ * }
+ * </code></pre>
  *
- * <p>You can have multiple Sockets scattered through a scene graph, and may even nest them. This enables you to do some
+ *
+ * <p>The outgoing message format is not part of the SceneJS specification and is whatever JSON objects the server on
+ * the other end expects.</p>
+ *
+ * <h2>Message Queues</h2>
+ * <p>Messages can be configured on the Socket to send when the connection first opens, or enqueued at any
+ * time with {@link #addMessage} to send when the socket is next rendered while a connection is open.</p>
+ *
+ * <p>Incoming messages are also queued - each time the Socket is rendered while a connection is open, it dequeues and
+ * processes the next incoming message before sending all queued outgoing messages.</p>
+ *
+ * <p>You can have multiple Sockets scattered throughout a scene graph, and may even nest them. This enables you to do some
  * fancy things, like have "live assets" that are controlled by the servers that they are downloaded from. Imagine a
  * subgraph defining an airplane, that relies on its server to manage its complex physics computations, for example.</p>
  *
- * <h2>Message Protocol</h2>
- *
+ *  <p><b>Example Usage</b></p><p>Below is a Socket that connects to a server on the local host. The Socket starts off
+ * in {@link #STATE_INITIAL}. Then as soon as it is rendered, it transitions to {@link #STATE_CONNECTING} and tries to
+ * open the connection. When successful, it sends the optional specified messages and transitions to {@link #STATE_OPENED}.
+ * The server may respond with an error (described further below) or a configuration map. If the response is a
+ * configuration map, the Socket would then apply that to its sub-nodes.
+ * On error, the Socket will transition to {@link #STATE_ERROR} and remain in that state, with connection closed. If
+ * the connection ever closes, the Socket will attempt to re-open it when next rendered.</p> 
  * <pre><code>
- * {
- *     error : {String} or undefined when no error,
- *     body  : {
- *         /* Response from server - either a JSON SceneJS subgraph or a configuration map
- *     }
- * }
+ * new SceneJS.Socket({
+ *
+ *       // Location of server
+ *
+ *       uri: "ws://127.0.0.1:8888/",
+ *
+ *       // Messages to send as soon as the socket is first opened
+ *
+ *       messages: [
+ *          {
+ *               myParam  : "foo",
+ *               myParam2 : "bar"
+ *          },
+ *
+ *          // Next message ...
+ *
+ *      ],
+ *
+ *      listeners: {
+ *         "state-changed" : {
+ *              fn: function(theNode, params) {
+ *                  switch (params.newState) {
+ *                      case SceneJS.Socket.STATE_CONNECTING:
+ *
+ *                          // Socket attempting to open connection with server at specified URI
+ *
+ *                          alert("STATE_CONNECTING");
+ *                          break;
+ *
+ *                      case SceneJS.Socket.STATE_OPEN:
+ *
+ *                          // Server connection opened, messages sent
+ *
+ *                          alert("STATE_OPEN");
+ *                          break;
+ *
+ *                      case SceneJS.Socket.STATE_CLOSED:
+ *
+ *                          // Connection closed OK
+ *
+ *                          alert("STATE_CLOSED");
+ *                          break;
+ *
+ *                      case SceneJS.Socket.STATE_ERROR:
+ *
+ *                          // Error opening connection, or server error response
+ *
+ *                          alert("STATE_ERROR: " + params.exception.message);
+ *                          break;
+ *                   }
+ *               }
+ *           }
+ *       },
+ *
+ *       // Child nodes that will receive configs returned by socket's server peer
+ *)
+ *
  * </code></pre>
+
  */
 SceneJS.Socket = function() {
     SceneJS.Node.apply(this, arguments);
@@ -47,32 +120,29 @@ SceneJS.Socket = function() {
 
 SceneJS._inherit(SceneJS.Socket, SceneJS.Node);
 
-/**
+/** Initial state of Socket when not rendered yet.
  */
 SceneJS.Socket.STATE_INITIAL = 0;
 
-/**
+/** State of Socket when it has attempted to open a connection with a server and awaiting response. Socket tries to open
+ * the connection as soon as it is rendered and enters this state.
  */
 SceneJS.Socket.STATE_CONNECTING = 2;
 
-/**
+/** State of Socket when connection is open with server.
  */
 SceneJS.Socket.STATE_OPEN = 3;
 
 /**
- * State of Socket in which it re-open is pending after it has been closed by SceneJS or server, perhaps due to
- * lack of recent use. When next rendered, the Socket will then attempt to reopen and transition to
- * {@link #STATE_CONNECTING}.
- * @const
+ * State of Socket in which connection is closed. From here it will attempt to r-open when next rendered.
  */
 SceneJS.Socket.STATE_CLOSED = 4;
 
-/**
+/** State of Socket in which an error occured, either due to failure to open connection, or as signalled by the server.
  */
 SceneJS.Socket.STATE_ERROR = -1;
 
-
-/** Enqeues an outgoing message to send when the Socket is next rendered.
+/** Enqeues an outgoing message to send when the Socket is next rendered while a connection is open.
  *
  * @param message
  * @returns {this}
@@ -82,7 +152,7 @@ SceneJS.Socket.prototype.addMessage = function(message) {
     return this;
 };
 
-/** Clears outgoing message queue.
+/** Clears outgoing message queue - messages are not sent.
  * @returns {this}
  */
 SceneJS.Socket.prototype.removeMessages = function() {
@@ -105,7 +175,7 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
     }
     if (!this._uri) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidNodeConfigException("SceneJS.Socket uri property not defined"));
+                new SceneJS.errors.InvalidNodeConfigException("SceneJS.Socket uri property not defined"));
     }
 
     /* Socket can close after lack of use, in which case
@@ -130,7 +200,7 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
         if (message) {
             if (message.error) {
                 SceneJS._errorModule.error(
-                        new SceneJS.SocketServerErrorException(
+                        new SceneJS.errors.SocketServerErrorException(
                                 "SceneJS.Socket server responded with error: " + message.error + ", " + message.body));
             } else if (message.body) {
                 // alert(message.body);

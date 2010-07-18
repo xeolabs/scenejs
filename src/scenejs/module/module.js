@@ -19,7 +19,7 @@ new (function() {
             modules[name] = module;
         } catch (e) {
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.ModuleInstallFailureException(
+                    new SceneJS.errors.ModuleInstallFailureException(
                             "Module install failed - " + moduleLoading.url + ": " + e));
         } finally {
             moduleLoading = null;
@@ -33,7 +33,7 @@ new (function() {
                 moduleLoading = null;
                 moduleQueue = [];
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.ModuleLoadTimeoutException(
+                        new SceneJS.errors.ModuleLoadTimeoutException(
                                 "Module load timed out - SceneJS.requireModule(" + url + ") - check console for more info"));
             }
             moduleLoadTimer += TICK_INTERVAL;
@@ -95,7 +95,7 @@ new (function() {
                     this._startTime = (new Date()).getTime();
                 } else if (((new Date()).getTime() - this._startTime) > TIMEOUT) {
                     throw SceneJS._errorModule.fatalError(
-                            new SceneJS.ModuleNotFoundException(
+                            new SceneJS.errors.ModuleNotFoundException(
                                     "SceneJS.UseModule failed to find module '"
                                             + this._moduleName + "' after waiting " + (TIMEOUT / 1000) + " seconds - check console for more info"));
                 }

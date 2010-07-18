@@ -13,7 +13,7 @@
 <span class='line'>  6</span>  * with "#" map to the SIDs of nodes. In the first example, we have property keys that map to setter methods on
 <span class='line'>  7</span>  * those nodes. In the second example we have a property key prefixed with "+", which maps it to a method beginning
 <span class='line'>  8</span>  * with "add" (addNode). In the third example, we have a property key prefixed with "-", which maps it to a method
-<span class='line'>  9</span>  * beginning with "remove" (removeNode).&lt;/p>.
+<span class='line'>  9</span>  * beginning with "remove" (removeNode).&lt;/p>
 <span class='line'> 10</span>  *
 <span class='line'> 11</span>  * &lt;p>The functionality of {@link SceneJS.WithConfigs} is also provided in the {@link SceneJS.Socket} node, which allows
 <span class='line'> 12</span>  * a server to push a configuration map onto a scene subgraph through a WebSocket.&lt;/p>
@@ -26,7 +26,7 @@
 <span class='line'> 19</span>  * &lt;p>&lt;b>Example 1:&lt;/b>&lt;/p>&lt;p>Configuring properties on {@link SceneJS.Translation} and {@link SceneJS.Scale} nodes in the subgraph:&lt;/b>&lt;/p>&lt;pre>&lt;code>
 <span class='line'> 20</span>  * var wc = new SceneJS.WithConfigs({
 <span class='line'> 21</span>  *
-<span class='line'> 22</span>  *         // Have the WithConfigs throw a SceneJS.WithConfigsNodeNotFoundException if any target node
+<span class='line'> 22</span>  *         // Have the WithConfigs throw a SceneJS.errors.WithConfigsNodeNotFoundException if any target node
 <span class='line'> 23</span>  *         // is not found at exactly the hierarchy position specified in our configs map.
 <span class='line'> 24</span>  *         //
 <span class='line'> 25</span>  *         // Default is false, which would allow unmatched nodes to be simply skipped as traversal
@@ -34,7 +34,7 @@
 <span class='line'> 27</span>  *         //
 <span class='line'> 28</span>  *         strictNodes : true,       // Default is false
 <span class='line'> 29</span>  *
-<span class='line'> 30</span>  *         // Have the WithConfigs throw a SceneJS.WithConfigsPropertyNotFoundException if any target property
+<span class='line'> 30</span>  *         // Have the WithConfigs throw a SceneJS.errors.WithConfigsPropertyNotFoundException if any target property
 <span class='line'> 31</span>  *         // is not found on its target node.
 <span class='line'> 32</span>  *         //
 <span class='line'> 33</span>  *         // Default is true.
@@ -183,7 +183,7 @@
 <span class='line'>176</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>177</span> 
 <span class='line'>178</span> </span><span class="COMM">/**
-<span class='line'>179</span>  * Specifies whether or not a {@link SceneJS.WithConfigsPropertyNotFoundException} is to be raised when
+<span class='line'>179</span>  * Specifies whether or not a {@link SceneJS.errors.WithConfigsPropertyNotFoundException} is to be raised when
 <span class='line'>180</span>  * a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
 <span class='line'>181</span>  * @param {Boolean} value When true, enables exception
 <span class='line'>182</span>  */</span><span class="WHIT">
@@ -192,7 +192,7 @@
 <span class='line'>185</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>186</span> 
 <span class='line'>187</span> </span><span class="COMM">/**
-<span class='line'>188</span>  * Returns whether or not a {@link SceneJS.WithConfigsPropertyNotFoundException} will be raised when
+<span class='line'>188</span>  * Returns whether or not a {@link SceneJS.errors.WithConfigsPropertyNotFoundException} will be raised when
 <span class='line'>189</span>  * a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
 <span class='line'>190</span>  * @returns {Boolean} When true, exception is enabled
 <span class='line'>191</span>  */</span><span class="WHIT">
@@ -201,7 +201,7 @@
 <span class='line'>194</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>195</span> 
 <span class='line'>196</span> </span><span class="COMM">/**
-<span class='line'>197</span>  * Specifies whether or not a {@link SceneJS.WithConfigsNodeNotFoundException} exception is to be raised when
+<span class='line'>197</span>  * Specifies whether or not a {@link SceneJS.errors.WithConfigsNodeNotFoundException} exception is to be raised when
 <span class='line'>198</span>  * a node reference in the WithConfigs config map cannot be resolved to its target node in the subgraph.
 <span class='line'>199</span>  * @param {Boolean} value When true, enables exception
 <span class='line'>200</span>  */</span><span class="WHIT">
@@ -210,7 +210,7 @@
 <span class='line'>203</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>204</span> 
 <span class='line'>205</span> </span><span class="COMM">/**
-<span class='line'>206</span>  * Returns whether or not a {@link SceneJS.WithConfigsNodeNotFoundException} exception will be raised when
+<span class='line'>206</span>  * Returns whether or not a {@link SceneJS.errors.WithConfigsNodeNotFoundException} exception will be raised when
 <span class='line'>207</span>  * a node reference on the WithConfigs config map cannot be resolved to its target node in the subgraph.
 <span class='line'>208</span>  * @returns {Boolean} When true, exception is enabled
 <span class='line'>209</span>  */</span><span class="WHIT">

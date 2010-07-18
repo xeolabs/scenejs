@@ -86,7 +86,7 @@
             xmlDoc.loadXML(xml);
         }
         //        } catch (e) {
-        //throw new SceneJS.ParseException("Failed to parse res")
+        //throw new SceneJS.errors.ParseException("Failed to parse res")
         //        }
     }
 
@@ -437,7 +437,7 @@
             }
         }
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.ParseException
+                new SceneJS.errors.ParseException
                         ("COLLADA element expected: "
                                 + profileTag.tagName
                                 + "/newparam[sid == '"
@@ -456,7 +456,7 @@
                         .nodeValue;
             }
         }
-        throw SceneJS._errorModule.fatalError(new SceneJS.ParseException
+        throw SceneJS._errorModule.fatalError(new SceneJS.errors.ParseException
                 ("COLLADA element expected: "
                         + profileTag.tagName
                         + "/newparam[sid == '"

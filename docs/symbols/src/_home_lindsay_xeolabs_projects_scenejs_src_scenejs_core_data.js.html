@@ -9,8 +9,8 @@
 <span class='line'>  2</span>  * @class Data scope that is passed as the single argument to the callback function that many scene node classes may be
 <span class='line'>  3</span>  * dynamically configured through.
 <span class='line'>  4</span>  * &lt;p>These are created whenever data is generated within a scene graph, to transport the data down to sub-nodes.&lt;/p>
-<span class='line'>  5</span>  * &lt;p>Methods and nodes that create instances of these include {@link SceneJS.Scene#render}, {@link SceneJS.WithData} and
-<span class='line'>  6</span>  * {@link SceneJS.ScalarInterpolator}.&lt;/p>.
+<span class='line'>  5</span>  * &lt;p>Methods and nodes that create instances of these include {@link SceneJS.Scene#setData}, {@link SceneJS.WithData}
+<span class='line'>  6</span>  * , {@link SceneJS.Generator} and {@link SceneJS.Interpolator}.&lt;/p>.
 <span class='line'>  7</span>  * &lt;p>&lt;b>Example:&lt;/b>&lt;/p>&lt;p>The example below shows how nested creation of these will form a linked chain of data scopes.
 <span class='line'>  8</span>  * The outer {@link SceneJS.WithData} node creates one SceneJS.Data with "sizeX" and "sizeY" properties, then the inner
 <span class='line'>  9</span>  * {@link SceneJS.WithData} chains another SceneJS.Data to that, containing a "sizeZ" property. The dynamic config

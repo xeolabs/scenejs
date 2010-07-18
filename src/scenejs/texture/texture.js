@@ -2,9 +2,7 @@
  * @class A scene node that defines one or more layers of texture to apply to all geometries within its subgraph that have UV coordinates.
  * @extends SceneJS.node
  * <p>Texture layers are applied to specified material reflection cooficients, and may be transformed.</p>
- * <p><b>Live Examples</b></p>
- * <li><a target = "other" href="http://bit.ly/scenejs-animated-texture">Animated Texture</a></li>
- * </ul>
+
  * <p>A cube wrapped with a material which specifies its base (diffuse) color coefficient, and a texture with
  * one layer which applies a texture image to that particular coefficient. The texture is also translated, scaled and
  * rotated, in that order. All the texture properties are specified here to show what they are. </p>
@@ -153,13 +151,13 @@ SceneJS.Texture._STATE_ERROR = -1;
 SceneJS.Texture.prototype._init = function(params) {
     this._layers = [];
     if (!params.layers) {
-        throw new SceneJS.NodeConfigExpectedException(
+        throw new SceneJS.errors.NodeConfigExpectedException(
                 "SceneJS.Texture.layers is undefined");
     }
     for (var i = 0; i < params.layers.length; i++) {
         var layerParam = params.layers[i];
         if (!layerParam.uri) {
-            throw new SceneJS.NodeConfigExpectedException(
+            throw new SceneJS.errors.NodeConfigExpectedException(
                     "SceneJS.Texture.layers[" + i + "].uri is undefined");
         }
         if (layerParam.applyFrom) {
@@ -168,7 +166,7 @@ SceneJS.Texture.prototype._init = function(params) {
                 layerParam.applyFrom != "normal" &&
                 layerParam.applyFrom != "geometry") {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.InvalidNodeConfigException(
+                        new SceneJS.errors.InvalidNodeConfigException(
                                 "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
                                 "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
             }
@@ -177,7 +175,7 @@ SceneJS.Texture.prototype._init = function(params) {
             if (layerParam.applyTo != "baseColor" && // Colour map
                 layerParam.applyTo != "diffuseColor") {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.InvalidNodeConfigException(
+                        new SceneJS.errors.InvalidNodeConfigException(
                                 "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
                                 "should be either 'baseColor', 'diffuseColor'"));
             }

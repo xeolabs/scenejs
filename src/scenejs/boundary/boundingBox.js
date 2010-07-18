@@ -7,8 +7,7 @@
  * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.</p>
  *
  * <p>When configured with a projected size threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
- * <p><b>Live Demo</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-lod-boundingbox-example">Level of Detail Example</a></li></ul>
+ * 
  *  <p><b>Example 1.</b></p><p>This BoundingBox is configured to work as a level-of-detail selector. The 'levels'
  * property specifies thresholds for the boundary's projected size, each corresponding to one of the node's children,
  * such that the child corresponding to the threshold imediately below the boundary's current projected size is only one
@@ -293,13 +292,13 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     this._zmax = params.zmax || 0;
     if (params.levels) {
         if (params.levels.length != this._children.length) {
-          throw SceneJS._errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+          throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
                     ("SceneJS.boundingBox levels property should have a value for each child node"));
         }
 
         for (var i = 1; i < params.levels.length; i++) {
             if (params.levels[i - 1] >= params.levels[i]) {
-                throw SceneJS._errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
                         ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
             }
         }

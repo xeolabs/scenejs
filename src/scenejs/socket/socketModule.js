@@ -61,14 +61,14 @@ SceneJS._SocketModule = new (function() {
     this.openSocket = function(params, onOpen, onClose, onError) {
         if (!("WebSocket" in window)) {
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.SocketNotSupportedException("SceneJS.Socket cannot be used - WebSockets not supported by this browser"));
+                    new SceneJS.errors.SocketNotSupportedException("SceneJS.Socket cannot be used - WebSockets not supported by this browser"));
         }
         var socketId = SceneJS._createKeyForMap(activeSceneSockets.sockets, "socket");
         var webSocket;
         try {
             webSocket = new WebSocket(params.uri);  // W3C WebSocket
         } catch (e) {
-            onError(new SceneJS.SocketErrorException("SceneJS.Socket error (URI: '" + params.uri + "') : " + e.message || e));
+            onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error (URI: '" + params.uri + "') : " + e.message || e));
             return;
         }
         var socket = {
@@ -88,7 +88,7 @@ SceneJS._SocketModule = new (function() {
         };
         webSocket.onerror = function(e) {
             activeSceneSockets.sockets[socketId] = null;
-            onError(new SceneJS.SocketErrorException("SceneJS.Socket error (URI: '" + socket.uri + "') : " + e));
+            onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error (URI: '" + socket.uri + "') : " + e));
         };
         webSocket.onclose = function() {
             activeSceneSockets.sockets[socketId] = null;
@@ -124,7 +124,7 @@ SceneJS._SocketModule = new (function() {
                 messages.pop();
             }
         } catch(e) {
-            onError(new SceneJS.SocketErrorException("SceneJS.Socket error (URI: '" + activeSocket.uri + "') : " + e));
+            onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error (URI: '" + activeSocket.uri + "') : " + e));
             return;
         }
         onSuccess();
@@ -145,7 +145,7 @@ SceneJS._SocketModule = new (function() {
                 }
                 return message;
             } catch (e) {
-                onError(new SceneJS.SocketErrorException("SceneJS.Socket error (URI: '" + activeSocket.uri + "') : " + e));
+                onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error (URI: '" + activeSocket.uri + "') : " + e));
             }
         }
         return null;

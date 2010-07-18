@@ -51,7 +51,7 @@ SceneJS._memoryModule = new (function() {
     // @private
     function outOfMemory(description) {
         SceneJS._loggingModule.error("Memory allocation failed");
-        throw SceneJS._errorModule.fatalError(new SceneJS.OutOfVRAMException(
+        throw SceneJS._errorModule.fatalError(new SceneJS.errors.OutOfVRAMException(
                 "Out of memory - failed to allocate memory for " + description));
     }
 

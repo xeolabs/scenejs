@@ -45,8 +45,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
@@ -119,8 +117,6 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/core/data.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/logging/logging.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingToPage.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/name/name.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>
@@ -141,7 +137,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/lookAt.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/stationary.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/inverse.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projection/camera.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lights.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>

@@ -1,8 +1,6 @@
 SceneJS._namespace("SceneJS.objects");
 /**
  * @class A scene node that defines the geometry of the venerable OpenGL teapot.
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-example-teapot">Example 1</a></li></ul>
  * <p><b>Example Usage</b></p><p>Definition of teapot:</b></p><pre><code>
  * var c = new SceneJS.objects.Teapot(); // Requires no parameters
  * </pre></code>
@@ -5810,7 +5808,7 @@ SceneJS.objects.Teapot = function() {
             var result = [];
             for (var i = 0; i < ar.length; i++) {
                 if (numPerElement && ar[i].length != numPerElement)
-                    throw new SceneJS.InvalidNodeConfigException("Bad geometry array element");
+                    throw new SceneJS.errors.InvalidNodeConfigException("Bad geometry array element");
                 for (var j = 0; j < ar[i].length; j++)
                     result.push(ar[i][j]);
             }

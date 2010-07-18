@@ -20,7 +20,7 @@
  * </code></pre>
  * Note the optional <b>info</b> property, which you can provide in order to attach a note that may be useful for
  * debugging, which may be got with {@link #getInfo}.
- * <b>Dynamic configuration</b>
+ * <h2>Dynamic configuration</h2>
  * <p>Dynamic configuration can be achieved through a callback that is invoked each time the node is rendered, which
  * will pull configs off the scene data scope (more explanation on that below):</p>
  * <pre><code>
@@ -37,7 +37,7 @@
  *             );
  * </code></pre>
  *
- * <b>Static configuration with dynamic override</b>
+ * <h2>Static configuration with dynamic override</h2>
  * <p>A combination of static and dynamic configuration can be achieved through both a config object and a callback. The
  * config object's properties are set on the node immediately, then overridden by the callback at render-time:
  * <pre><code>
@@ -57,7 +57,7 @@
  *             );
  * </pre></code>
  *
- * <b>No configuration</b>
+ * <h2>No configuration</h2>
  * <p>For many node types you can omit configuration altogether. This node falls back on defaults for all configs:</p>
  * <pre><code>
  * var n4 = new SceneJS.Scale(                           // Scales by defaults of 1.0 on X, Y and Z axis
@@ -66,7 +66,7 @@
  *             );
  * </code></pre>
  *
- * <b>A bit more on dynamic configuration</b>
+ * <h2>A bit more on dynamic configuration</h2>
  * <p>The <b>data</b> parameter on the dynamic config callbacks shown above embodies a scene data scope. SceneJS
  * provides a fresh global data scope within each scene when it is rendered, into which you can inject data when you
  * render the scene graph. The example below demonstrates a property injected into the scope on render, which is then
@@ -86,7 +86,9 @@
  *                      // ... chld nodes ...
  *                  );
  *
- * exampleScene.render({ eye: { x: 0, y: 0, z: -100 });
+ * exampleScene
+ *     .setData({ eye: { x: 0, y: 0, z: -100 })
+ *         .render()
  * </code></pre>
  * <p>Using {@link SceneJS.WithData} nodes, you can create chains of sub-data scopes, to feed data down into the scene
  * hierarchy.</p>
@@ -116,7 +118,7 @@
  * <tr><td>rotate</td><td>{@link SceneJS.Rotate}</td></tr>
  * <tr><td>scale</td><td>{@link SceneJS.Scale}</td></tr>
  * <tr><td>scene</td><td>{@link SceneJS.Scene}</td></tr>
- * <tr><td>scalar-interpolator</td><td>{@link SceneJS.Interpolator}</td></tr>
+ * <tr><td>interpolator</td><td>{@link SceneJS.Interpolator}</td></tr>
  * <tr><td>selector</td><td>{@link SceneJS.Selector}</td></tr>
  * <tr><td>sphere</td><td>{@link SceneJS.objects.Sphere}</td></tr>
  * <tr><td>stationary</td><td>{@link SceneJS.Stationary}</td></tr>
@@ -126,6 +128,8 @@
  * <tr><td>texture</td><td>{@link SceneJS.Texture}</td></tr>
  * <tr><td>translate</td><td>{@link SceneJS.Translate}</td></tr>
  * <tr><td>with-data</td><td>{@link SceneJS.WithData}</td></tr>
+ * <tr><td>with-configs</td><td>{@link SceneJS.WithConfigs}</td></tr>
+ * <tr><td>socket</td><td>{@link SceneJS.Socket}</td></tr>
  * </table>
  *
  * <h2>Events</h2>
@@ -245,11 +249,11 @@ SceneJS.Node._ArgParser = new (function() {
             if (listeners.hasOwnProperty(eventName)) {
                 var l = listeners[eventName];
                 if (!l.fn) {
-                    throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                             ("Listener 'fn' missing in node config"));
                 }
                 if (!(l.fn instanceof Function)) {
-                    throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                             ("Listener 'fn' invalid in node config - is not a function"));
                 }
                 l.options = l.options || {};
@@ -303,7 +307,7 @@ SceneJS.Node._ArgParser = new (function() {
             } else if (arg._render) { // Determines arg to be a node
                 this._parseChild(arg, args, i + 1, node);
             } else {
-                throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         ("Unexpected type for node argument " + i + " - expected a config function or a child node"));
             }
         }
@@ -355,7 +359,7 @@ SceneJS.Node._ArgParser = new (function() {
             if (arg._nodeType) {
                 this._parseChild(arg, args, i + 1, node);
             } else {
-                throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         ("Unexpected type for node argument " + i + " - expected a child node"));
             }
         }
@@ -376,7 +380,7 @@ SceneJS.Node._ArgParser = new (function() {
             if (arg._nodeType) {
                 this._parseChild(arg, args, i + 1, node);
             } else {
-                throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         ("Unexpected type for node argument " + i + " - expected a child node"));
             }
         }
@@ -469,12 +473,12 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
 
 
 SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child, data) {
-//    var handle = {
-//        child : child,
-//        setterFuncs : [],
-//        values : []
-//    };
-  var  handle = null;
+    //    var handle = {
+    //        child : child,
+    //        setterFuncs : [],
+    //        values : []
+    //    };
+    var handle = null;
     var key;
     var funcName;
     var func;
@@ -493,7 +497,7 @@ SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child,
                     }
                 } else {
                     if (configsModes && configsModes.strictProperties) {
-                        throw SceneJS._errorModule.fatalError(new SceneJS.WithConfigsPropertyNotFoundException(
+                        throw SceneJS._errorModule.fatalError(new SceneJS.errors.WithConfigsPropertyNotFoundException(
                                 "Method '" + funcName + "' expected on node with SID '" + child.getSID() + "'"));
                     }
                 }
@@ -661,17 +665,17 @@ SceneJS.Node.prototype.removeNode = function(sid) {
 SceneJS.Node.prototype.addNode = function(node) {
     if (!node) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidSceneGraphException(
+                new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#addNode - node argument is undefined"));
     }
     if (!node._render) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidSceneGraphException(
+                new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#addNode - node argument is not a SceneJS.Node or subclass!"));
     }
     if (node._parent != null) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidSceneGraphException(
+                new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#addNode - node argument is still attached to another parent!"));
     }
     this._children.push(node);
@@ -688,7 +692,7 @@ SceneJS.Node.prototype.addNode = function(node) {
 SceneJS.Node.prototype.insertNode = function(node, i) {
     if (node._parent != null) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidSceneGraphException(
+                new SceneJS.errors.InvalidSceneGraphException(
                         "Attempted to insert a child to a node without " +
                         "first removing the child from it's current parent"));
     }

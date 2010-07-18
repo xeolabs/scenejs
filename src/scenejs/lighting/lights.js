@@ -9,10 +9,7 @@
  * while directional only have a vector that describes their direction, where they have no actual location since they
  * are an infinite distance away.</p>
  * <p>Therefore, each of these two light types have slightly different properties, as shown in the usage example below.</p>
- * <p><b>Live Examples</b></p>
- * <li><a target = "other" href="http://bit.ly/scenejs-dir-lighting-example">Directional Lighting</a></li>
- * <li><a target = "other" href="http://bit.ly/scenejs-point-lighting-exam">Point Lighting</a></li>
- * </ul>
+
  * <p><b>Example Usage</b></p><p>This example defines a cube that is illuminated by two light sources, point and directional.
  * The cube has a {@link SceneJS.Material} that define how it reflects the light.</b></p><pre><code>
  *  var l = new SceneJS.Lights({

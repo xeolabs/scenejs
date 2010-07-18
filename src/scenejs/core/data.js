@@ -2,8 +2,8 @@
  * @class Data scope that is passed as the single argument to the callback function that many scene node classes may be
  * dynamically configured through.
  * <p>These are created whenever data is generated within a scene graph, to transport the data down to sub-nodes.</p>
- * <p>Methods and nodes that create instances of these include {@link SceneJS.Scene#render}, {@link SceneJS.WithData} and
- * {@link SceneJS.ScalarInterpolator}.</p>.
+ * <p>Methods and nodes that create instances of these include {@link SceneJS.Scene#setData}, {@link SceneJS.WithData}
+ * , {@link SceneJS.Generator} and {@link SceneJS.Interpolator}.</p>.
  * <p><b>Example:</b></p><p>The example below shows how nested creation of these will form a linked chain of data scopes.
  * The outer {@link SceneJS.WithData} node creates one SceneJS.Data with "sizeX" and "sizeY" properties, then the inner
  * {@link SceneJS.WithData} chains another SceneJS.Data to that, containing a "sizeZ" property. The dynamic config

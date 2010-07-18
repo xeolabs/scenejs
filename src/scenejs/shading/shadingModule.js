@@ -342,7 +342,7 @@ SceneJS._shaderModule = new (function() {
      */
     function activateProgram() {
         if (!canvas) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.NoCanvasActiveException("No canvas active"));
+            throw SceneJS._errorModule.fatalError(new SceneJS.errors.NoCanvasActiveException("No canvas active"));
         }
 
         if (!sceneHash) {

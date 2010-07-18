@@ -2,129 +2,76 @@
 <project relativePaths="false" version="4">
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/bvhParser.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/pick/pickModule.js" afterPath="$PROJECT_DIR$/src/scenejs/pick/pickModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/seymourplane_triangulate.dae" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/modules/seymourplane/seymourplane.js" afterPath="$PROJECT_DIR$/src/examples/oo-api-intro/modules/seymourplane/seymourplane.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/modules/staircase/staircase.js" afterPath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/modules/staircase/staircase.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/processes/processModule.js" afterPath="$PROJECT_DIR$/src/scenejs/processes/processModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/hello-teapot/index.html" afterPath="$PROJECT_DIR$/src/examples/hello-teapot/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/withData/withData.js" afterPath="$PROJECT_DIR$/src/scenejs/withData/withData.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lightingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lightingModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/logging/logging.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometry.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/spiral-staircase/index.html" afterPath="$PROJECT_DIR$/src/examples/spiral-staircase/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/select-view/index.html" afterPath="$PROJECT_DIR$/src/examples/select-view/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/events/eventsModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/lookAt.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/lookAt.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/debug/debugModule.js" afterPath="$PROJECT_DIR$/src/scenejs/debug/debugModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js" afterPath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/lod-staircase-with-tiles.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/tron-tank/index.html" afterPath="$PROJECT_DIR$/src/examples/tron-tank/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/text/vectorTextModule.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/text/vectorTextModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/becken/index.debug.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/courtyard-house/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-cross-domain/index.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/inverse.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/inverse.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/logging.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/logging.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/generation/generator.js" afterPath="$PROJECT_DIR$/src/scenejs/generation/generator.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/parsers/mtlParser.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/mtlParser.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/text/text.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/text/text.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/camera/projectionModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/camera/projectionModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/seymour-plane/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/tron-tank/Tank.dae" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/viewLocalityModule.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/viewLocalityModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/seymour-plane/seymour-plane.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/billboard.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/billboard.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instancingModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/index.html" afterPath="$PROJECT_DIR$/src/examples/oo-api-intro/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/errors/errorsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/errors/errorsModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/animated-texture/animated-texture.js" afterPath="$PROJECT_DIR$/src/examples/animated-texture/animated-texture.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/rotate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/rotate.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/src/org/scenejs/proxy/AssetServlet.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" afterPath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/material/materialModule.js" afterPath="$PROJECT_DIR$/src/scenejs/material/materialModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/core/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/body.html" afterPath="$PROJECT_DIR$/resources/body.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/objParserOLD.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/with-configs/with-configs.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/locality.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/locality.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/custom-geometry/index.html" afterPath="$PROJECT_DIR$/src/examples/custom-geometry/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/interpolation/interpolator.js" afterPath="$PROJECT_DIR$/src/scenejs/interpolation/interpolator.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/renderer-node/renderer-node.js" afterPath="$PROJECT_DIR$/src/examples/renderer-node/renderer-node.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/animated-texture/index.html" afterPath="$PROJECT_DIR$/src/examples/animated-texture/index.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/tron-tank/tron-tank-old.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/camera/camera.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/camera/camera.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/webgl-trace.js" afterPath="$PROJECT_DIR$/src/scenejs/core/webgl-trace.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/core.js" afterPath="$PROJECT_DIR$/src/scenejs/core/core.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-add/with-configs-add.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/schema/collada_schema_1_4.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/oo-api-intro.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/socket/socket.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/select-view/select-view.js" afterPath="$PROJECT_DIR$/src/examples/select-view/select-view.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-local/teapot-load-local.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/symbol.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/material/material.js" afterPath="$PROJECT_DIR$/src/scenejs/material/material.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/trackball.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/trackball.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/parsers/objParser.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/objParser.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/lookAt.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/lookAt.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/instance.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-local/orange-teapot.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/tests/assets/becken/becken.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/parameterised-collada-instance/parameterised-collada-instance.js" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/tron-tank/tron-tank-scene.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/tron-tank/index.html" afterPath="$PROJECT_DIR$/src/examples/tron-tank/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/renderer-node/modules/seymourplane/seymourplane.js" afterPath="$PROJECT_DIR$/src/examples/renderer-node/modules/seymourplane/seymourplane.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/with-configs-set/with-configs-set.js" afterPath="$PROJECT_DIR$/src/examples/with-configs-set/with-configs-set.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/courtyard-house/index.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/renderer.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/moving-point-light/moving-point-light.js" afterPath="$PROJECT_DIR$/src/examples/moving-point-light/moving-point-light.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/web/WEB-INF/web.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/pouring-teapot/index.html" afterPath="$PROJECT_DIR$/src/examples/pouring-teapot/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/index.html" afterPath="$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/viewTransformModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/viewTransformModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/viewFrustumModule.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/viewFrustumModule.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/translate.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/translate.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/generation/generator.js" afterPath="$PROJECT_DIR$/src/scenejs/generation/generator.js" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/courtyard-house/courtyard-house.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/src/org/scenejs/proxy/Parser.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/node/node.js" afterPath="$PROJECT_DIR$/src/scenejs/node/node.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/memory/memoryModule.js" afterPath="$PROJECT_DIR$/src/scenejs/memory/memoryModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/web/index.jsp" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelTransformModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelTransformModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lightSource.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/texture.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/texture.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/with-configs-remove/with-configs-remove.js" afterPath="$PROJECT_DIR$/src/examples/with-configs-remove/with-configs-remove.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/selector/selector.js" afterPath="$PROJECT_DIR$/src/scenejs/selector/selector.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/sceneModule.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/sceneModule.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-remove/with-configs-remove.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/scale.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/scale.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/quaternion.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/quaternion.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.txt" afterPath="$PROJECT_DIR$/README.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/moving-dir-light/moving-dir-light.js" afterPath="$PROJECT_DIR$/src/examples/moving-dir-light/moving-dir-light.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/house/index.html" afterPath="$PROJECT_DIR$/src/examples/house/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/geometryModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/moving-dir-light/index.html" afterPath="$PROJECT_DIR$/src/examples/moving-dir-light/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/oo-api-intro/index.html" afterPath="$PROJECT_DIR$/src/examples/oo-api-intro/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/errors/errorsModule.js" afterPath="$PROJECT_DIR$/src/scenejs/errors/errorsModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" afterPath="$PROJECT_DIR$/src/scenejs/fog/fogModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/teapot-cloud/index.html" afterPath="$PROJECT_DIR$/src/examples/teapot-cloud/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/module/module.js" afterPath="$PROJECT_DIR$/src/scenejs/module/module.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" afterPath="$PROJECT_DIR$/src/scenejs/lighting/lights.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/matrix.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/matrix.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/math.js" afterPath="$PROJECT_DIR$/src/scenejs/core/math.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js" afterPath="$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/header.html" afterPath="$PROJECT_DIR$/resources/header.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/shading/shadingModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/socket/socket.js" afterPath="$PROJECT_DIR$/src/scenejs/socket/socket.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" afterPath="$PROJECT_DIR$/src/scenejs/boundary/boundingBox.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/body.html" afterPath="$PROJECT_DIR$/resources/body.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/renderer/rendererModule.js" afterPath="$PROJECT_DIR$/src/scenejs/renderer/rendererModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/with-configs/with-configs.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scenejs.iws" afterPath="$PROJECT_DIR$/scenejs.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/texture/textureModule.js" afterPath="$PROJECT_DIR$/src/scenejs/texture/textureModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/name/nameModule.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/time/timeModule.js" afterPath="$PROJECT_DIR$/src/scenejs/time/timeModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/proxy/proxy.iml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/select-teapots/index.html" afterPath="$PROJECT_DIR$/src/examples/select-teapots/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/moving-point-light/index.html" afterPath="$PROJECT_DIR$/src/examples/moving-point-light/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/webgl.js" afterPath="$PROJECT_DIR$/src/scenejs/core/webgl.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/stationary.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/stationary.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/name/name.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" afterPath="$PROJECT_DIR$/src/scenejs/logging/loggingModule.js" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-local/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/renderer-node/index.html" afterPath="$PROJECT_DIR$/src/examples/renderer-node/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" afterPath="$PROJECT_DIR$/src/scenejs/exceptions/exceptions.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/socket/socketModule.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/scene/scene.js" afterPath="$PROJECT_DIR$/src/scenejs/scene/scene.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/interpolation/interpolator.js" afterPath="$PROJECT_DIR$/src/scenejs/interpolation/interpolator.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/fog/fog.js" afterPath="$PROJECT_DIR$/src/scenejs/fog/fog.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelViewTransformModule.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/modelView/modelViewTransformModule.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/with-configs-add/with-configs-add.js" afterPath="$PROJECT_DIR$/src/examples/with-configs-add/with-configs-add.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/core/data.js" afterPath="$PROJECT_DIR$/src/scenejs/core/data.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/socket/socketModule.js" afterPath="$PROJECT_DIR$/src/scenejs/socket/socketModule.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/scenejs/logging/loggingToPage.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" afterPath="$PROJECT_DIR$/src/scenejs/geometry/objects/teapot.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/scenejs/module/module.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-remove/index.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/teapot-load-cross-domain/teapot-load-cross-domain.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/examples/with-configs/index.html" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/spiral-staircase/spiral-staircase.js" afterPath="$PROJECT_DIR$/src/examples/spiral-staircase/spiral-staircase.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/parsers/colladaParser.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/parsers/colladaParser.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/transformation/camera/camera.js" afterPath="$PROJECT_DIR$/src/scenejs/transformation/camera/camera.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/scenejs/instancing/loadModule.js" afterPath="$PROJECT_DIR$/src/scenejs/instancing/loadModule.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/examples/with-configs-add/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/examples/custom-geometry/custom-geometry.js" afterPath="$PROJECT_DIR$/src/examples/custom-geometry/custom-geometry.js" />
     </list>
     <list name="Not to commit" comment="" />
-    <ignored path="scenejs.iws" />
     <ignored path=".idea/workspace.xml" />
+    <ignored path="scenejs.iws" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="Commander">
@@ -180,8 +127,44 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/examples/animated-texture/index.html">
+      <file leaf-file-name="with-configs-set.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/with-configs-set/with-configs-set.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="57" column="74" selection-start="2209" selection-end="2209" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="seymourplane.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/oo-api-intro/modules/seymourplane/seymourplane.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="131" selection-start="2204" selection-end="2264" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="seymourplane.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/renderer-node/modules/seymourplane/seymourplane.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="5" column="80" selection-start="292" selection-end="292" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="body.html" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/resources/body.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="15" column="5" selection-start="1142" selection-end="1142" vertical-scroll-proportion="0.29109588">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="header.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/header.html">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
               <folding />
@@ -189,37 +172,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="body.html" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resources/body.html">
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/with-configs-set/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="61" selection-start="359" selection-end="359" vertical-scroll-proportion="-4.25">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="socket.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/scenejs/socket/socket.js">
+      <file leaf-file-name="spiral-staircase.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/spiral-staircase/spiral-staircase.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="39" selection-start="3" selection-end="3" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="README.txt" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/README.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="13" column="30" selection-start="331" selection-end="331" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="134" column="12" selection-start="6909" selection-end="6909" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -228,10 +193,26 @@
       <file leaf-file-name="withConfigs.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="1" selection-start="5" selection-end="5" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1279364430000" expanded="true" signature="0:6763" placeholder="/**...*/" />
-              </folding>
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="select-view.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/select-view/select-view.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/examples/select-view/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="30" column="0" selection-start="831" selection-end="1261" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -242,9 +223,6 @@
     <FindUsagesManager>
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/scenejs/logging/logging.js" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MavenRunner">
     <option name="jreName" value="#JAVA_INTERNAL" />
@@ -502,14 +480,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1921" y="26" width="1919" height="1068" extended-state="1" />
+    <frame x="1921" y="26" width="1919" height="1068" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.02631579" sideWeight="0.5" order="7" side_tool="false" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32922733" sideWeight="0.5" order="1" side_tool="false" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2014768" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32923076" sideWeight="0.5" order="8" side_tool="false" />
@@ -518,7 +496,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24330118" sideWeight="0.9" order="0" side_tool="false" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24330118" sideWeight="0.79049677" order="0" side_tool="false" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" />
@@ -559,49 +537,109 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/examples/moving-point-light/index.html">
+    <entry file="file://$PROJECT_DIR$/src/examples/select-teapots/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="20" selection-start="947" selection-end="1369" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/spiral-staircase/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="31" selection-start="672" selection-end="954" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1279439419000" expanded="true" signature="678:953" placeholder="..." />
+            <marker date="1279439419000" expanded="true" signature="791:935" placeholder="..." />
+            <marker date="1279439419000" expanded="true" signature="864:930" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/teapot-cloud/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="17" selection-start="677" selection-end="955" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/tron-tank/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="93" selection-start="1303" selection-end="1303" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/with-configs-add/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/moving-dir-light/index.html">
+    <entry file="file://$PROJECT_DIR$/src/examples/with-configs-remove/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/lod-staircase-with-tiles/index.html">
+    <entry file="file://$PROJECT_DIR$/src/examples/select-view/select-view.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/house/index.html">
+    <entry file="file://$PROJECT_DIR$/src/examples/select-view/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="38" selection-start="1773" selection-end="1773" vertical-scroll-proportion="-26.916666">
+        <state line="30" column="0" selection-start="831" selection-end="1261" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/hello-teapot/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="38" selection-start="964" selection-end="964" vertical-scroll-proportion="-17.708334">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/custom-geometry/index.html">
+    <entry file="file://$PROJECT_DIR$/src/examples/with-configs-set/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/animated-texture/index.html">
+    <entry file="file://$PROJECT_DIR$/src/examples/spiral-staircase/spiral-staircase.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="134" column="12" selection-start="6909" selection-end="6909" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/with-configs-set/with-configs-set.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="57" column="74" selection-start="2209" selection-end="2209" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/oo-api-intro/modules/seymourplane/seymourplane.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="131" selection-start="2204" selection-end="2264" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/renderer-node/modules/seymourplane/seymourplane.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="80" selection-start="292" selection-end="292" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/header.html">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
@@ -610,37 +648,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/body.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="61" selection-start="359" selection-end="359" vertical-scroll-proportion="-4.25">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/withConfigs/withConfigs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="1" selection-start="5" selection-end="5" vertical-scroll-proportion="0.0">
-          <folding>
-            <marker date="1279364430000" expanded="true" signature="0:6763" placeholder="/**...*/" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/scenejs/socket/socket.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="39" selection-start="3" selection-end="3" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="30" selection-start="331" selection-end="331" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="15" column="5" selection-start="1142" selection-end="1142" vertical-scroll-proportion="0.29109588">
           <folding />
         </state>
       </provider>

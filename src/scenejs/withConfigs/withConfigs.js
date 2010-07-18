@@ -6,7 +6,7 @@
  * with "#" map to the SIDs of nodes. In the first example, we have property keys that map to setter methods on
  * those nodes. In the second example we have a property key prefixed with "+", which maps it to a method beginning
  * with "add" (addNode). In the third example, we have a property key prefixed with "-", which maps it to a method
- * beginning with "remove" (removeNode).</p>.
+ * beginning with "remove" (removeNode).</p>
  *
  * <p>The functionality of {@link SceneJS.WithConfigs} is also provided in the {@link SceneJS.Socket} node, which allows
  * a server to push a configuration map onto a scene subgraph through a WebSocket.</p>
@@ -19,7 +19,7 @@
  * <p><b>Example 1:</b></p><p>Configuring properties on {@link SceneJS.Translation} and {@link SceneJS.Scale} nodes in the subgraph:</b></p><pre><code>
  * var wc = new SceneJS.WithConfigs({
  *
- *         // Have the WithConfigs throw a SceneJS.WithConfigsNodeNotFoundException if any target node
+ *         // Have the WithConfigs throw a SceneJS.errors.WithConfigsNodeNotFoundException if any target node
  *         // is not found at exactly the hierarchy position specified in our configs map.
  *         //
  *         // Default is false, which would allow unmatched nodes to be simply skipped as traversal
@@ -27,7 +27,7 @@
  *         //
  *         strictNodes : true,       // Default is false
  *
- *         // Have the WithConfigs throw a SceneJS.WithConfigsPropertyNotFoundException if any target property
+ *         // Have the WithConfigs throw a SceneJS.errors.WithConfigsPropertyNotFoundException if any target property
  *         // is not found on its target node.
  *         //
  *         // Default is true.
@@ -176,7 +176,7 @@ SceneJS.WithConfigs.prototype.getConfigs = function() {
 };
 
 /**
- * Specifies whether or not a {@link SceneJS.WithConfigsPropertyNotFoundException} is to be raised when
+ * Specifies whether or not a {@link SceneJS.errors.WithConfigsPropertyNotFoundException} is to be raised when
  * a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
  * @param {Boolean} value When true, enables exception
  */
@@ -185,7 +185,7 @@ SceneJS.WithConfigs.prototype.setStrictProperties = function(value) {
 };
 
 /**
- * Returns whether or not a {@link SceneJS.WithConfigsPropertyNotFoundException} will be raised when
+ * Returns whether or not a {@link SceneJS.errors.WithConfigsPropertyNotFoundException} will be raised when
  * a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
  * @returns {Boolean} When true, exception is enabled
  */
@@ -194,7 +194,7 @@ SceneJS.WithConfigs.prototype.getStrictProperties = function() {
 };
 
 /**
- * Specifies whether or not a {@link SceneJS.WithConfigsNodeNotFoundException} exception is to be raised when
+ * Specifies whether or not a {@link SceneJS.errors.WithConfigsNodeNotFoundException} exception is to be raised when
  * a node reference in the WithConfigs config map cannot be resolved to its target node in the subgraph.
  * @param {Boolean} value When true, enables exception
  */
@@ -203,7 +203,7 @@ SceneJS.WithConfigs.prototype.setStrictNodes = function(value) {
 };
 
 /**
- * Returns whether or not a {@link SceneJS.WithConfigsNodeNotFoundException} exception will be raised when
+ * Returns whether or not a {@link SceneJS.errors.WithConfigsNodeNotFoundException} exception will be raised when
  * a node reference on the WithConfigs config map cannot be resolved to its target node in the subgraph.
  * @returns {Boolean} When true, exception is enabled
  */

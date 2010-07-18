@@ -16,8 +16,7 @@
  * restricted in what state it can memoise within a Symbol's subgraph when it is likely to be dynamically affected by
  * the different scene locations it which it is instanced.</p>
  *
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 1 - Instancing and Branching - Switchable Viewpoint</a></li></ul>
+ 
  * <p><b>Example Usage</b></p><p>Here we're defining a Symbol in a {@link SceneJS.Node}, then instantiating it three times with
  * {@link SceneJS.Instance} nodes to show variations on how an {@link SceneJS.Instance} node can refer to a Symbol, relative to
  * a namespace created by a {@link SceneJS.Node}:</b></p><pre><code>
@@ -73,7 +72,7 @@ SceneJS._inherit(SceneJS.Symbol, SceneJS.Node);
 // @private
 SceneJS.Symbol.prototype._render = function(traversalContext, data) {
     if (!this._sid) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.NodeConfigExpectedException
+        throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
                 ("SceneJS.Symbol parameter expected: sid"));
     }
     this._sidPath = SceneJS._instancingModule.getName();  // Path to this Symbol, without this Symbol's SID

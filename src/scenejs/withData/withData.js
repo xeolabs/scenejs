@@ -2,7 +2,7 @@
  * @class A scene node that creates data in a scope for its subgraph.
  * @extends SceneJS.Node
  * <p>This node provides a simple yet flexible mechanism for passing data down into a scene graph at runtime, analogous to
- * creation of a closure's data scope in JavaScript .</p>.
+ * creation of a closure's data scope in JavaScript .</p>
  * <p>The data scope is implemented by a {@link SceneJS.Data} instance. On each render a {@link SceneJS.Scene} creates a global
  * SceneJS.Data populated with any properties that were given to the SceneJS.Scene's render method. That Data forms a
  * chain on which SceneJS.WithData nodes will push and pop as they are visited and departed from during scene traversal.</p>

@@ -132,7 +132,7 @@ var dragging = false;
  * We render the scene, injecting the initial angles for the rotate nodes.
  */
 exampleScene
-        .withData({yaw: yaw, pitch: pitch})
+        .setData({yaw: yaw, pitch: pitch})
         .render();
 
 var canvas = document.getElementById(exampleScene.getCanvasId());

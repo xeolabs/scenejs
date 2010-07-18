@@ -2,9 +2,7 @@
  * @class A scene branch node that selects which among its children are currently active.
  *
  * <p>This node is useful for dynamically controlling traversal within a scene graph.</p>
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-teapot-select">Example 1 - Switching Geometry</a></li></ul>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-view-select">Example 2 - Switchable Viewpoint</a></li></ul>
+
  * <p><b>Example Usage 1</b></p><p>This selector will allow only child nodes at indices 0 and 2 to be rendered,
  * which are the teapot and sphere. Child 1, a cube, is not selected and therefore won't be rendered.</p><pre><code>
  * var s = new SceneJS.Selector({ selection: [0, 2]},

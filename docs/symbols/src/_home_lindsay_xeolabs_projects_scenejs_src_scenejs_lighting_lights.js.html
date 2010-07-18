@@ -16,206 +16,203 @@
 <span class='line'>  9</span>  * while directional only have a vector that describes their direction, where they have no actual location since they
 <span class='line'> 10</span>  * are an infinite distance away.&lt;/p>
 <span class='line'> 11</span>  * &lt;p>Therefore, each of these two light types have slightly different properties, as shown in the usage example below.&lt;/p>
-<span class='line'> 12</span>  * &lt;p>&lt;b>Live Examples&lt;/b>&lt;/p>
-<span class='line'> 13</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-dir-lighting-example">Directional Lighting&lt;/a>&lt;/li>
-<span class='line'> 14</span>  * &lt;li>&lt;a target = "other" href="http://bit.ly/scenejs-point-lighting-exam">Point Lighting&lt;/a>&lt;/li>
-<span class='line'> 15</span>  * &lt;/ul>
-<span class='line'> 16</span>  * &lt;p>&lt;b>Example Usage&lt;/b>&lt;/p>&lt;p>This example defines a cube that is illuminated by two light sources, point and directional.
-<span class='line'> 17</span>  * The cube has a {@link SceneJS.Material} that define how it reflects the light.&lt;/b>&lt;/p>&lt;pre>&lt;code>
-<span class='line'> 18</span>  *  var l = new SceneJS.Lights({
-<span class='line'> 19</span>  *      sources: [
-<span class='line'> 20</span>  *          {
-<span class='line'> 21</span>  *              type: "point",
-<span class='line'> 22</span>  *              pos: { x: 100.0, y: 30.0, z: -100.0 }, // Position
-<span class='line'> 23</span>  *              color: { r: 0.0, g: 1.0, b: 1.0 },
-<span class='line'> 24</span>  *              diffuse: true,   // Contribute to diffuse lighting
-<span class='line'> 25</span>  *              specular: true,  // Contribute to specular lighting
-<span class='line'> 26</span>  *
-<span class='line'> 27</span>  *              // Since this light source has a position, it therefore has
-<span class='line'> 28</span>  *              // a distance over which its intensity can attenuate.
-<span class='line'> 29</span>  *              // Consult any OpenGL book for how to use these factors.
-<span class='line'> 30</span>  *
-<span class='line'> 31</span>  *              constantAttenuation: 1.0,
-<span class='line'> 32</span>  *              quadraticAttenuation: 0.0,
-<span class='line'> 33</span>  *              linearAttenuation: 0.0
-<span class='line'> 34</span>  *          },
-<span class='line'> 35</span>  *          {
-<span class='line'> 36</span>  *              type: "dir",
-<span class='line'> 37</span>  *              color: { r: 1.0, g: 1.0, b: 0.0 },
-<span class='line'> 38</span>  *              diffuse: true,
-<span class='line'> 39</span>  *              specular: true,
-<span class='line'> 40</span>  *              dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction - default is { x: 0, y: 0, z: -1 }
-<span class='line'> 41</span>  *          }
-<span class='line'> 42</span>  *      ]
-<span class='line'> 43</span>  *  },
-<span class='line'> 44</span>  *
-<span class='line'> 45</span>  *      new SceneJS.material({
-<span class='line'> 46</span>  *              baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
-<span class='line'> 47</span>  *              specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
-<span class='line'> 48</span>  *              emit:           0.0,
-<span class='line'> 49</span>  *              specular:       0.9,
-<span class='line'> 50</span>  *              shine:          6.0
-<span class='line'> 51</span>  *          },
+<span class='line'> 12</span> 
+<span class='line'> 13</span>  * &lt;p>&lt;b>Example Usage&lt;/b>&lt;/p>&lt;p>This example defines a cube that is illuminated by two light sources, point and directional.
+<span class='line'> 14</span>  * The cube has a {@link SceneJS.Material} that define how it reflects the light.&lt;/b>&lt;/p>&lt;pre>&lt;code>
+<span class='line'> 15</span>  *  var l = new SceneJS.Lights({
+<span class='line'> 16</span>  *      sources: [
+<span class='line'> 17</span>  *          {
+<span class='line'> 18</span>  *              type: "point",
+<span class='line'> 19</span>  *              pos: { x: 100.0, y: 30.0, z: -100.0 }, // Position
+<span class='line'> 20</span>  *              color: { r: 0.0, g: 1.0, b: 1.0 },
+<span class='line'> 21</span>  *              diffuse: true,   // Contribute to diffuse lighting
+<span class='line'> 22</span>  *              specular: true,  // Contribute to specular lighting
+<span class='line'> 23</span>  *
+<span class='line'> 24</span>  *              // Since this light source has a position, it therefore has
+<span class='line'> 25</span>  *              // a distance over which its intensity can attenuate.
+<span class='line'> 26</span>  *              // Consult any OpenGL book for how to use these factors.
+<span class='line'> 27</span>  *
+<span class='line'> 28</span>  *              constantAttenuation: 1.0,
+<span class='line'> 29</span>  *              quadraticAttenuation: 0.0,
+<span class='line'> 30</span>  *              linearAttenuation: 0.0
+<span class='line'> 31</span>  *          },
+<span class='line'> 32</span>  *          {
+<span class='line'> 33</span>  *              type: "dir",
+<span class='line'> 34</span>  *              color: { r: 1.0, g: 1.0, b: 0.0 },
+<span class='line'> 35</span>  *              diffuse: true,
+<span class='line'> 36</span>  *              specular: true,
+<span class='line'> 37</span>  *              dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction - default is { x: 0, y: 0, z: -1 }
+<span class='line'> 38</span>  *          }
+<span class='line'> 39</span>  *      ]
+<span class='line'> 40</span>  *  },
+<span class='line'> 41</span>  *
+<span class='line'> 42</span>  *      new SceneJS.material({
+<span class='line'> 43</span>  *              baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+<span class='line'> 44</span>  *              specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+<span class='line'> 45</span>  *              emit:           0.0,
+<span class='line'> 46</span>  *              specular:       0.9,
+<span class='line'> 47</span>  *              shine:          6.0
+<span class='line'> 48</span>  *          },
+<span class='line'> 49</span>  *
+<span class='line'> 50</span>  *          new SceneJS.objects.cube()))
+<span class='line'> 51</span>  *&lt;/pre>&lt;/code>
 <span class='line'> 52</span>  *
-<span class='line'> 53</span>  *          new SceneJS.objects.cube()))
-<span class='line'> 54</span>  *&lt;/pre>&lt;/code>
+<span class='line'> 53</span>  *&lt;p>&lt;b>Example 2:&lt;/b>&lt;/p>&lt;p>Creates same content as Example 1.&lt;/b>&lt;/p>&lt;pre>&lt;code>
+<span class='line'> 54</span>  *  var lights = new SceneJS.Lights();
 <span class='line'> 55</span>  *
-<span class='line'> 56</span>  *&lt;p>&lt;b>Example 2:&lt;/b>&lt;/p>&lt;p>Creates same content as Example 1.&lt;/b>&lt;/p>&lt;pre>&lt;code>
-<span class='line'> 57</span>  *  var lights = new SceneJS.Lights();
-<span class='line'> 58</span>  *
-<span class='line'> 59</span>  *  var pointSource = new SceneJS.LightSource({
-<span class='line'> 60</span>  *      type: "point",
-<span class='line'> 61</span>  *      pos: { x: 100.0, y: 30.0, z: -100.0 },
-<span class='line'> 62</span>  *      color: { r: 0.0, g: 1.0, b: 1.0 },
-<span class='line'> 63</span>  *      diffuse: true,
-<span class='line'> 64</span>  *      specular: true,
-<span class='line'> 65</span>  *      constantAttenuation: 1.0,
-<span class='line'> 66</span>  *      quadraticAttenuation: 0.0,
-<span class='line'> 67</span>  *      linearAttenuation: 0.0
-<span class='line'> 68</span>  *  });
-<span class='line'> 69</span>  *
-<span class='line'> 70</span>  *  var dirSource = new SceneJS.LightSource({
-<span class='line'> 71</span>  *      type: "dir",
-<span class='line'> 72</span>  *      color: { r: 1.0, g: 1.0, b: 0.0 },
-<span class='line'> 73</span>  *      diffuse: true,
-<span class='line'> 74</span>  *      specular: true,
-<span class='line'> 75</span>  *      dir: { x: 1.0, y: 2.0, z: 0.0 }
-<span class='line'> 76</span>  *  });
-<span class='line'> 77</span>  *
-<span class='line'> 78</span>  *  lights.addSource(pointSource);
-<span class='line'> 79</span>  *
-<span class='line'> 80</span>  *  lights.addSource(dirSource);
-<span class='line'> 81</span>  *
-<span class='line'> 82</span>  *  var material = new SceneJS.Material({
-<span class='line'> 83</span>  *          baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
-<span class='line'> 84</span>  *          specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
-<span class='line'> 85</span>  *          emit:           0.0,
-<span class='line'> 86</span>  *          specular:       0.9,
-<span class='line'> 87</span>  *          shine:          6.0
-<span class='line'> 88</span>  *      });
-<span class='line'> 89</span>  *
-<span class='line'> 90</span>  *  lights.addChild(material);
-<span class='line'> 91</span>  *
-<span class='line'> 92</span>  *  material.addChild(new SceneJS.objects.Cube())
-<span class='line'> 93</span>  *
-<span class='line'> 94</span>  *  // Move the light back a bit just to show off a setter method
-<span class='line'> 95</span>  *
-<span class='line'> 96</span>  *  pointSource.setPos({ z: -150.0 });
-<span class='line'> 97</span>  *
-<span class='line'> 98</span>  * &lt;/pre>&lt;/code>
-<span class='line'> 99</span>  * @extends SceneJS.Node
-<span class='line'>100</span>  * @constructor
-<span class='line'>101</span>  * Create a new SceneJS.Lights
-<span class='line'>102</span>  * @param {Object} [cfg] Static configuration object (see class overview comments)
-<span class='line'>103</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
-<span class='line'>104</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
-<span class='line'>105</span>  */</span><span class="WHIT">
-<span class='line'>106</span> </span><span class="NAME">SceneJS.Lights</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>107</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>108</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"lights"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>109</span> </span><span class="WHIT">    </span><span class="NAME">this._sources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>110</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>111</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>112</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>113</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>114</span> 
-<span class='line'>115</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Lights</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>116</span> 
-<span class='line'>117</span> </span><span class="COMM">/**
-<span class='line'>118</span>  Adds a light source.
-<span class='line'>119</span>  @param {SceneJS.LightSource} source
-<span class='line'>120</span>  @returns {SceneJS.Lights} this
-<span class='line'>121</span>  */</span><span class="WHIT">
-<span class='line'>122</span> </span><span class="NAME">SceneJS.Lights.prototype.addSource</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">source</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>123</span> </span><span class="WHIT">    </span><span class="NAME">this._sources.push</span><span class="PUNC">(</span><span class="NAME">source</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>124</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>125</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>126</span> 
-<span class='line'>127</span> </span><span class="COMM">/**
-<span class='line'>128</span>  Get sources
-<span class='line'>129</span>  @return {Array} Array of  SceneJS.LightSource objects
-<span class='line'>130</span>  */</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="NAME">SceneJS.Lights.prototype.getSources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>132</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">list</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>133</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._sources.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>134</span> </span><span class="WHIT">        </span><span class="NAME">list.push</span><span class="PUNC">(</span><span class="NAME">this._sources</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>135</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>136</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">list</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>137</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>138</span> 
-<span class='line'>139</span> </span><span class="COMM">/** Set sources
-<span class='line'>140</span>  @param {Array} Array of  SceneJS.LightSource objects
-<span class='line'>141</span>  @returns {SceneJS.Lights} this
-<span class='line'>142</span>  */</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="NAME">SceneJS.Lights.prototype.setSources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">sources</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>144</span> </span><span class="WHIT">    </span><span class="NAME">this._sources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>145</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">sources.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>146</span> </span><span class="WHIT">        </span><span class="NAME">this._sources.push</span><span class="PUNC">(</span><span class="NAME">sources</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>147</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>148</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>149</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>150</span> 
-<span class='line'>151</span> </span><span class="COMM">/** Get number of sources
-<span class='line'>152</span>  @return {int}
-<span class='line'>153</span>  */</span><span class="WHIT">
-<span class='line'>154</span> </span><span class="NAME">SceneJS.Lights.prototype.getNumSources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>155</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._sources.length</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>156</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>157</span> 
-<span class='line'>158</span> </span><span class="COMM">/** Get light source at given index
-<span class='line'>159</span>  * @return {SceneJS.lightSource} Light source
-<span class='line'>160</span>  */</span><span class="WHIT">
-<span class='line'>161</span> </span><span class="NAME">SceneJS.Lights.prototype.getSourceAt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>162</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._sources</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>163</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>164</span> 
-<span class='line'>165</span> </span><span class="COMM">/**
-<span class='line'>166</span>  Removes and returns the light source at the given index. Returns null if no such source.
-<span class='line'>167</span>  @param {int} index Light source index
-<span class='line'>168</span>  @returns {SceneJS.LightSource}
-<span class='line'>169</span>  */</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="NAME">SceneJS.Lights.prototype.removeSourceAt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>171</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._sources.splice</span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>172</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">r.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>173</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">r</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>174</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>175</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>176</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>177</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>178</span> 
-<span class='line'>179</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'>180</span> </span><span class="NAME">SceneJS.Lights.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>181</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.sources</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>182</span> </span><span class="WHIT">        </span><span class="NAME">this._sources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>183</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">params.sources.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>184</span> </span><span class="WHIT">            </span><span class="NAME">this._sources.push</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.LightSource</span><span class="PUNC">(</span><span class="NAME">params.sources</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// TODO: allow either config or object</span><span class="WHIT">
-<span class='line'>185</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>186</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>187</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>188</span> 
-<span class='line'>189</span> </span><span class="COMM">// @private</span><span class="WHIT">
-<span class='line'>190</span> </span><span class="NAME">SceneJS.Lights.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>191</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">SceneJS._traversalMode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.TRAVERSAL_MODE_PICKING</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>192</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>193</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>194</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>195</span> </span><span class="WHIT">            </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>196</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>197</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._lightingModule.pushLightSources</span><span class="PUNC">(</span><span class="NAME">this._sources</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>198</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>199</span> </span><span class="WHIT">       </span><span class="COMM">// SceneJS._lightingModule.popLightSources(this._sources.length);</span><span class="WHIT">
-<span class='line'>200</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>201</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>202</span> 
-<span class='line'>203</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Lights} instance
-<span class='line'>204</span>  * @param {Object} [cfg] Static configuration object (see class overview comments)
-<span class='line'>205</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
-<span class='line'>206</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
-<span class='line'>207</span>  * @returns {SceneJS.Lights}
-<span class='line'>208</span>  */</span><span class="WHIT">
-<span class='line'>209</span> </span><span class="NAME">SceneJS.lights</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>210</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Lights</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>211</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Lights.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>212</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>213</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>214</span> </span></pre></body></html>
+<span class='line'> 56</span>  *  var pointSource = new SceneJS.LightSource({
+<span class='line'> 57</span>  *      type: "point",
+<span class='line'> 58</span>  *      pos: { x: 100.0, y: 30.0, z: -100.0 },
+<span class='line'> 59</span>  *      color: { r: 0.0, g: 1.0, b: 1.0 },
+<span class='line'> 60</span>  *      diffuse: true,
+<span class='line'> 61</span>  *      specular: true,
+<span class='line'> 62</span>  *      constantAttenuation: 1.0,
+<span class='line'> 63</span>  *      quadraticAttenuation: 0.0,
+<span class='line'> 64</span>  *      linearAttenuation: 0.0
+<span class='line'> 65</span>  *  });
+<span class='line'> 66</span>  *
+<span class='line'> 67</span>  *  var dirSource = new SceneJS.LightSource({
+<span class='line'> 68</span>  *      type: "dir",
+<span class='line'> 69</span>  *      color: { r: 1.0, g: 1.0, b: 0.0 },
+<span class='line'> 70</span>  *      diffuse: true,
+<span class='line'> 71</span>  *      specular: true,
+<span class='line'> 72</span>  *      dir: { x: 1.0, y: 2.0, z: 0.0 }
+<span class='line'> 73</span>  *  });
+<span class='line'> 74</span>  *
+<span class='line'> 75</span>  *  lights.addSource(pointSource);
+<span class='line'> 76</span>  *
+<span class='line'> 77</span>  *  lights.addSource(dirSource);
+<span class='line'> 78</span>  *
+<span class='line'> 79</span>  *  var material = new SceneJS.Material({
+<span class='line'> 80</span>  *          baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+<span class='line'> 81</span>  *          specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+<span class='line'> 82</span>  *          emit:           0.0,
+<span class='line'> 83</span>  *          specular:       0.9,
+<span class='line'> 84</span>  *          shine:          6.0
+<span class='line'> 85</span>  *      });
+<span class='line'> 86</span>  *
+<span class='line'> 87</span>  *  lights.addChild(material);
+<span class='line'> 88</span>  *
+<span class='line'> 89</span>  *  material.addChild(new SceneJS.objects.Cube())
+<span class='line'> 90</span>  *
+<span class='line'> 91</span>  *  // Move the light back a bit just to show off a setter method
+<span class='line'> 92</span>  *
+<span class='line'> 93</span>  *  pointSource.setPos({ z: -150.0 });
+<span class='line'> 94</span>  *
+<span class='line'> 95</span>  * &lt;/pre>&lt;/code>
+<span class='line'> 96</span>  * @extends SceneJS.Node
+<span class='line'> 97</span>  * @constructor
+<span class='line'> 98</span>  * Create a new SceneJS.Lights
+<span class='line'> 99</span>  * @param {Object} [cfg] Static configuration object (see class overview comments)
+<span class='line'>100</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+<span class='line'>101</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
+<span class='line'>102</span>  */</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="NAME">SceneJS.Lights</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"lights"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">    </span><span class="NAME">this._sources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">        </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>111</span> 
+<span class='line'>112</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Lights</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>113</span> 
+<span class='line'>114</span> </span><span class="COMM">/**
+<span class='line'>115</span>  Adds a light source.
+<span class='line'>116</span>  @param {SceneJS.LightSource} source
+<span class='line'>117</span>  @returns {SceneJS.Lights} this
+<span class='line'>118</span>  */</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="NAME">SceneJS.Lights.prototype.addSource</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">source</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">    </span><span class="NAME">this._sources.push</span><span class="PUNC">(</span><span class="NAME">source</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>123</span> 
+<span class='line'>124</span> </span><span class="COMM">/**
+<span class='line'>125</span>  Get sources
+<span class='line'>126</span>  @return {Array} Array of  SceneJS.LightSource objects
+<span class='line'>127</span>  */</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="NAME">SceneJS.Lights.prototype.getSources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">list</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this._sources.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">        </span><span class="NAME">list.push</span><span class="PUNC">(</span><span class="NAME">this._sources</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">list</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>135</span> 
+<span class='line'>136</span> </span><span class="COMM">/** Set sources
+<span class='line'>137</span>  @param {Array} Array of  SceneJS.LightSource objects
+<span class='line'>138</span>  @returns {SceneJS.Lights} this
+<span class='line'>139</span>  */</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="NAME">SceneJS.Lights.prototype.setSources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">sources</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">    </span><span class="NAME">this._sources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">sources.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">        </span><span class="NAME">this._sources.push</span><span class="PUNC">(</span><span class="NAME">sources</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>145</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>146</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>147</span> 
+<span class='line'>148</span> </span><span class="COMM">/** Get number of sources
+<span class='line'>149</span>  @return {int}
+<span class='line'>150</span>  */</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="NAME">SceneJS.Lights.prototype.getNumSources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>152</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._sources.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>154</span> 
+<span class='line'>155</span> </span><span class="COMM">/** Get light source at given index
+<span class='line'>156</span>  * @return {SceneJS.lightSource} Light source
+<span class='line'>157</span>  */</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="NAME">SceneJS.Lights.prototype.getSourceAt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._sources</span><span class="PUNC">[</span><span class="NAME">index</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>161</span> 
+<span class='line'>162</span> </span><span class="COMM">/**
+<span class='line'>163</span>  Removes and returns the light source at the given index. Returns null if no such source.
+<span class='line'>164</span>  @param {int} index Light source index
+<span class='line'>165</span>  @returns {SceneJS.LightSource}
+<span class='line'>166</span>  */</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="NAME">SceneJS.Lights.prototype.removeSourceAt</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">r</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._sources.splice</span><span class="PUNC">(</span><span class="NAME">index</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">r.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">r</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="WHIT">        </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>173</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>174</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>175</span> 
+<span class='line'>176</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="NAME">SceneJS.Lights.prototype._init</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">params.sources</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">        </span><span class="NAME">this._sources</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">        </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">params.sources.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">            </span><span class="NAME">this._sources.push</span><span class="PUNC">(</span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.LightSource</span><span class="PUNC">(</span><span class="NAME">params.sources</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// TODO: allow either config or object</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>185</span> 
+<span class='line'>186</span> </span><span class="COMM">// @private</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="NAME">SceneJS.Lights.prototype._render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">SceneJS._traversalMode</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">SceneJS.TRAVERSAL_MODE_PICKING</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">            </span><span class="NAME">this._init</span><span class="PUNC">(</span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._lightingModule.pushLightSources</span><span class="PUNC">(</span><span class="NAME">this._sources</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">        </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">data</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">       </span><span class="COMM">// SceneJS._lightingModule.popLightSources(this._sources.length);</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>199</span> 
+<span class='line'>200</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Lights} instance
+<span class='line'>201</span>  * @param {Object} [cfg] Static configuration object (see class overview comments)
+<span class='line'>202</span>  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
+<span class='line'>203</span>  * @param {...SceneJS.Node} [childNodes] Child nodes
+<span class='line'>204</span>  * @returns {SceneJS.Lights}
+<span class='line'>205</span>  */</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="NAME">SceneJS.lights</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Lights</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Lights.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>211</span> </span></pre></body></html>

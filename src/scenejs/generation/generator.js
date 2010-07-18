@@ -15,8 +15,7 @@
  *  is desired in large scenes. The impact will depend on the type of subnode that receives the generated data.
  *  For example, inability to memoize will cascade downwards through  modelling transform node hierarchies since they
  *  will have to re-multiply matrices by dynamic parent modelling transforms etc.</p>
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/c9ySdG">Example 1</a></li></ul>
+ *
  * <p><b>Example Usage</b></p><p>Below is a SceneJS.Generator that loops over its subgraph to create a ring of cubes, 45 degrees apart.</b></p><pre><code>
  * var g = new SceneJS.Generator(
  *        (function() {                        // Higher order function tracks the angle in closure
@@ -62,7 +61,7 @@ SceneJS._inherit(SceneJS.Generator, SceneJS.Node);
 SceneJS.Generator.prototype._render = function(traversalContext, data) {
     if (this._fixedParams) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidNodeConfigException
+                new SceneJS.errors.InvalidNodeConfigException
                         ("SceneJS.Generator may only be configured with a function"));
     }
     var params = this._getParams(data);

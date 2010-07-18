@@ -15,8 +15,6 @@
  * <tr><td>alpha</td><td>1.0</td></tr>
  * <tr><td>emit</td><td>1.0</td></tr>
  * </table>
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-material-example">Example 1</a></li></ul>
  * <p><b>Usage Example</b></p><p>A cube illuminated by a directional light source and wrapped
  * with material properties that define how it reflects the light.</b></p><pre><code>
  * var l = new SceneJS.Lights({

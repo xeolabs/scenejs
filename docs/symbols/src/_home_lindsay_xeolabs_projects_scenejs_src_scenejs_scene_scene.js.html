@@ -14,288 +14,304 @@
 <span class='line'>  7</span>  * &lt;p>The Scene node can be configured with a &lt;b>canvasId&lt;/b> property to specify the ID of a WebGL compatible Canvas
 <span class='line'>  8</span>  * element for the scene to render to. When that is omitted, the node will look for one with the default ID of
 <span class='line'>  9</span>  * "_scenejs-default-canvas".&lt;/p>
-<span class='line'> 10</span>  * &lt;p>&lt;b>Timeout for {@link SceneJS.Instance} sub-nodes&lt;/b>&lt;/p>
-<span class='line'> 11</span>  * &lt;p>The Scene node can be configured with a &lt;b>loadTimeoutSecs&lt;/b> property to specify the number of seconds within
-<span class='line'> 12</span>  * which {@link SceneJS.Instance} nodes within its subgraph must receive and parse content when they load it from files.
-<span class='line'> 13</span>  * That may be overridden in the configs of individual {@link SceneJS.Instance} nodes.
-<span class='line'> 14</span>  * &lt;p>&lt;b>Usage Example:&lt;/b>&lt;/p>&lt;p>Shown below is Scene bound to a canvas and specifying a JSONP proxy, that contains a
-<span class='line'> 15</span>  * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.Instance}
-<span class='line'> 16</span>  * node loads a Collada model cross-domain through the proxy. When the Scene is rendered, a value for the
-<span class='line'> 17</span>  * {@link Scene.LookAt}'s property is injected into it. The Scene will put the property on a data scope (which is
-<span class='line'> 18</span>  * implemented by a {@link SceneJS.Data}) that the {@link SceneJS.LookAt}'s config callback then accesses.&lt;/b>&lt;/p>
-<span class='line'> 19</span>  * &lt;pre>&lt;code>
-<span class='line'> 20</span>  *
-<span class='line'> 21</span>  * // To enable the COLLADA content to load cross-domain, we'll first configure SceneJS with a strategy to allow it
-<span class='line'> 22</span>  * // to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
-<span class='line'> 23</span>  * // create the request URL for the service, and another to extract the data from the response.
-<span class='line'> 24</span>  *
-<span class='line'> 25</span>  * SceneJS.setJSONPStrategy({
-<span class='line'> 26</span>  *     request : function(url, format, callback) {
-<span class='line'> 27</span>  *        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
-<span class='line'> 28</span>  *     },
-<span class='line'> 29</span>  *
-<span class='line'> 30</span>  *    response : function(data) {
-<span class='line'> 31</span>  *
-<span class='line'> 32</span>  *        // The SceneJS proxy will provide an error message like this when
-<span class='line'> 33</span>  *        // it fails to service the request
-<span class='line'> 34</span>  *
-<span class='line'> 35</span>  *        if (data.error) {
-<span class='line'> 36</span>  *            throw "Proxy server responded with error: " + data.error;
-<span class='line'> 37</span>  *        }
-<span class='line'> 38</span>  *        return data;
-<span class='line'> 39</span>  *    }
-<span class='line'> 40</span>  * });
-<span class='line'> 41</span>  *
-<span class='line'> 42</span>  * var myScene = new SceneJS.Scene({
-<span class='line'> 43</span>  *
-<span class='line'> 44</span>  *         // Bind scene to render to WebGL Canvas element with given ID.
-<span class='line'> 45</span>  *         // Default is "_scenejs-default-canvas"
-<span class='line'> 46</span>  *
-<span class='line'> 47</span>  *         canvasId:        "myCanvas",
-<span class='line'> 48</span>  *
-<span class='line'> 49</span>  *         // Optionally write scene logging to a DIV:
-<span class='line'> 50</span>  *
-<span class='line'> 51</span>  *        loggingElementId: "myLoggingDiv",
+<span class='line'> 10</span>  * &lt;p>&lt;b>Usage Example:&lt;/b>&lt;/p>&lt;p>Below is a minimal scene graph. To render the scene, SceneJS will traverse its nodes
+<span class='line'> 11</span>  * in depth-first order. Each node will set some scene state on entry, then un-set it again before exit. In this graph,
+<span class='line'> 12</span>  * the {@link SceneJS.Scene} node binds to a WebGL Canvas element, a {@link SceneJS.LookAt} defines the viewoint,
+<span class='line'> 13</span>  * a {@link SceneJS.Camera} defines the projection, a {@link SceneJS.Lights} defines a light source,
+<span class='line'> 14</span>  * a {@link SceneJS.Material} defines the current material properties, {@link SceneJS.Rotate} nodes orient the modeling
+<span class='line'> 15</span>  * coordinate space, then a {@link SceneJS.objects.Cube} defines our cube.&lt;/p>
+<span class='line'> 16</span>  * &lt;pre>&lt;code>
+<span class='line'> 17</span>  *
+<span class='line'> 18</span>  * var myScene = new SceneJS.Scene({
+<span class='line'> 19</span>  *     canvasId: 'theCanvas'
+<span class='line'> 20</span>  *   },
+<span class='line'> 21</span>  *
+<span class='line'> 22</span>  *   new SceneJS.LookAt({
+<span class='line'> 23</span>  *       eye  : { x: -1.0, y: 0.0, z: 15 },
+<span class='line'> 24</span>  *       look : { x: -1.0, y: 0, z: 0 },
+<span class='line'> 25</span>  *       up   : { y: 1.0 }
+<span class='line'> 26</span>  *     },
+<span class='line'> 27</span>  *
+<span class='line'> 28</span>  *     new SceneJS.Camera({
+<span class='line'> 29</span>  *         optics: {
+<span class='line'> 30</span>  *           type: "perspective",
+<span class='line'> 31</span>  *           fovy   : 55.0,
+<span class='line'> 32</span>  *           aspect : 1.0,
+<span class='line'> 33</span>  *           near   : 0.10,
+<span class='line'> 34</span>  *           far    : 1000.0
+<span class='line'> 35</span>  *         }
+<span class='line'> 36</span>  *       },
+<span class='line'> 37</span>  *
+<span class='line'> 38</span>  *       new SceneJS.Lights({
+<span class='line'> 39</span>  *           sources: [
+<span class='line'> 40</span>  *             {
+<span class='line'> 41</span>  *               type:  "dir",
+<span class='line'> 42</span>  *               color: { r: 1.0, g: 1.0, b: 1.0 },
+<span class='line'> 43</span>  *               dir:   { x: 1.0, y: -1.0, z: 1.0 }
+<span class='line'> 44</span>  *             },
+<span class='line'> 45</span>  *             {
+<span class='line'> 46</span>  *               type:  "dir",
+<span class='line'> 47</span>  *               color: { r: 1.0, g: 1.0, b: 1.0 },
+<span class='line'> 48</span>  *               dir:   { x: -1.0, y: -1.0, z: -3.0 }
+<span class='line'> 49</span>  *             }
+<span class='line'> 50</span>  *           ]
+<span class='line'> 51</span>  *         },
 <span class='line'> 52</span>  *
-<span class='line'> 53</span>  *        // Optional default timeout for SceneJS.Instance&lt;xxx> nodes, which may override
-<span class='line'> 54</span>  *        // it individually - default is 180 seconds
-<span class='line'> 55</span>  *
-<span class='line'> 56</span>  *       loadTimeoutSecs: 180
-<span class='line'> 57</span>  *   },
-<span class='line'> 58</span>  *
-<span class='line'> 59</span>  *   new SceneJS.LookAt(
-<span class='line'> 60</span>  *       function(data) {
-<span class='line'> 61</span>  *           return {
-<span class='line'> 62</span>  *              eye: data.get("eye")
-<span class='line'> 63</span>  *          };
-<span class='line'> 64</span>  *       },
-<span class='line'> 65</span>  *
-<span class='line'> 66</span>  *       new SceneJS.Instance({ uri: "http://foo.com/models/myModel.dae" })
-<span class='line'> 67</span>  * );
-<span class='line'> 68</span>  *
-<span class='line'> 69</span>  * myScene.setData({
-<span class='line'> 70</span>  *          eye: {
-<span class='line'> 71</span>  *             x: 0, y: 0, z: -100
-<span class='line'> 72</span>  *          }
-<span class='line'> 73</span>  *      }).render();
+<span class='line'> 53</span>  *         new SceneJS.Material({
+<span class='line'> 54</span>  *                  baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+<span class='line'> 55</span>  *                  specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+<span class='line'> 56</span>  *                  emit:           0.0,
+<span class='line'> 57</span>  *                  specular:       0.9,
+<span class='line'> 58</span>  *                  shine:          6.0
+<span class='line'> 59</span>  *             },
+<span class='line'> 60</span>  *
+<span class='line'> 61</span>  *             new SceneJS.Rotate(
+<span class='line'> 62</span>  *                 function(data) {
+<span class='line'> 63</span>  *                    return {
+<span class='line'> 64</span>  *                      angle: data.get('yaw'), y : 1.0
+<span class='line'> 65</span>  *                   };
+<span class='line'> 66</span>  *                 },
+<span class='line'> 67</span>  *
+<span class='line'> 68</span>  *                 new SceneJS.Rotate(
+<span class='line'> 69</span>  *                     function(data) {
+<span class='line'> 70</span>  *                       return {
+<span class='line'> 71</span>  *                         angle: data.get('pitch'), x : 1.0
+<span class='line'> 72</span>  *                       };
+<span class='line'> 73</span>  *                     },
 <span class='line'> 74</span>  *
-<span class='line'> 75</span>  * &lt;/pre>&lt;/code>
-<span class='line'> 76</span>  * @extends SceneJS.Node
-<span class='line'> 77</span>  */</span><span class="WHIT">
-<span class='line'> 78</span> </span><span class="NAME">SceneJS.Scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 79</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 80</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"scene"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 81</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 82</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">SceneJS._errorModule.fatalError</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'> 83</span> </span><span class="WHIT">                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.InvalidNodeConfigException</span><span class="WHIT">
-<span class='line'> 84</span> </span><span class="WHIT">                        </span><span class="PUNC">(</span><span class="STRN">"Dynamic configuration of SceneJS.scene node is not supported"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 86</span> </span><span class="WHIT">    </span><span class="NAME">this._params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 87</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="NAME">this._configs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 89</span> </span><span class="WHIT">    </span><span class="NAME">this._lastRenderedData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._params.canvasId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 91</span> </span><span class="WHIT">        </span><span class="NAME">this._canvasId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.getElementById</span><span class="PUNC">(</span><span class="NAME">this._params.canvasId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">this._params.canvasId</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS.Scene.DEFAULT_CANVAS_ID</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 92</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 93</span> </span><span class="WHIT">        </span><span class="NAME">this._canvasId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Scene.DEFAULT_CANVAS_ID</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 94</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'> 95</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 96</span> 
-<span class='line'> 97</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Scene</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 98</span> 
-<span class='line'> 99</span> </span><span class="COMM">/** ID of canvas SceneJS looks for when {@link SceneJS.Scene} node does not supply one
-<span class='line'>100</span>  */</span><span class="WHIT">
-<span class='line'>101</span> </span><span class="NAME">SceneJS.Scene.DEFAULT_CANVAS_ID</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"_scenejs-default-canvas"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>102</span> 
-<span class='line'>103</span> </span><span class="COMM">/** ID ("_scenejs-default-logging") of default element to which {@link SceneJS.Scene} node will log to, if found.
-<span class='line'>104</span>  */</span><span class="WHIT">
-<span class='line'>105</span> </span><span class="NAME">SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"_scenejs-default-logging"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>106</span> 
-<span class='line'>107</span> </span><span class="COMM">/** Returns the ID of the canvas element that this scene is to bind to. When no canvasId was configured, it will be the
-<span class='line'>108</span>  * the default ID of "_scenejs-default-canvas".
-<span class='line'>109</span>  */</span><span class="WHIT">
-<span class='line'>110</span> </span><span class="NAME">SceneJS.Scene.prototype.getCanvasId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>111</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._canvasId</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>112</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>113</span> 
-<span class='line'>114</span> </span><span class="COMM">/**
-<span class='line'>115</span>  * Sets a map of values to set on the global scene data scope. This data will then be available
-<span class='line'>116</span>  * to any configuration callbacks that are used to configure nodes. The map is the same as that
-<span class='line'>117</span>  * configured on a {@link SceneJS.WithData} and works the same way. The given values will be forgotten
-<span class='line'>118</span>  * when the scene is next rendered with {@link #render}.
-<span class='line'>119</span>  * @param {object} values Values for the global scene data scope, same format as that given to {@link SceneJS.WithData}
+<span class='line'> 75</span>  *                     new SceneJS.objects.Cube()
+<span class='line'> 76</span>  *                   )
+<span class='line'> 77</span>  *                )
+<span class='line'> 78</span>  *              )
+<span class='line'> 79</span>  *            )
+<span class='line'> 80</span>  *          )
+<span class='line'> 81</span>  *       )
+<span class='line'> 82</span>  *     );
+<span class='line'> 83</span>  *
+<span class='line'> 84</span>  *   myScene.setData({ yaw: 315, pitch: 20 });
+<span class='line'> 85</span>  *   myScene.render();
+<span class='line'> 86</span>  * &lt;/pre>&lt;/code>
+<span class='line'> 87</span>  * &lt;p>Take a closer look at those rotate nodes. See how they can optionally take a function which feeds them their
+<span class='line'> 88</span>  * parameters? You can do that for any node to dynamically evaluate parameters for them at traversal-time. The functions
+<span class='line'> 89</span>  * take an immutable data object, which is SceneJS's mechanism for passing variables down into scene graphs. Using the
+<span class='line'> 90</span>  * yaw and pitch properties on that data object, our functions create configurations that specify rotations about
+<span class='line'> 91</span>  * the X and Y axis. See also how we inject those angles when we render the scene.&lt;/p>
+<span class='line'> 92</span>  * @extends SceneJS.Node
+<span class='line'> 93</span>  */</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="NAME">SceneJS.Scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Node.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">    </span><span class="NAME">this._nodeType</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"scene"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._fixedParams</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">        </span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">SceneJS._errorModule.fatalError</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">                </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.errors.InvalidNodeConfigException</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">                        </span><span class="PUNC">(</span><span class="STRN">"Dynamic configuration of SceneJS.scene node is not supported"</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">    </span><span class="NAME">this._params</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">    </span><span class="NAME">this._configs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">    </span><span class="NAME">this._lastRenderedData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._params.canvasId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">        </span><span class="NAME">this._canvasId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.getElementById</span><span class="PUNC">(</span><span class="NAME">this._params.canvasId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">this._params.canvasId</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">SceneJS.Scene.DEFAULT_CANVAS_ID</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">        </span><span class="NAME">this._canvasId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS.Scene.DEFAULT_CANVAS_ID</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> 
+<span class='line'>113</span> </span><span class="NAME">SceneJS._inherit</span><span class="PUNC">(</span><span class="NAME">SceneJS.Scene</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">SceneJS.Node</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>114</span> 
+<span class='line'>115</span> </span><span class="COMM">/** ID of canvas SceneJS looks for when {@link SceneJS.Scene} node does not supply one
+<span class='line'>116</span>  */</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="NAME">SceneJS.Scene.DEFAULT_CANVAS_ID</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"_scenejs-default-canvas"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>118</span> 
+<span class='line'>119</span> </span><span class="COMM">/** ID ("_scenejs-default-logging") of default element to which {@link SceneJS.Scene} node will log to, if found.
 <span class='line'>120</span>  */</span><span class="WHIT">
-<span class='line'>121</span> </span><span class="NAME">SceneJS.Scene.prototype.setData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">values</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>122</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">values</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>123</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>124</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>125</span> 
-<span class='line'>126</span> </span><span class="COMM">/**
-<span class='line'>127</span>  * Returns any data values map previously set with {@link #setData} since the last call to {@link #render}.
-<span class='line'>128</span>  *
-<span class='line'>129</span>  * @returns {Object} The data values map
-<span class='line'>130</span>  */</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="NAME">SceneJS.Scene.prototype.getData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>132</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._configs</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>133</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>134</span> 
-<span class='line'>135</span> </span><span class="COMM">/**
-<span class='line'>136</span>  * Sets a map of values to set on nodes in the scene graph as they are rendered. The map is the same as that
-<span class='line'>137</span>  * configured on a {@link SceneJS.WithConfigs} and works the same way. The given values will be forgotten
-<span class='line'>138</span>  * when the scene is next rendered with {@link #render}.
-<span class='line'>139</span>  * @param {object} values Map of values, same format as that given to {@link SceneJS.WithConfigs}
-<span class='line'>140</span>  */</span><span class="WHIT">
-<span class='line'>141</span> </span><span class="NAME">SceneJS.Scene.prototype.setConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">values</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>142</span> </span><span class="WHIT">    </span><span class="NAME">this._configs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">values</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>143</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>144</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>145</span> 
-<span class='line'>146</span> </span><span class="COMM">/**
-<span class='line'>147</span>  * Returns any config values map previously set with {@link #setConfigs} since the last call to {@link #render}.
-<span class='line'>148</span>  *
-<span class='line'>149</span>  * @returns {Object} The config values map
-<span class='line'>150</span>  */</span><span class="WHIT">
-<span class='line'>151</span> </span><span class="NAME">SceneJS.Scene.prototype.getConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>152</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._configs</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>153</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>154</span> 
-<span class='line'>155</span> </span><span class="COMM">/**
-<span class='line'>156</span>  * Renders the scene, applying any config and data scope values given to {@link #setData} and {#link setConfigs},
-<span class='line'>157</span>  * then clearing those values afterwards.
-<span class='line'>158</span>  */</span><span class="WHIT">
-<span class='line'>159</span> </span><span class="NAME">SceneJS.Scene.prototype.render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>160</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>161</span> </span><span class="WHIT">        </span><span class="NAME">this._sceneId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._sceneModule.createScene</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>162</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>163</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS._sceneModule.activateScene</span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>164</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">traversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>165</span> </span><span class="WHIT">    </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Data</span><span class="PUNC">(</span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>166</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS._sceneModule.deactivateScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>167</span> </span><span class="WHIT">    </span><span class="NAME">this._lastRenderedData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>168</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>169</span> </span><span class="WHIT">    </span><span class="NAME">this._configs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>170</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>171</span> 
-<span class='line'>172</span> </span><span class="COMM">/**
-<span class='line'>173</span>  * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
-<span class='line'>174</span>  * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
-<span class='line'>175</span>  * The scene must have been previously rendered, since this method re-renders it (to a special
-<span class='line'>176</span>  * pick frame buffer) using parameters retained from the prior render() call.
-<span class='line'>177</span>  *
-<span class='line'>178</span>  * @param canvasX
-<span class='line'>179</span>  * @param canvasY
-<span class='line'>180</span>  */</span><span class="WHIT">
-<span class='line'>181</span> </span><span class="COMM">//SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {</span><span class="WHIT">
-<span class='line'>182</span> </span><span class="COMM">//    if (this._sceneId) {</span><span class="WHIT">
-<span class='line'>183</span> </span><span class="COMM">//        try {</span><span class="WHIT">
-<span class='line'>184</span> </span><span class="COMM">//            if (!this._lastRenderedData) {</span><span class="WHIT">
-<span class='line'>185</span> </span><span class="COMM">//                throw new SceneJS.PickWithoutRenderedException</span><span class="WHIT">
-<span class='line'>186</span> </span><span class="COMM">//                        ("Scene not rendered - need to render before picking");</span><span class="WHIT">
-<span class='line'>187</span> </span><span class="COMM">//            }</span><span class="WHIT">
-<span class='line'>188</span> </span><span class="COMM">//            SceneJS._sceneModule.activateScene(this._sceneId);  // Also activates canvas</span><span class="WHIT">
-<span class='line'>189</span> </span><span class="COMM">//            SceneJS._pickModule.pick(canvasX, canvasY);</span><span class="WHIT">
-<span class='line'>190</span> </span><span class="COMM">//            if (this._params.loadProxy) {</span><span class="WHIT">
-<span class='line'>191</span> </span><span class="COMM">//                SceneJS._loadModule.setLoadProxyUri(this._params.proxy);</span><span class="WHIT">
-<span class='line'>192</span> </span><span class="COMM">//            }</span><span class="WHIT">
-<span class='line'>193</span> </span><span class="COMM">//            var traversalContext = {};</span><span class="WHIT">
-<span class='line'>194</span> </span><span class="COMM">//            this._renderNodes(traversalContext, this._lastRenderedData);</span><span class="WHIT">
-<span class='line'>195</span> </span><span class="COMM">//            SceneJS._loadModule.setLoadProxyUri(null);</span><span class="WHIT">
-<span class='line'>196</span> </span><span class="COMM">//            var picked = SceneJS._pickModule.getPicked();</span><span class="WHIT">
-<span class='line'>197</span> </span><span class="COMM">//            SceneJS._sceneModule.deactivateScene();</span><span class="WHIT">
-<span class='line'>198</span> </span><span class="COMM">//            return picked;</span><span class="WHIT">
-<span class='line'>199</span> </span><span class="COMM">//        } finally {</span><span class="WHIT">
-<span class='line'>200</span> </span><span class="COMM">//            SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;</span><span class="WHIT">
-<span class='line'>201</span> </span><span class="COMM">//        }</span><span class="WHIT">
-<span class='line'>202</span> </span><span class="COMM">//    }</span><span class="WHIT">
-<span class='line'>203</span> </span><span class="COMM">//};</span><span class="WHIT">
-<span class='line'>204</span> 
-<span class='line'>205</span> 
-<span class='line'>206</span> </span><span class="COMM">/**
-<span class='line'>207</span>  * Returns count of active processes. A non-zero count indicates that the scene should be rendered
-<span class='line'>208</span>  * at least one more time to allow asynchronous processes to complete - since processes are
-<span class='line'>209</span>  * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
-<span class='line'>210</span>  * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
-<span class='line'>211</span>  * a race condition.
-<span class='line'>212</span>  */</span><span class="WHIT">
-<span class='line'>213</span> </span><span class="NAME">SceneJS.Scene.prototype.getNumProcesses</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>214</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">SceneJS._processModule.getNumProcesses</span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>215</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>216</span> 
-<span class='line'>217</span> </span><span class="COMM">/** Destroys this scene. You should destroy
-<span class='line'>218</span>  * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
-<span class='line'>219</span>  * resources for it (eg. shaders, VBOs etc) that are no longer in use. A destroyed scene
-<span class='line'>220</span>  * becomes un-destroyed as soon as you render it again.
-<span class='line'>221</span>  */</span><span class="WHIT">
-<span class='line'>222</span> </span><span class="NAME">SceneJS.Scene.prototype.destroy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>223</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>224</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._sceneModule.destroyScene</span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Last one fires RESET command</span><span class="WHIT">
-<span class='line'>225</span> </span><span class="WHIT">        </span><span class="NAME">this._sceneId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>226</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>227</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>228</span> 
-<span class='line'>229</span> </span><span class="COMM">/** Returns true if scene active, ie. not destroyed. A destroyed scene becomes active again
-<span class='line'>230</span>  * when you render it.
-<span class='line'>231</span>  */</span><span class="WHIT">
-<span class='line'>232</span> </span><span class="NAME">SceneJS.Scene.prototype.isActive</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>233</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>234</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>235</span> 
-<span class='line'>236</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Scene} instance
-<span class='line'>237</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Scene constructor
-<span class='line'>238</span>  * @returns {SceneJS.Scene}
-<span class='line'>239</span>  */</span><span class="WHIT">
-<span class='line'>240</span> </span><span class="NAME">SceneJS.scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>241</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Scene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>242</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Scene.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>243</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>244</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>245</span> 
-<span class='line'>246</span> </span><span class="COMM">/** Total SceneJS reset - destroys all scenes and cached resources.
+<span class='line'>121</span> </span><span class="NAME">SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"_scenejs-default-logging"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>122</span> 
+<span class='line'>123</span> </span><span class="COMM">/** Returns the ID of the canvas element that this scene is to bind to. When no canvasId was configured, it will be the
+<span class='line'>124</span>  * the default ID of "_scenejs-default-canvas".
+<span class='line'>125</span>  */</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="NAME">SceneJS.Scene.prototype.getCanvasId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._canvasId</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> 
+<span class='line'>130</span> </span><span class="COMM">/**
+<span class='line'>131</span>  * Sets a map of values to set on the global scene data scope. This data will then be available
+<span class='line'>132</span>  * to any configuration callbacks that are used to configure nodes. The map is the same as that
+<span class='line'>133</span>  * configured on a {@link SceneJS.WithData} and works the same way. The given values will be forgotten
+<span class='line'>134</span>  * when the scene is next rendered with {@link #render}.
+<span class='line'>135</span>  * @param {object} values Values for the global scene data scope, same format as that given to {@link SceneJS.WithData}
+<span class='line'>136</span>  */</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="NAME">SceneJS.Scene.prototype.setData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">values</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">values</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>139</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> 
+<span class='line'>142</span> </span><span class="COMM">/**
+<span class='line'>143</span>  * Returns any data values map previously set with {@link #setData} since the last call to {@link #render}.
+<span class='line'>144</span>  *
+<span class='line'>145</span>  * @returns {Object} The data values map
+<span class='line'>146</span>  */</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="NAME">SceneJS.Scene.prototype.getData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._configs</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>150</span> 
+<span class='line'>151</span> </span><span class="COMM">/**
+<span class='line'>152</span>  * Sets a map of values to set on nodes in the scene graph as they are rendered. The map is the same as that
+<span class='line'>153</span>  * configured on a {@link SceneJS.WithConfigs} and works the same way. The given values will be forgotten
+<span class='line'>154</span>  * when the scene is next rendered with {@link #render}.
+<span class='line'>155</span>  * @param {object} values Map of values, same format as that given to {@link SceneJS.WithConfigs}
+<span class='line'>156</span>  */</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="NAME">SceneJS.Scene.prototype.setConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">values</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">    </span><span class="NAME">this._configs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">values</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>161</span> 
+<span class='line'>162</span> </span><span class="COMM">/**
+<span class='line'>163</span>  * Returns any config values map previously set with {@link #setConfigs} since the last call to {@link #render}.
+<span class='line'>164</span>  *
+<span class='line'>165</span>  * @returns {Object} The config values map
+<span class='line'>166</span>  */</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="NAME">SceneJS.Scene.prototype.getConfigs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this._configs</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>170</span> 
+<span class='line'>171</span> </span><span class="COMM">/**
+<span class='line'>172</span>  * Renders the scene, applying any config and data scope values given to {@link #setData} and {#link setConfigs},
+<span class='line'>173</span>  * then clearing those values afterwards.
+<span class='line'>174</span>  */</span><span class="WHIT">
+<span class='line'>175</span> </span><span class="NAME">SceneJS.Scene.prototype.render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">        </span><span class="NAME">this._sceneId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._sceneModule.createScene</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._getParams</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>179</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS._sceneModule.activateScene</span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">traversalContext</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">    </span><span class="NAME">this._renderNodes</span><span class="PUNC">(</span><span class="NAME">traversalContext</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Data</span><span class="PUNC">(</span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS._sceneModule.deactivateScene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">    </span><span class="NAME">this._lastRenderedData</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this._data</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">    </span><span class="NAME">this._data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="WHIT">    </span><span class="NAME">this._configs</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>187</span> 
+<span class='line'>188</span> </span><span class="COMM">/**
+<span class='line'>189</span>  * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
+<span class='line'>190</span>  * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
+<span class='line'>191</span>  * The scene must have been previously rendered, since this method re-renders it (to a special
+<span class='line'>192</span>  * pick frame buffer) using parameters retained from the prior render() call.
+<span class='line'>193</span>  *
+<span class='line'>194</span>  * @param canvasX
+<span class='line'>195</span>  * @param canvasY
+<span class='line'>196</span>  */</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="COMM">//SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="COMM">//    if (this._sceneId) {</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="COMM">//        try {</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="COMM">//            if (!this._lastRenderedData) {</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="COMM">//                throw new SceneJS.errors.PickWithoutRenderedException</span><span class="WHIT">
+<span class='line'>202</span> </span><span class="COMM">//                        ("Scene not rendered - need to render before picking");</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="COMM">//            }</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="COMM">//            SceneJS._sceneModule.activateScene(this._sceneId);  // Also activates canvas</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="COMM">//            SceneJS._pickModule.pick(canvasX, canvasY);</span><span class="WHIT">
+<span class='line'>206</span> </span><span class="COMM">//            if (this._params.loadProxy) {</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="COMM">//                SceneJS._loadModule.setLoadProxyUri(this._params.proxy);</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="COMM">//            }</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="COMM">//            var traversalContext = {};</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="COMM">//            this._renderNodes(traversalContext, this._lastRenderedData);</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="COMM">//            SceneJS._loadModule.setLoadProxyUri(null);</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="COMM">//            var picked = SceneJS._pickModule.getPicked();</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="COMM">//            SceneJS._sceneModule.deactivateScene();</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="COMM">//            return picked;</span><span class="WHIT">
+<span class='line'>215</span> </span><span class="COMM">//        } finally {</span><span class="WHIT">
+<span class='line'>216</span> </span><span class="COMM">//            SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="COMM">//        }</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="COMM">//    }</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="COMM">//};</span><span class="WHIT">
+<span class='line'>220</span> 
+<span class='line'>221</span> 
+<span class='line'>222</span> </span><span class="COMM">/**
+<span class='line'>223</span>  * Returns count of active processes. A non-zero count indicates that the scene should be rendered
+<span class='line'>224</span>  * at least one more time to allow asynchronous processes to complete - since processes are
+<span class='line'>225</span>  * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
+<span class='line'>226</span>  * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
+<span class='line'>227</span>  * a race condition.
+<span class='line'>228</span>  */</span><span class="WHIT">
+<span class='line'>229</span> </span><span class="NAME">SceneJS.Scene.prototype.getNumProcesses</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>230</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">SceneJS._processModule.getNumProcesses</span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>231</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>232</span> 
+<span class='line'>233</span> </span><span class="COMM">/** Destroys this scene. You should destroy
+<span class='line'>234</span>  * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
+<span class='line'>235</span>  * resources for it (eg. shaders, VBOs etc) that are no longer in use. A destroyed scene
+<span class='line'>236</span>  * becomes un-destroyed as soon as you render it again.
+<span class='line'>237</span>  */</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="NAME">SceneJS.Scene.prototype.destroy</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>239</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">        </span><span class="NAME">SceneJS._sceneModule.destroyScene</span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">// Last one fires RESET command</span><span class="WHIT">
+<span class='line'>241</span> </span><span class="WHIT">        </span><span class="NAME">this._sceneId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>242</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>243</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>244</span> 
+<span class='line'>245</span> </span><span class="COMM">/** Returns true if scene active, ie. not destroyed. A destroyed scene becomes active again
+<span class='line'>246</span>  * when you render it.
 <span class='line'>247</span>  */</span><span class="WHIT">
-<span class='line'>248</span> </span><span class="NAME">SceneJS.reset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>249</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">scenes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._sceneModule.getAllScenes</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>250</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">temp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>251</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">scenes.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>252</span> </span><span class="WHIT">        </span><span class="NAME">temp.push</span><span class="PUNC">(</span><span class="NAME">scenes</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>253</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>254</span> </span><span class="WHIT">    </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">temp.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>255</span> 
-<span class='line'>256</span> </span><span class="WHIT">        </span><span class="COMM">/* Destroy each scene individually so it they can mark itself as destroyed.
-<span class='line'>257</span>          * A RESET command will be fired after the last one is destroyed.
-<span class='line'>258</span>          */</span><span class="WHIT">
-<span class='line'>259</span> </span><span class="WHIT">        </span><span class="NAME">temp.pop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">destroy</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>260</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>261</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>262</span> 
-<span class='line'>263</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>264</span> </span><span class="COMM">//SceneJS._Visitor = (function() {</span><span class="WHIT">
-<span class='line'>265</span> </span><span class="COMM">//    this._nodeStack = new Object[5000];</span><span class="WHIT">
-<span class='line'>266</span> </span><span class="COMM">//    this._nStack = 0;</span><span class="WHIT">
-<span class='line'>267</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>268</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>269</span> </span><span class="COMM">//    this.visit = function(node, tc, data) {</span><span class="WHIT">
-<span class='line'>270</span> </span><span class="COMM">//        this._nodeStack[this._nStack++] = node;</span><span class="WHIT">
-<span class='line'>271</span> </span><span class="COMM">//        while (this._nStack > 0) {</span><span class="WHIT">
-<span class='line'>272</span> </span><span class="COMM">//            node = this._nodeStack[--this._nStack];</span><span class="WHIT">
-<span class='line'>273</span> </span><span class="COMM">//            node._visited = true;</span><span class="WHIT">
-<span class='line'>274</span> </span><span class="COMM">//            node._preRender(tc, data);</span><span class="WHIT">
-<span class='line'>275</span> </span><span class="COMM">//            for (var i = 0; i &lt; node._children.length; i++) {</span><span class="WHIT">
-<span class='line'>276</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>277</span> </span><span class="COMM">//            }</span><span class="WHIT">
-<span class='line'>278</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>279</span> </span><span class="COMM">//        }</span><span class="WHIT">
-<span class='line'>280</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>281</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>282</span> </span><span class="COMM">//        node._preRender(tc, data);</span><span class="WHIT">
-<span class='line'>283</span> </span><span class="COMM">//        node._render(tc, data);</span><span class="WHIT">
-<span class='line'>284</span> </span><span class="COMM">//        node._postRender(tc, data);</span><span class="WHIT">
-<span class='line'>285</span> </span><span class="COMM">//    };</span><span class="WHIT">
-<span class='line'>286</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>287</span> </span><span class="COMM">//    this.visitChildren = function(children, tc, data) {</span><span class="WHIT">
-<span class='line'>288</span> </span><span class="COMM">//        node._preRender(tc, data);</span><span class="WHIT">
-<span class='line'>289</span> </span><span class="COMM">//        node._render(tc, data);</span><span class="WHIT">
-<span class='line'>290</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>291</span> </span><span class="COMM">//        node._postRender(tc, data);</span><span class="WHIT">
-<span class='line'>292</span> </span><span class="COMM">//    };</span><span class="WHIT">
-<span class='line'>293</span> </span><span class="COMM">//});</span><span class="WHIT">
-<span class='line'>294</span> </span></pre></body></html>
+<span class='line'>248</span> </span><span class="NAME">SceneJS.Scene.prototype.isActive</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>249</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this._sceneId</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>250</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>251</span> 
+<span class='line'>252</span> </span><span class="COMM">/** Factory function that returns a new {@link SceneJS.Scene} instance
+<span class='line'>253</span>  * @param {Arguments} args Variable arguments that are passed to the SceneJS.Scene constructor
+<span class='line'>254</span>  * @returns {SceneJS.Scene}
+<span class='line'>255</span>  */</span><span class="WHIT">
+<span class='line'>256</span> </span><span class="NAME">SceneJS.scene</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>257</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS.Scene</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>258</span> </span><span class="WHIT">    </span><span class="NAME">SceneJS.Scene.prototype.constructor.apply</span><span class="PUNC">(</span><span class="NAME">n</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>259</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>260</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>261</span> 
+<span class='line'>262</span> </span><span class="COMM">/** Total SceneJS reset - destroys all scenes and cached resources.
+<span class='line'>263</span>  */</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="NAME">SceneJS.reset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">scenes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SceneJS._sceneModule.getAllScenes</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">temp</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">    </span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">scenes.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>268</span> </span><span class="WHIT">        </span><span class="NAME">temp.push</span><span class="PUNC">(</span><span class="NAME">scenes</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>269</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>270</span> </span><span class="WHIT">    </span><span class="KEYW">while</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">temp.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>271</span> 
+<span class='line'>272</span> </span><span class="WHIT">        </span><span class="COMM">/* Destroy each scene individually so it they can mark itself as destroyed.
+<span class='line'>273</span>          * A RESET command will be fired after the last one is destroyed.
+<span class='line'>274</span>          */</span><span class="WHIT">
+<span class='line'>275</span> </span><span class="WHIT">        </span><span class="NAME">temp.pop</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">destroy</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>276</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>277</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>278</span> 
+<span class='line'>279</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>280</span> </span><span class="COMM">//SceneJS._Visitor = (function() {</span><span class="WHIT">
+<span class='line'>281</span> </span><span class="COMM">//    this._nodeStack = new Object[5000];</span><span class="WHIT">
+<span class='line'>282</span> </span><span class="COMM">//    this._nStack = 0;</span><span class="WHIT">
+<span class='line'>283</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>284</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="COMM">//    this.visit = function(node, tc, data) {</span><span class="WHIT">
+<span class='line'>286</span> </span><span class="COMM">//        this._nodeStack[this._nStack++] = node;</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="COMM">//        while (this._nStack > 0) {</span><span class="WHIT">
+<span class='line'>288</span> </span><span class="COMM">//            node = this._nodeStack[--this._nStack];</span><span class="WHIT">
+<span class='line'>289</span> </span><span class="COMM">//            node._visited = true;</span><span class="WHIT">
+<span class='line'>290</span> </span><span class="COMM">//            node._preRender(tc, data);</span><span class="WHIT">
+<span class='line'>291</span> </span><span class="COMM">//            for (var i = 0; i &lt; node._children.length; i++) {</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="COMM">//            }</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>295</span> </span><span class="COMM">//        }</span><span class="WHIT">
+<span class='line'>296</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>297</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>298</span> </span><span class="COMM">//        node._preRender(tc, data);</span><span class="WHIT">
+<span class='line'>299</span> </span><span class="COMM">//        node._render(tc, data);</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="COMM">//        node._postRender(tc, data);</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="COMM">//    };</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="COMM">//    this.visitChildren = function(children, tc, data) {</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="COMM">//        node._preRender(tc, data);</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="COMM">//        node._render(tc, data);</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="COMM">//</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="COMM">//        node._postRender(tc, data);</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="COMM">//    };</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="COMM">//});</span><span class="WHIT">
+<span class='line'>310</span> </span></pre></body></html>

@@ -195,7 +195,7 @@ SceneJS._webgl_Shader = function(context, type, source, logging) {
     }
     if (!this.valid) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.ShaderCompilationFailureException("Shader program failed to compile"));
+                new SceneJS.errors.ShaderCompilationFailureException("Shader program failed to compile"));
     }
 }
 
@@ -252,7 +252,7 @@ SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragme
 
     if (!this.valid) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.ShaderLinkFailureException("Shader program failed to link"));
+                new SceneJS.errors.ShaderLinkFailureException("Shader program failed to link"));
     }
 
     /* Discover active uniforms and samplers

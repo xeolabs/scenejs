@@ -154,12 +154,12 @@ SceneJS._textureModule = new (function() {
         }
         var glName = SceneJS._webgl_enumMap[value];
         if (glName == undefined) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+            throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
                     "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'"));
         }
         var glValue = context[glName];
         //                if (!glValue) {
-        //                    throw new SceneJS.WebGLUnsupportedNodeConfigException(
+        //                    throw new SceneJS.errors.WebGLUnsupportedNodeConfigException(
         //                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
         //                }
         return glValue;

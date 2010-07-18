@@ -6,8 +6,7 @@
  * points on the Z axis at which the fog region starts and ends, along with the proportion as a linear, exponential
  * or quadratic mode. Scene content falling in front of the start point will have no fog applied, while content
  * after the end point will be invisible, having blended completely into the ambient colour.</p>
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/9d8wLu">Example 1</a></li></ul>
+ * 
  * <p><b>Example Usage</b></p><p>Definition of fog with parameters that happen to be the defaults -
  * starting at Z=1, extending until Z=1000, linear mode, gray colour. Objects beyond Z=1000 will be entirely merged
  * into the background.</b></p><pre><code>
@@ -59,7 +58,7 @@ SceneJS._inherit(SceneJS.Fog, SceneJS.Node);
  */
 SceneJS.Fog.prototype.setMode = function(mode) {
     if (mode != "disabled" && mode != "exp" && mode != "exp2" && mode != "linear") {
-        throw SceneJS._errorModule.fatalError(new SceneJS.InvalidNodeConfigException(
+        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
                 "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'none', 'exp', 'exp2' or 'linear'"));
     }
     this._mode = mode;

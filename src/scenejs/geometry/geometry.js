@@ -1,7 +1,6 @@
 /**
  * @class A scene node that defines an element of geometry.
- * <p><b>Live Examples</b></p>
- * <ul><li><a target = "other" href="http://bit.ly/scenejs-geometry-example">Example 1</a></li></ul>
+ * 
  * <p><b>Example Usage</b></p><p>Definition of a cube, with normals and UV texture coordinates, with coordinates shown here only for the first face:</b></p><pre><code>
  * var g = new SceneJS.Geometry({
  *

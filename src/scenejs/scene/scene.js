@@ -7,72 +7,88 @@
  * <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
  * element for the scene to render to. When that is omitted, the node will look for one with the default ID of
  * "_scenejs-default-canvas".</p>
- * <p><b>Timeout for {@link SceneJS.Instance} sub-nodes</b></p>
- * <p>The Scene node can be configured with a <b>loadTimeoutSecs</b> property to specify the number of seconds within
- * which {@link SceneJS.Instance} nodes within its subgraph must receive and parse content when they load it from files.
- * That may be overridden in the configs of individual {@link SceneJS.Instance} nodes.
- * <p><b>Usage Example:</b></p><p>Shown below is Scene bound to a canvas and specifying a JSONP proxy, that contains a
- * {@link SceneJS.LookAt} node whose "eye" property is dynamically configured with a callback. A {@link SceneJS.Instance}
- * node loads a Collada model cross-domain through the proxy. When the Scene is rendered, a value for the
- * {@link Scene.LookAt}'s property is injected into it. The Scene will put the property on a data scope (which is
- * implemented by a {@link SceneJS.Data}) that the {@link SceneJS.LookAt}'s config callback then accesses.</b></p>
+ * <p><b>Usage Example:</b></p><p>Below is a minimal scene graph. To render the scene, SceneJS will traverse its nodes
+ * in depth-first order. Each node will set some scene state on entry, then un-set it again before exit. In this graph,
+ * the {@link SceneJS.Scene} node binds to a WebGL Canvas element, a {@link SceneJS.LookAt} defines the viewoint,
+ * a {@link SceneJS.Camera} defines the projection, a {@link SceneJS.Lights} defines a light source,
+ * a {@link SceneJS.Material} defines the current material properties, {@link SceneJS.Rotate} nodes orient the modeling
+ * coordinate space, then a {@link SceneJS.objects.Cube} defines our cube.</p>
  * <pre><code>
  *
- * // To enable the COLLADA content to load cross-domain, we'll first configure SceneJS with a strategy to allow it
- * // to use a Web service to proxy the JSONP load request. As shown here, the strategy implements two methods, one to
- * // create the request URL for the service, and another to extract the data from the response.
- *
- * SceneJS.setJSONPStrategy({
- *     request : function(url, format, callback) {
- *        return "http://scenejs.org/cgi-bin/jsonp_proxy.pl?uri=" + url + "&format=" + format + "&callback=" + callback;
- *     },
- *
- *    response : function(data) {
- *
- *        // The SceneJS proxy will provide an error message like this when
- *        // it fails to service the request
- *
- *        if (data.error) {
- *            throw "Proxy server responded with error: " + data.error;
- *        }
- *        return data;
- *    }
- * });
- *
  * var myScene = new SceneJS.Scene({
- *
- *         // Bind scene to render to WebGL Canvas element with given ID.
- *         // Default is "_scenejs-default-canvas"
- *
- *         canvasId:        "myCanvas",
- *
- *         // Optionally write scene logging to a DIV:
- *
- *        loggingElementId: "myLoggingDiv",
- *
- *        // Optional default timeout for SceneJS.Instance<xxx> nodes, which may override
- *        // it individually - default is 180 seconds
- *
- *       loadTimeoutSecs: 180
+ *     canvasId: 'theCanvas'
  *   },
  *
- *   new SceneJS.LookAt(
- *       function(data) {
- *           return {
- *              eye: data.get("eye")
- *          };
+ *   new SceneJS.LookAt({
+ *       eye  : { x: -1.0, y: 0.0, z: 15 },
+ *       look : { x: -1.0, y: 0, z: 0 },
+ *       up   : { y: 1.0 }
+ *     },
+ *
+ *     new SceneJS.Camera({
+ *         optics: {
+ *           type: "perspective",
+ *           fovy   : 55.0,
+ *           aspect : 1.0,
+ *           near   : 0.10,
+ *           far    : 1000.0
+ *         }
  *       },
  *
- *       new SceneJS.Instance({ uri: "http://foo.com/models/myModel.dae" })
- * );
+ *       new SceneJS.Lights({
+ *           sources: [
+ *             {
+ *               type:  "dir",
+ *               color: { r: 1.0, g: 1.0, b: 1.0 },
+ *               dir:   { x: 1.0, y: -1.0, z: 1.0 }
+ *             },
+ *             {
+ *               type:  "dir",
+ *               color: { r: 1.0, g: 1.0, b: 1.0 },
+ *               dir:   { x: -1.0, y: -1.0, z: -3.0 }
+ *             }
+ *           ]
+ *         },
  *
- * myScene.setData({
- *          eye: {
- *             x: 0, y: 0, z: -100
- *          }
- *      }).render();
+ *         new SceneJS.Material({
+ *                  baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+ *                  specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+ *                  emit:           0.0,
+ *                  specular:       0.9,
+ *                  shine:          6.0
+ *             },
  *
+ *             new SceneJS.Rotate(
+ *                 function(data) {
+ *                    return {
+ *                      angle: data.get('yaw'), y : 1.0
+ *                   };
+ *                 },
+ *
+ *                 new SceneJS.Rotate(
+ *                     function(data) {
+ *                       return {
+ *                         angle: data.get('pitch'), x : 1.0
+ *                       };
+ *                     },
+ *
+ *                     new SceneJS.objects.Cube()
+ *                   )
+ *                )
+ *              )
+ *            )
+ *          )
+ *       )
+ *     );
+ *
+ *   myScene.setData({ yaw: 315, pitch: 20 });
+ *   myScene.render();
  * </pre></code>
+ * <p>Take a closer look at those rotate nodes. See how they can optionally take a function which feeds them their
+ * parameters? You can do that for any node to dynamically evaluate parameters for them at traversal-time. The functions
+ * take an immutable data object, which is SceneJS's mechanism for passing variables down into scene graphs. Using the
+ * yaw and pitch properties on that data object, our functions create configurations that specify rotations about
+ * the X and Y axis. See also how we inject those angles when we render the scene.</p>
  * @extends SceneJS.Node
  */
 SceneJS.Scene = function() {
@@ -80,7 +96,7 @@ SceneJS.Scene = function() {
     this._nodeType = "scene";
     if (!this._fixedParams) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.InvalidNodeConfigException
+                new SceneJS.errors.InvalidNodeConfigException
                         ("Dynamic configuration of SceneJS.scene node is not supported"));
     }
     this._params = this._getParams();
@@ -182,7 +198,7 @@ SceneJS.Scene.prototype.render = function() {
 //    if (this._sceneId) {
 //        try {
 //            if (!this._lastRenderedData) {
-//                throw new SceneJS.PickWithoutRenderedException
+//                throw new SceneJS.errors.PickWithoutRenderedException
 //                        ("Scene not rendered - need to render before picking");
 //            }
 //            SceneJS._sceneModule.activateScene(this._sceneId);  // Also activates canvas
