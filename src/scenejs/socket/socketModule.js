@@ -54,7 +54,7 @@ SceneJS._SocketModule = new (function() {
 
     function log(socketId, message) {
         if (debugCfg.trace) {
-               SceneJS._loggingModule.info("Socket " + socketId + ": " + message);
+            SceneJS._loggingModule.info("Socket " + socketId + ": " + message);
         }
     }
 
@@ -82,17 +82,21 @@ SceneJS._SocketModule = new (function() {
         activeSceneSockets.sockets[socketId] = socket;
         webSocket.onopen = function() {
             onOpen(socketId);
+            log(socketId, "opened");
         };
         webSocket.onmessage = function (evt) {
             socket.messages.inQueue.push(evt.data);  // Message ready to be collected by node
         };
         webSocket.onerror = function(e) {
             activeSceneSockets.sockets[socketId] = null;
-            onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error (URI: '" + socket.uri + "') : " + e));
+            var msg = "SceneJS.Socket error (URI: '" + socket.uri + "') : " + e;
+            onError(new SceneJS.errors.SocketErrorException(msg));
+            log(socketId, msg);
         };
         webSocket.onclose = function() {
             activeSceneSockets.sockets[socketId] = null;
             onClose();
+            log(socketId, "closed");
         };
 
         //testCreateMessages(activeSceneSockets.sockets[socketId]);
@@ -135,12 +139,11 @@ SceneJS._SocketModule = new (function() {
         if (inQueue.length > 0) {
             var messageStr = inQueue.pop();
             try {
-                 // alert(messageStr)
+                log(activeSocket.socketId, "received message: '" + messageStr + "");
                 eval("SceneJS.__socketJSON = " + messageStr); // Parse JSON in Window scope to resolve SceneJS
                 var message = SceneJS.__socketJSON;
                 if (message.format == "json") {
-                 //   alert(message.body)
-                    eval("SceneJS.__socketJSON = " + message.body);                
+                    eval("SceneJS.__socketJSON = " + message.body);
                     message.body = SceneJS.__socketJSON;
                 }
                 return message;

@@ -203,11 +203,10 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
                         new SceneJS.errors.SocketServerErrorException(
                                 "SceneJS.Socket server responded with error: " + message.error + ", " + message.body));
             } else if (message.body) {
-                // alert(message.body);
                 traversalContext = {
                     appendix : traversalContext.appendix,
                     insideRightFringe: this._children.length > 1,
-                    configs : message.body,
+                    configs : this._preprocessConfigs(message.body),
                     configsModes : this._configsModes // TODO configsModes in message?
                 };
                 data = new SceneJS.Data(data, this._fixedParams, this._data);
@@ -239,6 +238,39 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
         }
         this._renderNodes(traversalContext, data); // We're assuming socket wont open instantly, ie. during this node visit
     }
+};
+
+// TODO: factor out and share with SceneJS.WithConfigs - mutual feature envy smell ;)
+
+SceneJS.Socket.prototype._preprocessConfigs = function(configs) {
+    var configAction;
+    var funcName;
+    var newConfigs = {};
+    for (var key in configs) {
+        if (configs.hasOwnProperty(key)) {
+            key = key.replace(/^\s*/, "").replace(/\s*$/, "");    // trim
+            if (key.length > 0) {
+                configAction = key.substr(0, 1);
+                if (configAction != "#") {  // Property reference
+                    if (configAction == "+") {
+                        funcName = "add" + key.substr(1, 1).toUpperCase() + key.substr(2);
+                    } else if (configAction == "-") {
+                        funcName = "remove" + key.substr(1, 1).toUpperCase() + key.substr(2);
+                    } else {
+                        funcName = "set" + key.substr(0, 1).toUpperCase() + key.substr(1);
+                    }
+                    newConfigs[funcName] = {
+                        isFunc : true,
+                        value : configs[key]
+                    };
+
+                } else {
+                    newConfigs[key.substr(1)] = this._preprocessConfigs(configs[key]);
+                }
+            }
+        }
+    }
+    return newConfigs;
 };
 
 // @private
