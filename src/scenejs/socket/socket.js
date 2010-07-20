@@ -21,8 +21,10 @@
  * <p>Below is an example of a response containg subnode configurations:</p>
  * <pre><code>
  * {
- *     configs: {
- *
+ *     body : {
+ *          configs: {
+ *              // ...
+ *          }
  *     }
  * }
  * </code></pre>
