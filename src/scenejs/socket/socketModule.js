@@ -58,6 +58,8 @@ SceneJS._SocketModule = new (function() {
         }
     }
 
+    /** Open a fresh WebSocket, attach callbacks and make it the active one
+     */
     this.openSocket = function(params, onOpen, onClose, onError) {
         if (!("WebSocket" in window)) {
             throw SceneJS._errorModule.fatalError(
@@ -85,7 +87,9 @@ SceneJS._SocketModule = new (function() {
             log(socketId, "opened");
         };
         webSocket.onmessage = function (evt) {
-            socket.messages.inQueue.push(evt.data);  // Message ready to be collected by node
+            log(socketId, "received message: '" + evt.data + "");
+            socket.messages.inQueue.unshift(evt.data);  // Message ready to be collected by node
+
         };
         webSocket.onerror = function(e) {
             activeSceneSockets.sockets[socketId] = null;
@@ -102,6 +106,8 @@ SceneJS._SocketModule = new (function() {
         //testCreateMessages(activeSceneSockets.sockets[socketId]);
     };
 
+    /** Attempt to activate a currently-open open WebSocket
+     */
     this.acquireSocket = function(socketId) {
         if (activeSocket) {
             socketStack.push(activeSocket);
@@ -110,50 +116,82 @@ SceneJS._SocketModule = new (function() {
             activeSocket = activeSceneSockets.sockets[socketId];
             return true;
         } else {
-            log(socketId, "has been freed");
+            log(socketId, "has been freed");  /// Socket node must re-open
             return false;
         }
     };
 
+    /** Flushes given message queue out the active socket. Messages are sent as they are popped off the end.
+     */
     this.sendMessages = function(messages, onError, onSuccess) {
-        //  activeSocket.messages.outQueue.push(messages);
         var message;
         var messageStr;
         try {
             while (messages.length > 0 && activeSocket.socket.readyState == 1) {
-                message = messages[messages.length - 1];
+                message = messages[messages.length - 1]; // Dont deqeue yet for debug in case of error
                 messageStr = JSON.stringify(message);
-                log(activeSocket.socketId, "sending message: '" + messageStr + "");
+                if (debugCfg.trace) {
+                    log(activeSocket.id, "sending message: '" + messageStr + "");
+                }
                 activeSocket.socket.send(messageStr);
-                messages.pop();
+                messages.pop();                       // Sent OK, can pop now
             }
         } catch(e) {
-            onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error (URI: '" + activeSocket.uri + "') : " + e));
+            onError(new SceneJS.errors.SocketErrorException
+                    ("SceneJS.Socket error sending message (to server at URI: '" + activeSocket.uri + "') : " + e));
             return;
         }
         onSuccess();
     };
 
-    this.getNextMessage = function(onError) {
+    /**
+     * Fetches next message from the end of the incoming queue.
+     *
+     * Incoming messages look like this:
+     *
+     * { error: 404, body: "Not found!" }
+     *
+     * { body: < body object/string> }
+     *
+     * The onError will return an exception object, while the onSuccess handler will return the message body JSON object.
+     */
+    this.getNextMessage = function(onError, onSuccess) {
         var inQueue = activeSocket.messages.inQueue;
-        if (inQueue.length > 0) {
-            var messageStr = inQueue.pop();
+        var messageStr = inQueue[inQueue.length - 1]; // Dont deqeue yet for debug in case of error
+        if (messageStr) {
             try {
-                log(activeSocket.socketId, "received message: '" + messageStr + "");
-                eval("SceneJS.__socketJSON = " + messageStr); // Parse JSON in Window scope to resolve SceneJS
-                var message = SceneJS.__socketJSON;
-                if (message.format == "json") {
-                    eval("SceneJS.__socketJSON = " + message.body);
-                    message.body = SceneJS.__socketJSON;
+                if (debugCfg.trace) {
+                    log(activeSocket.id, "processing message: '" + messageStr + "");
                 }
-                return message;
+                var messageObj = eval('(' + messageStr + ')');
+                if (messageObj.error) {
+
+                    /* Server reports an error
+                     */
+                    onError(new SceneJS.errors.SocketServerErrorException(
+                            "SceneJS.Socket server error - server reports error (server URI: '"
+                                    + activeSocket.uri + "'): " + messageObj.error + ", " + messageObj.body));
+
+                } else if (!messageObj.body) {
+
+                    /* Badly-formed response - body missing
+                     */
+                    onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error - bad message from server (server URI: '"
+                            + activeSocket.uri + "'): body is missing in message:" + messageStr));
+                } else {
+                    inQueue.pop();                        // Evaled OK, can pop now
+                    onSuccess(messageObj.body);
+                }
             } catch (e) {
-                onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error (URI: '" + activeSocket.uri + "') : " + e));
+                onError(new SceneJS.errors.SocketErrorException
+                        ("SceneJS.Socket error reading message (from server at URI: '" + activeSocket.uri + "') : " + e));
             }
         }
-        return null;
     };
 
+
+    /** Deactivates the current socket, reactivates the previously activated one (belonging to a higher Socket node if any)
+     */
     this.releaseSocket = function() {
         if (socketStack.length > 0) {
             activeSocket = socketStack.pop();

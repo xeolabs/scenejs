@@ -18,6 +18,14 @@
  * }
  * </code></pre>
  *
+ * <p>Below is an example of a response containg subnode configurations:</p>
+ * <pre><code>
+ * {
+ *     configs: {
+ *
+ *     }
+ * }
+ * </code></pre>
  *
  * <p>The outgoing message format is not part of the SceneJS specification and is whatever JSON objects the server on
  * the other end expects.</p>
@@ -39,7 +47,7 @@
  * The server may respond with an error (described further below) or a configuration map. If the response is a
  * configuration map, the Socket would then apply that to its sub-nodes.
  * On error, the Socket will transition to {@link #STATE_ERROR} and remain in that state, with connection closed. If
- * the connection ever closes, the Socket will attempt to re-open it when next rendered.</p> 
+ * the connection ever closes, the Socket will attempt to re-open it when next rendered.</p>
  * <pre><code>
  * new SceneJS.Socket({
  *
@@ -148,7 +156,7 @@ SceneJS.Socket.STATE_ERROR = -1;
  * @returns {this}
  */
 SceneJS.Socket.prototype.addMessage = function(message) {
-    this._outMessages.push(message);
+    this._outMessages.unshift(message);
     return this;
 };
 
@@ -164,7 +172,7 @@ SceneJS.Socket.prototype.removeMessages = function() {
 SceneJS.Socket.prototype._init = function(params) {
     this._uri = params.uri;
     if (params.messages) {
-        this._outMessages = params.messages;
+        this._outMessages = params.messages.reverse();
     }
 };
 
@@ -192,26 +200,40 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
         /* Process next incoming message then send pending outgoing messages
          */
         var _self = this;
-        var message = SceneJS._SocketModule.getNextMessage(
+        SceneJS._SocketModule.getNextMessage(
+
+            /* Error
+             */
                 function(exception) { // onerror
                     _self._changeState(SceneJS.Socket.STATE_ERROR, { exception: exception });
                     SceneJS._errorModule.error(exception);
+                },
+
+            /* OK
+             */
+                function(messageBody) {
+
+                    if (messageBody.configs) {
+
+                        /* Configuration message
+                         */
+                        traversalContext = {
+                            appendix : traversalContext.appendix,
+                            insideRightFringe: _self._children.length > 1,
+                            configs : _self._preprocessConfigs(messageBody.configs),
+                            configsModes : _self._configsModes // TODO configsModes in message?
+                        };
+                        data = new SceneJS.Data(data, _self._fixedParams, this._data);
+
+                    } else {
+
+                        /* TODO: handle other message types
+                         */
+                        SceneJS._errorModule.error(
+                                new SceneJS.errors.SocketServerErrorException(
+                                        "SceneJS.Socket server responded with unrecognised message: " + JSON.stringify(messageBody)));
+                    }
                 });
-        if (message) {
-            if (message.error) {
-                SceneJS._errorModule.error(
-                        new SceneJS.errors.SocketServerErrorException(
-                                "SceneJS.Socket server responded with error: " + message.error + ", " + message.body));
-            } else if (message.body) {
-                traversalContext = {
-                    appendix : traversalContext.appendix,
-                    insideRightFringe: this._children.length > 1,
-                    configs : this._preprocessConfigs(message.body),
-                    configsModes : this._configsModes // TODO configsModes in message?
-                };
-                data = new SceneJS.Data(data, this._fixedParams, this._data);
-            }
-        }
         this._sendMessages();
         this._renderNodes(traversalContext, data);
         SceneJS._SocketModule.releaseSocket();
@@ -243,6 +265,7 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
 // TODO: factor out and share with SceneJS.WithConfigs - mutual feature envy smell ;)
 
 SceneJS.Socket.prototype._preprocessConfigs = function(configs) {
+    alert("processConfigs")
     var configAction;
     var funcName;
     var newConfigs = {};
@@ -279,8 +302,14 @@ SceneJS.Socket.prototype._changeState = function(newState, params) {
     params.oldState = this._state;
     params.newState = newState;
     this._state = newState;
-    if (this._listeners["state-changed"]) { // Optimisation
+    if (this._listeners["state-changed"]) {
         this._fireEvent("state-changed", params);
+    }
+};
+
+SceneJS.Socket.prototype._onMessage = function(message) {
+    if (this._listeners["msg-received"]) {
+        this._fireEvent("msg-received", message);
     }
 };
 
