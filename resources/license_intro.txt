@@ -10,6 +10,4 @@
  * Various functions for helping debug WebGL apps.
  * http://github.com/jackpal/webgltrace
  * Copyright (c) 2009 The Chromium Authors. All rights reserved.
- *
- * Date: Sat Feb 13 22:33:48 2010 -0500
  */
