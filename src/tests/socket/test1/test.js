@@ -1,3 +1,0 @@
-x = {
-    format: 'json',
-    body: '{        "#world-root": {            "+node" : SceneJS.node({ sid: "teapot" },                    SceneJS.translate(                        SceneJS.rotate({                               sid: "rotate",                                angle: 0,                                y : 1.0                            },                            SceneJS.objects.teapot())))        }}' }
