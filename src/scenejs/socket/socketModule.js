@@ -121,7 +121,7 @@ SceneJS._SocketModule = new (function() {
         }
     };
 
-    /** Flushes given message queue out the active socket. Messages are sent as they are popped off the end.
+    /** Flushes given message queue out the active socket. Messages are sent as they are popped off the tail.
      */
     this.sendMessages = function(messages, onError, onSuccess) {
         var message;

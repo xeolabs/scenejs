@@ -1,3 +1,11 @@
+/*--------------------------------------------------------------------------------------------------
+ *
+ * Template for getting started with the SceneJS.Socket node in SceneJS V0.7.6
+ *
+ * Lindsay Kay
+ * July 20, 2010
+ * lindsay.kay@xeolabs.com
+ *--------------------------------------------------------------------------------------------------*/
 var exampleScene = SceneJS.scene({
     canvasId: "theCanvas",
     loggingElementId: "theLoggingDiv" },
@@ -59,28 +67,29 @@ var exampleScene = SceneJS.scene({
                                             messages: [
                                                 {
                                                     cmd: "createTeapot"
-                                                }
-                                                ,
+                                                },
+
                                                 {
                                                     cmd: "rotateTeapot"
                                                 }
-//                                                ,
-//                                                {
-//                                                    cmd: "destroyTeapot"
-//                                                }
+
+                                                //  ,
+                                                //  {
+                                                //       cmd: "destroyTeapot"
+                                                //  }
                                             ],
 
                                             listeners: {
 
                                                 "msg-sent" : {
                                                     fn: function(theNode, message) {
-                                                        alert(JSON.stringify(message));
+                                                        //alert(JSON.stringify(message));
                                                     }
                                                 },
 
                                                 "msg-received" : {
                                                     fn: function(theNode, message) {
-                                                        alert(JSON.stringify(message.body.configs));
+                                                        //alert(JSON.stringify(message.body.configs));
                                                     }
                                                 },
 
@@ -110,11 +119,11 @@ var exampleScene = SceneJS.scene({
                                                 SceneJS.node({ sid: "world-root" })
 
                                                 ) // Socket
-                                        )
-                                )
-                        )
-                )
-        );
+                                        )  // material
+                                ) // lights
+                        ) // camera
+                ) // lookAt
+        ); // scene
 
 
 /*----------------------------------------------------------------------
@@ -133,7 +142,6 @@ SceneJS.setDebugConfigs({
 var pInterval;
 
 window.render = function() {
-    var x;
     exampleScene.render();
 };
 

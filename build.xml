@@ -3,13 +3,14 @@
     <property name="BUILD_MAJOR" value="0"/>
     <property name="BUILD_MINOR" value="7"/>
     <property name="BUILD_ID" value="6"/>
+    <property name="PATCH_ID" value="1"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
     <property name="SRC_DIR" location="${basedir}/src"/>
     <property name="SceneJS._JS_NAME" value="scenejs.js"/>
     <property name="SceneJS._MIN_JS_NAME" value="scenejs.min.js"/>
     <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
-    <property name="SceneJS._NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}"/>
+    <property name="SceneJS._NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}"/>
     <property name="SceneJS._LATEST_MIN_JS_NAME" value="scenejs-latest.min.js"/>
     <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SceneJS._NAME}"/>
 
@@ -31,7 +32,7 @@
     </path>
 
     <path id="sourcefiles">
-        <fileset dir="${basedir}" includes="license.txt"/>
+        <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
@@ -168,6 +169,9 @@
     <!-- Create compressed javascript lib -->
 
     <target name="package" depends="assemble-lib, package-index, package-examples, package-docs">
+
+        <!-- Compress JS file list -->
+
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
             <classpath>
                 <path refid="yuicompressor.classpath"/>
@@ -179,8 +183,27 @@
                 <include name="**/*.js"/>
             </fileset>
         </yuicompress>
+
+        <!-- Move compressed lib into temp file in lib dir -->
+
         <move file="${EXTRACTED_DIST_DIR}/${SceneJS._JS_NAME}"
-              tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}"/>
+              tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}-temp"/>
+
+        <!-- Concat temp file to license yeilding final compressed lib file -->
+
+        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}">
+            <path id="sourcefiles">
+                <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
+                <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="${SceneJS._MIN_JS_NAME}-temp"/>
+            </path>
+        </concat>
+
+        <!-- Delete temp file -->
+
+        <delete>
+            <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="*-temp" defaultexcludes="false"/>
+        </delete>
+
     </target>
 
     <target name="assemble-lib" depends="create-dist-directories">
@@ -190,7 +213,7 @@
     </target>
 
     <target name="package-index">
-        <echo file="resources/version.txt" append="false">SceneJS V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}
+        <echo file="resources/version.txt" append="false">SceneJS V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
         </echo>
         <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/index.html">
             <filelist dir="."

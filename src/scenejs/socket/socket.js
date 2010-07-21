@@ -10,7 +10,8 @@
  * exactly like those specified with a {@link SceneJS.WithConfigs}. On receipt of a configuration map, a Socket
  * automatically applies the map to its subgraph in the same way that a {@link SceneJS.WithConfigs} does.</p>
  * <p>An error response object has two parts: the error code, either a string or number, and a message.</p>
- * <p>Below is an example of an HTTP 404 error response:</p>
+ *
+ * <p>Below is an example of an HTTP 404 error server response:</p>
  * <pre><code>
  * {
  *     error : 404,
@@ -18,7 +19,7 @@
  * }
  * </code></pre>
  *
- * <p>Below is an example of a response containg subnode configurations:</p>
+ * <p>Below is an example of a server response containing subnode configurations:</p>
  * <pre><code>
  * {
  *     body : {
@@ -267,7 +268,6 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
 // TODO: factor out and share with SceneJS.WithConfigs - mutual feature envy smell ;)
 
 SceneJS.Socket.prototype._preprocessConfigs = function(configs) {
-    alert("processConfigs")
     var configAction;
     var funcName;
     var newConfigs = {};

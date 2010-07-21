@@ -1,2 +1,2 @@
-SceneJS V0.7.6
+SceneJS V0.7.6.1
         

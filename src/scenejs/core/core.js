@@ -7,7 +7,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.6',
+    VERSION: '0.7.6.1',
 
     /** Names of supported WebGL canvas contexts
      */
