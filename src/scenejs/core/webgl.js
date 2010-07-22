@@ -385,9 +385,9 @@ SceneJS._webgl_Texture2D = function(context, cfg) {
 
         /* Texture from image
          */
-        //context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
+       context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
 
-        context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, cfg.image);
+       // context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, cfg.image);
 
         this.format = context.RGBA;
         this.width = cfg.image.width;
