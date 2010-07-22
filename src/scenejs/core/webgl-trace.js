@@ -285,12 +285,12 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
         return undefined;
     }
     var buf = 'new ' + arrayType + '( [';
-    for (var i = 0; i < a.length; i++) {
-        if (i > 0 ) {
-            buf += ', ';
-        }
-        buf += a.get(i);
-    }
+    // for (var i = 0; i < a.length; i++) {
+    //     if (i > 0 ) {
+    //         buf += ', ';
+    //     }
+    //     buf += a.get(i);
+    // }
     buf += '] )';
     return buf;
   };
@@ -304,7 +304,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
             }
             var objectName;
             try {
-            if (arg !== null) {
+            if (arg !== null && arg !== undefined) {
                 objectName = arg[objectNameProperty];
             }
             } catch (e) {
