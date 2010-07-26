@@ -102,7 +102,6 @@ SceneJS.Scene = function() {
     this._params = this._getParams();
     this._data = {};
     this._configs = {};
-    this._lastRenderedData = null;
     if (this._params.canvasId) {
         this._canvasId = document.getElementById(this._params.canvasId) ? this._params.canvasId : SceneJS.Scene.DEFAULT_CANVAS_ID;
     } else {
@@ -170,7 +169,7 @@ SceneJS.Scene.prototype.getConfigs = function() {
 
 /**
  * Renders the scene, applying any config and data scope values given to {@link #setData} and {#link setConfigs},
- * then clearing those values afterwards.
+ * retaining those values in the scene afterwards.
  */
 SceneJS.Scene.prototype.render = function() {
     if (!this._sceneId) {
@@ -180,44 +179,25 @@ SceneJS.Scene.prototype.render = function() {
     var traversalContext = {};
     this._renderNodes(traversalContext, new SceneJS.Data(null, false, this._data));
     SceneJS._sceneModule.deactivateScene();
-    this._lastRenderedData = this._data;
-    this._data = {};
-    this._configs = {};
 };
 
 /**
- * Performs pick on rendered scene and returns path to picked geometry, if any. The path is the
- * concatenation of the names specified by SceneJS.name nodes on the path to the picked geometry.
- * The scene must have been previously rendered, since this method re-renders it (to a special
- * pick frame buffer) using parameters retained from the prior render() call.
+ * Renders the scene while picking whatever is rendered at the given canvas coordinates.
+ * If a node is picked, then all nodes on the traversal path to that node
+ * that have "picked" listeners will receive a "picked" event as they are rendered.
  *
- * @param canvasX
- * @param canvasY
+ * @param canvasX Canvas X-coordinate
+ * @param canvasY Canvas Y-coordinate
  */
-//SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
-//    if (this._sceneId) {
-//        try {
-//            if (!this._lastRenderedData) {
-//                throw new SceneJS.errors.PickWithoutRenderedException
-//                        ("Scene not rendered - need to render before picking");
-//            }
-//            SceneJS._sceneModule.activateScene(this._sceneId);  // Also activates canvas
-//            SceneJS._pickModule.pick(canvasX, canvasY);
-//            if (this._params.loadProxy) {
-//                SceneJS._loadModule.setLoadProxyUri(this._params.proxy);
-//            }
-//            var traversalContext = {};
-//            this._renderNodes(traversalContext, this._lastRenderedData);
-//            SceneJS._loadModule.setLoadProxyUri(null);
-//            var picked = SceneJS._pickModule.getPicked();
-//            SceneJS._sceneModule.deactivateScene();
-//            return picked;
-//        } finally {
-//            SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
-//        }
-//    }
-//};
-
+SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
+    if (!this._sceneId) {
+        throw new SceneJS.errors.InvalidSceneGraphException
+                ("Attempted pick on Scene that has been destroyed or not yet rendered");
+    }
+    SceneJS._pickModule.pick(canvasX, canvasY); // Enter pick mode
+    this.render();  // Pick-mode traversal, resets to render-mode afterwards
+    this.render();  // Render-mode traversal
+};
 
 /**
  * Returns count of active processes. A non-zero count indicates that the scene should be rendered

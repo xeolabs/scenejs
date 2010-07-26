@@ -3,13 +3,15 @@
     <property name="BUILD_MAJOR" value="0"/>
     <property name="BUILD_MINOR" value="7"/>
     <property name="BUILD_ID" value="6"/>
-    <property name="PATCH_ID" value="1"/>
+    <property name="PATCH_ID" value="2"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
     <property name="SRC_DIR" location="${basedir}/src"/>
     <property name="SceneJS._JS_NAME" value="scenejs.js"/>
     <property name="SceneJS._MIN_JS_NAME" value="scenejs.min.js"/>
+
     <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
+
     <property name="SceneJS._NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}"/>
     <property name="SceneJS._LATEST_MIN_JS_NAME" value="scenejs-latest.min.js"/>
     <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SceneJS._NAME}"/>
@@ -39,6 +41,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-debug.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/data.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>
@@ -97,6 +100,8 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/socket/socketModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/socket/socket.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
+        <!-- Must be last to intercept viewport update events -->
     </path>
 
     <target name="all" depends="archive"/>

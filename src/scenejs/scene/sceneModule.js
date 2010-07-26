@@ -11,7 +11,6 @@ SceneJS._sceneModule = new (function() {
 
     var projMat;
     var viewMat;
-    var picking;
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.RESET,
@@ -20,10 +19,6 @@ SceneJS._sceneModule = new (function() {
                 nScenes = 0;
                 activeSceneId = null;
             });
-
-    // @private
-    function updatePick() {
-    }
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED,
@@ -92,7 +87,7 @@ SceneJS._sceneModule = new (function() {
                 SceneJS._loggingModule.info("SceneJS.Scene binding to canvas '" + canvasId + "'");
             } else {
                 SceneJS._loggingModule.info("SceneJS.Scene config 'canvasId' unresolved - looking for default canvas with " +
-                                           "ID '" + SceneJS.Scene.DEFAULT_CANVAS_ID + "'");
+                                            "ID '" + SceneJS.Scene.DEFAULT_CANVAS_ID + "'");
                 canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
                 canvas = document.getElementById(canvasId);
                 if (!canvas) {
@@ -105,10 +100,13 @@ SceneJS._sceneModule = new (function() {
         var context;
         var contextNames = SceneJS.SUPPORTED_WEBGL_CONTEXT_NAMES;
         for (var i = 0; (!context) && i < contextNames.length; i++) {
-            try {
+            try {            
                 if (SceneJS._debugModule.getConfigs("webgl.logTrace") == true) {
+
                     context = canvas.getContext(contextNames[i]);
                     if (context) {
+                       // context = WebGLDebugUtils.makeDebugContext(context);
+
                         context = WebGLDebugUtils.makeDebugContext(
                                 context,
                                 function(err, functionName, args) {
@@ -117,6 +115,8 @@ SceneJS._sceneModule = new (function() {
                                             " on WebGL canvas context - see console log for details");
                                 });
                         context.setTracing(true);
+                        
+
                     }
                 } else {
                     context = canvas.getContext(contextNames[i]);
@@ -143,8 +143,6 @@ SceneJS._sceneModule = new (function() {
             canvasId : canvasId
         };
     }
-
-    ;
 
     /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
      * @private
@@ -197,7 +195,7 @@ SceneJS._sceneModule = new (function() {
         }
         activeSceneId = sceneId;
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERING, { sceneId: sceneId });
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERING, { sceneId: sceneId, canvas : scene.canvas });
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_ACTIVATED, scene.canvas);
 
     };
@@ -255,8 +253,4 @@ SceneJS._sceneModule = new (function() {
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERED, {sceneId : sceneId });
         //SceneJS._loggingModule.info("Scene deactivated: " + sceneId);
     };
-
-}
-
-        )
-        ();
+})();
