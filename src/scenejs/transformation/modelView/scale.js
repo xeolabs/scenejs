@@ -36,12 +36,9 @@ SceneJS._inherit(SceneJS.Scale, SceneJS.Node);
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setXYZ = function(xyz) {
-    var x = xyz.x || 0;
-    var y = xyz.y || 0;
-    var z = xyz.z || 0;
-    this._x = x;
-    this._y = y;
-    this._z = z;
+    this._x = (xyz.x != undefined) ? xyz.x : 0;
+    this._y = (xyz.y != undefined) ? xyz.y : 0;
+    this._z = (xyz.z != undefined) ? xyz.z : 0;
     this._memoLevel = 0;
     return this;
 };
@@ -63,7 +60,7 @@ SceneJS.Scale.prototype.getXYZ = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setX = function(x) {
-    this._x = x;
+    this._x = (x != undefined) ? x : 1.0;
     this._memoLevel = 0;
     return this;
 };
@@ -82,7 +79,7 @@ SceneJS.Scale.prototype.getX = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setY = function(y) {
-    this._y = y;
+    this._y = (y != undefined) ? y : 1.0;
     this._memoLevel = 0;
     return this;
 };
@@ -101,7 +98,7 @@ SceneJS.Scale.prototype.getY = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setZ = function(z) {
-    this._z = z;
+    this._z = (z != undefined) ? z : 1.0;
     this._memoLevel = 0;
     return this;
 };
@@ -119,6 +116,9 @@ SceneJS.Scale.prototype._init = function(params) {
 };
 
 SceneJS.Scale.prototype._render = function(traversalContext, data) {
+
+    var origMemoLevel = this._memoLevel;
+
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
@@ -128,14 +128,16 @@ SceneJS.Scale.prototype._render = function(traversalContext, data) {
         this._mat = SceneJS._math_scalingMat4v([this._x, this._y, this._z]);
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
-    if (this._memoLevel < 2) {
+    if (origMemoLevel < 2 || (!superXform.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
+
         var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams && !instancing
+            fixed: origMemoLevel == 2
         };
+
         if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }

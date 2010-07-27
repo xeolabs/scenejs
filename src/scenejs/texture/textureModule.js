@@ -219,6 +219,7 @@ SceneJS._textureModule = new (function() {
                                 logging: SceneJS._loggingModule
                             });
                         } catch (e) {
+                             throw SceneJS._errorModule.fatalError("Failed to create texture: \"" + uri + "\" : " + e);
                         }
                     });
             SceneJS._processModule.killProcess(process);

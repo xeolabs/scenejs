@@ -189,6 +189,7 @@ SceneJS.Node = function() {
     this._fixedParams = true;
     this._parent = null;
     this._listeners = {};
+    this._events = []; // FIFO queue for each event listener
 
     /* Used by many node types to track the level at which they can
      * memoise internal state. When rendered, a node increments
@@ -414,37 +415,43 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
     var child;
     var childConfigs;
     var i;
-    var handle;
-    var savedName;  // Saves SID path for when rendering subgraph of Instance
+    var configUnsetters;
 
+    var savedName;  // Saves SID path for when rendering subgraph of Instance  
     if (this._sidPath) {
         savedName = SceneJS._instancingModule.getName();      // Save SID path at Instance node
-        SceneJS._instancingModule.setName(this._sidPath);     // Initialise empty SID path for Symbol's subgraph
+        SceneJS._instancingModule.setName(this._sidPath, this);     // Initialise empty SID path for Symbol's subgraph
     } else if (this._sid) {
         SceneJS._instancingModule.pushName(this._sid, this);
+    }
+
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+        SceneJS._pickModule.preVisitNode(this);
     }
 
     children = children || this._children;  // for Selector node
     var numChildren = children.length;
     if (numChildren) {
+        var childTraversalContext;
         for (i = 0; i < numChildren; i++) {
             child = children[i];
-            handle = null;
+            configUnsetters = null;
             childConfigs = traversalContext.configs;
             if (childConfigs && child._sid) {
                 childConfigs = childConfigs[child._sid];
                 if (childConfigs) {
-                    handle = this._setConfigs(childConfigs, traversalContext.configsModes, child, data);
+                    configUnsetters = this._setConfigs(childConfigs, traversalContext.configsModes, child, data);
                 }
             }
-            child._renderWithEvents.call(child, { // Traversal context
+            childTraversalContext = {
                 insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
                 callback : traversalContext.callback,
                 configs: childConfigs || traversalContext.configs,
                 configsModes : traversalContext.configsModes
-            }, data);
-            if (handle) {
-                this._unsetConfigs(handle);
+            };
+            child._renderWithEvents.call(child, childTraversalContext, data);
+            if (configUnsetters) {
+                this._unsetConfigs(configUnsetters);
             }
         }
     }
@@ -465,9 +472,13 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
         }
     }
     if (savedName) {
-        SceneJS._instancingModule.setName(savedName); // Restore SID path for Instance node
+        SceneJS._instancingModule.setName(savedName, this); // Restore SID path for Instance node
     } else if (this._sid) {
         SceneJS._instancingModule.popName();
+    }
+
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+        SceneJS._pickModule.postVisitNode(this);
     }
 };
 
@@ -514,6 +525,7 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
     if (this._listeners["rendering"]) { // Optimisation
         this._fireEvent("rendering", { });
     }
+    this._processEvents();
     this._render(traversalContext, data);
     if (this._listeners["rendered"]) { // Optimisation
         this._fireEvent("rendered", { });
@@ -758,7 +770,9 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
 };
 
 /**
- * @private
+ * Fires an event at this node
+ * @param {String} eventName Event name
+ * @param {Object} params Event parameters
  */
 SceneJS.Node.prototype._fireEvent = function(eventName, params) {
     var list = this._listeners[eventName];
@@ -774,11 +788,35 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params) {
 };
 
 /**
+ * Adds an event to a FIFO queue for the given event type, to be processed when the node is next rendered.
+ * @param {String} eventName Event name
+ * @param {Object} params Event parameters
+ * @return this
+ */
+SceneJS.Node.prototype.addEvent = function(eventName, params) {
+    this._events.unshift({name : eventName, params: params });
+    return this;
+};
+
+
+/**
+ * Processes all events queued on this node
+ * @private
+ */
+SceneJS.Node.prototype._processEvents = function() {
+    var event;
+    while (this._events.length > 0) {
+        event = this._events.pop();
+        this._fireEvent(event.name, event.params);
+    }
+};
+
+/**
  * Removes a handler that is registered for the given event on this node.
  * Does nothing if no such handler registered.
  *
  * @param {String} eventName Event type that handler is registered for
- * @param fn - Handler function that is registered for the event
+ * @param {function} fn - Handler function that is registered for the event
  * @return {function} The handler, or null if not registered
  */
 SceneJS.Node.prototype.removeListener = function(eventName, fn) {
@@ -793,6 +831,16 @@ SceneJS.Node.prototype.removeListener = function(eventName, fn) {
         }
     }
     return null;
+};
+
+/**
+ * Returns true if this node has any listeners for the given event .
+ *
+ * @param {String} eventName Event type
+ * @return {boolean} True if listener present
+ */
+SceneJS.Node.prototype.hasListener = function(eventName) {
+    return this._listeners[eventName];
 };
 
 /** Removes all listeners registered on this node.

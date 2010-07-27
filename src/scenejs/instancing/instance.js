@@ -139,7 +139,7 @@ SceneJS.Instance.prototype._changeState = function(newState, exception) {
     var oldState = this._state;
     this._state = newState;
     if (this._listeners["state-changed"]) { // Optimisation
-        this._fireEvent("state-changed", { oldState: oldState, newState: newState, exception : exception });
+        this.fireEvent("state-changed", { oldState: oldState, newState: newState, exception : exception });
     }
 };
 
@@ -156,7 +156,6 @@ SceneJS.Instance.prototype._changeState = function(newState, exception) {
  * @private
  */
 SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalContext, target) {
-    var callback;
     this._superCallback = traversalContext.callback;
     var _this = this;
     if (!this._callback) {
@@ -191,54 +190,50 @@ SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalCon
  * @param data
  * @private
  */
-SceneJS.Instance.prototype._renderNodes = function(traversalContext, data) {
-    var numChildren = this._children.length;
-    var child;
-    var childConfigs;
-    var configUnsetters;
-
-    if (numChildren == 0) {
-
-        /* Instance has no child nodes - render super-Instance's child nodes
-         * through callback if one is passed in
-         */
-        if (traversalContext.callback) {
-            traversalContext.callback(traversalContext, data);
-        }
-
-    } else {
-
-        /* Instance has child nodes - last node in Instance's subtree will invoke
-         * the callback, if any (from within its SceneJS.Node#_renderNodes)
-         */
-        for (var i = 0; i < numChildren; i++) {
-            child = this._children[i];
-
-            childConfigs = traversalContext.configs;
-            configUnsetters = null;
-
-            if (childConfigs && child._sid) {
-                childConfigs = traversalContext.configs["#" + child._sid];
-                if (childConfigs) {
-                    configUnsetters = this._setConfigs(childConfigs, child);
-                }
-            }
-
-            var childTraversalContext = {
-                insideRightFringe : (i < numChildren - 1),
-                callback : traversalContext.callback,
-                configs : childConfigs || traversalContext.configs,
-                configsModes : traversalContext.configsModes
-            };
-
-            child._render.call(child, childTraversalContext, data);
-
-            if (configUnsetters) {
-                this._unsetConfigs(configUnsetters);
-            }
-        }
-    }
-};
+//SceneJS.Instance.prototype._renderNodes = function(traversalContext, data) {    
+//    var numChildren = this._children.length;
+//    var child;
+//    var childConfigs;
+//    var configUnsetters;
+//
+//    if (numChildren == 0) {
+//
+//        /* Instance has no child nodes - render super-Instance's child nodes
+//         * through callback if one is passed in
+//         */
+//        if (traversalContext.callback) {
+//            traversalContext.callback(traversalContext, data);
+//        }
+//
+//    } else {
+//
+//        /* Instance has child nodes - last node in Instance's subtree will invoke
+//         * the callback, if any (from within its SceneJS.Node#_renderNodes)
+//         */
+//        var childTraversalContext;
+//        for (var i = 0; i < numChildren; i++) {
+//            child = this._children[i];
+//            configUnsetters = null;
+//            childConfigs = traversalContext.configs;
+//            if (childConfigs && child._sid) {
+//                childConfigs = childConfigs[child._sid];
+//                if (childConfigs) {
+//                    configUnsetters = this._setConfigs(childConfigs, child);
+//                }
+//            }
+//            childTraversalContext = {
+//                insideRightFringe : (i < numChildren - 1),
+//                callback : traversalContext.callback,
+//                configs : childConfigs || traversalContext.configs,
+//                configsModes : traversalContext.configsModes
+//            };
+//            child._renderWithEvents.call(child, childTraversalContext, data);
+//            if (configUnsetters) {
+//                this._unsetConfigs(configUnsetters);
+//            }
+//        }
+//    }
+//};
 
 /** Instances a Symbol that is currently defined after being rendered prior to this Instance
  *

@@ -269,7 +269,7 @@ SceneJS._pickModule = new (function() {
                             if (debugCfg.logTrace) {
                                 SceneJS._loggingModule.info("Node was picked - SID path:" + relSIDPath);
                             }
-                            var pickedEvent = { url : relSIDPath };
+                            var pickedEvent = { uri : relSIDPath };
                             if (debugCfg.logTrace) {
                                 SceneJS._loggingModule.info("Notifying \"picked\" event observer");
                             }

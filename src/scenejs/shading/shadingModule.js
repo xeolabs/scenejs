@@ -21,6 +21,8 @@
  */
 SceneJS._shaderModule = new (function() {
 
+    var debugCfg;
+
     var time = (new Date()).getTime();      // For LRU caching
 
     /* Resources contributing to shader
@@ -69,6 +71,7 @@ SceneJS._shaderModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
+                debugCfg = SceneJS._debugModule.getConfigs("shading");
                 canvas = null;
                 rendererState = null;
                 activeProgram = null;
@@ -151,7 +154,7 @@ SceneJS._shaderModule = new (function() {
                     activeProgram.bindTexture("uSampler" + i, layer.texture, i);
                     if (layer.params.matrixAsArray) {
                         activeProgram.setUniform("uLayer" + i + "Matrix", layer.params.matrixAsArray);
-                    }           
+                    }
                 }
             });
 
@@ -236,6 +239,16 @@ SceneJS._shaderModule = new (function() {
                 activeProgram.setUniform("uMaterialAlpha", m.alpha);
             });
 
+    /**
+     * When in pick mode, then with the pick fragment shader loaded, we'll get the
+     * pick color instead of a material
+     */
+     SceneJS._eventModule.addListener(
+            SceneJS._eventModule.PICK_COLOR_EXPORTED,
+            function(p) {
+                activeProgram.setUniform("uPickColor", p.pickColor);
+            });
+
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.FOG_UPDATED,
             function(f) {
@@ -256,10 +269,8 @@ SceneJS._shaderModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.MODEL_TRANSFORM_EXPORTED,
             function(transform) {
-
                 activeProgram.setUniform("uMMatrix", transform.matrixAsArray);
                 activeProgram.setUniform("uMNMatrix", transform.normalMatrixAsArray);
-
             });
 
     SceneJS._eventModule.addListener(
@@ -397,12 +408,11 @@ SceneJS._shaderModule = new (function() {
      * @private
      */
     function generateHash() {
-        if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
+        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
             sceneHash = ([canvas.canvasId, "picking"]).join(";");
         } else {
             sceneHash = ([canvas.canvasId, rendererHash, fogHash, lightsHash, textureHash, geometryHash]).join(";");
         }
-        //      SceneJS._loggingModule.debug("Scene shading hash:" + sceneHash);
     }
 
     /**
@@ -439,7 +449,7 @@ SceneJS._shaderModule = new (function() {
      * @private
      */
     function composePickingVertexShader() {
-        return [
+        var src = [
             "attribute vec3 aVertex;",
             "uniform mat4 uMMatrix;",
             "uniform mat4 uVMatrix;",
@@ -447,7 +457,11 @@ SceneJS._shaderModule = new (function() {
             "void main(void) {",
             "  gl_Position = uPMatrix * (uVMatrix * (uMMatrix * vec4(aVertex, 1.0)));",
             "}"
-        ].join("\n");
+        ];
+        if (debugCfg.logScripts == true) {
+            SceneJS._loggingModule.info(src);
+        }
+        return src.join("\n");
     }
 
     /**
@@ -455,19 +469,20 @@ SceneJS._shaderModule = new (function() {
      * @private
      */
     function composePickingFragmentShader() {
-        var g = parseFloat(Math.round((10 + 1) / 256) / 256);
-        var r = parseFloat((10 - g * 256 + 1) / 256);
+//        var g = parseFloat(Math.round((10 + 1) / 256) / 256);  // TODO: use exported pick color
+//        var r = parseFloat((10 - g * 256 + 1) / 256);
         var src = [
-            "uniform vec3 uColor;",
+            "uniform vec3 uPickColor;",
             "void main(void) {",
-
-            "gl_FragColor = vec4(" + (r.toFixed(17)) + ", " + (g.toFixed(17)) + ",1.0,1.0);",
-
-            //      "    gl_FragColor = vec4(uColor.rgb, 1.0);  ",
+            //"gl_FragColor = vec4(" + (r.toFixed(17)) + ", " + (g.toFixed(17)) + ",1.0,1.0);",
+                  "    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ",
+              //  "    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);  ",
             "}"
-        ].join("\n");
-
-        return src;
+        ];
+        if (debugCfg.logScripts == true) {
+            SceneJS._loggingModule.info(src);
+        }
+        return src.join("\n");
     }
 
 
@@ -571,7 +586,7 @@ SceneJS._shaderModule = new (function() {
             }
         }
         src.push("}");
-        if (SceneJS._debugModule.getConfigs("shading.logScripts") == true) {
+        if (debugCfg.logScripts == true) {
             SceneJS._loggingModule.info(src);
         }
         return src.join("\n");
@@ -581,7 +596,7 @@ SceneJS._shaderModule = new (function() {
      * @private
      */
     function composeRenderingFragmentShader() {
-        var texturing = textureLayers.length > 0  && (geometry.uvBuf || geometry.uvBuf2);
+        var texturing = textureLayers.length > 0 && (geometry.uvBuf || geometry.uvBuf2);
         var lighting = (lights.length > 0 && geometry.normalBuf);
 
         var src = ["\n"];
@@ -812,11 +827,11 @@ SceneJS._shaderModule = new (function() {
         } else {
             src.push("gl_FragColor = fragColor;");
         }
-        if (SceneJS._debugModule.getConfigs("shading.whitewash") == true) {
+        if (debugCfg.whitewash == true) {
             src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         }
         src.push("}");
-        if (SceneJS._debugModule.getConfigs("shading.logScripts") == true) {
+        if (debugCfg.logScripts == true) {
             SceneJS._loggingModule.info(src);
         }
         return src.join("\n");

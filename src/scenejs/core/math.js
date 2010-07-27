@@ -683,7 +683,7 @@ SceneJS._math_perspectiveMatrix4 = function(fovyrad, aspectratio, znear, zfar) {
     pmin[0] = -pmax[0];
 
     return SceneJS._math_frustumMat4v(pmin, pmax);
-}
+};
 
 /** @private */
 SceneJS._math_transformPoint3 = function(m, p) {
@@ -694,6 +694,7 @@ SceneJS._math_transformPoint3 = function(m, p) {
         (m[3] * p[0]) + (m[7] * p[1]) + (m[11] * p[2]) + m[15]
     ];
 }
+
 
 /** @private */
 SceneJS._math_transformPoints3 = function(m, points) {

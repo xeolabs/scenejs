@@ -277,7 +277,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
      * Render this node
      *-----------------------------------------------*/
 
-    if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
     } else {
 

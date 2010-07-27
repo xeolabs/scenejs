@@ -190,7 +190,7 @@ SceneJS.Fog.prototype._init = function(params) {
 
 // @private
 SceneJS.Fog.prototype._render = function(traversalContext, data) {
-    if (SceneJS._traversalMode == SceneJS.TRAVERSAL_MODE_PICKING) {
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext, data);
     } else {
         if (!this._fixedParams) {

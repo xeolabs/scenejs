@@ -139,6 +139,8 @@ SceneJS.LookAt.prototype._init = function(params) {
 };
 
 SceneJS.LookAt.prototype._render = function(traversalContext, data) {
+    var origMemoLevel = this._memoLevel;
+
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
@@ -151,8 +153,10 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
                 this._upX, this._upY, this._upZ);
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
-    if (this._memoLevel < 2) {
+    if (origMemoLevel < 2 || (!superXform.fixed)) {
+
         var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
+
         this._xform = {
             type: "lookat",
             matrix: tempMat,
@@ -161,8 +165,9 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
                 look: { x: this._lookX, y: this._lookY, z: this._lookZ },
                 up:  { x: this._upX, y: this._upY, z: this._upZ }
             },
-            fixed: superXform.fixed && this._fixedParams
+            fixed: origMemoLevel == 2
         };
+        
         if (this._memoLevel == 1 && superXform.fixed && !SceneJS._instancingModule.instancing()) {   // Bump up memoization level if space fixed
             this._memoLevel = 2;
         }

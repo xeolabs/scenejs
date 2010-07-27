@@ -119,6 +119,8 @@ SceneJS.Translate.prototype._init = function(params) {
 };
 
 SceneJS.Translate.prototype._render = function(traversalContext, data) {
+    var origMemoLevel = this._memoLevel;
+
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
@@ -135,23 +137,24 @@ SceneJS.Translate.prototype._render = function(traversalContext, data) {
             this._mat = SceneJS._math_translationMat4v([this._x, this._y, this._z]);
         }
     }
-    this._superXForm = SceneJS._modelViewTransformModule.getTransform();
-    if (this._memoLevel < 2) {
+    var superXForm = SceneJS._modelViewTransformModule.getTransform();
+    if (origMemoLevel < 2 || (!superXForm.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
-        
-        var tempMat = SceneJS._math_mulMat4(this._superXForm.matrix, this._mat);
+      
+        var tempMat = SceneJS._math_mulMat4(superXForm.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: this._superXForm.fixed && this._fixedParams && !instancing
+            fixed: origMemoLevel == 2
         };
-        if (this._memoLevel == 1 && this._superXForm.fixed && !instancing) {   // Bump up memoization level if model-space fixed
+
+        if (this._memoLevel == 1 && superXForm.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
     this._renderNodes(traversalContext, data);
-    SceneJS._modelViewTransformModule.setTransform(this._superXForm);
+    SceneJS._modelViewTransformModule.setTransform(superXForm);
 };
 
 /** Factory function that returns a new {@link SceneJS.Translate} instance

@@ -187,6 +187,14 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
         if (this._optics.type == "ortho") {
             this._transform = {
                 type: this._optics.type,
+                optics : {
+                    left: this._optics.left,
+                    right: this._optics.right,
+                    bottom: this._optics.bottom,
+                    top: this._optics.top,
+                    near: this._optics.near,
+                    far : this._optics.far
+                },
                 matrix:SceneJS._math_orthoMat4c(
                         this._optics.left,
                         this._optics.right,
@@ -198,6 +206,14 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
         } else if (this._optics.type == "frustum") {
             this._transform = {
                 type: this._optics.type,
+                optics : {
+                    left: this._optics.left,
+                    right: this._optics.right,
+                    bottom: this._optics.bottom,
+                    top: this._optics.top,
+                    near: this._optics.near,
+                    far : this._optics.far
+                },
                 matrix:SceneJS._math_frustumMatrix4(
                         this._optics.left,
                         this._optics.right,
@@ -209,6 +225,12 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
         } else if (this._optics.type == "perspective") {
             this._transform = {
                 type: this._optics.type,
+                optics : {
+                    fovy: this._optics.fovy,
+                    aspect: this._optics.aspect,
+                    near: this._optics.near,
+                    far: this._optics.far
+                },
                 matrix:SceneJS._math_perspectiveMatrix4(
                         this._optics.fovy * Math.PI / 180.0,
                         this._optics.aspect,

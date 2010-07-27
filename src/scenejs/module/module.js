@@ -14,8 +14,9 @@ new (function() {
 
     SceneJS.installModule = function(name, module) {
         try {
-           // alert("installing " + moduleLoading.url);
-            module.init({ baseURL : SceneJS._getBaseURL(moduleLoading.url) });
+            if (module.init) {
+                module.init({ baseURL : SceneJS._getBaseURL(moduleLoading.url) });
+            }
             modules[name] = module;
         } catch (e) {
             throw SceneJS._errorModule.fatalError(
@@ -52,7 +53,6 @@ new (function() {
         var newScript = document.createElement('script');
         newScript.type = 'text/javascript';
         newScript.src = moduleLoading.url;
-                // alert("loading " + moduleLoading.url);
         headID.appendChild(newScript);
     };
     window.setInterval("SceneJS._moduleLoadTicker()", TICK_INTERVAL);
@@ -81,12 +81,85 @@ new (function() {
         }
     };
 
+    /* Same method as used on SceneJS.Instance - TODO: factor out to common utility method
+     *
+     * @private
+     */
+    SceneJS.UseModule.prototype._createTargetTraversalContext = function(traversalContext, target) {
+        this._superCallback = traversalContext.callback;
+        var _this = this;
+        if (!this._callback) {
+            this._callback = function(traversalContext, data) {
+                var subTraversalContext = {
+                    callback : _this._superCallback,
+                    insideRightFringe : _this._children.length > 1,
+                    configs: traversalContext.configs,
+                    configsModes: traversalContext.configsModes
+                };
+                _this._renderNodes(subTraversalContext, data);
+            };
+        }
+        return {
+            callback: this._callback,
+            insideRightFringe:  target._children.length > 1,
+            configs: traversalContext.configs,
+            configsModes: traversalContext.configsModes
+        };
+    };
+
+//    SceneJS.UseModule.prototype._renderNodes = function(traversalContext, data) {
+//        var numChildren = this._children.length;
+//        var child;
+//        var childConfigs;
+//        var configUnsetters;
+//
+//        if (numChildren == 0) {
+//
+//            /* Instance has no child nodes - render super-Instance's child nodes
+//             * through callback if one is passed in
+//             */
+//            if (traversalContext.callback) {
+//                traversalContext.callback(traversalContext, data);
+//            }
+//
+//        } else {
+//
+//            /* Instance has child nodes - last node in Instance's subtree will invoke
+//             * the callback, if any (from within its SceneJS.Node#_renderNodes)
+//             */
+//            var childTraversalContext;
+//            for (var i = 0; i < numChildren; i++) {
+//                child = this._children[i];
+//                configUnsetters = null;
+//                childConfigs = traversalContext.configs;
+//                if (childConfigs && child._sid) {
+//                    childConfigs = childConfigs[child._sid];
+//                    if (childConfigs) {
+//                        configUnsetters = this._setConfigs(childConfigs, child);
+//                    }
+//                }
+//                childTraversalContext = {
+//                    insideRightFringe : (i < numChildren - 1),
+//                    callback : traversalContext.callback,
+//                    configs : childConfigs || traversalContext.configs,
+//                    configsModes : traversalContext.configsModes
+//                };
+//                child._renderWithEvents.call(child, childTraversalContext, data);
+//                if (configUnsetters) {
+//                    this._unsetConfigs(configUnsetters);
+//                }
+//            }
+//        }
+//    };
+
     // @private
     SceneJS.UseModule.prototype._render = function(traversalContext, data) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
         }
+
         if (!this._moduleNode) {
+
             var module = modules[this._moduleName];
             if (module) {
                 this._moduleNode = module.getNode(this._moduleParams);
@@ -102,7 +175,7 @@ new (function() {
             }
         }
         if (this._moduleNode) {
-            this._moduleNode._render(traversalContext, data);
+            this._moduleNode._render(this._createTargetTraversalContext(traversalContext, this._moduleNode), data);
         }
         //this._renderNodes(traversalContext, data);
         ;

@@ -51,7 +51,8 @@ SceneJS._eventModule = new (function() {
     this.PROCESS_KILLED = 35;
     this.PROCESS_TIMED_OUT = 36;
     this.LOGGING_ELEMENT_ACTIVATED = 37;
-
+    this.PICK_COLOR_EXPORTED = 38;
+    
     /* Priority queue for each type of event
      */
     var events = new Array(37);

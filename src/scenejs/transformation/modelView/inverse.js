@@ -27,18 +27,22 @@ SceneJS.Inverse = function() {
 SceneJS._inherit(SceneJS.Inverse, SceneJS.Node);
 
 SceneJS.Inverse.prototype._render = function(traversalContext, data) {
+    var origMemoLevel = this._memoLevel;
+
     if (this._memoLevel == 0) {
         this._memoLevel = 1; // For consistency with other transform nodes
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
-    if (this._memoLevel < 2) {
+    if (origMemoLevel < 2 || (!superXform.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
         var tempMat = SceneJS._math_inverseMat4(superXform.matrix, this._mat);
+
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams && !instancing
+            fixed: origMemoLevel == 2
         };
+
         if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }

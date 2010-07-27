@@ -203,6 +203,8 @@ SceneJS.Quaternion.prototype._init = function(params) {
 };
 
 SceneJS.Quaternion.prototype._render = function(traversalContext, data) {
+    var origMemoLevel = this._memoLevel;
+
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
@@ -212,14 +214,16 @@ SceneJS.Quaternion.prototype._render = function(traversalContext, data) {
         this._mat = SceneJS._math_newMat4FromQuaternion(this._q);
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
-    if (this._memoLevel < 2) {
+    if (origMemoLevel < 2 || (!superXform.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
         var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
+
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
-            fixed: superXform.fixed && this._fixedParams && !instancing
+            fixed: origMemoLevel == 2
         };
+
         if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
         }

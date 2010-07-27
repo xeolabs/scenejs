@@ -19,7 +19,13 @@
  * <p><b>Example 1:</b></p><p>Configuring properties on {@link SceneJS.Translation} and {@link SceneJS.Scale} nodes in the subgraph:</b></p><pre><code>
  * var wc = new SceneJS.WithConfigs({
  *
- *         // Have the WithConfigs throw a SceneJS.errors.WithConfigsNodeNotFoundException if any target node
+ *         // Optionally you can specify that the configs map is to be forgotten as soon as it is used,
+ *         // where the WithConfigs node only applies it the first time it is rendered, before clearing it.
+ *         // In this case, our WithConfigs applies it every time:
+ *
+ *         once : false,
+ *
+ *         // Optionally have the WithConfigs throw a SceneJS.errors.WithConfigsNodeNotFoundException if any target node
  *         // is not found at exactly the hierarchy position specified in our configs map.
  *         //
  *         // Default is false, which would allow unmatched nodes to be simply skipped as traversal
@@ -144,6 +150,7 @@ SceneJS.WithConfigs = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "with-configs";
     this._configs = {};
+    this._once = false;
     this._configsModes = {
         strictProperties : true,
         strictNodes : false
@@ -160,8 +167,11 @@ SceneJS._inherit(SceneJS.WithConfigs, SceneJS.Node);
  @param {Object} configs The configs map
  @returns {SceneJS.WithConfigs} this
  */
-SceneJS.WithConfigs.prototype.setConfigs = function(configs) {
+SceneJS.WithConfigs.prototype.setConfigs = function(configs, once) {
     this._configs = configs;
+    if (once != undefined) {
+        this._once = once;
+    }
     this._memoLevel = 0;
     return this;
 };
@@ -173,6 +183,29 @@ SceneJS.WithConfigs.prototype.setConfigs = function(configs) {
  */
 SceneJS.WithConfigs.prototype.getConfigs = function() {
     return this._configs;
+};
+
+/**
+ Sets whether the configs map is forgotten as soon as the node has rendered, ie. to apply only once.
+ @param {boolean} once - Will forget when this is true
+ @returns {SceneJS.WithConfigs} this
+ */
+SceneJS.WithConfigs.prototype.setOnce = function(once) {
+    this._once = once;
+    if (once != undefined) {
+        this._once = once;
+    }
+    this._memoLevel = 0;
+    return this;
+};
+
+/**
+ * Sets whether the configs map is forgotten as soon as the node has rendered, ie. to apply only once.
+ *
+ * @returns {boolean} True if to forget, else false
+ */
+SceneJS.WithConfigs.prototype.getOnce = function() {
+    return this._once;
 };
 
 /**
@@ -213,6 +246,7 @@ SceneJS.WithConfigs.prototype.getStrictNodes = function() {
 
 SceneJS.WithConfigs.prototype._init = function(params) {
     this._configs = params.configs || {};
+     this._once = params.once != undefined ? params.once : false;
 };
 
 SceneJS.WithConfigs.prototype._render = function(traversalContext, data) {
@@ -225,19 +259,23 @@ SceneJS.WithConfigs.prototype._render = function(traversalContext, data) {
             this._configs = this._preprocessConfigs(this._configs);
         }
     }
-//    if (this._memoLevel < 2) {
-//        if (this._memoLevel == 1 && data.isFixed() && !SceneJS._instancingModule.instancing()) {
-//            this._memoLevel = 2;
-//        }
-//    }
+    //    if (this._memoLevel < 2) {
+    //        if (this._memoLevel == 1 && data.isFixed() && !SceneJS._instancingModule.instancing()) {
+    //            this._memoLevel = 2;
+    //        }
+    //    }
     traversalContext = {
         appendix : traversalContext.appendix,
         insideRightFringe: this._children.length > 1,
         configs : this._configs,
         configsModes : this._configsModes
     };
-   // this._renderNodes(traversalContext, new SceneJS.Data(data, this._fixedParams, this._data));
+    // this._renderNodes(traversalContext, new SceneJS.Data(data, this._fixedParams, this._data));
     this._renderNodes(traversalContext, data);
+
+    if (this._once) {
+        this._configs = {};
+    }
 };
 
 

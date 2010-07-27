@@ -45,7 +45,7 @@ SceneJS._frustumModule = new (function() {
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
-            function(params) {
+            function(params) {               
                 viewMat = params.matrix;
                 frustum = null;
             });
