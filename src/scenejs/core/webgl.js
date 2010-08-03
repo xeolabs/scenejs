@@ -134,12 +134,12 @@ SceneJS._webgl_ProgramUniform = function(context, program, name, type, size, loc
         throw "Unsupported shader uniform type: " + type;
     }
 
-        /** @private */
+    /** @private */
     this.setValue = function(v) {
         func(v);
     };
 
-        /** @private */
+    /** @private */
     this.getValue = function() {
         return context.getUniform(program, location);
     };
@@ -262,25 +262,33 @@ SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragme
 
     var numUniforms = context.getProgramParameter(handle, context.ACTIVE_UNIFORMS);
 
+    /* Patch for http://code.google.com/p/chromium/issues/detail?id=40175)  where
+     * gl.getActiveUniform was producing uniform names that had a trailing NUL in Chrome 6.0.466.0 dev
+     * Issue ticket at: https://xeolabs.lighthouseapp.com/projects/50643/tickets/124-076-live-examples-blank-canvas-in-chrome-5037599
+     */
     for (var i = 0; i < numUniforms; ++i) {
         var u = context.getActiveUniform(handle, i);
         if (u) {
-            var location = context.getUniformLocation(handle, u.name);
+            var u_name = u.name;
+            if (u_name[u_name.length - 1] == "\u0000") {
+                u_name = u_name.substr(0, u_name.length - 1);
+            }
+            var location = context.getUniformLocation(handle, u_name);
             if ((u.type == context.SAMPLER_2D) || (u.type == context.SAMPLER_CUBE) || (u.type == 35682)) {
 
-                samplers[u.name] = new SceneJS._webgl_ProgramSampler(
+                samplers[u_name] = new SceneJS._webgl_ProgramSampler(
                         context,
                         handle,
-                        u.name,
+                        u_name,
                         u.type,
                         u.size,
                         location,
                         logging);
             } else {
-                uniforms[u.name] = new SceneJS._webgl_ProgramUniform(
+                uniforms[u_name] = new SceneJS._webgl_ProgramUniform(
                         context,
                         handle,
-                        u.name,
+                        u_name,
                         u.type,
                         u.size,
                         location,
@@ -385,9 +393,9 @@ SceneJS._webgl_Texture2D = function(context, cfg) {
 
         /* Texture from image
          */
-       context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
+        context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
 
-       // context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, cfg.image);
+        // context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, cfg.image);
 
         this.format = context.RGBA;
         this.width = cfg.image.width;
@@ -523,17 +531,17 @@ SceneJS._webgl_ArrayBuffer = function(context, type, values, numItems, itemSize,
     this.itemSize = itemSize;
 
 
-        /** @private */
+    /** @private */
     this.bind = function() {
         context.bindBuffer(type, this.handle);
     };
 
-        /** @private */
+    /** @private */
     this.unbind = function() {
         context.bindBuffer(type, null);
     };
 
-        /** @private */
+    /** @private */
     this.destroy = function() {
         context.deleteBuffer(this.handle);
     };
