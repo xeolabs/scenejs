@@ -246,7 +246,7 @@ SceneJS.WithConfigs.prototype.getStrictNodes = function() {
 
 SceneJS.WithConfigs.prototype._init = function(params) {
     this._configs = params.configs || {};
-     this._once = params.once != undefined ? params.once : false;
+    this._once = params.once != undefined ? params.once : false;
 };
 
 SceneJS.WithConfigs.prototype._render = function(traversalContext, data) {
@@ -304,7 +304,11 @@ SceneJS.WithConfigs.prototype._preprocessConfigs = function(configs) {
                     };
 
                 } else {
-                    newConfigs[key.substr(1)] = this._preprocessConfigs(configs[key]);
+                    if (configs[key] instanceof Function) {
+                        newConfigs[key.substr(1)] = configs[key];
+                    } else {
+                        newConfigs[key.substr(1)] = this._preprocessConfigs(configs[key]);
+                    }
                 }
             }
         }

@@ -473,10 +473,8 @@ SceneJS._shaderModule = new (function() {
 //        var r = parseFloat((10 - g * 256 + 1) / 256);
         var src = [
             "uniform vec3 uPickColor;",
-            "void main(void) {",
-            //"gl_FragColor = vec4(" + (r.toFixed(17)) + ", " + (g.toFixed(17)) + ",1.0,1.0);",
+            "void main(void) {",,
                   "    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ",
-              //  "    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);  ",
             "}"
         ];
         if (debugCfg.logScripts == true) {
@@ -827,7 +825,7 @@ SceneJS._shaderModule = new (function() {
         } else {
             src.push("gl_FragColor = fragColor;");
         }
-        if (debugCfg.whitewash == true) {
+        if (debugCfg.whitewash == true) {           
             src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         }
         src.push("}");

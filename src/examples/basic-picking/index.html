@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
+</head>
+<body>
+<table>
+    <tr>
+        <td valign="top">
+            <canvas id="theCanvas" width="600" height="600">
+                <p>This example requires a browser that supports the
+                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                    &lt;canvas&gt; feature.</p>
+            </canvas>
+        </td>
+        <td valign="top">
+            <h1>Picking Example - Firing and Catching "picked" Events</h1>
+
+            <p>This example shows how "picked" events are created within a scene graph when you click on its various
+                geometries.</p>
+
+            <p>You can define "picked" listeners on any kind of node so that they will catch those events when they
+                occur on Geometry nodes
+                within their subgraphs.</p>
+
+            <p>On mouse down, we render the scene in picking mode, passing in the
+                mouse canvas coordinates. This will cause a scene render traversal in which
+                all the "picked" listeners will fire on those nodes situated above whatever
+                geometry node was picked. Each of those node's listeners will be called as their node is
+            visited, in the usual depth-first, right-to-left traversal order.</p>
+            <ul>
+                <li><a target="other" href="basic-picking.js">Scene source code</a></li>
+                <li><a target="other" href="http://scenejs.wikispaces.com/SceneJS.WithConfigs">Wiki page on
+                    SceneJS.WithConfigs</a></li>
+            </ul>
+            <div id="theLoggingDiv"></div>
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript" src="basic-picking.js"></script>
+</body>
+</html>

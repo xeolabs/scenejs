@@ -1,6 +1,13 @@
 /**
  * SceneJS Example - Basic picking
  *
+ * This is a basic example that shows how picking can be used with a SceneJS.WithConfigs node.
+ *
+ * The WithConfigs node listens for "picked" events on its subgraph, handling them by either pushing new
+ * configurations down into the subgraph or replacing nodes, depending on the origin of the event.
+ *
+ * Scroll down to the WithConfigs node for more details.
+ *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
  * March 2010
@@ -12,8 +19,8 @@ var exampleScene = SceneJS.scene({
     loggingElementId: "theLoggingDiv" },
 
         SceneJS.lookAt({
-            eye : { x: 0, y: 2, z: -30},
-            look : { x : 0.0, y : -1.0, z : 0 },
+            eye : { x: 0, y: 2, z: -40},
+            look : { x : 0.0, y : 5.0, z : 0 },
             up : { x: 0.0, y: 1.0, z: 0.0 }
         },
                 SceneJS.camera({
@@ -70,6 +77,9 @@ var exampleScene = SceneJS.scene({
                      *-----------------------------------------------------------------------------------*/
 
                         SceneJS.withConfigs({
+
+                            once: true, // Forget my config map as soon as I've applied it - dont keep reapplying it!
+
                             listeners: {
                                 "picked":{
                                     fn : function(self, params) {
@@ -79,7 +89,7 @@ var exampleScene = SceneJS.scene({
                                          * its "#teapot1-rotate" rotate node to spin it around
                                          */
 
-                                        if (params.url.match("^teapot1") == "teapot1") {
+                                        if (params.uri.match("^teapot1") == "teapot1") {
                                             self.setConfigs({
                                                 "#teapot1" : {
                                                     "#teapot1-rotate": {
@@ -94,12 +104,13 @@ var exampleScene = SceneJS.scene({
                                          * replace it with a sphere
                                          */
 
-                                        if (params.url.match("^teapot2") == "teapot2") {
-                                            self.setOnce(true); // Only apply these configs once then forget them
+                                        if (params.uri.match("^teapot2") == "teapot2") {
                                             self.setConfigs({
-                                                "#mount-point" : {
-                                                    "-node": "remove-me",
-                                                    "+node": SceneJS.objects.sphere()
+                                                "#teapot2" : {
+                                                    "#mount-point" : {
+                                                        "-node": "remove-me",
+                                                        "+node": SceneJS.objects.sphere()
+                                                    }
                                                 }
                                             });
                                         }
@@ -109,11 +120,44 @@ var exampleScene = SceneJS.scene({
                                          * into its "teapot3-color" Material node
                                          */
 
-                                        if (params.url.match("^teapot3") == "teapot3") {
+                                        if (params.uri.match("^teapot3") == "teapot3") {
                                             self.setConfigs({
                                                 "#teapot3" : {
                                                     "#teapot3-color": {
                                                         baseColor: {r: 0.9, g: 0.3, b: 0.3 }
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                        /*
+                                         * When "teapot4" is picked, we'll splice translation and rotation
+                                         * transforms above it to lift it out of the row while spinning it
+                                         */
+
+                                        if (params.uri.match("^teapot4") == "teapot4") {
+                                            self.setConfigs({
+                                                "#teapot4" : {
+                                                    "#mount-point" : function() {
+                                                        var insertAt = this.findNodeIndex("insert-here");
+                                                        if (insertAt >= 0) {
+                                                            var startTime = (new Date()).getTime();
+                                                            var removedNode = this.removeNodeAt(insertAt);
+                                                            var newSubGraph =
+                                                                    SceneJS.translate(
+                                                                            function() {
+                                                                                var y = ((new Date()).getTime() - startTime) * 0.005;
+                                                                                return { y: y < 10 ? y : 10 };
+                                                                            },
+                                                                            SceneJS.rotate(
+                                                                                    function() {
+                                                                                        var angle = ((new Date()).getTime() - startTime) * 0.05;
+                                                                                        return {x: 1, angle: angle < 360 ? angle : 0 };
+                                                                                    },
+                                                                                    removedNode));
+
+                                                            this.insertNode(newSubGraph, insertAt);
+                                                        }
                                                     }
                                                 }
                                             });
@@ -169,18 +213,49 @@ var exampleScene = SceneJS.scene({
                                                     specular:       0.9,
                                                     shine:          6.0
                                                 },
-                                                        SceneJS.objects.teapot())))
+                                                        SceneJS.objects.teapot()))),
+
+                            /*
+                             * "teapot4"
+                             */
+
+                                SceneJS.node({ sid: "teapot4" },
+                                        SceneJS.translate({ x: -14 },
+                                                SceneJS.material({
+                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                    specular:       0.9,
+                                                    shine:          6.0
+                                                },
+                                                        SceneJS.node({ sid: "mount-point"},
+                                                                SceneJS.node({ sid: "insert-here"},
+                                                                        SceneJS.objects.teapot())))))
                                 )
                         )
                 )
         );
 
-exampleScene.render();
+
+/*----------------------------------------------------------------------
+ * Scene rendering stuff follows
+ *---------------------------------------------------------------------*/
+var pInterval;
+
+var x = 0;
+window.render = function() {
+    exampleScene.render();
+};
+
+SceneJS.addListener("error", function(e) {
+    window.clearInterval(pInterval);
+    alert(e.exception.message ? e.exception.message : e.exception);
+});
+
+pInterval = setInterval("window.render()", 10);
 
 var canvas = document.getElementById("theCanvas");
 
 canvas.addEventListener('mousedown', function (event) {
     exampleScene.pick(event.clientX, event.clientY);
 }, false);
-
 

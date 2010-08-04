@@ -231,6 +231,10 @@ SceneJS.Node._ArgParser = new (function() {
          */
         if (args.length > 0) {
             var arg = args[0];
+            if (!arg) {
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
+                        ("First element in node config is null or undefined"));
+            }
             if (arg instanceof Function) {
                 this._parseConfigFunc(arg, args, 1, node);
             } else if (arg._render) {   // Determines arg to be a node
@@ -378,6 +382,10 @@ SceneJS.Node._ArgParser = new (function() {
         arg._resetMemoLevel(); // In case child is a pruned and grafted subgraph
         if (i < args.length) {
             arg = args[i];
+            if (!arg) {
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
+                        ("Node argument " + i + " is null or undefined"));
+            }
             if (arg._nodeType) {
                 this._parseChild(arg, args, i + 1, node);
             } else {
@@ -440,7 +448,11 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
             if (childConfigs && child._sid) {
                 childConfigs = childConfigs[child._sid];
                 if (childConfigs) {
-                    configUnsetters = this._setConfigs(childConfigs, traversalContext.configsModes, child, data);
+                    if (childConfigs instanceof Function) {
+                        childConfigs.call(child, data);
+                    } else {
+                        configUnsetters = this._setConfigs(childConfigs, traversalContext.configsModes, child, data);
+                    }
                 }
             }
             childTraversalContext = {
@@ -662,6 +674,11 @@ SceneJS.Node.prototype.removeNodeAt = function(index) {
  * @returns {SceneJS.Node} The removed child node if located, else null
  */
 SceneJS.Node.prototype.removeNode = function(sid) {
+    if (!sid) {
+        throw SceneJS._errorModule.fatalError(
+                new SceneJS.errors.InvalidSceneGraphException(
+                        "SceneJS.Node#removeNode - target node not defined"));
+    }
     for (var i = 0; i < this._children.length; i++) {
         if (this._children[i].getSID() == sid) {
             return this.removeNodeAt(i);
@@ -695,6 +712,56 @@ SceneJS.Node.prototype.addNode = function(node) {
     node._resetMemoLevel();
     return node;
 };
+//
+///** Attaches a new child node as a spliced parent of an existing target child
+// * @param {string} sid SID of target child node
+// * @param {SceneJS.Node} node Node to splice
+// * @return {SceneJS.Node} The spliced node
+// */
+//SceneJS.Node.prototype.spliceNode = function(sid, node) {
+//    if (!sid) {
+//        throw SceneJS._errorModule.fatalError(
+//                new SceneJS.errors.InvalidSceneGraphException(
+//                        "SceneJS.Node#spliceNode - target node not defined"));
+//    }
+//    var targetNodeIndex = this._findNodeIndex(sid);
+//    if (targetNodeIndex == -1) {
+//        new SceneJS.errors.InvalidSceneGraphException(
+//                "SceneJS.Node#spliceNode - target node not found with this SID: '" + sid + "'");
+//    }
+//    if (!node) {
+//        throw SceneJS._errorModule.fatalError(
+//                new SceneJS.errors.InvalidSceneGraphException(
+//                        "SceneJS.Node#spliceNode - node argument is undefined"));
+//    }
+//    if (node._parent != null) {
+//        throw SceneJS._errorModule.fatalError(
+//                new SceneJS.errors.InvalidSceneGraphException(
+//                        "SceneJS.Node#spliceNode - node to splice is still attached to another parent!"));
+//    }
+//    var targetNode = this._children[targetNodeIndex];
+//
+//    this._children[targetNodeIndex] = node;
+//    node._parent = this;
+//
+//    node._children.push(targetNode);
+//    targetNode._parent = node;
+//
+//    node._resetMemoLevel();
+//    targetNode._resetMemoLevel();
+//    return node;
+//};
+
+/** @private
+ */
+SceneJS.Node.prototype.findNodeIndex = function(sid) {
+    for (var i = 0; i < this._children.length; i++) {
+        if (this._children[i].getSID() == sid) {
+            return i;
+        }
+    }
+    return -1;
+};
 
 /** Inserts a child node
  * @param {SceneJS.Node} node Child node
@@ -719,6 +786,9 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
     node._resetMemoLevel();
     return node;
 };
+
+
+
 
 /**
  * Registers a listener for a given event on this node. If the event type

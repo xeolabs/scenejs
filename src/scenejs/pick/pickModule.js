@@ -9,7 +9,7 @@ SceneJS._pickModule = new (function() {
     var boundPickBuf = null;           // Pick buffer for currently active scene while picking
     var color = { r: 0, g: 0, b: 0 };
     var sidStack = [];
-    var nodeArray = [];
+    var nodeArray = new Array(1000);
     var pickX = null;
     var pickY = null;
     var debugCfg = null;
@@ -26,7 +26,7 @@ SceneJS._pickModule = new (function() {
             SceneJS._eventModule.INIT,
             function() {
                 SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
-                debugCfg = SceneJS._debugModule.getConfigs("pick"); // TODO: debug mode only changes on reset
+                debugCfg = SceneJS._debugModule.getConfigs("picking"); // TODO: debug mode only changes on reset
                 scenePickBufs = {};
                 boundPickBuf = null;
             });
@@ -166,9 +166,9 @@ SceneJS._pickModule = new (function() {
                 };
                 if (debugCfg.logTrace) {
                     SceneJS._loggingModule.info(
-                            "Mapping pick index to node: " + nodeIndex + " => " + sidStack.join("/"));
+                            "Mapping pick index to color/node: " + nodeIndex + " => {r:" + color.r + ", g:" + color.g + ", b:" + color.b + "} " + sidStack.join("/"));
                 }
-                nodeIndex++;
+                nodeIndex+=1;
             }
 
             /* Track pick event observer
@@ -229,10 +229,10 @@ SceneJS._pickModule = new (function() {
 
     function readPickBuffer() {
         var context = boundPickBuf.canvas.context;
-        var pix = context.readPixels(pickX, boundPickBuf.canvas.canvas.height - pickY, 1, 1, context.RGB, context.UNSIGNED_BYTE);
+        var pix = context.readPixels(pickX, boundPickBuf.canvas.canvas.height - pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
         if (!pix) {  //  http://asalga.wordpress.com/2010/07/14/compensating-for-webgl-readpixels-spec-changes/
-            pix = new WebGLUnsignedByteArray(3);
-            context.readPixels(pickX, boundPickBuf.canvas.height - pickY, 1, 1, context.RGB, context.UNSIGNED_BYTE, pix);
+            pix = new WebGLUnsignedByteArray(4);
+            context.readPixels(pickX, boundPickBuf.canvas.height - pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
         }
         if (debugCfg.logTrace) {
             SceneJS._loggingModule.info("Reading pick buffer - picked pixel(" + pickX + ", " + pickY + ") = {r:" + pix[0] + ", g:" + pix[1] + ", b:" + pix[2] + "}");
