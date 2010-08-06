@@ -231,8 +231,8 @@ SceneJS._pickModule = new (function() {
         var context = boundPickBuf.canvas.context;
         var pix = context.readPixels(pickX, boundPickBuf.canvas.canvas.height - pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
         if (!pix) {  //  http://asalga.wordpress.com/2010/07/14/compensating-for-webgl-readpixels-spec-changes/
-            pix = new WebGLUnsignedByteArray(4);
-            context.readPixels(pickX, boundPickBuf.canvas.height - pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
+            pix = new WebGLUnsignedByteArray(4);            
+            context.readPixels(pickX, boundPickBuf.canvas.canvas.height - pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
         }
         if (debugCfg.logTrace) {
             SceneJS._loggingModule.info("Reading pick buffer - picked pixel(" + pickX + ", " + pickY + ") = {r:" + pix[0] + ", g:" + pix[1] + ", b:" + pix[2] + "}");
