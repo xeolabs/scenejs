@@ -1,8 +1,8 @@
 /**
  *@class Root node of a SceneJS scene graph.
  *
- * <p>This is entry and exit point for execution when rendering one frame of a scene graph, while also providing
- * the means to configure global data scope values and configurations for each frame. </p>
+ * <p>This is entry and exit point for traversal of a scene graph, providing the means to inject data, pick 
+ * {@link SceneJS.Geometry} and render frames either singularly or in a continuous loop.</p>
  * <p><b>Binding to a canvas</b></p>
  * <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
  * element for the scene to render to. When that is omitted, the node will look for one with the default ID of
@@ -89,6 +89,29 @@
  * take an immutable data object, which is SceneJS's mechanism for passing variables down into scene graphs. Using the
  * yaw and pitch properties on that data object, our functions create configurations that specify rotations about
  * the X and Y axis. See also how we inject those angles when we render the scene.</p>
+ * <h2>Rendering in a Loop</h2>
+ * <p>If you wanted to animate the rotation within the scene example above, then instead of rendering just a single frame
+ * you could start a rendering loop on the scene, as shown below:</p>
+ * <pre><code>
+ *    var yaw = 0.0;
+ *    var pitch = 20.0
+ *
+ *    myScene.start({
+ *
+ *        // Idle function called before each render traversal
+ *
+ *        idleFunc: function(scene) {
+ *             scene.setData({ yaw: yaw, pitch: 20 };
+ *
+ *             yaw += 2.0;
+ *             if (yaw == 360) {
+ *                 scene.stop();
+ *             }
+ *        },
+ *
+ *        fps: 20
+ * });
+ * </code></pre>
  * @extends SceneJS.Node
  */
 SceneJS.Scene = function() {
@@ -127,10 +150,89 @@ SceneJS.Scene.prototype.getCanvasId = function() {
 };
 
 /**
- * Sets a map of values to set on the global scene data scope. This data will then be available
- * to any configuration callbacks that are used to configure nodes. The map is the same as that
- * configured on a {@link SceneJS.WithData} and works the same way. The given values will be forgotten
- * when the scene is next rendered with {@link #render}.
+ * Starts the scene rendering repeatedly in a loop. After this {@link #isRunning} will return true, and you can then stop it again
+ * with {@link #stop}. You can specify an idleFunc that will be called within each iteration before the scene graph is
+ * traversed for the next frame. You can also specify the desired number of frames per second to render, which SceneJS
+ * will attempt to achieve.
+ *
+ * To render just one frame at a time, use {@link #render}.
+ *
+ * <p><b>Usage Example: Basic Loop</b></p><p>Here we are rendering a scene in a loop, at each frame feeding some data into it
+ * (see main {@link SceneJS.Scene} comment for more info on that), then stopping the loop after ten frames are rendered:</p>
+ *
+ * <pre><code>
+ * var n = 0;
+ * myScene.start({
+ *     idleFunc: function(scene) {
+ *
+ *         scene.setData({ someData: 5, moreData: 10 };
+ *
+ *         n++;
+ *         if (n == 100) {
+ *             scene.stop();
+ *         }
+ *     },
+ *     fps: 20
+ * });
+ * </code></pre>
+ *
+ *
+ * <p><b>Usage Example: Picking</b></p><p>The snippet below shows how to do picking via the idle function, where we
+ * retain the mouse click event in some variables which are collected when the idleFunc is next called. The idleFunc
+ * then puts the scene into picking mode for the next traversal. Then any {@link SceneJS.Geometry} intersecting the
+ * canvas-space coordinates during that traversal will fire a "picked" event to be observed by "picked" listeners at
+ * higher nodes (see examples, wiki etc. for the finer details of picking). After the traversal, the scene will be back
+ * "rendering" mode again.</p>
+ *
+ * <pre><code>
+ * var clicked = false;
+ * var clickX, clickY;
+ *
+ * canvas.addEventListener('mousedown',
+ *     function (event) {
+ *         clicked = true;
+ *         clickX = event.clientX;
+ *         clickY = event.clientY;
+ * }, false);
+ *
+ * myScene.start({
+ *     idleFunc: function(scene) {
+ *         if (clicked) {
+ *             scene.pick(clickX, clickY);
+ *             clicked = false;
+ *         }
+ *     }
+ * });
+ * </code></pre>
+ * @param cfg
+ */
+SceneJS.Scene.prototype.start = function(cfg) {
+    if (!this._running) {
+        this._running = true;
+        var self = this;
+        var fnName = "__scenejs_renderScene" + this._sceneId;
+        window[fnName] = function() {
+            if (cfg.idleFunc) {
+                cfg.idleFunc(self);
+            }
+            if (self._running) { // idleFunc may have stopped render loop
+                self.render();
+            }
+        };
+        this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 10));
+    }
+};
+
+/** Returns true if the scene is currently rendering repeatedly in a loop after being started with {@link #start}.
+ */
+SceneJS.Scene.prototype.isRunning = function() {
+    return this._running;
+};
+
+/**
+ * Sets a map of values to set on the global scene data scope when the scene is next rendered.
+ * This data will then be available to any configuration callbacks that are used to configure nodes. The map is the same
+ * as that configured on a {@link SceneJS.WithData} and works the same way.
  * @param {object} values Values for the global scene data scope, same format as that given to {@link SceneJS.WithData}
  */
 SceneJS.Scene.prototype.setData = function(values) {
@@ -148,9 +250,8 @@ SceneJS.Scene.prototype.getData = function() {
 };
 
 /**
- * Sets a map of values to set on nodes in the scene graph as they are rendered. The map is the same as that
- * configured on a {@link SceneJS.WithConfigs} and works the same way. The given values will be forgotten
- * when the scene is next rendered with {@link #render}.
+ * Sets a map of values to set on target nodes in the scene graph when the scene is next rendered. The map is the same as that
+ * configured on a {@link SceneJS.WithConfigs} and works the same way.
  * @param {object} values Map of values, same format as that given to {@link SceneJS.WithConfigs}
  */
 SceneJS.Scene.prototype.setConfigs = function(values) {
@@ -159,7 +260,7 @@ SceneJS.Scene.prototype.setConfigs = function(values) {
 };
 
 /**
- * Returns any config values map previously set with {@link #setConfigs} since the last call to {@link #render}.
+ * Returns the config values map that was last set with {@link #setConfigs}.
  *
  * @returns {Object} The config values map
  */
@@ -168,10 +269,19 @@ SceneJS.Scene.prototype.getConfigs = function() {
 };
 
 /**
- * Renders the scene, applying any config and data scope values given to {@link #setData} and {#link setConfigs},
- * retaining those values in the scene afterwards.
+ * Immediately renders one frame of the scene, applying any config and data scope values given to {@link #setData} and
+ * {#link #setConfigs}, retaining those values in the scene afterwards. Has no effect if the scene has been
+ * {@link #start}ed and is currently rendering in a loop.
  */
 SceneJS.Scene.prototype.render = function() {
+    if (!this._running) {
+        this._render();
+    }
+};
+
+/** @private
+ */
+SceneJS.Scene.prototype._render = function() {
     if (!this._sceneId) {
         this._sceneId = SceneJS._sceneModule.createScene(this, this._getParams());
     }
@@ -182,9 +292,11 @@ SceneJS.Scene.prototype.render = function() {
 };
 
 /**
- * Renders the scene while picking whatever is rendered at the given canvas coordinates.
- * If a node is picked, then all nodes on the traversal path to that node
- * that have "picked" listeners will receive a "picked" event as they are rendered.
+ * Picks whatever {@link SceneJS.Geometry} will be rendered at the given canvas coordinates. When this is called within
+ * the idle function of a currently running render loop (ie. started with {@link #start) then pick will be performed on
+ * the next render. When called on a non-running scene, the pick is performed immediately.
+ * When a node is picked (hit), then all nodes on the traversal path to that node that have "picked" listeners will
+ * receive a "picked" event as they are rendered (see examples and wiki for more info).
  *
  * @param canvasX Canvas X-coordinate
  * @param canvasY Canvas Y-coordinate
@@ -195,8 +307,10 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
                 ("Attempted pick on Scene that has been destroyed or not yet rendered");
     }
     SceneJS._pickModule.pick(canvasX, canvasY); // Enter pick mode
-    this.render();  // Pick-mode traversal, resets to render-mode afterwards
-    this.render();  // Render-mode traversal
+    if (!this._running) {
+        this._render(); // Pick-mode traversal - get picked element and fire events
+        this._render(); // Render-mode traversal - process events with listeners while drawing
+    }
 };
 
 /**
@@ -213,10 +327,12 @@ SceneJS.Scene.prototype.getNumProcesses = function() {
 /** Destroys this scene. You should destroy
  * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
  * resources for it (eg. shaders, VBOs etc) that are no longer in use. A destroyed scene
- * becomes un-destroyed as soon as you render it again.
+ * becomes un-destroyed as soon as you render it again. If the scene is currently rendering in a loop (after a call
+ * to {@link #start}) then the loop is stopped.
  */
 SceneJS.Scene.prototype.destroy = function() {
     if (this._sceneId) {
+        this.stop();
         SceneJS._sceneModule.destroyScene(this._sceneId); // Last one fires RESET command
         this._sceneId = null;
     }
@@ -227,6 +343,16 @@ SceneJS.Scene.prototype.destroy = function() {
  */
 SceneJS.Scene.prototype.isActive = function() {
     return (this._sceneId != null);
+};
+
+/** Stops current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
+ */
+SceneJS.Scene.prototype.stop = function() {
+    if (this._running) {
+        this._running = false;
+        window["__scenejs_renderScene" + this._sceneId] = null;
+        window.clearInterval(this._pInterval);
+    }
 };
 
 /** Factory function that returns a new {@link SceneJS.Scene} instance
@@ -256,34 +382,3 @@ SceneJS.reset = function() {
     }
 };
 
-//
-//SceneJS._Visitor = (function() {
-//    this._nodeStack = new Object[5000];
-//    this._nStack = 0;
-//
-//
-//    this.visit = function(node, tc, data) {
-//        this._nodeStack[this._nStack++] = node;
-//        while (this._nStack > 0) {
-//            node = this._nodeStack[--this._nStack];
-//            node._visited = true;
-//            node._preRender(tc, data);
-//            for (var i = 0; i < node._children.length; i++) {
-//
-//            }
-//
-//        }
-//
-//
-//        node._preRender(tc, data);
-//        node._render(tc, data);
-//        node._postRender(tc, data);
-//    };
-//
-//    this.visitChildren = function(children, tc, data) {
-//        node._preRender(tc, data);
-//        node._render(tc, data);
-//
-//        node._postRender(tc, data);
-//    };
-//});
