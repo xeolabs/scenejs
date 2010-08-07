@@ -2,8 +2,8 @@
 
     <property name="BUILD_MAJOR" value="0"/>
     <property name="BUILD_MINOR" value="7"/>
-    <property name="BUILD_ID" value="6"/>
-    <property name="PATCH_ID" value="2"/>
+    <property name="BUILD_ID" value="7"/>
+    <property name="PATCH_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
     <property name="SRC_DIR" location="${basedir}/src"/>
@@ -101,7 +101,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/socket/socketModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/socket/socket.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
-        <!-- Must be last to intercept viewport update events -->
     </path>
 
     <target name="all" depends="archive"/>
