@@ -243,7 +243,7 @@ SceneJS._shaderModule = new (function() {
      * When in pick mode, then with the pick fragment shader loaded, we'll get the
      * pick color instead of a material
      */
-     SceneJS._eventModule.addListener(
+    SceneJS._eventModule.addListener(
             SceneJS._eventModule.PICK_COLOR_EXPORTED,
             function(p) {
                 activeProgram.setUniform("uPickColor", p.pickColor);
@@ -469,12 +469,16 @@ SceneJS._shaderModule = new (function() {
      * @private
      */
     function composePickingFragmentShader() {
-//        var g = parseFloat(Math.round((10 + 1) / 256) / 256);  // TODO: use exported pick color
-//        var r = parseFloat((10 - g * 256 + 1) / 256);
+        //        var g = parseFloat(Math.round((10 + 1) / 256) / 256);  // TODO: use exported pick color
+        //        var r = parseFloat((10 - g * 256 + 1) / 256);
         var src = [
+            "#ifdef GL_ES",
+            "   precision highp float;",
+            "#endif",
+
             "uniform vec3 uPickColor;",
             "void main(void) {",,
-                  "    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ",
+            "    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ",
             "}"
         ];
         if (debugCfg.logScripts == true) {
@@ -598,6 +602,10 @@ SceneJS._shaderModule = new (function() {
         var lighting = (lights.length > 0 && geometry.normalBuf);
 
         var src = ["\n"];
+                
+        src.push("#ifdef GL_ES");
+        src.push("   precision highp float;");
+        src.push("#endif");
 
         src.push("varying vec4 vViewVertex;");              // View-space vertex
 
@@ -825,7 +833,7 @@ SceneJS._shaderModule = new (function() {
         } else {
             src.push("gl_FragColor = fragColor;");
         }
-        if (debugCfg.whitewash == true) {           
+        if (debugCfg.whitewash == true) {
             src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         }
         src.push("}");
