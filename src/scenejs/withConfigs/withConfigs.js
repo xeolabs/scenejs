@@ -264,9 +264,9 @@ SceneJS.WithConfigs.prototype._render = function(traversalContext, data) {
     //            this._memoLevel = 2;
     //        }
     //    }
-    traversalContext = {
-        appendix : traversalContext.appendix,
+    traversalContext = {               
         insideRightFringe: this._children.length > 1,
+        callback : traversalContext.callback,
         configs : this._configs,
         configsModes : this._configsModes
     };

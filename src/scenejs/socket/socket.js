@@ -220,9 +220,9 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
 
                         /* Configuration message
                          */
-                        traversalContext = {
-                            appendix : traversalContext.appendix,
+                        traversalContext = {                            
                             insideRightFringe: _self._children.length > 1,
+                            callback : traversalContext.callback,
                             configs : _self._preprocessConfigs(messageBody.configs),
                             configsModes : _self._configsModes // TODO configsModes in message?
                         };
