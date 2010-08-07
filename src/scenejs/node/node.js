@@ -536,7 +536,7 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
 /** @private */
 SceneJS.Node.prototype._render = function(traversalContext, data) {
     if (!this._fixedParams) {
-        this._init(this._getParams(data));
+        this._init(this._getParams.call(this, data));
     }
     this._renderNodes(traversalContext, data);
 };
