@@ -72,7 +72,7 @@
  *
  *      listeners: {
  *         "state-changed" : {
- *              fn: function(theNode, params) {
+ *              fn: function(params) {
  *                  switch (params.newState) {
  *                      case SceneJS.Socket.STATE_CONNECTING:
  *
