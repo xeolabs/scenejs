@@ -57,8 +57,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                                 SceneJS.node({ sid: "spheres",
                                     listeners: {
                                         "picked":{
-                                            fn : function(theNode, params) {
-                                                alert(theNode.getSID() + " handling 'picked' from " + params.uri);
+                                            fn : function(params) {
+                                                alert(this.getSID() + " handling 'picked' from " + params.uri);
                                             }
                                         }
 
@@ -97,8 +97,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                                         SceneJS.node({ sid: "green-group",
                                             listeners: {
                                                 "picked":{
-                                                    fn : function(theNode, params) {
-                                                        alert(theNode.getSID() + " handling 'picked' from " + params.uri);
+                                                    fn : function(params) {
+                                                        alert(this.getSID() + " handling 'picked' from " + params.uri);
                                                     }
                                                 }
 
@@ -115,8 +115,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                                                                 SceneJS.node({ sid: "right-green-sphere",
                                                                     listeners: {
                                                                         "picked":{
-                                                                            fn : function(theNode, params) {
-                                                                                alert(theNode.getSID() + " handling 'picked' from " + params.uri);
+                                                                            fn : function(params) {
+                                                                                alert(this.getSID() + " handling 'picked' from " + params.uri);
                                                                             }
                                                                         }
 
@@ -130,8 +130,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                                                                 SceneJS.node({ sid: "left-green-sphere",
                                                                     listeners: {
                                                                         "picked":{
-                                                                            fn : function(theNode, params) {
-                                                                                alert(theNode.getSID() + " handling 'picked' from " + params.uri);
+                                                                            fn : function(params) {
+                                                                                alert(this.getSID() + " handling 'picked' from " + params.uri);
                                                                             }
                                                                         }
 

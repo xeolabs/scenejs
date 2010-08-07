@@ -137,8 +137,6 @@
  * constructor on a static config object, or at any time on a node instance through its {@link #addListener} method.</p>
  * <p><b>Registering listeners on configuration</b></p>
  * <p>The example below creates a {@link SceneJS.Instance} node, with a "state-changed" listener registered through its constructor.
- * See how the listener can have an optional <b>options</b> object, which in this case specifies the JavaScript scope on
- * which to invoke the handler function.</p>
  * <pre><code>
  * var myLoad = new SceneJS.Instance({
  *
@@ -146,12 +144,9 @@
  *
  *                  listeners: {
  *                        "state-changed" : {
- *                                fn: function(node, params) {
- *                                       alert("Node " + node.getType() + " has changed state to " + params.newState);
- *                                    },
- *                                options: {
- *                                    scope: this            // Optional scope for handler call, defaults to this
- *                                }
+ *                                fn: function(params) {
+ *                                       alert("Node " + this.getType() + " has changed state to " + params.newState);
+ *                                    }
  *                         }
  *                  }
  *             }
@@ -160,17 +155,11 @@
  * <p><b>Registering and de-registering listeners on node instances</b></p>
  * <p>This example registers a "state-changed" listener on an existing instance of the node, then removes it again:</p>
  * <pre><code>
- * var handler = function(node, params) {
- *                  alert("Node " + node.getType() + " has changed state to " + node.getState());
+ * var handler = function(params) {
+ *                  alert("Node " + this.getType() + " has changed state to " + this.getState());
  *              };
  *
- * myLoad.addListener("state-changed", handler,
- *
- *              // Listener options
- *
- *              {
- *                    scope: this
- *              });
+ * myLoad.addListener("state-changed", handler);
  *
  * myLoad.removeListener("state-changed", handler);
  * </code></pre>
@@ -807,13 +796,6 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
  *                       params) {  // Whatever params accompany the event type
  *
  *                     // ...
- *              },
- *
- *              // options
- *              {
- *                     // Optional scope on which handler is
- *                     // called - default is this
- *                     scope: this
  *              }
  * );
  *
@@ -852,7 +834,7 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params) {
         }
         for (var i = 0; i < list.length; i++) {
             var listener = list[i];
-            listener.fn.call(listener.options.scope || this, this, params);
+            listener.fn.call(this, params);
         }
     }
 };

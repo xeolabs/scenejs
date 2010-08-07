@@ -82,7 +82,7 @@ var exampleScene = SceneJS.scene({
 
                             listeners: {
                                 "picked":{
-                                    fn : function(self, params) {
+                                    fn : function(params) {
 
                                         /*
                                          * When "teapot1" is picked, we'll push a new angle down into
@@ -90,7 +90,7 @@ var exampleScene = SceneJS.scene({
                                          */
 
                                         if (params.uri.match("^teapot1") == "teapot1") {
-                                            self.setConfigs({
+                                            this.setConfigs({
                                                 "#teapot1" : {
                                                     "#teapot1-rotate": {
                                                         angle: 60
@@ -105,7 +105,7 @@ var exampleScene = SceneJS.scene({
                                          */
 
                                         if (params.uri.match("^teapot2") == "teapot2") {
-                                            self.setConfigs({
+                                            this.setConfigs({
                                                 "#teapot2" : {
                                                     "#mount-point" : {
                                                         "-node": "remove-me",
@@ -121,7 +121,7 @@ var exampleScene = SceneJS.scene({
                                          */
 
                                         if (params.uri.match("^teapot3") == "teapot3") {
-                                            self.setConfigs({
+                                            this.setConfigs({
                                                 "#teapot3" : {
                                                     "#teapot3-color": {
                                                         baseColor: {r: 0.9, g: 0.3, b: 0.3 }
@@ -136,7 +136,7 @@ var exampleScene = SceneJS.scene({
                                          */
 
                                         if (params.uri.match("^teapot4") == "teapot4") {
-                                            self.setConfigs({
+                                            this.setConfigs({
                                                 "#teapot4" : {
                                                     "#mount-point" : function() {
                                                         var insertAt = this.findNodeIndex("insert-here");
