@@ -80,9 +80,9 @@ var SceneJS = {
         if (i == 0 || i == -1) {
             return "";
         }
-        return url.substr(0, i+1);
+        return url.substr(0, i + 1);
     },
-    
+
     /**
      * Returns true if object is an array
      * @private
@@ -90,33 +90,27 @@ var SceneJS = {
     _isArray : function(testObject) {
         return testObject && !(testObject.propertyIsEnumerable('length'))
                 && typeof testObject === 'object' && typeof testObject.length === 'number';
+    },
+
+    /**
+     * ID map of all existing nodes.
+     * Referenced by {@link SceneJS.Node}.
+     * @private
+     */
+    _nodeIDMap : {},
+
+    /** Finds a {@link SceneJS.Node} by ID
+     *
+     * @param id ID of {@link SceneJS.Node} to find
+     * @returns {SceneJS.Node} The node else null if not found
+     */
+    getNode : function(id) {
+        return SceneJS._nodeIDMap[id];
     }
-    //,
 
-    //    _debugEnabled : {},
-    //
-    //    /**
-    //     * Enables of disables debugging mode
-    //     * @param enabled
-    //     */
-    //    setDebugging : function(key, enabled) {
-    //        this._debugEnabled[key] = enabled;
-    //    },
-    //
-    //    /** Gets whether debug mode is enabled or not
-    //     * @returns {boolean} True if debugging enabled else false
-    //     */
-    //    getDebugging : function(key) {
-    //        return this._debugEnabled[key];
-    //    }
-
-}
-        ;
+};
 
 SceneJS._namespace("SceneJS");
-
-
-
 
 window["SceneJS"] = SceneJS;
 

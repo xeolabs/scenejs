@@ -171,6 +171,14 @@
  * @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
 SceneJS.Node = function() {
+
+    /* Register this node on SceneJS
+     */
+    if (!this._id) {
+        this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
+        SceneJS._nodeIDMap[this._id] = this;
+    }
+
     this._nodeType = "node";
     this._NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
     this._sid = null;
@@ -563,6 +571,14 @@ SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
         }
     }
     child._render.call(child, traversalContext, data);
+};
+
+/**
+ * Returns the SceneJS-assigned ID of the node.
+ * @returns {string} Node's ID
+ */
+SceneJS.Node.prototype.getID = function() {
+    return this._id;
 };
 
 /**
