@@ -49,6 +49,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/nodeEvents/nodeEventsModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/symbol.js"/>

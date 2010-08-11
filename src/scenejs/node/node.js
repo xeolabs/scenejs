@@ -137,6 +137,8 @@
  * constructor on a static config object, or at any time on a node instance through its {@link #addListener} method.</p>
  * <p><b>Registering listeners on configuration</b></p>
  * <p>The example below creates a {@link SceneJS.Instance} node, with a "state-changed" listener registered through its constructor.
+ * To specify event-handling options, specify an object containing the handler function and your selected options. When no options
+ * are required, just specify the function.
  * <pre><code>
  * var myLoad = new SceneJS.Instance({
  *
@@ -146,8 +148,18 @@
  *                        "state-changed" : {
  *                                fn: function(params) {
  *                                       alert("Node " + this.getType() + " has changed state to " + params.newState);
+ *                                    },
+ *                                options: {
+ *                                     // Whatever event-handling options are supported (none yet as of V0.7.7)
+ *                                }
+ *                         },
+ *
+ *                         // You can specify just the listener's function
+ *                         // when there are no options to specify
+ *
+ *                         "rendering" : function(params) {
+ *                                       alert("Node " + this.getType() + " is rendering");
  *                                    }
- *                         }
  *                  }
  *             }
  *        );
@@ -186,7 +198,9 @@ SceneJS.Node = function() {
     this._fixedParams = true;
     this._parent = null;
     this._listeners = {};
-    this._events = []; // FIFO queue for each event listener
+    this._numListeners = 0; // Useful for quick check whether node observes any events
+    this._eventsIn = []; // FIFO queue for each event listener
+    this._eventsOut = []; // FIFO queue for events fired from this node with #fireEvent, flushed after each render
 
     /* Used by many node types to track the level at which they can
      * memoise internal state. When rendered, a node increments
@@ -250,19 +264,30 @@ SceneJS.Node._ArgParser = new (function() {
         for (var eventName in listeners) {
             if (listeners.hasOwnProperty(eventName)) {
                 var l = listeners[eventName];
-                if (!l.fn) {
-                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                            ("Listener 'fn' missing in node config"));
-                }
-                if (!(l.fn instanceof Function)) {
-                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                            ("Listener 'fn' invalid in node config - is not a function"));
+
+                /* A listener can be either an object containing a function
+                 * and options, or just the function for brevity
+                 */
+                if (l instanceof Function) {
+                    l = {
+                        fn: l
+                    };
+                } else {
+                    if (!l.fn) {
+                        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
+                                ("Listener 'fn' missing in node config"));
+                    }
+                    if (!(l.fn instanceof Function)) {
+                        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
+                                ("Listener 'fn' invalid in node config - is not a function"));
+                    }
                 }
                 l.options = l.options || {};
                 if (!node._listeners[eventName]) {
                     node._listeners[eventName] = [];
                 }
                 node._listeners[eventName].push(l);
+                node._numListeners++;
             }
         }
     };
@@ -404,7 +429,6 @@ SceneJS.Node.prototype._resetMemoLevel = function() {
     }
 };
 
-
 /** @private
  *
  * Recursively renders a node's child list. This is effectively rendering a subtree,
@@ -421,6 +445,8 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
     var childConfigs;
     var i;
     var configUnsetters;
+
+
 
     var savedName;  // Saves SID path for when rendering subgraph of Instance  
     if (this._sidPath) {
@@ -475,6 +501,7 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
                 /* The node is within the subtree of a Symbol - Instance has provided a
                  * callback to render the Instance's child nodes as if they were children
                  * of the last node in the subtree
+                 * of the last node in the subtree
                  */
                 traversalContext.callback(traversalContext, data);
             }
@@ -486,11 +513,24 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
         SceneJS._instancingModule.popName();
     }
 
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-        SceneJS._pickModule.postVisitNode(this);
-    }
+//    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+//        SceneJS._pickModule.postVisitNode(this);
+//    }
+
+
 };
 
+/**
+ * Fires all buffered outgoing events
+ * @private
+ */
+SceneJS.Node.prototype._flushEventsOut = function() {
+    var event;
+    while (this._eventsOut.length > 0) {
+        event = this._eventsOut.pop();
+        SceneJS._nodeEventsModule.fireEvent(event.name, event.params);
+    }
+};
 
 SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child, data) {
     //    var handle = {
@@ -528,17 +568,64 @@ SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child,
 };
 
 /**
- * Wraps _render to fire events either side of rendering.
+ * Wraps _render to fire built-in events either side of rendering.
  * @private */
 SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
-    if (this._listeners["rendering"]) { // Optimisation
-        this._fireEvent("rendering", { });
+    SceneJS._nodeEventsModule.preVisitNode(this);
+    this._processEventsIn();
+
+
+    if (this._numListeners == 0) {
+        this._render(traversalContext, data);
+    } else {
+        if (this._listeners["rendering"]) {
+            this._fireEvent("rendering", { });
+        }
+        this._render(traversalContext, data);
+        if (this._listeners["rendered"]) {
+            this._fireEvent("rendered", { });
+        }
     }
-    this._processEvents();
-    this._render(traversalContext, data);
-    if (this._listeners["rendered"]) { // Optimisation
-        this._fireEvent("rendered", { });
+     this._flushEventsOut();
+
+    SceneJS._nodeEventsModule.postVisitNode(this);
+};
+
+/**
+ * Processes all events queued on this node
+ * @private
+ */
+SceneJS.Node.prototype._processEventsIn = function() {
+    var eventsIn = SceneJS._nodeEventsModule.getEvents();
+    if (eventsIn) {
+        var event;
+        while (eventsIn.length > 0) {
+            event = eventsIn.pop();
+            var list = this._listeners[event.name];
+            if (list) {
+                if (!event.params) {
+                    event.params = {};
+                }
+                for (var i = 0; i < list.length; i++) {
+                    var listener = list[i];
+                    listener.fn.call(this, event);
+                }
+            }
+        }
     }
+    //    while (this._eventsIn.length > 0) {
+    //        event = this._eventsIn.pop();
+    //        var list = this._listeners[event.name];
+    //        if (list) {
+    //            if (!event.params) {
+    //                event.params = {};
+    //            }
+    //            for (var i = 0; i < list.length; i++) {
+    //                var listener = list[i];
+    //                listener.fn.call(this, params);
+    //            }
+    //        }
+    //    }
 };
 
 /** @private */
@@ -548,7 +635,6 @@ SceneJS.Node.prototype._render = function(traversalContext, data) {
     }
     this._renderNodes(traversalContext, data);
 };
-
 
 // @private
 SceneJS.Node.prototype._unsetConfigs = function(handle) {
@@ -717,45 +803,6 @@ SceneJS.Node.prototype.addNode = function(node) {
     node._resetMemoLevel();
     return node;
 };
-//
-///** Attaches a new child node as a spliced parent of an existing target child
-// * @param {string} sid SID of target child node
-// * @param {SceneJS.Node} node Node to splice
-// * @return {SceneJS.Node} The spliced node
-// */
-//SceneJS.Node.prototype.spliceNode = function(sid, node) {
-//    if (!sid) {
-//        throw SceneJS._errorModule.fatalError(
-//                new SceneJS.errors.InvalidSceneGraphException(
-//                        "SceneJS.Node#spliceNode - target node not defined"));
-//    }
-//    var targetNodeIndex = this._findNodeIndex(sid);
-//    if (targetNodeIndex == -1) {
-//        new SceneJS.errors.InvalidSceneGraphException(
-//                "SceneJS.Node#spliceNode - target node not found with this SID: '" + sid + "'");
-//    }
-//    if (!node) {
-//        throw SceneJS._errorModule.fatalError(
-//                new SceneJS.errors.InvalidSceneGraphException(
-//                        "SceneJS.Node#spliceNode - node argument is undefined"));
-//    }
-//    if (node._parent != null) {
-//        throw SceneJS._errorModule.fatalError(
-//                new SceneJS.errors.InvalidSceneGraphException(
-//                        "SceneJS.Node#spliceNode - node to splice is still attached to another parent!"));
-//    }
-//    var targetNode = this._children[targetNodeIndex];
-//
-//    this._children[targetNodeIndex] = node;
-//    node._parent = this;
-//
-//    node._children.push(targetNode);
-//    targetNode._parent = node;
-//
-//    node._resetMemoLevel();
-//    targetNode._resetMemoLevel();
-//    return node;
-//};
 
 /** @private
  */
@@ -791,8 +838,6 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
     node._resetMemoLevel();
     return node;
 };
-
-
 
 
 /**
@@ -834,6 +879,7 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
         fn: fn,
         options : options || {}
     });
+    this._numListeners++;
     return this;
 };
 
@@ -857,26 +903,28 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params) {
 
 /**
  * Adds an event to a FIFO queue for the given event type, to be processed when the node is next rendered.
- * @param {String} eventName Event name
- * @param {Object} params Event parameters
+ * @param {String} event.name Event name
+ * @param {Object} event.params Event parameters
+ * @param {String} event.uri Relative SID path to event source node
  * @return this
  */
-SceneJS.Node.prototype.addEvent = function(eventName, params) {
-    this._events.unshift({name : eventName, params: params });
+SceneJS.Node.prototype.addEvent = function(event) { // TODO: not enqeue event when node has no listeners?
+    this._eventsIn.unshift(event);
     return this;
 };
 
-
 /**
- * Processes all events queued on this node
- * @private
+ * Called when this node is being rendered, to fire an event up the path of super-nodes that have been traversed to
+ * arrive at this node, to be processed by those super-nodes that have corresponding listeners, if and when those nodes
+ * are rendered on the next scene traversal.
+ *
+ * @param {String} name Event name
+ * @param {Object} params Event parameters
+ * @return this
  */
-SceneJS.Node.prototype._processEvents = function() {
-    var event;
-    while (this._events.length > 0) {
-        event = this._events.pop();
-        this._fireEvent(event.name, event.params);
-    }
+SceneJS.Node.prototype.fireEvent = function(name, params) {
+    this._eventsOut.unshift({ name: name, params : params });
+    return this;
 };
 
 /**
@@ -898,6 +946,7 @@ SceneJS.Node.prototype.removeListener = function(eventName, fn) {
             return fn;
         }
     }
+    this._numListeners--;
     return null;
 };
 
@@ -911,11 +960,21 @@ SceneJS.Node.prototype.hasListener = function(eventName) {
     return this._listeners[eventName];
 };
 
+/**
+ * Returns true if this node has any listeners at all.
+ *
+ * @return {boolean} True if any listener present
+ */
+SceneJS.Node.prototype.hasListeners = function() {
+    return (this._numListeners > 0);
+};
+
 /** Removes all listeners registered on this node.
  * @return {SceneJS.Node} this
  */
 SceneJS.Node.prototype.removeListeners = function() {
     this._listeners = {};
+    this._numListeners = 0;
     return this;
 };
 

@@ -1,6 +1,14 @@
-/* Backend that manages picking
+/* Manages picking
  *
+ * In response to a request to pick Geometry at the given canvas coordinates, this puts SceneJS
+ * into TRAVERSAL_PICKING_MODE for the next render traversal.
  *
+ * When the next traversal begins, signalled by an incoming SCENE_RENDERING event, the module will ensure that a
+ * pick buffer (frame buffer) exists on the current scene's canvas, then bind the buffer to make it active.
+ *
+ * Scene nodes then register their pre-rendering on this module during the traversal. This module assumes that the node
+ * has just been registered on SceneJS._nodeEventsModule. When a node has an SID (scoped identifier), then this
+ * module generates a colour value that is unique to the node within the traversal, then tags the current node   
  *
  *  @private
  */
@@ -8,13 +16,9 @@ SceneJS._pickModule = new (function() {
     var scenePickBufs = {};            // Pick buffer for each existing scene
     var boundPickBuf = null;           // Pick buffer for currently active scene while picking
     var color = { r: 0, g: 0, b: 0 };
-    var sidStack = [];
-    var nodeArray = new Array(1000);
     var pickX = null;
     var pickY = null;
     var debugCfg = null;
-    var rootObserver = null;
-    var leafObserver = null;
     var nodeIndex = 0;
     var pickedNodeIndex = 0;
 
@@ -50,9 +54,6 @@ SceneJS._pickModule = new (function() {
         pickY = y;
         color = { r: 0, g: 0, b: 0 };
         nodeIndex = 0;
-        sidStack = [];
-        rootObserver = null;
-        leafObserver = null;
     };
 
     /**
@@ -74,7 +75,6 @@ SceneJS._pickModule = new (function() {
         var gl = canvas.context;
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
-
         var pickBuf = {
             canvas : canvas,
             frameBuf : gl.createFramebuffer(),
@@ -141,51 +141,19 @@ SceneJS._pickModule = new (function() {
         boundPickBuf = pickBuf;
     }
 
-    /** Push SID to path, map next unique colour to path and node
+    /**
+     * Notify pick module of node pre-render, assuming that SceneJS._nodeEventsModule.preVisit has been notified prior.
+     * If node has a SID, then tag it on the SceneJS._nodeEventsModule.
      */
     this.preVisitNode = function(node) {
         if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) { // Quietly igore if not picking
-
-            /* Save node with SID
-             */
             var sid = node.getSID();
             if (sid) {
-                sidStack.push(sid);
-
                 color.g = parseFloat(Math.round((nodeIndex + 1) / 256) / 256);
                 color.r = parseFloat((nodeIndex - color.g * 256 + 1) / 256);
                 color.b = 1.0;
-
-                if (nodeArray.length <= nodeIndex) {
-                    nodeArray.push({});
-                }
-                nodeArray[nodeIndex] = {
-                    node: node,
-                    sidStack : sidStack.slice(0),
-                    leafObserver : leafObserver
-                };
-                if (debugCfg.logTrace) {
-                    SceneJS._loggingModule.info(
-                            "Mapping pick index to color/node: " + nodeIndex + " => {r:" + color.r + ", g:" + color.g + ", b:" + color.b + "} " + sidStack.join("/"));
-                }
-                nodeIndex+=1;
-            }
-
-            /* Track pick event observer
-             */
-            if (node.hasListener("picked")) {
-                leafObserver = {             // TODO: reuse same observer records from pool array
-                    node: node,
-                    sidDepth: sidStack.length, // Depth of observer node in SID namespace
-                    parent : leafObserver
-                };
-                if (!rootObserver) {
-                    rootObserver = leafObserver;
-                }
-                if (debugCfg.logTrace) {
-                    SceneJS._loggingModule.info(
-                            "Registering node as \"picked\" event listener: SID path = {" + sidStack.join("/") + "}");
-                }
+                SceneJS._nodeEventsModule.tagNode("" + nodeIndex);
+                nodeIndex++;
             }
         }
     };
@@ -201,20 +169,6 @@ SceneJS._pickModule = new (function() {
                 }
             });
 
-    /** Pop SID off path
-     */
-    this.postVisitNode = function(node) {
-        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) { // Quietly igore if not picking
-            sidStack.pop();
-            if (node.hasListener("picked")) {
-                leafObserver = leafObserver.parent;
-                if (!leafObserver) {
-                    rootObserver = null;
-                }
-            }
-        }
-    };
-
     /** When scene finished rendering, then if in pick mode, read and unbind pick buffer
      */
     SceneJS._eventModule.addListener(
@@ -226,12 +180,11 @@ SceneJS._pickModule = new (function() {
                 }
             });
 
-
     function readPickBuffer() {
         var context = boundPickBuf.canvas.context;
         var pix = context.readPixels(pickX, boundPickBuf.canvas.canvas.height - pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
         if (!pix) {  //  http://asalga.wordpress.com/2010/07/14/compensating-for-webgl-readpixels-spec-changes/
-            pix = new WebGLUnsignedByteArray(4);            
+            pix = new WebGLUnsignedByteArray(4);
             context.readPixels(pickX, boundPickBuf.canvas.canvas.height - pickY, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
         }
         if (debugCfg.logTrace) {
@@ -259,34 +212,14 @@ SceneJS._pickModule = new (function() {
                     if (debugCfg.logTrace) {
                         SceneJS._loggingModule.info("Finished rendering..");
                     }
-                    var picked = nodeArray[pickedNodeIndex];
-                    if (picked) {
-                        for (var observer = picked.leafObserver; observer != null; observer = observer.parent) {
-
-                            /* Path to picked node, relative to the observer node
-                             */
-                            var relSIDPath = picked.sidStack.slice(observer.sidDepth).join("/");
-                            if (debugCfg.logTrace) {
-                                SceneJS._loggingModule.info("Node was picked - SID path:" + relSIDPath);
-                            }
-                            var pickedEvent = { uri : relSIDPath };
-                            if (debugCfg.logTrace) {
-                                SceneJS._loggingModule.info("Notifying \"picked\" event observer");
-                            }
-                            observer.node.addEvent("picked", pickedEvent);
-                        }
-                    } else {
-                        if (debugCfg.logTrace) {
-                            SceneJS._loggingModule.info("No nodes picked");
-                        }
-                    }
+                    SceneJS._nodeEventsModule.fireEventFromTagNode("" + pickedNodeIndex, "picked");
                     SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
                 }
             });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_DESTROYED,
-            function(e) {
+            function() {
                 if (debugCfg.logTrace) {
                     SceneJS._loggingModule.info("Destroying pick buffer");
                 }
