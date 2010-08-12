@@ -7,7 +7,7 @@
  * the outer radius of the Locality is used internally by SceneJS to support content staging strategies.</p>
  *
  * <p>When configured with a projected size threshold for each child, they can also function as level-of-detail (LOD) selectors.</p>
- * 
+ *
  *  <p><b>Example 1.</b></p><p>This BoundingBox is configured to work as a level-of-detail selector. The 'levels'
  * property specifies thresholds for the boundary's projected size, each corresponding to one of the node's children,
  * such that the child corresponding to the threshold imediately below the boundary's current projected size is only one
@@ -87,8 +87,10 @@ SceneJS.BoundingBox = function() {
     this._xmax = 0;
     this._ymax = 0;
     this._zmax = 0;
-    this._levels = null;
+    this._levels = null; // LOD levels
+    this._level = -1; // Current LOD level
     this._states = [];
+    this._state = SceneJS.BoundingBox.STATE_INITIAL;
     this._objectsCoords = null;  // Six object-space vertices for memo level 1
     this._viewBox = null;         // Axis-aligned view-space box for memo level 2
     if (this._fixedParams) {
@@ -97,6 +99,56 @@ SceneJS.BoundingBox = function() {
 };
 
 SceneJS._inherit(SceneJS.BoundingBox, SceneJS.Node);
+
+/**
+ * State of the BoundingBox when not rendered yet
+ */
+SceneJS.BoundingBox.STATE_INITIAL = 0;
+
+/**
+ * State of the BoundingBox when it is completely outside the outer locality radius,
+ * which which may be either that defined explicitly by a higher {@link SceneJS.Locality} node, or the
+ * default value (see {@link SceneJS.Locality}). In this state it is therefore also completely
+ * outside the inner radius and the view frustum.
+ */
+SceneJS.BoundingBox.STATE_OUTSIDE_OUTER_LOCALITY = 1;
+
+/**
+ * State of the BoundingBox when it intersects the outer locality radius, but does not
+ * intersect the inner radius
+ */
+SceneJS.BoundingBox.STATE_INTERSECTING_OUTER_LOCALITY = 2;
+
+/**
+ * State of the BoundingBox when it intersects the inner locality radius, while therefore also intersecting
+ * the outer locality radius
+ */
+SceneJS.BoundingBox.STATE_INTERSECTING_INNER_LOCALITY = 3;
+
+/**
+ * State of the BoundingBox when it is intersecting the view frustum, while therefore also intersecting
+ * the inner and outer locality radius
+ */
+SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM = 4;
+
+/**
+ * State of the BoundingBox when it has selected a level of detail (LOD) while intersecting the view frustum.
+ * When it has a child {@link Node} for each level, then it will be about to render that particular child. When it
+ * has only one child {@link Node}, then it will render that child regardless of which level it has selected. When it
+ * has no children, then it will happily not render any children.
+ */
+SceneJS.BoundingBox.STATE_LOD_SELECTED = 5;
+
+// @private
+SceneJS.BoundingBox.prototype._changeState = function(newState, params) {
+    this._state = newState;
+    if (this._listeners["state-changed"]) {
+        params = params || {};
+        params.oldState = this._state;
+        params.newState = newState;
+        this._fireEvent("state-changed", params);
+    }
+};
 
 /**
  * Sets the minimum X extent
@@ -292,7 +344,7 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     this._zmax = params.zmax || 0;
     if (params.levels) {
         if (params.levels.length != this._children.length) {
-          throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
+            throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
                     ("SceneJS.boundingBox levels property should have a value for each child node"));
         }
 
@@ -308,7 +360,13 @@ SceneJS.BoundingBox.prototype._init = function(params) {
 
 // @private
 SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
+
+    var origLevel = this._level; // We'll fire a "lod-changed" if LOD level changes
+    var origState = this._state; // We'll fire "state-changed" if state changes from this during render
+    var newState;
+
     if (this._memoLevel == 0) {
+        this._state = SceneJS.BoundingBox.STATE_INITIAL;
         if (!this._fixedParams) {
             this._init(this._getParams(data));
         } else {
@@ -353,18 +411,59 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
             this._memoLevel = 2;
         }
     }
+
+    newState = SceneJS.BoundingBox.STATE_OUTSIDE_OUTER_LOCALITY;
+
     if (SceneJS._localityModule.testAxisBoxIntersectOuterRadius(this._viewBox)) {
+        newState = SceneJS.BoundingBox.STATE_INTERSECTING_OUTER_LOCALITY;
+
         if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(this._viewBox)) {
+            newState = SceneJS.BoundingBox.STATE_INTERSECTING_INNER_LOCALITY;
+
             var result = SceneJS._frustumModule.testAxisBoxIntersection(this._viewBox);
             switch (result) {
-                case SceneJS._math_INTERSECT_FRUSTUM:  // TODO: GL clipping hints
+                case SceneJS._math_INTERSECT_FRUSTUM:
                 case SceneJS._math_INSIDE_FRUSTUM:
+
+                    /* Bounding makes no distinction between being inside
+                     * the frustum and merely intersecting it because it is
+                     * aimed at triggering those processes that load or discard
+                     * content, not at those that decide things like whether to
+                     * enabling clipping etc.
+                     */
+                    newState = SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM;
+
+                    if (newState != origState) {
+                        this._changeState(newState);
+                    }
+
                     if (this._levels) { // Level-of-detail mode
                         var size = SceneJS._frustumModule.getProjectedSize(this._viewBox);
+
                         for (var i = this._levels.length - 1; i >= 0; i--) {
                             if (this._levels[i] <= size) {
+                                this._level = i;
+
+                                if (origLevel != this._level) {
+                                    if (this._listeners["lod-selected"]) {
+                                        this._fireEvent("lod-selected", { oldLevel : origLevel, newLevel : this._level });
+                                    }
+                                }
+
                                 var state = this._states[i];
-                                this._renderNode(i, traversalContext, data);
+                                if (this._children.length > 0) {
+
+                                    /* Child provided for each LOD - select one
+                                     * for the projected boundary canvas size
+                                     */
+                                    this._renderNode(i, traversalContext, data);
+                                } else {
+
+                                    /* Zero or one child provided for all LOD -
+                                     * just render it if there is one
+                                     */
+                                    this._renderNodes(traversalContext, data);
+                                }
                                 return;
                             }
                         }
@@ -374,9 +473,17 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
                     break;
 
                 case SceneJS._math_OUTSIDE_FRUSTUM:
+
+                    if (newState != origState) {
+                        this._changeState(newState);
+                    }
                     break;
             }
         } else {
+
+            if (newState != origState) {
+                this._changeState(newState);
+            }
 
             /* Allow content staging for subgraph
              */
@@ -384,6 +491,10 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
             // TODO:
 
             this._renderNodes(traversalContext, data);
+        }
+    } else {
+        if (newState != origState) {
+            this._changeState(newState);
         }
     }
 };

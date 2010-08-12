@@ -447,8 +447,7 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
     var configUnsetters;
 
 
-
-    var savedName;  // Saves SID path for when rendering subgraph of Instance  
+    var savedName;  // Saves SID path for when rendering subgraph of Instance
     if (this._sidPath) {
         savedName = SceneJS._instancingModule.getName();      // Save SID path at Instance node
         SceneJS._instancingModule.setName(this._sidPath, this);     // Initialise empty SID path for Symbol's subgraph
@@ -513,9 +512,9 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
         SceneJS._instancingModule.popName();
     }
 
-//    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-//        SceneJS._pickModule.postVisitNode(this);
-//    }
+    //    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+    //        SceneJS._pickModule.postVisitNode(this);
+    //    }
 
 
 };
@@ -586,7 +585,7 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
             this._fireEvent("rendered", { });
         }
     }
-     this._flushEventsOut();
+    this._flushEventsOut();
 
     SceneJS._nodeEventsModule.postVisitNode(this);
 };
@@ -608,7 +607,7 @@ SceneJS.Node.prototype._processEventsIn = function() {
                 }
                 for (var i = 0; i < list.length; i++) {
                     var listener = list[i];
-                    listener.fn.call(this, event);
+                    listener.fn.call(this, event.params);
                 }
             }
         }
@@ -645,18 +644,20 @@ SceneJS.Node.prototype._unsetConfigs = function(handle) {
 
 /** @private */
 SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
-    var child = this._children[index];
-    var childConfigs = traversalContext.configs;
-    if (childConfigs && child._sid) {
-        childConfigs = childConfigs["#" + child._sid];
-        if (childConfigs) {
-            var handle = this._setConfigs(childConfigs, traversalContext.configsModes, child);
-            child._render.call(child, traversalContext, data);
-            this._unsetConfigs(handle);
-            return;
+    if (index >= 0 && index < this._children.length) {
+        var child = this._children[index];
+        var childConfigs = traversalContext.configs;
+        if (childConfigs && child._sid) {
+            childConfigs = childConfigs["#" + child._sid];
+            if (childConfigs) {
+                var handle = this._setConfigs(childConfigs, traversalContext.configsModes, child);
+                child._render.call(child, traversalContext, data);
+                this._unsetConfigs(handle);
+                return;
+            }
         }
+        child._render.call(child, traversalContext, data);
     }
-    child._render.call(child, traversalContext, data);
 };
 
 /**
