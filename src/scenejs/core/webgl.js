@@ -392,10 +392,20 @@ SceneJS._webgl_Texture2D = function(context, cfg) {
     if (cfg.image) {
 
         /* Texture from image
+         *
+         * HACK - see https://xeolabs.lighthouseapp.com/projects/50643-scenejs/tickets/149-hack-to-fall-back-on-old-createtexture-api
          */
-        context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
+        try {
 
-        // context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, cfg.image);
+            /* New API change
+             */
+            context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, cfg.image);
+        } catch (e) {
+
+            /* Fall back for old browser
+             */
+            context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
+        }
 
         this.format = context.RGBA;
         this.width = cfg.image.width;

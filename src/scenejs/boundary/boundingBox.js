@@ -131,14 +131,6 @@ SceneJS.BoundingBox.STATE_INTERSECTING_INNER_LOCALITY = 3;
  */
 SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM = 4;
 
-/**
- * State of the BoundingBox when it has selected a level of detail (LOD) while intersecting the view frustum.
- * When it has a child {@link Node} for each level, then it will be about to render that particular child. When it
- * has only one child {@link Node}, then it will render that child regardless of which level it has selected. When it
- * has no children, then it will happily not render any children.
- */
-SceneJS.BoundingBox.STATE_LOD_SELECTED = 5;
-
 // @private
 SceneJS.BoundingBox.prototype._changeState = function(newState, params) {
     this._state = newState;
@@ -429,7 +421,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext, data) {
                      * the frustum and merely intersecting it because it is
                      * aimed at triggering those processes that load or discard
                      * content, not at those that decide things like whether to
-                     * enabling clipping etc.
+                     * enabl clipping etc.
                      */
                     newState = SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM;
 
