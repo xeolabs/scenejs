@@ -779,6 +779,24 @@ SceneJS.Node.prototype.removeNode = function(sid) {
     return null;
 };
 
+
+/** Appends multiple child nodes
+ * @param {Array[SceneJS.Node]} nodes Array of nodes
+ * @return {SceneJS.Node} This node
+ */
+SceneJS.Node.prototype.addNodes = function(nodes) {
+    if (!nodes) {
+        throw SceneJS._errorModule.fatalError(
+                new SceneJS.errors.InvalidSceneGraphException(
+                        "SceneJS.Node#addNodes - nodes argument is undefined"));
+    }
+    for (var i = nodes.length - 1; i >= 0; i--) {
+        this.addNode(nodes[i]);
+    }
+    return this;
+};
+
+
 /** Appends a child node
  * @param {SceneJS.Node} node Child node
  * @return {SceneJS.Node} The child node
