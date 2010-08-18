@@ -124,3 +124,5 @@ SceneJS.selector = function() {
     SceneJS.Selector.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("selector", SceneJS.selector);

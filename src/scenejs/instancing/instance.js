@@ -295,3 +295,6 @@ SceneJS.instance = function() {
     SceneJS.Instance.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("instance", SceneJS.instance);
+

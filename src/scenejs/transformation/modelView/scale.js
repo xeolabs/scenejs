@@ -154,3 +154,5 @@ SceneJS.scale = function() {
     SceneJS.Scale.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("scale", SceneJS.scale);

@@ -193,3 +193,5 @@ SceneJS.rotate = function() {
     SceneJS.Rotate.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("rotate", SceneJS.rotate);

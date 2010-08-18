@@ -208,3 +208,6 @@ SceneJS.lights = function() {
     SceneJS.Lights.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+
+SceneJS.registerNodeType("lights", SceneJS.lights);

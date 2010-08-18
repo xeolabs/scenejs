@@ -113,3 +113,6 @@ SceneJS.objects.sphere = function() {
     SceneJS.objects.Sphere.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+
+SceneJS.registerNodeType("sphere", SceneJS.objects.sphere);

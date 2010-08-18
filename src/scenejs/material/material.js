@@ -273,3 +273,4 @@ SceneJS.material = function() {
     return n;
 };
 
+SceneJS.registerNodeType("material", SceneJS.material);

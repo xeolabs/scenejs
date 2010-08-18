@@ -111,3 +111,5 @@ SceneJS.matrix = function() {
     SceneJS.Matrix.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("matrix", SceneJS.matrix);

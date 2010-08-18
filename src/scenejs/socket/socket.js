@@ -343,3 +343,5 @@ SceneJS.socket = function() {
     SceneJS.Socket.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("socket", SceneJS.socket);

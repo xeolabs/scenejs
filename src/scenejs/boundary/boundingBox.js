@@ -511,4 +511,6 @@ SceneJS.boundingBox = function() {
     return n;
 };
 
+SceneJS.registerNodeType("bounding-box", SceneJS.boundingBox);
+
 

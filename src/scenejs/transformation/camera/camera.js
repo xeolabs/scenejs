@@ -261,3 +261,5 @@ SceneJS.camera = function() {
     SceneJS.Camera.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("camera", SceneJS.camera);

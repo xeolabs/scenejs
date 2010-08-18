@@ -5835,3 +5835,5 @@ SceneJS._inherit(SceneJS.objects.Teapot, SceneJS.Geometry);
 SceneJS.objects.teapot = function() {
     return new SceneJS.objects.Teapot();
 };
+
+SceneJS.registerNodeType("teapot", SceneJS.objects.teapot);

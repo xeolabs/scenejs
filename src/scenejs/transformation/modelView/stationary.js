@@ -74,3 +74,4 @@ SceneJS.stationary = function() {
     return n;
 };
 
+SceneJS.registerNodeType("stationary", SceneJS.stationary);

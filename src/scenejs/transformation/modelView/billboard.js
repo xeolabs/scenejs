@@ -28,3 +28,5 @@ SceneJS.billboard = function() {
             })());
 };
 
+SceneJS.registerNodeType("billboard", SceneJS.billboard);
+

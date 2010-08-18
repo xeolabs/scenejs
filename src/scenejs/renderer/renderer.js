@@ -33,3 +33,5 @@ SceneJS.renderer = function() {
     SceneJS.Renderer.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("renderer", SceneJS.renderer);

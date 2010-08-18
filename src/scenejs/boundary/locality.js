@@ -117,3 +117,5 @@ SceneJS.locality = function() {
     SceneJS.Locality.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("locality", SceneJS.locality);

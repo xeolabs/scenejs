@@ -93,6 +93,46 @@ var SceneJS = {
     },
 
     /**
+     * Registers a node factory func against the node's type name. This is used
+     * when we create nodes from JSON.
+     *
+     * @param {string} Type ID by which the node type may be looked up
+     * @param {function} factoryFunc Factory function that constructs a new instance of the node
+     */
+    registerNodeType : function(type, factoryFunc) {
+        this._nodeFactoryFuncs[type] = factoryFunc;
+    },
+
+    /**
+     * Factory function to create a subgraph from JSON
+     * @param json
+     */
+    createNode : function(json) {
+        if (!json.type) {
+            throw "Node type undefined";
+        }
+        var func = this._nodeFactoryFuncs[json.type];
+        if (!func) {
+            throw "Node type unregistered: '" + json.type + "'";
+        }
+        var cfg = json.cfg || {};
+        var args = [cfg];
+        if (json.nodes) {
+            var len = json.nodes.length;
+            for (var i = 0; i < len; i++) {
+                args.push(SceneJS.createNode(json.nodes[i]));
+            }
+        }
+        return func.apply(this, args);
+    },
+
+    /**
+     * Node factory funcs mapped to type
+     * @private
+     */
+    _nodeFactoryFuncs: {},
+
+    /**
      * ID map of all existing nodes.
      * Referenced by {@link SceneJS.Node}.
      * @private

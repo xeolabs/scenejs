@@ -83,3 +83,5 @@ SceneJS.generator = function() {
     SceneJS.Generator.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("generator", SceneJS.generator);

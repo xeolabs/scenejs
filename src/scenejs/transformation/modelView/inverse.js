@@ -59,3 +59,5 @@ SceneJS.inverse = function() {
     SceneJS.Inverse.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("inverse", SceneJS.inverse);

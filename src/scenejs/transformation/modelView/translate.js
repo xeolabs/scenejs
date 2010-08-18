@@ -164,3 +164,5 @@ SceneJS.translate = function() {
     SceneJS.Translate.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("translate", SceneJS.translate);

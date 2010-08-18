@@ -382,3 +382,4 @@ SceneJS.reset = function() {
     }
 };
 
+SceneJS.registerNodeType("scene", SceneJS.scene);

@@ -184,3 +184,5 @@ SceneJS.lookAt = function() {
     SceneJS.LookAt.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("lookat", SceneJS.lookAt);

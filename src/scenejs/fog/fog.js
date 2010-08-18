@@ -226,3 +226,6 @@ SceneJS.fog = function() {
     SceneJS.Fog.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+
+SceneJS.registerNodeType("fog", SceneJS.fog);

@@ -93,3 +93,6 @@ SceneJS.symbol = function() {
     SceneJS.Symbol.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("symbol", SceneJS.symbol);
+

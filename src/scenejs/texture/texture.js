@@ -320,3 +320,5 @@ SceneJS.texture = function() {
     SceneJS.Texture.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("texture", SceneJS.texture);

@@ -164,3 +164,6 @@ SceneJS.geometry = function() {
     SceneJS.Geometry.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("geometry", SceneJS.geometry);
+

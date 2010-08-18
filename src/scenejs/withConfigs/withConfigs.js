@@ -330,3 +330,5 @@ SceneJS.withConfigs = function() {
     SceneJS.WithConfigs.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("with-configs", SceneJS.withConfigs);

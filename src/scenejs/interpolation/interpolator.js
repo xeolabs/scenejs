@@ -311,6 +311,7 @@ SceneJS.interpolator = function() {
     return n;
 };
 
+SceneJS.registerNodeType("interpolator", SceneJS.interpolator);
 
 
 

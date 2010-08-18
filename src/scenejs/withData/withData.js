@@ -118,3 +118,5 @@ SceneJS.withData = function() {
     SceneJS.WithData.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("with-data", SceneJS.withData);

@@ -192,3 +192,5 @@ SceneJS.objects.cube = function() {
     SceneJS.objects.Cube.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("cube", SceneJS.objects.cube);

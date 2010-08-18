@@ -240,3 +240,5 @@ SceneJS.quaternion = function() {
     SceneJS.Quaternion.prototype.constructor.apply(n, arguments);
     return n;
 };
+
+SceneJS.registerNodeType("quaternion", SceneJS.quaternion);

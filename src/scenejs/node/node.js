@@ -1040,3 +1040,6 @@ SceneJS.node = function() {
 };
 
 
+SceneJS.registerNodeType("node", SceneJS.node);
+
+
