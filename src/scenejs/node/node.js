@@ -805,6 +805,9 @@ SceneJS.Node.prototype.addNode = function(node) {
                         "SceneJS.Node#addNode - node argument is undefined"));
     }
     if (!node._render) {
+        node = SceneJS.createNode(node);
+    }
+    if (!node._render) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#addNode - node argument is not a SceneJS.Node or subclass!"));
