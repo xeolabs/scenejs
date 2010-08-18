@@ -72,8 +72,8 @@
  *
  *      listeners: {
  *         "state-changed" : {
- *              fn: function(params) {
- *                  switch (params.newState) {
+ *              fn: function(event) {
+ *                  switch (event.params.newState) {
  *                      case SceneJS.Socket.STATE_CONNECTING:
  *
  *                          // Socket attempting to open connection with server at specified URI
@@ -212,13 +212,14 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
                     SceneJS._errorModule.error(exception);
                 },
 
-            /* OK
+            /* Messages got
              */
                 function(messageBody) {
 
                     if (messageBody.configs) {
 
-                        /* Configuration message
+                        /* Message is configs - insert them
+                         * into the traversal context
                          */
                         traversalContext = {                            
                             insideRightFringe: _self._children.length > 1,
@@ -259,7 +260,7 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
                         });
             })(this);
         }
-        if (this._state == this._STATE_ERROR) { // Socket disabled - TODO: retry?
+        if (this._state == SceneJS.Socket.STATE_ERROR) { // Socket disabled - TODO: retry?
         }
         this._renderNodes(traversalContext, data); // We're assuming socket wont open instantly, ie. during this node visit
     }

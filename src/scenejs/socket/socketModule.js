@@ -157,6 +157,9 @@ SceneJS._SocketModule = new (function() {
      */
     this.getNextMessage = function(onError, onSuccess) {
         var inQueue = activeSocket.messages.inQueue;
+        if (inQueue.length == 0) {
+            return;
+        }
         var messageStr = inQueue[inQueue.length - 1]; // Dont deqeue yet for debug in case of error
         if (messageStr) {
             try {

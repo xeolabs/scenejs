@@ -82,14 +82,14 @@ var exampleScene = SceneJS.scene({
 
                             listeners: {
                                 "picked":{
-                                    fn : function(params) {
+                                    fn : function(event) {
 
                                         /*
                                          * When "teapot1" is picked, we'll push a new angle down into
                                          * its "#teapot1-rotate" rotate node to spin it around
                                          */
 
-                                        if (params.uri.match("^teapot1") == "teapot1") {
+                                        if (event.uri.match("^teapot1") == "teapot1") {
                                             this.setConfigs({
                                                 "#teapot1" : {
                                                     "#teapot1-rotate": {
@@ -104,7 +104,7 @@ var exampleScene = SceneJS.scene({
                                          * replace it with a sphere
                                          */
 
-                                        if (params.uri.match("^teapot2") == "teapot2") {
+                                        if (event.uri.match("^teapot2") == "teapot2") {
                                             this.setConfigs({
                                                 "#teapot2" : {
                                                     "#mount-point" : {
@@ -120,7 +120,7 @@ var exampleScene = SceneJS.scene({
                                          * into its "teapot3-color" Material node
                                          */
 
-                                        if (params.uri.match("^teapot3") == "teapot3") {
+                                        if (event.uri.match("^teapot3") == "teapot3") {
                                             this.setConfigs({
                                                 "#teapot3" : {
                                                     "#teapot3-color": {
@@ -135,7 +135,7 @@ var exampleScene = SceneJS.scene({
                                          * transforms above it to lift it out of the row while spinning it
                                          */
 
-                                        if (params.uri.match("^teapot4") == "teapot4") {
+                                        if (event.uri.match("^teapot4") == "teapot4") {
                                             this.setConfigs({
                                                 "#teapot4" : {
                                                     "#mount-point" : function() {

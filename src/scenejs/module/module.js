@@ -115,51 +115,6 @@ new (function() {
         };
     };
 
-    //    SceneJS.UseModule.prototype._renderNodes = function(traversalContext, data) {
-    //        var numChildren = this._children.length;
-    //        var child;
-    //        var childConfigs;
-    //        var configUnsetters;
-    //
-    //        if (numChildren == 0) {
-    //
-    //            /* Instance has no child nodes - render super-Instance's child nodes
-    //             * through callback if one is passed in
-    //             */
-    //            if (traversalContext.callback) {
-    //                traversalContext.callback(traversalContext, data);
-    //            }
-    //
-    //        } else {
-    //
-    //            /* Instance has child nodes - last node in Instance's subtree will invoke
-    //             * the callback, if any (from within its SceneJS.Node#_renderNodes)
-    //             */
-    //            var childTraversalContext;
-    //            for (var i = 0; i < numChildren; i++) {
-    //                child = this._children[i];
-    //                configUnsetters = null;
-    //                childConfigs = traversalContext.configs;
-    //                if (childConfigs && child._sid) {
-    //                    childConfigs = childConfigs[child._sid];
-    //                    if (childConfigs) {
-    //                        configUnsetters = this._setConfigs(childConfigs, child);
-    //                    }
-    //                }
-    //                childTraversalContext = {
-    //                    insideRightFringe : (i < numChildren - 1),
-    //                    callback : traversalContext.callback,
-    //                    configs : childConfigs || traversalContext.configs,
-    //                    configsModes : traversalContext.configsModes
-    //                };
-    //                child._renderWithEvents.call(child, childTraversalContext, data);
-    //                if (configUnsetters) {
-    //                    this._unsetConfigs(configUnsetters);
-    //                }
-    //            }
-    //        }
-    //    };
-
     // @private
     SceneJS.UseModule.prototype._render = function(traversalContext, data) {
         if (!this._fixedParams) {
@@ -183,9 +138,9 @@ new (function() {
             }
         }
         if (this._moduleNode) {
-            this._moduleNode._render(this._createTargetTraversalContext(traversalContext, this._moduleNode), data);
+            this._moduleNode._renderWithEvents(this._createTargetTraversalContext(traversalContext, this._moduleNode), data);
         }
-        //this._renderNodes(traversalContext, data);
+        //this._renderNodes(traversalContext, data); // TODO: render children while module loads?
         ;
     };
 

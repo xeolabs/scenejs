@@ -146,8 +146,8 @@
  *
  *                  listeners: {
  *                        "state-changed" : {
- *                                fn: function(params) {
- *                                       alert("Node " + this.getType() + " has changed state to " + params.newState);
+ *                                fn: function(event) {
+ *                                       alert("Node " + this.getType() + " has changed state to " + event.params.newState);
  *                                    },
  *                                options: {
  *                                     // Whatever event-handling options are supported (none yet as of V0.7.7)
@@ -157,7 +157,7 @@
  *                         // You can specify just the listener's function
  *                         // when there are no options to specify
  *
- *                         "rendering" : function(params) {
+ *                         "rendering" : function(event) {
  *                                       alert("Node " + this.getType() + " is rendering");
  *                                    }
  *                  }
@@ -572,8 +572,6 @@ SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child,
 SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
     SceneJS._nodeEventsModule.preVisitNode(this);
     this._processEventsIn();
-
-
     if (this._numListeners == 0) {
         this._render(traversalContext, data);
     } else {
@@ -586,7 +584,6 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
         }
     }
     this._flushEventsOut();
-
     SceneJS._nodeEventsModule.postVisitNode(this);
 };
 
@@ -607,7 +604,7 @@ SceneJS.Node.prototype._processEventsIn = function() {
                 }
                 for (var i = 0; i < list.length; i++) {
                     var listener = list[i];
-                    listener.fn.call(this, event.params);
+                    listener.fn.call(this, event);
                 }
             }
         }
@@ -913,9 +910,10 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params) {
         if (!params) {
             params = {};
         }
+        var event = { name: eventName, params : params };
         for (var i = 0; i < list.length; i++) {
             var listener = list[i];
-            listener.fn.call(this, params);
+            listener.fn.call(this, event);
         }
     }
 };
