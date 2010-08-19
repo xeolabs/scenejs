@@ -113,7 +113,7 @@ var SceneJS = {
         }
         var func = this._nodeFactoryFuncs[json.type];
         if (!func) {
-            throw "Node type unregistered: '" + json.type + "'";
+            throw "Node type not registered: '" + json.type + "'";
         }
         var cfg = json.cfg || {};
         var args = [cfg];
@@ -124,6 +124,21 @@ var SceneJS = {
             }
         }
         return func.apply(this, args);
+    },
+  
+    /**
+     * Fire an event at the node with teh given ID
+     *
+     * @param {String} name Event name
+     * @param {String} targetNodeId ID of target node
+     * @param {Object} params Event parameters
+     */
+    fireEvent : function(name, targetNodeId, params) {
+        var node = this.getNode(targetNodeId);
+        if (!node) {
+            throw "Node with this ID not found: '" + targetNodeId + "'";
+        }
+        node.addEvent({ name: name, params: params });
     },
 
     /**

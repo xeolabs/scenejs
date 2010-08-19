@@ -183,14 +183,6 @@
  * @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
 SceneJS.Node = function() {
-
-    /* Register this node on SceneJS
-     */
-    if (!this._id) {
-        this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
-        SceneJS._nodeIDMap[this._id] = this;
-    }
-
     this._nodeType = "node";
     this._NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
     this._sid = null;
@@ -199,7 +191,7 @@ SceneJS.Node = function() {
     this._parent = null;
     this._listeners = {};
     this._numListeners = 0; // Useful for quick check whether node observes any events
-    this._eventsIn = []; // FIFO queue for each event listener
+    this._addedEvents = []; // Events added with #addEvent
     this._eventsOut = []; // FIFO queue for events fired from this node with #fireEvent, flushed after each render
 
     /* Used by many node types to track the level at which they can
@@ -213,7 +205,21 @@ SceneJS.Node = function() {
      * private
      */
     this._memoLevel = 0;
+
+    /* Deregister default ID
+     */
+    if (this._id) {
+        SceneJS._nodeIDMap[this._id] = null;
+    }
+
     SceneJS.Node._ArgParser.parseArgs(arguments, this);
+
+    /* Register again by whatever ID we now have
+     */
+    if (!this._id) {
+        this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
+    }
+    SceneJS._nodeIDMap[this._id] = this;
 };
 
 SceneJS.Node.prototype.constructor = SceneJS.Node;
@@ -305,7 +311,9 @@ SceneJS.Node._ArgParser = new (function() {
          */
         for (var key in arg) {
             if (arg.hasOwnProperty(key)) {
-                if (key == "listeners") {
+                if (key == "id") {
+                    node._id = arg[key];
+                } else if (key == "listeners") {
                     this._parseListeners(arg[key], node);
                 } else if (key == "sid") {
                     node._sid = arg[key];
@@ -446,16 +454,32 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
     var i;
     var configUnsetters;
 
-
     var savedName;  // Saves SID path for when rendering subgraph of Instance
+
     if (this._sidPath) {
-        savedName = SceneJS._instancingModule.getName();      // Save SID path at Instance node
-        SceneJS._instancingModule.setName(this._sidPath, this);     // Initialise empty SID path for Symbol's subgraph
+
+        /* If this node has a SID path, then it is a Symbol. When a Symbol is rendered, it does not render its own
+         * children, instead it registers itself on the Instancing Module and records on itself the SID path of nodes
+         * that were visited on the path from the root.
+         *
+         * We're now here rendering its children as part of the rendering of an Instance node that refers to the Symbol.
+         * We're entering the "virtual world" of the Symbol, so we'll set the Symbol's SID path on the Instancing Module
+         * to set the current SID name space for the Symbol.
+         */
+        savedName = SceneJS._instancingModule.getName();
+        SceneJS._instancingModule.setName(this._sidPath, this);
     } else if (this._sid) {
+
+        /* If this node has a SID, push it to the instancing module to build up a name space for any Symbols we
+         * might be about render within the child subtrees.
+         */
         SceneJS._instancingModule.pushName(this._sid, this);
     }
 
     if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+
+        /* If in picking mode, notify the Picking Module of our visit to this node
+         */
         SceneJS._pickModule.preVisitNode(this);
     }
 
@@ -507,16 +531,17 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
         }
     }
     if (savedName) {
-        SceneJS._instancingModule.setName(savedName, this); // Restore SID path for Instance node
+
+        /* Finished visiting children of Symbol. We're leaving the virtual world of the Symbol now,
+         * so restore the SID namespace of the caller Instance.
+         */
+        SceneJS._instancingModule.setName(savedName, this);
     } else if (this._sid) {
+
+        /* Else we're just ascending back up the tree as normal. Pop the SID if we pushed one.
+         */
         SceneJS._instancingModule.popName();
     }
-
-    //    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-    //        SceneJS._pickModule.postVisitNode(this);
-    //    }
-
-
 };
 
 /**
@@ -592,6 +617,12 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
  * @private
  */
 SceneJS.Node.prototype._processEventsIn = function() {
+    if (this._addedEvents.length > 0) {
+
+        /* First process any pending events fired directly at this node
+         */
+        this._processEvents(this._addedEvents);
+    }
     var eventsIn = SceneJS._nodeEventsModule.getEvents();
     if (eventsIn) {
         var event;
@@ -606,23 +637,46 @@ SceneJS.Node.prototype._processEventsIn = function() {
                     var listener = list[i];
                     listener.fn.call(this, event);
                 }
+
+                /* Processing the last event may have indirectly caused
+                 * another event to be fired directly at this node - merge the queues
+                 */
+                if (this._addedEvents.length > 0) {
+                    this._processEvents(this._addedEvents);
+                }
             }
         }
     }
-    //    while (this._eventsIn.length > 0) {
-    //        event = this._eventsIn.pop();
-    //        var list = this._listeners[event.name];
-    //        if (list) {
-    //            if (!event.params) {
-    //                event.params = {};
-    //            }
-    //            for (var i = 0; i < list.length; i++) {
-    //                var listener = list[i];
-    //                listener.fn.call(this, params);
-    //            }
-    //        }
-    //    }
 };
+
+/**
+ * @private
+ */
+SceneJS.Node.prototype._processEvents = function(events) {
+    var event;
+    while (events.length > 0) {
+        event = events.pop();
+        if (event.name == "configure") {
+            this._configure(event.params);
+        }
+        var list = this._listeners[event.name];
+        if (list) {
+            if (!event.params) {
+                event.params = {};
+            }
+            for (var i = 0; i < list.length; i++) {
+                var listener = list[i];
+                listener.fn.call(this, event);
+            }
+        }
+    }
+};
+
+SceneJS.Node.prototype._configure = function(cfg) {
+    alert("Node#_configure")
+    // this._configs = cfg;
+};
+
 
 /** @private */
 SceneJS.Node.prototype._render = function(traversalContext, data) {
@@ -929,7 +983,7 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params) {
  * @return this
  */
 SceneJS.Node.prototype.addEvent = function(event) { // TODO: not enqeue event when node has no listeners?
-    this._eventsIn.unshift(event);
+    this._addedEvents.unshift(event);
     return this;
 };
 
