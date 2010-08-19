@@ -254,29 +254,29 @@ SceneJS._geometryModule = new (function() {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             vertexBuf = createArrayBuffer("geometry vertex buffer", context, context.ARRAY_BUFFER,
-                    new WebGLFloatArray(data.positions), data.positions.length, 3, usage);
+                    new Float32Array(data.positions), data.positions.length, 3, usage);
 
             if (data.normals && data.normals.length > 0) {
                 normalBuf = createArrayBuffer("geometry normal buffer", context, context.ARRAY_BUFFER,
-                        new WebGLFloatArray(data.normals), data.normals.length, 3, usage);
+                        new Float32Array(data.normals), data.normals.length, 3, usage);
             }
 
             if (data.uv && data.uv.length > 0) {
                 if (data.uv) {
                     uvBuf = createArrayBuffer("geometry UV buffer", context, context.ARRAY_BUFFER,
-                            new WebGLFloatArray(data.uv), data.uv.length, 2, usage);
+                            new Float32Array(data.uv), data.uv.length, 2, usage);
                 }
             }
 
             if (data.uv2 && data.uv2.length > 0) {
                 if (data.uv2) {
                     uvBuf2 = createArrayBuffer("geometry UV2 buffer", context, context.ARRAY_BUFFER,
-                            new WebGLFloatArray(data.uv2), data.uv2.length, 2, usage);
+                            new Float32Array(data.uv2), data.uv2.length, 2, usage);
                 }
             }
 
             indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
-                    new WebGLUnsignedShortArray(data.indices), data.indices.length, 3, usage);
+                    new Uint16Array(data.indices), data.indices.length, 3, usage);
 
             var geo = {
                 fixed : true, // TODO: support dynamic geometry

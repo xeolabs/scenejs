@@ -421,7 +421,7 @@ SceneJS._webgl_Texture2D = function(context, cfg) {
          */
         if (!cfg.texels) {
             if (cfg.sourceType == context.FLOAT) {
-                cfg.texels = new WebGLFloatArray(cfg.width * cfg.height * 4);
+                cfg.texels = new Float32Array(cfg.width * cfg.height * 4);
             }
             else {
                 cfg.texels = new WebGLUnsignedByteArray(cfg.width * cfg.height * 4);

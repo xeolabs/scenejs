@@ -245,7 +245,7 @@ SceneJS._textureModule = new (function() {
         texture.lastUsed = time;
 
         if (params.matrix && !params.matrixAsArray) {
-            params.matrixAsArray = new WebGLFloatArray(params.matrix);
+            params.matrixAsArray = new Float32Array(params.matrix);
         }
         layerStack.push({
             texture: texture,

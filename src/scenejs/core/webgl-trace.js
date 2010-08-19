@@ -273,10 +273,10 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
     "[object WebGLByteArray]" : "WebGLByteArray",
     "[object WebGLUnsignedByteArray]" : "WebGLUnsignedByteArray",
     "[object WebGLShortArray]" : "WebGLShortArray",
-    "[object WebGLUnsignedShortArray]" : "WebGLUnsignedShortArray",
+    "[object Uint16Array]" : "Uint16Array",
     "[object WebGLIntArray]" : "WebGLIntArray",
     "[object WebGLUnsignedIntArray]" : "WebGLUnsignedIntArray",
-    "[object WebGLFloatArray]" : "WebGLFloatArray"
+    "[object Float32Array]" : "Float32Array"
   }
 
   function asWebGLArray(a) {

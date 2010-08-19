@@ -490,14 +490,14 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
         for (i = 0; i < numChildren; i++) {
             child = children[i];
             configUnsetters = null;
-            childConfigs = traversalContext.configs;
+            childConfigs = this._configs || traversalContext.configs;
             if (childConfigs && child._sid) {
                 childConfigs = childConfigs[child._sid];
                 if (childConfigs) {
                     if (childConfigs instanceof Function) {
                         childConfigs.call(child, data);
                     } else {
-                        configUnsetters = this._setConfigs(childConfigs, traversalContext.configsModes, child, data);
+                        configUnsetters = this._applyConfigs(childConfigs, traversalContext.configsModes, child, data);
                     }
                 }
             }
@@ -556,9 +556,9 @@ SceneJS.Node.prototype._flushEventsOut = function() {
     }
 };
 
-SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child, data) {
+SceneJS.Node.prototype._applyConfigs = function(configs, configsModes, node, data) {
     //    var handle = {
-    //        child : child,
+    //        node : node,
     //        setterFuncs : [],
     //        values : []
     //    };
@@ -567,22 +567,22 @@ SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child,
     var funcName;
     var func;
     var config;
-    for (key in childConfigs) {
-        if (childConfigs.hasOwnProperty(key)) {
-            config = childConfigs[key];
+    for (key in configs) {
+        if (configs.hasOwnProperty(key)) {
+            config = configs[key];
             if (config.isFunc) {
-                func = child[key];
+                func = node[key];
                 if (func) {
                     if (config.value instanceof Function) {
-                        var val = config.value.call(child, data)
-                        func.call(child, val);
+                        var val = config.value.call(node, data)
+                        func.call(node, val);
                     } else {
-                        func.call(child, config.value);
+                        func.call(node, config.value);
                     }
                 } else {
                     if (configsModes && configsModes.strictProperties) {
                         throw SceneJS._errorModule.fatalError(new SceneJS.errors.WithConfigsPropertyNotFoundException(
-                                "Method '" + funcName + "' expected on node with SID '" + child.getSID() + "'"));
+                                "Method '" + funcName + "' expected on node with SID '" + node.getSID() + "'"));
                     }
                 }
             }
@@ -597,6 +597,15 @@ SceneJS.Node.prototype._setConfigs = function(childConfigs, configsModes, child,
 SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
     SceneJS._nodeEventsModule.preVisitNode(this);
     this._processEventsIn();
+
+    /* Apply any configs that were pushed into this node in a "configure" event. We'll also
+     * apply any sub-configs within those to children as we descend into those, then forget the
+     * configs when we leave this method so we don't keep re-applying them
+     */
+    if (this._configs) {
+       this._applyConfigs(this._configs, traversalContext.configsModes, this, data);
+    }
+
     if (this._numListeners == 0) {
         this._render(traversalContext, data);
     } else {
@@ -610,6 +619,12 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
     }
     this._flushEventsOut();
     SceneJS._nodeEventsModule.postVisitNode(this);
+
+    /* Forget any configs we applied
+     */
+    if (this._configs) {
+        this._configs = null;
+    }
 };
 
 /**
@@ -657,7 +672,9 @@ SceneJS.Node.prototype._processEvents = function(events) {
     while (events.length > 0) {
         event = events.pop();
         if (event.name == "configure") {
-            this._configure(event.params);
+            if (event.params && event.params.cfg) { // Silently tolerate missing config
+                this._configure(event.params.cfg);
+            }
         }
         var list = this._listeners[event.name];
         if (list) {
@@ -672,9 +689,47 @@ SceneJS.Node.prototype._processEvents = function(events) {
     }
 };
 
-SceneJS.Node.prototype._configure = function(cfg) {
-    alert("Node#_configure")
-    // this._configs = cfg;
+SceneJS.Node.prototype._configure = function(configs) {
+    this._configs = this._preprocessConfigs(configs);
+};
+
+/**
+ * Preprocesses configs map into node method calls for fast application when rendering node
+ * @param configs
+ */
+SceneJS.Node.prototype._preprocessConfigs = function(configs) {
+    var configAction;
+    var funcName;
+    var newConfigs = {};
+    for (var key in configs) {
+        if (configs.hasOwnProperty(key)) {
+            key = key.replace(/^\s*/, "").replace(/\s*$/, "");    // trim
+            if (key.length > 0) {
+                configAction = key.substr(0, 1);
+                if (configAction != "#") {  // Property reference
+                    if (configAction == "+") {
+                        funcName = "add" + key.substr(1, 1).toUpperCase() + key.substr(2);
+                    } else if (configAction == "-") {
+                        funcName = "remove" + key.substr(1, 1).toUpperCase() + key.substr(2);
+                    } else {
+                        funcName = "set" + key.substr(0, 1).toUpperCase() + key.substr(1);
+                    }
+                    newConfigs[funcName] = {
+                        isFunc : true,
+                        value : configs[key]
+                    };
+
+                } else {
+                    if (configs[key] instanceof Function) {
+                        newConfigs[key.substr(1)] = configs[key];
+                    } else {
+                        newConfigs[key.substr(1)] = this._preprocessConfigs(configs[key]);
+                    }
+                }
+            }
+        }
+    }
+    return newConfigs;
 };
 
 
@@ -701,7 +756,7 @@ SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
         if (childConfigs && child._sid) {
             childConfigs = childConfigs["#" + child._sid];
             if (childConfigs) {
-                var handle = this._setConfigs(childConfigs, traversalContext.configsModes, child);
+                var handle = this._applyConfigs(childConfigs, traversalContext.configsModes, child);
                 child._render.call(child, traversalContext, data);
                 this._unsetConfigs(handle);
                 return;

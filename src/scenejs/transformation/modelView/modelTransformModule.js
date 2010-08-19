@@ -5,10 +5,10 @@
  * get the current modelling transform matrices.
  *
  * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * MODEL_TRANSFORM_EXPORTED to pass the modelling matrix and inverse normal matrix as WebGLFloatArrays to the
+ * MODEL_TRANSFORM_EXPORTED to pass the modelling matrix and inverse normal matrix as Float32Arrays to the
  * shading backend.
  *
- * Normal matrix and WebGLFloatArrays are lazy-computed and cached on export to avoid repeatedly regenerating them.
+ * Normal matrix and Float32Arrays are lazy-computed and cached on export to avoid repeatedly regenerating them.
  *
  * Avoids redundant export of the matrices with a dirty flag; they are only exported when that is set, which occurs
  * when transform is set by scene node, or on SCENE_RENDERING, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
@@ -45,10 +45,10 @@ SceneJS._modelTransformModule = new (function() {
             function() {
                 if (dirty) {
                     if (!transform.matrixAsArray) {
-                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                        transform.matrixAsArray = new Float32Array(transform.matrix);
                     }
                     if (!transform.normalMatrixAsArray) {
-                        transform.normalMatrixAsArray = new WebGLFloatArray(
+                        transform.normalMatrixAsArray = new Float32Array(
                                 SceneJS._math_transposeMat4(
                                         SceneJS._math_inverseMat4(transform.matrix)));
                     }

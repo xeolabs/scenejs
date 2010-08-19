@@ -5,9 +5,9 @@
  * get the current projection matrix.
  *
  * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
- * PROJECTION_TRANSFORM_EXPORTED to pass the projection matrix as a WebGLFloatArray to the shading backend.
+ * PROJECTION_TRANSFORM_EXPORTED to pass the projection matrix as a Float32Array to the shading backend.
  *
- * The WebGLFloatArray is lazy-computed and cached on export to avoid repeatedly regenerating it.
+ * The Float32Array is lazy-computed and cached on export to avoid repeatedly regenerating it.
  *
  * Avoids redundant export of the matrix with a dirty flag; the matrix is only exported when the flag is set, which
  * occurs when the matrix is set by scene node, or on SCENE_RENDERING, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
@@ -44,7 +44,7 @@ SceneJS._projectionModule = new (function() {
             function() {
                 if (dirty) {
                     if (!transform.matrixAsArray) {
-                        transform.matrixAsArray = new WebGLFloatArray(transform.matrix);
+                        transform.matrixAsArray = new Float32Array(transform.matrix);
                     }
                     SceneJS._eventModule.fireEvent(
                             SceneJS._eventModule.PROJECTION_TRANSFORM_EXPORTED,
