@@ -98,6 +98,24 @@ SceneJS.Texture = function() {
 
 SceneJS._inherit(SceneJS.Texture, SceneJS.Node);
 
+/** Ready to create texture layers
+ */
+SceneJS.Texture.STATE_INITIAL = 0;
+
+/** At least one texture layer image load in progress. The Texture node can temporarily revert to this
+ * after {@link STATE_LOADED} if any layer has been evicted from VRAM (after lack of use) while
+ * the Texture node re-creates it.
+ */
+SceneJS.Texture.STATE_LOADING = 1;
+
+/** All texture layer image loads completed
+ */
+SceneJS.Texture.STATE_LOADED = 2;
+
+/** At least one texture layer creation or image load failed. The Texture node limps on in this state.
+ */
+SceneJS.Texture.STATE_ERROR = -1;
+
 // @private
 SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
     var matrix = null;
@@ -125,27 +143,6 @@ SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
     }
     return matrix;
 };
-
-/** Ready to create texture layer
- *  @private
- */
-SceneJS.Texture._STATE_INITIAL = 0;
-
-/** Texture layer image load in progress
- *  @private
- */
-SceneJS.Texture._STATE_LOADING = 1;
-
-/** Texture layer image load completed
- *  @private
- */
-SceneJS.Texture._STATE_LOADED = 2;
-
-/** Texture layer creation or image load failed
- * @private
- */
-SceneJS.Texture._STATE_ERROR = -1;
-
 
 // @private
 SceneJS.Texture.prototype._init = function(params) {
@@ -181,7 +178,7 @@ SceneJS.Texture.prototype._init = function(params) {
             }
         }
         this._layers.push({
-            state : SceneJS.Texture._STATE_INITIAL,
+            state : SceneJS.TextureLayer.STATE_INITIAL,
             process: null,                      // Image load process handle
             image : null,                       // Initialised when state == IMAGE_LOADED
             creationParams: layerParam,         // Create texture using this
@@ -226,9 +223,9 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
     for (var i = 0; i < this._layers.length; i++) {
         var layer = this._layers[i];
 
-        if (layer.state == SceneJS.Texture._STATE_LOADED) {
+        if (layer.state == SceneJS.TextureLayer.STATE_LOADED) {
             if (!SceneJS._textureModule.textureExists(layer.texture)) {  // Texture evicted from cache
-                layer.state = SceneJS.Texture._STATE_INITIAL;
+                layer.state = SceneJS.TextureLayer.STATE_INITIAL;
 
             }
         }
@@ -236,12 +233,12 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
 
         switch (layer.state) {
 
-            case SceneJS.Texture._STATE_LOADED: // Layer ready to apply
+            case SceneJS.TextureLayer.STATE_LOADED: // Layer ready to apply
                 countLayersReady++;
                 break;
 
-            case SceneJS.Texture._STATE_INITIAL: // Layer load to start
-                layer.state = SceneJS.Texture._STATE_LOADING;
+            case SceneJS.TextureLayer.STATE_INITIAL: // Layer load to start
+                layer.state = SceneJS.TextureLayer.STATE_LOADING;
                 (function(l) { // Closure allows this layer to receive results
                     SceneJS._textureModule.createTexture(
                             l.creationParams.uri,
@@ -249,26 +246,26 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
 
                             function(texture) { // Success
                                 l.texture = texture;
-                                l.state = SceneJS.Texture._STATE_LOADED;                                
+                                l.state = SceneJS.TextureLayer.STATE_LOADED;
                             },
 
                             function() { // General error, probably 404
-                                l.state = SceneJS.Texture._STATE_ERROR;
+                                l.state = SceneJS.TextureLayer.STATE_ERROR;
                                 var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
                                 SceneJS._loggingModule.warn(message);
                             },
 
                             function() { // Load aborted - user probably refreshed/stopped page
                                 SceneJS._loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
-                                l.state = SceneJS.Texture._STATE_ERROR;
+                                l.state = SceneJS.TextureLayer.STATE_ERROR;
                             });
                 }).call(this, layer);
                 break;
 
-            case SceneJS.Texture._STATE_LOADING: // Layer still loading
+            case SceneJS.TextureLayer.STATE_LOADING: // Layer still loading
                 break;
 
-            case SceneJS.Texture._STATE_ERROR: // Layer disabled
+            case SceneJS.TextureLayer.STATE_ERROR: // Layer disabled
                 break;
         }
     }
@@ -293,7 +290,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
             for (var i = 0; i < this._layers.length; i++) {
                 var layer = this._layers[i];
 
-                if (layer.state = SceneJS.Texture._STATE_LOADED) {
+                if (layer.state = SceneJS.TextureLayer.STATE_LOADED) {
                     SceneJS._textureModule.pushLayer(layer.texture, {
                         applyFrom : layer.applyFrom,
                         applyTo : layer.applyTo,
@@ -309,6 +306,19 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
         } else {
             this._renderNodes(traversalContext, data);
         }
+    }
+};
+
+
+
+// @private
+SceneJS.Texture.prototype._changeState = function(newState, params) {
+    params = params || {};
+    params.oldState = this._state;
+    params.newState = newState;
+    this._state = newState;
+    if (this._listeners["state-changed"]) {
+        this._fireEvent("state-changed", params);
     }
 };
 

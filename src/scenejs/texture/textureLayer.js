@@ -24,4 +24,24 @@ SceneJS.TextureLayer = function(cfg) {
         this._dirty = true; // Needs recreate when this is dirty        
 };
 
+/** Ready to create texture layer
+ *  @private
+ */
+SceneJS.TextureLayer.STATE_INITIAL = 0;
+
+/** Texture layer image load in progress
+ *  @private
+ */
+SceneJS.TextureLayer.STATE_LOADING = 1;
+
+/** Texture layer image load completed
+ *  @private
+ */
+SceneJS.TextureLayer.STATE_LOADED = 2;
+
+/** Texture layer creation or image load failed
+ * @private
+ */
+SceneJS.TextureLayer.STATE_ERROR = -1;
+
 
