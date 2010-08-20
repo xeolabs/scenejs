@@ -146,14 +146,7 @@ SceneJS._SocketModule = new (function() {
 
     /**
      * Fetches next message from the end of the incoming queue.
-     *
-     * Incoming messages look like this:
-     *
-     * { error: 404, body: "Not found!" }
-     *
-     * { body: < body object/string> }
-     *
-     * The onError will return an exception object, while the onSuccess handler will return the message body JSON object.
+     * The onError will return an exception object, while the onSuccess handler will return the message JSON object.
      */
     this.getNextMessage = function(onError, onSuccess) {
         var inQueue = activeSocket.messages.inQueue;
@@ -167,24 +160,8 @@ SceneJS._SocketModule = new (function() {
                     log(activeSocket.id, "processing message: '" + messageStr + "");
                 }
                 var messageObj = eval('(' + messageStr + ')');
-                if (messageObj.error) {
-
-                    /* Server reports an error
-                     */
-                    onError(new SceneJS.errors.SocketServerErrorException(
-                            "SceneJS.Socket server error - server reports error (server URI: '"
-                                    + activeSocket.uri + "'): " + messageObj.error + ", " + messageObj.body));
-
-                } else if (!messageObj.body) {
-
-                    /* Badly-formed response - body missing
-                     */
-                    onError(new SceneJS.errors.SocketErrorException("SceneJS.Socket error - bad message from server (server URI: '"
-                            + activeSocket.uri + "'): body is missing in message:" + messageStr));
-                } else {
-                    inQueue.pop();                        // Evaled OK, can pop now
-                    onSuccess(messageObj.body);
-                }
+                inQueue.pop();              // Evaled OK, can pop now
+                onSuccess(messageObj.body);
             } catch (e) {
                 onError(new SceneJS.errors.SocketErrorException
                         ("SceneJS.Socket error reading message (from server at URI: '" + activeSocket.uri + "') : " + e));

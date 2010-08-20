@@ -673,7 +673,7 @@ SceneJS.Node.prototype._processEvents = function(events) {
         event = events.pop();
         if (event.name == "configure") {
             if (event.params && event.params.cfg) { // Silently tolerate missing config
-                this._configure(event.params.cfg);
+                this.configure(event.params.cfg);
             }
         }
         var list = this._listeners[event.name];
@@ -689,12 +689,13 @@ SceneJS.Node.prototype._processEvents = function(events) {
     }
 };
 
-SceneJS.Node.prototype._configure = function(configs) {
+SceneJS.Node.prototype.configure = function(configs) {
     this._configs = this._preprocessConfigs(configs);
 };
 
 /**
- * Preprocesses configs map into node method calls for fast application when rendering node
+ * Preprocesses configs map into node method calls for fast
+ * application when rendering node
  * @param configs
  */
 SceneJS.Node.prototype._preprocessConfigs = function(configs) {

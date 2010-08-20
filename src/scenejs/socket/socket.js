@@ -1,37 +1,11 @@
 /**
- * @class Binds its subgraph to a WebSocket, providing a server with the ability to add, remove and manipulate content within the subgraph
+ * @class Binds its subgraph to a WebSocket, providing a scene with the ability to interact with a server.
  *
  * <p>The SceneJS.Socket node enables a server to dynamically participate in the construction, destruction and
  * configuration of its subgraph. It binds the subgraph to a WebSocket through which it exchanges JSON message objects
  * with a server.</p>
  *
- * <h2>Message Format</h2>
- * <p>Incoming messages from a server are either error responses, like that shown below, or configuration maps
- * exactly like those specified with a {@link SceneJS.WithConfigs}. On receipt of a configuration map, a Socket
- * automatically applies the map to its subgraph in the same way that a {@link SceneJS.WithConfigs} does.</p>
- * <p>An error response object has two parts: the error code, either a string or number, and a message.</p>
- *
- * <p>Below is an example of an HTTP 404 error server response:</p>
- * <pre><code>
- * {
- *     error : 404,
- *     body  : "Could not find asset 'foobar'
- * }
- * </code></pre>
- *
- * <p>Below is an example of a server response containing subnode configurations:</p>
- * <pre><code>
- * {
- *     body : {
- *          configs: {
- *              // ...
- *          }
- *     }
- * }
- * </code></pre>
- *
- * <p>The outgoing message format is not part of the SceneJS specification and is whatever JSON objects the server on
- * the other end expects.</p>
+ * <p>Messages are just JSON objects - it's up to the server and the Socket to agree on their structure and protocol.</p>
  *
  * <h2>Message Queues</h2>
  * <p>Messages can be configured on the Socket to send when the connection first opens, or enqueued at any
@@ -50,7 +24,8 @@
  * The server may respond with an error (described further below) or a configuration map. If the response is a
  * configuration map, the Socket would then apply that to its sub-nodes.
  * On error, the Socket will transition to {@link #STATE_ERROR} and remain in that state, with connection closed. If
- * the connection ever closes, the Socket will attempt to re-open it when next rendered.</p>
+ * the connection ever closes, the Socket will attempt to re-open it when next rendered. When the server asks
+ * "whatsYourFavouriteColor", we'll reply "green".</p>
  * <pre><code>
  * new SceneJS.Socket({
  *
@@ -58,12 +33,15 @@
  *
  *       uri: "ws://127.0.0.1:8888/",
  *
- *       // Messages to send as soon as the socket is first opened
+ *       // Optional messages to send as soon as the socket is first opened
  *
  *       messages: [
  *          {
- *               myParam  : "foo",
- *               myParam2 : "bar"
+ *               foo: "hi server",
+ *               favouriteAnimals: {
+ *                   animal1: "Kakapo",
+ *                   animal2: "Tuatara"
+ *               }
  *          },
  *
  *          // Next message ...
@@ -103,10 +81,19 @@
  *                          break;
  *                   }
  *               }
+ *           },
+ *
+ *           // Reply to "whatsYouFavouriteColour" messages
+ *
+ *           "msg-received" : function(event) {  // Can optionally just provide a function
+ *               var message = event.params.message;
+ *               if (message.bar == "whatsYouFavouriteColour") {
+ *                     this.addMessage({ foo: "favouriteColourIs", color: "green" });
+ *               }
  *           }
  *       },
  *
- *       // Child nodes that will receive configs returned by socket's server peer
+ *       // Child nodes
  *)
  *
  * </code></pre>
@@ -189,8 +176,7 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
                 new SceneJS.errors.InvalidNodeConfigException("SceneJS.Socket uri property not defined"));
     }
 
-    /* Socket can close after lack of use, in which case
-     * the node would have to re-open it
+    /* Socket can close after lack of use, in which case the node must to re-open it
      */
     if (this._state == SceneJS.Socket.STATE_OPEN) {
         if (!SceneJS._SocketModule.acquireSocket(this._socketId)) {
@@ -212,32 +198,12 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
                     SceneJS._errorModule.error(exception);
                 },
 
-            /* Messages got
+            /* Message got
              */
-                function(messageBody) {
-
-                    if (messageBody.configs) {
-
-                        /* Message is configs - insert them
-                         * into the traversal context
-                         */
-                        traversalContext = {                            
-                            insideRightFringe: _self._children.length > 1,
-                            callback : traversalContext.callback,
-                            configs : _self._preprocessConfigs(messageBody.configs),
-                            configsModes : _self._configsModes // TODO configsModes in message?
-                        };
-                        data = new SceneJS.Data(data, _self._fixedParams, this._data);
-
-                    } else {
-
-                        /* TODO: handle other message types
-                         */
-                        SceneJS._errorModule.error(
-                                new SceneJS.errors.SocketServerErrorException(
-                                        "SceneJS.Socket server responded with unrecognised message: " + JSON.stringify(messageBody)));
-                    }
+                function(message) {
+                    _self.addEvent({ name: "msg-received", params: { message: message } });
                 });
+
         this._sendMessages();
         this._renderNodes(traversalContext, data);
         SceneJS._SocketModule.releaseSocket();
@@ -262,41 +228,9 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
         }
         if (this._state == SceneJS.Socket.STATE_ERROR) { // Socket disabled - TODO: retry?
         }
-        this._renderNodes(traversalContext, data); // We're assuming socket wont open instantly, ie. during this node visit
+        this._renderNodes(traversalContext, data); // No socket acquired yet
     }
-};
 
-// TODO: factor out and share with SceneJS.WithConfigs - mutual feature envy smell ;)
-
-SceneJS.Socket.prototype._preprocessConfigs = function(configs) {
-    var configAction;
-    var funcName;
-    var newConfigs = {};
-    for (var key in configs) {
-        if (configs.hasOwnProperty(key)) {
-            key = key.replace(/^\s*/, "").replace(/\s*$/, "");    // trim
-            if (key.length > 0) {
-                configAction = key.substr(0, 1);
-                if (configAction != "#") {  // Property reference
-                    if (configAction == "+") {
-                        funcName = "add" + key.substr(1, 1).toUpperCase() + key.substr(2);
-                    } else if (configAction == "-") {
-                        funcName = "remove" + key.substr(1, 1).toUpperCase() + key.substr(2);
-                    } else {
-                        funcName = "set" + key.substr(0, 1).toUpperCase() + key.substr(1);
-                    }
-                    newConfigs[funcName] = {
-                        isFunc : true,
-                        value : configs[key]
-                    };
-
-                } else {
-                    newConfigs[key.substr(1)] = this._preprocessConfigs(configs[key]);
-                }
-            }
-        }
-    }
-    return newConfigs;
 };
 
 // @private
@@ -307,12 +241,6 @@ SceneJS.Socket.prototype._changeState = function(newState, params) {
     this._state = newState;
     if (this._listeners["state-changed"]) {
         this._fireEvent("state-changed", params);
-    }
-};
-
-SceneJS.Socket.prototype._onMessage = function(message) {
-    if (this._listeners["msg-received"]) {
-        this._fireEvent("msg-received", message);
     }
 };
 
