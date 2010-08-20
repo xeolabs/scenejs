@@ -55,7 +55,43 @@
  *                               z: 1
  *                           }
  *                       }
- *                   ]
+ *                   ],
+ *
+ *                   // You can observe the state of the Texture node:
+ *
+ *                   listeners: {
+ *                       "state-changed":
+ *                           function(event) {
+ *                               switch (event.params.newState) {
+ *                                   case SceneJS.Texture.STATE_INITIAL:
+ *                                       alert("SceneJS.Texture.STATE_INITIAL");
+ *                                       break;
+ *
+ *                                   case SceneJS.Texture.STATE_LOADING:
+ *
+ *                                       // At least one layer still loading
+ *
+ *                                       alert("SceneJS.Texture.STATE_LOADING");
+ *                                       break;
+ *
+ *                                   case SceneJS.Texture.STATE_LOADED:
+ *
+ *                                       // All layers loaded
+ *
+ *                                       alert("SceneJS.Texture.STATE_LOADED");
+ *                                       break;
+ *
+ *                                   case SceneJS.Texture.STATE_ERROR:
+ *
+ *                                       // One or more layers failed to load - Layer
+ *                                       // will limp on, remaining in this state
+ *
+ *                                       alert("SceneJS.Texture.STATE_ERROR: " + params.exception.message || params.exception);
+ *                                       break;
+ *                                  }
+ *                              }
+ *                          }
+ *                     }
  *               },
  *
  *               new SceneJS.objects.Cube()
@@ -94,6 +130,7 @@ SceneJS.Texture = function() {
     SceneJS.Node.apply(this, arguments);
     this._nodeType = "texture";
     this._layers = null;
+    this._state = SceneJS.Texture.STATE_INITIAL;
 };
 
 SceneJS._inherit(SceneJS.Texture, SceneJS.Node);
@@ -226,7 +263,6 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
         if (layer.state == SceneJS.TextureLayer.STATE_LOADED) {
             if (!SceneJS._textureModule.textureExists(layer.texture)) {  // Texture evicted from cache
                 layer.state = SceneJS.TextureLayer.STATE_INITIAL;
-
             }
         }
 
@@ -239,6 +275,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
 
             case SceneJS.TextureLayer.STATE_INITIAL: // Layer load to start
                 layer.state = SceneJS.TextureLayer.STATE_LOADING;
+                var self = this;
                 (function(l) { // Closure allows this layer to receive results
                     SceneJS._textureModule.createTexture(
                             l.creationParams.uri,
@@ -253,11 +290,23 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                                 l.state = SceneJS.TextureLayer.STATE_ERROR;
                                 var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
                                 SceneJS._loggingModule.warn(message);
+
+                                if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
+                                    self._changeState(SceneJS.Texture.STATE_ERROR, {
+                                        exception: new SceneJS.errors.Exception("SceneJS.Exception - " + message)
+                                    });
+                                }
                             },
 
                             function() { // Load aborted - user probably refreshed/stopped page
                                 SceneJS._loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
                                 l.state = SceneJS.TextureLayer.STATE_ERROR;
+
+                                if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
+                                    self._changeState(SceneJS.Texture.STATE_ERROR, {
+                                        exception: new SceneJS.errors.Exception("SceneJS.Exception - texture image load stopped - user aborted it?")
+                                    });
+                                }
                             });
                 }).call(this, layer);
                 break;
@@ -300,15 +349,24 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                     countPushed++;
                 }
             }
+
+            if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
+                this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
+                this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
+            }
+
             this._renderNodes(traversalContext, data);
             SceneJS._textureModule.popLayers(countPushed);
-
         } else {
+
+            if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
+                this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
+                this._changeState(SceneJS.Texture.STATE_LOADING); // Now loading some layers
+            }
             this._renderNodes(traversalContext, data);
         }
     }
 };
-
 
 
 // @private
