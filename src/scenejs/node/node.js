@@ -595,34 +595,35 @@ SceneJS.Node.prototype._applyConfigs = function(configs, configsModes, node, dat
  * Wraps _render to fire built-in events either side of rendering.
  * @private */
 SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
-    SceneJS._nodeEventsModule.preVisitNode(this);
-    this._processEventsIn();
+    try {
+        SceneJS._nodeEventsModule.preVisitNode(this);
+        this._processEventsIn();
 
-    /* Apply any configs that were pushed into this node in a "configure" event. We'll also
-     * apply any sub-configs within those to children as we descend into those, then forget the
-     * configs when we leave this method so we don't keep re-applying them
-     */
-    if (this._configs) {
-       this._applyConfigs(this._configs, traversalContext.configsModes, this, data);
-    }
-
-    if (this._numListeners == 0) {
-        this._render(traversalContext, data);
-    } else {
-        if (this._listeners["rendering"]) {
-            this._fireEvent("rendering", { });
+        /* Apply any configs that were pushed into this node in a "configure" event. We'll also
+         * apply any sub-configs within those to children as we descend into those, then forget the
+         * configs when we leave this method so we don't keep re-applying them
+         */
+        if (this._configs) {
+            this._applyConfigs(this._configs, traversalContext.configsModes, this, data);
         }
-        this._render(traversalContext, data);
-        if (this._listeners["rendered"]) {
-            this._fireEvent("rendered", { });
-        }
-    }
-    this._flushEventsOut();
-    SceneJS._nodeEventsModule.postVisitNode(this);
 
-    /* Forget any configs we applied
-     */
-    if (this._configs) {
+        if (this._numListeners == 0) {
+            this._render(traversalContext, data);
+        } else {
+            if (this._listeners["rendering"]) {
+                this._fireEvent("rendering", { });
+            }
+            this._render(traversalContext, data);
+            if (this._listeners["rendered"]) {
+                this._fireEvent("rendered", { });
+            }
+        }
+        this._flushEventsOut();
+        SceneJS._nodeEventsModule.postVisitNode(this);
+
+        /* Forget any configs we applied - make sure we do this if they threw an exception
+         */
+    } finally {
         this._configs = null;
     }
 };

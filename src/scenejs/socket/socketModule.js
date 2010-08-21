@@ -161,7 +161,7 @@ SceneJS._SocketModule = new (function() {
                 }
                 var messageObj = eval('(' + messageStr + ')');
                 inQueue.pop();              // Evaled OK, can pop now
-                onSuccess(messageObj.body);
+                onSuccess(messageObj);
             } catch (e) {
                 onError(new SceneJS.errors.SocketErrorException
                         ("SceneJS.Socket error reading message (from server at URI: '" + activeSocket.uri + "') : " + e));
