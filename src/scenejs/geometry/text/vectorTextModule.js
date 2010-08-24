@@ -1460,7 +1460,7 @@ SceneJS._vectorTextModule = new (function() {
                         continue;
                     }
 
-                    geo.positions.push(x + a[0] * -mag);
+                    geo.positions.push(x + a[0] * mag);
                     geo.positions.push(y + a[1] * mag);
                     geo.positions.push(0);
 
@@ -1486,10 +1486,10 @@ SceneJS._vectorTextModule = new (function() {
                     }
                     needLine = true;
                 }
-                x -= c.width * mag;
+                x += c.width * mag;
 
             }
-            y -= 25 * mag;
+            y += 25 * mag;
         }
         return geo;
     };

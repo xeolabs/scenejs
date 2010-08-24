@@ -33,6 +33,7 @@ SceneJS.Text.prototype._init = function(params) {
     this._create = function() {
         var geo = SceneJS._vectorTextModule.getGeometry(1, 0, 0, params.text); // Unit size
         return {
+            type: this._id,
             primitive : "lines",
             positions : geo.positions,
             normals: [],

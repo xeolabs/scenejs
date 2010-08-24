@@ -125,7 +125,7 @@ var SceneJS = {
         }
         return func.apply(this, args);
     },
-  
+
     /**
      * Fire an event at the node with teh given ID
      *

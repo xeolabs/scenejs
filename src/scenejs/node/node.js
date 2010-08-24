@@ -187,7 +187,7 @@ SceneJS.Node = function() {
     this._NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
     this._sid = null;
     this._children = [];
-    this._fixedParams = true;
+    this._fixedParams = true;     
     this._parent = null;
     this._listeners = {};
     this._numListeners = 0; // Useful for quick check whether node observes any events
@@ -1010,6 +1010,15 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
         options : options || {}
     });
     this._numListeners++;
+    return this;
+};
+
+/**
+ * Destroys this node the next time it's rendered
+ * @return {SceneJS.Node} this
+ */
+SceneJS.Node.prototype.destroy = function() {
+   // alert("destroying");
     return this;
 };
 

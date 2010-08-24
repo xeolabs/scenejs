@@ -48,7 +48,7 @@
  */
 SceneJS.Interpolator = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "interpolator";
+    this._nodeType = "interpolator";    
     this._input = null;
     this._output = null;
     this._outputValue = null;
@@ -284,7 +284,7 @@ SceneJS.Interpolator.prototype._render = function(traversalContext, data) {
     if (key == undefined || key == null) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.DataExpectedException(
-                        "SceneJS.Interpolator failed to find input on data: '" + params.input + "'"));
+                        "SceneJS.Interpolator failed to find input on data: '" + this._input + "'"));
     }
     this._update(key);
     var obj = {};

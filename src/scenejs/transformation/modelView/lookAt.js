@@ -55,6 +55,39 @@ SceneJS.LookAt.prototype.setEye = function(eye) {
     return this;
 };
 
+/** Sets the eye X position.
+ *
+ * @param {float} x Eye X position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setEyeX = function(x) {
+    this._eyeX = x || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the eye Y position.
+ *
+ * @param {float} y Eye Y position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setEyeY = function(y) {
+    this._eyeY = y || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the eye Z position.
+ *
+ * @param {float} z Eye Z position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setEyeZ = function(z) {
+    this._eyeZ = z || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
 /** Returns the eye position.
  *
  * @returns {Object} Eye position - Eg. { x: 0.0, y: 10.0, z: -15 }
@@ -77,6 +110,39 @@ SceneJS.LookAt.prototype.setLook = function(look) {
     this._lookX = look.x || 0;
     this._lookY = look.y || 0;
     this._lookZ = look.z || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the look X position.
+ *
+ * @param {float} x Look X position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setLookX = function(x) {
+    this._lookX = x || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the look Y position.
+ *
+ * @param {float} y Look Y position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setLookY = function(y) {
+    this._lookY = y || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the look Z position.
+ *
+ * @param {float} z Look Z position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setLookZ = function(z) {
+    this._lookZ = z || 0;
     this._memoLevel = 0;
     return this;
 };
@@ -109,6 +175,39 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     this._upX = x;
     this._upY = y;
     this._upZ = z;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the up X position.
+ *
+ * @param {float} x Up X position
+ * @returns {SceneJS.UpAt} this
+ */
+SceneJS.LookAt.prototype.setUpX = function(x) {
+    this._upX = x || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the up Y position.
+ *
+ * @param {float} y Up Y position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setUpY = function(x) {
+    this._upY = y || 0;
+    this._memoLevel = 0;
+    return this;
+};
+
+/** Sets the up Z position.
+ *
+ * @param {float} z Up Z position
+ * @returns {SceneJS.LookAt} this
+ */
+SceneJS.LookAt.prototype.setUpZ = function(x) {
+    this._upZ = z || 0;
     this._memoLevel = 0;
     return this;
 };
