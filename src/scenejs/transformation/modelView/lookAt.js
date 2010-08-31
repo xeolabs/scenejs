@@ -16,30 +16,16 @@
  * Create a new SceneJS.LookAt
  * @param {Object} cfg  Config object or function, followed by zero or more child nodes
  */
-SceneJS.LookAt = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "lookat";
+SceneJS.LookAt = SceneJS.createNodeType("lookAt");
+
+SceneJS.LookAt.prototype._init = function(params) {
     this._mat = null;
     this._xform = null;
 
-    this._eyeX = 0;
-    this._eyeY = 0;
-    this._eyeZ = 1;
-
-    this._lookX = 0;
-    this._lookY = 0;
-    this._lookZ = 0;
-
-    this._upX = 0;
-    this._upY = 1;
-    this._upZ = 0;
-
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
+    this.setEye(params.eye);
+    this.setLook(params.look);
+    this.setUp(params.up);
 };
-
-SceneJS._inherit(SceneJS.LookAt, SceneJS.Node);
 
 /** Sets the eye position.
  * Don't allow this position to be the same as the position being looked at.
@@ -48,10 +34,11 @@ SceneJS._inherit(SceneJS.LookAt, SceneJS.Node);
  * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setEye = function(eye) {
+    eye = eye || {};
     this._eyeX = eye.x || 0;
     this._eyeY = eye.y || 0;
     this._eyeZ = eye.z || 1;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -62,7 +49,7 @@ SceneJS.LookAt.prototype.setEye = function(eye) {
  */
 SceneJS.LookAt.prototype.setEyeX = function(x) {
     this._eyeX = x || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -73,7 +60,7 @@ SceneJS.LookAt.prototype.setEyeX = function(x) {
  */
 SceneJS.LookAt.prototype.setEyeY = function(y) {
     this._eyeY = y || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -84,7 +71,7 @@ SceneJS.LookAt.prototype.setEyeY = function(y) {
  */
 SceneJS.LookAt.prototype.setEyeZ = function(z) {
     this._eyeZ = z || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -107,10 +94,11 @@ SceneJS.LookAt.prototype.getEye = function() {
  * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setLook = function(look) {
+    look = look || {};
     this._lookX = look.x || 0;
     this._lookY = look.y || 0;
     this._lookZ = look.z || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -121,7 +109,7 @@ SceneJS.LookAt.prototype.setLook = function(look) {
  */
 SceneJS.LookAt.prototype.setLookX = function(x) {
     this._lookX = x || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -132,7 +120,7 @@ SceneJS.LookAt.prototype.setLookX = function(x) {
  */
 SceneJS.LookAt.prototype.setLookY = function(y) {
     this._lookY = y || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -143,7 +131,7 @@ SceneJS.LookAt.prototype.setLookY = function(y) {
  */
 SceneJS.LookAt.prototype.setLookZ = function(z) {
     this._lookZ = z || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -164,6 +152,7 @@ SceneJS.LookAt.prototype.getLook = function() {
  * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setUp = function(up) {
+    up = up || { y: 1.0 };
     var x = up.x || 0;
     var y = up.y || 0;
     var z = up.z || 0;
@@ -175,7 +164,7 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     this._upX = x;
     this._upY = y;
     this._upZ = z;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -186,7 +175,7 @@ SceneJS.LookAt.prototype.setUp = function(up) {
  */
 SceneJS.LookAt.prototype.setUpX = function(x) {
     this._upX = x || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -197,7 +186,7 @@ SceneJS.LookAt.prototype.setUpX = function(x) {
  */
 SceneJS.LookAt.prototype.setUpY = function(x) {
     this._upY = y || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -208,7 +197,7 @@ SceneJS.LookAt.prototype.setUpY = function(x) {
  */
 SceneJS.LookAt.prototype.setUpZ = function(x) {
     this._upZ = z || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -225,37 +214,18 @@ SceneJS.LookAt.prototype.getUp = function() {
     };
 };
 
-SceneJS.LookAt.prototype._init = function(params) {
-    if (params.eye) {
-        this.setEye(params.eye);
-    }
-    if (params.look) {
-        this.setLook(params.look);
-    }
-    if (params.up) {
-        this.setUp(params.up);
-    }
-};
-
-SceneJS.LookAt.prototype._render = function(traversalContext, data) {
+SceneJS.LookAt.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
-
     if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        } else {
-            this._memoLevel = 1;
-        }
         this._mat = SceneJS._math_lookAtMat4c(
                 this._eyeX, this._eyeY, this._eyeZ,
                 this._lookX, this._lookY, this._lookZ,
                 this._upX, this._upY, this._upZ);
+        this._memoLevel = 1;
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
-    if (origMemoLevel < 2 || (!superXform.fixed)) {
-
+    if (this._memoLevel < 2 || (!superXform.fixed)) {
         var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
-
         this._xform = {
             type: "lookat",
             matrix: tempMat,
@@ -266,22 +236,11 @@ SceneJS.LookAt.prototype._render = function(traversalContext, data) {
             },
             fixed: origMemoLevel == 2
         };
-        
         if (this._memoLevel == 1 && superXform.fixed && !SceneJS._instancingModule.instancing()) {   // Bump up memoization level if space fixed
             this._memoLevel = 2;
         }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXform);
 };
-
-/** Factory function that returns a new {@link SceneJS.LookAt} instance
- */
-SceneJS.lookAt = function() {
-    var n = new SceneJS.LookAt();
-    SceneJS.LookAt.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("lookat", SceneJS.lookAt);

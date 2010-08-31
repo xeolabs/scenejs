@@ -4,36 +4,53 @@
 <head>
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
+    <style>
+        body {
+            margin: auto;
+            background-color: #666666;
+            padding-top: 50px;
+            font-family: Helvetica, sans-serif;
+            font-size: 0.8em;
+            color: #666;
+            font-size: 0.8em
+        }
+
+        #demo {
+            margin: auto;
+            width: 1000px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            -webkit-box-shadow: 5px 5px 2px #444444;
+        }
+    </style>
+
 </head>
 <body>
-<table>
-    <tr>
-        <td valign="top">
-            <canvas id="theCanvas" width="600" height="600">
-                <p>This example requires a browser that supports the
-                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-                    &lt;canvas&gt; feature.</p>
-            </canvas>
-        </td>
-        <td valign="top">
-            <h1>Data Flow - Adding Elements within a Subgraph</h1>
+<div id="demo">
+    <canvas id="theCanvas" width="1000" height="800">
+        <p>This example requires a browser that supports the
+            <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+            &lt;canvas&gt; feature.</p>
+    </canvas>
+    <div id="info">
+        <h2>SceneJD Data Flow Demo - Pushing Elements into a Subgraph</h2>
 
-            <p>In this example we're using a SceneJS.WithConfigs node to add a teapot to its subgraph.</p>
+        <p>In this example we're using a SceneJS.WithConfigs node to add a teapot to its subgraph.</p>
 
-            <p>This isn't terribly dramatic - you should just see a teapot appear!</p>
+        <p>This isn't terribly dramatic - you should just see a teapot appear!</p>
+        <ul>
+            <li><a target="_other" href="with-configs-add.js">Scene source code</a></li>
+            <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.WithConfigs">Wiki article on
+                SceneJS.WithConfigs</a></li>
+        </ul>
+    </div>
+    <div id="log">
+        <h3>Log</h3>
 
-            <p>This is some powerful stuff - the SceneJS.Socket node contains the same functionality as a
-                SceneJS.WithConfigs, providing the means for a server to push content into a client scene graph.</p>
-
-            <li><a target="other" href="with-configs-add.js">Scene source code</a></li>
-            <li><a target="other" href="http://scenejs.wikispaces.com/SceneJS.WithConfigs">Wiki article on SceneJS.WithConfigs</a></li>
-            <li><a target="other" href="http://scenejs.wikispaces.com/SceneJS.Socket">Wiki article on SceneJS.Socket</a></li>
-            
-            <div id="theLoggingDiv"></div>
-        </td>
-    </tr>
-</table>
-
+        <div id="theLoggingDiv"></div>
+    </div>
+</div>
 <script type="text/javascript" src="with-configs-add.js"></script>
 </body>
 </html>

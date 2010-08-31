@@ -14,7 +14,7 @@
  *
  *      new SceneJS.Stationary(
  *          new SceneJS.Scale({ x: 100.0, y: 100.0, z: 100.0 },
- *              new SceneJS.objects.Cube()
+ *              new SceneJS.Cube()
  *          )
  *      )
  *  )
@@ -25,15 +25,9 @@
  * Create a new SceneJS.Stationary
  * @param {args} args Zero or more child nodes
  */
-SceneJS.Stationary = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "stationary";
-    this._xform = null;
-};
+SceneJS.Stationary = SceneJS.createNodeType("stationary");
 
-SceneJS._inherit(SceneJS.Stationary, SceneJS.Node);
-
-SceneJS.Stationary.prototype._render = function(traversalContext, data) {
+SceneJS.Stationary.prototype._render = function(traversalContext) {
 
     var origMemoLevel = this._memoLevel;
 
@@ -58,20 +52,9 @@ SceneJS.Stationary.prototype._render = function(traversalContext, data) {
             }
         }
         SceneJS._viewTransformModule.setTransform(this._xform);
-        this._renderNodes(traversalContext, data);
+        this._renderNodes(traversalContext);
         SceneJS._viewTransformModule.setTransform(superXform);
     } else {
-        this._renderNodes(traversalContext, data);
+        this._renderNodes(traversalContext);
     }
 };
-
-
-/** Factory function that returns a new {@link SceneJS.Stationary} instance
- */
-SceneJS.stationary = function() {
-    var n = new SceneJS.Stationary();
-    SceneJS.Stationary.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("stationary", SceneJS.stationary);

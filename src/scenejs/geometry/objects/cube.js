@@ -9,7 +9,7 @@ SceneJS._namespace("SceneJS.objects");
  * one made of triangles. When not solid, it will be a wireframe drawn as line segments.</p>
  * <p><b>Example Usage</b></p><p>Definition of solid cube that is 6 units long on the X axis and 2 units long on the
  * Y and Z axis:</b></p><pre><code>
- * var c = new SceneJS.objects.Cube({
+ * var c = new SceneJS.Cube({
  *          xSize : 3,
  *          solid: true // Optional - when true (default) cube is solid, otherwise it is wireframe
  *     })
@@ -17,29 +17,23 @@ SceneJS._namespace("SceneJS.objects");
  * @extends SceneJS.Geometry
  * @since Version 0.7.4
  * @constructor
- * Create a new SceneJS.objects.Cube
+ * Create a new SceneJS.Cube
  * @param {Object} [cfg] Static configuration object
  * @param {float} [cfg.xSize=1.0] Half-width on X-axis
  * @param {float} [cfg.ySize=1.0] Half-width on Y-axis
  * @param {float} [cfg.zSize=1.0] Half-width on Z-axis
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.objects.Cube = function() {
-    SceneJS.Geometry.apply(this, arguments);
-    this._nodeType = "cube";
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
-};
-
-SceneJS._inherit(SceneJS.objects.Cube, SceneJS.Geometry);
+SceneJS.Cube = SceneJS.createNodeType("cube", "geometry");
 
 // @private
-SceneJS.objects.Cube.prototype._init = function(params) {
+SceneJS.Cube.prototype._init = function(params) {
+    this._nodeType = "cube";
+
     var x = params.xSize || 1;
     var y = params.ySize || 1;
     var z = params.zSize || 1;
+
     var solid = (params.solid != undefined) ? params.solid : true;
 
     /* Type ID ensures that we reuse any scube that has already been created with
@@ -176,21 +170,3 @@ SceneJS.objects.Cube.prototype._init = function(params) {
         };
     };
 };
-
-/** Returns a new SceneJS.objects.Cube instance
- * @param {Object} [cfg] Static configuration object
- * @param {float} [cfg.xSize=1.0] Half-width on X-axis
- * @param {float} [cfg.ySize=1.0] Half-width on Y-axis
- * @param {float} [cfg.zSize=1.0] Half-width on Z-axis
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
- * @param {...SceneJS.Node} [childNodes] Child nodes
- * @since Version 0.7.0
- * @returns {SceneJS.objects.Cube}
- */
-SceneJS.objects.cube = function() {
-    var n = new SceneJS.objects.Cube();
-    SceneJS.objects.Cube.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("cube", SceneJS.objects.cube);

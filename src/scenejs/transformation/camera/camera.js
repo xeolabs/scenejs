@@ -94,70 +94,71 @@
  * Create a new SceneJS.Camera
  * @param {Object} cfg  Config object or function, followed by zero or more child nodes
  */
-SceneJS.Camera = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "camera";
-    this._optics = {
-        type: "perspective",
-        fovy : 60.0,
-        aspect : 1.0,
-        near : 0.10,
-        far : 5000.0
-    };
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
-};
+SceneJS.Camera = SceneJS.createNodeType("camera");
 
-SceneJS._inherit(SceneJS.Camera, SceneJS.Node);
+// @private
+SceneJS.Camera.prototype._init = function(params) {
+    this.setOptics(params.optics); // Can be undefined
+};
 
 /**
  * Sets projection properties on the camera.
+ * Sets to default when args undefined.
  *
  * @param {Object} optics Projection properties
  * @returns {SceneJS.Camera} this
  */
 SceneJS.Camera.prototype.setOptics = function(optics) {
-    if (optics.type == "ortho") {
+    if (!optics) {
         this._optics = {
-            type: optics.type,
-            left : optics.left || -1.0,
-            bottom : optics.bottom || -1.0,
-            near : optics.near || 0.1,
-            right : optics.right || 1.00,
-            top : optics.top || 1.0,
-            far : optics.far || 5000.0
+            type: "perspective",
+            fovy : 60.0,
+            aspect : 1.0,
+            near : 0.10,
+            far : 5000.0
         };
-    } else if (optics.type == "frustum") {
-        this._optics = {
-            type: optics.type,
-            left : optics.left || -1.0,
-            bottom : optics.bottom || -1.0,
-            near : optics.near || 0.1,
-            right : optics.right || 1.00,
-            top : optics.top || 1.0,
-            far : optics.far || 5000.0
-        };
-    } else  if (optics.type == "perspective") {
-        this._optics = {
-            type: optics.type,
-            fovy : optics.fovy || 60.0,
-            aspect: optics.aspect || 1.0,
-            near : optics.near || 0.1,
-            far : optics.far || 5000.0
-        };
-    } else if (!optics.type) {
-        throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidNodeConfigException(
-                        "SceneJS.Camera configuration invalid: optics type not specified - " +
-                        "supported types are 'perspective', 'frustum' and 'ortho'"));
     } else {
-        throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidNodeConfigException(
-                        "SceneJS.Camera configuration invalid: optics type not supported - " +
-                        "supported types are 'perspective', 'frustum' and 'ortho'"));
+        if (optics.type == "ortho") {
+            this._optics = {
+                type: optics.type,
+                left : optics.left || -1.0,
+                bottom : optics.bottom || -1.0,
+                near : optics.near || 0.1,
+                right : optics.right || 1.00,
+                top : optics.top || 1.0,
+                far : optics.far || 5000.0
+            };
+        } else if (optics.type == "frustum") {
+            this._optics = {
+                type: optics.type,
+                left : optics.left || -1.0,
+                bottom : optics.bottom || -1.0,
+                near : optics.near || 0.1,
+                right : optics.right || 1.00,
+                top : optics.top || 1.0,
+                far : optics.far || 5000.0
+            };
+        } else  if (optics.type == "perspective") {
+            this._optics = {
+                type: optics.type,
+                fovy : optics.fovy || 60.0,
+                aspect: optics.aspect || 1.0,
+                near : optics.near || 0.1,
+                far : optics.far || 5000.0
+            };
+        } else if (!optics.type) {
+            throw SceneJS._errorModule.fatalError(
+                    new SceneJS.errors.InvalidNodeConfigException(
+                            "SceneJS.Camera configuration invalid: optics type not specified - " +
+                            "supported types are 'perspective', 'frustum' and 'ortho'"));
+        } else {
+            throw SceneJS._errorModule.fatalError(
+                    new SceneJS.errors.InvalidNodeConfigException(
+                            "SceneJS.Camera configuration invalid: optics type not supported - " +
+                            "supported types are 'perspective', 'frustum' and 'ortho'"));
+        }
     }
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -176,14 +177,8 @@ SceneJS.Camera.prototype.getOptics = function() {
 };
 
 // Override
-SceneJS.Camera.prototype._render = function(traversalContext, data) {
+SceneJS.Camera.prototype._render = function(traversalContext) {
     if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        } else {
-            this._memoLevel = 1;
-        }
-
         if (this._optics.type == "ortho") {
             this._transform = {
                 type: this._optics.type,
@@ -238,28 +233,10 @@ SceneJS.Camera.prototype._render = function(traversalContext, data) {
                         this._optics.far)
             };
         }
+        this._memoLevel = 1;
     }
     var prevTransform = SceneJS._projectionModule.getTransform();
     SceneJS._projectionModule.setTransform(this._transform);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
     SceneJS._projectionModule.setTransform(prevTransform);
 };
-
-// @private
-SceneJS.Camera.prototype._init = function(params) {
-    if (params.optics) {
-        this.setOptics(params.optics);
-    }
-};
-
-/** Factory function that returns a new {@link SceneJS.Camera} instance
- * @param {Arguments} args Variable arguments that are passed to the {@link SceneJS.Camera} constructor
- * @returns {SceneJS.Camera}
- */
-SceneJS.camera = function() {
-    var n = new SceneJS.Camera();
-    SceneJS.Camera.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("camera", SceneJS.camera);

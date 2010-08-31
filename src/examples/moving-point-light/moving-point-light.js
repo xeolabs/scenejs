@@ -15,115 +15,97 @@ var exampleScene = SceneJS.scene({
      */
     loggingElementId: "theLoggingDiv" },
 
-        SceneJS.renderer({
-            clear : { depth : true, color : true},
-            viewport:{ x : 1, y : 1, width: 600, height: 600},
-            clearColor: { r:0.0, g: 0.0, b: 0.0 },
-            enableTexture2D: true
+        SceneJS.lookAt({
+            eye : { x: 0.0, y: 10.0, z: -35 },
+            look : { y:1.0 },
+            up : { y: 1.0 }
         },
-                SceneJS.lookAt({
-                    eye : { x: 0.0, y: 10.0, z: -35 },
-                    look : { y:1.0 },
-                    up : { y: 1.0 }
+                SceneJS.camera({
+                    optics: {
+                        type: "perspective",
+                        fovy : 55.0,
+                        aspect : 1.25,
+                        near : 0.10,
+                        far : 300.0
+                    }
                 },
-                        SceneJS.camera({
-                            optics: {
-                                type: "perspective",
-                                fovy : 55.0,
-                                aspect : 1.0,
-                                near : 0.10,
-                                far : 300.0
-                            }
+
+                    /*---------------------------------------------------------------------------------
+                     * Our animated light source is rotated using a Quaternion node which
+                     * received rotation updates through the scene's data context chain
+                     * -------------------------------------------------------------------------------*/
+
+                        SceneJS.quaternion({
+                            sid: "myQuaternion"
                         },
+                                SceneJS.translate({ x: 10, z: -10 },
 
-                            /*---------------------------------------------------------------------------------
-                             * Our animated light source is rotated using a Quaternion node which
-                             * received rotation updates through the scene's data context chain
-                             * -------------------------------------------------------------------------------*/
+                                        SceneJS.light({
+                                            type: "point",
 
-                                SceneJS.quaternion(function(data) {
-                                    return {
-                                        rotations: data.get("rotations")
-                                    };
-                                },
-                                        SceneJS.translate({ x: 10, z: -10 },
-                                                SceneJS.lights({
-                                                    sources: [
-                                                        {
-                                                            type: "point",
+                                            /* Our light source's colour
+                                             */
+                                            color: { r: 1.0, g: 1.0, b: 0.0 },
 
-                                                            /* Our light source's colour
-                                                             */
-                                                            color: { r: 1.0, g: 1.0, b: 0.0 },
+                                            /* Our light will contribute to both the quantities of
+                                             * specular and diffuse light that will hit our teapot.
+                                             */
+                                            diffuse: true,
+                                            specular: true,
 
-                                                            /* Our light will contribute to both the quantities of
-                                                             * specular and diffuse light that will hit our teapot.
-                                                             */
-                                                            diffuse: true,
-                                                            specular: true,
+                                            /* The point light's position
+                                             */
+                                            pos: { x: 0, y: 0, z: 0},
 
-                                                            /* The point light's position
-                                                             */
-                                                            pos: { x: 0, y: 0, z: 0},
+                                            /* Since our light has a position, it therefore has
+                                             * a distance over which its intensity can attenuate.
+                                             * Consult any OpenGL book for how to use these factors,
+                                             * or just tweak them right here to see what happens!
+                                             */
+                                            constantAttenuation: 1.0,
+                                            quadraticAttenuation: 0.0,
+                                            linearAttenuation: 0.0
+                                        }),
 
-                                                            /* Since our light has a position, it therefore has
-                                                             * a distance over which its intensity can attenuate.
-                                                             * Consult any OpenGL book for how to use these factors,
-                                                             * or just tweak them right here to see what happens!
-                                                             */
-                                                            constantAttenuation: 1.0,
-                                                            quadraticAttenuation: 0.0,
-                                                            linearAttenuation: 0.0
-                                                        }
-                                                    ]
-                                                },
+                                    /*----------------------------------------------------------
+                                     * A sphere that marks the light's position - not the focus
+                                     * of this example
+                                     * -------------------------------------------------------*/
 
-                                                    /*----------------------------------------------------------
-                                                     * A sphere that marks the light's position - not the focus
-                                                     * of this example
-                                                     * -------------------------------------------------------*/
-
-                                                        SceneJS.material({
-                                                            baseColor:      { r: .6, g: .6, b: 0.6 },
-                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                            emit: 0.5,
-                                                            specular:       0.9,
-                                                            shine:          6.0
-                                                        },
-                                                                SceneJS.scale({x:0.3, y: 0.3, z: 0.3 },
-                                                                        SceneJS.objects.sphere()))))),
-
-                            /*--------------------------------------------------------------------------
-                             * Our static teapot is in a sibling branch to the light source - note that
-                             * the Lights node and this subgraph are both children of the Camera, where
-                             * the effect of the Lights has persisted even though it has been rendered.
-                             * ------------------------------------------------------------------------*/
-
-                                SceneJS.rotate({
-                                    angle: -20, x : 1.0
-                                },
-                                        SceneJS.rotate({
-                                            angle: 30.0, y : 1.0
+                                        SceneJS.material({
+                                            baseColor:      { r: .6, g: .6, b: 0.6 },
+                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                            emit: 0.5,
+                                            specular:       0.9,
+                                            shine:          6.0
                                         },
-                                                SceneJS.scale({
-                                                    x: 2, y: 2, z: 2
-                                                },
+                                                SceneJS.scale({x:0.3, y: 0.3, z: 0.3 },
+                                                        SceneJS.sphere())))),
 
-                                                        SceneJS.material({
-                                                            baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
-                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
-                                                            emit:           0.0,
-                                                            specular:       0.9,
-                                                            shine:          6.0
-                                                        },
-                                                                SceneJS.objects.teapot()
-                                                                ))
-                                                )
-                                        )
-                                )
-                        )
-                )
-        );
+                    /*--------------------------------------------------------------------------
+                     * Our static teapot is in a sibling branch to the light source - note that
+                     * the Lights node and this subgraph are both children of the Camera, where
+                     * the effect of the Lights has persisted even though it has been rendered.
+                     * ------------------------------------------------------------------------*/
+
+                        SceneJS.rotate({
+                            angle: -20, x : 1.0
+                        },
+                                SceneJS.rotate({
+                                    angle: 30.0, y : 1.0
+                                },
+                                        SceneJS.scale({
+                                            x: 2, y: 2, z: 2
+                                        },
+
+                                                SceneJS.material({
+                                                    baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+                                                    emit:           0.0,
+                                                    specular:       0.9,
+                                                    shine:          6.0
+                                                },
+                                                        SceneJS.teapot())))))));
 
 /*---------------------------------------------------------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff
@@ -164,22 +146,27 @@ function mouseMove(event) {
     if (dragging) {
         roty = (event.clientX - lastX);
         rotx = (event.clientY - lastY) * -1;
+
         if (Math.abs(roty) > Math.abs(rotx)) {
 
-            exampleScene.setData({rotations: [
-                {
-                    y: 1,
-                    angle: roty
+            exampleScene.setConfigs({
+                "#myQuaternion" : {
+                    "+rotation": {   // Maps to SceneJS.Quaterion#addRotation
+                        y: 1,
+                        angle: roty
+                    }
                 }
-            ] }).render();
+            }).render();
         } else {
 
-            exampleScene.setData({rotations: [
-                {
-                    x: 1,
-                    angle: rotx
+            exampleScene.setConfigs({
+                "#myQuaternion" : {
+                    "+rotation": {
+                        x: 1,
+                        angle: rotx
+                    }
                 }
-            ]}).render();
+            }).render();
         }
         lastX = event.clientX;
         lastY = event.clientY;

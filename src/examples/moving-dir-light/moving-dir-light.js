@@ -19,117 +19,99 @@ var exampleScene = SceneJS.scene({
      */
     loggingElementId: "theLoggingDiv" },
 
-        SceneJS.renderer({
-            clear : { depth : true, color : true},
-            viewport:{ x : 1, y : 1, width: 600, height: 600},
-            clearColor: { r:0.0, g: 0.0, b: 0.0 },
-            enableTexture2D: true
+        SceneJS.lookAt({
+            eye : { x: 0.0, y: 10.0, z: -35 },
+            look : { y:1.0 },
+            up : { y: 1.0 }
         },
-                SceneJS.lookAt({
-                    eye : { x: 0.0, y: 10.0, z: -35 },
-                    look : { y:1.0 },
-                    up : { y: 1.0 }
+                SceneJS.camera({
+                    optics: {
+                        type: "perspective",
+                        fovy : 55.0,
+                        aspect : 1.25,
+                        near : 0.10,
+                        far : 300.0
+                    }
                 },
-                        SceneJS.camera({
-                            optics: {
-                                type: "perspective",
-                                fovy : 55.0,
-                                aspect : 1.0,
-                                near : 0.10,
-                                far : 300.0
-                            }
+
+                    /*---------------------------------------------------------------------------------
+                     * Our animated light source is rotated using a Quaternion node which
+                     * receives rotation updates through configs injected into the scene when
+                     * it is rendered
+                     * -------------------------------------------------------------------------------*/
+
+                        SceneJS.quaternion({
+                            sid: "myQuaternion"
                         },
 
-                            /*---------------------------------------------------------------------------------
-                             * Our animated light source is rotated using a Quaternion node which
-                             * received rotation updates through the scene's data context chain
-                             * -------------------------------------------------------------------------------*/
+                                SceneJS.light({
+                                    type: "dir",
 
-                                SceneJS.quaternion(function(data) {
-                                    return {
-                                        rotations: data.get("rotations") || []
-                                    };
-                                },
+                                    /* Colour of our light
+                                     */
+                                    color: { r: 1.0, g: 1.0, b: 0.0 },
 
-                                        SceneJS.lights({
-                                            sources: [
-                                                {
-                                                    type: "dir",
+                                    /* Our light will contribute to both the quantities of
+                                     * specular and diffuse light that will hit our teapot.
+                                     */
+                                    diffuse: true,
+                                    specular: true,
 
-                                                    /* Colour of our light
-                                                     */
-                                                    color: { r: 1.0, g: 1.0, b: 0.0 },
+                                    /* The directional light's direction, a vector from the
+                                     * origin of this coordinate system (which is in this
+                                     * case the view coordinate system, since our light is
+                                     * not within any no modelling transform nodes).
+                                     *
+                                     * The direction vector is calculated by mouse handlers and
+                                     * injected into the scene's render method.
+                                     */
+                                    dir: {  x: 0, y: 0, z: -1.0 }
 
-                                                    /* Our light will contribute to both the quantities of
-                                                     * specular and diffuse light that will hit our teapot.
-                                                     */
-                                                    diffuse: true,
-                                                    specular: true,
+                                    /* Note the absence of attenuation properties;
+                                     * unlike a point light, a directional light has no
+                                     * position, and is therefore not subject to attenuation
+                                     * since it is at an infinite distance.
+                                     */
+                                }),
 
-                                                    /* The directional light's direction, a vector from the
-                                                     * origin of this coordinate system (which is in this
-                                                     * case the view coordinate system, since our light is
-                                                     * not within any no modelling transform nodes).
-                                                     *
-                                                     * The direction vector is calculated by mouse handlers and
-                                                     * injected into the scene's render method.
-                                                     */
-                                                    dir: {  x: 0, y: 0, z: -1.0 }
-
-                                                    /* Note the absence of attenuation properties;
-                                                     * unlike a point light, a directional light has no
-                                                     * position, and is therefore not subject to attenuation
-                                                     * since it is at an infinite distance.
-                                                     */
-                                                }
-                                            ]
+                            /*----------------------------------------------------------
+                             * A sphere that marks the light's direction - not the focus
+                             * of this example
+                             * -------------------------------------------------------*/
+                                SceneJS.translate({ z: -10 },
+                                        SceneJS.material({
+                                            baseColor:      { r: .6, g: .6, b: 0.6 },
+                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                            emit: 0.5,
+                                            specular:       0.9,
+                                            shine:          6.0
                                         },
+                                                SceneJS.scale({x:0.5, y: 0.5, z: 0.5 },
+                                                        SceneJS.sphere())))),
 
-                                            /*----------------------------------------------------------
-                                             * A sphere that marks the light's direction - not the focus
-                                             * of this example
-                                             * -------------------------------------------------------*/
-                                                SceneJS.translate({ z: -10 },
-                                                        SceneJS.material({
-                                                            baseColor:      { r: .6, g: .6, b: 0.6 },
-                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                            emit: 0.5,
-                                                            specular:       0.9,
-                                                            shine:          6.0
-                                                        },
-                                                                SceneJS.scale({x:0.5, y: 0.5, z: 0.5 },
-                                                                        SceneJS.objects.sphere()))))),
+                    /*--------------------------------------------------------------------------
+                     * Teapot, rotated and scaled into position within model-space, coloured
+                     * with some material properties
+                     * ------------------------------------------------------------------------*/
 
-                            /*--------------------------------------------------------------------------
-                             * Teapot, rotated and scaled into position within model-space, coloured
-                             * with some material properties
-                             * ------------------------------------------------------------------------*/
-
+                        SceneJS.rotate({
+                            angle: -20, x : 1.0
+                        },
                                 SceneJS.rotate({
-                                    angle: -20, x : 1.0
+                                    angle: 30.0, y : 1.0
                                 },
-                                        SceneJS.rotate({
-                                            angle: 30.0, y : 1.0
+                                        SceneJS.scale({
+                                            x: 2, y: 2, z: 2
                                         },
-                                                SceneJS.scale({
-                                                    x: 2, y: 2, z: 2
-                                                },
 
-                                                        SceneJS.material({
-                                                            baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
-                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
-                                                            emit:           0.0,
-                                                            specular:       0.9,
-                                                            shine:          6.0
-                                                        },
-                                                                SceneJS.objects.teapot()
-                                                                ))
-                                                )
-                                        )
-                                )
-                        )
-                )
-        );
+                                                SceneJS.material({
+                                                    baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+                                                    emit:           0.0,
+                                                    specular:       0.9,
+                                                    shine:          6.0
+                                                },
+                                                        SceneJS.teapot())))))));
 
 /*---------------------------------------------------------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff
@@ -172,20 +154,24 @@ function mouseMove(event) {
 
         if (Math.abs(roty) > Math.abs(rotx)) {
 
-            exampleScene.setData({rotations: [
-                {
-                    y: 1,
-                    angle: roty
+            exampleScene.setConfigs({
+                "#myQuaternion" : {
+                    "+rotation": {   // Maps to SceneJS.Quaterion#addRotation
+                        y: 1,
+                        angle: roty
+                    }
                 }
-            ] }).render();
+            }).render();
         } else {
 
-            exampleScene.setData({rotations: [
-                {
-                    x: 1,
-                    angle: rotx
+            exampleScene.setConfigs({
+                "#myQuaternion" : {
+                    "+rotation": {
+                        x: 1,
+                        angle: rotx
+                    }
                 }
-            ]}).render();
+            }).render();
         }
         lastX = event.clientX;
         lastY = event.clientY;

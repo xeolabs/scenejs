@@ -1,6 +1,7 @@
 /**
- * @class A scene node that defines one or more layers of texture to apply to all geometries within its subgraph that have UV coordinates.
- * @extends SceneJS.node
+ * @class A scene node that defines one or more layers of texture to apply to all those geometries within its subgraph
+ * that have UV coordinates.
+ * @extends SceneJS.Node
  * <p>Texture layers are applied to specified material reflection cooficients, and may be transformed.</p>
 
  * <p>A cube wrapped with a material which specifies its base (diffuse) color coefficient, and a texture with
@@ -37,7 +38,7 @@
  *                           sourceType: "unsignedByte",            // (default)
  *                           applyTo:"baseColor",                   // Options so far are “baseColor” (default) or “diffuseColor”
  *
- *                           // Optional transforms - these can also be functions, as shown in the next example
+ *                           // Optional transforms
  *
  *                           rotate: {      // Currently textures are 2-D, so only rotation about Z makes sense
  *                               z: 45.0
@@ -94,7 +95,7 @@
  *                     }
  *               },
  *
- *               new SceneJS.objects.Cube()
+ *               new SceneJS.Cube()
  *           )
  *     );
  *  </code></pre>
@@ -118,7 +119,7 @@
  *                       }
  *                   ]
  *               },
- *               new SceneJS.objects.Cube()
+ *               new SceneJS.Cube()
  *         )
  *   );
  *  </code></pre>
@@ -126,14 +127,58 @@
  * Create a new SceneJS.texture
  * @param {Object} The config object or function, followed by zero or more child nodes
  */
-SceneJS.Texture = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "texture";
-    this._layers = null;
+SceneJS.Texture = SceneJS.createNodeType("texture");
+
+// @private
+SceneJS.Texture.prototype._init = function(params) {
+    this._layers = [];
     this._state = SceneJS.Texture.STATE_INITIAL;
+
+    if (params.layers) {
+        for (var i = 0; i < params.layers.length; i++) {
+            var layerParam = params.layers[i];
+            if (!layerParam.uri) {
+                throw new SceneJS.errors.NodeConfigExpectedException(
+                        "SceneJS.Texture.layers[" + i + "].uri is undefined");
+            }
+            if (layerParam.applyFrom) {
+                if (layerParam.applyFrom != "uv" &&
+                    layerParam.applyFrom != "uv2" &&
+                    layerParam.applyFrom != "normal" &&
+                    layerParam.applyFrom != "geometry") {
+                    throw SceneJS._errorModule.fatalError(
+                            new SceneJS.errors.InvalidNodeConfigException(
+                                    "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
+                                    "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
+                }
+            }
+            if (layerParam.applyTo) {
+                if (layerParam.applyTo != "baseColor" && // Colour map
+                    layerParam.applyTo != "diffuseColor") {
+                    throw SceneJS._errorModule.fatalError(
+                            new SceneJS.errors.InvalidNodeConfigException(
+                                    "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
+                                    "should be either 'baseColor', 'diffuseColor'"));
+                }
+            }
+            this._layers.push({
+                state : SceneJS.TextureLayer.STATE_INITIAL,
+                process: null,                      // Image load process handle
+                image : null,                       // Initialised when state == IMAGE_LOADED
+                creationParams: layerParam,         // Create texture using this
+                texture: null,                      // Initialised when state == TEXTURE_LOADED
+                applyFrom: layerParam.applyFrom || "uv",
+                applyTo: layerParam.applyTo || "baseColor",
+                blendMode: layerParam.blendMode || "multiply",
+                scale : layerParam.scale,
+                translate : layerParam.translate,
+                rotate : layerParam.rotate,
+                rebuildMatrix : true
+            });
+        }
+    }
 };
 
-SceneJS._inherit(SceneJS.Texture, SceneJS.Node);
 
 /** Ready to create texture layers
  */
@@ -153,103 +198,8 @@ SceneJS.Texture.STATE_LOADED = 2;
  */
 SceneJS.Texture.STATE_ERROR = -1;
 
-// @private
-SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
-    var matrix = null;
-    var t;
-    if (translate) {
-        matrix = SceneJS._math_translationMat4v([ translate.x || 0, translate.y || 0, translate.z || 0]);
-    }
-    if (scale) {
-        t = SceneJS._math_scalingMat4v([ scale.x || 1, scale.y || 1, scale.z || 1]);
-        matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
-    }
-    if (rotate) {
-        if (rotate.x) {
-            t = SceneJS._math_rotationMat4v(rotate.x * 0.0174532925, [1,0,0]);
-            matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
-        }
-        if (rotate.y) {
-            t = SceneJS._math_rotationMat4v(rotate.y * 0.0174532925, [0,1,0]);
-            matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
-        }
-        if (rotate.z) {
-            t = SceneJS._math_rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
-            matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
-        }
-    }
-    return matrix;
-};
 
-// @private
-SceneJS.Texture.prototype._init = function(params) {
-    this._layers = [];
-    if (!params.layers) {
-        throw new SceneJS.errors.NodeConfigExpectedException(
-                "SceneJS.Texture.layers is undefined");
-    }
-    for (var i = 0; i < params.layers.length; i++) {
-        var layerParam = params.layers[i];
-        if (!layerParam.uri) {
-            throw new SceneJS.errors.NodeConfigExpectedException(
-                    "SceneJS.Texture.layers[" + i + "].uri is undefined");
-        }
-        if (layerParam.applyFrom) {
-            if (layerParam.applyFrom != "uv" &&
-                layerParam.applyFrom != "uv2" &&
-                layerParam.applyFrom != "normal" &&
-                layerParam.applyFrom != "geometry") {
-                throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidNodeConfigException(
-                                "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
-            }
-        }
-        if (layerParam.applyTo) {
-            if (layerParam.applyTo != "baseColor" && // Colour map
-                layerParam.applyTo != "diffuseColor") {
-                throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidNodeConfigException(
-                                "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
-                                "should be either 'baseColor', 'diffuseColor'"));
-            }
-        }
-        this._layers.push({
-            state : SceneJS.TextureLayer.STATE_INITIAL,
-            process: null,                      // Image load process handle
-            image : null,                       // Initialised when state == IMAGE_LOADED
-            creationParams: layerParam,         // Create texture using this
-            texture: null,                      // Initialised when state == TEXTURE_LOADED
-            createMatrix : new (function() {
-                var translate = layerParam.translate;
-                var rotate = layerParam.rotate;
-                var scale = layerParam.scale;
-                var dynamic = ((translate instanceof Function) ||
-                               (rotate instanceof Function) ||
-                               (scale instanceof Function));
-                var defined = dynamic || translate || rotate || scale;
-                return function(data) {
-                    var matrix = null;
-                    if (defined && (dynamic || !matrix)) {
-                        matrix = SceneJS.Texture.prototype._getMatrix(
-                                (translate instanceof Function) ? translate(data) : translate,
-                                (rotate instanceof Function) ? rotate(data) : rotate,
-                                (scale instanceof Function) ? scale(data) : scale);
-                    }
-                    return matrix;
-                };
-            })(),
-            applyFrom: layerParam.applyFrom || "uv",
-            applyTo: layerParam.applyTo || "baseColor",
-            blendMode: layerParam.blendMode || "multiply"
-        });
-    }
-};
-
-SceneJS.Texture.prototype._render = function(traversalContext, data) {
-    if (!this._layers) { // One-shot dynamic config
-        this._init(this._getParams(data));
-    }
+SceneJS.Texture.prototype._render = function(traversalContext) {
 
     /*-----------------------------------------------------
      * On each render, update state of each texture layer
@@ -257,15 +207,15 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
      *-----------------------------------------------------*/
 
     var countLayersReady = 0;
+    var layer;
     for (var i = 0; i < this._layers.length; i++) {
-        var layer = this._layers[i];
+        layer = this._layers[i];
 
         if (layer.state == SceneJS.TextureLayer.STATE_LOADED) {
             if (!SceneJS._textureModule.textureExists(layer.texture)) {  // Texture evicted from cache
                 layer.state = SceneJS.TextureLayer.STATE_INITIAL;
             }
         }
-
 
         switch (layer.state) {
 
@@ -324,7 +274,11 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
      *-----------------------------------------------*/
 
     if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-        this._renderNodes(traversalContext, data);
+
+        /* Don't need textures in pick traversal
+         * TODO: Picking for textures that create holes
+         */
+        this._renderNodes(traversalContext);
     } else {
 
         /* Fastest strategy is to allow the complete set of layers to load
@@ -336,15 +290,15 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
 
         if (countLayersReady == this._layers.length) {
             var countPushed = 0;
+            var layer;
             for (var i = 0; i < this._layers.length; i++) {
-                var layer = this._layers[i];
-
+                layer = this._layers[i];
                 if (layer.state = SceneJS.TextureLayer.STATE_LOADED) {
                     SceneJS._textureModule.pushLayer(layer.texture, {
                         applyFrom : layer.applyFrom,
                         applyTo : layer.applyTo,
                         blendMode : layer.blendMode,
-                        matrix: layer.createMatrix(data)
+                        matrix: this._getTextureMatrix(layer)
                     });
                     countPushed++;
                 }
@@ -355,7 +309,7 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                 this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
             }
 
-            this._renderNodes(traversalContext, data);
+            this._renderNodes(traversalContext);
             SceneJS._textureModule.popLayers(countPushed);
         } else {
 
@@ -363,11 +317,119 @@ SceneJS.Texture.prototype._render = function(traversalContext, data) {
                 this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
                 this._changeState(SceneJS.Texture.STATE_LOADING); // Now loading some layers
             }
-            this._renderNodes(traversalContext, data);
+            this._renderNodes(traversalContext);
         }
     }
 };
 
+/* Returns texture transform matrix
+ */
+SceneJS.Texture.prototype._getTextureMatrix = function(layer) {
+    if (layer.rebuildMatrix) {
+        if (layer.translate || layer.rotate || layer.scale) {
+            layer.matrix = SceneJS.Texture.prototype._getMatrix(layer.translate, layer.rotate, layer.scale);
+            layer.rebuildMatrix = false;
+        }
+    }
+    return layer.matrix;
+};
+
+// @private
+SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
+    var matrix = null;
+    var t;
+    if (translate) {
+        matrix = SceneJS._math_translationMat4v([ translate.x || 0, translate.y || 0, 0]);
+    }
+    if (scale) {
+        t = SceneJS._math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
+        matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
+    }
+    if (rotate) {
+        t = SceneJS._math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
+        matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
+    }
+    return matrix;
+};
+
+/**
+ * <pre><code>
+ * //var x = {
+ //    "#myTex": {
+ //       "layer": {
+ //            index: 1,
+ //            cfg: { rotate: 45 }
+ //        }
+ //    }
+ //}
+ * </code></pre>
+ * @param cfg
+ */
+SceneJS.Texture.prototype.setLayer = function(cfg) {
+    if (cfg.index == undefined || cfg.index == null) {
+        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
+                "Invalid SceneJS.Texture#setLayerConfig argument: index null or undefined"));
+    }
+    if (cfg.index < 0 || cfg.index >= this._layers.length) {
+        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
+                "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)"));
+    }
+    var layer = this._layers[cfg.index];
+    cfg = cfg.cfg || {};
+    if (cfg.translate) {
+        this.setTranslate(layer, cfg.translate);
+    }
+    if (cfg.scale) {
+        this.setScale(layer, cfg.scale);
+    }
+    if (cfg.rotate) {
+        this.setRotate(layer, cfg.rotate);
+    }
+    this._setDirty();
+};
+
+/**
+ * @private
+ */
+SceneJS.Texture.prototype.setTranslate = function(layer, xy) {
+    if (!layer.translate) {
+        layer.translate = { x: 0, y: 0 };
+    }
+    if (xy.x != undefined) {
+        layer.translate.x = xy.x;
+    }
+    if (xy.y != undefined) {
+        layer.translate.y = xy.y;
+    }
+    layer.rebuildMatrix = true;
+};
+
+/**
+ * @private
+ */
+SceneJS.Texture.prototype.setScale = function(layer, xy) {
+    if (!layer.scale) {
+        layer.scale = { x: 1, y: 1 };
+    }
+    if (xy.x != undefined) {
+        layer.scale.x = xy.x;
+    }
+    if (xy.y != undefined) {
+        layer.scale.y = xy.y;
+    }
+    layer.rebuildMatrix = true;
+};
+
+/**
+ * @private
+ */
+SceneJS.Texture.prototype.setRotate = function(layer, angle) {
+    if (!layer.rotate) {
+        layer.rotate = angle;
+    }
+    layer.rotate = angle;
+    layer.rebuildMatrix = true;
+};
 
 // @private
 SceneJS.Texture.prototype._changeState = function(newState, params) {
@@ -379,14 +441,3 @@ SceneJS.Texture.prototype._changeState = function(newState, params) {
         this._fireEvent("state-changed", params);
     }
 };
-
-
-/** Factory function that returns a new {@link SceneJS.Texture} instance
- */
-SceneJS.texture = function() {
-    var n = new SceneJS.Texture();
-    SceneJS.Texture.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("texture", SceneJS.texture);

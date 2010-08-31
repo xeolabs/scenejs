@@ -8,9 +8,6 @@
  * with "add" (addNode). In the third example, we have a property key prefixed with "-", which maps it to a method
  * beginning with "remove" (removeNode).</p>
  *
- * <p>The functionality of {@link SceneJS.WithConfigs} is also provided in the {@link SceneJS.Socket} node, which allows
- * a server to push a configuration map onto a scene subgraph through a WebSocket.</p>
- *
  * <p>Note that configs are applied to nodes just before they are rendered, so as long as your config map
  * resolves correctly, the nodes don't have to have initial configurations wherever you have specified them for "setXXX"
  * methods in the config map.</p>
@@ -24,21 +21,6 @@
  *         // In this case, our WithConfigs applies it every time:
  *
  *         once : false,
- *
- *         // Optionally have the WithConfigs throw a SceneJS.errors.WithConfigsNodeNotFoundException if any target node
- *         // is not found at exactly the hierarchy position specified in our configs map.
- *         //
- *         // Default is false, which would allow unmatched nodes to be simply skipped as traversal
- *         // descends into the subgraph.
- *         //
- *         strictNodes : true,       // Default is false
- *
- *         // Have the WithConfigs throw a SceneJS.errors.WithConfigsPropertyNotFoundException if any target property
- *         // is not found on its target node.
- *         //
- *         // Default is true.
- *         //
- *         strictProperties : true,  // Default is true
  *
  *         configs: {
  *             "#myTranslate" : {    // Selects the SceneJS.Scale
@@ -66,7 +48,7 @@
  *                        x : 1.0
  *                     },
  *
- *                new SceneJS.objects.Cube()
+ *                new SceneJS.Cube()
  *          )
  *      )
  *  )
@@ -77,8 +59,6 @@
  * within it's own subgraph. Abstractly, a teapot is being attached to a chair at a table in a cafe. Note
  * the "+node" key in the map for the "chair2" node, which maps to the "addNode" method on that node.</b></p><pre><code>
  * var wc = SceneJS.withConfigs({
- *         strictNodes : true,       // Target node must exist - default is false
- *         strictProperties : true,  // Function addNode must exist on target node - default is true
  *         configs: {
  *             "#cafe": {
  *                  "#table5" : {
@@ -93,7 +73,7 @@
  *                                         angle: 0,    // this teapot is a person!
  *                                         y : 1.0
  *                                    },
- *                                    SceneJS.objects.teapot())
+ *                                    SceneJS.teapot())
  *                               }
  *                          }
  *                      }
@@ -114,8 +94,6 @@
  * Abstractly, a chair is being removed from a table in a cafe. Note the "-node" key in the map for the "chair2" node,
  * which maps to the "removeNode" method on that node, and the value, which is the SID of the node to remove.</b></p><pre><code>
  * var wc = SceneJS.withConfigs({
- *         strictNodes : true,        // Target node must exist - default is false
- *         strictProperties : true,   // Function addNode must exist on target node - default is true
  *         configs: {
  *             "#cafe": {
  *                  "#table5" : {
@@ -143,24 +121,14 @@
  * @constructor
  * Create a new SceneJS.WithConfigs
  * @param {Object} [cfg] Static configuration object containing hierarchical map of values for sub-nodes
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning the hierarchical map
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.WithConfigs = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "with-configs";
-    this._configs = {};
-    this._once = false;
-    this._configsModes = {
-        strictProperties : true,
-        strictNodes : false
-    };
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
-};
+SceneJS.WithConfigs = SceneJS.createNodeType("withConfigs");
 
-SceneJS._inherit(SceneJS.WithConfigs, SceneJS.Node);
+SceneJS.WithConfigs.prototype._init = function(params) {
+    this.setConfigs(params.configs);
+    this._once = params.once != undefined ? params.once : false;
+};
 
 /**
  Sets the configs map
@@ -168,11 +136,11 @@ SceneJS._inherit(SceneJS.WithConfigs, SceneJS.Node);
  @returns {SceneJS.WithConfigs} this
  */
 SceneJS.WithConfigs.prototype.setConfigs = function(configs, once) {
-    this._configs = configs;
+    this._childConfigs = configs || {}; // Lazy pre-process on render in case set repeatedly
     if (once != undefined) {
         this._once = once;
     }
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -182,7 +150,7 @@ SceneJS.WithConfigs.prototype.setConfigs = function(configs, once) {
  * @returns {Object} The configs map
  */
 SceneJS.WithConfigs.prototype.getConfigs = function() {
-    return this._configs;
+    return this._childConfigs;
 };
 
 /**
@@ -195,7 +163,7 @@ SceneJS.WithConfigs.prototype.setOnce = function(once) {
     if (once != undefined) {
         this._once = once;
     }
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -208,127 +176,26 @@ SceneJS.WithConfigs.prototype.getOnce = function() {
     return this._once;
 };
 
-/**
- * Specifies whether or not a {@link SceneJS.errors.WithConfigsPropertyNotFoundException} is to be raised when
- * a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
- * @param {Boolean} value When true, enables exception
- */
-SceneJS.WithConfigs.prototype.setStrictProperties = function(value) {
-    this._configsModes.strictProperties = value;
-};
-
-/**
- * Returns whether or not a {@link SceneJS.errors.WithConfigsPropertyNotFoundException} will be raised when
- * a property reference on the WithConfigs config map cannot be resolved to any method on a target node.
- * @returns {Boolean} When true, exception is enabled
- */
-SceneJS.WithConfigs.prototype.getStrictProperties = function() {
-    return this._configsModes.strictProperties;
-};
-
-/**
- * Specifies whether or not a {@link SceneJS.errors.WithConfigsNodeNotFoundException} exception is to be raised when
- * a node reference in the WithConfigs config map cannot be resolved to its target node in the subgraph.
- * @param {Boolean} value When true, enables exception
- */
-SceneJS.WithConfigs.prototype.setStrictNodes = function(value) {
-    this._configsModes.strictNodes = value;
-};
-
-/**
- * Returns whether or not a {@link SceneJS.errors.WithConfigsNodeNotFoundException} exception will be raised when
- * a node reference on the WithConfigs config map cannot be resolved to its target node in the subgraph.
- * @returns {Boolean} When true, exception is enabled
- */
-SceneJS.WithConfigs.prototype.getStrictNodes = function() {
-    return this._configsModes.strictNodes;
-};
-
-SceneJS.WithConfigs.prototype._init = function(params) {
-    this._configs = params.configs || {};
-    this._once = params.once != undefined ? params.once : false;
-};
-
-SceneJS.WithConfigs.prototype._render = function(traversalContext, data) {
+SceneJS.WithConfigs.prototype._render = function(traversalContext) {
     if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-            this._configs = this._preprocessConfigs(this._configs);
-        } else {
-            this._memoLevel = 1;
-            this._configs = this._preprocessConfigs(this._configs);
-        }
+        this._childConfigs = SceneJS._preprocessConfigs(this._childConfigs);
+        this._memoLevel = 1;
     }
+
     //    if (this._memoLevel < 2) {
     //        if (this._memoLevel == 1 && data.isFixed() && !SceneJS._instancingModule.instancing()) {
     //            this._memoLevel = 2;
     //        }
     //    }
-    traversalContext = {               
+    traversalContext = {
         insideRightFringe: this._children.length > 1,
         callback : traversalContext.callback,
-        configs : this._configs,
-        configsModes : this._configsModes
+        configs : this._childConfigs
     };
     // this._renderNodes(traversalContext, new SceneJS.Data(data, this._fixedParams, this._data));
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
 
     if (this._once) {
-        this._configs = {};
+        this._childConfigs = {};
     }
 };
-
-
-/* Preprocess config map for faster application when rendering nodes
- */
-SceneJS.WithConfigs.prototype._preprocessConfigs = function(configs) {
-    var configAction;
-    var funcName;
-    var newConfigs = {};
-    for (var key in configs) {
-        if (configs.hasOwnProperty(key)) {
-            key = key.replace(/^\s*/, "").replace(/\s*$/, "");    // trim
-            if (key.length > 0) {
-                configAction = key.substr(0, 1);
-                if (configAction != "#") {  // Property reference
-                    if (configAction == "+") {
-                        funcName = "add" + key.substr(1, 1).toUpperCase() + key.substr(2);
-                    } else if (configAction == "-") {
-                        funcName = "remove" + key.substr(1, 1).toUpperCase() + key.substr(2);
-                    } else {
-                        funcName = "set" + key.substr(0, 1).toUpperCase() + key.substr(1);
-                    }
-                    newConfigs[funcName] = {
-                        isFunc : true,
-                        value : configs[key]
-                    };
-
-                } else {
-                    if (configs[key] instanceof Function) {
-                        newConfigs[key.substr(1)] = configs[key];
-                    } else {
-                        newConfigs[key.substr(1)] = this._preprocessConfigs(configs[key]);
-                    }
-                }
-            }
-        }
-    }
-    return newConfigs;
-};
-
-
-/**
- * Factory function that returns a new {@link SceneJS.WithConfigs} instance
- * @param {Object} [cfg] Static config map object
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function returning the config map
- * @param {...SceneJS.Node} [childNodes] Child nodes
- * @returns {SceneJS.WithConfigs}
- * @since Version 0.7.6
- */
-SceneJS.withConfigs = function() {
-    var n = new SceneJS.WithConfigs();
-    SceneJS.WithConfigs.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("with-configs", SceneJS.withConfigs);

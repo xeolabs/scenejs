@@ -25,90 +25,94 @@ var exampleScene = SceneJS.scene({
 
     //--------------------------------------------------------------------------------------------------------------
     // The scene content, a teapot illuminated by two light sources.
-    // We'll defined it within a Symbol that will be referenced by an
-    // Instance node within each child of our Selector, down below.
+
+    // We'll defined it within a Camera that will be referenced
+    // by an Instance node within each child of our Selector, down below.
+    //
+    // The Camera is wrapped in a Library, cause initial traversal to
+    // bypass it - it will only be rendered via an instantiation link.
     //--------------------------------------------------------------------------------------------------------------
 
-        SceneJS.symbol({ sid: "theScene" },
-
+        SceneJS.library(
                 SceneJS.camera({
+
+                    id: "theCamera",
+
                     optics: {
                         type: "perspective",
                         fovy : 65.0,
-                        aspect : 1.0,
+                        aspect : 1.25,
                         near : 0.10,
                         far : 300.0  }
                 },
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 1.0, y: 1.0, z: 1.0 }
+                        }),
 
-                        SceneJS.lights({
-                            sources: [
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: 1.0, z: 1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.8, g: 0.8, b: 0.8 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: -2.0, y: -1.0, z: 0.0 }
-                                }
-                            ]},
-                                SceneJS.material({
-                                    baseColor:      { r: 0.6, g: 0.9, b: 0.6 },
-                                    specularColor:  { r: 0.6, g: 0.9, b: 0.6 },
-                                    specular:       0.9,
-                                    shine:          6.0
-                                },
-                                        SceneJS.objects.teapot())))),
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: -2.0, y: -1.0, z: 0.0 }
+                        }),
+
+                        SceneJS.material({
+                            baseColor:      { r: 0.6, g: 0.9, b: 0.6 },
+                            specularColor:  { r: 0.6, g: 0.9, b: 0.6 },
+                            specular:       0.9,
+                            shine:          6.0
+                        },
+                                SceneJS.teapot()))),
 
     //------------------------------------------------------------------------------------------------------
     // Our Selector node selects one of three LookAt child nodes
     // to provide the current view point. Each LookAt contains an
-    // instance of the scene content.
+    // instance of the Camera.
     //------------------------------------------------------------------------------------------------------
 
-        SceneJS.selector(function(data) {
-            return {
-
-                selection: [data.get("activeView")]
-            };
+        SceneJS.selector({
+            sid: "mySelector",
+            selection: [0]
         },
                 SceneJS.lookAt({
+                    up: {y: 1.0},
                     eye : { z: 10.0 }
                 },
-                        SceneJS.instance({ uri: "theScene"})),
+                        SceneJS.instance({ target: "theCamera"})),
 
                 SceneJS.lookAt({
+                    up: {y: 1.0},
                     eye : { x: 10.0 }
                 },
-                        SceneJS.instance({ uri: "theScene"})),
+                        SceneJS.instance({ target: "theCamera"})),
 
                 SceneJS.lookAt({
+                    up: {y: 1.0},
                     eye : { x: -5.0, y: 5, z: 5 }
                 },
-                        SceneJS.instance({ uri: "theScene" })))
+                        SceneJS.instance({ target: "theCamera" })))
         )
         ;
 
 //------------------------------------------------------------------------------------------------------------------
-// Mouse handler and scene render calls - whenever the mouse is clicked, switch cameras and re-render scene.
+// Mouse handler and scene render calls - whenever the mouse is clicked, switch views and re-render scene.
 //------------------------------------------------------------------------------------------------------------------
 
 var activeView = 0;
 var canvas = document.getElementById(exampleScene.getCanvasId());
 
 exampleScene
-        .setData({activeView: activeView })
         .render();
 
 function mouseClick() {
     activeView = (activeView + 1) % 3;
     exampleScene
-            .setData({activeView: activeView})
+            .setConfigs({ "#mySelector" : { selection: [activeView] }})// Maps to SceneJS.Selector#setSelection([..])
             .render();
 }
 

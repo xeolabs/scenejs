@@ -5,14 +5,15 @@
  * lindsay.kay AT xeolabs.com
  * January 2010
  *
- * This example demonstrates a single-layered texture that uses a dynamic
- * config function to animate its scale. The animation is driven by system time,
- * which the render loop injects into the scene data context on each traversal.
- *
- * Also demonstrates mouse interaction, where handlers bound to the canvas inject
- * yaw and pitch angles into the scene through the data context, to be used by
- * modelling rotations.
  */
+
+/* Node references - there are a few ways to inject data into a scene graph,
+ * but we'll just update node setters for this example.
+ */
+var texture;
+var rotateX;
+var rotateY;
+
 var exampleScene = SceneJS.scene({
 
     /* Bind to a WebGL canvas:
@@ -29,130 +30,97 @@ var exampleScene = SceneJS.scene({
                     optics: {
                         type: "perspective",
                         fovy : 25.0,
-                        aspect : 1.0,
+                        aspect : 1.25,
                         near : 0.10,
                         far : 300.0
                     }
                 },
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                        }),
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                        }),
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                        }),
 
-                        SceneJS.lights({
-                            sources: [
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                }          ,
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                                }
-                            ]},
+                        SceneJS.material({
+                            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                            specular:       0.9,
+                            shine:          6.0
+                        },
 
-                                SceneJS.material({
-                                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                    specular:       0.9,
-                                    shine:          6.0
-                                },
+                            /** Textures images are loaded asynchronously and won't render
+                             * immediately. On first traversal, they start loading their image,
+                             * which they collect on a subsequent traversal.
+                             */
+                                texture = SceneJS.texture({
 
-                                    /** Textures images are loaded asynchronously and won't render
-                                     * immediately. On first traversal, they start loading their image,
-                                     * which they collect on a subsequent traversal.
+                                    /* A texture can have multiple layers, each applying an
+                                     * image to a different material reflection component.
+                                     * This layer applies the Zod image to the diffuse
+                                     * component, with animated scaling.
                                      */
-                                        SceneJS.texture({
+                                    layers: [
+                                        {
+                                            uri:"general-zod.jpg",                                            
+                                            minFilter: "linear",
+                                            magFilter: "linear",
+                                            wrapS: "repeat",
+                                            wrapT: "repeat",
+                                            isDepth: false,
+                                            depthMode:"luminance",
+                                            depthCompareMode: "compareRToTexture",
+                                            depthCompareFunc: "lequal",
+                                            flipY: false,
+                                            width: 1,
+                                            height: 1,
+                                            internalFormat:"lequal",
+                                            sourceFormat:"alpha",
+                                            sourceType: "unsignedByte",
+                                            applyTo:"baseColor",
 
-                                            /* A texture can have multiple layers, each applying an
-                                             * image to a different material reflection component.
-                                             * This layer applies the Zod image to the diffuse
-                                             * component, with animated scaling.
+                                            /* Texture rotation angle in degrees
                                              */
-                                            layers: [
-                                                {
-                                                    uri:"general-zod.jpg",
-                                                    minFilter: "linear",
-                                                    magFilter: "linear",
-                                                    wrapS: "repeat",
-                                                    wrapT: "repeat",
-                                                    isDepth: false,
-                                                    depthMode:"luminance",
-                                                    depthCompareMode: "compareRToTexture",
-                                                    depthCompareFunc: "lequal",
-                                                    flipY: false,
-                                                    width: 1,
-                                                    height: 1,
-                                                    internalFormat:"lequal",
-                                                    sourceFormat:"alpha",
-                                                    sourceType: "unsignedByte",
-                                                    applyTo:"baseColor",
+                                            rotate: 0.0,
 
-                                                    /* The rotate, translate and scale properties
-                                                     * can be functions that pull properties (if required)
-                                                     * from the current data context
-                                                     */
-                                                    rotate: (function() {
-                                                        var factor = 0;
-                                                        return function(data) {
-                                                            if (factor > 90.0) {
-                                                                factor = 0;
-                                                            }
-                                                            factor += data.get("time") * 0.01;
-                                                            return {
-                                                                z: factor
-                                                            };
-                                                        };
-                                                    })(),
+                                            /* Texture translation offset
+                                             */
+                                            translate : {
+                                                x: 0,
+                                                y: 0
+                                            },
 
-                                                    translate : {
-                                                        x: 0,
-                                                        y: 0,
-                                                        z: 0
-                                                    },
-
-                                                    /* Animate the scaling  with a function that is
-                                                     * called on each visit - creates that strange
-                                                     * multi-Zod effect. This function is a higher-order
-                                                     * one that tracks the factor in a closure.
-                                                     */
-                                                    scale : (function() {
-                                                        var factor = 0;
-                                                        return function(data) {
-                                                            if (factor > 10.0) {
-                                                                factor = 0;
-                                                            }
-                                                            factor += data.get("time") * 0.001;
-                                                            return {
-                                                                x: factor,
-                                                                y: factor
-                                                            };
-                                                        };
-                                                    })()
-                                                }
-                                            ]
+                                            /* Texture scale factors
+                                             */
+                                            scale : {
+                                                x: 1.0,
+                                                y: 1.0
+                                            }
+                                        }
+                                    ]
+                                },
+                                        rotateX = SceneJS.rotate({
+                                            angle: 0.0, x : 1.0
                                         },
-                                                SceneJS.rotate(function(data) {
-                                                    return {
-                                                        angle: data.get('pitch'), x : 1.0
-                                                    };
+                                                rotateY = SceneJS.rotate({
+                                                    angle: 0.0, y : 1.0
                                                 },
-                                                        SceneJS.rotate(function(data) {
-                                                            return {
-                                                                angle: data.get('yaw'), y : 1.0
-                                                            };
-                                                        },
-                                                                SceneJS.objects.cube()
-                                                                )
+                                                        SceneJS.cube()
                                                         )
                                                 )
                                         )
@@ -170,6 +138,9 @@ var pitch = -30;
 var lastX;
 var lastY;
 var dragging = false;
+
+var texAngle = 0.0;
+var texScale = 1.0;
 
 /* For texture animation
  */
@@ -204,15 +175,25 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
-    var timeNow = (new Date()).getTime();
-    exampleScene
-        .setData({
-            yaw: yaw,
-            pitch: pitch,
-            time : timeNow - timeLast
-        })
-            .render();
-    timeLast = timeNow;
+    rotateX.setAngle(pitch);
+    rotateY.setAngle(yaw);
+
+    texture.setLayer({
+        index: 0,
+        cfg: {
+            scale: {
+                x: texScale,
+                y: texScale
+            },
+            rotate: texAngle
+        }
+    });
+
+    exampleScene.render();
+
+    texAngle += 0.4;
+    texScale = (texScale + 0.01) % 10.0;
+
 };
 
 SceneJS.addListener("error", function() {

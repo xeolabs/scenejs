@@ -21,11 +21,9 @@
  *  <p><b>Example Usage</b></p><p>Below is a Socket that connects to a server on the local host. The Socket starts off
  * in {@link #STATE_INITIAL}. Then as soon as it is rendered, it transitions to {@link #STATE_CONNECTING} and tries to
  * open the connection. When successful, it sends the optional specified messages and transitions to {@link #STATE_OPENED}.
- * The server may respond with an error (described further below) or a configuration map. If the response is a
- * configuration map, the Socket would then apply that to its sub-nodes.
- * On error, the Socket will transition to {@link #STATE_ERROR} and remain in that state, with connection closed. If
- * the connection ever closes, the Socket will attempt to re-open it when next rendered. When the server asks
- * "whatsYourFavouriteColor", we'll reply "green".</p>
+ * On error, the Socket will transition to {@link #STATE_ERROR} and remain in that state, with connection closed. If the
+ * connection ever closes, the Socket will attempt to re-open it when next rendered. The Socket receives each incoming
+ * message via a "msg-received" event; when the server asks "whatsYourFavouriteColor", we'll reply "green".</p>
  * <pre><code>
  * new SceneJS.Socket({
  *
@@ -99,10 +97,10 @@
  * </code></pre>
 
  */
-SceneJS.Socket = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "socket";
-    this._uri = null;
+SceneJS.Socket = SceneJS.createNodeType("socket");
+
+// @private
+SceneJS.Socket.prototype._init = function(params) {
     this._autoOpen = true;
     this._socketId = null;
     this._outMessages = [];
@@ -111,12 +109,11 @@ SceneJS.Socket = function() {
         strictProperties : true,
         strictNodes : false
     };
-    if (this._fixedParams) {
-        this._init(this._getParams());
+    this._uri = params.uri;
+    if (params.messages) {
+        this._outMessages = params.messages.reverse();
     }
 };
-
-SceneJS._inherit(SceneJS.Socket, SceneJS.Node);
 
 /** Initial state of Socket when not rendered yet.
  */
@@ -159,19 +156,8 @@ SceneJS.Socket.prototype.removeMessages = function() {
 };
 
 // @private
-SceneJS.Socket.prototype._init = function(params) {
-    this._uri = params.uri;
-    if (params.messages) {
-        this._outMessages = params.messages.reverse();
-    }
-};
-
-// @private
-SceneJS.Socket.prototype._render = function(traversalContext, data) {
-    if (!this._fixedParams) {
-        this._init(this._getParams(data));
-    }
-    if (!this._uri) {
+SceneJS.Socket.prototype._render = function(traversalContext) {
+    if (!this._uri) { // TODO: catch this error at definition-time
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.InvalidNodeConfigException("SceneJS.Socket uri property not defined"));
     }
@@ -205,7 +191,7 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
                 });
 
         this._sendMessages();
-        this._renderNodes(traversalContext, data);
+        this._renderNodes(traversalContext);
         SceneJS._SocketModule.releaseSocket();
     } else {
         if (this._state == SceneJS.Socket.STATE_INITIAL || this._state == SceneJS.Socket.STATE_CLOSED) {
@@ -228,7 +214,7 @@ SceneJS.Socket.prototype._render = function(traversalContext, data) {
         }
         if (this._state == SceneJS.Socket.STATE_ERROR) { // Socket disabled - TODO: retry?
         }
-        this._renderNodes(traversalContext, data); // No socket acquired yet
+        this._renderNodes(traversalContext); // No socket acquired yet
     }
 
 };
@@ -251,7 +237,9 @@ SceneJS.Socket.prototype._sendMessages = function() {
         SceneJS._SocketModule.sendMessages(
                 this._outMessages,
                 function(exception) { // onerror
-                    _self._changeState(SceneJS.Socket.STATE_ERROR, { exception: exception });
+                    _self._changeState(SceneJS.Socket.STATE_ERROR, {
+                        exception: exception 
+                    });
                 },
                 function() {  // onsuccess
                     this._outMessages = [];
@@ -260,16 +248,3 @@ SceneJS.Socket.prototype._sendMessages = function() {
     }
 };
 
-/** Factory function that returns a new {@link SceneJS.Socket} instance
- * @param {Object} [cfg] Static configuration object
-
- * @returns {SceneJS.Socket}
- * @since Version 0.7.6
- */
-SceneJS.socket = function() {
-    var n = new SceneJS.Socket();
-    SceneJS.Socket.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("socket", SceneJS.socket);

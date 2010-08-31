@@ -4,31 +4,54 @@
 <head>
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
+
+    <style>
+        body {
+            margin: auto;
+            background-color: #666666;
+            padding-top: 50px;
+            font-family: Helvetica, sans-serif;
+            font-size: 0.8em;
+            color: #666;
+            font-size: 0.8em
+        }
+
+        #demo {
+            margin: auto;
+            width: 1000px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            -webkit-box-shadow: 5px 5px 2px #444444;
+        }
+    </style>
+
 </head>
 <body>
-<table>
-    <tr>
-        <td valign="top">
-            <canvas id="theCanvas" width="600" height="600">
-                <p>This example requires a browser that supports the
-                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-                    &lt;canvas&gt; feature.</p>
-            </canvas>
-        </td>
-        <td valign="top">
-            <h1>Picking Example - Re-configuring Subgraph Nodes when they are Picked</h1>
+<div id="demo">
+    <canvas id="theCanvas" width="1000" height="800">
+        <p>This example requires a browser that supports the
+            <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+            &lt;canvas&gt; feature.</p>
+    </canvas>
+    <div id="info">
+        <h2>SceneJS Picking - Re-configuring Subgraph Nodes when they are Picked</h2>
 
-             <p>This is a basic example that shows how picking can be used with a SceneJS.WithConfigs node, where the 
+        <p>This is a basic example that shows how picking can be used with a SceneJS.WithConfigs node, where the
             node responds to "picked" events in its subgraph by pushing new configurations (or content) into them.</p>
-            <ul>
-                <li><a target="other" href="config-on-pick.js">Scene source code</a></li>
-                <li><a target="other" href="http://scenejs.wikispaces.com/SceneJS.WithConfigs">Wiki page on
-                    SceneJS.WithConfigs</a></li>
-            </ul>
-            <div id="theLoggingDiv"></div>
-        </td>
-    </tr>
-</table>
+
+        <ul>
+            <li><a target="_other" href="config-on-pick.js">Scene source code</a></li>
+            <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.WithConfigs">Wiki page on
+                SceneJS.WithConfigs</a></li>
+        </ul>
+    </div>
+    <div id="log">
+        <h3>Log</h3>
+
+        <div id="theLoggingDiv"></div>
+    </div>
+</div>
 
 <script type="text/javascript" src="config-on-pick.js"></script>
 </body>

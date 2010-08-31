@@ -8,27 +8,20 @@
  *       z: 0.0
  *   },
  *
- *      new SceneJS.objects.Cube()
+ *      new SceneJS.Cube()
  * )
  * </pre></code>
  * @constructor
  * Create a new SceneJS.Translate
  * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
-SceneJS.Translate = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "translate";
-    this._mat = null;
-    this._xform = null;    
-    this._x = 0;
-    this._y = 0;
-    this._z = 1;
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
-};
+SceneJS.Translate = SceneJS.createNodeType("translate");
 
-SceneJS._inherit(SceneJS.Translate, SceneJS.Node);
+SceneJS.Translate.prototype._init = function(params) {
+    this._mat = null;
+    this._xform = null;
+    this.setXYZ({x : params.x, y: params.y, z: params.z });
+};
 
 /**
  * Sets the translation vector
@@ -36,13 +29,14 @@ SceneJS._inherit(SceneJS.Translate, SceneJS.Node);
  * @returns {SceneJS.Translate} this
  */
 SceneJS.Translate.prototype.setXYZ = function(xyz) {
+    xyz = xyz || {};
     var x = xyz.x || 0;
     var y = xyz.y || 0;
     var z = xyz.z || 0;
     this._x = x;
     this._y = y;
     this._z = z;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -64,7 +58,7 @@ SceneJS.Translate.prototype.getXYZ = function() {
  */
 SceneJS.Translate.prototype.setX = function(x) {
     this._x = x;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -83,7 +77,7 @@ SceneJS.Translate.prototype.getX = function() {
  */
 SceneJS.Translate.prototype.setY = function(y) {
     this._y = y;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -102,7 +96,7 @@ SceneJS.Translate.prototype.getY = function() {
  */
 SceneJS.Translate.prototype.setZ = function(z) {
     this._z = z;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -114,19 +108,9 @@ SceneJS.Translate.prototype.getZ = function() {
     return this._z;
 };
 
-SceneJS.Translate.prototype._init = function(params) {
-    this.setXYZ({x : params.x, y: params.y, z: params.z });
-};
-
-SceneJS.Translate.prototype._render = function(traversalContext, data) {
+SceneJS.Translate.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
-
     if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        } else {
-            this._memoLevel = 1;
-        }
         if (SceneJS._modelViewTransformModule.isBuildingViewTransform()) {
 
             /* When building a view transform, apply the negated translation vector
@@ -136,11 +120,12 @@ SceneJS.Translate.prototype._render = function(traversalContext, data) {
         } else {
             this._mat = SceneJS._math_translationMat4v([this._x, this._y, this._z]);
         }
+        this._memoLevel = 1;
     }
     var superXForm = SceneJS._modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXForm.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
-      
+
         var tempMat = SceneJS._math_mulMat4(superXForm.matrix, this._mat);
         this._xform = {
             localMatrix: this._mat,
@@ -153,16 +138,6 @@ SceneJS.Translate.prototype._render = function(traversalContext, data) {
         }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXForm);
 };
-
-/** Factory function that returns a new {@link SceneJS.Translate} instance
- */
-SceneJS.translate = function() {
-    var n = new SceneJS.Translate();
-    SceneJS.Translate.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("translate", SceneJS.translate);

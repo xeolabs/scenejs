@@ -2,96 +2,28 @@
  * @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
  *
  * <h1>Flexible Constructor Signature</h1>
- * <p>Node constructors have a flexible signature to support different forms of instantiation. They generally take
- * static and/or dynamic configuration arguments followed by zero or more child nodes.</p>
+ * <p>Node constructors generally take a static configuration object followed by zero or more child nodes.</p>
  *
- * <b>Simple static configuration</b>
- * <p>The simplest form is with a single static configuration object. For many nodes you only need to specify properties
- * where you want to override the node's defaults. Note the <b>sid</b> property, which is an optional subidentifier
- * which must be unique within the scope of the parent {@link SceneJS.Node}:</p>
+ * <p>For many nodes you only need to specify properties where you want to override the node's defaults. Note the
+ * optional <b>sid</b> property, which is an optional subidentifier which must be unique within the scope of the
+ * parent {@link SceneJS.Node}, and the optional <b>id</b> which must be unique among all nodes:</p>
  * <pre><code>
  * var n1 = new SceneJS.Scale({
- *                 sid:  "myScale",                // Optional subidentifier, unique within scope of parent node
- *                 info: "This is my Scale node",  // Optional metadata, useful for debugging
- *                 x:    100.0 },                  // Falls back on node's defaults of 1.0 for y and z
+ *     id:   "foo",                    // Optional global ID, unique among all nodes
+ *     sid:  "bar",                    // Optional subidentifier, unique within scope of parent node
+ *     x:    100.0 },                  // Falls back on node's defaults of 1.0 for y and z
  *
- *                      new SceneJS.Geometry( ... )  // Child nodes, zero or more
- *             );
+ *         new SceneJS.Geometry( ... ) // Child nodes, zero or more
+ * );
  * </code></pre>
- * Note the optional <b>info</b> property, which you can provide in order to attach a note that may be useful for
- * debugging, which may be got with {@link #getInfo}.
- * <h2>Dynamic configuration</h2>
- * <p>Dynamic configuration can be achieved through a callback that is invoked each time the node is rendered, which
- * will pull configs off the scene data scope (more explanation on that below):</p>
- * <pre><code>
- * var n2 = new SceneJS.Scale(
- *
- *                      function(data) {
- *                              return {
- *                                 x: data.get("scaleX"),    // Falls back on node's default of 1.0 when "scaleX" is null
- *                                 y: data.get("scaleY")
- *                              };
- *                      },
- *
- *                      new SceneJS.Geometry( ... )
- *             );
- * </code></pre>
- *
- * <h2>Static configuration with dynamic override</h2>
- * <p>A combination of static and dynamic configuration can be achieved through both a config object and a callback. The
- * config object's properties are set on the node immediately, then overridden by the callback at render-time:
- * <pre><code>
- * var n3 = new SceneJS.Scale(
- *
- *                      { x: 100.0 },                      // Falls back on node's defaults of 1.0 for y and z
- *
- *                      function(data) {
- *                              return {
- *                                 x: data.get("scaleX"),  // Falls back on 100.0 when "scaleX" is null
- *                                 y: data.get("scaleY")   // Falls back on node's default of 1.0 when "scaleY" is null
- *                              };
- *                      },
- *
- *                      new SceneJS.Geometry( ... ),     // A couple of child nodes this time, just for fun
- *                      new SceneJS.Geometry( ... )
- *             );
- * </pre></code>
  *
  * <h2>No configuration</h2>
  * <p>For many node types you can omit configuration altogether. This node falls back on defaults for all configs:</p>
  * <pre><code>
- * var n4 = new SceneJS.Scale(                           // Scales by defaults of 1.0 on X, Y and Z axis
- *
- *                  new SceneJS.Geometry( ... )        // Here's a child node
+ * var n4 = new SceneJS.Scale(         // Scales by defaults of 1.0 on X, Y and Z axis
+ *     new SceneJS.Geometry( ... )     // Here's a child node
  *             );
  * </code></pre>
- *
- * <h2>A bit more on dynamic configuration</h2>
- * <p>The <b>data</b> parameter on the dynamic config callbacks shown above embodies a scene data scope. SceneJS
- * provides a fresh global data scope within each scene when it is rendered, into which you can inject data when you
- * render the scene graph. The example below demonstrates a property injected into the scope on render, which is then
- * pulled by a node's config callback when the node is rendered:
- * <pre><code>
- * var exampleScene = new SceneJS.Scene({ canvasId: 'theCanvas' },
- *
- *       new SceneJS.LookAt(
- *                      function(data) {
- *                            return {
- *                                eye  : data.get("eye"),
- *                                look : { x: 0, y: 0, z: 0 },
- *                                up   : { x: 0, y: 1, z: 0 }
- *                            };
- *                      },
- *
- *                      // ... chld nodes ...
- *                  );
- *
- * exampleScene
- *     .setData({ eye: { x: 0, y: 0, z: -100 })
- *         .render()
- * </code></pre>
- * <p>Using {@link SceneJS.WithData} nodes, you can create chains of sub-data scopes, to feed data down into the scene
- * hierarchy.</p>
  *
  * <h1>Node Type ID</h1>
  * <p>Every node type, (ie. subtypes of {@link SceneJS.Node}, has a SceneJS type ID, which may be got with {@link #getType}.
@@ -102,11 +34,11 @@
  * <tr><td>----</td><td>-----</td></tr>
  * <tr><td>bounding-box</td><td>{@link SceneJS.BoundingBox}</td></tr>
  * <tr><td>camera</td><td>{@link SceneJS.Camera}</td></tr>
- * <tr><td>cube</td><td>{@link SceneJS.objects.Cube}</td></tr>
+ * <tr><td>cube</td><td>{@link SceneJS.Cube}</td></tr>
  * <tr><td>fog</td><td>{@link SceneJS.Fog}</td></tr>
- * <tr><td>generator</td><td>{@link SceneJS.Generator}</td></tr>
  * <tr><td>geometry</td><td>{@link SceneJS.Geometry}</td></tr>
  * <tr><td>instance</td><td>{@link SceneJS.Instance}</td></tr>
+ * <tr><td>library</td><td>{@link SceneJS.Library}</td></tr>
  * <tr><td>lights</td><td>{@link SceneJS.Lights}</td></tr>
  * <tr><td>locality</td><td>{@link SceneJS.Locality}</td></tr>
  * <tr><td>lookat</td><td>{@link SceneJS.LookAt}</td></tr>
@@ -120,14 +52,13 @@
  * <tr><td>scene</td><td>{@link SceneJS.Scene}</td></tr>
  * <tr><td>interpolator</td><td>{@link SceneJS.Interpolator}</td></tr>
  * <tr><td>selector</td><td>{@link SceneJS.Selector}</td></tr>
- * <tr><td>sphere</td><td>{@link SceneJS.objects.Sphere}</td></tr>
+ * <tr><td>sphere</td><td>{@link SceneJS.Sphere}</td></tr>
  * <tr><td>stationary</td><td>{@link SceneJS.Stationary}</td></tr>
  * <tr><td>symbol</td><td>{@link SceneJS.Symbol}</td></tr>
- * <tr><td>teapot</td><td>{@link SceneJS.objects.Teapot}</td></tr>
+ * <tr><td>teapot</td><td>{@link SceneJS.Teapot}</td></tr>
  * <tr><td>text</td><td>{@link SceneJS.Text}</td></tr>
  * <tr><td>texture</td><td>{@link SceneJS.Texture}</td></tr>
  * <tr><td>translate</td><td>{@link SceneJS.Translate}</td></tr>
- * <tr><td>with-data</td><td>{@link SceneJS.WithData}</td></tr>
  * <tr><td>with-configs</td><td>{@link SceneJS.WithConfigs}</td></tr>
  * <tr><td>socket</td><td>{@link SceneJS.Socket}</td></tr>
  * </table>
@@ -142,7 +73,7 @@
  * <pre><code>
  * var myLoad = new SceneJS.Instance({
  *
- *                  uri: "http://foo.com/...",               // File to load
+ *                  target: "foo",               // Node to instantiate
  *
  *                  listeners: {
  *                        "state-changed" : {
@@ -179,18 +110,24 @@
  * @constructor
  * Create a new SceneJS.Node
  * @param {Object} [cfg] Static configuration object
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
 SceneJS.Node = function() {
     this._nodeType = "node";
     this._NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
     this._sid = null;
+
+    /* Optional symbolic names that were defined for params
+     */
+    this._propNames = {};
+
+    /* Child nodes
+     */
     this._children = [];
-    this._fixedParams = true;     
     this._parent = null;
     this._listeners = {};
     this._numListeners = 0; // Useful for quick check whether node observes any events
+
     this._addedEvents = []; // Events added with #addEvent
     this._eventsOut = []; // FIFO queue for events fired from this node with #fireEvent, flushed after each render
 
@@ -204,7 +141,7 @@ SceneJS.Node = function() {
      *
      * private
      */
-    this._memoLevel = 0;
+    this._setDirty();
 
     /* Deregister default ID
      */
@@ -220,6 +157,10 @@ SceneJS.Node = function() {
         this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
     }
     SceneJS._nodeIDMap[this._id] = this;
+
+    if (this._init) {
+        this._init(this._getParams());
+    }
 };
 
 SceneJS.Node.prototype.constructor = SceneJS.Node;
@@ -240,10 +181,9 @@ SceneJS.Node._ArgParser = new (function() {
             return {};
         };
         node._fixedParams = true;
-        node._config = {};
+        node._params = {};
 
-        /* Parse first argument - expected to be either a config object,
-         * config callback or a child node
+        /* Parse first argument - expected to be either a config object or a child node
          * @private
          */
         if (args.length > 0) {
@@ -252,12 +192,82 @@ SceneJS.Node._ArgParser = new (function() {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         ("First element in node config is null or undefined"));
             }
-            if (arg instanceof Function) {
-                this._parseConfigFunc(arg, args, 1, node);
-            } else if (arg._render) {   // Determines arg to be a node
+            if (arg._render) {   // Determines arg to be a node
                 this._parseChild(arg, args, 1, node);
             } else {
                 this._parseConfigObject(arg, args, 1, node);
+            }
+        }
+    };
+
+
+    /**
+     * Parse argument that is a configuration object, then parse the next
+     * argument (if any) at the given index, which is expected to be either a
+     * configuration callback or a child node.
+     * @private
+     */
+    this._parseConfigObject = function(arg, args, i, node) {
+
+        var cfg = arg;
+
+        /* Seperate out basic node configs (such as SID, info and listeners) from other configs - set those
+         * directly on the node and set the rest on an intermediate config object.
+         */
+        var param;
+        for (var key in cfg) {
+            if (cfg.hasOwnProperty(key)) {
+                param = cfg[key];
+                if (key == "id") {
+                    node._id = param;
+                } else if (key == "listeners") {
+                    this._parseListeners(param, node);
+                } else if (key == "sid") {
+                    node._sid = param;
+                } else if (key == "info") {
+                    node._NODEINFO = param;
+                } else {
+                    if (param.name) {
+
+                        /* Property has a binding for dynamic configuration, which
+                         * specifies a symbolic name and an optional default value.
+                         *
+                         * - symbolic name will be resolved to the property name
+                         *      whenever the node is dynamically configured
+                         *
+                         * - first char of symbolic name is converted to upper case to optimise comparison
+                         *      with preprocessed configs map
+                         *
+                         * - the binding is an object of the form { name: "foo", value: bar }
+                         *
+                         * - map the property's  actual name to the symbolic name and default value
+                         */
+                        node._propNames[param.name] = key.substr(0, 1).toUpperCase() + key.substr(1);
+                        node._params[key] = param.value;
+                    } else {
+                        node._params[key] = param;
+                    }
+                }
+            }
+        }
+
+        node._getParams = (function() {
+            var _config = node._params;
+            node._params = {};
+            return function() {
+                return _config;
+            };
+        })();
+
+        /* Wind on to next argument if any, expected be a child node
+         */
+        if (i < args.length) {
+            arg = args[i];
+            if (arg._render) { // Determines arg to be a node
+                this._parseChild(arg, args, i + 1, node);
+            } else {
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
+                        ("Unexpected type for node argument " + i + " - expected a child node"));
             }
         }
     };
@@ -299,108 +309,6 @@ SceneJS.Node._ArgParser = new (function() {
     };
 
     /**
-     * Parse argument that is a configuration object, then parse the next
-     * argument (if any) at the given index, which is expected to be either a
-     * configuration callback or a child node.
-     * @private
-     */
-    this._parseConfigObject = function(arg, args, i, node) {
-
-        /* Seperate out basic node configs (such as SID, info and listeners) from other configs - set those
-         * directly on the node and set the rest on an intermediate config object.
-         */
-        for (var key in arg) {
-            if (arg.hasOwnProperty(key)) {
-                if (key == "id") {
-                    node._id = arg[key];
-                } else if (key == "listeners") {
-                    this._parseListeners(arg[key], node);
-                } else if (key == "sid") {
-                    node._sid = arg[key];
-                } else if (key == "info") {
-                    node._NODEINFO = arg[key];
-                } else {
-                    node._config[key] = arg[key];
-                }
-            }
-        }
-
-        node._getParams = (function() {
-            var _config = node._config;
-            return function() {
-                return _config;
-            };
-        })();
-
-        /* Wind on to next argument if any, expected be either
-         * a config callback or a child node
-         */
-        if (i < args.length) {
-            arg = args[i];
-            if (arg instanceof Function) {
-                this._parseConfigFunc(arg, args, i + 1, node);
-            } else if (arg._render) { // Determines arg to be a node
-                this._parseChild(arg, args, i + 1, node);
-            } else {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                        ("Unexpected type for node argument " + i + " - expected a config function or a child node"));
-            }
-        }
-    };
-
-    /**
-     * Parse argument that is a configuration callback, then parse
-     * the next argument (if any) at the given index, which is
-     * expected to be a child node.
-     * @private
-     */
-    this._parseConfigFunc = function(arg, args, i, node) {
-        node._getParams = (function() {
-            var _config = node._config;
-            var _arg = arg;
-            var val;
-            return function(data) {
-                var c = _arg.call(this, data);
-                if (!c) {
-                    /* Dynamic config returns nothing - we'll assume this is
-                     * explicit, such as when done by a SceneJS.Generator to
-                     * signal the end of its generation.
-                     */
-                    return null;
-                }
-                var result = {};
-                for (var key in _config) {
-                    if (_config.hasOwnProperty(key)) {
-                        result[key] = _config[key];
-                    }
-                }
-                for (var key in c) {
-                    if (c.hasOwnProperty(key)) {
-                        val = c[key];   // Don't clobber possible non-null static value with a null dynamic one 
-                        if (val != null && val != undefined) {
-                            result[key] = val;
-                        }
-                    }
-                }
-                return result;
-            };
-        })();
-        node._fixedParams = false;
-
-        /* Wind on to next argument if any, expected be a child node
-         */
-        if (i < args.length) {
-            arg = args[i];
-            if (arg._nodeType) {
-                this._parseChild(arg, args, i + 1, node);
-            } else {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                        ("Unexpected type for node argument " + i + " - expected a child node"));
-            }
-        }
-    };
-
-    /**
      * Parse argument that is a child node, then parse the next
      * argument (if any) at the given index, which is expected to
      * be a child node.
@@ -426,12 +334,22 @@ SceneJS.Node._ArgParser = new (function() {
     };
 })();
 
+
+/**
+ * Flags state change on this node.
+ * Resets memoisation level and schedules another scene render pass.
+ * @private
+ */
+SceneJS.Node.prototype._setDirty = function() {
+    this._memoLevel = 0;   // TODO: schedule another scene render pass
+};
+
 /**
  * Resets memoization level to zero - called when moving nodes around in graph or calling their setters
  * @private
  */
 SceneJS.Node.prototype._resetMemoLevel = function() {
-    this._memoLevel = 0;
+    this._setDirty();
     for (var i = 0; i < this._children.length; i++) {
         this._children[i]._resetMemoLevel();
     }
@@ -444,37 +362,13 @@ SceneJS.Node.prototype._resetMemoLevel = function() {
  * it tracks in traversalContext the location of each node in relation to the right
  * fringe of the subtree. As soon as the current node has zero children and no right
  * sibling, then it must be the last one in the subtree. If the nodes are part of the
- * subtree of a Symbol node, then a callback will have been planted on the traversalContext
+ * subtree of an instanced node, then a callback will have been planted on the traversalContext
  * by the Instance node that is intiating it. The callback is then called to render the
  * Instance's child nodes as if they were children of the last node.
  */
-SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children) {
-    var child;
-    var childConfigs;
-    var i;
-    var configUnsetters;
-
-    var savedName;  // Saves SID path for when rendering subgraph of Instance
-
-    if (this._sidPath) {
-
-        /* If this node has a SID path, then it is a Symbol. When a Symbol is rendered, it does not render its own
-         * children, instead it registers itself on the Instancing Module and records on itself the SID path of nodes
-         * that were visited on the path from the root.
-         *
-         * We're now here rendering its children as part of the rendering of an Instance node that refers to the Symbol.
-         * We're entering the "virtual world" of the Symbol, so we'll set the Symbol's SID path on the Instancing Module
-         * to set the current SID name space for the Symbol.
-         */
-        savedName = SceneJS._instancingModule.getName();
-        SceneJS._instancingModule.setName(this._sidPath, this);
-    } else if (this._sid) {
-
-        /* If this node has a SID, push it to the instancing module to build up a name space for any Symbols we
-         * might be about render within the child subtrees.
-         */
-        SceneJS._instancingModule.pushName(this._sid, this);
-    }
+SceneJS.Node.prototype._renderNodes = function(
+        traversalContext,
+        selectedChildren) {             // Selected children - useful for Selector node
 
     if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
 
@@ -483,31 +377,43 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
         SceneJS._pickModule.preVisitNode(this);
     }
 
-    children = children || this._children;  // for Selector node
+    var children = selectedChildren || this._children;  // Set of child nodes we'll be rendering
     var numChildren = children.length;
-    if (numChildren) {
+    var child;
+    var childConfigs;
+    var i;
+    var configUnsetters;
+
+    if (numChildren > 0) {
         var childTraversalContext;
+        var configs = this._configs || traversalContext.configs;
+        this._configs = undefined;
+
         for (i = 0; i < numChildren; i++) {
             child = children[i];
             configUnsetters = null;
-            childConfigs = this._configs || traversalContext.configs;
-            if (childConfigs && child._sid) {
-                childConfigs = childConfigs[child._sid];
-                if (childConfigs) {
-                    if (childConfigs instanceof Function) {
-                        childConfigs.call(child, data);
-                    } else {
-                        configUnsetters = this._applyConfigs(childConfigs, traversalContext.configsModes, child, data);
+            childConfigs = configs;   // Configs to apply to child - may descend into sub-configs yet
+            if (configs) {
+                if (configs["*"]) {
+
+                    /* Wildcard configs - applied to all children
+                     * regardless of whether they have an SID or not
+                     */
+                    configUnsetters = this._applyConfigs(configs["*"], child);
+
+                } else if (child._sid) {
+                    childConfigs = configs["#" + child._sid];    // Look for configs for child
+                    if (childConfigs) {                                             // Found - configure child
+                        configUnsetters = this._applyConfigs(childConfigs, child);
                     }
                 }
             }
             childTraversalContext = {
                 insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
                 callback : traversalContext.callback,
-                configs: childConfigs || traversalContext.configs,
-                configsModes : traversalContext.configsModes
+                configs: childConfigs || configs
             };
-            child._renderWithEvents.call(child, childTraversalContext, data);
+            child._renderWithEvents.call(child, childTraversalContext);
             if (configUnsetters) {
                 this._unsetConfigs(configUnsetters);
             }
@@ -521,26 +427,13 @@ SceneJS.Node.prototype._renderNodes = function(traversalContext, data, children)
              */
             if (traversalContext.callback) {
 
-                /* The node is within the subtree of a Symbol - Instance has provided a
+                /* The node is within the subtree of an instantiated node - Instance has provided a
                  * callback to render the Instance's child nodes as if they were children
                  * of the last node in the subtree
-                 * of the last node in the subtree
                  */
-                traversalContext.callback(traversalContext, data);
+                traversalContext.callback(traversalContext);
             }
         }
-    }
-    if (savedName) {
-
-        /* Finished visiting children of Symbol. We're leaving the virtual world of the Symbol now,
-         * so restore the SID namespace of the caller Instance.
-         */
-        SceneJS._instancingModule.setName(savedName, this);
-    } else if (this._sid) {
-
-        /* Else we're just ascending back up the tree as normal. Pop the SID if we pushed one.
-         */
-        SceneJS._instancingModule.popName();
     }
 };
 
@@ -556,7 +449,7 @@ SceneJS.Node.prototype._flushEventsOut = function() {
     }
 };
 
-SceneJS.Node.prototype._applyConfigs = function(configs, configsModes, node, data) {
+SceneJS.Node.prototype._applyConfigs = function(configs, node) {
     //    var handle = {
     //        node : node,
     //        setterFuncs : [],
@@ -564,37 +457,65 @@ SceneJS.Node.prototype._applyConfigs = function(configs, configsModes, node, dat
     //    };
     var handle = null;
     var key;
-    var funcName;
+    var propName;
+
     var func;
     var config;
     for (key in configs) {
         if (configs.hasOwnProperty(key)) {
             config = configs[key];
-            if (config.isFunc) {
-                func = node[key];
-                if (func) {
-                    if (config.value instanceof Function) {
-                        var val = config.value.call(node, data)
-                        func.call(node, val);
-                    } else {
+
+            if (config.action) { // Method call to set/add/remove something on node
+
+                /* Try to resolve method via symbolic property name
+                 */
+                propName = node._propNames[config.propKey];
+                if (propName) {
+                    func = node[config.action + propName];
+                    if (func) {
                         func.call(node, config.value);
+                        continue;
                     }
-                } else {
-                    if (configsModes && configsModes.strictProperties) {
-                        throw SceneJS._errorModule.fatalError(new SceneJS.errors.WithConfigsPropertyNotFoundException(
-                                "Method '" + funcName + "' expected on node with SID '" + node.getSID() + "'"));
-                    }
+                }
+
+                /* Failed - try to resolve method directly on node
+                 */
+                func = node[config.action + config.propName];
+                if (!func) {
+
+                    /* Prop name is like "foo" - no func found - try "setFOO"                    
+                     */
+                    func = node[config.action + config.propName];
+                }
+                if (func) {
+                    func.call(node, config.value);
                 }
             }
         }
     }
-    return handle; // TODO: restore handle!
+    return handle; // TODO: restore handle
 };
 
 /**
  * Wraps _render to fire built-in events either side of rendering.
  * @private */
-SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
+SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
+
+    /* Record performance stats for profiling
+     */
+//    if (!SceneJS.perfStats) {
+//        SceneJS.perfStats = {
+//            nodeCount: 0,
+//            memoLevelCounts : [0,0,0,0,0]
+//        };
+//    }
+//    if (this._nodeType == "rotate" || this._nodeType == "translate" || this._nodeType == "matrix") {
+//        SceneJS.perfStats.nodeCount++;
+//        if (this._memoLevel != undefined) {
+//            SceneJS.perfStats.memoLevelCounts[this._memoLevel]++;
+//        }
+//    }
+
     try {
         SceneJS._nodeEventsModule.preVisitNode(this);
         this._processEventsIn();
@@ -604,16 +525,16 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
          * configs when we leave this method so we don't keep re-applying them
          */
         if (this._configs) {
-            this._applyConfigs(this._configs, traversalContext.configsModes, this, data);
+            this._applyConfigs(this._configs, this);
         }
 
         if (this._numListeners == 0) {
-            this._render(traversalContext, data);
+            this._render(traversalContext);
         } else {
             if (this._listeners["rendering"]) {
                 this._fireEvent("rendering", { });
             }
-            this._render(traversalContext, data);
+            this._render(traversalContext);
             if (this._listeners["rendered"]) {
                 this._fireEvent("rendered", { });
             }
@@ -621,8 +542,6 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext, data) {
         this._flushEventsOut();
         SceneJS._nodeEventsModule.postVisitNode(this);
 
-        /* Forget any configs we applied - make sure we do this if they threw an exception
-         */
     } finally {
         this._configs = null;
     }
@@ -690,57 +609,20 @@ SceneJS.Node.prototype._processEvents = function(events) {
     }
 };
 
-SceneJS.Node.prototype.configure = function(configs) {
-    this._configs = this._preprocessConfigs(configs);
-};
-
-/**
- * Preprocesses configs map into node method calls for fast
- * application when rendering node
- * @param configs
+/** Configures nodes within the tree rooted by this node. The configuration is
+ * provided in a map containing properties that will be applied to the node(s)
+ * as they are next traversed. This is the same mechanism as used in {@link SceneJS.WithConfigs}. 
+ *
+ * @param {Object} configs Configuration map (see {@link SceneJS.WithConfigs})
  */
-SceneJS.Node.prototype._preprocessConfigs = function(configs) {
-    var configAction;
-    var funcName;
-    var newConfigs = {};
-    for (var key in configs) {
-        if (configs.hasOwnProperty(key)) {
-            key = key.replace(/^\s*/, "").replace(/\s*$/, "");    // trim
-            if (key.length > 0) {
-                configAction = key.substr(0, 1);
-                if (configAction != "#") {  // Property reference
-                    if (configAction == "+") {
-                        funcName = "add" + key.substr(1, 1).toUpperCase() + key.substr(2);
-                    } else if (configAction == "-") {
-                        funcName = "remove" + key.substr(1, 1).toUpperCase() + key.substr(2);
-                    } else {
-                        funcName = "set" + key.substr(0, 1).toUpperCase() + key.substr(1);
-                    }
-                    newConfigs[funcName] = {
-                        isFunc : true,
-                        value : configs[key]
-                    };
-
-                } else {
-                    if (configs[key] instanceof Function) {
-                        newConfigs[key.substr(1)] = configs[key];
-                    } else {
-                        newConfigs[key.substr(1)] = this._preprocessConfigs(configs[key]);
-                    }
-                }
-            }
-        }
-    }
-    return newConfigs;
+SceneJS.Node.prototype.configure = function(configs) {
+    this._configs = SceneJS._preprocessConfigs(configs);
+    this._setDirty();
 };
-
 
 /** @private */
-SceneJS.Node.prototype._render = function(traversalContext, data) {
-    if (!this._fixedParams) {
-        this._init(this._getParams.call(this, data));
-    }
-    this._renderNodes(traversalContext, data);
+SceneJS.Node.prototype._render = function(traversalContext) {
+    this._renderNodes(traversalContext);
 };
 
 // @private
@@ -751,20 +633,20 @@ SceneJS.Node.prototype._unsetConfigs = function(handle) {
 };
 
 /** @private */
-SceneJS.Node.prototype._renderNode = function(index, traversalContext, data) {
+SceneJS.Node.prototype._renderNode = function(index, traversalContext) {
     if (index >= 0 && index < this._children.length) {
         var child = this._children[index];
         var childConfigs = traversalContext.configs;
         if (childConfigs && child._sid) {
             childConfigs = childConfigs["#" + child._sid];
             if (childConfigs) {
-                var handle = this._applyConfigs(childConfigs, traversalContext.configsModes, child);
-                child._render.call(child, traversalContext, data);
+                var handle = this._applyConfigs(childConfigs, child);
+                child._render.call(child, traversalContext);
                 this._unsetConfigs(handle);
                 return;
             }
         }
-        child._render.call(child, traversalContext, data);
+        child._render.call(child, traversalContext);
     }
 };
 
@@ -807,7 +689,7 @@ SceneJS.Node.prototype.getInfo = function() {
  * @param {string} info Node info string
  */
 SceneJS.Node.prototype.setInfo = function(info) {
-    this._NODEINFO = info;
+    this._NODEINFO = info; // Doesnt require re-render
 };
 
 /**
@@ -861,6 +743,7 @@ SceneJS.Node.prototype.getNode = function(sid) {
  */
 SceneJS.Node.prototype.removeNodeAt = function(index) {
     var r = this._children.splice(index, 1);
+    this._setDirty();
     if (r.length > 0) {
         r[0]._parent = null;
         return r[0];
@@ -881,6 +764,7 @@ SceneJS.Node.prototype.removeNode = function(sid) {
     }
     for (var i = 0; i < this._children.length; i++) {
         if (this._children[i].getSID() == sid) {
+            this._setDirty();
             return this.removeNodeAt(i);
         }
     }
@@ -901,6 +785,7 @@ SceneJS.Node.prototype.addNodes = function(nodes) {
     for (var i = nodes.length - 1; i >= 0; i--) {
         this.addNode(nodes[i]);
     }
+    this._setDirty();
     return this;
 };
 
@@ -931,6 +816,7 @@ SceneJS.Node.prototype.addNode = function(node) {
     this._children.push(node);
     node._parent = this;
     node._resetMemoLevel();
+    this._setDirty();
     return node;
 };
 
@@ -966,6 +852,7 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
     }
     node._parent = this;
     node._resetMemoLevel();
+    this._setDirty();
     return node;
 };
 
@@ -1010,6 +897,7 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
         options : options || {}
     });
     this._numListeners++;
+    this._setDirty();  // Need re-render - potentially more state changes
     return this;
 };
 
@@ -1018,7 +906,7 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
  * @return {SceneJS.Node} this
  */
 SceneJS.Node.prototype.destroy = function() {
-   // alert("destroying");
+    // alert("destroying");
     return this;
 };
 
@@ -1152,7 +1040,6 @@ SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
 
 /** Factory function that returns a new {@link SceneJS.Node} instance
  * @param {Object} [cfg] Static configuration object
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {SceneJS.node, ...} arguments Zero or more child nodes
  * @returns {SceneJS.Node}
  */
@@ -1162,7 +1049,6 @@ SceneJS.node = function() {
     return n;
 };
 
-
-SceneJS.registerNodeType("node", SceneJS.node);
+SceneJS._registerNode("node", SceneJS.Node, SceneJS.node);
 
 

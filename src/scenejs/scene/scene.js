@@ -1,7 +1,7 @@
 /**
  *@class Root node of a SceneJS scene graph.
  *
- * <p>This is entry and exit point for traversal of a scene graph, providing the means to inject data, pick 
+ * <p>This is entry and exit point for traversal of a scene graph, providing the means to inject configs, pick
  * {@link SceneJS.Geometry} and render frames either singularly or in a continuous loop.</p>
  * <p><b>Binding to a canvas</b></p>
  * <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
@@ -12,7 +12,7 @@
  * the {@link SceneJS.Scene} node binds to a WebGL Canvas element, a {@link SceneJS.LookAt} defines the viewoint,
  * a {@link SceneJS.Camera} defines the projection, a {@link SceneJS.Lights} defines a light source,
  * a {@link SceneJS.Material} defines the current material properties, {@link SceneJS.Rotate} nodes orient the modeling
- * coordinate space, then a {@link SceneJS.objects.Cube} defines our cube.</p>
+ * coordinate space, then a {@link SceneJS.Cube} defines our cube.</p>
  * <pre><code>
  *
  * var myScene = new SceneJS.Scene({
@@ -35,60 +35,87 @@
  *         }
  *       },
  *
- *       new SceneJS.Lights({
- *           sources: [
- *             {
+ *       new SceneJS.Light({
  *               type:  "dir",
  *               color: { r: 1.0, g: 1.0, b: 1.0 },
  *               dir:   { x: 1.0, y: -1.0, z: 1.0 }
- *             },
- *             {
+ *             }),
+ *
+ *       new SceneJS.Light({
  *               type:  "dir",
  *               color: { r: 1.0, g: 1.0, b: 1.0 },
  *               dir:   { x: -1.0, y: -1.0, z: -3.0 }
- *             }
- *           ]
- *         },
+ *             }),
  *
- *         new SceneJS.Material({
- *                  baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
- *                  specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
- *                  emit:           0.0,
- *                  specular:       0.9,
- *                  shine:          6.0
- *             },
+ *       new SceneJS.Material({
+ *               baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
+ *               specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
+ *               emit:           0.0,
+ *               specular:       0.9,
+ *               shine:          6.0
+ *            },
  *
- *             new SceneJS.Rotate(
- *                 function(data) {
- *                    return {
- *                      angle: data.get('yaw'), y : 1.0
- *                   };
+ *            // We're going to demonstrate two techniques for updating
+ *            // the angles of these rotate nodes. One technique requires
+ *            // that they have scoped identifiers (SID)s, while the other
+ *            // requires them to have globally-unique IDs.
+ *
+ *            new SceneJS.Rotate({
+ *                     id:   "foo-id",                // Optional global ID
+ *                     sid:  "foo-sid",               // Optional scoped identifier
+ *                     angle: 0.0, y : 1.0
  *                 },
  *
- *                 new SceneJS.Rotate(
- *                     function(data) {
- *                       return {
- *                         angle: data.get('pitch'), x : 1.0
- *                       };
+ *                 new SceneJS.Rotate({
+ *                          id:  "bar-id",            // Optional global ID
+ *                         sid: "bar-sid",           // Optional scoped identifier
+ *                          angle: 0.0, x : 1.0
  *                     },
  *
- *                     new SceneJS.objects.Cube()
+ *                     new SceneJS.Cube()
  *                   )
  *                )
  *              )
- *            )
- *          )
- *       )
+ *           )
+ *        )
  *     );
+ * </pre></code>
  *
- *   myScene.setData({ yaw: 315, pitch: 20 });
+ * <b><p>Injecting Data into the Scene</p></b>
+ * <p>Now, to inject some data into those rotate nodes, we can pass a configuration map into the scene graph,
+ *  which as traversal descends into the scene, locates our rotate node by their SIDs and stuffs some angles into
+ * their appropriate setter methods:</p>
+ * <code><pre>
+ *   myScene.setConfigs({
+ *           "foo-sid": {
+ *               angle: 315,       // Maps to SceneJS.Rotate#setAngle
+ *               "#bar-sid": {
+ *                   angle:20
+ *               }
+ *           });
+ *
  *   myScene.render();
  * </pre></code>
- * <p>Take a closer look at those rotate nodes. See how they can optionally take a function which feeds them their
- * parameters? You can do that for any node to dynamically evaluate parameters for them at traversal-time. The functions
- * take an immutable data object, which is SceneJS's mechanism for passing variables down into scene graphs. Using the
- * yaw and pitch properties on that data object, our functions create configurations that specify rotations about
- * the X and Y axis. See also how we inject those angles when we render the scene.</p>
+ *
+ * <p>Since gave those rotate nodes <b>ID</b>s, then we could instead find them directly and set their angles:
+ * <pre><code>
+ * SceneJS.getNode("foo-id").setAngle(315);
+ * SceneJS.getNode("bar-id").setAngle(20);
+ *
+ * myScene.render();
+ * </pre></code>
+ *
+ * <p>We can also pass config objects directly to nodes:
+ * <pre><code>
+ * SceneJS.getNode("foo-id").configure({ angle: 315 });
+ * </pre></code>
+ *
+ * <p>..or pass them in "configure" events:
+ * <pre><code>
+ * SceneJS.fireEvent("configure", "foo-id", { angle: 315 });
+ * </pre></code>
+ *
+ *
  * <h2>Rendering in a Loop</h2>
  * <p>If you wanted to animate the rotation within the scene example above, then instead of rendering just a single frame
  * you could start a rendering loop on the scene, as shown below:</p>
@@ -101,7 +128,13 @@
  *        // Idle function called before each render traversal
  *
  *        idleFunc: function(scene) {
- *             scene.setData({ yaw: yaw, pitch: 20 };
+ *             scene.setConfigs({
+ *                 "foo-sid": {
+ *                     angle: yaw,
+ *                     "#bar-sid": {
+ *                         angle: pitch
+ *                     }
+ *                 });
  *
  *             yaw += 2.0;
  *             if (yaw == 360) {
@@ -114,25 +147,18 @@
  * </code></pre>
  * @extends SceneJS.Node
  */
-SceneJS.Scene = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "scene";
-    if (!this._fixedParams) {
-        throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidNodeConfigException
-                        ("Dynamic configuration of SceneJS.scene node is not supported"));
-    }
-    this._params = this._getParams();
-    this._data = {};
+SceneJS.Scene = SceneJS.createNodeType("scene");
+
+// @private
+SceneJS.Scene.prototype._init = function(params) {
     this._configs = {};
-    if (this._params.canvasId) {
-        this._canvasId = document.getElementById(this._params.canvasId) ? this._params.canvasId : SceneJS.Scene.DEFAULT_CANVAS_ID;
+    if (params.canvasId) {
+        this._canvasId = document.getElementById(params.canvasId) ? params.canvasId : SceneJS.Scene.DEFAULT_CANVAS_ID;
     } else {
         this._canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
     }
+    this._loggingElementId = params.loggingElementId;
 };
-
-SceneJS._inherit(SceneJS.Scene, SceneJS.Node);
 
 /** ID of canvas SceneJS looks for when {@link SceneJS.Scene} node does not supply one
  */
@@ -230,32 +256,12 @@ SceneJS.Scene.prototype.isRunning = function() {
 };
 
 /**
- * Sets a map of values to set on the global scene data scope when the scene is next rendered.
- * This data will then be available to any configuration callbacks that are used to configure nodes. The map is the same
- * as that configured on a {@link SceneJS.WithData} and works the same way.
- * @param {object} values Values for the global scene data scope, same format as that given to {@link SceneJS.WithData}
- */
-SceneJS.Scene.prototype.setData = function(values) {
-    this._data = values || {};
-    return this;
-};
-
-/**
- * Returns any data values map previously set with {@link #setData} since the last call to {@link #render}.
- *
- * @returns {Object} The data values map
- */
-SceneJS.Scene.prototype.getData = function() {
-    return this._configs;
-};
-
-/**
  * Sets a map of values to set on target nodes in the scene graph when the scene is next rendered. The map is the same as that
  * configured on a {@link SceneJS.WithConfigs} and works the same way.
  * @param {object} values Map of values, same format as that given to {@link SceneJS.WithConfigs}
  */
 SceneJS.Scene.prototype.setConfigs = function(values) {
-    this._configs = values || {};
+    this._configs = SceneJS._preprocessConfigs(values || {});
     return this;
 };
 
@@ -269,7 +275,7 @@ SceneJS.Scene.prototype.getConfigs = function() {
 };
 
 /**
- * Immediately renders one frame of the scene, applying any config and data scope values given to {@link #setData} and
+ * Immediately renders one frame of the scene, applying any config  values given to
  * {#link #setConfigs}, retaining those values in the scene afterwards. Has no effect if the scene has been
  * {@link #start}ed and is currently rendering in a loop.
  */
@@ -283,11 +289,14 @@ SceneJS.Scene.prototype.render = function() {
  */
 SceneJS.Scene.prototype._render = function() {
     if (!this._sceneId) {
-        this._sceneId = SceneJS._sceneModule.createScene(this, this._getParams());
+        this._sceneId = SceneJS._sceneModule.createScene(this, {
+            canvasId: this._canvasId,
+            loggingElementId: this._loggingElementId
+        });
     }
     SceneJS._sceneModule.activateScene(this._sceneId);
     var traversalContext = {};
-    this._renderNodes(traversalContext, new SceneJS.Data(null, false, this._data));
+    this._renderNodes(traversalContext);
     SceneJS._sceneModule.deactivateScene();
 };
 
@@ -355,16 +364,6 @@ SceneJS.Scene.prototype.stop = function() {
     }
 };
 
-/** Factory function that returns a new {@link SceneJS.Scene} instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Scene constructor
- * @returns {SceneJS.Scene}
- */
-SceneJS.scene = function() {
-    var n = new SceneJS.Scene();
-    SceneJS.Scene.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
 /** Total SceneJS reset - destroys all scenes and cached resources.
  */
 SceneJS.reset = function() {
@@ -382,4 +381,3 @@ SceneJS.reset = function() {
     }
 };
 
-SceneJS.registerNodeType("scene", SceneJS.scene);

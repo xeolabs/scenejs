@@ -92,30 +92,60 @@ var SceneJS = {
                 && typeof testObject === 'object' && typeof testObject.length === 'number';
     },
 
-    /**
-     * Registers a node factory func against the node's type name. This is used
-     * when we create nodes from JSON.
+    /** Creates a new {@link SceneJS.Node} subtype.
      *
-     * @param {string} Type ID by which the node type may be looked up
-     * @param {function} factoryFunc Factory function that constructs a new instance of the node
+     * @param {string} type Name of new subtype
+     * @param {string} superType Optional name of super-type - {@link SceneJS.Node} by default
+     * @return {class} New node class
      */
-    registerNodeType : function(type, factoryFunc) {
-        this._nodeFactoryFuncs[type] = factoryFunc;
+    createNodeType : function(type, superType) {
+        var supa = this._nodeTypes[superType || "node"];
+        if (!supa) {
+            throw "undefined superType: '" + superType + "'";
+        }
+        var nodeType = function() {                  // Create class
+            supa.nodeClass.apply(this, arguments);
+        };
+        SceneJS._inherit(nodeType, supa.nodeClass);
+
+        var nodeFunc = function() {                // Create factory function
+            var n = new nodeType();
+            nodeType.prototype.constructor.apply(n, arguments);
+            n._nodeType = type;
+            return n;
+        };
+        this._registerNode(type, nodeType, nodeFunc);
+        SceneJS[type] = nodeFunc;
+        return nodeType;
+    },
+
+    _registerNode : function(type, nodeClass, nodeFunc) {
+        this._nodeTypes[type] = {
+            nodeClass : nodeClass,
+            nodeFunc: nodeFunc
+        };
     },
 
     /**
-     * Factory function to create a subgraph from JSON
+     * Factory function to create a scene (sub)graph from JSON
      * @param json
+     * @return {SceneJS.Node} Root of (sub)graph
      */
     createNode : function(json) {
-        if (!json.type) {
-            throw "Node type undefined";
-        }
-        var func = this._nodeFactoryFuncs[json.type];
-        if (!func) {
+        json.type = json.type || "node";
+
+        var nodeType = this._nodeTypes[json.type];
+        if (!nodeType) {
             throw "Node type not registered: '" + json.type + "'";
         }
         var cfg = json.cfg || {};
+
+        //---------------------------------------------------------------
+        //
+        //---------------------------------------------------------------
+        cfg.id = json.id;
+        cfg.sid = json.sid;
+
         var args = [cfg];
         if (json.nodes) {
             var len = json.nodes.length;
@@ -123,29 +153,93 @@ var SceneJS = {
                 args.push(SceneJS.createNode(json.nodes[i]));
             }
         }
-        return func.apply(this, args);
+        return nodeType.nodeFunc.apply(this, args);
     },
 
     /**
-     * Fire an event at the node with teh given ID
+     * Fire an event at the node with the given ID
      *
      * @param {String} name Event name
-     * @param {String} targetNodeId ID of target node
+     * @param {String} target ID of target node
      * @param {Object} params Event parameters
      */
-    fireEvent : function(name, targetNodeId, params) {
-        var node = this.getNode(targetNodeId);
+    fireEvent : function(name, target, params) {
+        var node = this.getNode(target);
         if (!node) {
-            throw "Node with this ID not found: '" + targetNodeId + "'";
+            throw "Node with this ID not found: '" + target + "'";
         }
         node.addEvent({ name: name, params: params });
+    },
+
+    /**
+     * Preprocesses the given configs map for fast application to nodes.
+     * @private
+     * @param configs
+     */
+    _preprocessConfigs : function(configs) {
+        var pattern;
+        var action;
+        var propKey;
+        var propName;
+        var newConfigs = {};
+
+        for (var key in configs) {
+
+            if (configs.hasOwnProperty(key)) {
+                key = key.replace(/^\s*/, "").replace(/\s*$/, "");    // trim
+
+                if (key.length > 0) {
+                    pattern = key.substr(0, 1);
+
+                    if (pattern != "#" && pattern != "*") {
+
+                        /* Reference to node method
+                         */
+                        if (pattern == "+") {
+                            action = "add";
+                            propKey = key.substr(1);
+                            propName = key.substr(1, 1).toUpperCase() + key.substr(2);
+
+                        } else if (pattern == "-") {
+                            action = "remove";
+                            propKey = key.substr(1);
+                            propName = key.substr(1, 1).toUpperCase() + key.substr(2);
+
+                        } else {
+                            action = "set";
+                            propKey = key.substr(0);
+                            propName = key.substr(0, 1).toUpperCase() + key.substr(1);
+                        }
+
+                        newConfigs[key] = {
+                            pattern: (action != "set") ? pattern : null,
+                            action: action,
+                            propKey : propKey,
+                            propName: propName,
+                            value : configs[key]
+                        };
+
+                    } else {
+
+                        /* Reference to node.
+                         *
+                         * Keep the special char (eg '#') on the
+                         * child node selector - we'll need it for
+                         * doing fancy selection (wildcards etc) when we apply it
+                         */
+                        newConfigs[key] = this._preprocessConfigs(configs[key]);
+                    }
+                }
+            }
+        }
+        return newConfigs;
     },
 
     /**
      * Node factory funcs mapped to type
      * @private
      */
-    _nodeFactoryFuncs: {},
+    _nodeTypes: {},
 
     /**
      * ID map of all existing nodes.
@@ -161,8 +255,25 @@ var SceneJS = {
      */
     getNode : function(id) {
         return SceneJS._nodeIDMap[id];
-    }
+    },
 
+    /**
+     * SceneJS IOC service registry
+     */
+    services : new (function() {
+
+        this.NODE_SOURCE_SERVICE = "node-source";
+
+        this._services = {};
+
+        this.addService = function(name, service) {
+            this._services[name] = service;
+        };
+
+        this.getService = function(name) {
+            return this._services[name];
+        };
+    })()
 };
 
 SceneJS._namespace("SceneJS");

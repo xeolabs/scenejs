@@ -16,7 +16,6 @@
 
  */
 
-SceneJS.requireModule("modules/house/house.js");
 
 var exampleScene = SceneJS.scene({ canvasId: "theCanvas",
 
@@ -24,70 +23,65 @@ var exampleScene = SceneJS.scene({ canvasId: "theCanvas",
      */
     loggingElementId: "theLoggingDiv" },
 
-        SceneJS.lookAt(
-                function(data) {
-                    return {
-                        eye : { x: -1.0, y: 100.0, z: data.get("dist") },
-                        look : { x: -1.0, y: 50, z: 0 },
-                        up : { y: 1.0 }
-                    };
-                },
+        SceneJS.lookAt({
+            sid: "lookat",
+            eye : { x: -1.0, y: 100.0, z: 1000 },
+            look : { x: -1.0, y: 50, z: 0 },
+            up : { y: 1.0 }
+        },
                 SceneJS.camera({
                     optics: {
                         type: "perspective",
                         fovy : 55.0,
-                        aspect : 1.0,
+                        aspect : 1.25,
                         near : 0.10,
                         far : 5000.0  }
                 },
-                        SceneJS.lights({
-                            sources: [
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    dir:                    { x: 1.0, y: -1.0, z: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    dir:                    { x: -1.0, y: -1.0, z: -3.0 },
-                                    diffuse:                true,
-                                    specular:               true
-                                }
-                            ]},
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            dir:                    { x: 1.0, y: -1.0, z: 1.0 },
+                            diffuse:                true,
+                            specular:               true
+                        }),
 
-                            /* Next, modelling transforms to orient the house.  These particular
-                             * transforms are dynamically configured from data injected into the
-                             * scene graph when its rendered:
-                             */
-                                SceneJS.rotate(function(data) {
-                                    return {
-                                        angle: data.get('pitch'), x : 1.0
-                                    };
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            dir:                    { x: -1.0, y: -1.0, z: -3.0 },
+                            diffuse:                true,
+                            specular:               true
+                        }),
+
+                    /* Next, modelling transforms to orient the house.  These particular
+                     * transforms are dynamically configured from data injected into the
+                     * scene graph when its rendered:
+                     */
+                        SceneJS.rotate({
+                            sid: "pitch",
+                            angle : { name: "pitch", value: 0.0 },
+                            x : 1.0
+                        },
+                                SceneJS.rotate({
+                                    sid: "yaw",
+                                    angle : { name: "yaw", value: 0.0 },
+                                    y : 1.0
                                 },
-                                        SceneJS.rotate(function(data) {
-                                            return {
-                                                angle: data.get('yaw'), y : 1.0
-                                            };
+                                        SceneJS.rotate({
+                                            x:1,
+                                            angle:270
                                         },
-                                                SceneJS.rotate({
-                                                    x:1,
-                                                    angle:270
-                                                },
 
-                                                    /* Use our house content module
-                                                     */
-                                                        SceneJS.useModule({
-                                                            name: "house"
-                                                        }))
-                                                )
+                                            /* Use our house model, defined in house.js
+                                             * and loaded via a <script> tag in index.html
+                                             */
+                                                houseModel )
                                         )
                                 )
                         )
                 )
-        );
+        )
+        ;
 
 
 /*----------------------------------------------------------------------
@@ -128,8 +122,6 @@ function mouseMove(event) {
         pitch += (event.clientY - lastY) * 0.5;
         lastX = event.clientX;
         lastY = event.clientY;
-
-
     }
 }
 
@@ -174,8 +166,26 @@ window.render = function() {
     if (pitch > 80) {
         pitch = 80;
     }
+
+    var configs = {
+
+        "#lookat" : {
+            "eye" : {
+                z: dist
+            },
+
+            "#pitch": {
+                pitch: pitch,
+
+                "#yaw": {
+                    yaw: yaw
+                }
+            }
+        }
+    };
+
     exampleScene
-            .setData({dist: dist, yaw: yaw, pitch: pitch})
+            .setConfigs(configs)
             .render();
 };
 

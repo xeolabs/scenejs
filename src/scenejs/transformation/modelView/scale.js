@@ -8,27 +8,20 @@
  *       z: 0.5
  *   },
  *
- *      new SceneJS.objects.Cube()
+ *      new SceneJS.Cube()
  * )
  * </pre></code>
  * @constructor
  * Create a new SceneJS.Scale
  * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
-SceneJS.Scale = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "scale";
+SceneJS.Scale = SceneJS.createNodeType("scale");
+
+SceneJS.Scale.prototype._init = function(params) {
     this._mat = null;
     this._xform = null;
-    this._x = 0;
-    this._y = 0;
-    this._z = 1;
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
+    this.setXYZ({x : params.x, y: params.y, z: params.z });
 };
-
-SceneJS._inherit(SceneJS.Scale, SceneJS.Node);
 
 /**
  * Sets all scale factors.
@@ -36,10 +29,11 @@ SceneJS._inherit(SceneJS.Scale, SceneJS.Node);
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setXYZ = function(xyz) {
+    xyz = xyz || {};
     this._x = (xyz.x != undefined) ? xyz.x : 0;
     this._y = (xyz.y != undefined) ? xyz.y : 0;
     this._z = (xyz.z != undefined) ? xyz.z : 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -60,8 +54,8 @@ SceneJS.Scale.prototype.getXYZ = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setX = function(x) {
-    this._x = (x != undefined) ? x : 1.0;
-    this._memoLevel = 0;
+    this._x = (x != undefined && x != null) ? x : 1.0;
+    this._setDirty();
     return this;
 };
 
@@ -79,8 +73,8 @@ SceneJS.Scale.prototype.getX = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setY = function(y) {
-    this._y = (y != undefined) ? y : 1.0;
-    this._memoLevel = 0;
+    this._y = (y != undefined && y != null) ? y : 1.0;
+    this._setDirty();
     return this;
 };
 
@@ -98,8 +92,8 @@ SceneJS.Scale.prototype.getY = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setZ = function(z) {
-    this._z = (z != undefined) ? z : 1.0;
-    this._memoLevel = 0;
+    this._z = (z != undefined && z != null) ? z : 1.0;
+    this._setDirty();
     return this;
 };
 
@@ -111,20 +105,12 @@ SceneJS.Scale.prototype.getZ = function() {
     return this._z;
 };
 
-SceneJS.Scale.prototype._init = function(params) {
-    this.setXYZ({x : params.x, y: params.y, z: params.z });
-};
-
-SceneJS.Scale.prototype._render = function(traversalContext, data) {
+SceneJS.Scale.prototype._render = function(traversalContext) {
 
     var origMemoLevel = this._memoLevel;
 
-    if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        } else {
+    if (this._memoLevel == 0) {       
             this._memoLevel = 1;
-        }
         this._mat = SceneJS._math_scalingMat4v([this._x, this._y, this._z]);
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
@@ -143,16 +129,6 @@ SceneJS.Scale.prototype._render = function(traversalContext, data) {
         }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXform);
 };
-
-/** Factory function that returns a new {@link SceneJS.Scale} instance
- */
-SceneJS.scale = function() {
-    var n = new SceneJS.Scale();
-    SceneJS.Scale.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("scale", SceneJS.scale);

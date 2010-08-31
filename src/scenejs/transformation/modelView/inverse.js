@@ -17,16 +17,9 @@
  * Create a new SceneJS.Inverse
  * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
-SceneJS.Inverse = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "inverse";
-    this._mat = SceneJS._math_identityMat4();
-    this._xform = null;
-};
+SceneJS.Inverse = SceneJS.createNodeType("inverse");
 
-SceneJS._inherit(SceneJS.Inverse, SceneJS.Node);
-
-SceneJS.Inverse.prototype._render = function(traversalContext, data) {
+SceneJS.Inverse.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
 
     if (this._memoLevel == 0) {
@@ -48,16 +41,6 @@ SceneJS.Inverse.prototype._render = function(traversalContext, data) {
         }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXform);
 };
-
-/** Factory function that returns a new {@link SceneJS.Inverse} instance
- */
-SceneJS.inverse = function() {
-    var n = new SceneJS.Inverse();
-    SceneJS.Inverse.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("inverse", SceneJS.inverse);

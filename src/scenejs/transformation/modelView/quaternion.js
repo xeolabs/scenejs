@@ -28,7 +28,7 @@
  *
  * // rotate one more time, 15 degrees about the Z axis
  *
- * q.rotate({ x : 0, y : 0, z : 1, angle : 15 });
+ * q.addRotation({ x : 0, y : 0, z : 1, angle : 15 });
  * </pre></code>
  * <p>Quaternions are designed to be animated. Typically, we would dynamically provide rotation updates to them at
  * render time, either from an interpolator node or human interaction.</p>
@@ -68,21 +68,24 @@
  * @param {float} [cfg.z=0.0] Base rotation vector Z axis
  * @param {float} [cfg.angle=0.0] Base rotation angle in degrees
  * @param {[{x:float, y:float, z:float, angle:float}]} [cfg.rotations=[]] Sequence of rotations to apply on top of the base rotation
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function that can return the same signature as the static config
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.Quaternion = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "quaternion";
+SceneJS.Quaternion = SceneJS.createNodeType("quaternion");
+
+SceneJS.Quaternion.prototype._init = function(params) {
     this._mat = null;
     this._xform = null;
     this._q = SceneJS._math_identityQuaternion();
-    if (this._fixedParams) {
-        this._init(this._getParams());
+
+    if (params.x || params.y || params.x || params.angle || params.w) {
+        this.setRotation(params);
+    }
+    if (params.rotations) {
+        for (var i = 0; i < params.rotations.length; i++) {
+            this.addRotation(params.rotations[i]);
+        }
     }
 };
-
-SceneJS._inherit(SceneJS.Quaternion, SceneJS.Node);
 
 ///** Sets the quaternion properties. This method resets the quaternion to it's default
 // * { x: 0, y: 0, z: 0, w: 1 } when you supply no argument.
@@ -97,7 +100,7 @@ SceneJS._inherit(SceneJS.Quaternion, SceneJS.Node);
 //SceneJS.Quaternion.prototype.setQuaternion = function(q) {
 //    q = q || {};
 //    this._q = [ q.x || 0, q.y || 0, q.z || 0, (q.w == undefined || q.w == null) ? 1 : q.w];
-//    this._memoLevel = 0;
+//    this._setDirty();
 //    return this;
 //};
 //
@@ -125,7 +128,7 @@ SceneJS._inherit(SceneJS.Quaternion, SceneJS.Node);
 // */
 //SceneJS.Quaternion.prototype.multiply = function(q) {
 //    this._q = SceneJS._math_mulQuaternions(SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
-//    this._memoLevel = 0;
+//    this._setDirty();
 //    return this;
 //};
 
@@ -143,7 +146,7 @@ SceneJS._inherit(SceneJS.Quaternion, SceneJS.Node);
 SceneJS.Quaternion.prototype.setRotation = function(q) {
     q = q || {};
     this._q = SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -166,9 +169,9 @@ SceneJS.Quaternion.prototype.getRotation = function() {
  * @param {float} [q.angle=0.0] Rotation angle in degrees
  * @returns {SceneJS.Quaternion} this
  */
-SceneJS.Quaternion.prototype.rotate = function(q) {
+SceneJS.Quaternion.prototype.addRotation = function(q) {
     this._q = SceneJS._math_mulQuaternions(SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -177,7 +180,7 @@ SceneJS.Quaternion.prototype.rotate = function(q) {
  *
  */
 SceneJS.Quaternion.prototype.getMatrix = function() {
-    return SceneJS._math_newMat4FromQuaternion(this._q)
+    return SceneJS._math_newMat4FromQuaternion(this._q);
 };
 
 
@@ -187,31 +190,15 @@ SceneJS.Quaternion.prototype.getMatrix = function() {
  */
 SceneJS.Quaternion.prototype.normalize = function() {
     this._q = SceneJS._math_normalizeQuaternion(this._q);
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
-SceneJS.Quaternion.prototype._init = function(params) {
-    if (params.x || params.y || params.x || params.angle || params.w) {
-        this.setRotation(params);
-    }
-    if (params.rotations) {
-        for (var i = 0; i < params.rotations.length; i++) {
-            this.rotate(params.rotations[i]);
-        }
-    }
-};
-
-SceneJS.Quaternion.prototype._render = function(traversalContext, data) {
+SceneJS.Quaternion.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
-
     if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        } else {
-            this._memoLevel = 1;
-        }
         this._mat = SceneJS._math_newMat4FromQuaternion(this._q);
+        this._memoLevel = 1;
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {
@@ -229,16 +216,6 @@ SceneJS.Quaternion.prototype._render = function(traversalContext, data) {
         }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXform);
 };
-
-/**Factory function that returns a new {@link SceneJS.Quaternion} instance
- */
-SceneJS.quaternion = function() {
-    var n = new SceneJS.Quaternion();
-    SceneJS.Quaternion.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("quaternion", SceneJS.quaternion);

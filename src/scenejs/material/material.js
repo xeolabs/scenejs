@@ -17,16 +17,12 @@
  * </table>
  * <p><b>Usage Example</b></p><p>A cube illuminated by a directional light source and wrapped
  * with material properties that define how it reflects the light.</b></p><pre><code>
- * var l = new SceneJS.Lights({
- *          sources: [
- *              {
- *                  type: "dir",
- *                  color: { r: 1.0, g: 1.0, b: 0.0 },
- *                  diffuse: true,
- *                  specular: true,
- *                  dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction of light from coordinate space origin
- *              }
- *          ]
+ * var l = new SceneJS.Light({
+ *              type: "dir",
+ *              color: { r: 1.0, g: 1.0, b: 0.0 },
+ *              diffuse: true,
+ *              specular: true,
+ *              dir: { x: 1.0, y: 2.0, z: 0.0 } // Direction of light from coordinate space origin
  *      },
  *
  *      new SceneJS.Material({
@@ -37,7 +33,7 @@
  *              shine:          6.0
  *          },
  *
- *          new SceneJS.objects.Cube()
+ *          new SceneJS.Cube()
  *     )
  * )
  * </pre></code>
@@ -47,24 +43,20 @@
  * @param {Object} config The config object or function, followed by zero or more child nodes
  *
  */
-SceneJS.Material = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "material";
-    this._material = {
-        baseColor : [ 0.0, 0.0, 0.0 ],
-        specularColor: [ 0.0,  0.0,  0.0 ],
-        specular : 0,
-        shine : 0,
-        reflect : 0,
-        alpha : 1.0,
-        emit : 0.0
-    };
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
-};
+SceneJS.Material = SceneJS.createNodeType("material");
 
-SceneJS._inherit(SceneJS.Material, SceneJS.Node);
+// @private
+SceneJS.Material.prototype._init = function(params) {
+    this._nodeType = "material";
+    this._material = {};
+    this.setBaseColor(params.baseColor);
+    this.setSpecularColor(params.specularColor);
+    this.setSpecular(params.specular);
+    this.setShine(params.shine);
+    this.setReflect(params.reflect);
+    this.setEmit(params.emit);
+    this.setAlpha(params.alpha);
+};
 
 /**
  * Sets the material base color
@@ -73,11 +65,13 @@ SceneJS._inherit(SceneJS.Material, SceneJS.Node);
  * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setBaseColor = function(color) {
+    color = color || {};
     this._material.baseColor = [
         color.r != undefined && color.r != null ? color.r : 0.0,
         color.g != undefined && color.g != null ? color.g : 0.0,
         color.b != undefined && color.b != null ? color.b : 0.0
     ];
+    this._setDirty();
     return this;
 };
 
@@ -101,11 +95,13 @@ SceneJS.Material.prototype.getBaseColor = function() {
  * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setSpecularColor = function(color) {
+    color = color || {};
     this._material.specularColor = [
         color.r != undefined && color.r != null ? color.r : 0.5,
         color.g != undefined && color.g != null ? color.g : 0.5,
         color.b != undefined && color.b != null ? color.b : 0.5
     ];
+    this._setDirty();
     return this;
 };
 
@@ -130,6 +126,7 @@ SceneJS.Material.prototype.getSpecularColor = function() {
  */
 SceneJS.Material.prototype.setSpecular = function(specular) {
     this._material.specular = specular || 0;
+    this._setDirty();
     return this;
 };
 
@@ -150,6 +147,7 @@ SceneJS.Material.prototype.getSpecular = function() {
  */
 SceneJS.Material.prototype.setShine = function(shine) {
     this._material.shine = shine || 0;
+    this._setDirty();
     return this;
 };
 
@@ -170,6 +168,7 @@ SceneJS.Material.prototype.getShine = function() {
  */
 SceneJS.Material.prototype.setReflect = function(reflect) {
     this._material.reflect = reflect || 0;
+    this._setDirty();
     return this;
 };
 
@@ -190,6 +189,7 @@ SceneJS.Material.prototype.getReflect = function() {
  */
 SceneJS.Material.prototype.setEmit = function(emit) {
     this._material.emit = emit || 0;
+    this._setDirty();
     return this;
 };
 
@@ -210,6 +210,7 @@ SceneJS.Material.prototype.getEmit = function() {
  */
 SceneJS.Material.prototype.setAlpha = function(alpha) {
     this._material.alpha = alpha == undefined ? 1.0 : alpha;
+    this._setDirty();
     return this;
 };
 
@@ -222,55 +223,18 @@ SceneJS.Material.prototype.getAlpha = function() {
     return this._material.alpha;
 };
 
-// @private
-SceneJS.Material.prototype._init = function(params) {
-    if (params.baseColor) {
-        this.setBaseColor(params.baseColor);
-    }
-    if (params.specularColor) {
-        this.setSpecularColor(params.specularColor);
-    }
-    if (params.specular) {
-        this.setSpecular(params.specular);
-    }
-    if (params.shine) {
-        this.setShine(params.shine);
-    }
-    if (params.reflect) {
-        this.setReflect(params.reflect);
-    }
-    if (params.emit) {
-        this.setEmit(params.emit);
-    }
-    if (params.alpha) {
-        this.setAlpha(params.alpha);
-    }
-};
 
 // @private
-SceneJS.Material.prototype._render = function(traversalContext, data) {
+SceneJS.Material.prototype._render = function(traversalContext) {
     if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-        this._renderNodes(traversalContext, data);
-    } else {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        }
 
+        /* No need for materials in a picking traversal
+         */
+        this._renderNodes(traversalContext);
+    } else {
         var saveMaterial = SceneJS._materialModule.getMaterial();
         SceneJS._materialModule.setMaterial(this._material);
-        this._renderNodes(traversalContext, data);
+        this._renderNodes(traversalContext);
         SceneJS._materialModule.setMaterial(saveMaterial);
     }
 };
-
-/** Factory function that returns a new {@link SceneJS.Material} instance
- * @param {Arguments} args Variable arguments that are passed to the SceneJS.Material constructor
- * @returns {SceneJS.Material}
- */
-SceneJS.material = function() {
-    var n = new SceneJS.Material();
-    SceneJS.Material.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("material", SceneJS.material);

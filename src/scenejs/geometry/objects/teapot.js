@@ -2,17 +2,17 @@ SceneJS._namespace("SceneJS.objects");
 /**
  * @class A scene node that defines the geometry of the venerable OpenGL teapot.
  * <p><b>Example Usage</b></p><p>Definition of teapot:</b></p><pre><code>
- * var c = new SceneJS.objects.Teapot(); // Requires no parameters
+ * var c = new SceneJS.Teapot(); // Requires no parameters
  * </pre></code>
  * @extends SceneJS.Geometry
  * @since Version 0.7.4
  * @constructor
- * Create a new SceneJS.objects.Teapot
+ * Create a new SceneJS.Teapot
  * @param {Object} [cfg] Static configuration object
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.objects.Teapot = function() {
+SceneJS.Teapot = function() {
     SceneJS.Geometry.apply(this, arguments);
     this._nodeType = "teapot";
 
@@ -5823,17 +5823,16 @@ SceneJS.objects.Teapot = function() {
     };
 };
 
-SceneJS._inherit(SceneJS.objects.Teapot, SceneJS.Geometry);
+SceneJS._inherit(SceneJS.Teapot, SceneJS.Geometry);
 
-/** Returns a new SceneJS.objects.Teapot instance
+/** Returns a new SceneJS.Teapot instance
  * @param {Object} [cfg] Static configuration object
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
- * @returns {SceneJS.objects.Teapot}
+ * @returns {SceneJS.Teapot}
  * @since Version 0.7.4
  */
-SceneJS.objects.teapot = function() {
-    return new SceneJS.objects.Teapot();
+SceneJS.teapot = function() {
+    return new SceneJS.Teapot();
 };
 
-SceneJS.registerNodeType("teapot", SceneJS.objects.teapot);
+SceneJS._registerNode("teapot", SceneJS.Teapot, SceneJS.teapot);

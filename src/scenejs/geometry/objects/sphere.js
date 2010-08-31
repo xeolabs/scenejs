@@ -7,7 +7,7 @@ SceneJS._namespace("SceneJS.objects");
  * texture-mapping.</p>
  * <p>The radius is 1.0 -  use the SceneJS.Scale node to set the size of a Sphere.</p>
  * <p><b>Example Usage</b></p><p>Definition of sphere with a radius of 6 units:</b></p><pre><code>
- * var c = new SceneJS.objects.Sphere({
+ * var c = new SceneJS.Sphere({
  *          slices: 30,     // Optional number of longitudinal slices (30 is default)
  *          rings: 30      // Optional number of latitudinal slices (30 is default)
  *     })
@@ -15,22 +15,17 @@ SceneJS._namespace("SceneJS.objects");
 * @extends SceneJS.Geometry
  * @since Version 0.7.4
  * @constructor
- * Create a new SceneJS.objects.Sphere
+ * Create a new SceneJS.Sphere
  * @param {Object} [cfg] Static configuration object
  * @param {float} [cfg.slices=30] Number of longitudinal slices
  * @param {float} [cfg.rings=30] Number of longitudinal slices
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.objects.Sphere = function() {
-    SceneJS.Geometry.apply(this, arguments);
-    this._nodeType = "sphere";
-};
-
-SceneJS._inherit(SceneJS.objects.Sphere, SceneJS.Geometry);
+SceneJS.Sphere = SceneJS.createNodeType("sphere", "geometry");
 
 // @private
-SceneJS.objects.Sphere.prototype._init = function(params) {
+SceneJS.Sphere.prototype._init = function(params) {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 
@@ -98,21 +93,3 @@ SceneJS.objects.Sphere.prototype._init = function(params) {
     };
 };
 
-
-/** Returns a new SceneJS.objects.Sphere instance
- * @param {Object} [cfg] Static configuration object
- * @param {float} [cfg.slices=30] Number of longitudinal slices
- * @param {float} [cfg.rings=30] Number of longitudinal slices
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
- * @param {...SceneJS.Node} [childNodes] Child nodes
- * @returns {SceneJS.objects.Sphere}
- * @since Version 0.7.0
- */
-SceneJS.objects.sphere = function() {
-    var n = new SceneJS.objects.Sphere();
-    SceneJS.objects.Sphere.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-
-SceneJS.registerNodeType("sphere", SceneJS.objects.sphere);

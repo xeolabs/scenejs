@@ -4,49 +4,56 @@
 <head>
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
+    <script type="text/javascript" src="libs/sylvester.js"></script>
+    <style>
+        body {
+            margin: auto;
+            background-color: #666666;
+            padding-top: 50px;
+            font-family: Helvetica, sans-serif;
+            font-size: 0.8em;
+            color: #666;
+            font-size: 0.8em
+        }
+
+        #demo {
+            margin: auto;
+            width: 1000px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            -webkit-box-shadow: 5px 5px 2px #444444;
+        }
+    </style>
+
 </head>
 <body>
-<table>
-    <tr>
-        <td valign="top">
-            <canvas id="theCanvas" width="600" height="600">
-                <p>This example requires a browser that supports the
-                    <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-                    &lt;canvas&gt; feature.</p>
-            </canvas>
-        </td>
-        <td valign="top">
-                 <h1>Scene Graph Branching - Teapot Selector</h1>
-            <p>Although SceneJS manages WebGL state settings for you automatically, the SceneJS.Renderer node
-                allows you to set them explicitly for portions of your scene graph, perhaps to optimise its performance
-                or do some special rendering effect.</p>
+<div id="demo">
+    <canvas id="theCanvas" width="1000" height="800">
+        <p>This example requires a browser that supports the
+            <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+            &lt;canvas&gt; feature.</p>
+    </canvas>
+    <div id="info">
+        <h2>SceneJS WebGL Tweaking Demo - The SceneJS.Renderer Node</h2>
 
-            <p>Use it to explicitly set things for subgraphs, such as the current viewport extents, scissoring,
-                enable/disable shading, backface culling, and so on.</p>
+        <p>This demo shows off the SceneJS.Renderer node, which allows you to specifically tweak certain WebGL
+            state.</p>
+        <ul>
+            <li><a target="_other" href="scene-definition.js">Scene source code</a></li>
+            <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.Renderer">Wiki article on ScenJS.Renderer
+                node</a></li>
+        </ul>
+    </div>
+    <div id="log">
+        <h3>Log</h3>
 
-            <p>Normally you wouldn't need to use renderer nodes, but you can insert them throughout your
-                scene when you want more control over WebGL, perhaps to optimise your scene graph.</p>
+        <div id="theLoggingDiv"></div>
+    </div>
+</div>
 
-            <p>They can also be nested, where the inner renderers will override the effects of the outer ones.</p>
+<script type="text/javascript" src="seymour-plane.js"></script>
+<script type="text/javascript" src="scene-definition.js"></script>
 
-            <p>This example is taken from one of the COLLADA test examples, but with a renderer node inserted
-                with all its properties set to defaults. When you omit a renderer node, SceneJS will effectively
-                provide this renderer by default.</p>
-
-            <a target="other" href="renderer-node.js">Scene source code</a>
-            <a target="other" href="modules/seymourplane/seymourplane.js">Airplane source code</a>
-              <li><a target="other" href="modules/seymourplane/seymourplane.dae">Airplane's original COLLADA file</a>
-                </li>
-                <li><a target="other" href="http://scenejs.wikispaces.com/SceneJS.UseModule">Wiki article on SceneJS
-                    modules</a></li>
-            <li><a target="other" href="http://scenejs.wikispaces.com/SceneJS.Renderer">Wiki article on ScenJS.Renderer
-                    node</a></li>
-
-            <div id="theLoggingDiv"></div>
-        </td>
-    </tr>
-</table>
-
-<script type="text/javascript" src="renderer-node.js"></script>
 </body>
 </html>

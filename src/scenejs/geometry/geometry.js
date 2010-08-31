@@ -1,6 +1,6 @@
 /**
  * @class A scene node that defines an element of geometry.
- * 
+ *
  * <p><b>Example Usage</b></p><p>Definition of a cube, with normals and UV texture coordinates, with coordinates shown here only for the first face:</b></p><pre><code>
  * var g = new SceneJS.Geometry({
  *
@@ -94,22 +94,17 @@
  * @param {double[]} [cfg.uv = []] Flattened array of 2D UV-space coordinates for the first texture layer, two elements each
  * @param {double[]} [cfg.uv2 = []] Flattened array of 2D UV-space coordinates for the second texture layer, two elements each
  * @param {int[]} cfg.indices Flattened array of indices to index the other arrays per the specified primitive type
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
  * @since Version 0.7.3
  */
-SceneJS.Geometry = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "geometry";
-    this._geo = null;  // Holds geometry when configured as given arrays
-    this._create = null; // Callback to create geometry
-    this._type = null; // Optional geometry type ID
-    this._handle = null; // Handle to created geometry
-};
-
-SceneJS._inherit(SceneJS.Geometry, SceneJS.Node);
+SceneJS.Geometry = SceneJS.createNodeType("geometry");
 
 SceneJS.Geometry.prototype._init = function(params) {
+    this._nodeType = "geometry";
+    this._geo = null;    // Holds geometry when configured as arrays
+    this._create = null; // Callback to create geometry
+    this._handle = null; // Handle to created geometry
+
     this._type = params.type;       // Optional - can be null
     if (params.create instanceof Function) {
         this._create = params.create;
@@ -126,10 +121,7 @@ SceneJS.Geometry.prototype._init = function(params) {
 };
 
 // @private
-SceneJS.Geometry.prototype._render = function(traversalContext, data) {
-    if (!this._geo && !this._create) { // Dynamically configured
-        this._init(this._getParams(data));
-    }
+SceneJS.Geometry.prototype._render = function(traversalContext) {
     if (this._handle) { // Was created before - test if not evicted since
         if (!SceneJS._geometryModule.testGeometryExists(this._handle)) {
             this._handle = null;
@@ -143,27 +135,5 @@ SceneJS.Geometry.prototype._render = function(traversalContext, data) {
         }
     }
     SceneJS._geometryModule.drawGeometry(this._handle);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
 };
-
-/** Factory function that returns a new {@link SceneJS.Geometry} instance
- * @param {Object} [cfg] Static configuration object
- * @param {String} cfg.primitive The primitive type - "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
- * @param {double[]} cfg.positions Flattened array of 3D coordinates, three elements each
- * @param {double[]} [cfg.normals = []] Flattened array of 3D vertex normal vectors, three elements each
- * @param {double[]} [cfg.uv = []] Flattened array of 2D UV-space coordinates for the first texture layer, two elements each
- * @param {double[]} [cfg.uv2 = []] Flattened array of 2D UV-space coordinates for the second texture layer, two elements each
- * @param {int[]} cfg.indices  Flattened array of indices to index the other arrays per the specified primitive type
- * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
- * @param {...SceneJS.Node} [childNodes] Child nodes
- * @returns {SceneJS.Geometry}
- * @since Version 0.7.1
- */
-SceneJS.geometry = function() {
-    var n = new SceneJS.Geometry();
-    SceneJS.Geometry.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("geometry", SceneJS.geometry);
-

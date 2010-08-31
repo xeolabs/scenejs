@@ -169,11 +169,11 @@ SceneJS._shaderModule = new (function() {
                 var hash = [];
                 for (var i = 0; i < lights.length; i++) {
                     var light = lights[i];
-                    hash.push(light._type);
-                    if (light._specular) {
+                    hash.push(light.type);
+                    if (light.specular) {
                         hash.push("s");
                     }
-                    if (light._diffuse) {
+                    if (light.diffuse) {
                         hash.push("d");
                     }
                 }
@@ -186,36 +186,36 @@ SceneJS._shaderModule = new (function() {
                 var ambient;
                 for (var i = 0; i < _lights.length; i++) {
                     var light = _lights[i];
-                    activeProgram.setUniform("uLightColor" + i, light._color);
-                    activeProgram.setUniform("uLightDiffuse" + i, light._diffuse);
-                    if (light._type == "dir") {
-                        activeProgram.setUniform("uLightDir" + i, light._viewDir);
+                    activeProgram.setUniform("uLightColor" + i, light.color);
+                    activeProgram.setUniform("uLightDiffuse" + i, light.diffuse);
+                    if (light.type == "dir") {
+                        activeProgram.setUniform("uLightDir" + i, light.viewDir);
                     } else if (light.type == "ambient") {
                         ambient = ambient ? [
-                            ambient[0] + light._color[0],
-                            ambient[1] + light._color[1],
-                            ambient[2] + light._color[2]
-                        ] : light._color;
+                            ambient[0] + light.color[0],
+                            ambient[1] + light.color[1],
+                            ambient[2] + light.color[2]
+                        ] : light.color;
                     } else {
-                        if (light._type == "point") {
-                            activeProgram.setUniform("uLightPos" + i, light._viewPos);
+                        if (light.type == "point") {
+                            activeProgram.setUniform("uLightPos" + i, light.viewPos);
                         }
-                        if (light._type == "spot") {
-                            activeProgram.setUniform("uLightPos" + i, light._viewPos);
-                            activeProgram.setUniform("uLightDir" + i, light._viewDir);
-                            activeProgram.setUniform("uLightSpotCosCutOff" + i, light._spotCosCutOff);
-                            activeProgram.setUniform("uLightSpotExp" + i, light._spotExponent);
+                        if (light.type == "spot") {
+                            activeProgram.setUniform("uLightPos" + i, light.viewPos);
+                            activeProgram.setUniform("uLightDir" + i, light.viewDir);
+                            activeProgram.setUniform("uLightSpotCosCutOff" + i, light.spotCosCutOff);
+                            activeProgram.setUniform("uLightSpotExp" + i, light.spotExponent);
                         }
                         activeProgram.setUniform("uLightAttenuation" + i,
                                 [
-                                    light._constantAttenuation,
-                                    light._linearAttenuation,
-                                    light._quadraticAttenuation
+                                    light.constantAttenuation,
+                                    light.linearAttenuation,
+                                    light.quadraticAttenuation
                                 ]);
                     }
                 }
                 if (ambient) {
-                    //activeProgram.setUniform("uLightPos" + i, light._viewPos);
+                    //activeProgram.setUniform("uLightPos" + i, light.viewPos);
                 }
             });
 
@@ -509,13 +509,13 @@ SceneJS._shaderModule = new (function() {
 
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
-                if (light._type == "dir") {
+                if (light.type == "dir") {
                     src.push("uniform vec3 uLightDir" + i + ";");
                 }
-                if (light._type == "point") {
+                if (light.type == "point") {
                     src.push("uniform vec4 uLightPos" + i + ";");
                 }
-                if (light._type == "spot") {
+                if (light.type == "spot") {
                     src.push("uniform vec4 uLightPos" + i + ";");
                 }
 
@@ -561,14 +561,14 @@ SceneJS._shaderModule = new (function() {
         if (lighting) {
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
-                if (light._type == "dir") {
+                if (light.type == "dir") {
                     src.push("tmpVec = -uLightDir" + i + ";");
                 }
-                if (light._type == "point") {
+                if (light.type == "point") {
                     src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
                     src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
                 }
-                if (light._type == "spot") {
+                if (light.type == "spot") {
                     src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
                     src.push("vLightDist" + i + " = length(tmpVec);");          // Distance from light to vertex
 
@@ -643,13 +643,13 @@ SceneJS._shaderModule = new (function() {
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
                 src.push("uniform vec3  uLightColor" + i + ";");
-                if (light._type == "point") {
+                if (light.type == "point") {
                     src.push("uniform vec4   uLightPos" + i + ";");
                 }
-                if (light._type == "dir") {
+                if (light.type == "dir") {
                     src.push("uniform vec3   uLightDir" + i + ";");
                 }
-                if (light._type == "spot") {
+                if (light.type == "spot") {
                     src.push("uniform vec4   uLightPos" + i + ";");
                     src.push("uniform vec3   uLightDir" + i + ";");
                     src.push("uniform float  uLightSpotCosCutOff" + i + ";");
@@ -754,17 +754,17 @@ SceneJS._shaderModule = new (function() {
 
                 /* Point Light
                  */
-                if (light._type == "point") {
+                if (light.type == "point") {
                     src.push("dotN = max(dot(vNormal,lightVec),0.0);");
                     src.push("if (dotN > 0.0) {");
                     src.push("  attenuation = 1.0 / (" +
                              "  uLightAttenuation" + i + "[0] + " +
                              "  uLightAttenuation" + i + "[1] * vLightDist" + i + " + " +
                              "  uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
-                    if (light._diffuse) {
+                    if (light.diffuse) {
                         src.push("  lightValue += dotN *  uLightColor" + i + " * attenuation;");
                     }
-                    if (light._specular) {
+                    if (light.specular) {
                         src.push("specularValue += attenuation * specularColor * uLightColor" + i +
                                  " * specular  * pow(max(dot(reflect(lightVec, vNormal), vEyeVec),0.0), shine);");
                     }
@@ -773,12 +773,12 @@ SceneJS._shaderModule = new (function() {
 
                 /* Directional Light
                  */
-                if (light._type == "dir") {
+                if (light.type == "dir") {
                     src.push("dotN = max(dot(vNormal,lightVec),0.0);");
-                    if (light._diffuse) {
+                    if (light.diffuse) {
                         src.push("lightValue += dotN * uLightColor" + i + ";");
                     }
-                    if (light._specular) {
+                    if (light.specular) {
                         src.push("specularValue += specularColor * uLightColor" + i +
                                  " * specular  * pow(max(dot(reflect(lightVec, vNormal),normalize(vEyeVec)),0.0), shine);");
                     }
@@ -786,7 +786,7 @@ SceneJS._shaderModule = new (function() {
 
                 /* Spot light
                  */
-                if (light._type == "spot") {
+                if (light.type == "spot") {
                     src.push("spotFactor = max(dot(normalize(uLightDir" + i + "), lightVec));");
                     src.push("if ( spotFactor > 20) {");
                     src.push("  spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
@@ -799,10 +799,10 @@ SceneJS._shaderModule = new (function() {
                     //                                     "uLightAttenuation" + i + "[2] * vLightDist" + i + " * vLightDist" + i + ");");
                     src.push("          attenuation = 1;");
 
-                    if (light._diffuse) {
+                    if (light.diffuse) {
                         src.push("lightValue +=  dotN * uLightColor" + i + " * attenuation;");
                     }
-                    if (light._specular) {
+                    if (light.specular) {
                         src.push("specularValue += attenuation * specularColor * uLightColor" + i +
                                  " * specular  * pow(max(dot(reflect(normalize(lightVec), vNormal),normalize(vEyeVec)),0.0), shine);");
                     }

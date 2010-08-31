@@ -11,24 +11,20 @@
  *          ]
  *   },
  *
- *      new SceneJS.objects.Cube()
+ *      new SceneJS.Cube()
  * )
  * </pre></code>
  * @constructor
  * Create a new SceneJS.Matrix
  * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
-SceneJS.Matrix = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "matrix";
-    this._mat = SceneJS._math_identityMat4();
-    this._xform = null;
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
-};
+SceneJS.Matrix = SceneJS.createNodeType("matrix");
 
-SceneJS._inherit(SceneJS.Matrix, SceneJS.Node);
+SceneJS.Matrix.prototype._init = function(params) {
+    this._xform = null;
+    this._mat = SceneJS._math_identityMat4();
+    this.setElements(params.elements);
+};
 
 /**
  * Sets the matrix elements
@@ -36,6 +32,7 @@ SceneJS._inherit(SceneJS.Matrix, SceneJS.Node);
  * @returns {SceneJS.Matrix} this
  */
 SceneJS.Matrix.prototype.setElements = function(elements) {
+    elements = elements || SceneJS._math_identityMat4();
     if (!elements) {
         throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException("SceneJS.Matrix elements undefined"));
     }
@@ -45,7 +42,7 @@ SceneJS.Matrix.prototype.setElements = function(elements) {
     for (var i = 0; i < 16; i++) {
         this._mat[i] = elements[i];
     }
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -60,21 +57,11 @@ SceneJS.Matrix.prototype.getElements = function() {
     return elements;
 };
 
-SceneJS.Matrix.prototype._init = function(params) {
-    if (params.elements) {
-        this.setElements(params.elements);
-    }
-};
-
-SceneJS.Matrix.prototype._render = function(traversalContext, data) {
+SceneJS.Matrix.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
 
     if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        } else {
             this._memoLevel = 1;
-        }
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {
@@ -100,16 +87,6 @@ SceneJS.Matrix.prototype._render = function(traversalContext, data) {
         }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext, data);
+    this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXform);
 };
-
-/** Factory function that returns a new {@link SceneJS.Matrix} instance
- */
-SceneJS.matrix = function() {
-    var n = new SceneJS.Matrix();
-    SceneJS.Matrix.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("matrix", SceneJS.matrix);

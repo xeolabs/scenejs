@@ -10,28 +10,21 @@
  *       z: 0.0
  *   },
  *
- *      new SceneJS.objects.Cube()
+ *      new SceneJS.Cube()
  * )
  * </pre></code>
  * @constructor
  * Create a new SceneJS.Rotate
  * @param {Object} config  Config object or function, followed by zero or more child nodes
  */
-SceneJS.Rotate = function() {
-    SceneJS.Node.apply(this, arguments);
-    this._nodeType = "rotate";
+SceneJS.Rotate = SceneJS.createNodeType("rotate");
+
+SceneJS.Rotate.prototype._init = function(params) {
     this._mat = null;
     this._xform = null;
-    this._angle = 0;
-    this._x = 0;
-    this._y = 0;
-    this._z = 1;
-    if (this._fixedParams) {
-        this._init(this._getParams());
-    }
+    this.setAngle(params.angle);
+    this.setXYZ({x : params.x, y: params.y, z: params.z });
 };
-
-SceneJS._inherit(SceneJS.Rotate, SceneJS.Node);
 
 /** Sets the rotation angle
  * @param {float} angle Rotation angle in degrees
@@ -39,7 +32,7 @@ SceneJS._inherit(SceneJS.Rotate, SceneJS.Node);
  */
 SceneJS.Rotate.prototype.setAngle = function(angle) {
     this._angle = angle || 0;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -56,13 +49,14 @@ SceneJS.Rotate.prototype.getAngle = function() {
  * @returns {SceneJS.Rotate} this
  */
 SceneJS.Rotate.prototype.setXYZ = function(xyz) {
+    xyz = xyz || {};
     var x = xyz.x || 0;
     var y = xyz.y || 0;
     var z = xyz.z || 0;
     this._x = x;
     this._y = y;
     this._z = z;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -84,7 +78,7 @@ SceneJS.Rotate.prototype.getXYZ = function() {
  */
 SceneJS.Rotate.prototype.setX = function(x) {
     this._x = x;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -103,7 +97,7 @@ SceneJS.Rotate.prototype.getX = function() {
  */
 SceneJS.Rotate.prototype.setY = function(y) {
     this._y = y;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -122,7 +116,7 @@ SceneJS.Rotate.prototype.getY = function() {
  */
 SceneJS.Rotate.prototype.setZ = function(z) {
     this._z = z;
-    this._memoLevel = 0;
+    this._setDirty();
     return this;
 };
 
@@ -134,23 +128,10 @@ SceneJS.Rotate.prototype.getZ = function() {
     return this._z;
 };
 
-SceneJS.Rotate.prototype._init = function(params) {
-    if (params.angle) {
-        this.setAngle(params.angle);
-    }
-    this.setXYZ({x : params.x, y: params.y, z: params.z });
-};
-
-SceneJS.Rotate.prototype._render = function(traversalContext, data) {
-
+SceneJS.Rotate.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
-
     if (this._memoLevel == 0) {
-        if (!this._fixedParams) {
-            this._init(this._getParams(data));
-        } else {
-            this._memoLevel = 1;
-        }
+        this._memoLevel = 1;
         if (this._x + this._y + this._z > 0) {
 
             /* When building a view transform, apply the negated rotation angle
@@ -177,21 +158,9 @@ SceneJS.Rotate.prototype._render = function(traversalContext, data) {
 
         if (this._memoLevel == 1 && superXForm.fixed && !instancing) {   // Bump up memoization level if model-space fixed
             this._memoLevel = 2;
-        }        
+        }
     }
     SceneJS._modelViewTransformModule.setTransform(this._xform);
-
-    this._renderNodes(traversalContext, data);
-
+    this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXForm);
 };
-
-/** Factory function that returns a new {@link SceneJS.Rotate} instance
- */
-SceneJS.rotate = function() {
-    var n = new SceneJS.Rotate();
-    SceneJS.Rotate.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS.registerNodeType("rotate", SceneJS.rotate);

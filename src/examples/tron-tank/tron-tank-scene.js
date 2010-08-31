@@ -1,9 +1,6 @@
 /* SceneJS COLLADA import example - the Tank Program from the 1982 Disney motion picture "Tron".
  *
- * This demo is a revamp of the old one for V0.7.5, using new capabilities of V0.7.6:
- *
- * WithConfigs : http://scenejs.wikispaces.com/SceneJS.WithConfigs
- * Modular content : http://scenejs.wikispaces.com/SceneJS.UseModule
+ * This demo is a revamp of the old one for V0.7.6, using new capabilities of V0.7.8:
  *
  * Take it for a drive - mouse wheel controls speed, left/right drag to steer, up/down drag to change viewpoint height.
  *
@@ -11,13 +8,7 @@
  *
  * Lindsay S. Kay,
  * lindsay.kay@xeolabs.com
- *
  */
-
-/** Load the content modules - tank model and grid floor
- */
-SceneJS.requireModule("modules/tron-tank.js");
-SceneJS.requireModule("modules/grid-floor.js");
 
 var exampleScene = SceneJS.scene({
 
@@ -28,166 +19,109 @@ var exampleScene = SceneJS.scene({
     loggingElementId: "theLoggingDiv"
 },
 
-    /* Some fog for fun
+    /**
+     * View transform - we've given it a globally-unique ID
+     * so we can look it up and update it's properties from
+     * mouse input.
+     *
+     * There are a number of other ways we could push
+     * properties into it - we could keep a reference to the
+     * node object and call setters on that, locate the node by ID
+     * and fire properties at it in a "configure" event, or
+     * identify it with a SID (scoped ID) and push a configs
+     * map down to it through the scene graph.
      */
-        SceneJS.fog({
-            mode:"linear",
-            color:{r:.50, g:.50,b:.50},
-            start: 0,
-            end:300  ,
-            density:300.0
+        SceneJS.lookAt({
+            id: "viewpoint",                  // Globally-unique ID for lookat node
+            eye : { x: 0, y: 10, z: -400 },
+            look :  { x: 0, y: 0, z: 0 },
+            up : { x: 0, y: 1, z: .0 }
         },
 
-            /* View transform - takes viewing parameters through the data passed
-             * into this scene as it is rendered. Those parameters are generated
-             * in mouse handlers outside the scene graph - see below.
+            /* Perspective camera
              */
-                SceneJS.lookAt(function(data) {
-                    return {
-                        eye : data.get("eye"),
-                        look :  data.get("look"),
-                        up : { x: 0, y: 1, z: .0 }
-                    };
+                SceneJS.camera({
+                    optics: {
+                        type: "perspective",
+                        fovy : 40.0,
+                        aspect : 1.25,
+                        near : 0.10,
+                        far : 7000.0
+                    }
                 },
 
-                    /* Perspective camera
+                    /* Lighting
                      */
-                        SceneJS.camera({ optics: { type: "perspective", fovy : 40.0, aspect : 1.0, near : 0.10, far : 7000.0 }},
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 0.5 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 0.0, y: -1, z: -1.0 }
+                        }),
 
-                            /* Lighting
-                             */
-                                SceneJS.lights({
-                                    sources: [
-                                        {
-                                            type:                   "dir",
-                                            color:                  { r: 1.0, g: 1.0, b: 0.5 },
-                                            diffuse:                true,
-                                            specular:               true,
-                                            dir:                    { x: 0.0, y: -1, z: -1.0 }
-                                        } ,
-                                        {
-                                            type:                   "dir",
-                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                            diffuse:                true,
-                                            specular:               true,
-                                            dir:                    { x: 1.0, y: .5, z: -1.0  }
-                                        } ,
-                                        {
-                                            type:                   "dir",
-                                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                            diffuse:                true,
-                                            specular:               true,
-                                            dir:                    { x: -1.0, y: .5, z: 1.0  }
-                                        }
-                                    ]},
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 1.0, y: .5, z: -1.0  }
+                        }),
 
-                                    /*----------------------------------------------------------------------------------
-                                     * A WithConfigs node creates a hierarchical map of values to set on the
-                                     * methods of the nodes within its subgraph as they are is rendered.
-                                     *
-                                     * The keys starting with '#' locate their target nodes by their SIDs.
-                                     *
-                                     * SIDs were introduced in V0.7.6 - an SID is a subidentifier that uniquely
-                                     * identifies its node within the scope of its parent.
-                                     *
-                                     * The keys starting with "-" map to "removeXXX" methods, "+" maps to "addXXX"
-                                     * methods, and keys with no prefix map to "setXXX" methods.
-                                     *
-                                     *
-                                     * Our WithConfigs pushes properties down into the visual-scene subgraph within
-                                     * our tank module - translation offsets and rotation angles. See the JSDocs for
-                                     * the SceneJS.WithConfigs node, and look at modules/tron-tank.js to find the nodes
-                                     * that map to the WithConfigs.                                     
-                                     *
-                                     * More info on SceneJS.WithConfigs at http://scenejs.wikispaces.com/SceneJS.WithConfigs
-                                     *
-                                     *--------------------------------------------------------------------------------*/
-                                        SceneJS.withConfigs({
-                                            configs: {
-                                                "#Group1" : {
-
-                                                    "#translate" : {
-
-                                                        x: function (data) {
-                                                            return data.get("tron.tank.pos.x");
-                                                        },
-
-                                                        y: function (data) {
-                                                            return data.get("tron.tank.pos.y");
-                                                        },
-
-                                                        z: function (data) {
-                                                            return data.get("tron.tank.pos.z");
-                                                        },
-
-                                                        "#rotateY": {
-                                                            angle: function(data) {
-                                                                return data.get("tron.tank.yaw") + 180 || 180;
-                                                            },
-
-                                                            "#Gun1" : {
-                                                                "#rotateZ": {
-                                                                    angle: function(data) {
-                                                                        return -data.get("tron.tank.yaw");
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-
-                                            /* Here's our tank - we're using the content module we loaded for it
-                                             * earlier, and we're instantiating its primary <visual-scene> element.
-                                             */
-                                                SceneJS.useModule({
-                                                    name: "tron-tank",
-                                                    params: {
-                                                        symbolURI: "SketchUpScene"  // Selected <visual-scene>
-                                                    }
-                                                })),
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: -1.0, y: .5, z: 1.0  }
+                        }),
 
 
-                                    /* Grid floor module
-                                     */
-                                        SceneJS.useModule({
-                                            name: "grid-floor"
-                                        }),
+                    /* Integrate our JSON Tron Tank model, which is defined in tron-tank-model.js
+                     * and loaded via a <script> tag in index.html.
+                     *
+                     * Various nodes (ie. rotate and translate) within the model have been assigned IDs,
+                     * allowing us to locate them and set their properties, in order to move the tank
+                     * around, rotate its cannon etc.
+                     */
+                        tronTank,
 
-                                    /* Canyon walls, a bunch of cubes
-                                     */
-                                        SceneJS.material({
-                                            baseColor:      { r: 0.5, g: 0.5, b: 0.5 },
-                                            specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
-                                            specular:       10.9,
-                                            shine:          20.0
-                                        },
-                                                SceneJS.translate({ x: -75, y: 0, z: 0},
-                                                        SceneJS.rotate({y: 1, angle: 6 },
-                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                    /* Integrate our grid floor, which is defined in grid-floor.js
+                     * and loaded via a <script> tag in index.html.
+                     */
+                        gridFloor,
 
-                                                SceneJS.translate({ x: 80, y: 0, z: 0},
-                                                        SceneJS.rotate({y: 1, angle: 0 },
-                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                    /* Canyon walls, a bunch of cubes
+                     */
+                        SceneJS.material({
+                            baseColor:      { r: 0.5, g: 0.5, b: 0.5 },
+                            specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
+                            specular:       10.9,
+                            shine:          20.0
+                        },
+                                SceneJS.translate({ x: -75, y: 0, z: 0},
+                                        SceneJS.rotate({y: 1, angle: 6 },
+                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
 
-                                                SceneJS.translate({ x: -80, y: 0, z: 80},
-                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                                SceneJS.translate({ x: 80, y: 0, z: 0},
+                                        SceneJS.rotate({y: 1, angle: 0 },
+                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
 
-                                                SceneJS.translate({ x: 80, y: 0, z: 40},
-                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                                SceneJS.translate({ x: -80, y: 0, z: 80},
+                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
 
-                                                SceneJS.translate({ x: 120, y: 0, z: 140},
-                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                                SceneJS.translate({ x: 80, y: 0, z: 40},
+                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
 
-                                                SceneJS.translate({ x: -60, y: 0, z: 160},
-                                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                                SceneJS.objects.cube({xSize: 50, ySize: 30, zSize: 50})))
-                                                )
-                                        )
+                                SceneJS.translate({ x: 120, y: 0, z: 140},
+                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
+
+                                SceneJS.translate({ x: -60, y: 0, z: 160},
+                                        SceneJS.rotate({y: 1, angle: -12 },
+                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50})))
                                 )
                         )
                 )
@@ -197,7 +131,10 @@ var exampleScene = SceneJS.scene({
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
-var timeStarted = new Date().getTime();
+var lookatNode = SceneJS.getNode("viewpoint");
+var tankPosNode = SceneJS.getNode("tankPos");
+var tankRotateNode = SceneJS.getNode("tankRotate");
+var tankGunRotateNode = SceneJS.getNode("tankGunRotate");
 
 var speed = 0;
 var tankPos = { x: 0, y: 0, z: -100 };
@@ -263,9 +200,9 @@ function mouseWheel(event) {
     }
     if (delta) {
         if (delta < 0) {
-            speed -= 0.2
+            speed -= 0.2;
         } else {
-            speed += 0.2
+            speed += 0.2;
         }
     }
     if (event.preventDefault)
@@ -280,13 +217,7 @@ canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 
 
-var x = 0;
 window.render = function() {
-    x++;
-    if (x == 10) {
-        //  clearInterval(pInterval);
-    }
-
     pitch += pitchInc;
 
     if (pitch < 1) {
@@ -330,17 +261,15 @@ window.render = function() {
     eye.y = tankPos.y + (trailVec[1] * 35);
     eye.z = tankPos.z + (trailVec[2] * 35);
 
-    var timeSeconds = (new Date().getTime() - timeStarted) / 1000;
+    lookatNode.setEye(eye);
+    lookatNode.setLook({ x: tankPos.x, y: tankPos.y, z : tankPos.z });
 
-    exampleScene.setData({
-        eye : eye,
-        look: { x: tankPos.x, y: tankPos.y, z : tankPos.z },
-        "tron.tank.pos.x" : tankPos.x,
-        "tron.tank.pos.z" : tankPos.z,
-        "tron.tank.yaw" : tankYaw,
-        "tron.tank.gun.yaw" : -tankYaw,
+    tankPosNode.setXYZ({ x: tankPos.x, z: tankPos.z });
 
-        timeSeconds: timeSeconds}).render();
+    tankRotateNode.setAngle(tankYaw + 180 || 180);
+    tankGunRotateNode.setAngle(-tankYaw);
+
+    exampleScene.render();
 
     if (trailYaw > tankYaw) {
         trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
@@ -350,7 +279,6 @@ window.render = function() {
 };
 
 /* Render loop until error or reset
- * (which IDE does whenever you hit that run again button)
  */
 var pInterval;
 

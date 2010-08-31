@@ -37,7 +37,7 @@
  *                    return { x: 10.0 };
  *                },
  *
- *                new SceneJS.objects.cube()
+ *                new SceneJS.cube()
  *            )
  *         )
  *   );

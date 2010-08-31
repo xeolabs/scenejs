@@ -5,17 +5,13 @@
  * lindsay.kay AT xeolabs.com
  * January 2010
  *
- * This example crudely pours some tea from the OpenGL teapot, using
+ * This example crudely pours some tea from the Newell Teapot, using
  * two linear Interpolators that interpolate yaw and pitch rotations
  * from an alpha value fed in through a scene data scope.
  *
  * Since V0.7.3, other types of supported interpolation are: "cosine", "cubic"
  * and "constant".
  *
- * See how the Inpolators are configured with the names of the
- * incoming alpha value and the outgoing value. Each time they are visited,
- * they will interpolate within their key-vaue sequences by the alpha,
- * then write the output to a fresh child scope for their sub-nodes.
  */
 
 var exampleScene = SceneJS.scene({
@@ -34,89 +30,77 @@ var exampleScene = SceneJS.scene({
             up : { x: 0.0, y: 1.0, z: 0.0 }
 
         },
+
                 SceneJS.camera({
                     optics: {
                         type: "perspective",
                         fovy : 55.0,
-                        aspect : 1.0,
+                        aspect : 1.25,
                         near : 0.10,
                         far : 300.0  }
                 },
 
-                        SceneJS.lights({
-                            sources: [
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                                }
-                            ]},
-                                SceneJS.material({
-                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                    specular:       0.9,
-                                    shine:          6.0
-                                },
-                                        SceneJS.interpolator({
-                                            type:"linear",
-                                            input:"alpha",
-                                            output:"yaw",
-                                            keys: [0.0, 0.2, 0.5, 0.7, 0.9, 1.0],
-                                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0]
-                                        },
-                                                SceneJS.interpolator({
-                                                    type:"linear",
-                                                    input:"alpha",
-                                                    output:"pitch",
-                                                    keys: [0.0, 0.2, 0.5, 0.7, 0.9, 1.0],
-                                                    values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0]
-                                                },
-                                                        SceneJS.rotate(function(data) {
-                                                            return { angle : data.get("yaw"), y: 1.0 };
-                                                        },
-                                                                SceneJS.rotate(function(data) {
-                                                                    return { angle : data.get("pitch"), z: 1.0 };
-                                                                },
-                                                                        SceneJS.objects.teapot()
-                                                                        )
-                                                                )
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                )
-        ); // scene
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                        }),
 
-var alpha = 0;
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                        }),
+
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                        }),
+
+                        SceneJS.material({
+                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                            specular:       0.9,
+                            shine:          6.0
+                        },
+
+                                SceneJS.rotate({                               // Interpolator target
+                                    id: "spin",
+                                    angle: 0.0,
+                                    y : 1.0
+                                },
+                                        SceneJS.rotate({                      // Interpolator target
+                                            id: "tip",
+                                            angle: 0.0,
+                                            z : 1.0
+                                        },
+                                                SceneJS.teapot()))),
+
+                        SceneJS.interpolator({
+                            type:"linear",
+                            target: "spin",
+                            targetProperty: "angle",
+                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],               // Seconds
+                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0]    // Values
+                        }),
+
+                        SceneJS.interpolator({
+                            type:"linear",
+                            target: "tip",
+                            targetProperty: "angle",
+                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],               // Seconds
+                            values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0]        // Values
+                        }))));
 
 window.render = function() {
-    if (alpha > 1) {
-        clearInterval(pInterval);
-        exampleScene.destroy();
-    } else {
-        alpha += 0.002;
-
-        exampleScene
-                .setData({"alpha":alpha})
-                .render();
-    }
+    exampleScene.render();
 };
 
 var pInterval;

@@ -27,35 +27,34 @@ var exampleScene = SceneJS.scene({
                     optics: {
                         type: "perspective",
                         fovy : 45.0,
-                        aspect : 1.0,
+                        aspect : 1.25,
                         near : 0.10,
                         far : 300.0
                     }
                 },
-                        SceneJS.lights({
-                            sources: [
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type:                   "dir",
-                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                                }
-                            ]}),
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                        }),
+
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                        }),
+
+                        SceneJS.light({
+                            type:                   "dir",
+                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                        }),
 
 
                     /*-------------------------------------------------------------------------------------
@@ -109,7 +108,7 @@ var exampleScene = SceneJS.scene({
                                                 "#teapot2" : {
                                                     "#mount-point" : {
                                                         "-node": "remove-me",
-                                                        "+node": SceneJS.objects.sphere()
+                                                        "+node": SceneJS.sphere()
                                                     }
                                                 }
                                             });
@@ -131,33 +130,45 @@ var exampleScene = SceneJS.scene({
                                         }
 
                                         /*
-                                         * When "teapot4" is picked, we'll splice translation and rotation
-                                         * transforms above it to lift it out of the row while spinning it
+                                         * When "teapot4" is picked, we'll push down some interpolator nodes
+                                         *  to lift it out of the row while spinning it
                                          */
 
                                         if (event.uri.match("^teapot4") == "teapot4") {
                                             this.setConfigs({
                                                 "#teapot4" : {
-                                                    "#mount-point" : function() {
-                                                        var insertAt = this.findNodeIndex("insert-here");
-                                                        if (insertAt >= 0) {
-                                                            var startTime = (new Date()).getTime();
-                                                            var removedNode = this.removeNodeAt(insertAt);
-                                                            var newSubGraph =
-                                                                    SceneJS.translate(
-                                                                            function() {
-                                                                                var y = ((new Date()).getTime() - startTime) * 0.005;
-                                                                                return { y: y < 10 ? y : 10 };
-                                                                            },
-                                                                            SceneJS.rotate(
-                                                                                    function() {
-                                                                                        var angle = ((new Date()).getTime() - startTime) * 0.05;
-                                                                                        return {x: 1, angle: angle < 360 ? angle : 0 };
-                                                                                    },
-                                                                                    removedNode));
-
-                                                            this.insertNode(newSubGraph, insertAt);
-                                                        }
+                                                    "#mount-point" : {
+                                                        "+node": SceneJS.node(
+                                                                SceneJS.interpolator({
+                                                                    target: "teapot4-pos",
+                                                                    targetProperty: "x",
+                                                                    keys: [0, 3, 6],
+                                                                    values: [0, 20, 15]
+                                                                }),
+                                                                SceneJS.interpolator({
+                                                                    target: "teapot4-pos",
+                                                                    targetProperty: "y",
+                                                                    keys: [0, 3],
+                                                                    values: [0, 3]
+                                                                }),
+                                                                SceneJS.interpolator({
+                                                                    target: "teapot4-pos",
+                                                                    targetProperty: "z",
+                                                                    keys: [0, 6],
+                                                                    values: [0, -30]
+                                                                }),
+                                                                SceneJS.interpolator({
+                                                                    target: "teapot4-tumble",
+                                                                    targetProperty: "angle",
+                                                                    keys: [0, 6],
+                                                                    values: [0, 720]
+                                                                }),
+                                                                SceneJS.interpolator({
+                                                                    target: "teapot4-spin",
+                                                                    targetProperty: "angle",
+                                                                    keys: [0, 6],
+                                                                    values: [0, 720]
+                                                                }))
                                                     }
                                                 }
                                             });
@@ -179,7 +190,7 @@ var exampleScene = SceneJS.scene({
                                                             specular:       0.9,
                                                             shine:          6.0
                                                         },
-                                                                SceneJS.objects.teapot())))),
+                                                                SceneJS.teapot())))),
 
 
                             /*
@@ -197,7 +208,7 @@ var exampleScene = SceneJS.scene({
                                         },
                                                 SceneJS.node({ sid: "mount-point"},
                                                         SceneJS.node({ sid: "remove-me"},
-                                                                SceneJS.objects.teapot())))),
+                                                                SceneJS.teapot())))),
 
 
                             /*
@@ -213,23 +224,26 @@ var exampleScene = SceneJS.scene({
                                                     specular:       0.9,
                                                     shine:          6.0
                                                 },
-                                                        SceneJS.objects.teapot()))),
+                                                        SceneJS.teapot()))),
 
                             /*
                              * "teapot4"
                              */
 
                                 SceneJS.node({ sid: "teapot4" },
-                                        SceneJS.translate({ x: -14 },
-                                                SceneJS.material({
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:       0.9,
-                                                    shine:          6.0
-                                                },
-                                                        SceneJS.node({ sid: "mount-point"},
-                                                                SceneJS.node({ sid: "insert-here"},
-                                                                        SceneJS.objects.teapot())))))
+                                        SceneJS.node({ sid: "mount-point"},
+                                                SceneJS.translate({ x: -14 },
+                                                        SceneJS.material({
+                                                            id: "teapot4-color",
+                                                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                            specular:       0.9,
+                                                            shine:          6.0
+                                                        },
+                                                                SceneJS.translate({ id: "teapot4-pos" },
+                                                                        SceneJS.rotate({ id: "teapot4-spin", y: 1.0 },
+                                                                                SceneJS.rotate({ id: "teapot4-tumble", z: 1.0 },
+                                                                                        SceneJS.teapot())))))))
                                 )
                         )
                 )
@@ -256,6 +270,6 @@ pInterval = setInterval("window.render()", 10);
 var canvas = document.getElementById("theCanvas");
 
 canvas.addEventListener('mousedown', function (event) {
-    exampleScene.pick(event.clientX, event.clientY);
+    exampleScene.pick(event.offsetX, event.offsetY);
 }, false);
 

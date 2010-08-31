@@ -125,10 +125,19 @@ SceneJS.errors.InternalException = function(msg, cause) {
 
 /**
  * @class  Exception thrown to signify that a {@link SceneJS.Instance} node could not find
- * a {@link SceneJS.Symbol} to instance
+ * it's target node
  */
 SceneJS.errors.SymbolNotFoundException = function(msg, cause) {
     this.message = "SceneJS.errors.SymbolNotFoundException: " + msg;
+    this.cause = cause;
+};
+
+/**
+ * @class  Exception thrown to signify that a {@link SceneJS.Instance} node is attempting to create a cyclic
+ * chain of instantiation
+ */
+SceneJS.errors.CyclicInstanceException = function(msg, cause) {
+    this.message = "SceneJS.errors.CyclicInstanceException: " + msg;
     this.cause = cause;
 };
 
