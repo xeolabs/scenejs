@@ -5,61 +5,63 @@
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
     <script type="text/javascript" src="libs/sylvester.js"></script>
-    <style>
-        body {
-            margin: auto;
-            background-color: #666666;
-            padding-top: 50px;
-            font-family: Helvetica, sans-serif;
-            font-size: 0.8em;
-            color: #666;
-            font-size: 0.8em
-        }
-
-        #demo {
-            margin: auto;
-            width: 1000px;
-            padding: 10px;
-            background-color: #ffffff;
-            border-radius: 6px;
-            -webkit-box-shadow: 5px 5px 2px #444444;
-        }
-    </style>
+    <link href="../web/style.css" rel="stylesheet" type="text/css"/>
 
 </head>
 <body>
-<div id="demo">
-    <canvas id="theCanvas" width="1000" height="800">
-        <p>This example requires a browser that supports the
-            <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-            &lt;canvas&gt; feature.</p>
-    </canvas>
-    <div id="info">
-        <h2>SceneJS Collada Tron Tank</h2>
+<div id="container">
+    <div id="header">
+        <div id="header-nav">
 
-        <p>SceneJS COLLADA example - the Tank Program from the 1982 Disney motion picture "Tron".</p>
-
-        <p>Take it for a drive - mouse wheel controls speed, left/right drag to steer, up/down drag to change viewpoint
-            height.</p>
-
-        <p>More info:</p>
-        <ul>
-            <li><a target="_other" href="tron-tank-scene.js">Scene source code</a></li>
-            <li><a target="_other" href="tron-tank-model.js">JSON tank model</a>
-            </li>
-            <li><a target="_other" href="extras/tron-tank-model.dae">Tank's original COLLADA file</a>
-            </li>
-            <li><a target="_other" href="http://scenejs.org/tools/collada-translator/collada-translator.html">SceneJS
-                tools:
-                Online COLLADA Translator</a></li>
-            <li><a target="_other" href="http://scenejs.wikispaces.com/JSON+Scene+Definition">Wiki article: JSON
-                Scene Definition</a></li>
-        </ul>
+        </div>
+        <div id="header-inner">
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Collada Tron Tank
+                Demo
+            </h1>
+            <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
+                    src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
+                    alt="Share/Bookmark"/></a>
+            <script type="text/javascript">
+                var a2a_linkname = "SceneJS Live Examples";
+                var a2a_linkurl = window.location;
+                var a2a_onclick = 1;</script>
+            <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+        </div>
     </div>
-    <div id="log">
-        <h3>Log</h3>
+    <div id="content">
+        <canvas id="theCanvas" width="1030" height="700">
+            <p>This example requires a browser that supports the
+                <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                &lt;canvas&gt; feature.</p>
+        </canvas>
+        <div id="info">
+            <h2>Interacting with Collada Models</h2>
 
-        <div id="theLoggingDiv"></div>
+            <p>SceneJS COLLADA example - the Tank Program from the 1982 Disney motion picture "Tron".</p>
+
+            <p>Take it for a drive - mouse wheel controls speed, left/right drag to steer, up/down drag to change
+                viewpoint
+                height.</p>
+
+            <br/>
+            <ul>
+                <li><a target="_other" href="tron-tank-scene.js">Scene source code</a></li>
+                <li><a target="_other" href="tron-tank-model.js">JSON tank model</a>
+                </li>
+                <li><a target="_other" href="extras/tron-tank-model.dae">Tank's original COLLADA file</a>
+                </li>
+                <li><a target="_other" href="http://scenejs.org/tools/collada-translator/collada-translator.html">SceneJS
+                    tools:
+                    Online COLLADA Translator</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/JSON+Scene+Definition">Wiki article: JSON
+                    Scene Definition</a></li>
+            </ul>
+        </div>
+        <div id="log">
+            <h3>Log</h3>
+
+            <div id="theLoggingDiv"></div>
+        </div>
     </div>
 </div>
 

@@ -5,54 +5,57 @@
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
 
-    <style>
-        body {
-            margin: auto;
-            background-color: #666666;
-            padding-top: 50px;
-            font-family: Helvetica, sans-serif;
-            font-size: 0.8em;
-            color: #666;
-            font-size: 0.8em
-        }
-
-        #demo {
-            margin: auto;
-            width: 1000px;
-            padding: 10px;
-            background-color: #ffffff;
-            border-radius: 6px;
-            -webkit-box-shadow: 5px 5px 2px #444444;
-        }
-    </style>
+    <link href="../web/style.css" rel="stylesheet" type="text/css"/>
 
 </head>
-<body>
-<div id="demo">
-    <canvas id="theCanvas" width="1000" height="800">
-        <p>This example requires a browser that supports the
-            <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
-            &lt;canvas&gt; feature.</p>
-    </canvas>
-    <div id="info">
-        <h2>SceneJS Custom Geometry - Definition of a Textured Cube</h2>
+<div id="container">
+    <div id="header">
+        <div id="header-nav">
 
-        <p>This example demonstrates how to define geometry, in this case a simple cube
-            object that supports texturing.</p>
-
-        <ul>
-            <li><a target="_other" href="custom-geometry.js">Scene source code</a></li>
-            <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.Geometry">Wiki page on
-                SceneJS.Geometry</a></li>
-        </ul>
+        </div>
+        <div id="header-inner">
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Custom
+                Geometry Demo
+            </h1>
+            <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
+                    src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
+                    alt="Share/Bookmark"/></a>
+            <script type="text/javascript">
+                var a2a_linkname = "SceneJS Live Examples";
+                var a2a_linkurl = window.location;
+                var a2a_onclick = 1;</script>
+            <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+        </div>
     </div>
-    <div id="log">
-        <h3>Log</h3>
+    <div id="content">
+        <canvas id="theCanvas" width="1030" height="700">
+            <p>This example requires a browser that supports the
+                <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                &lt;canvas&gt; feature.</p>
+        </canvas>
+        <div id="info">
+            <h2>Defining a Textured Cube from Scratch</h2>
 
-        <div id="theLoggingDiv"></div>
+            <p>Use this example as a template for designing your own custom geometry.</p>
+
+            <p>The source code will show you how to define position, texture coordinate and primitive index arrays,
+                along with how to apply texture and material properties.</p>
+
+           <br/>
+            <ul>
+                <li><a target="_other" href="custom-geometry.js">Scene source code</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.Geometry">Wiki page on
+                    SceneJS.Geometry</a></li>
+            </ul>
+        </div>
+        <div id="log">
+            <h3>Log</h3>
+
+            <div id="theLoggingDiv"></div>
+        </div>
     </div>
+
 </div>
-
 <script type="text/javascript" src="custom-geometry.js"></script>
 </body>
 </html>

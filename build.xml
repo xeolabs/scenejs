@@ -212,15 +212,21 @@
     </target>
 
     <target name="package-index">
-        <echo file="resources/version.txt" append="false">SceneJS V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
+        <echo file="resources/version.txt" append="false">V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
         </echo>
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/index.html">
+        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/examples/index.html">
             <filelist dir="."
-                      files="${basedir}/resources/header.html, ${basedir}/resources/version.txt, ${basedir}/resources/body.html"/>
+                      files="${basedir}/resources/example-index-p1.html, ${basedir}/resources/version.txt, ${basedir}/resources/example-index-p2.html"/>
         </concat>
+
     </target>
 
     <target name="package-examples">
+        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
+        <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
+            <fileset dir="${basedir}/resources/web"/>
+        </copy>
+        
         <copy todir="${EXTRACTED_DIST_DIR}/examples">
             <fileset dir="${SRC_DIR}/examples"/>
         </copy>

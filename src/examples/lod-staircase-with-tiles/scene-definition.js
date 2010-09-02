@@ -49,7 +49,7 @@ var exampleScene = SceneJS.scene({
                             optics: {
                                 type: "perspective",
                                 fovy : 45.0,
-                                aspect : 1.25,
+                                aspect : 1.47,
                                 near : 0.10,
                                 far : 7000.0  }
                         },
@@ -80,95 +80,85 @@ var exampleScene = SceneJS.scene({
                              */
                                 tiledFloor,
 
-                            /* Our spiral staircase, wrapped with some material colour
-                             */
-                                SceneJS.material({
-                                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                    specular:       0.9,
-                                    shine:          6.0
+                                new SceneJS.boundingBox({
+                                    xmin: -20,
+                                    ymin: -20,
+                                    zmin: -20,
+                                    xmax:  20,
+                                    ymax:  20,
+                                    zmax:  20,
+
+                                    /* We'll do level-of-detail selection with this
+                                     * boundingBox - five representations at
+                                     * different sizes:
+                                     */
+                                    levels: [
+                                        10,     // Level 1
+                                        200,    // Level 2
+                                        400,    // Level 3
+                                        500,    // Level 4
+                                        600     // Level 5
+                                    ]
                                 },
 
-                                    /* Bounding box - roughly fitted to staircase
+                                    /* And here are the child nodes:
                                      */
-                                        SceneJS.boundingBox({
-                                            xmin: -20,
-                                            ymin: -20,
-                                            zmin: -20,
-                                            xmax:  20,
-                                            ymax:  20,
-                                            zmax:  20,
 
-                                            /* We'll do level-of-detail selection with this
-                                             * boundingBox - five representations at
-                                             * different sizes:
-                                             */
-                                            levels: [
-                                                10,     // Level 1
-                                                200,    // Level 2
-                                                400,    // Level 3
-                                                500,    // Level 4
-                                                600     // Level 5
-                                            ]
-                                        },
+                                    /* Level 1 - a cube to at least show a dot on the horizon
+                                     */
+                                        SceneJS.cube(),
 
-                                            /* And here are the child nodes:
-                                             */
+                                    /* Level 2 - staircase with 12 very chunky steps
+                                     * and no texture. Staircase factory function is defined in staircase.js
+                                     */
+                                        createStaircase({
+                                            stepWidth:7,
+                                            stepHeight:2.4,
+                                            stepDepth:3,
+                                            stepSpacing:6,
+                                            innerRadius:10,
+                                            numSteps:12,
+                                            stepAngle:80 }),
 
-                                            /* Level 1 - a cube to at least show a dot on the horizon
-                                             */
-                                                SceneJS.cube(),
+                                    /* Level 3 - more detail; staircase with 24 chunky
+                                     *  steps and no texture
+                                     */
+                                        createStaircase({
+                                            stepWidth:7,
+                                            stepHeight:1.2,
+                                            stepDepth:3,
+                                            stepSpacing:3,
+                                            innerRadius:10,
+                                            numSteps:24,       // Half the number of steps, less coarse
+                                            stepAngle:40 }),
 
-                                            /* Level 2 - staircase with 12 very chunky steps
-                                             * and no texture. Staircase factory function is defined in staircase.js
-                                             */
-                                                createStaircase({
-                                                    stepWidth:7,
-                                                    stepHeight:2.4,
-                                                    stepDepth:3,
-                                                    stepSpacing:6,
-                                                    innerRadius:10,
-                                                    numSteps:12,
-                                                    stepAngle:80 }),
+                                    /* Level 4 - yet more detail; staircase with 48 fine
+                                     * steps and no texture
+                                     */
+                                        createStaircase({
+                                            stepWidth:7,
+                                            stepHeight:0.6,
+                                            stepDepth:3,
+                                            stepSpacing:1.5,
+                                            innerRadius:10,
+                                            numSteps:48,
+                                            stepAngle:20 }),
 
-                                            /* Level 3 - more detail; staircase with 24 chunky
-                                             *  steps and no texture
-                                             */
-                                                createStaircase({
-                                                    stepWidth:7,
-                                                    stepHeight:1.2,
-                                                    stepDepth:3,
-                                                    stepSpacing:3,
-                                                    innerRadius:10,
-                                                    numSteps:24,       // Half the number of steps, less coarse
-                                                    stepAngle:40 }),
-
-                                            /* Level 4 - yet more detail; staircase with 48 fine
-                                             * steps and no texture
-                                             */
-                                                createStaircase({
-                                                    stepWidth:7,
-                                                    stepHeight:0.6,
-                                                    stepDepth:3,
-                                                    stepSpacing:1.5,
-                                                    innerRadius:10,
-                                                    numSteps:48,
-                                                    stepAngle:20 }),
-
-                                            /* Level 5 - maximum detail; textured staircase with
-                                             * 48 fine steps
-                                             */
-                                                createStaircase({
-                                                    withTexture: true,
-                                                    stepWidth:7,
-                                                    stepHeight:0.6,
-                                                    stepDepth:3,
-                                                    stepSpacing:1.5,
-                                                    innerRadius:10,
-                                                    numSteps:48,
-                                                    stepAngle:20 })
-                                                )
+                                    /* Level 5 - maximum detail; textured staircase with
+                                     * 48 fine steps
+                                     */
+                                        createStaircase({
+                                            withTexture: true,
+                                            stepWidth:7,
+                                            stepHeight:0.6,
+                                            stepDepth:3,
+                                            stepSpacing:1.5,
+                                            innerRadius:10,
+                                            numSteps:48,
+                                            stepAngle:20 })
                                         )
+
+
                                 )
                         )
                 )

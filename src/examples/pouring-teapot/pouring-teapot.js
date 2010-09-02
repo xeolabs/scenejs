@@ -7,7 +7,7 @@
  *
  * This example crudely pours some tea from the Newell Teapot, using
  * two linear Interpolators that interpolate yaw and pitch rotations
- * from an alpha value fed in through a scene data scope.
+ * from the elapsed time.
  *
  * Since V0.7.3, other types of supported interpolation are: "cosine", "cubic"
  * and "constant".
@@ -35,7 +35,7 @@ var exampleScene = SceneJS.scene({
                     optics: {
                         type: "perspective",
                         fovy : 55.0,
-                        aspect : 1.25,
+                        aspect : 1.47,
                         near : 0.10,
                         far : 300.0  }
                 },
@@ -81,14 +81,20 @@ var exampleScene = SceneJS.scene({
                                             angle: 0.0,
                                             z : 1.0
                                         },
-                                                SceneJS.teapot()))),
+                                                SceneJS.scale({              // Interpolator target
+                                                    id: "stretch",
+                                                    x: 1,
+                                                    y: 1,
+                                                    z: 1
+                                                },
+                                                        SceneJS.teapot())))),
 
                         SceneJS.interpolator({
                             type:"linear",
                             target: "spin",
                             targetProperty: "angle",
-                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],               // Seconds
-                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0]    // Values
+                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0, 5],               // Seconds
+                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0, 360]    // Values
                         }),
 
                         SceneJS.interpolator({
@@ -97,6 +103,22 @@ var exampleScene = SceneJS.scene({
                             targetProperty: "angle",
                             keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],               // Seconds
                             values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0]        // Values
+                        }),
+
+                        SceneJS.interpolator({
+                            type:"linear",
+                            target: "stretch",
+                            targetProperty: "y",
+                            keys: [2.0, 3.0, 4.0, 5.0],                       // Seconds
+                            values: [1.0, 2.0, .3, 1.0]                       // Values
+                        }),
+
+                        SceneJS.interpolator({
+                            type:"linear",
+                            target: "stretch",
+                            targetProperty: "x",
+                            keys: [2.5, 3.5, 4.5, 5.5],                       // Seconds
+                            values: [1.0, 3.0, .1, 1.0]                       // Values
                         }))));
 
 window.render = function() {

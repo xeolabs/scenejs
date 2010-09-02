@@ -27,7 +27,7 @@ var exampleScene = SceneJS.scene({
                     optics: {
                         type: "perspective",
                         fovy : 45.0,
-                        aspect : 1.25,
+                        aspect : 1.47,
                         near : 0.10,
                         far : 300.0
                     }
