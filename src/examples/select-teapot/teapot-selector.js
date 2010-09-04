@@ -22,7 +22,7 @@ var exampleScene = SceneJS.scene({
     loggingElementId: "theLoggingDiv" },
 
         SceneJS.lookAt({
-            eye : { x: 30.0, y: 0.0, z: 35.0},
+            eye : { x: -30.0, y: 0.0, z: -35.0},
             look : { x : 15.0, y : 0.0, z : 0 },
             up : { x: 0.0, y: 1.0, z: 0.0 }
         },
