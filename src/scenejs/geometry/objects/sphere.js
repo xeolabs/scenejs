@@ -29,10 +29,10 @@ SceneJS.Sphere.prototype._init = function(params) {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 
-    /* Type ID ensures that we reuse any sphere that has already been created with
+    /* Resource ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
      */
-    this._type = "sphere_" + rings + "_" + slices;
+    this._resource = "sphere_" + rings + "_" + slices;
 
     /* Callback that does the creation in case we can't find matching sphere to reuse     
      */

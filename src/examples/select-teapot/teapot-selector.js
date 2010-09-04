@@ -37,7 +37,7 @@ var exampleScene = SceneJS.scene({
                 },
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
@@ -45,7 +45,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 0.8, g: 0.8, b: 0.8 },
                             diffuse:                true,
                             specular:               true,

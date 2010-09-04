@@ -57,7 +57,7 @@ var exampleScene = new SceneJS.Scene({
                         light1 = new SceneJS.Light({
                             sources: [
                                 {
-                                    type:                   "dir",
+                                    mode:                   "dir",
                                     color:                  { r: 1.0, g: 1.0, b: 1.0 },
                                     dir:                    { x: 1.0, y: -1.0, z: 1.0 },
                                     diffuse:                true,
@@ -66,7 +66,7 @@ var exampleScene = new SceneJS.Scene({
                             ]}),
 
                         light2 = new SceneJS.Light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             dir:                    { x: -1.0, y: -1.0, z: -3.0 },
                             diffuse:                true,

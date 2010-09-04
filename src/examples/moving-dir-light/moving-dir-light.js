@@ -45,7 +45,7 @@ var exampleScene = SceneJS.scene({
                         },
 
                                 SceneJS.light({
-                                    type: "dir",
+                                    mode: "dir",
 
                                     /* Colour of our light
                                      */

@@ -41,7 +41,7 @@ var exampleScene = SceneJS.scene({
                                 SceneJS.translate({ x: 10, z: -10 },
 
                                         SceneJS.light({
-                                            type: "point",
+                                            mode: "point",
 
                                             /* Our light source's colour
                                              */

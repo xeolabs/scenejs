@@ -4,17 +4,17 @@
  * light, the number of which is only limited by video memory.</p>
  * <p>note that SceneJS does not create any default light sources for you, so if you have non-emissive
  * {@link SceneJS.Material}s with no lights you may not see anything in your scene until you add a light.</p>
- * <p>Currently, two kinds of light are supported: point and directional. Point lights have a location, like a lightbulb,
+ * <p>Currently, two modes of light are supported: point and directional. Point lights have a location, like a lightbulb,
  * while directional only have a vector that describes their direction, where they have no actual location since they
  * are an infinite distance away.</p>
- * <p>Therefore, each of these two light types have slightly different properties, as shown in the usage example below.</p>
+ * <p>Therefore, each of these two light modes have slightly different properties, as shown in the usage example below.</p>
 
  * <p><b>Example Usage</b></p><p>This example defines a cube that is illuminated by two light sources, point and directional.
  * The cube has a {@link SceneJS.Material} that define how it reflects the light.</b></p><pre><code>
  *  var l = new SceneJS.Node(
  *
  *         new SceneJS.Light({
- *              type: "point",
+ *              mode: "point",
  *              pos: { x: 100.0, y: 30.0, z: -100.0 }, // Position
  *              color: { r: 0.0, g: 1.0, b: 1.0 },
  *              diffuse: true,   // Contribute to diffuse lighting
@@ -30,7 +30,7 @@
  *         }),
  *
  *         new SceneJS.Light({
- *              type: "dir",
+ *              mode: "dir",
  *              color: { r: 1.0, g: 1.0, b: 0.0 },
  *              diffuse: true,
  *              specular: true,
@@ -61,7 +61,7 @@ SceneJS.Light = SceneJS.createNodeType("light");
 SceneJS.Light.prototype._init = function(params) {
     params = params || {};
     this._light = {};
-    this.setType(params.type);
+    this.setMode(params.mode);
     this.setColor(params.color);
     this.setDiffuse(params.diffuse);
     this.setSpecular(params.specular);
@@ -72,25 +72,25 @@ SceneJS.Light.prototype._init = function(params) {
     this.setQuadraticAttenuation(params.quadraticAttenuation);
 };
 
-/** Sets the light source type
- * @param {String} type Light source type - "dir" or "point"
+/** Sets the lighting mode - eg. "dir" or "point"
+ * @param {String} mode Lighting mode - "dir" or "point"
  * @return {SceneJS.Light} this
  */
-SceneJS.Light.prototype.setType = function(type) {
-    type = type || "dir";
-    if (type != "dir" && type != "point") {
+SceneJS.Light.prototype.setMode = function(mode) {
+    mode = mode || "dir";
+    if (mode != "dir" && mode != "point") {
         throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "SceneJS.Light unsupported type - should be 'dir' or 'point' or 'ambient'"));
+                "SceneJS.Light unsupported mode - should be 'dir' or 'point' or 'ambient'"));
     }
-    this._light.type = type;
+    this._light.mode = mode;
     return this;
 };
 
-/** Gets the light source type
- * @return {String} Light source type - "dir" or "point"
+/** Gets the lighting mode - eg. "dir" or "point"
+ * @return {String} Light source mode - "dir" or "point"
  */
-SceneJS.Light.prototype.getType = function() {
-    return this._light.type;
+SceneJS.Light.prototype.getMode = function() {
+    return this._light.mode;
 };
 
 /** Sets the light source color
@@ -155,7 +155,7 @@ SceneJS.Light.prototype.getSpecular = function() {
 };
 
 /** Sets the light source object-space position.
- * This is only used when the source is of type "point".
+ * This is only used when the source is of mode "point".
  *
  * @param pos {Object} - Eg. {x: 5.0, y: 5.0, z: 5.0 }
  * @return {SceneJS.Light} this
@@ -175,7 +175,7 @@ SceneJS.Light.prototype.getPos = function() {
 };
 
 /** Sets the light source object-space direction vector.
- * This is only used when the source is of type "dir".
+ * This is only used when the source is of mode "dir".
  * Components will fall back on defaults of { x: 0, y: 0, z: -1 } where not supplied;
  * <pre><code>
  * myLight.setDir({  });       // Sets direction of { x : 0.0, y: 0.0, z: -1.0 }
@@ -200,7 +200,7 @@ SceneJS.Light.prototype.getDir = function() {
 };
 
 /** Sets the light source constant attenuation factor.
- * This is only used wen the source is of type "point".
+ * This is only used wen the source is of mode "point".
  *
  * @param constantAttenuation {double}
  * @return {SceneJS.Light} this
@@ -219,7 +219,7 @@ SceneJS.Light.prototype.getConstantAttenuation = function() {
 };
 
 /** Sets the light source linear attenuation factor.
- * This is only used wen the source is of type "point".
+ * This is only used wen the source is of mode "point".
  *
  * @param linearAttenuation {double}
  * @return {SceneJS.Light} this
@@ -238,7 +238,7 @@ SceneJS.Light.prototype.getLinearAttenuation = function() {
 };
 
 /** Sets the light source quadratic attenuation factor.
- * This is only used wen the source is of type "point".
+ * This is only used wen the source is of mode "point".
  *
  * @param quadraticAttenuation {double}
  * @return {SceneJS.Light} this

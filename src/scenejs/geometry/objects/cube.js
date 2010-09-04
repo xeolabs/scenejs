@@ -36,10 +36,10 @@ SceneJS.Cube.prototype._init = function(params) {
 
     var solid = (params.solid != undefined) ? params.solid : true;
 
-    /* Type ID ensures that we reuse any scube that has already been created with
+    /* Resource ID ensures that we reuse any scube that has already been created with
      * these parameters instead of wasting memory
      */
-    this._type = "cube_" + x + "_" + y + "_" + z + (solid ? "_solid" : "wire");
+    this._resource = "cube_" + x + "_" + y + "_" + z + (solid ? "_solid" : "wire");
 
     /* Callback that does the creation in case we can't find matching cube to reuse
      */

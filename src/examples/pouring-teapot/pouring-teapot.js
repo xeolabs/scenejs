@@ -41,7 +41,7 @@ var exampleScene = SceneJS.scene({
                 },
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
@@ -49,7 +49,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
@@ -57,7 +57,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 0.2, g: 0.2, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
@@ -90,7 +90,7 @@ var exampleScene = SceneJS.scene({
                                                         SceneJS.teapot())))),
 
                         SceneJS.interpolator({
-                            type:"linear",
+                            mode:"linear",
                             target: "spin",
                             targetProperty: "angle",
                             keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0, 5],               // Seconds
@@ -98,7 +98,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.interpolator({
-                            type:"linear",
+                            mode:"linear",
                             target: "tip",
                             targetProperty: "angle",
                             keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],               // Seconds
@@ -106,7 +106,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.interpolator({
-                            type:"linear",
+                            mode:"linear",
                             target: "stretch",
                             targetProperty: "y",
                             keys: [2.0, 3.0, 4.0, 5.0],                       // Seconds
@@ -114,7 +114,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.interpolator({
-                            type:"linear",
+                            mode:"linear",
                             target: "stretch",
                             targetProperty: "x",
                             keys: [2.5, 3.5, 4.5, 5.5],                       // Seconds

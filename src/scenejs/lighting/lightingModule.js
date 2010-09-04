@@ -79,9 +79,9 @@ SceneJS._lightingModule = new (function() {
     };
 
     function instanceLight(light) {
-        if (light.type == "point") {
+        if (light.mode == "point") {
             light.viewPos = SceneJS._math_transformPoint3(viewMat, SceneJS._math_transformPoint3(modelMat, light.pos));
-        } else if (light.type == "dir") {
+        } else if (light.mode == "dir") {
             light.viewDir = SceneJS._math_transformVector3(viewMat, SceneJS._math_transformVector3(modelMat, light.dir));
         }
     }

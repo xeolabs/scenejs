@@ -23,7 +23,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                     }
                 },
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                 "dir",
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
@@ -31,7 +31,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                         }),
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                 "dir",
                             color:                  {r: 1.0, g: 1.0, b: 1.0},
                             diffuse:                true,
                             specular:               true,
@@ -39,7 +39,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                         }),
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                 "dir",
                             color:                  {r: 1.0, g: 1.0, b: 1.0},
                             diffuse:                true,
                             specular:               true,

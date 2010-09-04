@@ -40,7 +40,7 @@ var exampleScene = SceneJS.scene({
                         far : 300.0  }
                 },
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 0.5, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
@@ -48,7 +48,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 0.7, g: 0.7, b: 0.7 },
                             diffuse:                true,
                             specular:               true,
@@ -56,7 +56,7 @@ var exampleScene = SceneJS.scene({
                         }),
 
                         SceneJS.light({
-                            type:                   "dir",
+                            mode:                   "dir",
                             color:                  { r: 0.8, g: 0.8, b: 0.8 },
                             diffuse:                true,
                             specular:               true,
@@ -136,19 +136,16 @@ var exampleScene = SceneJS.scene({
                                                      */
                                                         SceneJS.geometry({
 
-                                                            /* Mandatory type name, must be unique among all
+                                                            /* Optional resource name, must be unique among all
                                                              * geometries - if another geometry has already
-                                                             * been defined with this type, then that
+                                                             * been defined with this resource type, then that
                                                              * geometry will be instanced here in place of
                                                              * this one, and this geometry definition will be
                                                              * ignored. This supports dynamic instancing,
                                                              * where we may reuse the same geometry in
-                                                             * many places to save memory. Make sure that
-                                                             * you give your geometries very unique names,
-                                                             * because they may end up alongside all sorts
-                                                             * of other geometries from other developers!
+                                                             * many places to save memory.
                                                              */
-                                                            type: "my-geometry",
+                                                            resource: "my-geometry",
 
                                                             /* The primitive type - allowed values are
                                                              * "points", "lines", "line-loop", "line-strip",

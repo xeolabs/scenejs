@@ -133,27 +133,32 @@ var SceneJS = {
      */
     createNode : function(json) {
         json.type = json.type || "node";
-
         var nodeType = this._nodeTypes[json.type];
         if (!nodeType) {
             throw "Node type not registered: '" + json.type + "'";
         }
-        var cfg = json.cfg || {};
-
-        //---------------------------------------------------------------
-        //
-        //---------------------------------------------------------------
-        cfg.id = json.id;
-        cfg.sid = json.sid;
-
-        var args = [cfg];
+        var newNode = new nodeType.nodeClass(this._copyCfg(json));   // Faster to instantiate class directly
         if (json.nodes) {
             var len = json.nodes.length;
             for (var i = 0; i < len; i++) {
-                args.push(SceneJS.createNode(json.nodes[i]));
+                newNode.addNode(SceneJS.createNode(json.nodes[i]));
             }
         }
-        return nodeType.nodeFunc.apply(this, args);
+        return newNode;
+    },
+
+    /**
+     * Shallow copy of JSON node configs, filters out JSON-specific properties like "nodes"
+     * @private
+     */
+    _copyCfg : function (cfg) {
+        var cfg2 = {};
+        for (var key in cfg) {
+            if (cfg.hasOwnProperty(key) && key != "nodes") {
+                cfg2[key] = cfg[key];
+            }
+        }
+        return cfg2;
     },
 
     /**

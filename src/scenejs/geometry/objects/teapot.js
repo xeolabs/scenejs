@@ -16,9 +16,9 @@ SceneJS.Teapot = function() {
     SceneJS.Geometry.apply(this, arguments);
     this._nodeType = "teapot";
 
-    /* Type ID ensures that we save memory by reusing any teapot that has already been created
+    /* Resource ID ensures that we save memory by reusing any teapot that has already been created
      */
-    this._type = "teapot";
+    this._resource = "teapot";
 
     /* Callback that does the creation when teapot not created yet
      * @private

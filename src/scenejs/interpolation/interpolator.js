@@ -18,7 +18,7 @@
  *          new SceneJS.Cube())),
  *
  *      new SceneJS.Interpolator({
- *              type:"linear",   // or 'cosine', 'cubic' or 'constant'
+ *              mode:"linear",   // or 'cosine', 'cubic' or 'constant'
  *              target: "myRotate",
  *              targetProperty: "angle",
  *              keys: [0.0, 1.0, 1.5],       // Instants in time in seconds
@@ -34,7 +34,7 @@
  * @constructor
  * Create a new SceneJS.Interpolator
  * @param {Object} [cfg] Static configuration object
- * @param {String} [cfg.type="linear"] Interpolation type - "linear", "cosine", "cubic" or "constant"
+ * @param {String} [cfg.mode="linear"] Interpolation mode - "linear", "cosine", "cubic" or "constant"
  * @param {String} [cfg.target] ID of target node whose property we'll interpolate
  * @param {String} [cfg.targetProperty] Name of target property on target node
  * @param {double[]} [cfg.keys=[]] Time key values in seconds
@@ -84,10 +84,10 @@ SceneJS.Interpolator.prototype._init = function(params) {
     this._key1 = 0;
     this._key2 = 1;
 
-    /* Interpolation type
+    /* Interpolation mode
      */
-    params.type = params.type || 'linear';
-    switch (params.type) {
+    params.mode = params.mode || 'linear';
+    switch (params.mode) {
         case 'linear':
             break;
         case 'constant':
@@ -109,7 +109,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
         default:
             throw SceneJS._errorModule.fatalError(
                     new SceneJS.errors.InvalidNodeConfigException(
-                            "SceneJS.Interpolator configuration invalid:  type not supported - " +
+                            "SceneJS.Interpolator configuration invalid:  mode not supported - " +
                             "only 'linear', 'cosine', 'cubic', 'constant' and 'slerp' are supported"));
         /*
 
@@ -118,7 +118,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
          break;
          */
     }
-    this._type = params.type;
+    this._mode = params.mode;
     this._once = false;
 };
 
@@ -138,7 +138,7 @@ SceneJS.Interpolator.prototype._FOUND = 3;            // Found keys before and a
 SceneJS.Interpolator.prototype._render = function(traversalContext) {
     if (!this._targetFunc) {
 
-        /* Not bound to a target node setter method yet.
+        /* Not bound to a target node setter mode yet.
          *
          * Attempt to bind - if target not found, just try again
          * next render, since it might appear in the scene later.
@@ -169,7 +169,7 @@ SceneJS.Interpolator.prototype._render = function(traversalContext) {
     }
     if (this._targetFunc) {
 
-        /* Have target node method - start timer if not started,
+        /* Have target node mode - start timer if not started,
          * update interpolation, feed result into target node setter
          */
         if (!this._timeStarted) {
@@ -234,7 +234,7 @@ SceneJS.Interpolator.prototype._findEnclosingFrame = function(key) {
 
 // @private
 SceneJS.Interpolator.prototype._interpolate = function(k) {
-    switch (this._type) {
+    switch (this._mode) {
         case 'linear':
             return this._linearInterpolate(k);
         case 'cosine':
@@ -247,8 +247,8 @@ SceneJS.Interpolator.prototype._interpolate = function(k) {
             return this._slerp(k);
         default:
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.InternalException("SceneJS.Interpolator internal error - interpolation type not switched: '"
-                            + this._type + "'"));
+                    new SceneJS.errors.InternalException("SceneJS.Interpolator internal error - interpolation mode not switched: '"
+                            + this._mode + "'"));
     }
 };
 
