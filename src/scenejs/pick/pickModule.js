@@ -184,26 +184,19 @@ SceneJS._pickModule = new (function() {
         var context = boundPickBuf.canvas.context;
         var canvas = boundPickBuf.canvas.canvas;
         var x = pickX;
-        var y = canvas.height - pickY;
+        var y = canvas.height - pickY;       
 
-//        var agent = navigator.userAgent;
-//        var isSafari = agent.match(/safari/i);
-//
-//        // Safari returns undefined if format RGB is requested
-//        var buff = context.readPixels(x, y, 1, 1, context.RGB, context.UNSIGNED_BYTE);
-//        var pix = [];
-//
-//        if (isSafari) {
-//            for (var i = 0; i < buff.length; i++) {
-//                pix[i] = buff[i];
-//            }
-//        } else if (!isSafari) {   // Minefield
-//            pix = buff['data'];
-//        }
-
-        var pix = context.readPixels(x, y, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
-        if (!pix) {  //  http://asalga.wordpress.com/2010/07/14/compensating-for-webgl-readpixels-spec-changes/
-            pix = new WebGLUnsignedByteArray(4);
+        var pix;
+        try {
+            pix = context.readPixels(x, y, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
+        } catch (e) {
+        }
+        if (!pix) {
+            try {
+                pix = new WebGLUnsignedByteArray(4);
+            } catch (e) {
+                pix = new Uint8Array(4);
+            }
             context.readPixels(x, y, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
         }
         if (debugCfg.logTrace) {
