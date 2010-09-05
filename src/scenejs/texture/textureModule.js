@@ -200,7 +200,7 @@ SceneJS._textureModule = new (function() {
                             textures[textureId] = new SceneJS._webgl_Texture2D(_context, {
                                 textureId : textureId,
                                 canvas: _canvas,
-                                image : image,
+                                image : ensureImageSizePowerOfTwo(image),
                                 texels :cfg.texels,
                                 minFilter : getGLOption("minFilter", _context, cfg, _context.LINEAR),
                                 magFilter :  getGLOption("magFilter", _context, cfg, _context.LINEAR),
@@ -219,7 +219,7 @@ SceneJS._textureModule = new (function() {
                                 logging: SceneJS._loggingModule
                             });
                         } catch (e) {
-                             throw SceneJS._errorModule.fatalError("Failed to create texture: \"" + uri + "\" : " + e);
+                            throw SceneJS._errorModule.fatalError("Failed to create texture: \"" + uri + "\" : " + e);
                         }
                     });
             SceneJS._processModule.killProcess(process);
@@ -236,6 +236,33 @@ SceneJS._textureModule = new (function() {
         image.src = uri;  // Starts image load
         return image;
     };
+
+
+    function ensureImageSizePowerOfTwo(image) {
+        if (!isPowerOfTwo(image.width) || !isPowerOfTwo(image.height)) {
+            var canvas = document.createElement("canvas");
+            canvas.width = nextHighestPowerOfTwo(image.width);
+            canvas.height = nextHighestPowerOfTwo(image.height);
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(image,
+                    0, 0, image.width, image.height,
+                    0, 0, canvas.width, canvas.height);
+            image = canvas;
+        }
+        return image;
+    }
+
+    function isPowerOfTwo(x) {
+        return (x & (x - 1)) == 0;
+    }
+
+    function nextHighestPowerOfTwo(x) {
+        --x;
+        for (var i = 1; i < 32; i <<= 1) {
+            x = x | x >> i;
+        }
+        return x + 1;
+    }
 
     // @private
     this.pushLayer = function(texture, params) {
