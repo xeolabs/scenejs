@@ -128,6 +128,8 @@ SceneJS.Node = function() {
     this._listeners = {};
     this._numListeners = 0; // Useful for quick check whether node observes any events
 
+    this._enabled = true; // Traversal skips this node when false
+
     this._addedEvents = []; // Events added with #addEvent
     this._eventsOut = []; // FIFO queue for events fired from this node with #fireEvent, flushed after each render
 
@@ -218,34 +220,36 @@ SceneJS.Node._ArgParser = new (function() {
         for (var key in cfg) {
             if (cfg.hasOwnProperty(key)) {
                 param = cfg[key];
-                if (key == "id") {
-                    node._id = param;
-                } else if (key == "listeners") {
-                    this._parseListeners(param, node);
-                } else if (key == "sid") {
-                    node._sid = param;
-                } else if (key == "info") {
-                    node._NODEINFO = param;
-                } else {
-                    if (param.name) {
-
-                        /* Property has a binding for dynamic configuration, which
-                         * specifies a symbolic name and an optional default value.
-                         *
-                         * - symbolic name will be resolved to the property name
-                         *      whenever the node is dynamically configured
-                         *
-                         * - first char of symbolic name is converted to upper case to optimise comparison
-                         *      with preprocessed configs map
-                         *
-                         * - the binding is an object of the form { name: "foo", value: bar }
-                         *
-                         * - map the property's  actual name to the symbolic name and default value
-                         */
-                        node._propNames[param.name] = key.substr(0, 1).toUpperCase() + key.substr(1);
-                        node._params[key] = param.value;
+                if (param != null) {
+                    if (key == "id") {
+                        node._id = param;
+                    } else if (key == "listeners") {
+                        this._parseListeners(param, node);
+                    } else if (key == "sid") {
+                        node._sid = param;
+                    } else if (key == "info") {
+                        node._NODEINFO = param;
                     } else {
-                        node._params[key] = param;
+                        if (param.name) {
+
+                            /* Property has a binding for dynamic configuration, which
+                             * specifies a symbolic name and an optional default value.
+                             *
+                             * - symbolic name will be resolved to the property name
+                             *      whenever the node is dynamically configured
+                             *
+                             * - first char of symbolic name is converted to upper case to optimise comparison
+                             *      with preprocessed configs map
+                             *
+                             * - the binding is an object of the form { name: "foo", value: bar }
+                             *
+                             * - map the property's  actual name to the symbolic name and default value
+                             */
+                            node._propNames[param.name] = key.substr(0, 1).toUpperCase() + key.substr(1);
+                            node._params[key] = param.value;
+                        } else {
+                            node._params[key] = param;
+                        }
                     }
                 }
             }
@@ -391,31 +395,35 @@ SceneJS.Node.prototype._renderNodes = function(
 
         for (i = 0; i < numChildren; i++) {
             child = children[i];
-            configUnsetters = null;
-            childConfigs = configs;   // Configs to apply to child - may descend into sub-configs yet
-            if (configs) {
-                if (configs["*"]) {
 
-                    /* Wildcard configs - applied to all children
-                     * regardless of whether they have an SID or not
-                     */
-                    configUnsetters = this._applyConfigs(configs["*"], child);
+            if (child._enabled) { // Node can be disabled with #setEnabled(false)
 
-                } else if (child._sid) {
-                    childConfigs = configs["#" + child._sid];    // Look for configs for child
-                    if (childConfigs) {                                             // Found - configure child
-                        configUnsetters = this._applyConfigs(childConfigs, child);
+                configUnsetters = null;
+                childConfigs = configs;   // Configs to apply to child - may descend into sub-configs yet
+                if (configs) {
+                    if (configs["*"]) {
+
+                        /* Wildcard configs - applied to all children
+                         * regardless of whether they have an SID or not
+                         */
+                        configUnsetters = this._applyConfigs(configs["*"], child);
+
+                    } else if (child._sid) {
+                        childConfigs = configs["#" + child._sid];    // Look for configs for child
+                        if (childConfigs) {                                             // Found - configure child
+                            configUnsetters = this._applyConfigs(childConfigs, child);
+                        }
                     }
                 }
-            }
-            childTraversalContext = {
-                insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
-                callback : traversalContext.callback,
-                configs: childConfigs || configs
-            };
-            child._renderWithEvents.call(child, childTraversalContext);
-            if (configUnsetters) {
-                this._unsetConfigs(configUnsetters);
+                childTraversalContext = {
+                    insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
+                    callback : traversalContext.callback,
+                    configs: childConfigs || configs
+                };
+                child._renderWithEvents.call(child, childTraversalContext);
+                if (configUnsetters) {
+                    this._unsetConfigs(configUnsetters);
+                }
             }
         }
     }
@@ -503,18 +511,18 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
 
     /* Record performance stats for profiling
      */
-//    if (!SceneJS.perfStats) {
-//        SceneJS.perfStats = {
-//            nodeCount: 0,
-//            memoLevelCounts : [0,0,0,0,0]
-//        };
-//    }
-//    if (this._nodeType == "rotate" || this._nodeType == "translate" || this._nodeType == "matrix") {
-//        SceneJS.perfStats.nodeCount++;
-//        if (this._memoLevel != undefined) {
-//            SceneJS.perfStats.memoLevelCounts[this._memoLevel]++;
-//        }
-//    }
+    //    if (!SceneJS.perfStats) {
+    //        SceneJS.perfStats = {
+    //            nodeCount: 0,
+    //            memoLevelCounts : [0,0,0,0,0]
+    //        };
+    //    }
+    //    if (this._nodeType == "rotate" || this._nodeType == "translate" || this._nodeType == "matrix") {
+    //        SceneJS.perfStats.nodeCount++;
+    //        if (this._memoLevel != undefined) {
+    //            SceneJS.perfStats.memoLevelCounts[this._memoLevel]++;
+    //        }
+    //    }
 
     try {
         SceneJS._nodeEventsModule.preVisitNode(this);
@@ -611,7 +619,7 @@ SceneJS.Node.prototype._processEvents = function(events) {
 
 /** Configures nodes within the tree rooted by this node. The configuration is
  * provided in a map containing properties that will be applied to the node(s)
- * as they are next traversed. This is the same mechanism as used in {@link SceneJS.WithConfigs}. 
+ * as they are next traversed. This is the same mechanism as used in {@link SceneJS.WithConfigs}.
  *
  * @param {Object} configs Configuration map (see {@link SceneJS.WithConfigs})
  */
@@ -881,7 +889,7 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
  * </code></pre>
  *
  * @param {String} eventName One of the event types supported by this node
- * @param fn - Handler function that be called as specified
+ * @param {Function} fn - Handler function that be called as specified
  * @param options - Optional options for the handler as specified
  * @return {SceneJS.Node} this
  */
@@ -899,6 +907,29 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
     this._numListeners++;
     this._setDirty();  // Need re-render - potentially more state changes
     return this;
+};
+
+
+/**
+ * Specifies whether or not this node and its subtree will be rendered when next visited during traversal
+ * @param {Boolean} enabled Will only be rendered when true
+ * @return {SceneJS.Node} this
+ */
+SceneJS.Node.prototype.setEnabled = function(enabled) {
+    this._enabled = enabled;
+    this._setDirty();
+    return this;
+};
+
+/**
+ * Returns whether or not this node and its subtree will be rendered when next visited during traversal, as earlier
+ * specified with {@link SceneJS.Node#setEnabled}.
+ * @param {Boolean} enabled Will only be rendered when true
+ * @return {SceneJS.Node} this
+ */
+
+SceneJS.Node.prototype.getEnabled = function() {
+    return this._enabled;
 };
 
 /**
