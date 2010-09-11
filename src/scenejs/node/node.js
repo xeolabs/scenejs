@@ -760,18 +760,26 @@ SceneJS.Node.prototype.removeNodeAt = function(index) {
     }
 };
 
-/** Removes the child node with the given SID (structural identifier) string.
- * @param {String} sid The target child node's SID
+/** Removes the child node, given as either a node object or an SID (structural identifier) string.
+ * @param {String | SceneJS.Node} sid The target child node, or its SID
  * @returns {SceneJS.Node} The removed child node if located, else null
  */
-SceneJS.Node.prototype.removeNode = function(sid) {
-    if (!sid) {
+SceneJS.Node.prototype.removeNode = function(node) {
+    if (node._render) { //  instance of node
+        for (var i = 0; i < this._children.length; i++) {
+            if (this._children[i]._id == node._id) {
+                this._setDirty();
+                return this.removeNodeAt(i);
+            }
+        }
+    }
+    if (node instanceof String) {  // SID
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#removeNode - target node not defined"));
     }
     for (var i = 0; i < this._children.length; i++) {
-        if (this._children[i].getSID() == sid) {
+        if (this._children[i]._sid == node) {
             this._setDirty();
             return this.removeNodeAt(i);
         }
