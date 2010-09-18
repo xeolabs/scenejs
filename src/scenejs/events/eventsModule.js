@@ -52,7 +52,8 @@ SceneJS._eventModule = new (function() {
     this.PROCESS_TIMED_OUT = 36;
     this.LOGGING_ELEMENT_ACTIVATED = 37;
     this.PICK_COLOR_EXPORTED = 38;
-    
+    this.BOUNDARY_EXPORTED = 39;
+
     /* Priority queue for each type of event
      */
     var events = new Array(37);
@@ -107,7 +108,6 @@ SceneJS._eventModule = new (function() {
         }
     };
 })();
-
 
 
 /** <p>Adds a listener to be notified when a given event occurs within SceneJS.</p>
@@ -322,6 +322,6 @@ SceneJS.addListener = function(name, func) {
     }
 };
 
-/** @deprecated - use {@link #addListener} instead. 
+/** @deprecated - use {@link #addListener} instead.
  */
 SceneJS.onEvent = SceneJS.addListener;

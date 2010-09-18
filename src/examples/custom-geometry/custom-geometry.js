@@ -63,8 +63,8 @@ var exampleScene = SceneJS.scene({
                             dir:                    { x: -1.0, y: 0.0, z: -1.0 }
                         }),
 
-                    /* Next, modelling transforms to orient our teapot
-                     * by a given angle.
+                    /* Next, modelling transforms to orient our geometry
+                     * by a given angles.
                      * See how these have "sid" (scoped identifier) properties,
                      * which they will be referenced by when we push configurations
                      * into the scene graph when we render it
@@ -107,6 +107,7 @@ var exampleScene = SceneJS.scene({
                                                             sourceFormat:"alpha",
                                                             sourceType: "unsignedByte",
                                                             applyTo:"baseColor",
+                                                            blendMode:"multiply",
 
                                                             /* Texture rotation angle in degrees
                                                              */

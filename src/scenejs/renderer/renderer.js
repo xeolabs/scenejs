@@ -9,10 +9,11 @@ SceneJS.Renderer = SceneJS.createNodeType("renderer");
 // @private
 SceneJS.Renderer.prototype._render = function(traversalContext) {
     if (this._memoLevel == 0) {
-        this._rendererState = SceneJS._rendererModule.createRendererState(this._getParams());
+
+        this._props = SceneJS._rendererModule.createProps(this._getParams());
         this._memoLevel = 1;
     }
-    SceneJS._rendererModule.setRendererState(this._rendererState);
+    SceneJS._rendererModule.pushProps(this._props);
     this._renderNodes(traversalContext);
-    SceneJS._rendererModule.undoRendererState(this._rendererState);
+    SceneJS._rendererModule.pushProps(this._props);
 };

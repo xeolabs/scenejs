@@ -27,9 +27,10 @@ function createStaircase(cfg) {
             layers : [
                 {
                     uri: "images/white-marble.jpg",
-                    applyTo:"baseColor",
                     minFilter: "nearestMipMapLinear",
-                    maxFilter: "linearMapLinear"
+                    maxFilter: "linearMapLinear",
+                    applyTo:"baseColor",
+                    blendMode: "multiply"
                 }
             ],
             nodes: [

@@ -25,6 +25,7 @@ var gridFloor = SceneJS.createNode({
                     sourceFormat:"alpha",
                     sourceType: "unsignedByte",
                     applyTo:"baseColor",
+                    blendMode: "multiply",
                     scale : { x: 300, y: 300, z: 1.0 }
                 }
             ],

@@ -27,7 +27,7 @@ SceneJS._textureModule = new (function() {
     var time = (new Date()).getTime();      // Current system time for LRU caching
     var canvas;
     var textures = {};
-    var layerStack = [];
+    var textureStack = [];
     var dirty;
 
     SceneJS._eventModule.addListener(
@@ -39,7 +39,7 @@ SceneJS._textureModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
-                layerStack = [];
+                textureStack = [];
                 dirty = true;
             });
 
@@ -69,8 +69,9 @@ SceneJS._textureModule = new (function() {
                 if (dirty) {
                     SceneJS._eventModule.fireEvent(
                             SceneJS._eventModule.TEXTURES_EXPORTED,
-                            layerStack
-                            );
+                            (textureStack.length > 0)
+                                    ? { layers: textureStack[textureStack.length - 1] }
+                                    : { layers: [] });
                     dirty = false;
                 }
             });
@@ -102,7 +103,7 @@ SceneJS._textureModule = new (function() {
             deleteTexture(texture);
         }
         textures = {};
-        layerStack = [];
+        textureStack = [];
         dirty = true;
     }
 
@@ -264,30 +265,22 @@ SceneJS._textureModule = new (function() {
         return x + 1;
     }
 
-    // @private
-    this.pushLayer = function(texture, params) {
-        if (!textures[texture.textureId]) {
-            throw SceneJS._errorModule.fatalError("No such texture loaded \"" + texture.textureId + "\"");
-        }
-        texture.lastUsed = time;
+    this.pushTexture = function(layers) {
 
-        if (params.matrix && !params.matrixAsArray) {
-            params.matrixAsArray = new Float32Array(params.matrix);
+        /* Touch the cache LRU timestamp on each texture
+         */
+        for (var i = 0; i < layers.length; i++) {
+            if (!textures[layers[i].texture.textureId]) { // TODO: overkill to check for eviction?
+                throw SceneJS._errorModule.fatalError("No such texture loaded \"" + texture.layers[i].texture.textureId + "\"");
+            }
+            layers[i].texture.lastUsed = time;
         }
-        layerStack.push({
-            texture: texture,
-            params: params
-        });
+        textureStack.push(layers);
         dirty = true;
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.TEXTURES_UPDATED, layerStack);
     };
 
-    // @private
-    this.popLayers = function(nLayers) {
-        for (var i = 0; i < nLayers; i++) {
-            layerStack.pop();
-        }
+    this.popTexture = function() {
+        textureStack.pop();
         dirty = true;
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.TEXTURES_UPDATED, layerStack);
     };
 })();

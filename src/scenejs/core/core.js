@@ -105,6 +105,7 @@ var SceneJS = {
         }
         var nodeType = function() {                  // Create class
             supa.nodeClass.apply(this, arguments);
+            this._nodeType = type;
         };
         SceneJS._inherit(nodeType, supa.nodeClass);
 
@@ -162,7 +163,7 @@ var SceneJS = {
     },
 
     /**
-     * Fire an event at the node with the given ID
+     * Fire an event at a node
      *
      * @param {String} name Event name
      * @param {String} target ID of target node
@@ -174,6 +175,55 @@ var SceneJS = {
             throw "Node with this ID not found: '" + target + "'";
         }
         node.addEvent({ name: name, params: params });
+    },
+
+    /**
+     * Bind event listener to a node
+     *
+     * @param {String} name Event name
+     * @param {String} source ID of source node
+     * @param {Function} fn Event handler
+     */
+    bindEvent : function(name, source, fn) {
+        var node = this.getNode(source);
+        if (!node) {
+            throw "Node with this ID not found: '" + source + "'";
+        }
+        node.addListener(name, fn);
+    },
+
+    /** Configures nodes within the tree rooted by the target. The configuration is
+     * provided in a map containing properties that will be applied to the node(s)
+     * as they are next traversed. This is the same mechanism as used in {@link SceneJS.WithConfigs}.
+     *
+     * @param target ID of target node
+     * @param {Object} cfg Configuration map (see {@link SceneJS.WithConfigs})
+     */
+    configure : function (target, cfg) {
+        var node = this.getNode(target);
+        if (!node) {
+            throw "Node with this ID not found: '" + target + "'";
+        }
+        node.configure(cfg);
+    },
+
+    /** Renders the given {@link SceneJS.Scene}.
+     *
+     * @param target ID of taget {@link SceneJS.Scene}
+     * @param {Object} cfg Optional configuration to inject into scene before render
+     */
+    render : function (target, cfg) {
+        var node = this.getNode(target);
+        if (!node) {
+            throw "Node with this ID not found: '" + target + "'";
+        }
+        if (node.getType() != "scene") {
+            throw "Node with this ID is not a 'scene' type: '" + target + "'";
+        }
+        if (cfg) {
+            node.configure(cfg);
+        }
+        node.render();
     },
 
     /**
@@ -263,13 +313,24 @@ var SceneJS = {
     },
 
     /**
-     * SceneJS IOC service registry
+     * SceneJS service container
      */
     services : new (function() {
 
+        /** ID of node store service
+         */
         this.NODE_SOURCE_SERVICE = "node-source";
 
-        this._services = {};
+        this._services = {
+
+            /* Default node source service             
+             */
+            "node-source" : {
+                getNode: function(id) {
+                    return null;
+                }
+            }
+        };
 
         this.addService = function(name, service) {
             this._services[name] = service;

@@ -37,6 +37,7 @@
  *                           sourceFormat:"alpha",                  // (default)
  *                           sourceType: "unsignedByte",            // (default)
  *                           applyTo:"baseColor",                   // Options so far are “baseColor” (default) or “diffuseColor”
+ *                           blendMode: "multiply",                 // Options are "add" or "multiply" (default)
  *
  *                           // Optional transforms
  *
@@ -169,7 +170,7 @@ SceneJS.Texture.prototype._init = function(params) {
                 texture: null,                      // Initialised when state == TEXTURE_LOADED
                 applyFrom: layerParam.applyFrom || "uv",
                 applyTo: layerParam.applyTo || "baseColor",
-                blendMode: layerParam.blendMode || "multiply",
+                blendMode: layerParam.blendMode || "add",
                 scale : layerParam.scale,
                 translate : layerParam.translate,
                 rotate : layerParam.rotate,
@@ -221,6 +222,7 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
 
             case SceneJS.TextureLayer.STATE_LOADED: // Layer ready to apply
                 countLayersReady++;
+                this._rebuildTextureMatrix(layer);
                 break;
 
             case SceneJS.TextureLayer.STATE_INITIAL: // Layer load to start
@@ -288,21 +290,8 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
          * layer loaded, which would become redundant as soon as the next layer is loaded.
          */
 
-        if (countLayersReady == this._layers.length) {
-            var countPushed = 0;
-            var layer;
-            for (var i = 0; i < this._layers.length; i++) {
-                layer = this._layers[i];
-                if (layer.state = SceneJS.TextureLayer.STATE_LOADED) {
-                    SceneJS._textureModule.pushLayer(layer.texture, {
-                        applyFrom : layer.applyFrom,
-                        applyTo : layer.applyTo,
-                        blendMode : layer.blendMode,
-                        matrix: this._getTextureMatrix(layer)
-                    });
-                    countPushed++;
-                }
-            }
+        if (countLayersReady == this._layers.length) {  // All layers loaded
+            SceneJS._textureModule.pushTexture(this._layers);
 
             if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
                 this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
@@ -310,7 +299,8 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
             }
 
             this._renderNodes(traversalContext);
-            SceneJS._textureModule.popLayers(countPushed);
+
+            SceneJS._textureModule.popTexture();
         } else {
 
             if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
@@ -324,14 +314,14 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
 
 /* Returns texture transform matrix
  */
-SceneJS.Texture.prototype._getTextureMatrix = function(layer) {
+SceneJS.Texture.prototype._rebuildTextureMatrix = function(layer) {
     if (layer.rebuildMatrix) {
         if (layer.translate || layer.rotate || layer.scale) {
             layer.matrix = SceneJS.Texture.prototype._getMatrix(layer.translate, layer.rotate, layer.scale);
+            layer.matrixAsArray = new Float32Array(layer.matrix)
             layer.rebuildMatrix = false;
         }
     }
-    return layer.matrix;
 };
 
 // @private

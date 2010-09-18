@@ -82,6 +82,9 @@ SceneJS.BoundingBox = SceneJS.createNodeType("boundingBox");
 
 // @private
 SceneJS.BoundingBox.prototype._init = function(params) {
+
+    /* Local extents
+     */
     this._xmin = params.xmin || 0;
     this._ymin = params.ymin || 0;
     this._zmin = params.zmin || 0;
@@ -93,8 +96,9 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     this._level = -1; // Current LOD level
     this._states = [];
     this._state = SceneJS.BoundingBox.STATE_INITIAL;
-    this._objectsCoords = null;  // Six object-space vertices for memo level 1
-    this._viewBox = null;         // Axis-aligned view-space box for memo level 2
+
+    this._localCoords = null;    // Six local-space vertices for memo level 1
+    this._modelBox = null;       // Axis-aligned model-space box for memo level 2
 
     if (params.levels) {
         if (params.levels.length != this._children.length) {
@@ -354,7 +358,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
 
             /* Model transform exists
              */
-            this._objectCoords = [
+            this._localCoords = [
                 [this._xmin, this._ymin, this._zmin],
                 [this._xmax, this._ymin, this._zmin],
                 [this._xmax, this._ymax, this._zmin],
@@ -368,7 +372,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
 
             /* No model transform
              */
-            this._viewBox = {
+            this._modelBox = {
                 min: [this._xmin, this._ymin, this._zmin],
                 max: [this._xmax, this._ymax, this._zmax]
             };
@@ -378,26 +382,26 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
 
     if (this._memoLevel < 2) {
         modelTransform = SceneJS._modelTransformModule.getTransform();
-        this._viewBox = new SceneJS._math_Box3().fromPoints(
+        this._modelBox = new SceneJS._math_Box3().fromPoints(
                 SceneJS._math_transformPoints3(
                         modelTransform.matrix,
-                        this._objectCoords)
+                        this._localCoords)
                 );
         if (modelTransform.fixed && this._memoLevel == 1 && (!SceneJS._instancingModule.instancing())) {
-            this._objectCoords = null;
+            this._localCoords = null;
             this._memoLevel = 2;
         }
     }
 
     newState = SceneJS.BoundingBox.STATE_OUTSIDE_OUTER_LOCALITY;
 
-    if (SceneJS._localityModule.testAxisBoxIntersectOuterRadius(this._viewBox)) {
+    if (SceneJS._localityModule.testAxisBoxIntersectOuterRadius(this._modelBox)) {
         newState = SceneJS.BoundingBox.STATE_INTERSECTING_OUTER_LOCALITY;
 
-        if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(this._viewBox)) {
+        if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(this._modelBox)) {
             newState = SceneJS.BoundingBox.STATE_INTERSECTING_INNER_LOCALITY;
 
-            var result = SceneJS._frustumModule.testAxisBoxIntersection(this._viewBox);
+            var result = SceneJS._frustumModule.testAxisBoxIntersection(this._modelBox);
             switch (result) {
                 case SceneJS._math_INTERSECT_FRUSTUM:
                 case SceneJS._math_INSIDE_FRUSTUM:
@@ -414,8 +418,12 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                         this._changeState(newState);
                     }
 
+                    /* Export model-space boundary
+                     */
+                    SceneJS._boundaryModule.pushBoundary(this._modelBox);
+
                     if (this._levels) { // Level-of-detail mode
-                        var size = SceneJS._frustumModule.getProjectedSize(this._viewBox);
+                        var size = SceneJS._frustumModule.getProjectedSize(this._modelBox);
 
                         for (var i = this._levels.length - 1; i >= 0; i--) {
                             if (this._levels[i] <= size) {
@@ -447,6 +455,9 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                     } else {
                         this._renderNodes(traversalContext);
                     }
+
+                    SceneJS._boundaryModule.popBoundary();
+
                     break;
 
                 case SceneJS._math_OUTSIDE_FRUSTUM:

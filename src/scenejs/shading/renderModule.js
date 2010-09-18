@@ -21,33 +21,19 @@ SceneJS._shaderModule = new (function() {
 
     var rendererState;
     var lightState;
+    var boundaryState;
     var materialState;
     var fogState;
     var texState;
     var geoState;
-
     var modelXFormState;
     var viewXFormState;
     var projXFormState;
+    var pickState;
 
-    var modelMat;
-    var modelNormalMat;
-    var viewMat;
-    var viewNormalMat;
-    var projMat;
-
-    /* Root for each geometry
-     */
     var nodes = [];
 
     var programs = {};
-
-    /* Tracks last node created for Geometry that has positions but no indices.
-     * Nodes of subsequently-parsed Geometry's that have indices but no positions
-     * can then point back to that node to ensure that the node is always traversed
-     * just before them
-     */
-    var lastPositionNode;
 
 
     /* Register this module to deallocate shaders
@@ -112,6 +98,8 @@ SceneJS._shaderModule = new (function() {
                     hash: ""
                 };
 
+                boundaryState = null;
+
                 materialState = {
                     material: {
                         _stateId : nextStateId++,
@@ -135,16 +123,7 @@ SceneJS._shaderModule = new (function() {
                 };
 
                 geoState = null;
-
-                modelMat = null;
-                modelNormalMat = null;
-                viewMat = null;
-                viewNormalMat = null;
-                projMat = null;
-
                 nodes = [];
-
-
             });
 
     SceneJS._eventModule.addListener(
@@ -222,11 +201,31 @@ SceneJS._shaderModule = new (function() {
             });
 
     SceneJS._eventModule.addListener(
+            SceneJS._eventModule.BOUNDARY_EXPORTED,
+            function(params) {
+                boundaryState = {
+                    _stateId : nextStateId++,
+                    boundary: params.boundary,
+                    hash: ""
+                };
+            });
+
+    SceneJS._eventModule.addListener(
             SceneJS._eventModule.MATERIAL_EXPORTED,
             function(material) {
                 materialState = {
                     _stateId : nextStateId++,
                     material: material,
+                    hash: ""
+                };
+            });
+
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.PICK_COLOR_EXPORTED,
+            function(params) {
+                pickState = {
+                    _stateId : nextStateId++,
+                    pickColor: params.pickColor,
                     hash: ""
                 };
             });
@@ -282,15 +281,20 @@ SceneJS._shaderModule = new (function() {
                         geo.uvBuf2 ? "t" : "f"]).join("")
                 };
 
+                /* Marshal the state soup
+                 */
                 SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
 
                 var sceneHash = getSceneHash();
 
+                /* Add node for geometry, linked to current states in the soup
+                 */
                 nodes.push({
                     program : {
                         id: sceneHash,
                         program: getProgram(sceneHash)
                     },
+                    boundaryState: boundaryState,
                     geoState: geoState,
                     rendererState: rendererState,
                     lightState: lightState,
@@ -299,7 +303,8 @@ SceneJS._shaderModule = new (function() {
                     modelXFormState: modelXFormState,
                     viewXFormState: viewXFormState,
                     projXFormState: projXFormState,
-                    texState: texState
+                    texState: texState,
+                    pickState : pickState
                 });
             });
 
@@ -786,35 +791,40 @@ SceneJS._shaderModule = new (function() {
             });
 
     function traverseStateGraph() {
-        renderer.init();
 
-        /* TODO: if transparent, sort node list        
-         */
+       // canvas.context.disable(canvas.context.DEPTH_TEST);
+
+    //    nodes.sort(compareNodeBoundaries);
+
+        renderer.init();
 
         for (var iNode = 0; iNode < nodes.length; iNode++) {
             var node = nodes[iNode];
             renderer.renderNode(node);
         }
         canvas.context.flush();
+
+       // canvas.context.enable(canvas.context.DEPTH_TEST);
     }
 
+    function compareNodeBoundaries(a, b) {
+        if (!a.boundaryState.boundary) {  // Non-bounded nodes to front of list
+            return -1;
+        }
+        if (!b.boundaryState.boundary) {
+            return 1;
+        }
+        return (a.boundaryState.boundary.max[2] - b.boundaryState.boundary.max[2]);
+    }
 
     var renderer = new (function() {
 
         this.init = function() {
             this._program = null;
-            this._lastProgramId = null;
             this._lastRendererState = null;
-            this._lastGeoStateId = -1;
-            this._lastLightStateId = -1;
-            this._lastMaterialStateId = -1;
-            this._lastViewXFormStateId = -1;
-            this._lastModelXFormStateId = -1;
-            this._lastProjXFormStateId = -1;
         };
 
         this.renderNode = function(node) {
-
 
             /* Bind program if none bound, or if node uses different program
              * to that currently bound. Also flag all buffers as needing to be bound.
@@ -833,6 +843,7 @@ SceneJS._shaderModule = new (function() {
                 this._lastViewXFormStateId = -1;
                 this._lastModelXFormStateId = -1;
                 this._lastProjXFormStateId = -1;
+                this._lastPickStateId = -1;
 
                 this._lastProgramId = node.program.id;
             }
@@ -846,18 +857,14 @@ SceneJS._shaderModule = new (function() {
                 for (var k = 0; k < 8; k++) {
                     canvas.context.disableVertexAttribArray(k);
                 }
-
                 this._lastGeoStateId = node.geoState._stateId;
-
                 if (node.geoState.geo.vertexBuf) {
                     this._program.bindFloatArrayBuffer("aVertex", node.geoState.geo.vertexBuf);
                 }
-
                 if (node.geoState.geo.normalBuf) {
                     this._program.bindFloatArrayBuffer("aNormal", node.geoState.geo.normalBuf);
                 }
-
-                if (node.texState.texture.layers.length > 0) {
+                if (node.texState && node.texState.texture.layers.length > 0) {
                     if (node.geoState.geo.uvBuf) {
                         this._program.bindFloatArrayBuffer("aUVCoord", node.geoState.geo.uvBuf);
                     }
@@ -868,21 +875,30 @@ SceneJS._shaderModule = new (function() {
                 node.geoState.geo.indexBuf.bind();
             }
 
-
             /* Set GL props
              */
-            if (!this._lastRendererState || node.rendererState._stateId != this._lastRendererState._stateId) {
-                if (this._lastRendererState) {
-                    this._lastRendererState.props.restoreProps(canvas.context);
+            if (node.rendererState) {
+                if (!this._lastRendererState || node.rendererState._stateId != this._lastRendererState._stateId) {
+                    if (this._lastRendererState) {
+                        this._lastRendererState.props.restoreProps(canvas.context);
+                    }
+                    node.rendererState.props.setProps(canvas.context);
+                    this._lastRendererState = node.rendererState;
                 }
-                node.rendererState.props.setProps(canvas.context);
-                this._lastRendererState = node.rendererState;
+
+                /* Bind renderer properties
+                 */
+
+                var clearColor = node.rendererState.props.props.clearColor;
+                clearColor = clearColor
+                        ? [clearColor.r, clearColor.g, clearColor.b]
+                        : [0, 0, 0];
+                this._program.setUniform("uAmbient", clearColor);
             }
 
+            /* Bind texture layers
+             */
             if (node.texState) {
-
-                /* Bind texture layers
-                 */
                 var layer;
                 for (var j = 0; j < node.texState.texture.layers.length; j++) {
                     layer = node.texState.texture.layers[j];
@@ -893,10 +909,9 @@ SceneJS._shaderModule = new (function() {
                 }
             }
 
-
             /* Bind fog
              */
-            if (node.fogState.fog.mode != "disabled") {
+            if (node.fogState && node.fogState.fog.mode != "disabled") {
                 this._program.setUniform("uFogColor", node.fogState.fog.color);
                 this._program.setUniform("uFogDensity", node.fogState.fog.density);
                 this._program.setUniform("uFogStart", node.fogState.fog.start);
@@ -928,7 +943,7 @@ SceneJS._shaderModule = new (function() {
 
             /* Bind lights
              */
-            if (node.lightState._stateId != this._lastLightStateId) {
+            if (node.lightState && node.lightState._stateId != this._lastLightStateId) {
                 var ambient;
                 for (var k = 0; k < node.lightState.lights.length; k++) {
                     var light = node.lightState.lights[k];
@@ -965,7 +980,7 @@ SceneJS._shaderModule = new (function() {
 
             /* Bind Material
              */
-            if (node.materialState._stateId != this._lastMaterialStateId) {
+            if (node.materialState && node.materialState._stateId != this._lastMaterialStateId) {
                 this._program.setUniform("uMaterialBaseColor", node.materialState.material.baseColor);
                 this._program.setUniform("uMaterialSpecularColor", node.materialState.material.specularColor);
                 this._program.setUniform("uMaterialSpecular", node.materialState.material.specular);
@@ -975,13 +990,11 @@ SceneJS._shaderModule = new (function() {
                 this._lastMaterialStateId = node.materialState._stateId;
             }
 
-            /* Bind renderer properties
+            /* Bind pick color
              */
-            var clearColor = node.rendererState.props.props.clearColor;
-            clearColor = clearColor
-                    ? [clearColor.r, clearColor.g, clearColor.b]
-                    : [0, 0, 0];
-            this._program.setUniform("uAmbient", clearColor);
+            if (node.pickState && node.pickState._stateId != this._lastPickStateId) {
+                this._program.setUniform("uPickColor", node.pickState.pickColor);
+            }
 
             /* Draw
              */
@@ -990,10 +1003,6 @@ SceneJS._shaderModule = new (function() {
                     node.geoState.geo.indexBuf.numItems,
                     canvas.context.UNSIGNED_SHORT,
                     0);
-
-            //            if (this._program) {
-            //                this._program.unbind();
-            //            }
         };
     })();
 })();

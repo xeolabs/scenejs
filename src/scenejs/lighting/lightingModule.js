@@ -73,9 +73,6 @@ SceneJS._lightingModule = new (function() {
         instanceLight(light);
         lightStack.push(light);
         dirty = true;
-        SceneJS._eventModule.fireEvent(
-                SceneJS._eventModule.LIGHTS_UPDATED,
-                lightStack);
     };
 
     function instanceLight(light) {

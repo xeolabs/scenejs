@@ -55,15 +55,12 @@ var exampleScene = new SceneJS.Scene({
                         far : 300.0 }
                 },
                         light1 = new SceneJS.Light({
-                            sources: [
-                                {
-                                    mode:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    dir:                    { x: 1.0, y: -1.0, z: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true
-                                }
-                            ]}),
+                            mode:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            dir:                    { x: 1.0, y: -1.0, z: 1.0 },
+                            diffuse:                true,
+                            specular:               true
+                        }),
 
                         light2 = new SceneJS.Light({
                             mode:                   "dir",

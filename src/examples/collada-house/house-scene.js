@@ -151,6 +151,8 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 
+canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
+
 window.render = function() {
     dist += speed;
     if (dist < 100) {

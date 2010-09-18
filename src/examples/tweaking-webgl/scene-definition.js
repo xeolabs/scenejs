@@ -274,6 +274,7 @@ var exampleScene = SceneJS.scene({
                                                     sourceFormat:"alpha",
                                                     sourceType: "unsignedByte",
                                                     applyTo:"baseColor",
+                                                    blendMode: "multiply",
 
                                                     /* Texture rotation angle in degrees
                                                      */

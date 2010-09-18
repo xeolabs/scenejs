@@ -45,20 +45,10 @@ SceneJS._frustumModule = new (function() {
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
-            function(params) {               
+            function(params) {
                 viewMat = params.matrix;
                 frustum = null;
             });
-
-    /**
-     * @private
-     */
-    var getFrustum = function() {
-        if (!frustum) {
-            frustum = new SceneJS._math_Frustum(viewMat, projMat, viewport);
-        }
-        return frustum;
-    };
 
     /**
      * Tests the given axis-aligned box for intersection with the frustum
@@ -67,6 +57,13 @@ SceneJS._frustumModule = new (function() {
      */
     this.testAxisBoxIntersection = function(box) {
         return getFrustum().textAxisBoxIntersection(box);
+    };
+
+    var getFrustum = function() {
+        if (!frustum) {
+            frustum = new SceneJS._math_Frustum(viewMat, projMat, viewport);
+        }
+        return frustum;
     };
 
     /**

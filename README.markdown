@@ -4,7 +4,7 @@ SceneJS is a concise and flexible WebGL scene graph framework for JavaScript.
 
 Some key features:
 
- * pure JavaScript API
+ * JSON and JavaScript APIs
  * generates GLSL automatically - so you don't have to know GLSL
  * procedural scene generation
  * bounding boxes

@@ -7,7 +7,7 @@
  * or quadratic mode. Scene content falling in front of the start point will have no fog applied, while content
  * after the end point will be invisible, having blended completely into the ambient colour.</p>
  *
- * <p><b>Example Usage</b></p><p>Definition of fog with parameters that happen to be the defaults -
+ * <p><b>Example Usage</b></p><p>Definition of fog -
  * starting at Z=1, extending until Z=1000, linear mode, gray colour. Objects beyond Z=1000 will be entirely merged
  * into the background.</b></p><pre><code>
  * var fog = new SceneJS.Fog({
@@ -45,7 +45,7 @@ SceneJS.Fog.prototype._init = function(params) {
 };
 
 /**
- Sets the fogging mode
+ Sets the fogging mode. Default is "disabled".
  @function setMode
  @param {string} mode - "disabled", "exp", "exp2" or "linear"
  @returns {SceneJS.Fog} This fog node

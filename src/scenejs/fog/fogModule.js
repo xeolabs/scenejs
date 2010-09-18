@@ -8,7 +8,6 @@ SceneJS._fogModule = new (function() {
     var fog;
     var dirty;
 
-    // @private
     function colourToArray(v, fallback) {
         return v ?
                [
@@ -18,14 +17,15 @@ SceneJS._fogModule = new (function() {
                ] : fallback;
     }
 
-    // @private
     function _createFog(f) {
+        f = f || {};
         if (f.mode &&
             (f.mode != "disabled"
                     && f.mode != "exp"
                     && f.mode != "exp2"
                     && f.mode != "linear")) {
-            ctx.fatalError(new SceneJS.errors.InvalidNodeConfigException(
+            throw SceneJS._errorModule.fatalError(
+                    new SceneJS.errors.InvalidNodeConfigException(
                     "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'"));
         }
         if (f.mode == "disabled") {
@@ -34,7 +34,7 @@ SceneJS._fogModule = new (function() {
             };
         } else {
             return {
-                mode: f.mode || "exp",
+                mode: f.mode || "disabled",
                 color: colourToArray(f.color, [ 0.5,  0.5, 0.5 ]),
                 density: f.density || 1.0,
                 start: f.start || 0,
@@ -46,7 +46,7 @@ SceneJS._fogModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
-                _createFog({});
+                fog = _createFog();
                 dirty = true;
             });
 
@@ -73,22 +73,11 @@ SceneJS._fogModule = new (function() {
                 dirty = true;
             });
 
-    /** Sets the current fog
-     *
-     * @private
-     * @param f
-     */
     this.setFog = function(f) {
-        fog = f ? _createFog(f) : null;
+        fog = _createFog(f);
         dirty = true;
-        SceneJS._eventModule.fireEvent(
-                SceneJS._eventModule.FOG_UPDATED,
-                fog);
     };
 
-    /** Returns the current fog
-     * @private
-     */
     this.getFog = function() {
         return fog;
     };

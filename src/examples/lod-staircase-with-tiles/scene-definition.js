@@ -9,7 +9,7 @@
  *
  * This scene contains a staircase model that switches representations as a function of the
  * projected size of it's extents. The switching is done by a SceneJS.BoundingBox, which selects
- * an appropriate child for its current projected size from among its child nodes. 
+ * an appropriate child for its current projected size from among its child nodes.
  */
 var lookat;
 
@@ -76,94 +76,99 @@ var exampleScene = SceneJS.scene({
                                     dir:                    { x: 2.0, y: 1.0, z: 0.0 }
                                 }),
 
+                               createLODStairs(),
+                                
                             /* Integrate our tiled floor, which is defined in tiled-floor.js
                              */
-                                tiledFloor,
-
-                                new SceneJS.boundingBox({
-                                    xmin: -20,
-                                    ymin: -20,
-                                    zmin: -20,
-                                    xmax:  20,
-                                    ymax:  20,
-                                    zmax:  20,
-
-                                    /* We'll do level-of-detail selection with this
-                                     * boundingBox - five representations at
-                                     * different sizes:
-                                     */
-                                    levels: [
-                                        10,     // Level 1
-                                        200,    // Level 2
-                                        400,    // Level 3
-                                        500,    // Level 4
-                                        600     // Level 5
-                                    ]
-                                },
-
-                                    /* And here are the child nodes:
-                                     */
-
-                                    /* Level 1 - a cube to at least show a dot on the horizon
-                                     */
-                                        SceneJS.cube(),
-
-                                    /* Level 2 - staircase with 12 very chunky steps
-                                     * and no texture. Staircase factory function is defined in staircase.js
-                                     */
-                                        createStaircase({
-                                            stepWidth:7,
-                                            stepHeight:2.4,
-                                            stepDepth:3,
-                                            stepSpacing:6,
-                                            innerRadius:10,
-                                            numSteps:12,
-                                            stepAngle:80 }),
-
-                                    /* Level 3 - more detail; staircase with 24 chunky
-                                     *  steps and no texture
-                                     */
-                                        createStaircase({
-                                            stepWidth:7,
-                                            stepHeight:1.2,
-                                            stepDepth:3,
-                                            stepSpacing:3,
-                                            innerRadius:10,
-                                            numSteps:24,       // Half the number of steps, less coarse
-                                            stepAngle:40 }),
-
-                                    /* Level 4 - yet more detail; staircase with 48 fine
-                                     * steps and no texture
-                                     */
-                                        createStaircase({
-                                            stepWidth:7,
-                                            stepHeight:0.6,
-                                            stepDepth:3,
-                                            stepSpacing:1.5,
-                                            innerRadius:10,
-                                            numSteps:48,
-                                            stepAngle:20 }),
-
-                                    /* Level 5 - maximum detail; textured staircase with
-                                     * 48 fine steps
-                                     */
-                                        createStaircase({
-                                            withTexture: true,
-                                            stepWidth:7,
-                                            stepHeight:0.6,
-                                            stepDepth:3,
-                                            stepSpacing:1.5,
-                                            innerRadius:10,
-                                            numSteps:48,
-                                            stepAngle:20 })
-                                        )
-
+                                tiledFloor
 
                                 )
                         )
                 )
-        )
-        ;
+        ) ;
+
+
+function createLODStairs() {
+
+    return SceneJS.boundingBox({
+        xmin: -20,
+        ymin: -20,
+        zmin: -20,
+        xmax:  20,
+        ymax:  20,
+        zmax:  20,
+
+        /* We'll do level-of-detail selection with this
+         * boundingBox - five representations at
+         * different sizes:
+         */
+        levels: [
+            10,     // Level 1
+            200,    // Level 2
+            400,    // Level 3
+            500,    // Level 4
+            600     // Level 5
+        ]
+    },
+
+        /* And here are the child nodes:
+         */
+
+        /* Level 1 - a cube to at least show a dot on the horizon
+         */
+            SceneJS.cube(),
+
+        /* Level 2 - staircase with 12 very chunky steps
+         * and no texture. Staircase factory function is defined in staircase.js
+         */
+            createStaircase({
+                stepWidth:7,
+                stepHeight:2.4,
+                stepDepth:3,
+                stepSpacing:6,
+                innerRadius:10,
+                numSteps:12,
+                stepAngle:80 }),
+
+        /* Level 3 - more detail; staircase with 24 chunky
+         *  steps and no texture
+         */
+            createStaircase({
+                stepWidth:7,
+                stepHeight:1.2,
+                stepDepth:3,
+                stepSpacing:3,
+                innerRadius:10,
+                numSteps:24,       // Half the number of steps, less coarse
+                stepAngle:40 }),
+
+        /* Level 4 - yet more detail; staircase with 48 fine
+         * steps and no texture
+         */
+            createStaircase({
+                stepWidth:7,
+                stepHeight:0.6,
+                stepDepth:3,
+                stepSpacing:1.5,
+                innerRadius:10,
+                numSteps:48,
+                stepAngle:20 }),
+
+        /* Level 5 - maximum detail; textured staircase with
+         * 48 fine steps
+         */
+            createStaircase({
+                withTexture: true,
+                stepWidth:7,
+                stepHeight:0.6,
+                stepDepth:3,
+                stepSpacing:1.5,
+                innerRadius:10,
+                numSteps:48,
+                stepAngle:20 })
+            );
+
+}
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -238,7 +243,17 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 
+canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
+
+//var count = 0;
+
 window.render = function() {
+    //    if (count < 10) {
+    //        count++;
+    //    } else {
+    //        window.clearInterval(pInterval);
+    //        return;
+    //    }
     moveAngle -= moveAngleInc;
 
     /* Using Sylvester Matrix Library to create this matrix
@@ -275,7 +290,13 @@ SceneJS.addListener("reset", function() {
     window.clearInterval(pInterval);
 });
 
-pInterval = window.setInterval("window.render()", 10);
+//SceneJS.setDebugConfigs({
+//    webgl: {
+//        logTrace: true
+//    }
+//});
+
+pInterval = window.setInterval("window.render()", 30);
 
 
 

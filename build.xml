@@ -41,7 +41,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-debug.js"/>
+        <!--<fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-debug.js"/>-->
         <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
@@ -57,7 +57,8 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/processes/processModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/shading/shadingModule.js"/>
+        <!--<fileset dir="${SRC_DIR}" includes="scenejs/shading/shadingModule.js"/>-->
+           <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
@@ -90,6 +91,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundaryModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>

@@ -124,22 +124,22 @@ SceneJS._shaderModule = new (function() {
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.TEXTURES_UPDATED,
-            function(stack) {
-                textureLayers = stack;
+            function(texture) {
+                textureLayers = texture.layers || [];
                 sceneHash = null;
 
                 /* Build texture hash
                  */
                 var hash = [];
-                for (var i = 0; i < stack.length; i++) {
+                for (var i = 0; i < textureLayers.length; i++) {
                     var layer = textureLayers[i];
                     hash.push("/");
-                    hash.push(layer.params.applyFrom);
+                    hash.push(layer.applyFrom);
                     hash.push("/");
-                    hash.push(layer.params.applyTo);
+                    hash.push(layer.applyTo);
                     hash.push("/");
-                    hash.push(layer.params.blendMode);
-                    if (layer.params.matrix) {
+                    hash.push(layer.blendMode);
+                    if (layer.matrix) {
                         hash.push("/anim");
                     }
                 }
@@ -148,12 +148,14 @@ SceneJS._shaderModule = new (function() {
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.TEXTURES_EXPORTED,
-            function(stack) {
-                for (var i = 0; i < stack.length; i++) {
-                    var layer = stack[i];
+            function(texture) {
+                var layers = texture.layers || [];
+                var layer;
+                for (var i = 0; i < layers.length; i++) {
+                    layer = layers[i];
                     activeProgram.bindTexture("uSampler" + i, layer.texture, i);
-                    if (layer.params.matrixAsArray) {
-                        activeProgram.setUniform("uLayer" + i + "Matrix", layer.params.matrixAsArray);
+                    if (layer.matrixAsArray) {
+                        activeProgram.setUniform("uLayer" + i + "Matrix", layer.matrixAsArray);
                     }
                 }
             });
@@ -620,7 +622,7 @@ SceneJS._shaderModule = new (function() {
             for (var i = 0; i < textureLayers.length; i++) {
                 var layer = textureLayers[i];
                 src.push("uniform sampler2D uSampler" + i + ";");
-                if (layer.params.matrix) {
+                if (layer.matrix) {
                     src.push("uniform mat4 uLayer" + i + "Matrix;");
                 }
             }
@@ -694,7 +696,7 @@ SceneJS._shaderModule = new (function() {
 
                 /* Texture input
                  */
-                if (layer.params.applyFrom == "normal" && lighting) {
+                if (layer.applyFrom == "normal" && lighting) {
                     if (geometry.normalBuf) {
                         src.push("texturePos=vec4(vNormal.xyz, 1.0);");
                     } else {
@@ -702,7 +704,7 @@ SceneJS._shaderModule = new (function() {
                         continue;
                     }
                 }
-                if (layer.params.applyFrom == "uv") {
+                if (layer.applyFrom == "uv") {
                     if (geometry.uvBuf) {
                         src.push("texturePos = vec4(vUVCoord.s, vUVCoord.t, 1.0, 1.0);");
                     } else {
@@ -710,7 +712,7 @@ SceneJS._shaderModule = new (function() {
                         continue;
                     }
                 }
-                if (layer.params.applyFrom == "uv2") {
+                if (layer.applyFrom == "uv2") {
                     if (geometry.uvBuf2) {
                         src.push("texturePos = vec4(vUVCoord2.s, vUVCoord2.t, 1.0, 1.0);");
                     } else {
@@ -721,7 +723,7 @@ SceneJS._shaderModule = new (function() {
 
                 /* Texture matrix
                  */
-                if (layer.params.matrixAsArray) {
+                if (layer.matrixAsArray) {
                     src.push("textureCoord=(uLayer" + i + "Matrix * texturePos).xy;");
                 } else {
                     src.push("textureCoord=texturePos.xy;");
@@ -729,8 +731,8 @@ SceneJS._shaderModule = new (function() {
 
                 /* Texture output
                  */
-                if (layer.params.applyTo == "baseColor") {
-                    if (layer.params.blendMode == "multiply") {
+                if (layer.applyTo == "baseColor") {
+                    if (layer.blendMode == "multiply") {
                         src.push("color  = color * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                     } else {
                         src.push("color  = color + texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");

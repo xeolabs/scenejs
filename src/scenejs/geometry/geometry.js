@@ -134,6 +134,8 @@ SceneJS.Geometry.prototype._render = function(traversalContext) {
             this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._geo);
         }
     }
-    SceneJS._geometryModule.drawGeometry(this._handle);
+    SceneJS._geometryModule.pushGeometry(this._handle);
     this._renderNodes(traversalContext);
+    SceneJS._geometryModule.popGeometry();
+
 };

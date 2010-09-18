@@ -37,7 +37,7 @@ SceneJS._geometryModule = new (function() {
     var canvas;
     var geoMaps = {};                   // Geometry map for each canvas
     var currentGeoMap = null;
-    var currentBoundGeoResource;            // Type of geometry currently bound to shader
+    var geoStack = [];
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.TIME_UPDATED,
@@ -50,7 +50,7 @@ SceneJS._geometryModule = new (function() {
             function() {
                 canvas = null;
                 currentGeoMap = null;
-                currentBoundGeoResource = null;
+                geoStack = [];
             });
 
     SceneJS._eventModule.addListener(
@@ -61,27 +61,23 @@ SceneJS._geometryModule = new (function() {
                 }
                 canvas = c;
                 currentGeoMap = geoMaps[c.canvasId];
-                currentBoundGeoResource = null;
-            }); 
+            });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
                 currentGeoMap = null;
-                currentBoundGeoResource = null;
             });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
-                currentBoundGeoResource = null;
             });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_DEACTIVATED,
             function() {
-                currentBoundGeoResource = null;
             });
 
     SceneJS._eventModule.addListener(
@@ -97,7 +93,6 @@ SceneJS._geometryModule = new (function() {
                 canvas = null;
                 geoMaps = {};
                 currentGeoMap = null;
-                currentBoundGeoResource = null;
             });
 
     /**
@@ -107,9 +102,6 @@ SceneJS._geometryModule = new (function() {
      */
     function destroyGeometry(geo) {
         //  SceneJS._loggingModule.debug("Destroying geometry : '" + geo.resource + "'");
-        if (geo.resource == currentBoundGeoResource) {
-            currentBoundGeoResource = null;
-        }
         if (document.getElementById(geo.canvas.canvasId)) { // Context won't exist if canvas has disappeared
             if (geo.vertexBuf) {
                 geo.vertexBuf.destroy();
@@ -253,8 +245,10 @@ SceneJS._geometryModule = new (function() {
 
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
-            vertexBuf = createArrayBuffer("geometry vertex buffer", context, context.ARRAY_BUFFER,
-                    new Float32Array(data.positions), data.positions.length, 3, usage);
+            if (data.positions && data.positions.length > 0) {
+                vertexBuf = createArrayBuffer("geometry vertex buffer", context, context.ARRAY_BUFFER,
+                        new Float32Array(data.positions), data.positions.length, 3, usage);
+            }
 
             if (data.normals && data.normals.length > 0) {
                 normalBuf = createArrayBuffer("geometry normal buffer", context, context.ARRAY_BUFFER,
@@ -275,12 +269,16 @@ SceneJS._geometryModule = new (function() {
                 }
             }
 
-            indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
-                    new Uint16Array(data.indices), data.indices.length, 3, usage);
+            var primitive;
+            if (data.indices && data.indices.length > 0) {
+                primitive = getPrimitiveType(context, data.primitive);
+                indexBuf = createArrayBuffer("geometry index buffer", context, context.ELEMENT_ARRAY_BUFFER,
+                        new Uint16Array(data.indices), data.indices.length, 3, usage);
+            }
 
             var geo = {
                 fixed : true, // TODO: support dynamic geometry
-                primitive: getPrimitiveType(context, data.primitive),
+                primitive: primitive,
                 resource: resource,
                 lastUsed: time,
                 canvas : canvas,
@@ -314,59 +312,59 @@ SceneJS._geometryModule = new (function() {
         }
     };
 
-    /**
-     * Draws the geometry of the given ID that exists on the current canvas.
-     * Client node must ensure prior that the geometry exists on the canvas
-     * using findGeometry, and have created it if neccessary with createGeometry.
-     * @private
-     */
-    this.drawGeometry = function(resource) {
-        if (!canvas) {
-            throw SceneJS._errorModule.fatalError(SceneJS.errors.NoCanvasActiveException("No canvas active"));
-        }       
+    this.pushGeometry = function(resource) {
         var geo = currentGeoMap[resource];
+        geo.lastUsed = time;  // Geometry now not evictable during this scene traversal
 
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.GEOMETRY_UPDATED, geo);  // Gives shader backend a chance to generate a shader
+        if (!geo.vertexBuf) {
 
-        /* Prompt shader backend to in turn prompt for exports from all backends.
-         * This backend exports proactively however (see below), since it is the one
-         * which prompted the shader backend.
-         */
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_ACTIVATE);
+            /* geometry has no vertex buffer - it must be therefore be indexing a vertex/uv buffers defined
+             * by a higher Geometry, as part of a composite geometry:
+             *
+             * https://xeolabs.lighthouseapp.com/projects/50643/tickets/173-allow-mesh-as-one-vertex-geometry-and-multiple-index-geometrys
+             *
+             * It must therefore inherit the vertex buffer, along with UV coord buffers.
+             *
+             * We'll leave it to the render state graph traversal to ensure that the
+             * vertex and UV buffers are not needlessly rebound for this geometry.
+             */
+            geo = inheritVertices(geo);
+        }
 
-        geo.lastUsed = time;  // Geometry now not evictable in this scene traversal
+        if (geo.indexBuf) {
 
-        var context = canvas.context;
-
-        /* Dont re-export and bind if already the last one exported and bound - this is the case when
-         * we're drawing a batch of the same object, Eg. a bunch of cubes in a row
-         */
-      //  if (currentBoundGeoResource != resource) {
-            for (var i = 0; i < 8; i++) {
-                context.disableVertexAttribArray(i);
-            }
+            /* We don't render Geometry's that have no index buffer - they merely define
+             * vertex/uv buffers that are indexed by sub-Geometry's in a composite geometry  
+             */
             SceneJS._eventModule.fireEvent(
                     SceneJS._eventModule.GEOMETRY_EXPORTED,
                     geo);
+        }
 
-            geo.indexBuf.bind(); // Bind index buffer
+        geoStack.push(geo);
+    };
 
-            currentBoundGeoResource = resource;
-       // }
+    function inheritVertices(geo) {
+        var geo2 = {
+            primitive: geo.primitive,
+            normalBuf: geo.normalBuf,
+            uvBuf: geo.uvBuf,
+            uvBuf2: geo.uvBuf2,
+            indexBuf: geo.indexBuf
+        };
+        for (var i = geoStack.length - 1; i >= 0; i--) {
+            if (geoStack[i].vertexBuf) {
+                geo2.vertexBuf = geoStack[i].vertexBuf;
+                geo2.normalBuf = geoStack[i].normalBuf;
+                geo2.uvBuf = geoStack[i].uvBuf;           // Vertex and UVs are a package
+                geo2.uvBuf2 = geoStack[i].uvBuf2;
+                return geo2;
+            }
+        }
+        return geo2;
+    }
 
-        /* Draw geometry
-         */
-        context.drawElements(geo.primitive, geo.indexBuf.numItems, context.UNSIGNED_SHORT, 0);
-        context.flush();
-
-        /* Don't need to unbind buffers - only one is bound at a time anyway
-         */
-
-        /* Destroy one-off geometry
-         */
-        //                    if (!geo.fixed) {
-        //                        destroyGeometry(geo);
-        //                        currentBoundGeoResource = null;
-        //                    }
+    this.popGeometry = function() {
+        geoStack.pop();
     };
 })();

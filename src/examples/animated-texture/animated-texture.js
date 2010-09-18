@@ -77,7 +77,7 @@ var exampleScene = SceneJS.scene({
                                      */
                                     layers: [
                                         {
-                                            uri:"general-zod.jpg",                                            
+                                            uri:"general-zod.jpg",
                                             minFilter: "linear",
                                             magFilter: "linear",
                                             wrapS: "repeat",
@@ -93,6 +93,7 @@ var exampleScene = SceneJS.scene({
                                             sourceFormat:"alpha",
                                             sourceType: "unsignedByte",
                                             applyTo:"baseColor",
+                                            blendMode: "multiply",
 
                                             /* Texture rotation angle in degrees
                                              */

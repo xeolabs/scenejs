@@ -26,7 +26,8 @@ var skySphere = SceneJS.createNode({
                                     uri: "images/gigapixel-milky-way.gif",
                                     wrapS: "clampToEdge",
                                     wrapT: "clampToEdge",
-                                    applyTo:"baseColor"
+                                    applyTo:"baseColor",
+                                    blendMode:"multiply"
                                 }
                             ],
                             nodes: [

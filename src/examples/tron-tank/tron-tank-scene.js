@@ -189,7 +189,7 @@ function mouseMove(event) {
     }
 }
 
-function mouseWheel(event) {
+function mouseWheel(event) {    
     var delta = 0;
     if (!event) event = window.event;
     if (event.wheelDelta) {
@@ -215,7 +215,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
-
+canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
 window.render = function() {
     pitch += pitchInc;
