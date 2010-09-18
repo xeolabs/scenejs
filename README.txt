@@ -1,19 +1,21 @@
-SceneJS is a concise and flexible WebGL scene graph framework for JavaScript.
+SceneJS is a concise, fast and flexible scene graph framework for WebGL, targeted to be a browser interface
+for model and data visualisation systems.
 
 Some key features:
 
- * pure JavaScript API
- * generates GLSL automatically - so you don't have to know GLSL
- * procedural scene generation
+ * declarative JSON API for repurposable scene/model definitions
+ * JavaScript API for the JavaScript fans
+ * automatic internal GLSL generation
+ * WebGL state sorting for efficient sequences of GL calls
  * bounding boxes
- * level-of-detail culling
+ * LOD
  * flexible data flows
- * scene composition from parameterisable library modules
- * supports server control of client scene graphs through WebSockets
- * animated textures
- * almost everything animatable
+ * WebSockets
+ * interpolated animation
  * branching
  * instancing
+ * animated textures
+ * multimaterials
  * debugging modes
  * and more..
 
