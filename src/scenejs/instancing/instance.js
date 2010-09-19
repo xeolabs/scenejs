@@ -157,7 +157,7 @@ SceneJS.Instance.prototype._changeState = function(newState, exception) {
     var oldState = this._state;
     this._state = newState;
     if (this._numListeners > 0 && this._listeners["state-changed"]) { // Optimisation
-        this.fireEvent("state-changed", {
+        this._fireEvent("state-changed", {
             oldState: oldState,
             newState: newState,
             exception : exception
