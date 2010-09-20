@@ -326,11 +326,11 @@ SceneJS._rendererModule = new (function() {
                 }
                 return flag;
             }
-//            if (flag) {
-//                context.enable(context.DEPTH_TEST);
-//            } else {
-//                context.disable(context.DEPTH_TEST);
-//            }
+            if (flag) {
+                context.enable(context.DEPTH_TEST);
+            } else {
+                context.disable(context.DEPTH_TEST);
+            }
         },
 
         depthFunc: function(context, func) {

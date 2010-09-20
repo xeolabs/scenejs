@@ -23,6 +23,7 @@ SceneJS._shaderModule = new (function() {
     var lightState;
     var boundaryState;
     var materialState;
+    var highlightState;
     var fogState;
     var texState;
     var geoState;
@@ -31,7 +32,8 @@ SceneJS._shaderModule = new (function() {
     var projXFormState;
     var pickState;
 
-    var nodes = [];
+    var opaqueBin = [];
+    var transparentBin = [];
 
     var programs = {};
 
@@ -46,11 +48,7 @@ SceneJS._shaderModule = new (function() {
                 for (var hash in programs) {
                     if (hash) {
                         var program = programs[hash];
-
-                        /* Avoiding eviction of shader just used,
-                         * currently in use, or likely about to use
-                         */
-                        if (program.lastUsed < earliest && program.hash != sceneHash) {
+                        if (program.lastUsed < earliest) {
                             programToEvict = program;
                             earliest = programToEvict.lastUsed;
                         }
@@ -109,10 +107,13 @@ SceneJS._shaderModule = new (function() {
                         shine : 1,
                         reflect : 0,
                         alpha : 1.0,
-                        emit : 0.7
+                        emit : 0.7,
+                        opacity: 1.0
                     },
                     hash: ""
                 };
+
+                highlightState = null;
 
                 fogState = null;
 
@@ -123,7 +124,9 @@ SceneJS._shaderModule = new (function() {
                 };
 
                 geoState = null;
-                nodes = [];
+
+                opaqueBin = [];
+                transparentBin = [];
             });
 
     SceneJS._eventModule.addListener(
@@ -221,6 +224,17 @@ SceneJS._shaderModule = new (function() {
             });
 
     SceneJS._eventModule.addListener(
+            SceneJS._eventModule.HIGHLIGHT_EXPORTED,
+            function(params) {
+                highlightState = {
+                    _stateId : nextStateId++,
+                    highlighted: params.highlighted,
+                    hash: ""
+                };
+            });
+
+
+    SceneJS._eventModule.addListener(
             SceneJS._eventModule.PICK_COLOR_EXPORTED,
             function(params) {
                 pickState = {
@@ -289,7 +303,7 @@ SceneJS._shaderModule = new (function() {
 
                 /* Add node for geometry, linked to current states in the soup
                  */
-                nodes.push({
+                var node = {
                     program : {
                         id: sceneHash,
                         program: getProgram(sceneHash)
@@ -299,13 +313,20 @@ SceneJS._shaderModule = new (function() {
                     rendererState: rendererState,
                     lightState: lightState,
                     materialState: materialState,
+                    highlightState: highlightState,
                     fogState : fogState,
                     modelXFormState: modelXFormState,
                     viewXFormState: viewXFormState,
                     projXFormState: projXFormState,
                     texState: texState,
                     pickState : pickState
-                });
+                };
+
+                if (materialState.material.opacity == 1.0) {
+                    opaqueBin.push(node);
+                } else {
+                    transparentBin.push(node);
+                }
             });
 
     function getSceneHash() {
@@ -792,23 +813,44 @@ SceneJS._shaderModule = new (function() {
 
     function traverseStateGraph() {
 
-       // canvas.context.disable(canvas.context.DEPTH_TEST);
-
-    //    nodes.sort(compareNodeBoundaries);
+        var node;
+        var i;
 
         renderer.init();
 
-        for (var iNode = 0; iNode < nodes.length; iNode++) {
-            var node = nodes[iNode];
+        /* Render opaque bin - nodes are rendered in any order with no blending
+         */
+        for (var i = 0; i < opaqueBin.length; i++) {
+            node = opaqueBin[i];
             renderer.renderNode(node);
         }
-        canvas.context.flush();
 
-       // canvas.context.enable(canvas.context.DEPTH_TEST);
+        /* Render transparent bin - nodes are depth-sorted by min-Z extents of their
+         * boundaries and blended into the framebuffer
+         */
+        var context = canvas.context;
+        if (transparentBin.length > 0) {
+            //
+            context.blendFunc(context.SRC_ALPHA, context.ONE);
+            context.enable(context.BLEND);
+            context.disable(context.CULL_FACE);
+            //   context.disable(context.DEPTH_TEST);
+            transparentBin.sort(compareNodeBoundaries);
+            for (i = 0; i < transparentBin.length; i++) {
+                node = transparentBin[i];
+                renderer.renderNode(node);
+            }
+            context.disable(context.BLEND);
+            canvas.context.blendFunc(context.SRC_ALPHA, context.LESS);
+            context.enable(context.CULL_FACE);
+            //  context.enable(context.DEPTH_TEST);
+        }
+
+        canvas.context.flush();
     }
 
     function compareNodeBoundaries(a, b) {
-        if (!a.boundaryState.boundary) {  // Non-bounded nodes to front of list
+        if (!a.boundaryState.boundary) {  // Non-bounded opaqueBin to front of list
             return -1;
         }
         if (!b.boundaryState.boundary) {
@@ -978,16 +1020,27 @@ SceneJS._shaderModule = new (function() {
                 this._lastLightStateId = node.lightState._stateId;
             }
 
-            /* Bind Material
+            /*
              */
-            if (node.materialState && node.materialState._stateId != this._lastMaterialStateId) {
-                this._program.setUniform("uMaterialBaseColor", node.materialState.material.baseColor);
-                this._program.setUniform("uMaterialSpecularColor", node.materialState.material.specularColor);
-                this._program.setUniform("uMaterialSpecular", node.materialState.material.specular);
-                this._program.setUniform("uMaterialShine", node.materialState.material.shine);
-                this._program.setUniform("uMaterialEmit", node.materialState.material.emit);
-                this._program.setUniform("uMaterialAlpha", node.materialState.material.alpha);
-                this._lastMaterialStateId = node.materialState._stateId;
+            if (node.materialState) {
+
+                /* Bind Material
+                 */
+                if (node.materialState && node.materialState._stateId != this._lastMaterialStateId) {
+                    this._program.setUniform("uMaterialBaseColor", node.materialState.material.baseColor);
+                    this._program.setUniform("uMaterialSpecularColor", node.materialState.material.specularColor);
+                    this._program.setUniform("uMaterialSpecular", node.materialState.material.specular);
+                    this._program.setUniform("uMaterialShine", node.materialState.material.shine);
+                    this._program.setUniform("uMaterialEmit", node.materialState.material.emit);
+                    this._program.setUniform("uMaterialAlpha", node.materialState.material.alpha);
+                    this._lastMaterialStateId = node.materialState._stateId;
+                }
+
+                /* If highlighting then override material                
+                 */
+                if (node.highlightState && node.highlightState.highlighted) {
+                    this._program.setUniform("uMaterialBaseColor", node.materialState.material.highlightBaseColor);
+                }
             }
 
             /* Bind pick color
@@ -1005,4 +1058,12 @@ SceneJS._shaderModule = new (function() {
                     0);
         };
     })();
+
+    function getHighlight(material) {
+        return [
+            material.baseColor[0] + 1.0,
+            material.baseColor[1] + 1.0,
+            material.baseColor[2]
+        ];
+    }
 })();
