@@ -5,14 +5,14 @@ for model and data visualisation systems.
 
 Some key features:
 
- * declarative JSON API for repurposable scene/model definitions
- * JavaScript API for the JavaScript hackers
- * automatic internal GLSL generation
- * WebGL state sorting for efficient sequences of GL calls
+ * JSON API for repurposable content
+ * flexible JSON scene update/query API
+ * auto GLSL generation - fulluy encapsulated
+ * IoC container
+ * GL state sorting
  * bounding boxes
  * LOD
  * flexible data flows
- * WebSockets
  * interpolated animation
  * branching
  * instancing
