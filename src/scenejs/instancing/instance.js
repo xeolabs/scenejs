@@ -102,7 +102,7 @@ SceneJS.Instance.prototype.getState = function() {
  * @returns {SceneJS.Symbol} Target symbol
  */
 SceneJS.Instance.prototype.getTargetNode = function() {
-    if (this.state != SceneJS.Instance.STATE_RENDERING) {
+    if (this._state != SceneJS.Instance.STATE_RENDERING) {
         return null;
     }
     return this._symbol;
@@ -144,7 +144,7 @@ SceneJS.Instance.prototype._render = function(traversalContext) {
 
         } else {
             this._changeState(SceneJS.Instance.STATE_RENDERING);
-            this._symbol._render(this._createTargetTraversalContext(traversalContext, this._symbol));
+            this._symbol._renderWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
             SceneJS._instancingModule.releaseInstance(nodeId);
             this._changeState(SceneJS.Instance.STATE_READY);
             this._symbol = null;
@@ -184,17 +184,13 @@ SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalCon
         this._callback = function(traversalContext) {
             var subTraversalContext = {
                 callback : _this._superCallback,
-                insideRightFringe : _this._children.length > 1,
-                configs: traversalContext.configs,
-                configsModes: traversalContext.configsModes
+                insideRightFringe : _this._children.length > 1
             };
             _this._renderNodes(subTraversalContext);
         };
     }
     return {
         callback: this._callback,
-        insideRightFringe:  target._children.length > 1,
-        configs: traversalContext.configs,
-        configsModes: traversalContext.configsModes
+        insideRightFringe:  target._children.length > 1
     };
 };

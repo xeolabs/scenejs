@@ -10,131 +10,247 @@
  * lindsay.kay@xeolabs.com
  */
 
-var exampleScene = SceneJS.scene({
-
+SceneJS.createNode({
+    type: "scene",
+    id: "theScene",
     canvasId: 'theCanvas',
+    loggingElementId: "theLoggingDiv",
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv"
-},
+    nodes: [
 
-    /**
-     * View transform - we've given it a globally-unique ID
-     * so we can look it up and update it's properties from
-     * mouse input.
-     *
-     * There are a number of other ways we could push
-     * properties into it - we could keep a reference to the
-     * node object and call setters on that, locate the node by ID
-     * and fire properties at it in a "configure" event, or
-     * identify it with a SID (scoped ID) and push a configs
-     * map down to it through the scene graph.
-     */
-        SceneJS.lookAt({
-            id: "viewpoint",                  // Globally-unique ID for lookat node
+        /**
+         * View transform - we've given it a globally-unique ID
+         * so we can look it up and update it's properties from
+         * mouse input.
+         */
+        {
+            type: "lookAt",
+
+            id: "theLookAt",
+
             eye : { x: 0, y: 10, z: -400 },
             look :  { x: 0, y: 0, z: 0 },
-            up : { x: 0, y: 1, z: .0 }
-        },
+            up : { x: 0, y: 1, z: .0 },
 
-            /* Perspective camera
-             */
-                SceneJS.camera({
+            nodes: [
+                {
+                    type: "camera",
                     optics: {
                         type: "perspective",
                         fovy : 40.0,
                         aspect : 1.47,
                         near : 0.10,
                         far : 7000.0
-                    }
-                },
+                    },
 
-                    /* Lighting
-                     */
-                        SceneJS.light({
+                    nodes: [
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 1.0, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 0.0, y: -1, z: -1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type:"light",
                             mode:                   "dir",
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 1.0, y: .5, z: -1.0  }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: -1.0, y: .5, z: 1.0  }
-                        }),
+                        },
 
 
-                    /* Integrate our JSON Tron Tank model, which is defined in tron-tank-model.js
-                     * and loaded via a <script> tag in index.html.
-                     *
-                     * Various nodes (ie. rotate and translate) within the model have been assigned IDs,
-                     * allowing us to locate them and set their properties, in order to move the tank
-                     * around, rotate its cannon etc.
-                     */
-                        tronTank,
+                        /* Integrate our JSON Tron Tank model, which is defined in tron-tank-model.js
+                         * and loaded via a <script> tag in index.html.
+                         *
+                         * Various nodes (ie. rotate and translate) within the model have been assigned IDs,
+                         * allowing us to locate them and set their properties, in order to move the tank
+                         * around, rotate its cannon etc.
+                         */
+                        {
+                            type: "instance",
+                            target: "tron-tank"
+                        },
 
-                    /* Integrate our grid floor, which is defined in grid-floor.js
-                     * and loaded via a <script> tag in index.html.
-                     */
-                        gridFloor,
+                        /* Integrate our grid floor, which is defined in grid-floor.js
+                         * and loaded via a <script> tag in index.html.
+                         */
+                        {
+                            type: "instance",
+                            target: "grid-floor"
+                        },
 
-                    /* Canyon walls, a bunch of cubes
-                     */
-                        SceneJS.material({
-                            baseColor:      { r: 0.5, g: 0.5, b: 0.5 },
+                        /* Canyon walls, a bunch of cubes
+                         */
+                        {
+                            type:"material",
+                            baseColor:      { r: 0.3, g: 0.3, b: 0.3 },
                             specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
                             specular:       10.9,
-                            shine:          20.0
-                        },
-                                SceneJS.translate({ x: -75, y: 0, z: 0},
-                                        SceneJS.rotate({y: 1, angle: 6 },
-                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                            shine:          20.0,
+                            opacity: 0.5,
 
-                                SceneJS.translate({ x: 80, y: 0, z: 0},
-                                        SceneJS.rotate({y: 1, angle: 0 },
-                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                            nodes: [
 
-                                SceneJS.translate({ x: -80, y: 0, z: 80},
-                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                                {
+                                    type: "translate",
+                                    x: -75,
+                                    y: 0,
+                                    z: 0,
 
-                                SceneJS.translate({ x: 80, y: 0, z: 40},
-                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                                    nodes: [
 
-                                SceneJS.translate({ x: 120, y: 0, z: 140},
-                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50}))),
+                                        {
+                                            type: "rotate",
+                                            y: 1,
+                                            angle: 6,
+                                            nodes: [
+                                                {
+                                                    type: "cube",
+                                                    xSize: 50,
+                                                    ySize: 30,
+                                                    zSize: 50
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "translate",
+                                    x: 80,
+                                    y: 0,
+                                    z: 0,
 
-                                SceneJS.translate({ x: -60, y: 0, z: 160},
-                                        SceneJS.rotate({y: 1, angle: -12 },
-                                                SceneJS.cube({xSize: 50, ySize: 30, zSize: 50})))
-                                )
-                        )
-                )
-        );
+                                    nodes: [
+                                        {
+                                            type: "rotate",
+                                            y: 1,
+                                            angle: 0,
+
+                                            nodes: [
+                                                {
+                                                    type: "cube",
+                                                    xSize: 50,
+                                                    ySize: 30,
+                                                    zSize: 50
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "translate",
+                                    x: -80,
+                                    y: 0,
+                                    z: 80,
+
+                                    nodes: [
+                                        {
+                                            type : "rotate",
+                                            y: 1,
+                                            angle: -12 ,
+                                            nodes: [
+                                                {
+                                                    type: "cube",
+                                                    xSize: 50,
+                                                    ySize: 30,
+                                                    zSize: 50
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "rotate",
+                                    x: 80,
+                                    y: 0,
+                                    z: 40,
+
+                                    node:[
+                                        {
+                                            type: "rotate",
+                                            y: 1,
+                                            angle: -12,
+                                            nodes: [
+                                                {
+                                                    type: "cube",
+                                                    xSize: 50,
+                                                    ySize: 30,
+                                                    zSize: 50
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "translate",
+                                    x: 120,
+                                    y: 0,
+                                    z: 140,
+
+                                    nodes: [
+                                        {
+                                            type: "rotate",
+                                            y: 1,
+                                            angle: -12 ,
+
+                                            nodes: [
+                                                {
+                                                    type: "cube",
+                                                    xSize: 50,
+                                                    ySize: 30,
+                                                    zSize: 50
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                {
+                                    type: "translate",
+                                    x: -60,
+                                    y: 0,
+                                    z: 160,
+
+                                    nodes: [
+                                        {
+                                            type: "rotate",
+                                            y: 1,
+                                            angle: -12,
+
+                                            nodes: [
+                                                {
+                                                    type: "cube",
+                                                    xSize: 50,
+                                                    ySize: 30,
+                                                    zSize: 50
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
-
-var lookatNode = SceneJS.getNode("viewpoint");
-var tankPosNode = SceneJS.getNode("tankPos");
-var tankRotateNode = SceneJS.getNode("tankRotate");
-var tankGunRotateNode = SceneJS.getNode("tankGunRotate");
 
 var speed = 0;
 var tankPos = { x: 0, y: 0, z: -100 };
@@ -161,7 +277,7 @@ var turretRotating = false;
 /* Always get canvas from scene - it will try to bind to a default canvas
  * can't find the one specified
  */
-var canvas = document.getElementById(exampleScene.getCanvasId());
+var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -189,7 +305,7 @@ function mouseMove(event) {
     }
 }
 
-function mouseWheel(event) {    
+function mouseWheel(event) {
     var delta = 0;
     if (!event) event = window.event;
     if (event.wheelDelta) {
@@ -261,15 +377,29 @@ window.render = function() {
     eye.y = tankPos.y + (trailVec[1] * 35);
     eye.z = tankPos.z + (trailVec[2] * 35);
 
-    lookatNode.setEye(eye);
-    lookatNode.setLook({ x: tankPos.x, y: tankPos.y, z : tankPos.z });
+    SceneJS.withNode("theLookAt").set({
+        eye: eye,
+        look: {
+            x: tankPos.x,
+            y: tankPos.y,
+            z : tankPos.z
+        }
+    });
 
-    tankPosNode.setXYZ({ x: tankPos.x, z: tankPos.z });
+    SceneJS.withNode("tankPos").set({
+        x: tankPos.x,
+        z: tankPos.z
+    });
 
-    tankRotateNode.setAngle(tankYaw + 180 || 180);
-    tankGunRotateNode.setAngle(-tankYaw);
+    SceneJS.withNode("tankRotate").set({
+        angle: tankYaw + 180 || 180
+    });
 
-    exampleScene.render();
+    SceneJS.withNode("tankGunRotate").set({
+        angle: -tankYaw
+    });
+
+    SceneJS.withNode("theScene").render();
 
     if (trailYaw > tankYaw) {
         trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
@@ -282,12 +412,12 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.addListener("error", function(e) {
+SceneJS.bind("error", function(e) {
     alert(e.exception.message);
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function() {
+SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 

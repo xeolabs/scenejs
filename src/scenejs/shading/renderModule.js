@@ -32,8 +32,8 @@ SceneJS._shaderModule = new (function() {
     var projXFormState;
     var pickState;
 
-    var opaqueBin = [];
-    var transparentBin = [];
+    var canvasBins = {};
+    var bins;
 
     var programs = {};
 
@@ -80,24 +80,24 @@ SceneJS._shaderModule = new (function() {
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
-            function() {
+            function(params) {
                 debugCfg = SceneJS._debugModule.getConfigs("shading");
-                canvas = null;
+                canvas = params.canvas;
+
+                //---------------------------
+                // State soup
+                //---------------------------
 
                 nextStateId = 0;
-
                 rendererState = {
                     props: {},
                     hash: ""
                 };
-
                 lightState = {
                     lights: [],
                     hash: ""
                 };
-
                 boundaryState = null;
-
                 materialState = {
                     material: {
                         _stateId : nextStateId++,
@@ -112,27 +112,35 @@ SceneJS._shaderModule = new (function() {
                     },
                     hash: ""
                 };
-
                 highlightState = null;
-
                 fogState = null;
-
                 texState = {
                     _stateId : nextStateId++,
                     layers: [],
                     hash: ""
                 };
-
                 geoState = null;
 
-                opaqueBin = [];
-                transparentBin = [];
+                //---------------------------
+                // State bins for each canvas
+                //---------------------------
+
+                canvasBins[params.canvas.canvasId] = {
+                    nodes : [],
+                    transparentNodes : [],
+                    opaqueBin : {},
+                    transparentBin : {},
+                    info: {
+                        countTransparent: 0
+                    }
+                };
             });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
+                bins = canvasBins[c.canvasId];
             });
 
     SceneJS._eventModule.addListener(
@@ -218,7 +226,17 @@ SceneJS._shaderModule = new (function() {
             function(material) {
                 materialState = {
                     _stateId : nextStateId++,
-                    material: material,
+                    material: {
+                        baseColor : material.baseColor || [ 0.0, 0.0, 0.0 ],
+                        highlightBaseColor : material.highlightBaseColor || material.baseColor || [ 0.0, 0.0, 0.0 ],
+                        specularColor : material.specularColor || [ 0.5,  0.5,  0.5 ],
+                        specular : material.specular != undefined ? material.specular : 2,
+                        shine : material.shine != undefined ? material.shine : 0.5,
+                        reflect : material.reflect != undefined ? material.reflect : 0,
+                        alpha : material.alpha != undefined ? material.alpha : 1.0,
+                        emit : material.emit != undefined ? material.emit : 0.0,
+                        opacity : material.opacity != undefined ? material.opacity : 1.0
+                    },
                     hash: ""
                 };
             });
@@ -299,6 +317,10 @@ SceneJS._shaderModule = new (function() {
                  */
                 SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
 
+                //if (materialState.material.opacity != 1.0) {
+                SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_NEEDS_BOUNDARIES);
+                //}
+
                 var sceneHash = getSceneHash();
 
                 /* Add node for geometry, linked to current states in the soup
@@ -322,12 +344,429 @@ SceneJS._shaderModule = new (function() {
                     pickState : pickState
                 };
 
-                if (materialState.material.opacity == 1.0) {
-                    opaqueBin.push(node);
+                if (materialState.material.opacity != undefined && materialState.material.opacity != 1.0) {
+                    bins.transparentNodes.push(node);
                 } else {
-                    transparentBin.push(node);
+                    bins.nodes.push(node);
                 }
             });
+
+
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CANVAS_DEACTIVATED,
+            function() {
+                renderBins();
+                canvas = null;
+            });
+
+    //-----------------------------------------------------------------------------------------------------------------
+    //  Bin rendering
+    //-----------------------------------------------------------------------------------------------------------------
+
+    this.redraw = function() {
+        renderBins();
+    };
+
+    function renderBins() {
+        nodeRenderer.init();
+
+        var nTransparent = bins.transparentNodes.length;
+
+        if (nTransparent == 0) {
+
+            /* No transparent nodes
+             *
+             * - render all nodes into depth buffer, sorted by program
+             */
+            bins.nodes.sort(programCmp);
+            renderOpaqueNodes(bins.nodes);
+        }
+
+        if (nTransparent == 1) {
+
+            /* One transparent node
+             *
+             * - render opaque nodes into depth buffer, sorted by program
+             * - render transparent node into depth buffer with blending
+             */
+            bins.nodes.sort(programCmp);
+            renderOpaqueNodes(bins.nodes);
+
+            renderTransparentNodes(bins.transparentNodes);
+        }
+
+        if (nTransparent > 1) {
+
+            /* Many transparent nodes
+             *
+             * - render opaque nodes into depth buffer, sorted by program
+             * - render transparent nodes into depth buffer with blending, sorted by boundary depth
+             */
+            bins.nodes.sort(programCmp);
+            renderOpaqueNodes(bins.nodes);
+
+          //  bins.transparentNodes.sort(boundaryCmp);
+            renderTransparentNodes(bins.transparentNodes);
+        }
+        canvas.context.flush();
+    }
+
+    function renderOpaqueNodes(nodes) {
+        for (var i = 0, len = nodes.length; i < len; i++) {
+            nodeRenderer.renderNode(nodes[i]);
+        }
+    }
+
+    function renderTransparentNodes(nodes) {
+        var context = canvas.context;
+        context.blendFunc(context.SRC_ALPHA, context.ONE);
+        context.enable(context.BLEND);
+
+        for (var i = 0, len = nodes.length; i < len; i++) {
+            nodeRenderer.renderNode(nodes[i]);
+        }
+        context.disable(context.BLEND);
+        context.blendFunc(context.SRC_ALPHA, context.LESS);
+    }
+
+    function renderMixedNodes(nodes) {
+        var context = canvas.context;
+        var node;
+        for (var i = 0, len = nodes.length; i < len; i++) {
+            node = nodes[i];
+            if (node.materialState.material.opacity < 1.0) {
+                context.blendFunc(context.SRC_ALPHA, context.ONE);
+                context.enable(context.BLEND);
+                //   context.disable(context.CULL_FACE);
+                nodeRenderer.renderNode(node);
+                context.disable(context.BLEND);
+                context.blendFunc(context.SRC_ALPHA, context.LESS);
+                // context.enable(context.CULL_FACE);
+            } else {
+                nodeRenderer.renderNode(node);
+            }
+        }
+    }
+
+    //    function renderBins() {
+    //
+    //        var hash;
+    //        var nodes;
+    //        var i;
+    //        var context = canvas.context;
+    //
+    //        nodeRenderer.init();
+    //
+    //        /* Render opaque bin
+    //         */
+    //        for (hash in bins.opaqueBin) {
+    //            if (bins.opaqueBin.hasOwnProperty(hash)) {
+    //                nodes = bins.opaqueBin[hash].nodes;
+    //                nodes.sort(texCmp);
+    //                // nodes.sort(geoCmp);
+    //                for (i = nodes.length - 1; i >= 0; i--) {
+    //                    nodeRenderer.renderNode(nodes[i]);
+    //                }
+    //            }
+    //        }
+    //
+    //        /* Render transparent bin
+    //         */
+    //        context.blendFunc(context.SRC_ALPHA, context.ONE);
+    //        context.enable(context.BLEND);
+    //        context.disable(context.CULL_FACE);
+    //        //    context.disable(context.DEPTH_TEST);
+    //
+    //        for (hash in bins.transparentBin) {
+    //            if (bins.transparentBin.hasOwnProperty(hash)) {
+    //                nodes = bins.transparentBin[hash].nodes;
+    //                nodes.sort(boundaryCmp);
+    //                for (i = nodes.length - 1; i >= 0; i--) {
+    //                    nodeRenderer.renderNode(nodes[i]);
+    //                }
+    //            }
+    //        }
+    //        context.disable(context.BLEND);
+    //        canvas.context.blendFunc(context.SRC_ALPHA, context.LESS);
+    //        context.enable(context.CULL_FACE);
+    //        // context.enable(context.DEPTH_TEST);
+    //
+    //        canvas.context.flush();
+    //    }
+
+    var programCmp = function(node1, node2) {
+        return node1.program.id - node2.program.id;
+    };
+
+    var geoCmp = function(node1, node2) {
+        return node1.geoState._stateId - node2.geoState._stateId;
+    };
+
+    var texCmp = function(node1, node2) {
+        return node1.texState._stateId - node2.texState._stateId;
+    };
+
+    function boundaryCmp(a, b) {
+        if (!a.boundaryState.boundary) {  // Non-bounded opaqueBin to front of list
+            return -1;
+        }
+        if (!b.boundaryState.boundary) {
+            return 1;
+        }
+        return (a.boundaryState.boundary.max[2] - b.boundaryState.boundary.max[2]);
+    }
+
+    /* Renders a node, retaining the IDs of various WebGL state
+     */
+    const nodeRenderer = new (function() {
+
+        this.init = function() {
+            this._program = null;
+            this._lastRendererState = null;
+
+            this._stateStats = {
+                program: 0,
+                geo : 0,
+                renderer: 0,
+                tex: 0,
+                light: 0,
+                material: 0,
+                viewXForm: 0,
+                modelXForm: 0,
+                projXForm: 0,
+                pick: 0
+            };
+        };
+
+        this.renderNode = function(node) {
+
+            var context = canvas.context;
+
+            /* Bind program if none bound, or if node uses different program
+             * to that currently bound. Also flag all buffers as needing to be bound.
+             */
+            if ((!this._program) || (node.program.id != this._lastProgramId)) {
+                if (this._program) {
+                    //  this._program.unbind();
+                }
+
+                this._program = node.program.program;
+                this._program.bind();
+
+                this._lastGeoStateId = -1;
+                this._lastLightStateId = -1;
+                this._lastTexStateId = -1;
+                this._lastMaterialStateId = -1;
+                this._lastViewXFormStateId = -1;
+                this._lastModelXFormStateId = -1;
+                this._lastProjXFormStateId = -1;
+                this._lastPickStateId = -1;
+
+                this._lastProgramId = node.program.id;
+
+                this._stateStats.program++;
+            }
+
+            /* Bind geometry
+             */
+            if (node.geoState._stateId != this._lastGeoStateId) {
+
+                var geo = node.geoState.geo;
+
+                /* Disable all vertex arrays
+                 */
+                for (var k = 0; k < 8; k++) {
+                    context.disableVertexAttribArray(k);
+                }
+                this._lastGeoStateId = node.geoState._stateId;
+                if (geo.vertexBuf) {
+                    this._program.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
+                }
+                if (geo.normalBuf) {
+                    this._program.bindFloatArrayBuffer("aNormal", geo.normalBuf);
+                }
+                if (node.texState && node.texState.texture.layers.length > 0) {
+                    if (geo.uvBuf) {
+                        this._program.bindFloatArrayBuffer("aUVCoord", geo.uvBuf);
+                    }
+                    if (geo.uvBuf2) {
+                        this._program.bindFloatArrayBuffer("aUVCoord2", geo.uvBuf2);
+                    }
+                }
+                geo.indexBuf.bind();
+
+                this._stateStats.geo++;
+            }
+
+            /* Set GL props
+             */
+            if (node.rendererState) {
+                if (!this._lastRendererState || node.rendererState._stateId != this._lastRendererState._stateId) {
+                    if (this._lastRendererState) {
+                        this._lastRendererState.props.restoreProps(context);
+                    }
+                    node.rendererState.props.setProps(context);
+                    this._lastRendererState = node.rendererState;
+                }
+
+                /* Bind renderer properties
+                 */
+
+                var clearColor = node.rendererState.props.props.clearColor;
+                clearColor = clearColor
+                        ? [clearColor.r, clearColor.g, clearColor.b]
+                        : [0, 0, 0];
+                this._program.setUniform("uAmbient", clearColor);
+
+                this._stateStats.renderer++;
+            }
+
+            /* Bind texture layers
+             */
+            if (node.texState && node.texState._stateId != this._lastTexStateId) {
+                var layer;
+                for (var j = 0; j < node.texState.texture.layers.length; j++) {
+                    layer = node.texState.texture.layers[j];
+                    this._program.bindTexture("uSampler" + j, layer.texture, j);
+                    if (layer.matrixAsArray) {
+                        this._program.setUniform("uLayer" + j + "Matrix", layer.matrixAsArray);
+                    }
+                }
+                this._lastTexStateId = node.texState._stateId;
+                this._stateStats.tex++;
+            }
+
+            /* Bind fog
+             */
+            if (node.fogState && node.fogState.fog.mode != "disabled") {
+                this._program.setUniform("uFogColor", node.fogState.fog.color);
+                this._program.setUniform("uFogDensity", node.fogState.fog.density);
+                this._program.setUniform("uFogStart", node.fogState.fog.start);
+                this._program.setUniform("uFogEnd", node.fogState.fog.end);
+            }
+
+            /* Bind View matrix
+             */
+            if (node.viewXFormState._stateId != this._lastViewXFormStateId) {
+                this._program.setUniform("uVMatrix", node.viewXFormState.mat);
+                this._program.setUniform("uVNMatrix", node.viewXFormState.normalMat);
+                this._lastViewXFormStateId = node.viewXFormState._stateId;
+
+                this._stateStats.viewXForm++;
+            }
+
+            /* Bind Model matrix
+             */
+            if (node.modelXFormState._stateId != this._lastModelXFormStateId) {
+                this._program.setUniform("uMMatrix", node.modelXFormState.mat);
+                this._program.setUniform("uMNMatrix", node.modelXFormState.normalMat);
+                this._lastModelXFormStateId = node.modelXFormState._stateId;
+
+                this._stateStats.modelXForm++;
+            }
+
+            /* Bind Projection matrix
+             */
+            if (node.projXFormState._stateId != this._lastProjXFormStateId) {
+                this._program.setUniform("uPMatrix", node.projXFormState.mat);
+                this._lastProjXFormStateId = node.projXFormState._stateId;
+
+                this._stateStats.projXForm++;
+            }
+
+            /* Bind lights
+             */
+            if (node.lightState && node.lightState._stateId != this._lastLightStateId) {
+                var ambient;
+                var light;
+                for (var k = 0; k < node.lightState.lights.length; k++) {
+                    light = node.lightState.lights[k];
+                    this._program.setUniform("uLightColor" + k, light.color);
+                    this._program.setUniform("uLightDiffuse" + k, light.diffuse);
+                    if (light.mode == "dir") {
+                        this._program.setUniform("uLightDir" + k, light.viewDir);
+                    } else if (light.mode == "ambient") {
+                        ambient = ambient ? [
+                            ambient[0] + light.color[0],
+                            ambient[1] + light.color[1],
+                            ambient[2] + light.color[2]
+                        ] : light.color;
+                    } else {
+                        if (light.mode == "point") {
+                            this._program.setUniform("uLightPos" + k, light.viewPos);
+                        }
+                        if (light.mode == "spot") {
+                            this._program.setUniform("uLightPos" + k, light.viewPos);
+                            this._program.setUniform("uLightDir" + k, light.viewDir);
+                            this._program.setUniform("uLightSpotCosCutOff" + k, light.spotCosCutOff);
+                            this._program.setUniform("uLightSpotExp" + k, light.spotExponent);
+                        }
+                        this._program.setUniform("uLightAttenuation" + k,
+                                [
+                                    light.constantAttenuation,
+                                    light.linearAttenuation,
+                                    light.quadraticAttenuation
+                                ]);
+                    }
+                }
+                this._lastLightStateId = node.lightState._stateId;
+                this._stateStats.light++;
+            }
+
+            /*
+             */
+            if (node.materialState) {
+
+                var material = node.materialState.material;
+
+                /* Bind Material
+                 */
+                if (node.materialState) {
+                    this._program.setUniform("uMaterialBaseColor", material.baseColor);
+                    this._program.setUniform("uMaterialSpecularColor", material.specularColor);
+                    this._program.setUniform("uMaterialSpecular", material.specular);
+                    this._program.setUniform("uMaterialShine", material.shine);
+                    this._program.setUniform("uMaterialEmit", material.emit);
+                    this._program.setUniform("uMaterialAlpha", material.alpha);
+
+                    this._lastMaterialStateId = node.materialState._stateId;
+                    this._stateStats.material++;
+                }
+
+                /* If highlighting then override material
+                 */
+                if (node.highlightState && node.highlightState.highlighted) {
+                    this._program.setUniform("uMaterialBaseColor", material.highlightBaseColor);
+                    this._lastMaterialStateId = null; // Otherwise highlight may linger in shader when material state unchanged
+                }
+            }
+
+            /* Bind pick color
+             */
+            if (node.pickState && node.pickState._stateId != this._lastPickStateId) {
+                this._program.setUniform("uPickColor", node.pickState.pickColor);
+                this._stateStats.pick++;
+            }
+
+            /* Draw
+             */
+            context.drawElements(
+                    node.geoState.geo.primitive,
+                    node.geoState.geo.indexBuf.numItems,
+                    context.UNSIGNED_SHORT,
+                    0);
+        };
+
+        this.getStateStats = function() {
+            return this._stateStats;
+        };
+
+    })();
+
+
+    //-----------------------------------------------------------------------------------------------------------------
+    //  Shader generation
+    //-----------------------------------------------------------------------------------------------------------------
 
     function getSceneHash() {
         if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
@@ -803,267 +1242,5 @@ SceneJS._shaderModule = new (function() {
         return src.join("\n");
     }
 
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_DEACTIVATED,
-            function() {
-                traverseStateGraph();
-                canvas = null;
-            });
-
-    function traverseStateGraph() {
-
-        var node;
-        var i;
-
-        renderer.init();
-
-        /* Render opaque bin - nodes are rendered in any order with no blending
-         */
-        for (var i = 0; i < opaqueBin.length; i++) {
-            node = opaqueBin[i];
-            renderer.renderNode(node);
-        }
-
-        /* Render transparent bin - nodes are depth-sorted by min-Z extents of their
-         * boundaries and blended into the framebuffer
-         */
-        var context = canvas.context;
-        if (transparentBin.length > 0) {
-            //
-            context.blendFunc(context.SRC_ALPHA, context.ONE);
-            context.enable(context.BLEND);
-            context.disable(context.CULL_FACE);
-            //   context.disable(context.DEPTH_TEST);
-            transparentBin.sort(compareNodeBoundaries);
-            for (i = 0; i < transparentBin.length; i++) {
-                node = transparentBin[i];
-                renderer.renderNode(node);
-            }
-            context.disable(context.BLEND);
-            canvas.context.blendFunc(context.SRC_ALPHA, context.LESS);
-            context.enable(context.CULL_FACE);
-            //  context.enable(context.DEPTH_TEST);
-        }
-
-        canvas.context.flush();
-    }
-
-    function compareNodeBoundaries(a, b) {
-        if (!a.boundaryState.boundary) {  // Non-bounded opaqueBin to front of list
-            return -1;
-        }
-        if (!b.boundaryState.boundary) {
-            return 1;
-        }
-        return (a.boundaryState.boundary.max[2] - b.boundaryState.boundary.max[2]);
-    }
-
-    var renderer = new (function() {
-
-        this.init = function() {
-            this._program = null;
-            this._lastRendererState = null;
-        };
-
-        this.renderNode = function(node) {
-
-            /* Bind program if none bound, or if node uses different program
-             * to that currently bound. Also flag all buffers as needing to be bound.
-             */
-            if ((!this._program) || (node.program.id != this._lastProgramId)) {
-                if (this._program) {
-                    //  this._program.unbind();
-                }
-
-                this._program = node.program.program;
-                this._program.bind();
-
-                this._lastGeoStateId = -1;
-                this._lastLightStateId = -1;
-                this._lastMaterialStateId = -1;
-                this._lastViewXFormStateId = -1;
-                this._lastModelXFormStateId = -1;
-                this._lastProjXFormStateId = -1;
-                this._lastPickStateId = -1;
-
-                this._lastProgramId = node.program.id;
-            }
-
-            /* Bind geometry
-             */
-            if (node.geoState._stateId != this._lastGeoStateId) {
-
-                /* Disable all vertex arrays
-                 */
-                for (var k = 0; k < 8; k++) {
-                    canvas.context.disableVertexAttribArray(k);
-                }
-                this._lastGeoStateId = node.geoState._stateId;
-                if (node.geoState.geo.vertexBuf) {
-                    this._program.bindFloatArrayBuffer("aVertex", node.geoState.geo.vertexBuf);
-                }
-                if (node.geoState.geo.normalBuf) {
-                    this._program.bindFloatArrayBuffer("aNormal", node.geoState.geo.normalBuf);
-                }
-                if (node.texState && node.texState.texture.layers.length > 0) {
-                    if (node.geoState.geo.uvBuf) {
-                        this._program.bindFloatArrayBuffer("aUVCoord", node.geoState.geo.uvBuf);
-                    }
-                    if (node.geoState.geo.uvBuf2) {
-                        this._program.bindFloatArrayBuffer("aUVCoord2", node.geoState.geo.uvBuf2);
-                    }
-                }
-                node.geoState.geo.indexBuf.bind();
-            }
-
-            /* Set GL props
-             */
-            if (node.rendererState) {
-                if (!this._lastRendererState || node.rendererState._stateId != this._lastRendererState._stateId) {
-                    if (this._lastRendererState) {
-                        this._lastRendererState.props.restoreProps(canvas.context);
-                    }
-                    node.rendererState.props.setProps(canvas.context);
-                    this._lastRendererState = node.rendererState;
-                }
-
-                /* Bind renderer properties
-                 */
-
-                var clearColor = node.rendererState.props.props.clearColor;
-                clearColor = clearColor
-                        ? [clearColor.r, clearColor.g, clearColor.b]
-                        : [0, 0, 0];
-                this._program.setUniform("uAmbient", clearColor);
-            }
-
-            /* Bind texture layers
-             */
-            if (node.texState) {
-                var layer;
-                for (var j = 0; j < node.texState.texture.layers.length; j++) {
-                    layer = node.texState.texture.layers[j];
-                    this._program.bindTexture("uSampler" + j, layer.texture, j);
-                    if (layer.matrixAsArray) {
-                        this._program.setUniform("uLayer" + j + "Matrix", layer.matrixAsArray);
-                    }
-                }
-            }
-
-            /* Bind fog
-             */
-            if (node.fogState && node.fogState.fog.mode != "disabled") {
-                this._program.setUniform("uFogColor", node.fogState.fog.color);
-                this._program.setUniform("uFogDensity", node.fogState.fog.density);
-                this._program.setUniform("uFogStart", node.fogState.fog.start);
-                this._program.setUniform("uFogEnd", node.fogState.fog.end);
-            }
-
-            /* Bind View matrix
-             */
-            if (node.viewXFormState._stateId != this._lastViewXFormStateId) {
-                this._program.setUniform("uVMatrix", node.viewXFormState.mat);
-                this._program.setUniform("uVNMatrix", node.viewXFormState.normalMat);
-                this._lastViewXFormStateId = node.viewXFormState._stateId;
-            }
-
-            /* Bind Model matrix
-             */
-            if (node.modelXFormState._stateId != this._lastModelXFormStateId) {
-                this._program.setUniform("uMMatrix", node.modelXFormState.mat);
-                this._program.setUniform("uMNMatrix", node.modelXFormState.normalMat);
-                this._lastModelXFormStateId = node.modelXFormState._stateId;
-            }
-
-            /* Bind Projection matrix
-             */
-            if (node.projXFormState._stateId != this._lastProjXFormStateId) {
-                this._program.setUniform("uPMatrix", node.projXFormState.mat);
-                this._lastProjXFormStateId = node.projXFormState._stateId;
-            }
-
-            /* Bind lights
-             */
-            if (node.lightState && node.lightState._stateId != this._lastLightStateId) {
-                var ambient;
-                for (var k = 0; k < node.lightState.lights.length; k++) {
-                    var light = node.lightState.lights[k];
-                    this._program.setUniform("uLightColor" + k, light.color);
-                    this._program.setUniform("uLightDiffuse" + k, light.diffuse);
-                    if (light.mode == "dir") {
-                        this._program.setUniform("uLightDir" + k, light.viewDir);
-                    } else if (light.mode == "ambient") {
-                        ambient = ambient ? [
-                            ambient[0] + light.color[0],
-                            ambient[1] + light.color[1],
-                            ambient[2] + light.color[2]
-                        ] : light.color;
-                    } else {
-                        if (light.mode == "point") {
-                            this._program.setUniform("uLightPos" + k, light.viewPos);
-                        }
-                        if (light.mode == "spot") {
-                            this._program.setUniform("uLightPos" + k, light.viewPos);
-                            this._program.setUniform("uLightDir" + k, light.viewDir);
-                            this._program.setUniform("uLightSpotCosCutOff" + k, light.spotCosCutOff);
-                            this._program.setUniform("uLightSpotExp" + k, light.spotExponent);
-                        }
-                        this._program.setUniform("uLightAttenuation" + k,
-                                [
-                                    light.constantAttenuation,
-                                    light.linearAttenuation,
-                                    light.quadraticAttenuation
-                                ]);
-                    }
-                }
-                this._lastLightStateId = node.lightState._stateId;
-            }
-
-            /*
-             */
-            if (node.materialState) {
-
-                /* Bind Material
-                 */
-                if (node.materialState && node.materialState._stateId != this._lastMaterialStateId) {
-                    this._program.setUniform("uMaterialBaseColor", node.materialState.material.baseColor);
-                    this._program.setUniform("uMaterialSpecularColor", node.materialState.material.specularColor);
-                    this._program.setUniform("uMaterialSpecular", node.materialState.material.specular);
-                    this._program.setUniform("uMaterialShine", node.materialState.material.shine);
-                    this._program.setUniform("uMaterialEmit", node.materialState.material.emit);
-                    this._program.setUniform("uMaterialAlpha", node.materialState.material.alpha);
-                    this._lastMaterialStateId = node.materialState._stateId;
-                }
-
-                /* If highlighting then override material                
-                 */
-                if (node.highlightState && node.highlightState.highlighted) {
-                    this._program.setUniform("uMaterialBaseColor", node.materialState.material.highlightBaseColor);
-                }
-            }
-
-            /* Bind pick color
-             */
-            if (node.pickState && node.pickState._stateId != this._lastPickStateId) {
-                this._program.setUniform("uPickColor", node.pickState.pickColor);
-            }
-
-            /* Draw
-             */
-            canvas.context.drawElements(
-                    node.geoState.geo.primitive,
-                    node.geoState.geo.indexBuf.numItems,
-                    canvas.context.UNSIGNED_SHORT,
-                    0);
-        };
-    })();
-
-    function getHighlight(material) {
-        return [
-            material.baseColor[0] + 1.0,
-            material.baseColor[1] + 1.0,
-            material.baseColor[2]
-        ];
-    }
-})();
+})
+        ();

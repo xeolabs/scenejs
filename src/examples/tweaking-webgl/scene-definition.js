@@ -24,20 +24,19 @@
 /* Node references - there are a few ways to inject data into a scene graph,
  * but we'll just update node setters for this example.
  */
-var rotateX;
-var rotateY;
+SceneJS.createNode({
+    type: "scene",
+    id: "theScene",
+    canvasId: "theCanvas" ,
 
-var exampleScene = SceneJS.scene({
+    nodes: [
 
-    /* Bind scene to a WebGL canvas:
-     */
-    canvasId: "theCanvas" },
+        /*==================================================================================
+         * Our renderer node, with default values defined for all properties.
+         * ================================================================================*/
 
-    /*==================================================================================
-     * Our renderer node, with default values defined for all properties.
-     * ================================================================================*/
-
-        SceneJS.renderer({
+        {
+            type: "renderer",
 
             /*----------------------------------------
              Miscelleneous settings
@@ -80,7 +79,7 @@ var exampleScene = SceneJS.scene({
 
             /* Enable or disable blending
              */
-            enableBlend: true,
+            enableBlend: false,
 
             /* Set the blend color
              */
@@ -184,133 +183,161 @@ var exampleScene = SceneJS.scene({
 
             /* Specify front/back-facing mode. Accepted values are cw or ccw
              */
-            frontFace: "cw"
-        },
+            frontFace: "cw",
 
-            /*==================================================================================
-             * And just to show how you can nest them, here's an inner render that
-             * redefines the viewport
-             ==================================================================================*/
+            nodes: [
 
-                SceneJS.renderer({
-                    viewport: {
-                        x : 1,
-                        y : 1,
-                        width: 1030,
-                        height: 700
-                    }
-                },
-                    //----------------------------------------------------------
-                    // The rest of the scene is just copied from the COLLADA
-                    // Seymour Plane test example
-                    //----------------------------------------------------------
+                //----------------------------------------------------------
+                // The rest of the scene is just copied from the COLLADA
+                // Seymour Plane test example
+                //----------------------------------------------------------
 
-                        SceneJS.lookAt({
-                            eye : { x: 0.0, y: 0.0, z: 5 },
-                            look : { x: 0.0, y: 0, z: 0 },
-                            up : { y: 1.0 }
-                        },
+                {
+                    type: "lookAt",
+                    eye : { x: 0.0, y: 0.0, z: 5 },
+                    look : { x: 0.0, y: 0, z: 0 },
+                    up : { y: 1.0 },
 
-                            /* Perspective camera
-                             */
-                                SceneJS.camera({
-                                    optics: {
-                                        type: "perspective",
-                                        fovy : 55.0,
-                                        aspect : 1.47,
-                                        near : 0.10,
-                                        far : 5000.0  }
+                    nodes: [
+
+
+                        /* Perspective camera
+                         */
+                        {
+                            type: "camera",
+
+                            optics: {
+                                type: "perspective",
+                                fovy : 55.0,
+                                aspect : 1.47,
+                                near : 0.10,
+                                far : 5000.0
+                            },
+                            nodes: [
+                                {
+                                    type: "light",
+                                    mode:                   "dir",
+                                    color:                  { r: 0.0, g: 1.0, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                                },
+                                {
+                                    type: "light",
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 0.0, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 0.0, y: 1.0, z: 1.0 }
+                                },
+                                {
+                                    type: "light",
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 0.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: -1.0, y: 0.0, z: 1.0 }
                                 },
 
-                                        SceneJS.light({
-                                            mode:                   "dir",
-                                            color:                  { r: 0.0, g: 1.0, b: 1.0 },
-                                            diffuse:                true,
-                                            specular:               true,
-                                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                        }),
-                                        SceneJS.light({
-                                            mode:                   "dir",
-                                            color:                  { r: 1.0, g: 0.0, b: 1.0 },
-                                            diffuse:                true,
-                                            specular:               true,
-                                            dir:                    { x: 0.0, y: 1.0, z: 1.0 }
-                                        }),
-                                        SceneJS.light({
-                                            mode:                   "dir",
-                                            color:                  { r: 1.0, g: 1.0, b: 0.0 },
-                                            diffuse:                true,
-                                            specular:               true,
-                                            dir:                    { x: -1.0, y: 0.0, z: 1.0 }
-                                        }),
 
+                                /** Textures images are loaded asynchronously and won't render
+                                 * immediately. On first traversal, they start loading their image,
+                                 * which they collect on a subsequent traversal.
+                                 */
+                                {
+                                    type: "texture",
 
-                                    /** Textures images are loaded asynchronously and won't render
-                                     * immediately. On first traversal, they start loading their image,
-                                     * which they collect on a subsequent traversal.
+                                    /* A texture can have multiple layers, each applying an
+                                     * image to a different material reflection component.
+                                     * This layer applies the Zod image to the diffuse
+                                     * component, with animated scaling.
                                      */
-                                        SceneJS.texture({
+                                    layers: [
+                                        {
+                                            uri:"images/general-zod.jpg",
+                                            minFilter: "linear",
+                                            magFilter: "linear",
+                                            wrapS: "repeat",
+                                            wrapT: "repeat",
+                                            isDepth: false,
+                                            depthMode:"luminance",
+                                            depthCompareMode: "compareRToTexture",
+                                            depthCompareFunc: "lequal",
+                                            flipY: false,
+                                            width: 1,
+                                            height: 1,
+                                            internalFormat:"lequal",
+                                            sourceFormat:"alpha",
+                                            sourceType: "unsignedByte",
+                                            applyTo:"baseColor",
+                                            blendMode: "multiply",
 
-                                            /* A texture can have multiple layers, each applying an
-                                             * image to a different material reflection component.
-                                             * This layer applies the Zod image to the diffuse
-                                             * component, with animated scaling.
+                                            /* Texture rotation angle in degrees
                                              */
-                                            layers: [
+                                            rotate: 0.0,
+
+                                            /* Texture translation offset
+                                             */
+                                            translate : {
+                                                x: 0,
+                                                y: 0
+                                            },
+
+                                            /* Texture scale factors
+                                             */
+                                            scale : {
+                                                x: 1.0,
+                                                y: 1.0
+                                            }
+                                        }
+                                    ],
+
+                                    nodes: [
+
+                                        {
+                                            type: "material",
+
+                                            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                            specular:       0.9,
+                                            shine:          6.0,
+
+                                            nodes: [
                                                 {
-                                                    uri:"images/general-zod.jpg",
-                                                    minFilter: "linear",
-                                                    magFilter: "linear",
-                                                    wrapS: "repeat",
-                                                    wrapT: "repeat",
-                                                    isDepth: false,
-                                                    depthMode:"luminance",
-                                                    depthCompareMode: "compareRToTexture",
-                                                    depthCompareFunc: "lequal",
-                                                    flipY: false,
-                                                    width: 1,
-                                                    height: 1,
-                                                    internalFormat:"lequal",
-                                                    sourceFormat:"alpha",
-                                                    sourceType: "unsignedByte",
-                                                    applyTo:"baseColor",
-                                                    blendMode: "multiply",
+                                                    type: "rotate",
+                                                    id: "pitch",
+                                                    angle: 0.0,
+                                                    x : 1.0,
 
-                                                    /* Texture rotation angle in degrees
-                                                     */
-                                                    rotate: 0.0,
+                                                    nodes: [
+                                                        {
+                                                            type: "rotate",
+                                                            id: "yaw",
 
-                                                    /* Texture translation offset
-                                                     */
-                                                    translate : {
-                                                        x: 0,
-                                                        y: 0
-                                                    },
+                                                            angle: 0.0,
+                                                            y : 1.0,
 
-                                                    /* Texture scale factors
-                                                     */
-                                                    scale : {
-                                                        x: 1.0,
-                                                        y: 1.0
-                                                    }
+                                                            nodes: [
+                                                                {
+                                                                    type: "cube"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
                                                 }
                                             ]
-                                        },
-                                                SceneJS.material({
-                                                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:       0.9,
-                                                    shine:          6.0
-                                                },
-                                                        rotateX = SceneJS.rotate({
-                                                            angle: 0.0, x : 1.0
-                                                        },
-                                                                rotateY = SceneJS.rotate({
-                                                                    angle: 0.0, y : 1.0
-                                                                },
-                                                                        SceneJS.cube()))))))))
-        )
-        ;
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -322,10 +349,7 @@ var lastX;
 var lastY;
 var dragging = false;
 
-/* Always get canvas from scene - it will try to bind to a default canvas
- * can't find the one specified
- */
-var canvas = document.getElementById(exampleScene.getCanvasId());
+var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -355,10 +379,9 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
 
-    rotateX.setAngle(pitch);
-    rotateY.setAngle(yaw);
-
-    exampleScene.render();
+    SceneJS.withNode("pitch").set({ angle: pitch });
+    SceneJS.withNode("yaw").set({ angle: yaw });
+    SceneJS.withNode("theScene").render();
 };
 
 /* Render loop until error or reset
@@ -366,12 +389,12 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.addListener("error", function(event) {
+SceneJS.bind("error", function(event) {
     alert(event.exception.message);
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function() {
+SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 

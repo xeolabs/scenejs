@@ -120,6 +120,48 @@ SceneJS.Geometry.prototype._init = function(params) {
     }
 };
 
+
+/** Returns the local-space boundary of this Geometry's positions
+ * @return { xmin: Number, ymin: Number, zmin: Number, xmax: Number, ymax: Number, zmax: Number} The local-space boundary
+ */
+SceneJS.Geometry.prototype.getBoundary = function() {
+    var boundary = {
+        xmin : 100000,
+        ymin : 100000,
+        zmin : 100000,
+        xmax : -100000,
+        ymax : -100000,
+        zmax : -100000
+    };
+    var x, y, z;
+    for (var i = 0, len = this._geo.positions.length - 3; i < len; i += 3) {
+        x = this._geo.positions[i];
+        y = this._geo.positions[i + 1];
+        z = this._geo.positions[i + 2];
+
+        if (x < boundary.xmin) {
+            boundary.xmin = x;
+        }
+        if (y < boundary.ymin) {
+            boundary.ymin = y;
+        }
+        if (z < boundary.zmin) {
+            boundary.zmin = z;
+        }
+
+        if (x > boundary.xmax) {
+            boundary.xmax = x;
+        }
+        if (y > boundary.ymax) {
+            boundary.ymax = y;
+        }
+        if (z > boundary.zmax) {
+            boundary.zmax = z;
+        }
+    }
+    return boundary;
+};
+
 // @private
 SceneJS.Geometry.prototype._render = function(traversalContext) {
     if (this._handle) { // Was created before - test if not evicted since

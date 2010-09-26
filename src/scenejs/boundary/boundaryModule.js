@@ -6,7 +6,6 @@ SceneJS._boundaryModule = new (function() {
     var stackLen = 0;
     var dirty;
 
-
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
@@ -27,8 +26,12 @@ SceneJS._boundaryModule = new (function() {
                 dirty = true;
             });
 
+    /* When and if renderer requires the current view-space boundary, transform it into view-space and export it.
+     * Whether this happens depends on what kind of rendering the renderer is doing, eg. if it needs to sort objects,
+     * find intersections etc.
+     */
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+            SceneJS._eventModule.SHADER_NEEDS_BOUNDARIES,
             function() {
                 if (dirty) {
                     var topBoundary = stackLen > 0 ? boundaryStack[stackLen - 1] : null;

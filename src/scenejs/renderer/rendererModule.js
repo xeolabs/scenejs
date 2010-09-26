@@ -41,7 +41,7 @@ SceneJS._rendererModule = new (function() {
                     clear: { depth : true, color : true},
                     clearColor: {r: 0, g : 0, b : 0 },
                     clearDepth: 1.0,
-                    enableDepthTest:true,
+                    //enableDepthTest:true,
                     enableCullFace: false,
                     depthRange: { zNear: 0, zFar: 1},
                     enableScissorTest: false,

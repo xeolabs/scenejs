@@ -21,7 +21,7 @@
  */
 
 
-var json = {
+SceneJS.createNode({
     type: "scene",
     id: "myScene",
     canvasId: "theCanvas" , // Bind to canvas
@@ -30,6 +30,7 @@ var json = {
     nodes: [
         {
             type: "lookAt",
+            id: "theLookat",
             eye : { x: -1.0, y: 0.0, z: 15 },
             look : { x: -1.0, y: 0, z: 0 },
             up : { y: 1.0 },
@@ -84,6 +85,7 @@ var json = {
                                          */
                                         {
                                             type: "instance",
+                                            id: "my-airplane",
                                             target: "org.scenejs.examples.collada.seymourplane.scene"
                                         }
                                     ]
@@ -95,9 +97,7 @@ var json = {
             ]
         }
     ]
-};
-
-SceneJS.createNode(json);
+});
 
 var pInterval;
 var yaw = 305;
@@ -131,16 +131,15 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
-
-    SceneJS.configure("pitch", { angle: pitch });
-    SceneJS.configure("yaw", { angle: yaw });
-    SceneJS.render("myScene");
+    SceneJS.withNode("pitch").set("angle", pitch);
+    SceneJS.withNode("yaw").set("angle", yaw);
+    SceneJS.withNode("myScene").render();
 };
 
 pInterval = setInterval("window.render()", 10);
 
 
-SceneJS.addListener("error", // Listen for errors on SceneJS
+SceneJS.bind("error", // Listen for errors on SceneJS
         function(event) {
             alert(event.exception.message);
             window.clearInterval(pInterval);

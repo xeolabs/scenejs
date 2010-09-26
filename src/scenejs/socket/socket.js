@@ -104,11 +104,7 @@ SceneJS.Socket.prototype._init = function(params) {
     this._autoOpen = true;
     this._socketId = null;
     this._outMessages = [];
-    this._state = SceneJS.Socket.STATE_INITIAL;
-    this._configsModes = {
-        strictProperties : true,
-        strictNodes : false
-    };
+    this._state = SceneJS.Socket.STATE_INITIAL; 
     this._uri = params.uri;
     if (params.messages) {
         this._outMessages = params.messages.reverse();

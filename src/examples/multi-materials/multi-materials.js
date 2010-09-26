@@ -18,76 +18,79 @@
  */
 
 
-var exampleScene = SceneJS.scene({
-
-    /* Bind scene to a WebGL canvas:
-     */
+SceneJS.createNode({
+    type: "scene",
+    id: "theScene",
     canvasId: "theCanvas",
+    loggingElementId: "theLoggingDiv",
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
-
-        SceneJS.lookAt({
+    nodes: [
+        {
+            type: "lookAt",
             eye : { x: 0.0, y: 10.0, z: -55 },
             look : { y:1.0 },
-            up : { y: 1.0 }
-        },
+            up : { y: 1.0 },
 
-                SceneJS.camera({
+            nodes: [
+                {
+                    type: "camera",
                     optics: {
                         type: "perspective",
                         fovy : 25.0,
                         aspect : 1.47,
                         near : 0.10,
-                        far : 300.0  }
-                },
-                        SceneJS.light({
+                        far : 300.0
+                    },
+                    nodes: [
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.5, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.7, g: 0.7, b: 0.7 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.8, g: 0.8, b: 0.8 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                        }),
-
-                    /* Next, modelling transforms to orient our teapot
-                     * by a given angle.
-                     * See how these have "sid" (scoped identifier) properties,
-                     * which they will be referenced by when we push configurations
-                     * into the scene graph when we render it
-                     */
-                        SceneJS.rotate({
-                            sid: "pitch",
-                            angle: 0.0,
-                            x : 1.0
                         },
-                                SceneJS.rotate({
-                                    sid: "yaw",
-                                    angle: 0.0,
-                                    y : 1.0
-                                },
 
-                                    /**
-                                     * Root Geometry defines vertex and uv arrays which are shared
-                                     * among index arrays on sub-Geometry's
-                                     */
-                                        SceneJS.geometry({
+                        /* Next, modelling transforms to orient our teapot
+                         * by a given angle.
+                         */
+                        {
+                            type: "rotate",
+                            id: "pitch",
+                            angle: 0.0,
+                            x : 1.0,
+
+                            nodes: [
+                                {
+                                    type: "rotate",
+                                    id: "yaw",
+                                    angle: 0.0,
+                                    y : 1.0,
+
+                                    nodes: [
+
+                                        /**
+                                         * Root Geometry defines vertex and uv arrays which are shared
+                                         * among index arrays on sub-Geometry's
+                                         */
+                                        {
+                                            type: "geometry",
 
                                             /* The vertices - eight for our cube, each
                                              * one spanning three array elements for X,Y and Z
@@ -231,9 +234,11 @@ var exampleScene = SceneJS.scene({
                                                 5, 0,
                                                 5, 5,
                                                 0, 5
-                                            ]
-                                        },
-                                                SceneJS.texture({
+                                            ],
+
+                                            nodes: [
+                                                {
+                                                    type: "texture",
 
                                                     layers: [
                                                         {
@@ -273,15 +278,20 @@ var exampleScene = SceneJS.scene({
                                                                 y: .05
                                                             }
                                                         }
-                                                    ]},
-                                                        SceneJS.material({
+                                                    ],
+
+                                                    nodes: [
+                                                        {
+                                                            type: "material",
+
                                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                             specular:       0.9,
-                                                            shine:          6.0
-                                                        },
-                                                                SceneJS.geometry({
+                                                            shine:          6.0,
 
+                                                            nodes: [
+                                                                {
+                                                                    type: "geometry",
 
                                                                     /* Indices for first three faces
                                                                      */
@@ -302,9 +312,13 @@ var exampleScene = SceneJS.scene({
                                                                         8, 9,10,
                                                                         8,10,11
                                                                     ]
-                                                                }))),
-
-                                                SceneJS.texture({
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    type: "texture",
 
                                                     /* A texture can have multiple layers, each applying an
                                                      * image to a different material reflection component.
@@ -349,15 +363,19 @@ var exampleScene = SceneJS.scene({
                                                                 y: 1.0
                                                             }
                                                         }
-                                                    ]
-                                                },
-                                                        SceneJS.material({
+                                                    ],
+
+                                                    nodes: [
+                                                        {
+                                                            type: "material",
                                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                             specular:       0.9,
-                                                            shine:          6.0
-                                                        },
-                                                                SceneJS.geometry({
+                                                            shine:          6.0,
+
+                                                            nodes: [
+                                                                {
+                                                                    type: "geometry",
 
                                                                     /* Indices for remaining three faces
                                                                      */
@@ -378,13 +396,24 @@ var exampleScene = SceneJS.scene({
                                                                         20,21,22,
                                                                         20,22,23
                                                                     ]
-                                                                }))))
-                                        )
-                                )
-                        )
-                )
-        )
-        ;
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
 
 var yaw = 30;
 var pitch = -30;
@@ -392,10 +421,7 @@ var lastX;
 var lastY;
 var dragging = false;
 
-/* Always get canvas from scene - it will try to bind to a default canvas
- * can't find the one specified
- */
-var canvas = document.getElementById(exampleScene.getCanvasId());
+var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -425,9 +451,9 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
-    exampleScene
-            .setConfigs({ "#pitch": { angle: pitch, "#yaw": { angle: yaw } } })
-            .render();
+    SceneJS.withNode("yaw").set({angle: yaw});
+    SceneJS.withNode("pitch").set({angle: pitch});
+    SceneJS.withNode("theScene").render();
 
 };
 
@@ -436,11 +462,11 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.addListener("error", function() {
+SceneJS.bind("error", function() {
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function() {
+SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 

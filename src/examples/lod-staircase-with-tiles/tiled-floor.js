@@ -1,5 +1,8 @@
-var tiledFloor = SceneJS.createNode({
+SceneJS.createNode({
     type: "material",
+    
+    id: "tiled-floor",
+
     baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
     specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
     specular:       0.9,

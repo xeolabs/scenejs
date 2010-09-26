@@ -33,6 +33,12 @@ SceneJS._math_subVec3 = function(u, v) {
     return [u[0] - v[0],u[1] - v[1],u[2] - v[2]];
 }
 
+
+/** @private */
+SceneJS._math_subVec2 = function(u, v) {
+    return [u[0] - v[0], u[1] - v[1]];
+}
+
 /** @private */
 SceneJS._math_subVec4Scalar = function(v, s) {
     return [v[0] - s,v[1] - s,v[2] - s,v[3] - s];
@@ -115,13 +121,28 @@ SceneJS._math_dotVector3 = function(u, v) {
 }
 
 /** @private */
+SceneJS._math_dotVector2 = function(u, v) {
+    return (u[0] * v[0] + u[1] * v[1]);
+}
+
+/** @private */
 SceneJS._math_sqLenVec3 = function(v) {
     return SceneJS._math_dotVector3(v, v);
 }
 
 /** @private */
+SceneJS._math_sqLenVec2 = function(v) {
+    return SceneJS._math_dotVector2(v, v);
+}
+
+/** @private */
 SceneJS._math_lenVec3 = function(v) {
     return Math.sqrt(SceneJS._math_sqLenVec3(v));
+}
+
+/** @private */
+SceneJS._math_lenVec2 = function(v) {
+    return Math.sqrt(SceneJS._math_sqLenVec2(v));
 }
 
 /** @private */
@@ -946,7 +967,7 @@ SceneJS._math_billboardMat = function(viewMatrix) {
 }
 
 /** @private */
-SceneJS._math_FrustumPlane =  function(nx, ny, nz, offset) {
+SceneJS._math_FrustumPlane = function(nx, ny, nz, offset) {
     var s = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
     this.normal = [nx * s, ny * s, nz * s];
     this.offset = offset * s;
@@ -961,10 +982,10 @@ SceneJS._math_OUTSIDE_FRUSTUM = 3;
 /** @private */
 SceneJS._math_INTERSECT_FRUSTUM = 4;
 /** @private */
- SceneJS._math_INSIDE_FRUSTUM = 5;
+SceneJS._math_INSIDE_FRUSTUM = 5;
 
 /** @private */
- SceneJS._math_Frustum =  function(viewMatrix, projectionMatrix, viewport) {
+SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
     var m = SceneJS._math_mulMat4(projectionMatrix, viewMatrix);
     var q = [ m[3], m[7], m[11] ];
     var planes = [
@@ -1060,7 +1081,89 @@ SceneJS._math_INTERSECT_FRUSTUM = 4;
 
         return viewport[2] * Math.abs(p2[0] - p1[0]);
     };
-}
+
+
+
+    this.getProjectedState = function(modelCoords) {
+        var viewCoords = SceneJS._math_transformPoints3(this.matrix, modelCoords);
+
+        var canvasBox = {
+            min: [10000000, 10000000 ],
+            max: [-10000000, -10000000]
+        };
+
+        var v, x, y, w;
+
+        for (var i = 0; i < viewCoords.length; i++) {
+            v = SceneJS._math_projectVec4(viewCoords[i]);
+            x = v[0];
+            y = v[1];
+
+            if (x < -.5) {
+                x = -.5;
+            }
+
+            if (y < -.5) {
+                y = -.5;
+            }
+
+            if (x > .5) {
+                x = .5;
+            }
+
+            if (y > .5) {
+                y = .5;
+            }
+
+
+            if (x < canvasBox.min[0]) {
+                canvasBox.min[0] = x;
+            }
+            if (y < canvasBox.min[1]) {
+                canvasBox.min[1] = y;
+            }
+
+            if (x > canvasBox.max[0]) {
+                canvasBox.max[0] = x;
+            }
+            if (y > canvasBox.max[1]) {
+                canvasBox.max[1] = y;
+            }
+        }
+
+        canvasBox.min[0] += 0.5;
+        canvasBox.min[1] += 0.5;
+        canvasBox.max[0] += 0.5;
+        canvasBox.max[1] += 0.5;
+
+
+        canvasBox.min[0] = (canvasBox.min[0] *( viewport[2]+15));
+        canvasBox.min[1] = (canvasBox.min[1] * (viewport[3]+15));
+        canvasBox.max[0] = (canvasBox.max[0] * (viewport[2]+15));
+        canvasBox.max[1] = (canvasBox.max[1] * (viewport[3]+15));
+
+        var diagCanvasBoxVec = SceneJS._math_subVec2(canvasBox.max, canvasBox.min);
+        var diagCanvasBoxSize = SceneJS._math_lenVec2(diagCanvasBoxVec);
+
+        if (canvasBox.min[0] < 0) {
+            canvasBox.min[0] = 0;
+        }
+        if (canvasBox.max[0] > viewport[2]) {
+            canvasBox.max[0] = viewport[2];
+        }
+
+        if (canvasBox.min[1] < 0) {
+            canvasBox.min[1] = 0;
+        }
+        if (canvasBox.max[1] > viewport[3]) {
+            canvasBox.max[1] = viewport[3];
+        }
+        return {
+            canvasBox:  canvasBox,
+            canvasSize: diagCanvasBoxSize
+        };
+    };
+};
 
 SceneJS._math_identityQuaternion = function() {
     return [ 0.0, 0.0, 0.0, 1.0 ];
@@ -1113,7 +1216,6 @@ SceneJS._math_newMat4FromQuaternion = function(q) {
     SceneJS._math_setCellMat4(m, 2, 2, 1.0 - (txx + tyy));
     return m;
 }
-
 
 
 //SceneJS._math_slerp(t, q1, q2) {

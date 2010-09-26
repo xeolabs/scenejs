@@ -100,12 +100,12 @@ SceneJS._sceneModule = new (function() {
         var context;
         var contextNames = SceneJS.SUPPORTED_WEBGL_CONTEXT_NAMES;
         for (var i = 0; (!context) && i < contextNames.length; i++) {
-            try {            
+            try {
                 if (SceneJS._debugModule.getConfigs("webgl.logTrace") == true) {
 
                     context = canvas.getContext(contextNames[i]);
                     if (context) {
-                       // context = WebGLDebugUtils.makeDebugContext(context);
+                        // context = WebGLDebugUtils.makeDebugContext(context);
 
                         context = WebGLDebugUtils.makeDebugContext(
                                 context,
@@ -115,7 +115,7 @@ SceneJS._sceneModule = new (function() {
                                             " on WebGL canvas context - see console log for details");
                                 });
                         context.setTracing(true);
-                        
+
 
                     }
                 } else {
@@ -197,7 +197,21 @@ SceneJS._sceneModule = new (function() {
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERING, { sceneId: sceneId, canvas : scene.canvas });
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_ACTIVATED, scene.canvas);
+    };
 
+    /**
+     * Fast redraw of scene that has been previously rendered
+     *
+     * @param sceneId
+     */
+    this.redrawScene = function(sceneId) {
+        var scene = scenes[sceneId];
+        if (!scene) {
+            throw SceneJS._errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+        }
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_ACTIVATED, scene.canvas);
+        SceneJS._shaderModule.redraw();
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_DEACTIVATED, scene.canvas);
     };
 
     /** Returns the canvas element the given scene is bound to

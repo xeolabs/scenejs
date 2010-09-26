@@ -1,7 +1,9 @@
 var skySphere = SceneJS.createNode({
 
     // Prevent sky sphere from moving as lookat.eye moves
-    type: "stationary",
+    type: "stationary",    
+    id: "sky-sphere",
+
     nodes: [
 
         // Define fog just to disable it for our sky sphere

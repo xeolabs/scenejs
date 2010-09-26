@@ -1,5 +1,5 @@
 /**
- * Introductory SceneJS Example - Interpolated rotation of a teapot
+ * JSON Scene Graph with Interpolated Transformation of a Teapot
  *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
@@ -14,128 +14,157 @@
  *
  */
 
-var exampleScene = SceneJS.scene({
-
-    /* Bind scene to a WebGL canvas:
-     */
+SceneJS.createNode({
+    type: "scene",
+    id: "the-scene",
     canvasId: "theCanvas",
+    loggingElementId: "theLoggingDiv",
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
-
-        SceneJS.lookAt({
+    nodes: [
+        {
+            type: "lookAt",
             eye : { x: 0.0, y: 5.0, z: -8},
             look : { x : 0.0, y : 1.0, z : 0 },
-            up : { x: 0.0, y: 1.0, z: 0.0 }
+            up : { x: 0.0, y: 1.0, z: 0.0 },
 
-        },
+            nodes: [
+                {
+                    type: "camera",
 
-                SceneJS.camera({
                     optics: {
                         type: "perspective",
                         fovy : 55.0,
                         aspect : 1.47,
                         near : 0.10,
-                        far : 300.0  }
-                },
+                        far : 300.0
+                    },
 
-                        SceneJS.light({
+                    nodes: [
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.2, g: 0.2, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                        }),
-
-                        SceneJS.material({
+                        },
+                        {
+                            type: "material",
                             baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                             specular:       0.9,
-                            shine:          6.0
-                        },
+                            shine:          6.0,
 
-                                SceneJS.rotate({                               // Interpolator target
+                            nodes: [
+                                {
+                                    // Interpolator target
+                                    type: "rotate",
                                     id: "spin",
                                     angle: 0.0,
-                                    y : 1.0
-                                },
-                                        SceneJS.rotate({                      // Interpolator target
+                                    y : 1.0,
+
+                                    nodes: [
+                                        {
+                                            // Interpolator target
+                                            type: "rotate",
                                             id: "tip",
                                             angle: 0.0,
-                                            z : 1.0
-                                        },
-                                                SceneJS.scale({              // Interpolator target
+                                            z : 1.0,
+
+                                            nodes: [
+                                                {
+                                                    // Interpolator target
+                                                    type: "scale",
                                                     id: "stretch",
                                                     x: 1,
                                                     y: 1,
-                                                    z: 1
-                                                },
-                                                        SceneJS.teapot())))),
+                                                    z: 1,
 
-                        SceneJS.interpolator({
+                                                    nodes:[
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        /* Interpolator nodes - these can be anywhere in the scene graph
+                         */
+                        {
+                            type: "interpolator",
                             mode:"linear",
                             target: "spin",
                             targetProperty: "angle",
-                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0, 5],               // Seconds
-                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0, 360]    // Values
-                        }),
 
-                        SceneJS.interpolator({
+                            // Seconds and values
+                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0, 5],
+                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0, 360]
+                        },
+                        {
+                            type: "interpolator",
                             mode:"linear",
                             target: "tip",
                             targetProperty: "angle",
-                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],               // Seconds
-                            values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0]        // Values
-                        }),
-
-                        SceneJS.interpolator({
+                            keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],
+                            values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0]
+                        },
+                        {
+                            type: "interpolator",
                             mode:"linear",
                             target: "stretch",
                             targetProperty: "y",
-                            keys: [2.0, 3.0, 4.0, 5.0],                       // Seconds
-                            values: [1.0, 2.0, .3, 1.0]                       // Values
-                        }),
-
-                        SceneJS.interpolator({
+                            keys: [2.0, 3.0, 4.0, 5.0],
+                            values: [1.0, 2.0, .3, 1.0]
+                        },
+                        {
+                            type: "interpolator",
                             mode:"linear",
                             target: "stretch",
                             targetProperty: "x",
-                            keys: [2.5, 3.5, 4.5, 5.5],                       // Seconds
-                            values: [1.0, 3.0, .1, 1.0]                       // Values
-                        }))));
+                            keys: [2.5, 3.5, 4.5, 5.5],
+                            values: [1.0, 3.0, .1, 1.0]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
 
 window.render = function() {
-    exampleScene.render();
+    SceneJS.withNode("the-scene").render();
 };
 
 var pInterval;
 
-SceneJS.addListener("error", function() {
+SceneJS.bind("error", function() {
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function() {
+SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 
 pInterval = window.setInterval("window.render()", 10);
-
-
-

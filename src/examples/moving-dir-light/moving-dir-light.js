@@ -9,42 +9,46 @@
 
  */
 
-var exampleScene = SceneJS.scene({
-
-    /* Bind scene to a WebGL canvas:
-     */
+SceneJS.createNode({
+    type: "scene",
+    id:"theScene",
     canvasId: "theCanvas",
+    loggingElementId: "theLoggingDiv",
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
-
-        SceneJS.lookAt({
+    nodes: [
+        {
+            type: "lookAt",
             eye : { x: 0.0, y: 10.0, z: -35 },
             look : { y:1.0 },
-            up : { y: 1.0 }
-        },
-                SceneJS.camera({
+            up : { y: 1.0 },
+
+            nodes: [
+                {
+                    type: "camera",
                     optics: {
                         type: "perspective",
                         fovy : 55.0,
                         aspect : 1.47,
                         near : 0.10,
                         far : 300.0
-                    }
-                },
+                    },
 
-                    /*---------------------------------------------------------------------------------
-                     * Our animated light source is rotated using a Quaternion node which
-                     * receives rotation updates through configs injected into the scene when
-                     * it is rendered
-                     * -------------------------------------------------------------------------------*/
+                    nodes: [
 
-                        SceneJS.quaternion({
-                            sid: "myQuaternion"
-                        },
+                        /*---------------------------------------------------------------------------------
+                         * Our animated light source is rotated using a Quaternion node which
+                         * receives rotation updates through configs injected into the scene when
+                         * it is rendered
+                         * -------------------------------------------------------------------------------*/
 
-                                SceneJS.light({
+                        {
+                            type: "quaternion",
+                            id: "myQuaternion",
+
+                            nodes: [
+                                {
+                                    type: "light",
+                                    
                                     mode: "dir",
 
                                     /* Colour of our light
@@ -72,46 +76,93 @@ var exampleScene = SceneJS.scene({
                                      * position, and is therefore not subject to attenuation
                                      * since it is at an infinite distance.
                                      */
-                                }),
+                                },
 
-                            /*----------------------------------------------------------
-                             * A sphere that marks the light's direction - not the focus
-                             * of this example
-                             * -------------------------------------------------------*/
-                                SceneJS.translate({ z: -10 },
-                                        SceneJS.material({
+                                /*----------------------------------------------------------
+                                 * A sphere that marks the light's direction - not the focus
+                                 * of this example
+                                 * -------------------------------------------------------*/
+                                {
+                                    type: "translate",
+                                    z: -10 ,
+                                    nodes: [
+                                        {
+                                            type: "material",
                                             baseColor:      { r: .6, g: .6, b: 0.6 },
                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                             emit: 0.5,
                                             specular:       0.9,
-                                            shine:          6.0
-                                        },
-                                                SceneJS.scale({x:0.5, y: 0.5, z: 0.5 },
-                                                        SceneJS.sphere())))),
-
-                    /*--------------------------------------------------------------------------
-                     * Teapot, rotated and scaled into position within model-space, coloured
-                     * with some material properties
-                     * ------------------------------------------------------------------------*/
-
-                        SceneJS.rotate({
-                            angle: -20, x : 1.0
+                                            shine:          6.0,
+                                            nodes: [
+                                                {
+                                                    type: "scale",
+                                                    x:0.5,
+                                                    y: 0.5,
+                                                    z: 0.5,
+                                                    nodes: [
+                                                        {
+                                                            type: "sphere"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
                         },
-                                SceneJS.rotate({
-                                    angle: 30.0, y : 1.0
-                                },
-                                        SceneJS.scale({
-                                            x: 2, y: 2, z: 2
-                                        },
 
-                                                SceneJS.material({
+                        /*--------------------------------------------------------------------------
+                         * Teapot, rotated and scaled into position within model-space, coloured
+                         * with some material properties
+                         * ------------------------------------------------------------------------*/
+
+                        {
+                            type: "rotate",
+                            angle: -20,
+                            x : 1.0,
+                            nodes: [
+
+                                {
+                                    type: "rotate",
+                                    angle: 30.0,
+                                    y : 1.0,
+
+                                    nodes: [
+
+                                        {
+                                            type: "scale",
+                                            x: 2,
+                                            y: 2,
+                                            z: 2,
+
+                                            nodes: [
+                                                {
+                                                    type: "material",
                                                     baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
                                                     emit:           0.0,
                                                     specular:       0.9,
-                                                    shine:          6.0
-                                                },
-                                                        SceneJS.teapot())))))));
+                                                    shine:          6.0,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
 
 /*---------------------------------------------------------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff
@@ -123,16 +174,9 @@ var lastX;
 var lastY;
 var dragging = false;
 
-/* Throw the switch, Igor!
- * We render the scene.
- */
-exampleScene.render();
+SceneJS.withNode("theScene").render();
 
-/* Always get canvas from scene - it will try to bind to a default canvas
- * can't find the one specified
- */
-var canvas = document.getElementById(exampleScene.getCanvasId());
-
+var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -154,24 +198,23 @@ function mouseMove(event) {
 
         if (Math.abs(roty) > Math.abs(rotx)) {
 
-            exampleScene.setConfigs({
-                "#myQuaternion" : {
-                    "+rotation": {   // Maps to SceneJS.Quaterion#addRotation
-                        y: 1,
-                        angle: roty
-                    }
+            SceneJS.withNode("myQuaternion").add({
+                rotation:{   
+                    y: 1,
+                    angle: roty
                 }
-            }).render();
+            });
+            SceneJS.withNode("theScene").render();
+
         } else {
 
-            exampleScene.setConfigs({
-                "#myQuaternion" : {
-                    "+rotation": {
-                        x: 1,
-                        angle: rotx
-                    }
+            SceneJS.withNode("myQuaternion").add({
+                rotation:{
+                    x: 1,
+                    angle: rotx
                 }
-            }).render();
+            });
+            SceneJS.withNode("theScene").render();
         }
         lastX = event.clientX;
         lastY = event.clientY;
@@ -182,7 +225,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.addListener("error", function(e) {
+SceneJS.bind("error", function(e) {
     alert(e.exception.message);
 });
 

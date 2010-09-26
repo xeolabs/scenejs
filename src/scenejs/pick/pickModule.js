@@ -22,6 +22,9 @@ SceneJS._pickModule = new (function() {
     var nodeIndex = 0;
     var pickedNodeIndex = 0;
 
+    var nodeLookup = [];
+    var nodeStack = [];
+
     /**
      * On init, put SceneJS in rendering mode.
      * Pick buffers are destroyed when their scenes are destroyed.
@@ -54,6 +57,8 @@ SceneJS._pickModule = new (function() {
         pickY = y;
         color = { r: 0, g: 0, b: 0 };
         nodeIndex = 0;
+        nodeLookup = [];
+        nodeStack = [];
     };
 
     /**
@@ -141,19 +146,28 @@ SceneJS._pickModule = new (function() {
         boundPickBuf = pickBuf;
     }
 
-    /**
-     * Notify pick module of node pre-render, assuming that SceneJS._nodeEventsModule.preVisit has been notified prior.
-     * If node has a SID, then tag it on the SceneJS._nodeEventsModule.
-     */
-    this.preVisitNode = function(node) {
-        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) { // Quietly igore if not picking
-            var sid = node.getSID();
-            if (sid) {
+    this.pushNode = function(node) {
+        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+            if (node.hasListener("picked")) {
+
+                nodeStack.push(node);
+                nodeLookup.push(node);
+
+                /* Next pick index color
+                 */
                 color.g = parseFloat(Math.round((nodeIndex + 1) / 256) / 256);
                 color.r = parseFloat((nodeIndex - color.g * 256 + 1) / 256);
                 color.b = 1.0;
-                SceneJS._nodeEventsModule.tagNode("" + nodeIndex);
+
                 nodeIndex++;
+            }
+        }
+    };
+
+    this.popNode = function(node) {
+        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+            if (nodeStack.length > 0 && nodeStack[nodeStack.length - 1].getID() == node.getID()) {
+                nodeStack.pop();
             }
         }
     };
@@ -177,6 +191,7 @@ SceneJS._pickModule = new (function() {
                 if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
                     readPickBuffer();
                     unbindPickBuffer();
+                    SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
                 }
             });
 
@@ -184,7 +199,7 @@ SceneJS._pickModule = new (function() {
         var context = boundPickBuf.canvas.context;
         var canvas = boundPickBuf.canvas.canvas;
         var x = pickX;
-        var y = canvas.height - pickY;       
+        var y = canvas.height - pickY;
 
         var pix;
         try {
@@ -203,6 +218,12 @@ SceneJS._pickModule = new (function() {
             SceneJS._loggingModule.info("Reading pick buffer - picked pixel(" + x + ", " + y + ") = {r:" + pix[0] + ", g:" + pix[1] + ", b:" + pix[2] + "}");
         }
         pickedNodeIndex = (pix[0] + pix[1] * 256) - 1;
+        if (pickedNodeIndex >= 0) {
+            var node = nodeLookup[pickedNodeIndex];
+            if (node) {
+                node._fireEvent("picked", {});
+            }
+        }
     }
 
     function unbindPickBuffer() {
@@ -212,22 +233,6 @@ SceneJS._pickModule = new (function() {
         boundPickBuf.canvas.context.bindFramebuffer(boundPickBuf.canvas.context.FRAMEBUFFER, null);
         boundPickBuf = null;
     }
-
-    /**
-     * When a scene finished rendering in pick mode, find picked node and fire "picked" event at
-     * each node on path back to root that is listening for "picked" events.
-     */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERED,
-            function() {
-                if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-                    if (debugCfg.logTrace) {
-                        SceneJS._loggingModule.info("Finished rendering..");
-                    }
-                    SceneJS._nodeEventsModule.fireEventFromTagNode("" + pickedNodeIndex, "picked");
-                    SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
-                }
-            });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_DESTROYED,

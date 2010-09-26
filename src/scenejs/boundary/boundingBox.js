@@ -97,21 +97,12 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     this._states = [];
     this._state = SceneJS.BoundingBox.STATE_INITIAL;
 
-    this._localCoords = null;    // Six local-space vertices for memo level 1
-    this._modelBox = null;       // Axis-aligned model-space box for memo level 2
+    this._localCoords = null;       // Six local-space vertices for memo level 1
+    this._modelBox = null;          // Axis-aligned model-space box for memo level 2
+    this._viewBox = null;           // Axis-aligned view-space box for memo level 2
+    this._canvasBox = null;         // Axis-aligned canvas-space box for memo level 2
 
     if (params.levels) {
-        if (params.levels.length != this._children.length) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                    ("SceneJS.boundingBox levels property should have a value for each child node"));
-        }
-
-        for (var i = 1; i < params.levels.length; i++) {
-            if (params.levels[i - 1] >= params.levels[i]) {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                        ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
-            }
-        }
         this._levels = params.levels;
     }
 };
@@ -119,7 +110,7 @@ SceneJS.BoundingBox.prototype._init = function(params) {
 /**
  * State of the BoundingBox when not rendered yet
  */
-SceneJS.BoundingBox.STATE_INITIAL = 0;
+SceneJS.BoundingBox.STATE_INITIAL = "init";
 
 /**
  * State of the BoundingBox when it is completely outside the outer locality radius,
@@ -127,25 +118,25 @@ SceneJS.BoundingBox.STATE_INITIAL = 0;
  * default value (see {@link SceneJS.Locality}). In this state it is therefore also completely
  * outside the inner radius and the view frustum.
  */
-SceneJS.BoundingBox.STATE_OUTSIDE_OUTER_LOCALITY = 1;
+SceneJS.BoundingBox.STATE_OUTSIDE_OUTER_LOCALITY = "outside";
 
 /**
  * State of the BoundingBox when it intersects the outer locality radius, but does not
  * intersect the inner radius
  */
-SceneJS.BoundingBox.STATE_INTERSECTING_OUTER_LOCALITY = 2;
+SceneJS.BoundingBox.STATE_INTERSECTING_OUTER_LOCALITY = "far";
 
 /**
  * State of the BoundingBox when it intersects the inner locality radius, while therefore also intersecting
  * the outer locality radius
  */
-SceneJS.BoundingBox.STATE_INTERSECTING_INNER_LOCALITY = 3;
+SceneJS.BoundingBox.STATE_INTERSECTING_INNER_LOCALITY = "near";
 
 /**
  * State of the BoundingBox when it is intersecting the view frustum, while therefore also intersecting
  * the inner and outer locality radius
  */
-SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM = 4;
+SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM = "visible";
 
 // @private
 SceneJS.BoundingBox.prototype._changeState = function(newState, params) {
@@ -156,6 +147,15 @@ SceneJS.BoundingBox.prototype._changeState = function(newState, params) {
         params.newState = newState;
         this._fireEvent("state-changed", params);
     }
+};
+
+
+/**
+ * Returns the BoundingBox's current state.
+ * @returns {int} The state
+ */
+SceneJS.BoundingBox.prototype.getState = function() {
+    return this._state;
 };
 
 /**
@@ -342,8 +342,79 @@ SceneJS.BoundingBox.prototype.getBoundary = function() {
     };
 };
 
+/**
+ * Gets current model-space extents
+ * @function {Object} getModelBoundary
+ * @returns {Object}  The model boundary extents - {xmin: float, ymin: float, zmin: float, xmax: float, ymax: float, zmax: float}
+ * @since Version 0.7.8
+ */
+SceneJS.BoundingBox.prototype.getModelBoundary = function() {
+    return {
+        xmin: this._modelBox.min[0],
+        ymin: this._modelBox.min[1],
+        zmin: this._modelBox.min[2],
+        xmax: this._modelBox.max[0],
+        ymax: this._modelBox.max[1],
+        zmax: this._modelBox.max[2]
+    };
+};
+
+/**
+ * Gets current view-space extents
+ * @function {Object} getViewBoundary
+ * @returns {Object}  The view boundary extents - {xmin: float, ymin: float, zmin: float, xmax: float, ymax: float, zmax: float}
+ * @since Version 0.7.8
+ */
+SceneJS.BoundingBox.prototype.getViewBoundary = function() {
+    return {
+        xmin: this._viewBox.min[0],
+        ymin: this._viewBox.min[1],
+        zmin: this._viewBox.min[2],
+        xmax: this._viewBox.max[0],
+        ymax: this._viewBox.max[1],
+        zmax: this._viewBox.max[2]
+    };
+};
+//
+///**
+// * Gets current canvas-space extents
+// * @function {Object} getCanvasBoundary
+// * @returns {Object}  The canvas boundary extents - {xmin: float, ymin: float, xmax: float, ymax: float }
+// * @since Version 0.7.8
+// */
+//SceneJS.BoundingBox.prototype.getCanvasBoundary = function() {
+//    return {
+//        xmin: this._canvasBox.min[0],
+//        ymin: this._canvasBox.min[1],
+//        xmax: this._canvasBox.max[0],
+//        ymax: this._canvasBox.max[1]
+//    };
+//};
+
+/**
+ * Gets current canvas-space size
+ * @function {Object} getCanvasSize
+ * @returns {Object}  The canvas boundary diagonal size
+ * @since Version 0.7.8
+ */
+SceneJS.BoundingBox.prototype.getCanvasSize = function() {
+    return this._canvasSize;
+};
+
 // @private
 SceneJS.BoundingBox.prototype._render = function(traversalContext) {
+
+    if (this._levels.length != this._children.length) {
+        throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
+                ("SceneJS.boundingBox levels property should have a value for each child node"));
+    }
+
+    for (var i = 1; i < this._levels.length; i++) {
+        if (this._levels[i - 1] >= this._levels[i]) {
+            throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
+                    ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
+        }
+    }
 
     var origLevel = this._level; // We'll fire a "lod-changed" if LOD level changes
     var origState = this._state; // We'll fire "state-changed" if state changes from this during render
@@ -370,23 +441,28 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
             ];
         } else {
 
-            /* No model transform
+            /* Create model boundary directly from local boundary - no model transform
              */
             this._modelBox = {
                 min: [this._xmin, this._ymin, this._zmin],
                 max: [this._xmax, this._ymax, this._zmax]
             };
+            this._modelCoords = null;
             this._memoLevel = 2;
         }
     }
 
     if (this._memoLevel < 2) {
+
+        /* Create model boundary by transforming local boundary by model transform
+         */
         modelTransform = SceneJS._modelTransformModule.getTransform();
         this._modelBox = new SceneJS._math_Box3().fromPoints(
                 SceneJS._math_transformPoints3(
                         modelTransform.matrix,
                         this._localCoords)
                 );
+        this._modelCoords = null;
         if (modelTransform.fixed && this._memoLevel == 1 && (!SceneJS._instancingModule.instancing())) {
             this._localCoords = null;
             this._memoLevel = 2;
@@ -401,18 +477,41 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
         if (SceneJS._localityModule.testAxisBoxIntersectInnerRadius(this._modelBox)) {
             newState = SceneJS.BoundingBox.STATE_INTERSECTING_INNER_LOCALITY;
 
+            /* Fast model-space boundary test
+             */
             var result = SceneJS._frustumModule.testAxisBoxIntersection(this._modelBox);
             switch (result) {
                 case SceneJS._math_INTERSECT_FRUSTUM:
                 case SceneJS._math_INSIDE_FRUSTUM:
 
-                    /* Bounding makes no distinction between being inside
-                     * the frustum and merely intersecting it because it is
-                     * aimed at triggering those processes that load or discard
-                     * content, not at those that decide things like whether to
-                     * enabl clipping etc.
-                     */
                     newState = SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM;
+
+                    /* Intersects view - now create view and canvas boundaries
+                     */
+                    if (!this._modelCoords) {
+                        this._modelCoords = [
+                            [this._modelBox.min[0], this._modelBox.min[1], this._modelBox.min[2]],
+                            [this._modelBox.max[0], this._modelBox.min[1], this._modelBox.min[2]],
+                            [this._modelBox.max[0], this._modelBox.max[1], this._modelBox.min[2]],
+                            [this._modelBox.min[0], this._modelBox.max[1], this._modelBox.min[2]],
+                            [this._modelBox.min[0], this._modelBox.min[1], this._modelBox.max[2]],
+                            [this._modelBox.max[0], this._modelBox.min[1], this._modelBox.max[2]],
+                            [this._modelBox.max[0], this._modelBox.max[1], this._modelBox.max[2]],
+                            [this._modelBox.min[0], this._modelBox.max[1], this._modelBox.max[2]]
+                        ];
+                    }
+
+                    /* Create view boundary
+                     */
+                    this._viewBox = new SceneJS._math_Box3()
+                            .fromPoints(SceneJS._math_transformPoints3(
+                            SceneJS._viewTransformModule.getTransform().matrix, this._modelCoords));
+                    //
+
+                    //                    var pState = SceneJS._frustumModule.getProjectedState(this._modelCoords);
+                    //                    this._canvasBox = pState.canvasBox;
+
+                    this._canvasSize = SceneJS._frustumModule.getProjectedSize(this._modelBox);
 
                     if (newState != origState) {
                         this._changeState(newState);
@@ -423,10 +522,10 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                     SceneJS._boundaryModule.pushBoundary(this._modelBox);
 
                     if (this._levels) { // Level-of-detail mode
-                        var size = SceneJS._frustumModule.getProjectedSize(this._modelBox);
+                        //var size = SceneJS._frustumModule.getProjectedSize(this._modelBox);
 
                         for (var i = this._levels.length - 1; i >= 0; i--) {
-                            if (this._levels[i] <= size) {
+                            if (this._levels[i] <= this._canvasSize) {
                                 this._level = i;
 
                                 if (origLevel != this._level) {

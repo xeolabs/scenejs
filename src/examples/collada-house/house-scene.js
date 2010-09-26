@@ -191,12 +191,12 @@ window.render = function() {
             .render();
 };
 
-SceneJS.addListener("error", function(e) {
+SceneJS.bind("error", function(e) {
     alert(e.exception.message);
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function() {
+SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 

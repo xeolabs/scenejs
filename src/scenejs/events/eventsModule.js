@@ -43,16 +43,18 @@ SceneJS._eventModule = new (function() {
     this.SHADER_ACTIVATE = 27;
     this.SHADER_ACTIVATED = 28;
     this.SHADER_RENDERING = 29;
-    this.SHADER_DEACTIVATED = 30;
-    this.FOG_UPDATED = 31;
-    this.FOG_EXPORTED = 32;
-    this.NAME_UPDATED = 33;
-    this.PROCESS_CREATED = 34;
-    this.PROCESS_KILLED = 35;
-    this.PROCESS_TIMED_OUT = 36;
-    this.LOGGING_ELEMENT_ACTIVATED = 37;
-    this.PICK_COLOR_EXPORTED = 38;
-    this.BOUNDARY_EXPORTED = 39;
+    this.SHADER_NEEDS_BOUNDARIES = 30;
+    this.SHADER_DEACTIVATED = 31;
+    this.FOG_UPDATED = 32;
+    this.FOG_EXPORTED = 33;
+    this.NAME_UPDATED = 34;
+    this.PROCESS_CREATED = 35;
+    this.PROCESS_KILLED = 36;
+    this.PROCESS_TIMED_OUT = 37;
+    this.LOGGING_ELEMENT_ACTIVATED = 38;
+    this.PICK_COLOR_EXPORTED = 39;
+    this.BOUNDARY_EXPORTED = 40;
+    this.HIGHLIGHT_EXPORTED = 41;
 
     /* Priority queue for each type of event
      */
@@ -114,7 +116,7 @@ SceneJS._eventModule = new (function() {
  * <p><b>Supported events</b></p>
  * <p><b><em>error</em></b></p><p>An error has occurred either while defining or rendering a scene. These can be either fatal,
  * or errors that SceneJS can recover from.</p><p>Example:</p><pre><code>
- * SceneJS.addListener("error", function(e) {
+ * SceneJS.bind("error", function(e) {
  *     if (e.exception.message) {
  *         alert("Error: " + e.exception.message);
  *     } else {
@@ -125,7 +127,7 @@ SceneJS._eventModule = new (function() {
  *
  * <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all {@link SceneJS.Scene} instances have
  * been destroyed and resources held for them freed.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "reset",
  *      function(e) {
  *          alert("SceneJS has been reset");
@@ -133,7 +135,7 @@ SceneJS._eventModule = new (function() {
  * </pre></code>
 
  * <p><b><em>scene-created</em></b></p><p>A {@link SceneJS.Scene} has been defined.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "scene-created",
  *      function(e) {
  *          alert("A new Scene has been created - scene ID: " + e.sceneId);
@@ -141,7 +143,7 @@ SceneJS._eventModule = new (function() {
  * </pre></code>
  *
  * <p><b><em>scene-rendering</em></b></p><p>Traversal (render) of a {@link SceneJS.Scene} has just begun.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "scene-rendering",
  *      function(e) {
  *          alert("Rendering of a new Scene has just begun - scene ID: " + e.sceneId);
@@ -151,7 +153,7 @@ SceneJS._eventModule = new (function() {
  * <p><b><em>canvas-activated</em></b></p><p>A canvas has just been activated for a {@link SceneJS.Scene}, where that
  * node is about to start rendering to it. This will come right after a "scene-rendering" event, which will indicate which
  * {@link SceneJS.Scene} is the one about to do the rendering.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "canvas-activated",
  *      function(e) {
  *          var canvas = e.canvas;
@@ -165,7 +167,7 @@ SceneJS._eventModule = new (function() {
  * {@link SceneJS.Scene}. Processes track the progress of tasks such as the loading of remotely-stored content by
  * {@link SceneJS.Instance} nodes. This event is particularly useful to monitor for content loading. </p>
  * <p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "process-created",
  *      function(e) {
  *          var sceneId = e.sceneId;
@@ -180,7 +182,7 @@ SceneJS._eventModule = new (function() {
  *
  * <p><b><em>process-timed-out</em></b></p><p>An asynchronous process has timed out. This will be followed by
  * a "process-killed" event.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "process-timed-out",
  *      function(e) {
  *          var sceneId = e.sceneId;
@@ -194,7 +196,7 @@ SceneJS._eventModule = new (function() {
  * </pre></code>
  *
  * <p><b><em>process-killed</em></b></p><p>An asynchronous process has finished.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "process-killed",
  *      function(e) {
  *          var sceneId = e.sceneId;
@@ -208,7 +210,7 @@ SceneJS._eventModule = new (function() {
  * </pre></code>
  *
  * <p><b><em>scene-rendered</em></b></p><p>A render of a {@link SceneJS.Scene} has completed.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "scene-rendered",
  *      function(e) {
  *          alert("Traversal completed for Scene - scene ID: " + e.sceneId);
@@ -216,7 +218,7 @@ SceneJS._eventModule = new (function() {
  * </pre></code>
  *
  * <p><b><em>scene-destroyed</em></b></b></p><p>A SceneJS.Scene traversal has been destroyed.</p><p>Example:</p><pre><code>
- *  SceneJS.addListener(
+ *  SceneJS.bind(
  *      "scene-destroyed",
  *      function(e) {
  *          alert("Scene has been destroyed - scene ID: " + e.sceneId);
@@ -225,7 +227,7 @@ SceneJS._eventModule = new (function() {
  * @param name Event name
  * @param func Callback function
  */
-SceneJS.addListener = function(name, func) {
+SceneJS.bind = function(name, func) {
     switch (name) {
 
         /**
@@ -256,6 +258,16 @@ SceneJS.addListener = function(name, func) {
                 function(params) {
                     func({
                         sceneId : params.sceneId
+                    });
+                });
+            break;
+
+        case "node-created" : SceneJS._eventModule.addListener(
+                SceneJS._eventModule.NODE_CREATED,
+                function(params) {
+                    func({
+                        nodeId : params.nodeId,
+                        json: json
                     });
                 });
             break;
@@ -318,10 +330,10 @@ SceneJS.addListener = function(name, func) {
             break;
 
         default:
-            throw "SceneJS.addListener - this event type not supported: '" + name + "'";
+            throw "SceneJS.bind - this event type not supported: '" + name + "'";
     }
 };
 
 /** @deprecated - use {@link #addListener} instead.
  */
-SceneJS.onEvent = SceneJS.addListener;
+SceneJS.addListener = SceneJS.onEvent = SceneJS.bind;

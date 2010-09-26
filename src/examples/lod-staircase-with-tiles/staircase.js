@@ -1,5 +1,89 @@
-/* Returns SceneJS JavaScript subgraph that defines a spiral staircase.
+SceneJS.createNode({
+    type: "boundingBox",
 
+    id: "lod-stairs",
+
+    xmin: -20,
+    ymin: -20,
+    zmin: -20,
+    xmax:  20,
+    ymax:  20,
+    zmax:  20,
+
+    /* We'll do level-of-detail selection with this
+     * boundingBox - five representations at
+     * different sizes:
+     */
+    levels: [
+        10,     // Level 1
+        200,    // Level 2
+        400,    // Level 3
+        500,    // Level 4
+        600     // Level 5
+    ],
+
+    nodes:[
+
+        /* Level 1 - a cube to at least show a dot on the horizon
+         */
+        {
+            type: "cube"
+        },
+
+
+        /* Level 2 - staircase with 12 very chunky steps
+         * and no texture. Staircase factory function is defined in staircase.js
+         */
+        createStaircase({
+            stepWidth:7,
+            stepHeight:2.4,
+            stepDepth:3,
+            stepSpacing:6,
+            innerRadius:10,
+            numSteps:12,
+            stepAngle:80 }),
+
+        /* Level 3 - more detail; staircase with 24 chunky
+         *  steps and no texture
+         */
+        createStaircase({
+            stepWidth:7,
+            stepHeight:1.2,
+            stepDepth:3,
+            stepSpacing:3,
+            innerRadius:10,
+            numSteps:24,       // Half the number of steps, less coarse
+            stepAngle:40 }),
+
+        /* Level 4 - yet more detail; staircase with 48 fine
+         * steps and no texture
+         */
+        createStaircase({
+            stepWidth:7,
+            stepHeight:0.6,
+            stepDepth:3,
+            stepSpacing:1.5,
+            innerRadius:10,
+            numSteps:48,
+            stepAngle:20 }),
+
+        /* Level 5 - maximum detail; textured staircase with
+         * 48 fine steps
+         */
+        createStaircase({
+            withTexture: true,
+            stepWidth:7,
+            stepHeight:0.6,
+            stepDepth:3,
+            stepSpacing:1.5,
+            innerRadius:10,
+            numSteps:48,
+            stepAngle:20 })
+    ]
+});
+
+
+/* Returns SceneJS subgraph that defines a spiral staircase.
  * The result of this is processed with SceneJS.createNode to create the actual
  * scene graph node object.
  */
@@ -22,7 +106,7 @@ function createStaircase(cfg) {
     };
 
     if (cfg.withTexture) {
-        return  SceneJS.createNode({
+        return  {
             type: "texture",
             layers : [
                 {
@@ -36,23 +120,19 @@ function createStaircase(cfg) {
             nodes: [
                 material
             ]
-        });
+        };
     } else {
-        return SceneJS.createNode(material);
+        return material;
     }
 }
 
 function createSteps(cfg) {
     var nodes = [];
-
     var angle = 0;
     var height = -10;
-
     for (var stepNum = 0; stepNum < cfg.numSteps; stepNum++) {
-
         angle += cfg.stepAngle;
         height += cfg.stepSpacing;
-
         nodes.push({
             type: "rotate",
             angle: angle,
@@ -79,6 +159,5 @@ function createSteps(cfg) {
             ]
         });
     }
-
     return nodes;
 }

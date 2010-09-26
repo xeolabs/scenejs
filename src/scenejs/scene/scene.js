@@ -151,7 +151,6 @@ SceneJS.Scene = SceneJS.createNodeType("scene");
 
 // @private
 SceneJS.Scene.prototype._init = function(params) {
-    this._configs = {};
     if (params.canvasId) {
         this._canvasId = document.getElementById(params.canvasId) ? params.canvasId : SceneJS.Scene.DEFAULT_CANVAS_ID;
     } else {
@@ -256,25 +255,6 @@ SceneJS.Scene.prototype.isRunning = function() {
 };
 
 /**
- * Sets a map of values to set on target nodes in the scene graph when the scene is next rendered. The map is the same as that
- * configured on a {@link SceneJS.WithConfigs} and works the same way.
- * @param {object} values Map of values, same format as that given to {@link SceneJS.WithConfigs}
- */
-SceneJS.Scene.prototype.setConfigs = function(values) {
-    this._configs = SceneJS._preprocessConfigs(values || {});
-    return this;
-};
-
-/**
- * Returns the config values map that was last set with {@link #setConfigs}.
- *
- * @returns {Object} The config values map
- */
-SceneJS.Scene.prototype.getConfigs = function() {
-    return this._configs;
-};
-
-/**
  * Immediately renders one frame of the scene, applying any config  values given to
  * {#link #setConfigs}, retaining those values in the scene afterwards. Has no effect if the scene has been
  * {@link #start}ed and is currently rendering in a loop.
@@ -298,6 +278,20 @@ SceneJS.Scene.prototype._render = function() {
     var traversalContext = {};
     this._renderNodes(traversalContext);
     SceneJS._sceneModule.deactivateScene();
+};
+
+/** @private
+ */
+SceneJS.Scene.prototype.reRender = function() {
+    if (!this._sceneId) {
+        this._sceneId = SceneJS._sceneModule.createScene(this, {
+            canvasId: this._canvasId,
+            loggingElementId: this._loggingElementId
+        });
+        this.render();
+    } else {
+        SceneJS._sceneModule.redrawScene(this._sceneId);
+    }
 };
 
 /**

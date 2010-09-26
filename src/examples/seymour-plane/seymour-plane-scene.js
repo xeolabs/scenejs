@@ -149,12 +149,12 @@ window.render = function() {
     exampleScene.render();
 };
 
-SceneJS.addListener("error", function(event) {
+SceneJS.bind("error", function(event) {
     alert(event.exception.message);
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function(event) {
+SceneJS.bind("reset", function(event) {
     window.clearInterval(pInterval);
 });
 

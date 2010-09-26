@@ -11,84 +11,139 @@
  * lindsay.kay@xeolabs.com
  * January 2010
  */
-var exampleScene = SceneJS.scene({
-
-    /* Bind scene to a WebGL canvas:
-     */
+SceneJS.createNode({
+    type: "scene",
+    id: "theScene",
     canvasId: "theCanvas",
+    loggingElementId: "theLoggingDiv",
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
-
-        SceneJS.lookAt({
+    nodes: [
+        {
+            type: "lookAt",
             eye : { x: -30.0, y: 0.0, z: -35.0},
             look : { x : 15.0, y : 0.0, z : 0 },
-            up : { x: 0.0, y: 1.0, z: 0.0 }
-        },
+            up : { x: 0.0, y: 1.0, z: 0.0 },
 
-                SceneJS.camera({
+            nodes: [
+                {
+                    type: "camera",
                     optics: {
                         type: "perspective",
                         fovy : 65.0,
                         aspect : 1.47,
                         near : 0.10,
-                        far : 300.0  }
-                },
+                        far : 300.0
+                    },
 
-                        SceneJS.light({
+                    nodes: [
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 1.0, y: 1.0, z: 1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.8, g: 0.8, b: 0.8 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: -2.0, y: -1.0, z: 0.0 }
-                        }),
-
-                        SceneJS.material({
+                        },
+                        {
+                            type: "material",
                             baseColor:      { r: 0.6, g: 0.9, b: 0.6 },
                             specularColor:  { r: 0.6, g: 0.9, b: 0.6 },
                             specular:       0.9,
-                            shine:          6.0
-                        },
+                            shine:          6.0,
 
-                            //----------------------------------------------------------------------------------
-                            // Our Selector node selects three of its four sub-graphs to display three Teapots.
-                            // Try changing the indices in its "selection" property to change its selection.
-                            //----------------------------------------------------------------------------------
+                            nodes: [
 
-                                SceneJS.selector({selection: [0, 1, 3]},
+                                //----------------------------------------------------------------------------------
+                                // Our Selector node selects three of its four sub-graphs to display three Teapots.
+                                // Try changing the indices in its "selection" property to change its selection.
+                                //----------------------------------------------------------------------------------
 
-                                        SceneJS.translate({y : 15},
-                                                SceneJS.text({text: "     Selector selection contains 0"}),
-                                                SceneJS.teapot()),
+                                {
+                                    type: "selector",
+                                    selection: [0, 1, 3],
 
-                                        SceneJS.translate({y : 5},
-                                                SceneJS.text({text: "     Selector selection contains 1"}),
-                                                SceneJS.teapot()),
+                                    nodes: [
+                                        {
+                                            type:"translate",
+                                            y : 15,
+                                            nodes: [
+                                                {
+                                                    type: "text",
+                                                    text: "     Selector selection contains 0",
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            y : 5,
+                                            nodes: [
+                                                {
+                                                    type: "text",
+                                                    text: "     Selector selection contains 1",
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            y : -5,
+                                            nodes: [
+                                                {
+                                                    type: "text",
+                                                    text: "     Selector selection contains 2",
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            y : -15,
+                                            nodes: [
+                                                {
+                                                    type: "text",
+                                                    text: "     Selector selection contains 3",
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
 
-                                        SceneJS.translate({y : -5},
-                                                SceneJS.text({text: "     Selector selection contains 2"}),
-                                                SceneJS.teapot()),
-
-                                        SceneJS.translate({y : -15},
-                                                SceneJS.text({text: "     Selector selection contains 3"}),
-                                                SceneJS.teapot())
-                                        )
-                                )
-                        )
-                )
-        )
-        ;
 
 /* Throw the switch, Igor!
 
  */
-exampleScene.render();
+SceneJS.withNode("theScene").render();

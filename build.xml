@@ -2,7 +2,7 @@
 
     <property name="BUILD_MAJOR" value="0"/>
     <property name="BUILD_MINOR" value="7"/>
-    <property name="BUILD_ID" value="7"/>
+    <property name="BUILD_ID" value="8"/>
     <property name="PATCH_ID" value="0"/>
 
     <property name="LIB_DIR" location="${basedir}/lib"/>
@@ -36,6 +36,8 @@
     <path id="sourcefiles">
         <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/message.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
@@ -43,12 +45,10 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
         <!--<fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-debug.js"/>-->
         <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/nodeEvents/nodeEventsModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/library.js"/>
@@ -57,8 +57,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/processes/processModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
-        <!--<fileset dir="${SRC_DIR}" includes="scenejs/shading/shadingModule.js"/>-->
-           <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
@@ -86,8 +85,9 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/material/materialModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/highlight/highlightModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/highlight/highlight.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/withConfigs/withConfigs.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
@@ -120,7 +120,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>
+            <!--<fileset dir="${SRC_DIR}" includes="scenejs/module/module.js"/>-->
             <fileset dir="${SRC_DIR}" includes="scenejs/name/name.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/instancing/library.js"/>
@@ -146,7 +146,6 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/withConfigs/withConfigs.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>
@@ -228,7 +227,7 @@
         <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
             <fileset dir="${basedir}/resources/web"/>
         </copy>
-        
+
         <copy todir="${EXTRACTED_DIST_DIR}/examples">
             <fileset dir="${SRC_DIR}/examples"/>
         </copy>

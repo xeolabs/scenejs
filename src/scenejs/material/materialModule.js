@@ -20,24 +20,19 @@
  */
 SceneJS._materialModule = new (function() {
 
-    var material;
+    var materialStack = [];
     var dirty;
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
-                material = {
-                    baseColor : [ 0.5, 0.5, 0.5 ],
-                    specularColor: [ 0.9,  0.9,  0.9 ],
-                    specular : 200,
-                    shine : 1,
-                    reflect : 0,
-                    alpha : 1.0,
-                    emit : 0.7
-                };
+                materialStack = [
+                    {
+                        override : false
+                    }
+                ];
                 dirty = true;
             });
-
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_ACTIVATED,
@@ -51,7 +46,7 @@ SceneJS._materialModule = new (function() {
                 if (dirty) {
                     SceneJS._eventModule.fireEvent(
                             SceneJS._eventModule.MATERIAL_EXPORTED,
-                            material);
+                            materialStack[materialStack.length - 1]);
                     dirty = false;
                 }
             });
@@ -62,17 +57,28 @@ SceneJS._materialModule = new (function() {
                 dirty = true;
             });
 
-    // @private
-    this.setMaterial = function(m) {
-        material = m;
-        SceneJS._eventModule.fireEvent(
-                SceneJS._eventModule.MATERIAL_UPDATED,
-                material);
+    this.pushMaterial = function(m) {
+        var top = materialStack[materialStack.length - 1];
+
+        /* Copy the material because the Material node might be
+         * mutated during the rest of the traversal
+         */
+        materialStack.push({
+            highlightBaseColor : (m.highlightBaseColor != undefined && !(top.override && top.highlightBaseColor != undefined)) ? [ m.highlightBaseColor.r, m.highlightBaseColor.g, m.highlightBaseColor.b ] : top.baseColor,
+            baseColor : (m.baseColor != undefined && !(top.override && top.baseColor != undefined)) ? [ m.baseColor.r, m.baseColor.g, m.baseColor.b ] : top.baseColor,
+            specularColor: (m.specularColor != undefined && !(top.override && top.specularColor != undefined)) ? [ m.specularColor.r, m.specularColor.g, m.specularColor.b ] : top.specularColor,
+            specular : (m.specular != undefined && !(top.override && top.specular != undefined)) ? m.specular : top.specular,
+            shine : (m.shine != undefined && !(top.override && top.shine != undefined)) ? m.shine : top.shine,
+            reflect : (m.reflect != undefined && !(top.override && top.reflect != undefined )) ? m.reflect : top.reflect,
+            alpha : (m.alpha != undefined && !(top.override && top.alpha != undefined )) ? m.alpha : top.alpha,
+            emit : (m.emit != undefined && !(top.override && top.emit != undefined)) ? m.emit : top.emit,
+            opacity : (m.opacity != undefined && !(top.override && top.opacity != undefined)) ? m.opacity : top.opacity
+        });
         dirty = true;
     };
 
-    // @private
-    this.getMaterial = function() {
-        return material;
+    this.popMaterial = function() {
+        materialStack.pop();
     };
+
 })();

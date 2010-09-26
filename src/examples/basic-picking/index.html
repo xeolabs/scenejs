@@ -41,17 +41,9 @@
             <p>You can define "picked" listeners on any kind of node so that they will catch those events when they
                 occur on Geometry nodes within their subgraphs.</p>
 
-            <p>On mouse down, we render the scene in picking mode, passing in the
-                mouse canvas coordinates. This will cause a scene render traversal in which
-                all the "picked" listeners will fire on those nodes situated above whatever
-                geometry node was picked. Each of those node's listeners will be called as their node is
-                visited, in the usual depth-first, right-to-left traversal order.</p>
-
             <br/>
             <ul>
                 <li><a target="_other" href="basic-picking.js">Scene source code</a></li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.WithConfigs">Wiki page on
-                    SceneJS.WithConfigs</a></li>
             </ul>
         </div>
         <div id="log">

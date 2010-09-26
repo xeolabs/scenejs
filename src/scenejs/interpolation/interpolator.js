@@ -136,50 +136,43 @@ SceneJS.Interpolator.prototype._FOUND = 3;            // Found keys before and a
 
 // @private
 SceneJS.Interpolator.prototype._render = function(traversalContext) {
-    if (!this._targetFunc) {
 
-        /* Not bound to a target node setter mode yet.
-         *
-         * Attempt to bind - if target not found, just try again
-         * next render, since it might appear in the scene later.
-         */
+    /* Not bound to a target node setter mode yet.
+     *
+     * Attempt to bind - if target not found, just try again
+     * next render, since it might appear in the scene later.
+     */
 
-        if (!this._target) {
-            throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.NodeConfigExpectedException(
-                            "SceneJS.Interpolator config expected: target"));
-        }
-
-        if (!this._targetProperty) {
-            throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.NodeConfigExpectedException(
-                            "SceneJS.Interpolator config expected: targetProperty"));
-        }
-
-        this._targetNode = SceneJS.getNode(this._target);
-        if (this._targetNode) {
-
-            /* Found target node - bind to setter
-             */
-            var funcName = "set" + this._targetProperty.substr(0, 1).toUpperCase() + this._targetProperty.substr(1)
-            if (this._targetNode[funcName] instanceof Function) {
-                this._targetFunc = this._targetNode[funcName];
-            }
-        }
-    }
-    if (this._targetFunc) {
-
-        /* Have target node mode - start timer if not started,
-         * update interpolation, feed result into target node setter
-         */
-        if (!this._timeStarted) {
-            this._timeStarted = SceneJS._timeModule.getTime();
-        }
-        this._update((SceneJS._timeModule.getTime() - this._timeStarted) * 0.001);
-        this._targetFunc.call(this._targetNode, this._outputValue);
+    if (!this._target) {
+        throw SceneJS._errorModule.fatalError(
+                new SceneJS.errors.NodeConfigExpectedException(
+                        "SceneJS.Interpolator config expected: target"));
     }
 
-    /* Render child nodes regardless of target aquisition
+    if (!this._targetProperty) {
+        throw SceneJS._errorModule.fatalError(
+                new SceneJS.errors.NodeConfigExpectedException(
+                        "SceneJS.Interpolator config expected: targetProperty"));
+    }
+
+    /* Generate next value
+     */
+    if (!this._timeStarted) {
+        this._timeStarted = SceneJS._timeModule.getTime();
+    }
+    this._update((SceneJS._timeModule.getTime() - this._timeStarted) * 0.001);
+
+    /* Send value to target
+     */
+    var message = {
+        command: "update",
+        target: this._target,
+        set: {}
+    };
+    message.set[this._targetProperty] = this._outputValue;
+    SceneJS.Message.sendMessage(message);
+
+    /* Render child nodes
      */
     this._renderNodes(traversalContext);
 };

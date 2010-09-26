@@ -172,17 +172,12 @@ SceneJS.Fog.prototype.getEnd = function() {
     return this._end;
 };
 
-
 // @private
 SceneJS.Fog.prototype._render = function(traversalContext) {
     if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-
-        /* Don't need fog for pick traversal (TODO: unless we want to supress picking of things hidden by fog?)
-         */
-        this._renderNodes(traversalContext);
+        this._renderNodes(traversalContext); // No fog for pick
     } else {
-        var f = SceneJS._fogModule.getFog();
-        SceneJS._fogModule.setFog({
+        SceneJS._fogModule.pushFog({
             mode: this._mode,
             color: this._color,
             density: this._density,
@@ -190,6 +185,6 @@ SceneJS.Fog.prototype._render = function(traversalContext) {
             end: this._end
         });
         this._renderNodes(traversalContext);
-        SceneJS._fogModule.setFog(f);
+        SceneJS._fogModule.popFog();
     }
 };

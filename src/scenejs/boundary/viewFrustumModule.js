@@ -74,4 +74,9 @@ SceneJS._frustumModule = new (function() {
     this.getProjectedSize = function(box) {
         return getFrustum().getProjectedSize(box);
     };
+
+
+    this.getProjectedState = function(box) {
+        return getFrustum().getProjectedState(box);
+    };
 })();

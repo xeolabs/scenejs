@@ -5,7 +5,7 @@
  */
 SceneJS._fogModule = new (function() {
 
-    var fog;
+    var fogStack;
     var dirty;
 
     function colourToArray(v, fallback) {
@@ -26,7 +26,7 @@ SceneJS._fogModule = new (function() {
                     && f.mode != "linear")) {
             throw SceneJS._errorModule.fatalError(
                     new SceneJS.errors.InvalidNodeConfigException(
-                    "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'"));
+                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'"));
         }
         if (f.mode == "disabled") {
             return {
@@ -46,7 +46,9 @@ SceneJS._fogModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
-                fog = _createFog();
+                fogStack = [
+                    _createFog()
+                ];
                 dirty = true;
             });
 
@@ -62,7 +64,7 @@ SceneJS._fogModule = new (function() {
                 if (dirty) {
                     SceneJS._eventModule.fireEvent(
                             SceneJS._eventModule.FOG_EXPORTED,
-                            fog);
+                            fogStack[fogStack.length - 1]);
                     dirty = false;
                 }
             });
@@ -73,13 +75,13 @@ SceneJS._fogModule = new (function() {
                 dirty = true;
             });
 
-    this.setFog = function(f) {
-        fog = _createFog(f);
+    this.pushFog = function(f) {
+        fogStack.push(_createFog(f));
         dirty = true;
     };
 
-    this.getFog = function() {
-        return fog;
+    this.popFog = function() {
+        fogStack.pop();
     };
 
 })();

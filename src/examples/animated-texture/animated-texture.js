@@ -7,68 +7,72 @@
  *
  */
 
-/* Node references - there are a few ways to inject data into a scene graph,
- * but we'll just update node setters for this example.
- */
-var texture;
-var rotateX;
-var rotateY;
+SceneJS.createNode({
+    type: "scene",
+    id: "theScene",
+    canvasId: "theCanvas",
 
-var exampleScene = SceneJS.scene({
-
-    /* Bind to a WebGL canvas:
-     */
-    canvasId: "theCanvas" },
-
-        SceneJS.lookAt({
+    nodes: [
+        {
+            type: "lookAt",
             eye : { x: 0.0, y: 0.0, z: -10},
             look : { x : 0.0, y : 0.0, z : 0 },
-            up : { x: 0.0, y: 1.0, z: 0.0 }
+            up : { x: 0.0, y: 1.0, z: 0.0 },
 
-        },
-                SceneJS.camera({
+            nodes: [
+                {
+                    type: "camera",
                     optics: {
                         type: "perspective",
                         fovy : 25.0,
                         aspect : 1.47,
                         near : 0.10,
                         far : 300.0
-                    }
-                },
-                        SceneJS.light({
+                    },
+
+                    nodes: [
+                        {
+                            type: "light",
                             mode:                 "dir",
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                        }),
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                 "dir",
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        }),
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                 "dir",
                             color:                  { r: 0.2, g: 0.2, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                        }),
-
-                        SceneJS.material({
+                        },
+                        {
+                            type: "material",
                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                             specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
                             specular:       0.9,
-                            shine:          6.0
-                        },
+                            shine:          6.0,
 
-                            /** Textures images are loaded asynchronously and won't render
-                             * immediately. On first traversal, they start loading their image,
-                             * which they collect on a subsequent traversal.
-                             */
-                                texture = SceneJS.texture({
+                            nodes: [
+
+
+                                /** Textures images are loaded asynchronously and won't render
+                                 * immediately. On first traversal, they start loading their image,
+                                 * which they collect on a subsequent traversal.
+                                 */
+                                {
+                                    type: "texture",
+
+                                    id: "theTexture",
 
                                     /* A texture can have multiple layers, each applying an
                                      * image to a different material reflection component.
@@ -113,22 +117,40 @@ var exampleScene = SceneJS.scene({
                                                 y: 1.0
                                             }
                                         }
+                                    ],
+
+                                    nodes: [
+                                        {
+                                            type: "rotate",
+                                            id: "pitch",
+                                            angle: 0.0,
+                                            x : 1.0,
+
+                                            nodes: [
+                                                {
+                                                    type: "rotate",
+                                                    id: "yaw",
+                                                    angle: 0.0,
+                                                    y : 1.0,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "cube"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
                                     ]
-                                },
-                                        rotateX = SceneJS.rotate({
-                                            angle: 0.0, x : 1.0
-                                        },
-                                                rotateY = SceneJS.rotate({
-                                                    angle: 0.0, y : 1.0
-                                                },
-                                                        SceneJS.cube()
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                )
-        );
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -147,10 +169,7 @@ var texScale = 1.0;
  */
 var timeLast = (new Date()).getTime();
 
-/* Always get canvas from scene - it will try to bind to a default canvas
- * when it can't find the one specified
- */
-var canvas = document.getElementById(exampleScene.getCanvasId());
+var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -176,10 +195,11 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
-    rotateX.setAngle(pitch);
-    rotateY.setAngle(yaw);
 
-    texture.setLayer({
+    SceneJS.withNode("pitch").set("angle", pitch);
+    SceneJS.withNode("yaw").set("angle", yaw);
+
+    SceneJS.withNode("theTexture").set("layer", {
         index: 0,
         cfg: {
             scale: {
@@ -190,18 +210,18 @@ window.render = function() {
         }
     });
 
-    exampleScene.render();
+    SceneJS.withNode("theScene").render();
 
     texAngle += 0.4;
     texScale = (texScale + 0.01) % 10.0;
 
 };
 
-SceneJS.addListener("error", function() {
+SceneJS.bind("error", function() {
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function() {
+SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 

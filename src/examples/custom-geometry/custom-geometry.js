@@ -15,80 +15,83 @@
  */
 
 
-var exampleScene = SceneJS.scene({
-
-    /* Bind scene to a WebGL canvas:
-     */
+SceneJS.createNode({
+    type: "scene",
+    id: "the-scene",
     canvasId: "theCanvas",
+    loggingElementId: "theLoggingDiv",
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv" },
-
-        SceneJS.lookAt({
+    nodes: [
+        {
+            type: "lookAt",
             eye : { x: 0.0, y: 10.0, z: -55 },
             look : { y:1.0 },
-            up : { y: 1.0 }
-        },
+            up : { y: 1.0 },
 
-                SceneJS.camera({
+            nodes: [
+                {
+                    type: "camera",
                     optics: {
                         type: "perspective",
                         fovy : 25.0,
                         aspect : 1.47,
                         near : 0.10,
-                        far : 300.0  }
-                },
-                        SceneJS.light({
+                        far : 300.0
+                    },
+
+                    nodes: [
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.5, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.7, g: 0.7, b: 0.7 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        }),
-
-                        SceneJS.light({
+                        },
+                        {
+                            type: "light",
                             mode:                   "dir",
                             color:                  { r: 0.8, g: 0.8, b: 0.8 },
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                        }),
-
-                    /* Next, modelling transforms to orient our geometry
-                     * by a given angles.
-                     * See how these have "sid" (scoped identifier) properties,
-                     * which they will be referenced by when we push configurations
-                     * into the scene graph when we render it
-                     */
-                        SceneJS.rotate({
-                            sid: "pitch",
-                            angle: 0.0,
-                            x : 1.0
                         },
-                                SceneJS.rotate({
-                                    sid: "yaw",
-                                    angle: 0.0,
-                                    y : 1.0
-                                },
 
-                                        SceneJS.material({
+                        /* Next, modelling transforms to orient our geometry
+                         * by a given angles. The rotate nodes have IDs that we'll locate them with below.
+                         */
+                        {
+                            type: "rotate",
+                            id: "pitch",
+                            angle: 0.0,
+                            x : 1.0,
+
+                            nodes: [
+                                {
+                                    type: "rotate",
+                                    id: "yaw",
+                                    angle: 0.0,
+                                    y : 1.0,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                             specular:       0.9,
-                                            shine:          6.0
-                                        },
+                                            shine:          6.0,
 
-                                                SceneJS.texture({
-
+                                            nodes: [
+                                                {
+                                                    type: "texture",
                                                     layers: [
                                                         {
                                                             uri:"images/BrickWall.jpg" ,
@@ -127,15 +130,18 @@ var exampleScene = SceneJS.scene({
                                                                 y: .05
                                                             }
                                                         }
-                                                    ]},
+                                                    ],
 
+                                                    nodes: [
 
-                                                    /* Aha, here you are, glad you made it!
-                                                     *
-                                                     * Here is the geometry node which defines our
-                                                     * custom object, a simple cube.
-                                                     */
-                                                        SceneJS.geometry({
+                                                        /* Aha, here you are, glad you made it!
+                                                         *
+                                                         * Here is the geometry node which defines our
+                                                         * custom object, a simple cube.
+                                                         */
+                                                        {
+
+                                                            type: "geometry",
 
                                                             /* Optional resource name, must be unique among all
                                                              * geometries - if another geometry has already
@@ -352,15 +358,22 @@ var exampleScene = SceneJS.scene({
                                                                 20,21,22,
                                                                 20,22,23
                                                             ]
-                                                        })
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                )
-        )
-        ;
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
 
 var yaw = 30;
 var pitch = -30;
@@ -368,10 +381,7 @@ var lastX;
 var lastY;
 var dragging = false;
 
-/* Always get canvas from scene - it will try to bind to a default canvas
- * can't find the one specified
- */
-var canvas = document.getElementById(exampleScene.getCanvasId());
+var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -401,10 +411,10 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 window.render = function() {
-    exampleScene
-            .setConfigs({ "#pitch": { angle: pitch, "#yaw": { angle: yaw } } })
-            .render();
 
+    SceneJS.withNode("pitch").set("angle", pitch);
+    SceneJS.withNode("yaw").set("angle", yaw);
+    SceneJS.withNode("the-scene").render();
 };
 
 /* Render loop until error or reset
@@ -412,11 +422,11 @@ window.render = function() {
  */
 var pInterval;
 
-SceneJS.addListener("error", function() {
+SceneJS.bind("error", function() {
     window.clearInterval(pInterval);
 });
 
-SceneJS.addListener("reset", function() {
+SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 
