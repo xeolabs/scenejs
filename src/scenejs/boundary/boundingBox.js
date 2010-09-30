@@ -404,15 +404,17 @@ SceneJS.BoundingBox.prototype.getCanvasSize = function() {
 // @private
 SceneJS.BoundingBox.prototype._render = function(traversalContext) {
 
-    if (this._levels.length != this._children.length) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                ("SceneJS.boundingBox levels property should have a value for each child node"));
-    }
-
-    for (var i = 1; i < this._levels.length; i++) {
-        if (this._levels[i - 1] >= this._levels[i]) {
+    if (this._levels) {
+        if (this._levels.length != this._children.length) {
             throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                    ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
+                    ("SceneJS.boundingBox levels property should have a value for each child node"));
+        }
+
+        for (var i = 1; i < this._levels.length; i++) {
+            if (this._levels[i - 1] >= this._levels[i]) {
+                throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
+                        ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
+            }
         }
     }
 
