@@ -55,6 +55,7 @@ SceneJS._eventModule = new (function() {
     this.PICK_COLOR_EXPORTED = 39;
     this.BOUNDARY_EXPORTED = 40;
     this.HIGHLIGHT_EXPORTED = 41;
+    this.NODE_CREATED = 42;
 
     /* Priority queue for each type of event
      */
@@ -267,7 +268,7 @@ SceneJS.bind = function(name, func) {
                 function(params) {
                     func({
                         nodeId : params.nodeId,
-                        json: json
+                        json: params.json
                     });
                 });
             break;
