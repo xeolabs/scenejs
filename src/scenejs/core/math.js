@@ -19,6 +19,16 @@ SceneJS._math_addVec4s = function(v, s) {
 }
 
 /** @private */
+SceneJS._math_addVec3 = function(u, v) {
+    return [u[0] + v[0],u[1] + v[1],u[2] + v[2]];
+};
+
+/** @private */
+SceneJS._math_addVec3s = function(v, s) {
+    return [v[0] + s,v[1] + s,v[2] + s];
+};
+
+/** @private */
 SceneJS._math_addScalarVec4 = function(s, v) {
     return SceneJS._math_addVec4s(v, s)
 }
@@ -1279,7 +1289,11 @@ SceneJS._math_slerp = function(t, q1, q2) {
 SceneJS._math_normalizeQuaternion = function(q) {
     var len = SceneJS._math_lenVec3([q[0], q[1], q[2]]);
     return [ q[0] / len, q[1] / len, q[2] / len, q[3] / len ];
-}
+};
+
+SceneJS._math_conjugateQuaternion = function(q) {
+  return[-q[0],-q[1],-q[2],q[3]];
+};
 
 SceneJS._math_angleAxisFromQuaternion = function(q) {
     q = SceneJS._math_normalizeQuaternion(q);
