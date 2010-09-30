@@ -464,22 +464,22 @@ SceneJS.Node.prototype.getType = function() {
     return this._nodeType;
 };
 
-///**
-// * Returns the data object attached to this node.
-// * @returns {Object} data object
-// */
-//SceneJS.Node.prototype.getData = function() {
-//    return this._data;
-//};
-//
-///**
-// * Sets a data object on this node.
-// * @param {Object} data Data object
-// */
-//SceneJS.Node.prototype.setData = function(data) {
-//    this._data = data;
-//    return this;
-//};
+/**
+ * Returns the data object attached to this node.
+ * @returns {Object} data object
+ */
+SceneJS.Node.prototype.getData = function() {
+    return this._data;
+};
+
+/**
+ * Sets a data object on this node.
+ * @param {Object} data Data object
+ */
+SceneJS.Node.prototype.setData = function(data) {
+    this._data = data;
+    return this;
+};
 
 /**
  * Returns the node's optional subidentifier, which must be unique within the scope
@@ -526,19 +526,6 @@ SceneJS.Node.prototype.getNodes = function() {
     return list;
 };
 
-/** Iterates over child nodes of the selected node, executing a function
- * for each child node.
- * @param {Function(index, node)} fn Function to execute on each child node
- */
-SceneJS.Node.prototype.eachNode = function(fn) {
-    var len = this._children.length;
-    for (var i = 0; i < len; i++) {
-        if (fn(i, this._children[i]) == true) {
-            return this._children[i];
-        }
-    }
-};
-
 /** Returns child node at given index. Returns null if no node at that index.
  * @param {Number} index The child index
  * @returns {SceneJS.Node} Child node, or null if not found
@@ -548,6 +535,26 @@ SceneJS.Node.prototype.getNodeAt = function(index) {
         return null;
     }
     return this._children[index];
+};
+
+/** Returns first child node. Returns null if no child nodes.
+ * @returns {SceneJS.Node} First child node, or null if not found
+ */
+SceneJS.Node.prototype.getFirstNode = function() {
+    if (this._children.length == 0) {
+        return null;
+    }
+    return this._children[0];
+};
+
+/** Returns last child node. Returns null if no child nodes.
+ * @returns {SceneJS.Node} Last child node, or null if not found
+ */
+SceneJS.Node.prototype.getLastNode = function() {
+    if (this._children.length == 0) {
+        return null;
+    }
+    return this._children[this._children.length - 1];
 };
 
 /** Returns child node with the given ID.
@@ -664,7 +671,7 @@ SceneJS.Node.prototype.addNode = function(node) {
             }
             node = gotNode;
         } else {
-            node = SceneJS.createNode(node);
+            node = SceneJS._parseNodeJSON(node);
         }
     }
     if (!node._render) {
@@ -696,7 +703,7 @@ SceneJS.Node.prototype.findNodeIndex = function(sid) {
     return -1;
 };
 
-/** Inserts a child node
+/** Inserts a subgraph into child nodes
  * @param {SceneJS.Node} node Child node
  * @param {int} i Index for new child node
  * @return {SceneJS.Node} The child node
@@ -708,7 +715,7 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
                         "SceneJS.Node#insertNode - node argument is undefined"));
     }
     if (!node._render) {
-        node = SceneJS.createNode(node);
+        node = SceneJS._parseNodeJSON(node);
     }
     if (!node._render) {
         throw SceneJS._errorModule.fatalError(
@@ -726,7 +733,14 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
         /* Insert node above children when no index given
          */
         var children = this.removeNodes();
-        node.addNodes(children);
+
+        /* Move children to right-most leaf of inserted graph
+         */
+        var leaf = node;
+        while (leaf.getNumNodes() > 0) {
+            leaf = leaf.getLastNode();
+        }
+        leaf.addNodes(children);
         this.addNode(node);
 
     } else if (i <= 0) {
