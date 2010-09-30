@@ -7,13 +7,13 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.7',
+    VERSION: '0.7.8',
 
     /** Names of supported WebGL canvas contexts
      */
     SUPPORTED_WEBGL_CONTEXT_NAMES:["experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"],
 
-    /** Creates a new {@link SceneJS.Node} subtype.
+    /** Extension point to create a new node type.
      *
      * @param {string} type Name of new subtype
      * @param {string} superType Optional name of super-type - {@link SceneJS.Node} by default
@@ -54,7 +54,9 @@ var SceneJS = {
      * @return {SceneJS.Node} Root of (sub)graph
      */
     createNode : function(json) {
-        return SceneJS.withNode(this._parseNodeJSON(json));
+        var newNode = this._parseNodeJSON(json);
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
+        return SceneJS.withNode(newNode);
     },
 
     _parseNodeJSON : function(json) {
@@ -110,39 +112,56 @@ var SceneJS = {
                 return SceneJS.withNode(parent);
             },
 
-//            /** Selects a child node matching given ID or index
-//             * @param {Number|String} node Child node index or ID
-//             */
-//            node: function(node) {
-//                var type = typeof node;
-//                var nodeGot;
-//                if (type == "number") {
-//                    nodeGot = targetNode.getNodeAt(node);
-//                } else if (type == "string") {
-//                    nodeGot = targetNode.getNode(node);
-//                } else {
-//                    throw "Child node should be specified as ID or index";
-//                }
-//                if (!nodeGot) {
-//                    throw "Child node " + node + " not found on selected node: " + targetNode.getID();
-//                }
-//                return SceneJS.withNode(nodeGot);
-//            },
-//
-//            /**
-//             * Iterates over child nodes of the selected node, executing a function
-//             * for each child node. If the function returns true at any node, then a selector
-//             * is returned for that node.
-//             * @param {Function(index, node)} fn Function to execute on each child node
-//             * @return {Object} Selector for selected node, if any
-//             */
-//            each : function(fn) {
-//                var node = targetNode.eachNode(fn);
-//                if (node) {
-//                    return SceneJS.withNode(node);
-//                }
-//                return undefined; // IDE happy now
-//            },
+            //            /** Selects a child node matching given ID or index
+            //             * @param {Number|String} node Child node index or ID
+            //             */
+            //            node: function(node) {
+            //                var type = typeof node;
+            //                var nodeGot;
+            //                if (type == "number") {
+            //                    nodeGot = targetNode.getNodeAt(node);
+            //                } else if (type == "string") {
+            //                    nodeGot = targetNode.getNode(node);
+            //                } else {
+            //                    throw "Child node should be specified as ID or index";
+            //                }
+            //                if (!nodeGot) {
+            //                    throw "Child node " + node + " not found on selected node: " + targetNode.getID();
+            //                }
+            //                return SceneJS.withNode(nodeGot);
+            //            },
+            //
+
+            /**
+             * Iterates over sub-nodes of the selected node, executing a function
+             * for each. With the optional options object we can configure is depth-first or breadth-first order.
+             * If neither, then only the child nodes are iterated.
+             * If the function returns true at any node, then traversal stops and a selector is
+             * returned for that node.
+             * @param {Function(index, node)} fn Function to execute on each child node
+             * @return {Object} Selector for selected node, if any
+             */
+            eachNode : function(fn, options) {
+                var stoppedNode;
+                options = options || {};
+                var count = 0;
+                if (options.andSelf) {
+                    if (fn.call(this, count++) == true) {
+                        return this;
+                    }
+                }
+                if (!options.depthFirst && !options.breadthFirst) {
+                    stoppedNode = iterateEachNode(fn, targetNode, count);
+                } else if (options.depthFirst) {
+                    stoppedNode = iterateEachNodeDepthFirst(fn, targetNode, count, false); // Not below root yet
+                } else {
+                    // TODO: breadth-first
+                }
+                if (stoppedNode) {
+                    return SceneJS.withNode(stoppedNode);
+                }
+                return undefined; // IDE happy now
+            },
 
             /** Sets an attribute of the selected node
              */
@@ -211,14 +230,14 @@ var SceneJS = {
 
             /**
              * Performs pick on the selected scene node, which must be a scene.
-             * @param canvasX Canvas X-coordinate
-             * @param canvasY Canvas Y-coordinate
+             * @param offsetX Canvas X-coordinate
+             * @param offsetY Canvas Y-coordinate
              */
-            pick : function(canvasX, canvasY) {
+            pick : function(offsetX, offsetY) {
                 if (targetNode.getType() != "scene") {
                     throw "Cannot do pick on this node - not a \"scene\" type: '" + targetNode.getID() + "'";
                 }
-                targetNode.pick(canvasX, canvasY);
+                targetNode.pick(offsetX, offsetY);
                 return this;
             },
 
@@ -230,6 +249,34 @@ var SceneJS = {
                     throw "Cannot render this node - not a \"scene\" type: '" + targetNode.getID() + "'";
                 }
                 targetNode.render();
+                return this;
+            },
+
+            /**
+             * Starts the selected scene node, which must be a scene.
+             */
+            start : function (cfg) {
+                if (targetNode.getType() != "scene") {
+                    throw "Cannot start rendering this node - not a \"scene\" type: '" + targetNode.getID() + "'";
+                }
+                if (cfg.idleFunc) {    // Wrap idleFunc to call on selector as scope
+                    var fn = cfg.idleFunc;
+                    cfg.idleFunc = function() {
+                        fn(this);
+                    };
+                }
+                targetNode.start(cfg);
+                return this;
+            },
+
+            /**
+             * Stops the selected scene node, which must be a scene.
+             */
+            stop : function () {
+                if (targetNode.getType() != "scene") {
+                    throw "Cannot stop rendering this node - not a \"scene\" type: '" + targetNode.getID() + "'";
+                }
+                targetNode.stop();
                 return this;
             },
 
@@ -254,6 +301,37 @@ var SceneJS = {
                 }
             }
         };
+
+        function iterateEachNode(fn, node, count) {
+            var len = node._children.length;
+            var selector;
+            for (var i = 0; i < len; i++) {
+                selector = SceneJS.withNode(node._children[i]);
+                if (fn.call(selector, count++) == true) {
+                    return selector;
+                }
+            }
+            return undefined;
+        }
+
+        function iterateEachNodeDepthFirst(fn, node, count, belowRoot) {
+            var selector;
+            if (belowRoot) {
+                selector = SceneJS.withNode(node);
+                if (fn.call(selector, count++) == true) {
+                    return selector;
+                }
+            }
+            belowRoot = true;
+            var len = node._children.length;
+            for (var i = 0; i < len; i++) {
+                selector = iterateEachNodeDepthFirst(fn, node._children[i], count, belowRoot);
+                if (selector) {
+                    return selector;
+                }
+            }
+            return undefined;
+        }
     },
 
     /** Returns true if the {@link SceneJS.Node} with the given ID exists
@@ -322,7 +400,6 @@ var SceneJS = {
                     if (remove) {
                         SceneJS._callNodeMethods("remove", remove, targetNode);
                     }
-                    targetNode._fireEvent("updated");
                 }
             }
 
@@ -339,14 +416,23 @@ var SceneJS = {
 
     })(),
 
-    _callNodeMethod : function(prefix, attr, value, targetNode) {
+    _callNodeMethod: function(prefix, attr, value, targetNode) {
         var funcName = prefix + attr.substr(0, 1).toUpperCase() + attr.substr(1);
         var func = targetNode[funcName];
         if (!func) {
             throw "Attribute '" + attr + "' not found on node '" + targetNode.getID() + "'";
         }
         func.call(targetNode, value);
-    },
+
+        /* TODO: optimise - dont fire unless listener exists
+         */
+        var params = {};
+        params[attr] = value;
+
+        /* TODO: event should be queued and consumed to avoid many of these events accumulating
+         */
+        targetNode._fireEvent("updated", params);
+    } ,
 
     _callNodeMethods : function(prefix, attr, targetNode) {
         for (var key in attr) {
@@ -360,34 +446,42 @@ var SceneJS = {
                 func.call(targetNode, attr[key]);
             }
         }
-    },
+
+        /* TODO: optimise - dont fire unless listener exists
+         */
+        /* TODO: event should be queued and consumed to avoid many of these events accumulating
+         */
+        targetNode._fireEvent("updated", { attr: attr });
+    } ,
 
     /**
      * Node factory funcs mapped to type
      * @private
      */
-    _nodeTypes: {},
+    _nodeTypes: {
+    },
 
     /**
      * ID map of all existing nodes.
      * Referenced by {@link SceneJS.Node}.
      * @private
      */
-    _nodeIDMap : {},
+    _nodeIDMap : {
+    } ,
 
     /** @private */
     _traversalMode :0x1,
 
     /** @private */
-    _TRAVERSAL_MODE_RENDER: 0x1,
+    _TRAVERSAL_MODE_RENDER:0x1,
 
     /** @private */
-    _TRAVERSAL_MODE_PICKING:   0x2,
+    _TRAVERSAL_MODE_PICKING:0x2,
 
     /**
      * @private
      */
-    _inherit : function(DerivedClassName, BaseClassName) {
+    _inherit:function(DerivedClassName, BaseClassName) {
         DerivedClassName.prototype = new BaseClassName();
         DerivedClassName.prototype.constructor = DerivedClassName;
     },
@@ -453,7 +547,7 @@ var SceneJS = {
         return testObject && !(testObject.propertyIsEnumerable('length'))
                 && typeof testObject === 'object' && typeof testObject.length === 'number';
     }
-};
+} ;
 
 SceneJS._namespace("SceneJS");
 
