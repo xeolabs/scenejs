@@ -221,7 +221,7 @@ SceneJS._pickModule = new (function() {
         if (pickedNodeIndex >= 0) {
             var node = nodeLookup[pickedNodeIndex];
             if (node) {
-                node._fireEvent("picked", {});
+                node._fireEvent("picked", { x: pickX, y: pickY });
             }
         }
     }
