@@ -38,7 +38,7 @@ SceneJS._instancingModule = new function() {
         }
         var node = SceneJS._nodeIDMap[nodeID];
         if (!node) {
-            var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_STORE_SERVICE_ID);
+            var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_LOADER_SERVICE_ID);
             if (nodeStore) {
                 node = nodeStore.loadNode(nodeID);                
             }
