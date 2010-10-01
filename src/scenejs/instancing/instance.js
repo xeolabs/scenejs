@@ -61,7 +61,7 @@ SceneJS.Instance.prototype._init = function(params) {
  * target {@link SceneJS.Symbol} yet.
  * @const
  */
-SceneJS.Instance.STATE_INITIAL = 0;
+SceneJS.Instance.STATE_INITIAL = "init";
 
 /**
  * State of a SceneJS.Instance in which instantiation has failed. This condition might be temporary (eg. the target
@@ -69,7 +69,7 @@ SceneJS.Instance.STATE_INITIAL = 0;
  * instancing again when next rendered, transitioning to {@link STATE_RENDERING} when that succeeds.
  * @const
  */
-SceneJS.Instance.STATE_ERROR = -1;
+SceneJS.Instance.STATE_ERROR = "error";
 
 /**
  * State of a SceneJS.Instance in which it will attempt to instantiate its target when next rendered. This is when it
@@ -77,7 +77,7 @@ SceneJS.Instance.STATE_ERROR = -1;
  * {@link #STATE_RENDERING} if that succeeds, otherwise it will transition to {@link #STATE_ERROR}.
  * @const
  */
-SceneJS.Instance.STATE_READY = 2;
+SceneJS.Instance.STATE_READY = "ready";
 
 
 /**
@@ -86,7 +86,7 @@ SceneJS.Instance.STATE_READY = 2;
  * state, the SceneJS.Instance will transition back to {@link #STATE_READY} once it has completed rendering the target.
  * @const
  */
-SceneJS.Instance.STATE_RENDERING = 3;
+SceneJS.Instance.STATE_RENDERING = "rendering";
 
 /**
  * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
