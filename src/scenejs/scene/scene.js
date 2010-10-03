@@ -238,13 +238,13 @@ SceneJS.Scene.prototype.start = function(cfg) {
         var fnName = "__scenejs_renderScene" + this._sceneId;
         window[fnName] = function() {
             if (cfg.idleFunc) {
-                cfg.idleFunc(self);
+                cfg.idleFunc();
             }
             if (self._running) { // idleFunc may have stopped render loop
-                self.render();
+                self._render();
             }
         };
-        this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 10));
+        this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 100));
     }
 };
 
