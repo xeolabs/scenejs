@@ -145,7 +145,7 @@ SceneJS.Node = function() {
     /* Deregister default ID
      */
     if (this._id) {
-        SceneJS._nodeIDMap[this._id] = null;
+        SceneJS._nodeIDMap[this._id] = undefined;
     }
 
     SceneJS.Node._ArgParser.parseArgs(arguments, this);
@@ -456,6 +456,12 @@ SceneJS.Node.prototype.getID = function() {
 };
 
 /**
+ * Alias for {@link #getID()} to assist resolution of the ID by JSON query API
+ * @returns {string} Node's ID
+ */
+SceneJS.Node.prototype.getId = SceneJS.Node.prototype.getID;
+
+/**
  * Returns the type ID of the node. For the SceneJS.Node base class, it is "node",
  * which is overriden in sub-classes.
  * @returns {string} Type ID
@@ -650,6 +656,23 @@ SceneJS.Node.prototype.addNodes = function(nodes) {
     this._setDirty();
     return this;
 };
+
+//SceneJS.Node.prototype.addNodes = function(nodes) {
+//    if (!nodes) {
+//        throw SceneJS._errorModule.fatalError(
+//                new SceneJS.errors.InvalidSceneGraphException(
+//                        "SceneJS.Node#addNodes - nodes argument is undefined"));
+//    }
+//    if (typeof nodes == "array") {
+//        for (var i = nodes.length - 1; i >= 0; i--) {
+//            this.addNode(nodes[i]);
+//        }
+//    } else {
+//        this.addNode(nodes);
+//    }
+//    this._setDirty();
+//    return this;
+//};
 
 /** Appends a child node
  * @param {SceneJS.Node} node Child node
