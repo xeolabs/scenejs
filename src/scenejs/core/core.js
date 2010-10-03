@@ -20,6 +20,12 @@ var SceneJS = {
      * @return {class} New node class
      */
     createNodeType : function(type, superType) {
+        if (!type) {
+            throw "createNodeType param 'type' is null or undefined";
+        }
+        if (typeof type != "string") {
+            throw "createNodeType param 'type' should be a string";
+        }
         var supa = this._nodeTypes[superType || "node"];
         if (!supa) {
             throw "undefined superType: '" + superType + "'";
@@ -54,6 +60,9 @@ var SceneJS = {
      * @return {SceneJS.Node} Root of (sub)graph
      */
     createNode : function(json) {
+        if (!json) {
+            throw "createNode param 'json' is null or undefined";
+        }
         var newNode = this._parseNodeJSON(json);
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
         return SceneJS.withNode(newNode);
@@ -63,7 +72,7 @@ var SceneJS = {
         json.type = json.type || "node";
         var nodeType = this._nodeTypes[json.type];
         if (!nodeType) {
-            throw "Node type not registered: '" + json.type + "'";
+            throw "Failed to parse JSON node definition - unknown node type: '" + json.type + "'";
         }
         var newNode = new nodeType.nodeClass(this._copyCfg(json));   // Faster to instantiate class directly
         if (json.nodes) {
@@ -94,11 +103,11 @@ var SceneJS = {
      */
     withNode : function(node) {
         if (!node) {
-            throw "SceneJS.withNode node argument is null";
+            throw "withNode param 'node' is null or undefined";
         }
         var targetNode = node._render ? node : SceneJS._nodeIDMap[node];
         if (!targetNode) {
-            throw "Node not found: '" + node + "'";
+            throw "withNode node not found: '" + node + "'";
         }
         return {
 
@@ -107,7 +116,7 @@ var SceneJS = {
             parent : function() {
                 var parent = targetNode.getParent();
                 if (!parent) {
-                    throw "Selected node has no parent";
+                    throw "withNode node has no parent";
                 }
                 return SceneJS.withNode(parent);
             },
@@ -130,7 +139,6 @@ var SceneJS = {
             //                }
             //                return SceneJS.withNode(nodeGot);
             //            },
-            //
 
             /**
              * Iterates over sub-nodes of the selected node, executing a function
@@ -142,6 +150,12 @@ var SceneJS = {
              * @return {Object} Selector for selected node, if any
              */
             eachNode : function(fn, options) {
+                if (!fn) {
+                    throw "eachNode param 'fn' is null or undefined";
+                }
+                if (typeof fn != "function") {
+                    throw "eachNode param 'fn' should be a function";
+                }
                 var stoppedNode;
                 options = options || {};
                 var count = 0;
@@ -166,6 +180,9 @@ var SceneJS = {
             /** Sets an attribute of the selected node
              */
             set: function(attr, value) {
+                if (!attr) {
+                    throw "set param 'attr' null or undefined";
+                }
                 if (typeof attr == "string") {
                     SceneJS._callNodeMethod("set", attr, value, targetNode);
                 } else {
@@ -177,6 +194,9 @@ var SceneJS = {
             /** Adds an attribute to the selected node
              */
             add: function(attr, value) {
+                if (!attr) {
+                    throw "add param 'attr' null or undefined";
+                }
                 if (typeof attr == "string") {
                     SceneJS._callNodeMethod("add", attr, value, targetNode);
                 } else {
@@ -188,6 +208,9 @@ var SceneJS = {
             /** Inserts an attribute or child node into the selected node
              */
             insert: function(attr, value) {
+                if (!attr) {
+                    throw "insert param 'attr' null or undefined";
+                }
                 if (typeof attr == "string") {
                     SceneJS._callNodeMethod("insert", attr, value, targetNode);
                 } else {
@@ -199,6 +222,9 @@ var SceneJS = {
             /** Removes an attribute from the selected node
              */
             remove: function(attr, value) {
+                if (!attr) {
+                    throw "remove param 'attr' null or undefined";
+                }
                 if (typeof attr == "string") {
                     SceneJS._callNodeMethod("remove", attr, value, targetNode);
                 } else {
@@ -210,6 +236,9 @@ var SceneJS = {
             /** Returns the value of an attribute of the selected node
              */
             get: function(attr) {
+                if (!attr) {
+                    throw "get param 'attr' null or undefined";
+                }
                 var funcName = "get" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
                 var func = targetNode[funcName];
                 if (!func) {
@@ -224,6 +253,18 @@ var SceneJS = {
              * @param {Function} fn Event handler
              */
             bind : function(name, fn) {
+                if (!name) {
+                    throw "bind param 'name' null or undefined";
+                }
+                if (typeof name != "string") {
+                    throw "bind param 'name' should be a string";
+                }
+                if (!fn) {
+                    throw "bind param 'fn' null or undefined";
+                }
+                if (typeof fn != "function") {
+                    throw "bind param 'fn' should be a function";
+                }
                 targetNode.addListener(name, fn, { scope: this });
                 return this;
             },
@@ -234,8 +275,20 @@ var SceneJS = {
              * @param offsetY Canvas Y-coordinate
              */
             pick : function(offsetX, offsetY) {
+                if (!offsetX) {
+                    throw "pick param 'offsetX' null or undefined";
+                }
+                if (typeof offsetX != "number") {
+                    throw "pick param 'offsetX' should be a number";
+                }
+                if (!offsetY) {
+                    throw "pick param 'offsetY' null or undefined";
+                }
+                if (typeof offsetY != "number") {
+                    throw "pick param 'offsetY' should be a number";
+                }
                 if (targetNode.getType() != "scene") {
-                    throw "Cannot do pick on this node - not a \"scene\" type: '" + targetNode.getID() + "'";
+                    throw "pick attempted on node that is not a \"scene\" type: '" + targetNode.getID() + "'";
                 }
                 targetNode.pick(offsetX, offsetY);
                 return this;
@@ -246,7 +299,7 @@ var SceneJS = {
              */
             render : function () {
                 if (targetNode.getType() != "scene") {
-                    throw "Cannot render this node - not a \"scene\" type: '" + targetNode.getID() + "'";
+                    throw "render attempted on node that is not a \"scene\" type: '" + targetNode.getID() + "'";
                 }
                 targetNode.render();
                 return this;
@@ -257,8 +310,9 @@ var SceneJS = {
              */
             start : function (cfg) {
                 if (targetNode.getType() != "scene") {
-                    throw "Cannot start rendering this node - not a \"scene\" type: '" + targetNode.getID() + "'";
+                    throw "start attempted on node that is not a \"scene\" type: '" + targetNode.getID() + "'";
                 }
+                cfg = cfg || {};
                 if (cfg.idleFunc) {    // Wrap idleFunc to call on selector as scope
                     var fn = cfg.idleFunc;
                     cfg.idleFunc = function() {
@@ -274,15 +328,29 @@ var SceneJS = {
              */
             stop : function () {
                 if (targetNode.getType() != "scene") {
-                    throw "Cannot stop rendering this node - not a \"scene\" type: '" + targetNode.getID() + "'";
+                    throw "stop attempted on node that is not a \"scene\" '" + targetNode.getID() + "'";
                 }
                 targetNode.stop();
+                return this;
+            },
+
+            /**
+             * Destroys the selected scene node, which must be a scene.
+             */
+            destroy : function() {
+                if (targetNode.getType() != "scene") {
+                    throw "destroy attempted on node that is not a \"scene\" type: '" + targetNode.getID() + "'";
+                }
+                targetNode.destroy();
                 return this;
             },
 
             /** Allows us to get or set data of any type on the scene node
              */
             data: function(data, value) {
+                if (!data) {
+                    throw "data param 'data' null or undefined";
+                }
                 targetNode._data = targetNode._data || {};
                 if (typeof data == "string") {
                     if (value != undefined) {
@@ -340,6 +408,12 @@ var SceneJS = {
      * @returns {Boolean} True if node exists else false
      */
     nodeExists : function(id) {
+        if (!id) {
+            throw "nodeExists param 'id' null or undefined";
+        }
+        if (typeof id != "string") {
+            throw "nodeExists param 'id' not a string";
+        }
         var node = SceneJS._nodeIDMap[id];
         return (node != undefined && node != null);
     },
@@ -353,9 +427,12 @@ var SceneJS = {
          * @param message
          */
         this.sendMessage = function (message) {
+            if (!message) {
+                throw "sendMessage param 'message' null or undefined";
+            }
             var command = message.command;
             if (!command) {
-                throw "Message command expected";
+                throw "Message element expected: 'command'";
             }
 
             /* Create a node
