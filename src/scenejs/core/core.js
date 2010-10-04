@@ -68,6 +68,29 @@ var SceneJS = {
         return SceneJS.withNode(newNode);
     },
 
+    /** Schedule the destruction of a node
+     * @private
+     */
+    _scheduleNodeDestroy : function(node) {
+        this._destroyedNodes.push(node);
+    },
+
+    /** Nodes that are scheduled to be destroyed. When a node is destroyed it is added here, then at the end of each
+     * render traversal, each node in here is popped and has {@link SceneJS.Node#destroy} called.
+     *  @private
+     */
+    _destroyedNodes : [],
+
+    /** Action the scheduled destruction of nodes
+     * @private
+     */
+    _actionNodeDestroys : function() {
+        for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
+            this._destroyedNodes[i]._doDestroy();
+        }
+        this._destroyedNodes = [];
+    },
+
     _parseNodeJSON : function(json) {
         json.type = json.type || "node";
         var nodeType = this._nodeTypes[json.type];

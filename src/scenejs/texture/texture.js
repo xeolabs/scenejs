@@ -183,22 +183,30 @@ SceneJS.Texture.prototype._init = function(params) {
 
 /** Ready to create texture layers
  */
-SceneJS.Texture.STATE_INITIAL = 0;
+SceneJS.Texture.STATE_INITIAL = "init";
 
 /** At least one texture layer image load in progress. The Texture node can temporarily revert to this
  * after {@link STATE_LOADED} if any layer has been evicted from VRAM (after lack of use) while
  * the Texture node re-creates it.
  */
-SceneJS.Texture.STATE_LOADING = 1;
+SceneJS.Texture.STATE_LOADING = "loading";
 
 /** All texture layer image loads completed
  */
-SceneJS.Texture.STATE_LOADED = 2;
+SceneJS.Texture.STATE_LOADED = "loaded";
 
 /** At least one texture layer creation or image load failed. The Texture node limps on in this state.
  */
-SceneJS.Texture.STATE_ERROR = -1;
+SceneJS.Texture.STATE_ERROR = "error";
 
+/**
+ * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
+ * {@link #STATE_LOADING}, {@link #STATE_LOADED} and {@link #STATE_ERROR}.
+ * @returns {int} The state
+ */
+SceneJS.Texture.prototype.getState = function() {
+    return this._state;
+};
 
 SceneJS.Texture.prototype._render = function(traversalContext) {
 

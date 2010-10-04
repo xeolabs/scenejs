@@ -868,11 +868,32 @@ SceneJS.Node.prototype.getEnabled = function() {
 };
 
 /**
- * Destroys this node the next time it's rendered
+ * Destroys this node. It is marked for destruction; when the next scene traversal begins (or the current one ends)
+ * it will be destroyed and removed from it's parent.
  * @return {SceneJS.Node} this
  */
 SceneJS.Node.prototype.destroy = function() {
-    // alert("destroying");
+    if (!this._destroyed) {
+        this._destroyed = true;
+        SceneJS._scheduleNodeDestroy(this);
+    }
+    return this;
+};
+
+SceneJS.Node.prototype._doDestroy = function() {
+    if (this._destroy) {
+        this._destroy();
+    }
+    if (this._parent) {
+        this._parent.removeNode(this);
+    }
+    SceneJS._nodeIDMap[this._id] = null;
+    if (this._children.length > 0) {
+        var children = this._children.slice(0);      // destruction will modify this._children
+        for (var i = 0; i < children.length; i++) {
+            children[i]._doDestroy();
+        }
+    }
     return this;
 };
 

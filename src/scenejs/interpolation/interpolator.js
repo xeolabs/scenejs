@@ -119,20 +119,20 @@ SceneJS.Interpolator.prototype._init = function(params) {
          */
     }
     this._mode = params.mode;
-    this._once = false;
+    this._once = params.once;
 };
 
 // @private
-SceneJS.Interpolator.prototype._NOT_FOUND = 0;        // Alpha outside of key sequence
+SceneJS.Interpolator.prototype.STATE_OUTSIDE = "outside";    // Alpha outside of key sequence
 
 // @private
-SceneJS.Interpolator.prototype._BEFORE_FIRST = 1;     // Alpha before first key
+SceneJS.Interpolator.prototype.STATE_BEFORE = "pending";     // Alpha before first key
 
 // @private
-SceneJS.Interpolator.prototype._AFTER_LAST = 2;       // Alpha after last key
+SceneJS.Interpolator.prototype.STATE_AFTER = "complete";     // Alpha after last key
 
 // @private
-SceneJS.Interpolator.prototype._FOUND = 3;            // Found keys before and after alpha
+SceneJS.Interpolator.prototype.STATE_RUNNING = "running";    // Found keys before and after alpha
 
 // @private
 SceneJS.Interpolator.prototype._render = function(traversalContext) {
@@ -180,21 +180,21 @@ SceneJS.Interpolator.prototype._render = function(traversalContext) {
 // @private
 SceneJS.Interpolator.prototype._update = function(key) {
     switch (this._findEnclosingFrame(key)) {
-        case this._NOT_FOUND:
+        case this.STATE_OUTSIDE:
             break;
 
-        case this._BEFORE_FIRST:                            // Before first key
+        case this.STATE_BEFORE:                            // Before first key
             this._setDirty();                               // Need at least one more scene render to find first key
             break;                                          // Time delay before interpolation begins
 
-        case this._AFTER_LAST:
+        case this.STATE_AFTER:
             this._outputValue = this._values[this._values.length - 1];
             if (this._once) {
                 this.destroy();
             }
             break;
 
-        case this._FOUND:                                   // Found key pair
+        case this.STATE_RUNNING:                                   // Found key pair
             this._outputValue = this._interpolate((key));   // Do interpolation
             this._setDirty();                               // Need at least one more scene render to apply output
             break;
@@ -206,13 +206,13 @@ SceneJS.Interpolator.prototype._update = function(key) {
 // @private
 SceneJS.Interpolator.prototype._findEnclosingFrame = function(key) {
     if (this._keys.length == 0) {
-        return this._NOT_FOUND;
+        return this.STATE_OUTSIDE;
     }
     if (key < this._keys[0]) {
-        return this._BEFORE_FIRST;
+        return this.STATE_BEFORE;
     }
     if (key > this._keys[this._keys.length - 1]) {
-        return this._AFTER_LAST;
+        return this.STATE_AFTER;
     }
     while (this._keys[this._key1] > key) {
         this._key1--;
@@ -222,7 +222,7 @@ SceneJS.Interpolator.prototype._findEnclosingFrame = function(key) {
         this._key1++;
         this._key2++;
     }
-    return this._FOUND;
+    return this.STATE_RUNNING;
 };
 
 // @private
@@ -295,4 +295,15 @@ SceneJS.Interpolator.prototype._slerp = function(k) {
     return SceneJS._math_slerp((v / u), this._values[this._key1], this._values[this._key2]);
 };
 
+
+// @private
+SceneJS.Interpolator.prototype._changeState = function(newState, params) {
+    params = params || {};
+    params.oldState = this._state;
+    params.newState = newState;
+    this._state = newState;
+    if (this._listeners["state-changed"]) {
+        this._fireEvent("state-changed", params);
+    }
+};
 

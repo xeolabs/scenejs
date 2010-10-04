@@ -109,7 +109,12 @@ SceneJS.createNode({
                             ]
                         },
 
-                        /* Interpolator nodes - these can be anywhere in the scene graph
+                        /* Interpolator nodes - these can be placed anywhere in the scene graph as long as they
+                         * will be visited during traversal.
+                         *
+                         * Notice their "once" attribute, which indicates that once they have completed their
+                         * interpolation sequences they are to be removed from the scene and destroyed. This is
+                         * handy for injecting fire-and-forget animations into a scene graph.
                          */
                         {
                             type: "interpolator",
@@ -119,7 +124,8 @@ SceneJS.createNode({
 
                             // Seconds and values
                             keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0, 5],
-                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0, 360]
+                            values: [0.0, 100.0, 150.0, 150.0, 150.0, 0.0, 360],
+                            once: true  // Destroy this node when interpolation finished
                         },
                         {
                             type: "interpolator",
@@ -127,7 +133,8 @@ SceneJS.createNode({
                             target: "tip",
                             targetProperty: "angle",
                             keys: [0.0, 0.4, 1, 1.4, 1.8, 2.0],
-                            values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0]
+                            values: [0.0, 0.0, -50.0, -50.0, 0.0, 0.0],
+                            once: true
                         },
                         {
                             type: "interpolator",
@@ -135,7 +142,8 @@ SceneJS.createNode({
                             target: "stretch",
                             targetProperty: "y",
                             keys: [2.0, 3.0, 4.0, 5.0],
-                            values: [1.0, 2.0, .3, 1.0]
+                            values: [1.0, 2.0, .3, 1.0],
+                            once: true
                         },
                         {
                             type: "interpolator",
@@ -143,7 +151,8 @@ SceneJS.createNode({
                             target: "stretch",
                             targetProperty: "x",
                             keys: [2.5, 3.5, 4.5, 5.5],
-                            values: [1.0, 3.0, .1, 1.0]
+                            values: [1.0, 3.0, .1, 1.0],
+                            once: true
                         }
                     ]
                 }

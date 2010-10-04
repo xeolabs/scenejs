@@ -157,6 +157,7 @@ SceneJS.Scene.prototype._init = function(params) {
         this._canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
     }
     this._loggingElementId = params.loggingElementId;
+    this._destroyed = false;
 };
 
 /** ID of canvas SceneJS looks for when {@link SceneJS.Scene} node does not supply one
@@ -232,6 +233,10 @@ SceneJS.Scene.prototype.getCanvasId = function() {
  * @param cfg
  */
 SceneJS.Scene.prototype.start = function(cfg) {
+    if (this._destroyed) {
+        throw new SceneJS.errors.InvalidSceneGraphException
+                ("Attempted start on Scene that has been destroyed");
+    }
     if (!this._running) {
         this._running = true;
         var self = this;
@@ -260,6 +265,10 @@ SceneJS.Scene.prototype.isRunning = function() {
  * {@link #start}ed and is currently rendering in a loop.
  */
 SceneJS.Scene.prototype.render = function() {
+    if (this._destroyed) {
+        throw new SceneJS.errors.InvalidSceneGraphException
+                ("Attempted render on Scene that has been destroyed");
+    }
     if (!this._running) {
         this._render();
     }
@@ -274,25 +283,27 @@ SceneJS.Scene.prototype._render = function() {
             loggingElementId: this._loggingElementId
         });
     }
+    SceneJS._actionNodeDestroys();
     SceneJS._sceneModule.activateScene(this._sceneId);
     var traversalContext = {};
     this._renderNodes(traversalContext);
     SceneJS._sceneModule.deactivateScene();
+    SceneJS._actionNodeDestroys();
 };
 
-/** @private
- */
-SceneJS.Scene.prototype.reRender = function() {
-    if (!this._sceneId) {
-        this._sceneId = SceneJS._sceneModule.createScene(this, {
-            canvasId: this._canvasId,
-            loggingElementId: this._loggingElementId
-        });
-        this.render();
-    } else {
-        SceneJS._sceneModule.redrawScene(this._sceneId);
-    }
-};
+///** @private
+// */
+//SceneJS.Scene.prototype.reRender = function() {
+//    if (!this._sceneId) {
+//        this._sceneId = SceneJS._sceneModule.createScene(this, {
+//            canvasId: this._canvasId,
+//            loggingElementId: this._loggingElementId
+//        });
+//        this.render();
+//    } else {
+//        SceneJS._sceneModule.redrawScene(this._sceneId);
+//    }
+//};
 
 /**
  * Picks whatever {@link SceneJS.Geometry} will be rendered at the given canvas coordinates. When this is called within
@@ -305,14 +316,18 @@ SceneJS.Scene.prototype.reRender = function() {
  * @param canvasY Canvas Y-coordinate
  */
 SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
+    if (this._destroyed) {
+        throw new SceneJS.errors.InvalidSceneGraphException
+                ("Attempted pick on Scene that has been destroyed");
+    }
     if (!this._sceneId) {
         throw new SceneJS.errors.InvalidSceneGraphException
-                ("Attempted pick on Scene that has been destroyed or not yet rendered");
+                ("Attempted pick on Scene that has not yet rendered");
     }
     SceneJS._pickModule.pick(canvasX, canvasY); // Enter pick mode
     if (!this._running) {
         this._render(); // Pick-mode traversal - get picked element and fire events
-        this._render(); // Render-mode traversal - process events with listeners while drawing
+        this._render(); // Render-mode traversal 
     }
 };
 
@@ -327,17 +342,16 @@ SceneJS.Scene.prototype.getNumProcesses = function() {
     return (this._sceneId) ? SceneJS._processModule.getNumProcesses(this._sceneId) : 0;
 };
 
-/** Destroys this scene. You should destroy
- * a scene as soon as you are no longer using it, to ensure that SceneJS does not retain
- * resources for it (eg. shaders, VBOs etc) that are no longer in use. A destroyed scene
- * becomes un-destroyed as soon as you render it again. If the scene is currently rendering in a loop (after a call
- * to {@link #start}) then the loop is stopped.
+/**
+ * Scene node's destroy handler, called by {@link SceneJS.Node#destroy}
+ * @private
  */
-SceneJS.Scene.prototype.destroy = function() {
+SceneJS.Scene.prototype._destroy = function() {
     if (this._sceneId) {
         this.stop();
         SceneJS._sceneModule.destroyScene(this._sceneId); // Last one fires RESET command
         this._sceneId = null;
+        this._destroyed = true;
     }
 };
 
@@ -351,7 +365,7 @@ SceneJS.Scene.prototype.isActive = function() {
 /** Stops current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
  */
 SceneJS.Scene.prototype.stop = function() {
-    if (this._running) {
+    if (this._running && this._sceneId) {
         this._running = false;
         window["__scenejs_renderScene" + this._sceneId] = null;
         window.clearInterval(this._pInterval);

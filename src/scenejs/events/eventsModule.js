@@ -56,6 +56,7 @@ SceneJS._eventModule = new (function() {
     this.BOUNDARY_EXPORTED = 40;
     this.HIGHLIGHT_EXPORTED = 41;
     this.NODE_CREATED = 42;
+    this.LAYER_EXPORTED = 43;
 
     /* Priority queue for each type of event
      */
