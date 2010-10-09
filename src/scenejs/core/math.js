@@ -43,6 +43,15 @@ SceneJS._math_subVec3 = function(u, v) {
     return [u[0] - v[0],u[1] - v[1],u[2] - v[2]];
 }
 
+SceneJS._math_lerpVec3 = function(t, t1, t2, p1, p2) {
+    var f = (t - t1) / (t2 - t1);
+    return  {
+        x: p1.x + (f * p2.x - p1.x),
+        y: p1.y + (f * p2.y - p1.y),
+        z: p1.z + (f * p2.z - p1.z)
+    };
+};
+
 
 /** @private */
 SceneJS._math_subVec2 = function(u, v) {
@@ -971,7 +980,9 @@ SceneJS._math_billboardMat = function(viewMatrix) {
     SceneJS._math_setRowMat4(rotMatInverse, 1, rotVec[1]);
     SceneJS._math_setRowMat4(rotMatInverse, 2, rotVec[2]);
 
-    return SceneJS._math_mulMat4(rotMatInverse, sMat);
+    return rotMatInverse;
+    //return SceneJS._math_mulMat4(sMatInv, SceneJS._math_mulMat4(rotMatInverse, sMat));
+    //return SceneJS._math_mulMat4(rotMatInverse, sMat);
     // return SceneJS._math_mulMat4(sMat, SceneJS._math_mulMat4(rotMatInverse, sMat));
     //return SceneJS._math_mulMat4(sMatInv, SceneJS._math_mulMat4(rotMatInverse, sMat));
 }
