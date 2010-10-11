@@ -152,7 +152,7 @@ SceneJS.Quaternion.prototype.addRotation = function(q) {
  *
  */
 SceneJS.Quaternion.prototype.getMatrix = function() {
-    return SceneJS._math_newMat4FromQuaternion(this._q);
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_newMat4FromQuaternion(this._q);    
 };
 
 

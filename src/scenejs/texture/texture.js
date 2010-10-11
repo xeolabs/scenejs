@@ -237,8 +237,7 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
                 layer.state = SceneJS.TextureLayer.STATE_LOADING;
                 var self = this;
                 (function(l) { // Closure allows this layer to receive results
-                    SceneJS._textureModule.createTexture(
-                            l.creationParams.uri,
+                    SceneJS._textureModule.createTexture(                         
                             l.creationParams,
 
                             function(texture) { // Success

@@ -46,7 +46,7 @@ SceneJS.Instance = SceneJS.createNodeType("instance");
 // @private
 SceneJS.Instance.prototype._init = function(params) {
     this._symbol = null;
-    this._target = params.target;
+    this.setTarget(params.target);
     this._mustExist = params.mustExist;
 
     if (this._target) {
@@ -121,7 +121,29 @@ SceneJS.Instance.prototype.getTarget = function() {
  @returns {SceneJS.Instance} This node
  */
 SceneJS.Instance.prototype.setTarget = function(target) {
+
+    /* Deregister old link
+     */
+    var map;
+    if (this._target) {
+        map = SceneJS._nodeInstanceMap[this._target];
+        if (!map) {
+            map = SceneJS._nodeInstanceMap[this._target] = { numInstances: 0, instances: {} };
+        }
+        map.numInstances--;
+        map.instances[this._id] = undefined;
+
+    }
     this._target = target;
+
+    /* Register new link
+     */
+    if (target) {
+        map = SceneJS._nodeInstanceMap[target];
+        if (map) {
+            map[this._id] = this;
+        }
+    }
     this._setDirty();
     return this;
 };

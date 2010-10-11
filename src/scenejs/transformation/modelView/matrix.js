@@ -47,6 +47,7 @@ SceneJS.Matrix.prototype.setElements = function(elements) {
 };
 
 /** Returns the matrix elements
+ * @deprecated
  * @returns {Object} One-dimensional array of matrix elements
  */
 SceneJS.Matrix.prototype.getElements = function() {
@@ -56,6 +57,15 @@ SceneJS.Matrix.prototype.getElements = function() {
     }
     return elements;
 };
+
+/**
+ * Returns a copy of the matrix as a 1D array of 16 elements
+ * @returns {Number[16]} The matrix elements
+ */
+SceneJS.Matrix.prototype.getMatrix = function() {
+    return this._mat.slice(0);
+};
+
 
 SceneJS.Matrix.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;

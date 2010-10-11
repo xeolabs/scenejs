@@ -176,8 +176,31 @@ SceneJS.Camera.prototype.getOptics = function() {
     return optics;
 };
 
+/**
+ * Returns a copy of the matrix as a 1D array of 16 elements
+ * @returns {Number[16]}
+ */
+SceneJS.Camera.prototype.getMatrix = function() {
+    if (this._memoLevel == 0) {
+        this._rebuild();
+    }
+    return this._transform.matrix.slice(0);
+};
+
 // Override
 SceneJS.Camera.prototype._render = function(traversalContext) {
+    if (this._memoLevel == 0) {
+        this._rebuild();
+    }
+    var prevTransform = SceneJS._projectionModule.getTransform();
+    SceneJS._projectionModule.setTransform(this._transform);
+    this._renderNodes(traversalContext);
+    SceneJS._projectionModule.setTransform(prevTransform);
+};
+
+/** @private
+ */
+SceneJS.Camera.prototype._rebuild = function () {
     if (this._memoLevel == 0) {
         if (this._optics.type == "ortho") {
             this._transform = {
@@ -209,7 +232,7 @@ SceneJS.Camera.prototype._render = function(traversalContext) {
                     near: this._optics.near,
                     far : this._optics.far
                 },
-                matrix:SceneJS._math_frustumMatrix4(
+                matrix: SceneJS._math_frustumMatrix4(
                         this._optics.left,
                         this._optics.right,
                         this._optics.bottom,
@@ -235,8 +258,4 @@ SceneJS.Camera.prototype._render = function(traversalContext) {
         }
         this._memoLevel = 1;
     }
-    var prevTransform = SceneJS._projectionModule.getTransform();
-    SceneJS._projectionModule.setTransform(this._transform);
-    this._renderNodes(traversalContext);
-    SceneJS._projectionModule.setTransform(prevTransform);
 };

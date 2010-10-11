@@ -121,11 +121,20 @@ SceneJS.Rotate.prototype.setZ = function(z) {
 };
 
 /** Returns the rotation axis vector's Z component
-
  * @returns {float}
  */
 SceneJS.Rotate.prototype.getZ = function() {
     return this._z;
+};
+
+/**
+ * Returns a copy of the matrix as a 1D array of 16 elements
+ * @returns {Number[16]} The matrix elements
+ */
+SceneJS.Rotate.prototype.getMatrix = function() {
+  return (this._memoLevel > 0)
+          ? this._mat.slice(0)
+          : SceneJS._math_rotationMat4v(this._angle * Math.PI / 180.0, [this._x, this._y, this._z]);
 };
 
 SceneJS.Rotate.prototype._render = function(traversalContext) {

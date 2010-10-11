@@ -1,6 +1,3 @@
-SceneJS._namespace("SceneJS.objects");
-
-
 /**
  * @class A scene node that defines sphere geometry.
  * <p>The geometry is complete with normals for shading and one layer of UV coordinates for

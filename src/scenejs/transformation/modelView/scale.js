@@ -105,12 +105,20 @@ SceneJS.Scale.prototype.getZ = function() {
     return this._z;
 };
 
+/**
+ * Returns a copy of the matrix as a 1D array of 16 elements
+ * @returns {Number[16]} The matrix elements
+ */
+SceneJS.Scale.prototype.getMatrix = function() {
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_scalingMat4v([this._x, this._y, this._z]);
+};
+
 SceneJS.Scale.prototype._render = function(traversalContext) {
 
     var origMemoLevel = this._memoLevel;
 
-    if (this._memoLevel == 0) {       
-            this._memoLevel = 1;
+    if (this._memoLevel == 0) {
+        this._memoLevel = 1;
         this._mat = SceneJS._math_scalingMat4v([this._x, this._y, this._z]);
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();

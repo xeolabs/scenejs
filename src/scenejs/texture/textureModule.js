@@ -30,6 +30,7 @@ SceneJS._textureModule = new (function() {
     var textureStack = [];
     var dirty;
 
+
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.TIME_UPDATED,
             function(t) {
@@ -182,62 +183,73 @@ SceneJS._textureModule = new (function() {
         return textures[texture.textureId];
     };
 
-    this.createTexture = function(uri, cfg, onSuccess, onError, onAbort) {
+    /** Asynchronously creates a texture, either from image URL or image object
+     */
+    this.createTexture = function(cfg, onSuccess, onError, onAbort) {
         var image = new Image();
         var _canvas = canvas;
         var _context = canvas.context;
-        var process = SceneJS._processModule.createProcess({ // To support monitor of image loads through SceneJS PROCESS_XXX events
-            description:"creating texture: uri = " + uri,
-            timeoutSecs: -1 // Relying on Image object for timeout
-        });
-        //alert(uri);
-        image.onload = function() {
-            var textureId = SceneJS._createKeyForMap(textures, "t");
-            SceneJS._memoryModule.allocate(
-                    _context,
-                    "texture '" + textureId + "'",
-                    function() {
-                        try {
-                            textures[textureId] = new SceneJS._webgl_Texture2D(_context, {
-                                textureId : textureId,
-                                canvas: _canvas,
-                                image : ensureImageSizePowerOfTwo(image),
-                                texels :cfg.texels,
-                                minFilter : getGLOption("minFilter", _context, cfg, _context.LINEAR),
-                                magFilter :  getGLOption("magFilter", _context, cfg, _context.LINEAR),
-                                wrapS : getGLOption("wrapS", _context, cfg, _context.CLAMP_TO_EDGE),
-                                wrapT :   getGLOption("wrapT", _context, cfg, _context.CLAMP_TO_EDGE),
-                                isDepth :  getOption(cfg.isDepth, false),
-                                depthMode : getGLOption("depthMode", _context, cfg, _context.LUMINANCE),
-                                depthCompareMode : getGLOption("depthCompareMode", _context, cfg, _context.COMPARE_R_TO_TEXTURE),
-                                depthCompareFunc : getGLOption("depthCompareFunc", _context, cfg, _context.LEQUAL),
-                                flipY : getOption(cfg.flipY, true),
-                                width: getOption(cfg.width, 1),
-                                height: getOption(cfg.height, 1),
-                                internalFormat : getGLOption("internalFormat", _context, cfg, _context.LEQUAL),
-                                sourceFormat : getGLOption("sourceType", _context, cfg, _context.ALPHA),
-                                sourceType : getGLOption("sourceType", _context, cfg, _context.UNSIGNED_BYTE),
-                                logging: SceneJS._loggingModule
-                            });
-                        } catch (e) {
-                            throw SceneJS._errorModule.fatalError("Failed to create texture: \"" + uri + "\" : " + e);
-                        }
-                    });
-            SceneJS._processModule.killProcess(process);
+        if (cfg.uri) {
+            var process = SceneJS._processModule.createProcess({ // To support monitor of image loads through SceneJS PROCESS_XXX events
+                description:"creating texture: uri = " + cfg.uri,
+                timeoutSecs: -1 // Relying on Image object for timeout
+            });
+            image.onload = function() {
+                var textureId = allocateTexture(_canvas, _context, image, cfg);
+                SceneJS._processModule.killProcess(process);
+                onSuccess(textures[textureId]);
+            };
+            image.onerror = function() {
+                SceneJS._processModule.killProcess(process);
+                onError();
+            };
+            image.onabort = function() {
+                SceneJS._processModule.killProcess(process);
+                onAbort();
+            };
+            image.src = cfg.uri;  // Starts image load
+        } else if (cfg.image) {
+            var textureId = allocateTexture(_canvas, _context, cfg.image, cfg);
             onSuccess(textures[textureId]);
-        };
-        image.onerror = function() {
-            SceneJS._processModule.killProcess(process);
-            onError();
-        };
-        image.onabort = function() {
-            SceneJS._processModule.killProcess(process);
-            onAbort();
-        };
-        image.src = uri;  // Starts image load
-        return image;
+        } else {
+            throw SceneJS._errorModule.fatalError("Failed to create texture: neither cfg.image nor cfg.uri supplied");
+        }
     };
 
+    function allocateTexture(canvas, context, image, cfg) {
+        var textureId = SceneJS._createKeyForMap(textures, "t");
+        SceneJS._memoryModule.allocate(
+                context,
+                "texture '" + textureId + "'",
+                function() {
+                    try {
+                        textures[textureId] = new SceneJS._webgl_Texture2D(context, {
+                            textureId : textureId,
+                            canvas: canvas,
+                            image : ensureImageSizePowerOfTwo(image),
+                            texels :cfg.texels,
+                            minFilter : getGLOption("minFilter", context, cfg, context.LINEAR),
+                            magFilter :  getGLOption("magFilter", context, cfg, context.LINEAR),
+                            wrapS : getGLOption("wrapS", context, cfg, context.CLAMP_TO_EDGE),
+                            wrapT :   getGLOption("wrapT", context, cfg, context.CLAMP_TO_EDGE),
+                            isDepth :  getOption(cfg.isDepth, false),
+                            depthMode : getGLOption("depthMode", context, cfg, context.LUMINANCE),
+                            depthCompareMode : getGLOption("depthCompareMode", context, cfg, context.COMPARE_R_TO_TEXTURE),
+                            depthCompareFunc : getGLOption("depthCompareFunc", context, cfg, context.LEQUAL),
+                            flipY : getOption(cfg.flipY, true),
+                            width: getOption(cfg.width, 1),
+                            height: getOption(cfg.height, 1),
+                            internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
+                            sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
+                            sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
+                            logging: SceneJS._loggingModule
+                        });
+                    } catch (e) {
+                        throw SceneJS._errorModule.fatalError("Failed to create texture: " + e);
+                    }
+                });
+        return textureId;
+    }
 
     function ensureImageSizePowerOfTwo(image) {
         if (!isPowerOfTwo(image.width) || !isPowerOfTwo(image.height)) {

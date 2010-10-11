@@ -1,36 +1,105 @@
-/**
- * @class A scene node that defines vector text.
- * <p>.</p>
- * <p><b>Example Usage</b></p><p>Definition of text:</b></p><pre><code>
- * var c = new SceneJS.Text({
- *          text : "in morning sunlight\nrising steam from the cats yawn\n a smell of salmon"
- *     })
- * </pre></code>
- * @extends SceneJS.Geometry
- * @since Version 0.7.4
- * @constructor
- * Create a new SceneJS.Text
- * @param {Object} [cfg] Static configuration object
- * @param {String} cfg.text The string of text
- * @param {...SceneJS.Node} [childNodes] Child nodes
- */
-SceneJS.Text = SceneJS.createNodeType("text", "geometry");
+SceneJS.Text = SceneJS.createNodeType("text");
 
 // @private
 SceneJS.Text.prototype._init = function(params) {
-
-    /* Callback that creates the text geometry
-     */
-    this._create = function() {
-        var geo = SceneJS._vectorTextModule.getGeometry(1, 0, 0, params.text); // Unit size
-        return {
-            resource: this._id, // Assuming text geometry varies a lot - don't try to share VBOs
-            primitive : "lines",
-            positions : geo.positions,
-            normals: [],
-            uv : [],
-            indices : geo.indices,
-            colors:[]
-        };
+    var text = SceneJS._textModule.createText("Helvetica", params.size || 1, params.text || "");
+    this._layer = {
+        creationParams: {
+            image: text.image,
+            minFilter: "linear",
+            magFilter: "linear",
+            isDepth: false,
+            depthMode:"luminance",
+            depthCompareMode: "compareRToTexture",
+            depthCompareFunc: "lequal",
+            flipY: false,
+            width: 1,
+            height: 1,
+            internalFormat:"lequal",
+            sourceFormat:"alpha",
+            sourceType: "unsignedByte",
+            applyTo:"baseColor",
+            blendMode:"add"
+        },
+        texture: null,
+        applyFrom: "uv",
+        applyTo: "baseColor",
+        blendMode: "add",
+        scale : null,
+        translate : null,
+        rotate : null,
+        rebuildMatrix : true
     };
+    var w = text.width / 16;
+    var h = text.height / 16;
+
+    var positions = [ w, h, 0.1, 0, h, 0.1, 0,0, 0.1, w,0, 0.1 ];
+    var normals = [ 0, 0, -1,  0, 0, -1,  0, 0, -1,  0, 0, -1 ];
+    var uv = [1, 1,  0, 1,  0, 0, 1, 0];
+    var indices = [0, 1, 2,  0, 2, 3];
+
+    if (params.doubleSided) {
+        var z = 0.01;
+        positions = positions.concat([w,0,-z, 0,0,-z, 0, h,-z, w, h,-z]);
+        normals = normals.concat([0, 0,1, 0, 0,1, 0, 0,1,  0, 0,1]);
+        uv = uv.concat([0, 0, 1, 0, 1, 1, 0, 1]);
+        indices = indices.concat([4,5,6, 4,6,7]);
+    }
+
+    this.addNode({
+        type: "material",
+        emit: 0,
+        baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
+        specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+        specular:       0.9,
+        shine:          100.0,
+        nodes: [
+            {
+                type: "geometry",
+                primitive: "triangles",
+                positions : positions,
+                normals : normals,
+                uv : uv,
+                indices : indices
+            }
+        ]
+    });
+};
+
+SceneJS.Text.prototype._render = function(traversalContext) {
+    if (!this._texture && !this._error) {
+        var self = this;
+        (function() {
+
+            SceneJS._textureModule.createTexture(
+
+                    self._layer.creationParams,
+
+                    function(texture) { // Success
+                        self._layer.texture = texture;
+                    },
+
+                    function() { // General error
+                        self._error = true;
+                        var message = "SceneJS.text texture creation failed";
+                        SceneJS._loggingModule.warn(message);
+                    },
+
+                    function() { // Aborted
+                        self._error = true;
+                        var message = "SceneJS.text texture creation failed";
+                        SceneJS._loggingModule.warn(message);
+                    });
+        })();
+    }
+
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+        this._renderNodes(traversalContext);
+    } else {
+        if (this._layer) {
+            SceneJS._textureModule.pushTexture([this._layer]);
+            this._renderNodes(traversalContext);
+            SceneJS._textureModule.popTexture();
+        }
+    }
 };

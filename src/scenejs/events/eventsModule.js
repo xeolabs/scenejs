@@ -56,7 +56,9 @@ SceneJS._eventModule = new (function() {
     this.BOUNDARY_EXPORTED = 40;
     this.HIGHLIGHT_EXPORTED = 41;
     this.NODE_CREATED = 42;
-    this.LAYER_EXPORTED = 43;
+    this.NODE_UPDATED = 43;
+    this.NODE_DESTROYED = 44;
+    this.LAYER_EXPORTED = 45;
 
     /* Priority queue for each type of event
      */
@@ -270,6 +272,24 @@ SceneJS.bind = function(name, func) {
                     func({
                         nodeId : params.nodeId,
                         json: params.json
+                    });
+                });
+            break;
+
+        case "node-updated" : SceneJS._eventModule.addListener(
+                SceneJS._eventModule.NODE_UPDATED,
+                function(params) {
+                    func({
+                        nodeId : params.nodeId
+                    });
+                });
+            break;
+
+        case "node-destroyed" : SceneJS._eventModule.addListener(
+                SceneJS._eventModule.NODE_DESTROYED,
+                function(params) {
+                    func({
+                        nodeId : params.nodeId
                     });
                 });
             break;

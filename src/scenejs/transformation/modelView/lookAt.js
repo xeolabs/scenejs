@@ -214,6 +214,19 @@ SceneJS.LookAt.prototype.getUp = function() {
     };
 };
 
+/**
+ * Returns a copy of the matrix as a 1D array of 16 elements
+ * @returns {Number[16]}
+ */
+SceneJS.LookAt.prototype.getMatrix = function() {
+    return (this._memoLevel > 0)
+            ? this._mat.slice(0)
+            : SceneJS._math_lookAtMat4c(
+            this._eyeX, this._eyeY, this._eyeZ,
+            this._lookX, this._lookY, this._lookZ,
+            this._upX, this._upY, this._upZ);
+};
+
 SceneJS.LookAt.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {

@@ -79,6 +79,7 @@ SceneJS._materialModule = new (function() {
 
     this.popMaterial = function() {
         materialStack.pop();
+        dirty = true;
     };
 
 })();

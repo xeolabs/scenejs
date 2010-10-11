@@ -126,22 +126,68 @@ SceneJS._shaderModule = new (function() {
                 //---------------------------
 
                 canvasBins[params.canvas.canvasId] = {
-                    nodes : [],
-                    transparentNodes : [],
-                    opaqueBin : {},
-                    transparentBin : {},
-                    info: {
-                        countTransparent: 0
-                    }
+                    layerBins: [createBins(0)]
                 };
             });
+
+    function createBins(index) {
+        return {
+            index: index,
+            nodes : [],
+            transparentNodes : [],
+            opaqueBin : {},
+            transparentBin : {},
+            info: {
+                countTransparent: 0
+            }
+        };
+    }
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
-                bins = canvasBins[c.canvasId];
+                bins = createBins(0);
+                canvasBins[canvas.canvasId] = {
+                    layerBins: [bins]
+                };
             });
+
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.LAYER_EXPORTED,
+            function(layer) {
+                if (!layer || (layer.index == 0)) {
+
+                    /* Null or default layer exported - use default bins
+                     */
+                    bins = canvasBins[canvas.canvasId].layerBins[0];
+                } else {
+
+                    /* Non-default layer exported - get/create bins for the layer
+                     */
+                    bins = getBin(layer.index);
+                }
+            });
+
+    function getBin(index) {
+        var layerBins = canvasBins[canvas.canvasId].layerBins;
+        var bins ;
+        var newBins;
+        for (var i = 0; i < layerBins.length; i++) {
+            bins = layerBins[i];
+            if (bins.index == index) {
+                return bins;
+            }
+            if (bins.index > index) {
+                newBins = createBins(index);
+                bins.splice(index, newBins);
+                return newBins;
+            }
+        }
+        newBins = createBins(index);
+        layerBins.push(newBins);       // no insertion point found
+        return newBins;
+    }
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.RENDERER_EXPORTED,
@@ -355,7 +401,11 @@ SceneJS._shaderModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.CANVAS_DEACTIVATED,
             function() {
-                renderBins();
+                nodeRenderer.init();
+                var layerBins = canvasBins[canvas.canvasId].layerBins;
+                for (var i = 0; i < layerBins.length; i++) {
+                    renderBins(layerBins[i]);
+                }
                 canvas = null;
             });
 
@@ -364,13 +414,17 @@ SceneJS._shaderModule = new (function() {
     //-----------------------------------------------------------------------------------------------------------------
 
     this.redraw = function() {
-        renderBins();
+        nodeRenderer.init();
+        var layerBins = canvasBins[canvas.canvasId].layerBins;
+        for (var i = 0; i < layerBins.length; i++) {
+            renderBins(layerBins[i]);
+        }
     };
 
-    function renderBins() {
-        nodeRenderer.init();
+    function renderBins(binSet) {
 
-        var nTransparent = bins.transparentNodes.length;
+
+        var nTransparent = binSet.transparentNodes.length;
 
         if (nTransparent == 0) {
 
@@ -378,8 +432,8 @@ SceneJS._shaderModule = new (function() {
              *
              * - render all nodes into depth buffer, sorted by program
              */
-            bins.nodes.sort(programCmp);
-            renderOpaqueNodes(bins.nodes);
+            binSet.nodes.sort(programCmp);
+            renderOpaqueNodes(binSet.nodes);
         }
 
         if (nTransparent == 1) {
@@ -389,8 +443,8 @@ SceneJS._shaderModule = new (function() {
              * - render opaque nodes into depth buffer, sorted by program
              * - render transparent node into depth buffer with blending
              */
-            bins.nodes.sort(programCmp);
-            renderOpaqueNodes(bins.nodes);
+            binSet.nodes.sort(programCmp);
+            renderOpaqueNodes(binSet.nodes);
 
             renderTransparentNodes(bins.transparentNodes);
         }
@@ -402,11 +456,11 @@ SceneJS._shaderModule = new (function() {
              * - render opaque nodes into depth buffer, sorted by program
              * - render transparent nodes into depth buffer with blending, sorted by boundary depth
              */
-            bins.nodes.sort(programCmp);
-            renderOpaqueNodes(bins.nodes);
+            binSet.nodes.sort(programCmp);
+            renderOpaqueNodes(binSet.nodes);
 
-          //  bins.transparentNodes.sort(boundaryCmp);
-            renderTransparentNodes(bins.transparentNodes);
+            //  binSet.transparentNodes.sort(boundaryCmp);
+            renderTransparentNodes(binSet.transparentNodes);
         }
         canvas.context.flush();
     }

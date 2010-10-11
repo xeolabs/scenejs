@@ -108,6 +108,14 @@ SceneJS.Translate.prototype.getZ = function() {
     return this._z;
 };
 
+/**
+ * Returns a copy of the matrix as a 1D array of 16 elements
+ * @returns {Number[16]} The matrix elements
+ */
+SceneJS.Translate.prototype.getMatrix = function() {
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_translationMat4v([this._x, this._y, this._z]);
+};
+
 SceneJS.Translate.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {

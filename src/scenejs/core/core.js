@@ -68,29 +68,6 @@ var SceneJS = {
         return SceneJS.withNode(newNode);
     },
 
-    /** Schedule the destruction of a node
-     * @private
-     */
-    _scheduleNodeDestroy : function(node) {
-        this._destroyedNodes.push(node);
-    },
-
-    /** Nodes that are scheduled to be destroyed. When a node is destroyed it is added here, then at the end of each
-     * render traversal, each node in here is popped and has {@link SceneJS.Node#destroy} called.
-     *  @private
-     */
-    _destroyedNodes : [],
-
-    /** Action the scheduled destruction of nodes
-     * @private
-     */
-    _actionNodeDestroys : function() {
-        for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
-            this._destroyedNodes[i]._doDestroy();
-        }
-        this._destroyedNodes = [];
-    },
-
     _parseNodeJSON : function(json) {
         json.type = json.type || "node";
         var nodeType = this._nodeTypes[json.type];
@@ -121,6 +98,55 @@ var SceneJS = {
         return cfg2;
     },
 
+    /** Schedule the destruction of a node
+     * @private
+     */
+    _scheduleNodeDestroy : function(node) {
+        this._destroyedNodes.push(node);
+    },
+
+    /** Nodes that are scheduled to be destroyed. When a node is destroyed it is added here, then at the end of each
+     * render traversal, each node in here is popped and has {@link SceneJS.Node#destroy} called.
+     *  @private
+     */
+    _destroyedNodes : [],
+
+    /** Action the scheduled destruction of nodes
+     * @private
+     */
+    _actionNodeDestroys : function() {
+        var node;
+        for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
+            node = this._destroyedNodes[i];
+            node._doDestroy();
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : node.getID() });
+        }
+        this._destroyedNodes = [];
+    },
+
+    /**
+     * Node factory funcs mapped to type
+     * @private
+     */
+    _nodeTypes: {
+    },
+
+    /**
+     * ID map of all existing nodes.
+     * Referenced by {@link SceneJS.Node}.
+     * @private
+     */
+    _nodeIDMap : {
+    },
+
+    /**
+     * Links each node that is an instance target back to
+     * it's instance- for each target node a map of the
+     * {@link SceneJS.Instance} nodes pointing to it
+     */
+    _nodeInstanceMap : {
+    },
+
     /** Selects a scene graph node by its ID and provides a set of methods to modify and observe it.
      * @returns {Object} Handle to node
      */
@@ -139,14 +165,14 @@ var SceneJS = {
             parent : function() {
                 var parent = targetNode.getParent();
                 if (!parent) {
-                    throw "withNode node has no parent";
+                    return null;
                 }
                 return SceneJS.withNode(parent);
             },
 
-            //            /** Selects a child node matching given ID or index
-            //             * @param {Number|String} node Child node index or ID
-            //             */
+            /** Selects a child node matching given ID or index
+             * @param {Number|String} node Child node index or ID
+             */
             //            node: function(node) {
             //                var type = typeof node;
             //                var nodeGot;
@@ -199,6 +225,32 @@ var SceneJS = {
                 }
                 return undefined; // IDE happy now
             },
+
+            /**
+             * Iterates over instance nodes that target the selected node, executing a function
+             * for each.
+             * If the function returns true at any node, then traversal stops and a selector is
+             * returned for that node.
+             * @param {Function(index, node)} fn Function to execute on each instance node
+             * @return {Object} Selector for selected node, if any
+             */
+            eachInstance : function(fn, options) {
+                if (!fn) {
+                    throw "eachInstance param 'fn' is null or undefined";
+                }
+                if (typeof fn != "function") {
+                    throw "eachInstance param 'fn' should be a function";
+                }
+                var stoppedNode;
+                options = options || {};
+                var count = 0;
+                stoppedNode = iterateEachInstance(fn, targetNode, count);
+                if (stoppedNode) {
+                    return SceneJS.withNode(stoppedNode);
+                }
+                return undefined; // IDE happy now
+            },
+
 
             /** Sets an attribute of the selected node
              */
@@ -372,7 +424,7 @@ var SceneJS = {
              */
             data: function(data, value) {
                 if (!data) {
-                    throw "data param 'data' null or undefined";
+                    return targetNode._data;
                 }
                 targetNode._data = targetNode._data || {};
                 if (typeof data == "string") {
@@ -408,12 +460,18 @@ var SceneJS = {
         function iterateEachNodeDepthFirst(fn, node, count, belowRoot) {
             var selector;
             if (belowRoot) {
+
+                /* Visit this node - if we are below root, because entry point visits the root
+                 */
                 selector = SceneJS.withNode(node);
                 if (fn.call(selector, count++) == true) {
                     return selector;
                 }
             }
             belowRoot = true;
+
+            /* Iterate children
+             */
             var len = node._children.length;
             for (var i = 0; i < len; i++) {
                 selector = iterateEachNodeDepthFirst(fn, node._children[i], count, belowRoot);
@@ -423,6 +481,20 @@ var SceneJS = {
             }
             return undefined;
         }
+
+        function iterateEachInstance(fn, node, count) {
+            var selector;
+            for (var instanceNodeId in SceneJS._nodeInstanceMap) {
+                if (SceneJS._nodeInstanceMap.hasOwnProperty(instanceNodeId)) {
+                    selector = SceneJS.withNode(instanceNodeId);
+                    if (fn.call(selector, count++) == true) {
+                        return selector;
+                    }
+                }
+            }
+            return undefined;
+        }
+
     },
 
     /** Returns true if the {@link SceneJS.Node} with the given ID exists
@@ -532,6 +604,7 @@ var SceneJS = {
         /* TODO: event should be queued and consumed to avoid many of these events accumulating
          */
         targetNode._fireEvent("updated", params);
+        //   SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_UPDATED, { nodeId : node.getID() });
     } ,
 
     _callNodeMethods : function(prefix, attr, targetNode) {
@@ -554,20 +627,7 @@ var SceneJS = {
         targetNode._fireEvent("updated", { attr: attr });
     } ,
 
-    /**
-     * Node factory funcs mapped to type
-     * @private
-     */
-    _nodeTypes: {
-    },
 
-    /**
-     * ID map of all existing nodes.
-     * Referenced by {@link SceneJS.Node}.
-     * @private
-     */
-    _nodeIDMap : {
-    } ,
 
     /** @private */
     _traversalMode :0x1,

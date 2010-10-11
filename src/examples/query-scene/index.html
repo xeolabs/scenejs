@@ -14,7 +14,7 @@
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Collada House
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Scene Query
                 Demo
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
@@ -34,25 +34,15 @@
                 &lt;canvas&gt; feature.</p>
         </canvas>
         <div id="info">
-            <h2>COLLADA House Demo</h2>
+            <h1>Querying the World, View and Canvas-space origins of a node</h1>
 
-            <p>This is a COLLADA house that has been translated into a SceneJS JSON model, which is then loaded into
-                a scene graph. It contains 144 texture images, so give it a little time to load.</p>
-
-            <p>Model is courtesy of <a
-                    href="http://www.vastarchitecture.com/Projects_Residential/Courtyard/Courtyard.html">VaST
-                architecture</a>.</p>
-
+            <p>Click on a teapot, then we'll use the JSON API to walk the nodes on the path to the root while using the
+                matrices we find on each node to determine origin of the teapot in the various coordinate spaces.</p>
             <br/>
             <ul>
-                <li><a target="_other" href="house-scene.js">Source code</a></li>
-                <li><a target="_other" href="house.js">JSON house model</a></li>
-                <li><a target="_other" href="house.dae">Original house COLLADA file</a></li>
-                <li><a target="_other" href="http://scenejs.org/tools/collada-translator/collada-translator.html">SceneJS
-                    tools:
-                    Online COLLADA Translator</a></li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/JSON+Scene+Definition">Wiki article: JSON
-                    Scene Definition</a></li>
+                <li><a target="_other" href="query-scene.js">Scene source code</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.withNode">Wiki article on
+                    scene node query using the JSON API</a></li>
             </ul>
         </div>
         <div id="log">
@@ -62,7 +52,7 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="house.js"></script>
-<script type="text/javascript" src="house-scene.js"></script>
+
+<script type="text/javascript" src="query-scene.js"></script>
 </body>
 </html>

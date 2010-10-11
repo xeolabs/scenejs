@@ -65,8 +65,13 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/vectorTextModule.js"/>
+        <!--<fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/vectorTextModule.js"/>-->
+        <!--<fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/text.js"/>-->
+
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/textModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/text/text.js"/>
+
+
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/viewTransformModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelTransformModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelViewTransformModule.js"/>
@@ -77,6 +82,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/quaternion.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/lookAt.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/stationary.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/billboard.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/inverse.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/projectionModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
@@ -101,6 +107,9 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/socket/socketModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/socket/socket.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
+
+        <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
     </path>
 
     <target name="all" depends="archive"/>
@@ -140,6 +149,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/quaternion.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/lookAt.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/stationary.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/billboard.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/inverse.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
@@ -153,6 +163,8 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/socket/socket.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
         </jsdoctoolkit>
     </target>
 
@@ -168,8 +180,9 @@
 
     <!-- Create compressed javascript lib -->
 
-    <target name="package" depends="assemble-lib, package-index, package-examples, package-docs">
+    <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
 
+         <target name="package" depends="assemble-lib, package-index, package-examples">
         <!-- Compress JS file list -->
 
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">

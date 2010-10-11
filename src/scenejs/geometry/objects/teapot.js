@@ -1,4 +1,3 @@
-SceneJS._namespace("SceneJS.objects");
 /**
  * @class A scene node that defines the geometry of the venerable OpenGL teapot.
  * <p><b>Example Usage</b></p><p>Definition of teapot:</b></p><pre><code>

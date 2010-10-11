@@ -224,10 +224,6 @@ SceneJS._sceneModule = new (function() {
         }
         return scene.canvas.canvas;
     };
-    //
-    //                activatePick : function(sceneId) {
-    //
-    //                },
 
     /** Returns all registered scenes
      * @private
@@ -265,6 +261,5 @@ SceneJS._sceneModule = new (function() {
         }
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_DEACTIVATED, scene.canvas);
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERED, {sceneId : sceneId });
-        //SceneJS._loggingModule.info("Scene deactivated: " + sceneId);
     };
 })();

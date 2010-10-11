@@ -980,9 +980,9 @@ SceneJS._math_billboardMat = function(viewMatrix) {
     SceneJS._math_setRowMat4(rotMatInverse, 1, rotVec[1]);
     SceneJS._math_setRowMat4(rotMatInverse, 2, rotVec[2]);
 
-    return rotMatInverse;
+  //  return rotMatInverse;
     //return SceneJS._math_mulMat4(sMatInv, SceneJS._math_mulMat4(rotMatInverse, sMat));
-    //return SceneJS._math_mulMat4(rotMatInverse, sMat);
+    return SceneJS._math_mulMat4(rotMatInverse, sMat);
     // return SceneJS._math_mulMat4(sMat, SceneJS._math_mulMat4(rotMatInverse, sMat));
     //return SceneJS._math_mulMat4(sMatInv, SceneJS._math_mulMat4(rotMatInverse, sMat));
 }
@@ -1192,7 +1192,6 @@ SceneJS._math_identityQuaternion = function() {
 
 SceneJS._math_angleAxisQuaternion = function(x, y, z, degrees) {
     var angleRad = (degrees / 180.0) * Math.PI;
-    //var angleRad = degrees;
     var halfAngle = angleRad / 2.0;
     var fsin = Math.sin(halfAngle);
     return [
