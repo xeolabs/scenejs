@@ -17,4 +17,5 @@ SceneJS.utils.optimize.CollapseInstances.execute = function(params, callback) {
     if (!callback) {
         throw "SceneJS.utils.optimise.CollapseInstances.execute expects callback";
     }
+    callback();
 };

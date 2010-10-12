@@ -23,4 +23,5 @@ SceneJS.utils.optimize.CreateLOD.execute = function(params, callback) {
     if (!callback) {
         throw "SceneJS.utils.optimize.CreateLOD.execute expects callback";
     }
+    callback();
 };
