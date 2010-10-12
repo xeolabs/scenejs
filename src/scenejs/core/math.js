@@ -1314,14 +1314,14 @@ SceneJS._math_angleAxisFromQuaternion = function(q) {
             x : q[0],
             y : q[1],
             z : q[2],
-            angle: angle
+            angle: angle * 57.295779579
         };
     } else {
         return {
             x : q[0] / s,
             y : q[1] / s,
             z : q[2] / s,
-            angle: angle
+            angle: angle * 57.295779579
         };
     }
 }
