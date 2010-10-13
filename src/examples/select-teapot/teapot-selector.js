@@ -20,7 +20,7 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: -30.0, y: 0.0, z: -35.0},
+            eye : { x: -30.0, y: 0.0, z: 35.0},
             look : { x : 15.0, y : 0.0, z : 0 },
             up : { x: 0.0, y: 1.0, z: 0.0 },
 
@@ -77,6 +77,7 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "text",
+                                                    size: 80,
                                                     text: "     Selector selection contains 0",
                                                     nodes: [
                                                         {
@@ -92,6 +93,7 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "text",
+                                                    size: 80,
                                                     text: "     Selector selection contains 1",
                                                     nodes: [
                                                         {
@@ -107,6 +109,7 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "text",
+                                                    size: 80,
                                                     text: "     Selector selection contains 2",
                                                     nodes: [
                                                         {
@@ -122,6 +125,7 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "text",
+                                                    size: 80,
                                                     text: "     Selector selection contains 3",
                                                     nodes: [
                                                         {

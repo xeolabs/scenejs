@@ -173,21 +173,53 @@ var SceneJS = {
             /** Selects a child node matching given ID or index
              * @param {Number|String} node Child node index or ID
              */
-            //            node: function(node) {
-            //                var type = typeof node;
-            //                var nodeGot;
-            //                if (type == "number") {
-            //                    nodeGot = targetNode.getNodeAt(node);
-            //                } else if (type == "string") {
-            //                    nodeGot = targetNode.getNode(node);
-            //                } else {
-            //                    throw "Child node should be specified as ID or index";
-            //                }
-            //                if (!nodeGot) {
-            //                    throw "Child node " + node + " not found on selected node: " + targetNode.getID();
-            //                }
-            //                return SceneJS.withNode(nodeGot);
-            //            },
+            node: function(node) {
+                if (!node) {
+                    throw "node param 'node' is null or undefined";
+                }
+                var type = typeof node;
+                var nodeGot;
+                if (type == "number") {
+                    nodeGot = targetNode.getNodeAt(node);
+                } else if (type == "string") {
+                    nodeGot = targetNode.getNode(node);
+                } else {
+                    throw "node param 'node' should be either an index number or an ID string";
+                }
+                if (!nodeGot) {
+                    throw "node not found: '" + node + "'";
+                }
+                return SceneJS.withNode(nodeGot);
+            },
+
+
+//            hasNode: function(node) {
+//
+//            },
+            
+            /**
+             * Iterates over parent nodes on the path from the selected node to the root, executing a function
+             * for each.
+             * If the function returns true at any node, then traversal stops and a selector is
+             * returned for that node.
+             * @param {Function(node, index)} fn Function to execute on each instance node
+             * @return {Object} Selector for selected node, if any
+             */
+            eachParent : function(fn) {
+                if (!fn) {
+                    throw "eachParent param 'fn' is null or undefined";
+                }
+                var selector;
+                var count = 0;
+                while (node._parent) {
+                    selector = SceneJS.withNode(node._parent);
+                    if (fn.call(selector, count++) == true) {
+                        return selector;
+                    }
+                    node = node._parent;
+                }
+                return undefined;
+            },
 
             /**
              * Iterates over sub-nodes of the selected node, executing a function
@@ -226,6 +258,10 @@ var SceneJS = {
                 return undefined; // IDE happy now
             },
 
+            numNodes : function() {
+                return targetNode._children.length;
+            },
+
             /**
              * Iterates over instance nodes that target the selected node, executing a function
              * for each.
@@ -234,23 +270,33 @@ var SceneJS = {
              * @param {Function(index, node)} fn Function to execute on each instance node
              * @return {Object} Selector for selected node, if any
              */
-            eachInstance : function(fn, options) {
+            eachInstance : function(fn) {
                 if (!fn) {
                     throw "eachInstance param 'fn' is null or undefined";
                 }
                 if (typeof fn != "function") {
                     throw "eachInstance param 'fn' should be a function";
                 }
-                var stoppedNode;
-                options = options || {};
-                var count = 0;
-                stoppedNode = iterateEachInstance(fn, targetNode, count);
-                if (stoppedNode) {
-                    return SceneJS.withNode(stoppedNode);
+                var instances = SceneJS._nodeInstanceMap[node._id];
+                if (instances) {
+                    var count = 0;
+                    var selector;
+                    for (var instanceNodeId in instances) {
+                        if (instances.hasOwnProperty(instanceNodeId)) {
+                            selector = SceneJS.withNode(instanceNodeId);
+                            if (fn.call(selector, count++) == true) {
+                                return selector;
+                            }
+                        }
+                    }
                 }
-                return undefined; // IDE happy now
+                return undefined;
             },
 
+            numInstances : function() {
+                var instances = SceneJS._nodeInstanceMap[node._id];
+                return instances ? instances.numInstances : 0;
+            },
 
             /** Sets an attribute of the selected node
              */
@@ -481,20 +527,6 @@ var SceneJS = {
             }
             return undefined;
         }
-
-        function iterateEachInstance(fn, node, count) {
-            var selector;
-            for (var instanceNodeId in SceneJS._nodeInstanceMap) {
-                if (SceneJS._nodeInstanceMap.hasOwnProperty(instanceNodeId)) {
-                    selector = SceneJS.withNode(instanceNodeId);
-                    if (fn.call(selector, count++) == true) {
-                        return selector;
-                    }
-                }
-            }
-            return undefined;
-        }
-
     },
 
     /** Returns true if the {@link SceneJS.Node} with the given ID exists

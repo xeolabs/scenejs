@@ -128,11 +128,13 @@ SceneJS.Instance.prototype.setTarget = function(target) {
     if (this._target) {
         map = SceneJS._nodeInstanceMap[this._target];
         if (!map) {
-            map = SceneJS._nodeInstanceMap[this._target] = { numInstances: 0, instances: {} };
+            map = SceneJS._nodeInstanceMap[this._target] = {
+                numInstances: 0,
+                instances: {}
+            };
         }
         map.numInstances--;
         map.instances[this._id] = undefined;
-
     }
     this._target = target;
 
@@ -140,9 +142,15 @@ SceneJS.Instance.prototype.setTarget = function(target) {
      */
     if (target) {
         map = SceneJS._nodeInstanceMap[target];
-        if (map) {
-            map[this._id] = this;
+        if (!map) {
+            map = SceneJS._nodeInstanceMap[this._target] = {
+                numInstances: 0,
+                instances: {}
+            };
         }
+        map.numInstances++;
+        map.instances[this._id] = this._id;
+
     }
     this._setDirty();
     return this;
@@ -215,4 +223,16 @@ SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalCon
         callback: this._callback,
         insideRightFringe:  target._children.length > 1
     };
+};
+
+/** @private  
+ */
+SceneJS.Instance.prototype._destroy = function() {
+    if (this._target) {
+        var map = SceneJS._nodeInstanceMap[this._target];
+        if (map) {
+            map.numInstances--;
+            map.instances[this._id] = undefined;
+        }
+    }
 };
