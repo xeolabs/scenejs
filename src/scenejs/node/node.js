@@ -41,7 +41,7 @@
  * <tr><td>library</td><td>{@link SceneJS.Library}</td></tr>
  * <tr><td>lights</td><td>{@link SceneJS.Lights}</td></tr>
  * <tr><td>locality</td><td>{@link SceneJS.Locality}</td></tr>
- * <tr><td>lookat</td><td>{@link SceneJS.LookAt}</td></tr>
+ * <tr><td>lookAt</td><td>{@link SceneJS.LookAt}</td></tr>
  * <tr><td>material</td><td>{@link SceneJS.Material}</td></tr>
  * <tr><td>matrix</td><td>{@link SceneJS.Matrix}</td></tr>
  * <tr><td>node</td><td>{@link SceneJS.Node}</td></tr>
