@@ -174,7 +174,7 @@ var SceneJS = {
              * @param {Number|String} node Child node index or ID
              */
             node: function(node) {
-                if (!node) {
+                if (node === null || typeof(node) === "undefined") {
                     throw "node param 'node' is null or undefined";
                 }
                 var type = typeof node;
