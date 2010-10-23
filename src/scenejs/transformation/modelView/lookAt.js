@@ -35,9 +35,9 @@ SceneJS.LookAt.prototype._init = function(params) {
  */
 SceneJS.LookAt.prototype.setEye = function(eye) {
     eye = eye || {};
-    this._eyeX = eye.x || 0;
-    this._eyeY = eye.y || 0;
-    this._eyeZ = eye.z || 1;
+    this._eyeX = (eye.x != undefined && eye.x != null) ? eye.x : 0;
+    this._eyeY = (eye.y != undefined && eye.y != null) ? eye.y : 0;
+    this._eyeZ = (eye.z != undefined && eye.z != null) ? eye.z : 0;
     this._setDirty();
     return this;
 };
@@ -95,9 +95,9 @@ SceneJS.LookAt.prototype.getEye = function() {
  */
 SceneJS.LookAt.prototype.setLook = function(look) {
     look = look || {};
-    this._lookX = look.x || 0;
-    this._lookY = look.y || 0;
-    this._lookZ = look.z || 0;
+    this._lookX = (look.x != undefined && look.x != null) ? look.x : 0;
+    this._lookY = (look.y != undefined && look.y != null) ? look.y : 0;
+    this._lookZ = (look.z != undefined && look.z != null) ? look.z : 0;
     this._setDirty();
     return this;
 };
@@ -153,9 +153,9 @@ SceneJS.LookAt.prototype.getLook = function() {
  */
 SceneJS.LookAt.prototype.setUp = function(up) {
     up = up || { y: 1.0 };
-    var x = up.x || 0;
-    var y = up.y || 0;
-    var z = up.z || 0;
+    var x = (up.x != undefined && up.x != null) ? up.x : 0;
+    var y = (up.y != undefined && up.y != null) ? up.y : 0;
+    var z = (up.z != undefined && up.z != null) ? up.z : 0;
     if (x + y + z == 0) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.InvalidNodeConfigException(

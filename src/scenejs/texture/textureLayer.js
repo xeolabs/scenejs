@@ -6,6 +6,7 @@
  @param {Object} cfg The config object
  */
 SceneJS.TextureLayer = function(cfg) {
+    this._imageBuffer = null;
     this._imageURL = null;
     this._minFilter = "linear";
     this._magFilter = "linear";

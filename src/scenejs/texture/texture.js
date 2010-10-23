@@ -138,9 +138,9 @@ SceneJS.Texture.prototype._init = function(params) {
     if (params.layers) {
         for (var i = 0; i < params.layers.length; i++) {
             var layerParam = params.layers[i];
-            if (!layerParam.uri) {
+            if (!layerParam.uri && !layerParam.imageBuf) {
                 throw new SceneJS.errors.NodeConfigExpectedException(
-                        "SceneJS.Texture.layers[" + i + "].uri is undefined");
+                        "SceneJS.Texture.layers[" + i + "] has no uri or imageBuf specified");
             }
             if (layerParam.applyFrom) {
                 if (layerParam.applyFrom != "uv" &&
@@ -185,9 +185,8 @@ SceneJS.Texture.prototype._init = function(params) {
  */
 SceneJS.Texture.STATE_INITIAL = "init";
 
-/** At least one texture layer image load in progress. The Texture node can temporarily revert to this
- * after {@link STATE_LOADED} if any layer has been evicted from VRAM (after lack of use) while
- * the Texture node re-creates it.
+/** At least one texture layer image load (or target imageBuf search) in progress. The Texture node can temporarily revert to this
+ * after {@link STATE_LOADED} if any layer has been evicted from VRAM (after lack of use) while the Texture node re-creates it.
  */
 SceneJS.Texture.STATE_LOADING = "loading";
 
@@ -221,8 +220,26 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
         layer = this._layers[i];
 
         if (layer.state == SceneJS.TextureLayer.STATE_LOADED) {
-            if (!SceneJS._textureModule.textureExists(layer.texture)) {  // Texture evicted from cache
-                layer.state = SceneJS.TextureLayer.STATE_INITIAL;
+
+            /* Texture node has loaded texture, now check that the texture
+             * has not been deallocated by SceneJS after lack of recent use,
+             * or in the case if a target imageBuf node, that the target has
+             * not dissappeared.
+             */
+            if (layer.creationParams.uri) {
+                if (!SceneJS._textureModule.textureExists(layer.texture)) {
+
+                    /* Image texture evicted from cache
+                     */
+                    layer.state = SceneJS.TextureLayer.STATE_INITIAL;
+                }
+            } else if (layer.creationParams.imageBuf) {
+                if (!SceneJS._imageBufModule.getImageBuffer(layer.creationParams.imageBuf)) {
+
+                    /* Target imageBuf node was destroyed
+                     */
+                    layer.state = SceneJS.TextureLayer.STATE_INITIAL;
+                }
             }
         }
 
@@ -234,43 +251,62 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
                 break;
 
             case SceneJS.TextureLayer.STATE_INITIAL: // Layer load to start
+
                 layer.state = SceneJS.TextureLayer.STATE_LOADING;
-                var self = this;
-                (function(l) { // Closure allows this layer to receive results
-                    SceneJS._textureModule.createTexture(                         
-                            l.creationParams,
 
-                            function(texture) { // Success
-                                l.texture = texture;
-                                l.state = SceneJS.TextureLayer.STATE_LOADED;
-                            },
+                if (layer.creationParams.uri) {
+                    var self = this;
+                    (function(l) { // Closure allows this layer to receive results
+                        SceneJS._textureModule.createTexture(
+                                l.creationParams,
 
-                            function() { // General error, probably 404
-                                l.state = SceneJS.TextureLayer.STATE_ERROR;
-                                var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
-                                SceneJS._loggingModule.warn(message);
+                                function(texture) { // Success
+                                    l.texture = texture;
+                                    l.state = SceneJS.TextureLayer.STATE_LOADED;
+                                },
 
-                                if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
-                                    self._changeState(SceneJS.Texture.STATE_ERROR, {
-                                        exception: new SceneJS.errors.Exception("SceneJS.Exception - " + message)
-                                    });
-                                }
-                            },
+                                function() { // General error, probably 404
+                                    l.state = SceneJS.TextureLayer.STATE_ERROR;
+                                    var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
+                                    SceneJS._loggingModule.warn(message);
 
-                            function() { // Load aborted - user probably refreshed/stopped page
-                                SceneJS._loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
-                                l.state = SceneJS.TextureLayer.STATE_ERROR;
+                                    if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
+                                        self._changeState(SceneJS.Texture.STATE_ERROR, {
+                                            exception: new SceneJS.errors.Exception("SceneJS.Exception - " + message)
+                                        });
+                                    }
+                                },
 
-                                if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
-                                    self._changeState(SceneJS.Texture.STATE_ERROR, {
-                                        exception: new SceneJS.errors.Exception("SceneJS.Exception - texture image load stopped - user aborted it?")
-                                    });
-                                }
-                            });
-                }).call(this, layer);
+                                function() { // Load aborted - user probably refreshed/stopped page
+                                    SceneJS._loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
+                                    l.state = SceneJS.TextureLayer.STATE_ERROR;
+
+                                    if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
+                                        self._changeState(SceneJS.Texture.STATE_ERROR, {
+                                            exception: new SceneJS.errors.Exception("SceneJS.Exception - texture image load stopped - user aborted it?")
+                                        });
+                                    }
+                                });
+                    }).call(this, layer);
+                }
                 break;
 
             case SceneJS.TextureLayer.STATE_LOADING: // Layer still loading
+
+                if (layer.creationParams.imageBuf) {
+                    var imageBuf = SceneJS._imageBufModule.getImageBuffer(layer.creationParams.imageBuf);
+                    if (imageBuf && imageBuf.isRendered()) {
+                        var texture = SceneJS._imageBufModule.getTexture(layer.creationParams.imageBuf);
+                        if (texture) {
+
+                            // TODO: Waiting for target node is OK, but exception should be thrown when target is not an 'imageBuf'
+                            // TODO: Re-acquire texture dynamically
+
+                            layer.texture = texture;
+                            layer.state = SceneJS.TextureLayer.STATE_LOADED;
+                        }
+                    }
+                }
                 break;
 
             case SceneJS.TextureLayer.STATE_ERROR: // Layer disabled
@@ -350,15 +386,7 @@ SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
 };
 
 /**
- * <pre><code>
- * //var x = {
- //    "#myTex": {
- //       "layer": {
- //            index: 1,
- //            cfg: { rotate: 45 }
- //        }
- //    }
- //}
+ *
  * </code></pre>
  * @param cfg
  */

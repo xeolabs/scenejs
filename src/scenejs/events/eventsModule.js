@@ -58,7 +58,7 @@ SceneJS._eventModule = new (function() {
     this.NODE_CREATED = 42;
     this.NODE_UPDATED = 43;
     this.NODE_DESTROYED = 44;
-    this.LAYER_EXPORTED = 45;
+    this.IMAGEBUFFER_EXPORTED = 45;
 
     /* Priority queue for each type of event
      */

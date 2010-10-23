@@ -4,24 +4,93 @@
 <head>
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
+    <script type="text/javascript" src="../../lib/utils/query/scenejs-query-node-pos.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <link href="../web/style.css" rel="stylesheet" type="text/css"/>
+    <style type="text/css">
+        .transparent-ui {
+            opacity: .75;
+        }
 
+        .container {
+            z-index: 0;
+        }
+
+        #teapot1 {
+            position: absolute;
+            width: 180px;
+            height: 90px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: red;
+            color: white;
+            z-index: 2;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+	    -webkit-box-shadow: #444 5px 5px 2px;
+	    border-bottom-left-radius: 5px 5px;
+	    border-bottom-right-radius: 5px 5px;
+	    border-top-left-radius: 5px 5px;
+	    border-top-right-radius: 5px 5px;
+        }
+
+        #teapot2 {
+            position: absolute;
+            width: 180px;
+            height: 90px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: green;
+            color: white;
+            z-index: 2;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+	    border-bottom-left-radius: 5px 5px;
+	    border-bottom-right-radius: 5px 5px;
+	    border-top-left-radius: 5px 5px;
+	    border-top-right-radius: 5px 5px;
+        }
+
+        #teapot3 {
+            position: absolute;
+            width: 180px;
+            height: 90px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: blue;
+            color: white;
+            z-index: 2;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+	    border-bottom-left-radius: 5px 5px;
+	    border-bottom-right-radius: 5px 5px;
+	    border-top-left-radius: 5px 5px;
+	    border-top-right-radius: 5px 5px;
+        }
+    </style>
 </head>
 <body>
-<div id="container">
+<div id="container" class="container">
     <div id="header">
         <div id="header-nav">
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Scene Query
-                Demo - Get Node Position
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;SceneJS.utils.query.QueryNodePos
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
                     alt="Share/Bookmark"/></a>
             <script type="text/javascript">
-                var a2a_linkname = "SceneJS Live Examples";
+                var a2a_linkname = "SceneJS.utils.query.QueryNodePos";
                 var a2a_linkurl = window.location;
                 var a2a_onclick = 1;</script>
             <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
@@ -34,15 +103,17 @@
                 &lt;canvas&gt; feature.</p>
         </canvas>
         <div id="info">
-            <h1>Click a teapot to query its World, View and Canvas-space center point</h1>
+            <h1>Querying World, View and Canvas-space origins</h1>
 
-            <p><b>Click on a teapot</b>, then we'll use the JSON API to walk the nodes on the path to the root while using the
-                matrices we find on each node to determine origin of the teapot in the various coordinate spaces.</p>
+            <p>For each of these teapots we're using the <b>SceneJS.utils.query.QueryNodePos</b> utility, which uses the JSON API to walk the nodes up the path to the root while
+                gathering the various modelling and viewing matrices we find along the way. As we do that, we're able to
+                determine the center of each teapot on World, View and Canvas space.</p>
+            <p>Using the Canvas space centers, we can then float a DIV over each teapot on the canvas to report its center points.</p>
             <br/>
             <ul>
                 <li><a target="_other" href="query-scene.js">Scene source code</a></li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.withNode">Wiki article on
-                    scene node query using the JSON API</a></li>
+                <li><a target="_other" href="../../lib/utils/query/scenejs-query-node-pos.js">Utility source code</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.utils">Wiki page on the SceneJS Utility API</a></li>
             </ul>
         </div>
         <div id="log">
@@ -53,6 +124,20 @@
     </div>
 </div>
 
+<div id="teapot1" class="transparent-ui">
+    Teapot 1
+</div>
+
+<div id="teapot2" class="transparent-ui">
+    Teapot 2
+</div>
+
+<div id="teapot3" class="transparent-ui">
+    Teapot 3
+</div>
+
 <script type="text/javascript" src="query-scene.js"></script>
+
+
 </body>
 </html>

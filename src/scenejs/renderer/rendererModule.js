@@ -141,7 +141,7 @@ SceneJS._rendererModule = new (function() {
     this.pushProps = function(props) {
         propStack.push(props);
         if (props.props.viewport) {
-              SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, props.props.viewport);
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, props.props.viewport);
         }
         dirty = true;
     };

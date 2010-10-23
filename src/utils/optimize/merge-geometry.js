@@ -16,12 +16,16 @@ SceneJS.utils.optimize.MergeGeometry = function(cfg) {
     this._cfg = cfg;
 };
 
-SceneJS.utils.optimize.MergeGeometry.execute = function(params, callback) {
-    if (!params.nodeId) {
-        throw "SceneJS.utils.optimize.MergeGeometry.execute expects params.nodeId";
+SceneJS.utils.optimize.MergeGeometry.prototype.execute = function(params, completed) {
+    if (completed) {
+        completed(this);
     }
-    if (!callback) {
-        throw "SceneJS.utils.optimize.MergeGeometry.execute expects callback";
-    }
-    callback();
+    return this;
+};
+
+SceneJS.utils.optimize.MergeGeometry.prototype.setConfigs = function(cfg) {
+};
+
+SceneJS.utils.optimize.MergeGeometry.prototype.getResults = function() {
+    return {};
 };

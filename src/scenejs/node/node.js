@@ -623,7 +623,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
     }
     throw SceneJS._errorModule.fatalError(
             new SceneJS.errors.InvalidSceneGraphException(
-                    "SceneJS.Node#removeNode - node not found on target"));
+                    "SceneJS.Node#removeNode - child node not found: " + (node._render ? ": " + node._id : node)));
 };
 
 /** Removes all child nodes and returns them in an array.
