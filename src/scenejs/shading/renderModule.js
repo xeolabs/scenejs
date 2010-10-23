@@ -5,20 +5,32 @@
  * traversal by the other modules, then when traversal is finished, sort them into a sequence of
  * that would involve minimal WebGL state changes, then apply the sequence to WebGL.
  *
-
+ * By listening to XXX_UPDATED events, this module tracks various elements of scene state, such as WebGL settings,
+ * texture layers, lighting, current material properties etc.
+ *
+ * On a SHADER_ACTIVATE event it will compose and activate a shader taylored to the current scene state
+ * (ie. where the shader has variables and routines for the current lights, materials etc), then fire a
+ * SHADER_ACTIVATED event when the shader is ready for business.
+ *
+ * Other modules will then handle the SHADER_RENDERING event by firing XXXXX_EXPORTED events parameterised with
+ * resources that they want loaded into the shader. This module then handles those by loading their parameters into
+ * the shader.
+ *
+ * The module will avoid constant re-generation of shaders by caching each of them against a hash code that it
+ * derives from the current collective scene state; on a SHADER_ACTIVATE event, it will attempt to reuse a shader
+ * cached for the hash of the current scene state.
+ *
  * Shader allocation and LRU cache eviction is mediated by SceneJS._memoryModule.
  *  @private
  */
 SceneJS._shaderModule = new (function() {
+    var debugCfg;                       // Debugging configuration for this module
+    var time = (new Date()).getTime();  // Current time for least-recently-used shader cache eviction policy
+    var canvas;                         // Currently active WebGL canvas
+    var nextStateId;                    // Generates unique state chunk ID
 
-    var debugCfg;
-
-    var time = (new Date()).getTime();      // For LRU shader caching
-
-    var canvas;                             // Currently active canvas
-
-    var nextStateId;                        // Generates unique state ID
-
+    /* Currently exported states
+     */
     var rendererState;
     var lightState;
     var boundaryState;
@@ -31,15 +43,18 @@ SceneJS._shaderModule = new (function() {
     var viewXFormState;
     var projXFormState;
     var pickState;
+    var imageBufState;
 
-    var canvasBins = {};
-    var bins;
+    /** Bin set for the currently-active canvas
+     */
+    var binSet;
 
+    /** Shader programs currently allocated on all canvases
+     */
     var programs = {};
 
-
-    /* Register this module to deallocate shaders
-     * when memory module needs VRAM
+    /* Volunteer this module with the VRAM memory management module
+     * to deallocate programs when memory module needs VRAM.
      */
     SceneJS._memoryModule.registerEvictor(
             function() {
@@ -63,12 +78,18 @@ SceneJS._shaderModule = new (function() {
                 return false;   // Couldnt find suitable program to delete
             });
 
+    /* Track the scene graph time so we can timestamp the last time
+     * we use each shader programs in case we need to evict the
+     * least-recently-used program for the memor-management module.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
+    /* When SceneJS resets we'll free all the programs
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.RESET,
             function() {
@@ -78,16 +99,27 @@ SceneJS._shaderModule = new (function() {
                 programs = {};
             });
 
+
+    //    SceneJS._eventModule.addListener(
+    //            SceneJS._eventModule.SCENE_RENDERING,
+    //            function(params) {
+    //            });
+
+
+    /* When a canvas is activated we'll get a reference to it, prepare the default state soup,
+     * and an initial empty set of node bins
+     */
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
-            function(params) {
+            SceneJS._eventModule.CANVAS_ACTIVATED,
+            function(activatedCanvas) {
                 debugCfg = SceneJS._debugModule.getConfigs("shading");
-                canvas = params.canvas;
 
-                //---------------------------
-                // State soup
-                //---------------------------
+                /* Get reference to active canvas
+                 */
+                canvas = activatedCanvas;
 
+                /* Prepare initial default state soup
+                 */
                 nextStateId = 0;
                 rendererState = {
                     props: {},
@@ -120,75 +152,18 @@ SceneJS._shaderModule = new (function() {
                     hash: ""
                 };
                 geoState = null;
+                imageBufState = null;
 
-                //---------------------------
-                // State bins for each canvas
-                //---------------------------
-
-                canvasBins[params.canvas.canvasId] = {
-                    layerBins: [createBins(0)]
+                /* Prepare initial set of empty node bins
+                 */
+                binSet = {
+                    opaqueNodes : [],
+                    transpNodes : []
                 };
             });
 
-    function createBins(index) {
-        return {
-            index: index,
-            nodes : [],
-            transparentNodes : [],
-            opaqueBin : {},
-            transparentBin : {},
-            info: {
-                countTransparent: 0
-            }
-        };
-    }
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_ACTIVATED,
-            function(c) {
-                canvas = c;
-                bins = createBins(0);
-                canvasBins[canvas.canvasId] = {
-                    layerBins: [bins]
-                };
-            });
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.LAYER_EXPORTED,
-            function(layer) {
-                if (!layer || (layer.index == 0)) {
-
-                    /* Null or default layer exported - use default bins
-                     */
-                    bins = canvasBins[canvas.canvasId].layerBins[0];
-                } else {
-
-                    /* Non-default layer exported - get/create bins for the layer
-                     */
-                    bins = getBin(layer.index);
-                }
-            });
-
-    function getBin(index) {
-        var layerBins = canvasBins[canvas.canvasId].layerBins;
-        var bins ;
-        var newBins;
-        for (var i = 0; i < layerBins.length; i++) {
-            bins = layerBins[i];
-            if (bins.index == index) {
-                return bins;
-            }
-            if (bins.index > index) {
-                newBins = createBins(index);
-                bins.splice(index, newBins);
-                return newBins;
-            }
-        }
-        newBins = createBins(index);
-        layerBins.push(newBins);       // no insertion point found
-        return newBins;
-    }
-
+    /* Import GL flags state
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.RENDERER_EXPORTED,
             function(props) {
@@ -199,11 +174,14 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When texture state exported, add it to the state soup
+     * and make hash identity for its GLSL fragment.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.TEXTURES_EXPORTED,
             function(texture) {
 
-                /* Build texture hash
+                /* Make hash
                  */
                 var hashStr;
                 if (texture.layers.length) {
@@ -225,6 +203,8 @@ SceneJS._shaderModule = new (function() {
                     hashStr = "__scenejs_no_tex";
                 }
 
+                /* Add to state soup
+                 */
                 texState = {
                     _stateId : nextStateId++,
                     texture : texture,
@@ -232,11 +212,14 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When lighting state exported, add it to the state soup
+     * and make hash identity for its GLSL fragment.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.LIGHTS_EXPORTED,
             function(lights) {
 
-                /* Build lights hash
+                /* Make hash
                  */
                 var hash = [];
                 for (var i = 0; i < lights.length; i++) {
@@ -250,6 +233,8 @@ SceneJS._shaderModule = new (function() {
                     }
                 }
 
+                /* Add to state soup
+                 */
                 lightState = {
                     _stateId : nextStateId++,
                     lights: lights,
@@ -257,6 +242,9 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When boundary state exported, add it to the state soup.
+     * We don't need a hash identity since it's not renderable.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.BOUNDARY_EXPORTED,
             function(params) {
@@ -267,6 +255,10 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When material state exported, add it to the state soup. We don't need
+     * a GLSL hash for material since our GLSL happens to be generic for
+     * material attributes.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.MATERIAL_EXPORTED,
             function(material) {
@@ -287,6 +279,9 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When highlight state exported, add it to the state soup.
+     * We don't need a hash identity since our GLSL is generic for highlighting.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.HIGHLIGHT_EXPORTED,
             function(params) {
@@ -297,7 +292,10 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
-
+    /* When picking state exported, add it to the state soup.
+     * We don't need a hash identity since we'll just switch to
+     * a special pick shader for picking mode.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.PICK_COLOR_EXPORTED,
             function(params) {
@@ -308,6 +306,9 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When fog state exported, add it to the state soup and make
+     * hash code for its GLSL fragment
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.FOG_EXPORTED,
             function(fog) {
@@ -318,6 +319,10 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When model matrix exported, add it to the state soup.
+     * We don't need a GLSL hash for it since our GLSL always
+     * expects a modelling matrix.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.MODEL_TRANSFORM_EXPORTED,
             function(transform) {
@@ -328,6 +333,10 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When view matrix exported, add it to the state soup.
+     * We don't need a GLSL hash for it since our GLSL always
+     * expects a view matrix.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.VIEW_TRANSFORM_EXPORTED,
             function(transform) {
@@ -338,6 +347,10 @@ SceneJS._shaderModule = new (function() {
                 };
             });
 
+    /* When projection matrix exported, add it to the state soup.
+     * We don't need a GLSL hash for it since our GLSL always
+     * expects a projection matrix.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.PROJECTION_TRANSFORM_EXPORTED,
             function(transform) {
@@ -348,8 +361,49 @@ SceneJS._shaderModule = new (function() {
             });
 
     SceneJS._eventModule.addListener(
+            SceneJS._eventModule.IMAGEBUFFER_EXPORTED,
+            function(params) {
+                imageBufState = {
+                    _stateId : nextStateId++,
+                    imageBuf: params.imageBuf
+                };
+            });
+
+    /* When geometry exported, add it to the state soup and make
+     * GLSL hash code on the VBOs it provides.
+     *
+     * Geometry is automatically exported when a scene graph geometry node
+     * is rendered.
+     *
+     * Geometry is the central element of a state graph node, so now we
+     * will create a state graph node with pointers to the elements currently
+     * in the state soup.
+     *
+     * But first we need to ensure that the state soup is up to date. Other kinds of state
+     * are not automatically exported by scene traversal, where their modules
+     * require us to notify them that we'll be rendering something (the geometry) and
+     * need an up-to-date set state soup. If they havent yet exported their state
+     * (textures, material and so on) for this scene traversal, they'll do so.
+     *
+     * And if we need boundaries for our rendering algorithm, we'll send a
+     * special marshalling notification for those.
+     *
+     * Next, we'll build a program hash code by concatenating the hashes on
+     * the state soup elements, then use that to create (or re-use) a shader program
+     * that is equipped to render the current state soup elements.
+     *
+     * Then we create the state graph node, which has the program and pointers to
+     * the current state soup elements.
+     *
+     * Finally we put that node into either the opaque or transparent bin within the
+     * active bin set, depending on whether the material state is opaque or transparent.
+     */
+    SceneJS._eventModule.addListener(
             SceneJS._eventModule.GEOMETRY_EXPORTED,
             function(geo) {
+
+                /* Add geometry to state soup
+                 */
                 geoState = {
                     _stateId : nextStateId++,
                     geo:geo,
@@ -359,7 +413,7 @@ SceneJS._shaderModule = new (function() {
                         geo.uvBuf2 ? "t" : "f"]).join("")
                 };
 
-                /* Marshal the state soup
+                /* Ensure the rest of the state soup is marshalled
                  */
                 SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
 
@@ -367,15 +421,26 @@ SceneJS._shaderModule = new (function() {
                 SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_NEEDS_BOUNDARIES);
                 //}
 
+                /* Identify what GLSL is required for the current state soup elements
+                 */
                 var sceneHash = getSceneHash();
 
-                /* Add node for geometry, linked to current states in the soup
+                /* Create or re-use a program
+                 */
+                var program = getProgram(sceneHash);
+
+                /* Create state graph node, with program and
+                 * pointers to current state soup elements
                  */
                 var node = {
+
                     program : {
                         id: sceneHash,
-                        program: getProgram(sceneHash)
+                        program: program
                     },
+
+                    /* Pointers into state soup
+                     */
                     boundaryState: boundaryState,
                     geoState: geoState,
                     rendererState: rendererState,
@@ -387,179 +452,121 @@ SceneJS._shaderModule = new (function() {
                     viewXFormState: viewXFormState,
                     projXFormState: projXFormState,
                     texState: texState,
-                    pickState : pickState
+                    pickState : pickState ,
+                    imageBufState : imageBufState
                 };
 
+                /* Put node into either the transoarent or opaque bin,
+                 * depending on current material state's opacity
+                 */
                 if (materialState.material.opacity != undefined && materialState.material.opacity != 1.0) {
-                    bins.transparentNodes.push(node);
+                    binSet.transpNodes.push(node);
                 } else {
-                    bins.nodes.push(node);
+                    binSet.opaqueNodes.push(node);
                 }
             });
 
-
+    /* When the canvas deactivates, we'll render the node bins.
+     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.CANVAS_DEACTIVATED,
             function() {
-                nodeRenderer.init();
-                var layerBins = canvasBins[canvas.canvasId].layerBins;
-                for (var i = 0; i < layerBins.length; i++) {
-                    renderBins(layerBins[i]);
-                }
+                NodeRenderer.init();
+                renderBinSet(binSet);
+                NodeRenderer.cleanup();
                 canvas = null;
             });
 
-    //-----------------------------------------------------------------------------------------------------------------
-    //  Bin rendering
-    //-----------------------------------------------------------------------------------------------------------------
 
-    this.redraw = function() {
-        nodeRenderer.init();
-        var layerBins = canvasBins[canvas.canvasId].layerBins;
-        for (var i = 0; i < layerBins.length; i++) {
-            renderBins(layerBins[i]);
-        }
-    };
-
-    function renderBins(binSet) {
+    //    this.redraw = function() {
+    //        NodeRenderer.init();
+    //        renderBinSet(binSet);
+    //    };
 
 
-        var nTransparent = binSet.transparentNodes.length;
+    /**
+     * Renders the given bin set.
+     */
+    function renderBinSet(binSet) {
+        var nTransparent = binSet.transpNodes.length;
 
         if (nTransparent == 0) {
 
-            /* No transparent nodes
-             *
-             * - render all nodes into depth buffer, sorted by program
+            /* Bin set contains no transparent nodes, so we'll just render the opaque ones, Sort them
+             * first by program, to minimise the number of shader re-binds we do.
              */
-            binSet.nodes.sort(programCmp);
-            renderOpaqueNodes(binSet.nodes);
+        //    binSet.opaqueNodes.sort(programCmp);
+            renderOpaqueNodes(binSet.opaqueNodes);
         }
 
         if (nTransparent == 1) {
 
-            /* One transparent node
-             *
-             * - render opaque nodes into depth buffer, sorted by program
-             * - render transparent node into depth buffer with blending
+            /* Bin set contains one transparent node, so we'll sort the opaque nodes by program,
+             * render those, then render the solitary transparent node with blending enabled.
              */
-            binSet.nodes.sort(programCmp);
-            renderOpaqueNodes(binSet.nodes);
-
-            renderTransparentNodes(bins.transparentNodes);
+            binSet.opaqueNodes.sort(programCmp);
+            renderOpaqueNodes(binSet.opaqueNodes);
+            renderTransparentNodes(binSet.transpNodes);
         }
 
         if (nTransparent > 1) {
 
-            /* Many transparent nodes
-             *
-             * - render opaque nodes into depth buffer, sorted by program
-             * - render transparent nodes into depth buffer with blending, sorted by boundary depth
+            /* Bin set contains contains many transparent nodes. We'll sort the opaque nodes by program,
+             * render those, then sort the transparent nodes by boundary and render those with blending enabled.
              */
-            binSet.nodes.sort(programCmp);
-            renderOpaqueNodes(binSet.nodes);
+            binSet.opaqueNodes.sort(programCmp);
+            renderOpaqueNodes(binSet.opaqueNodes);
 
-            //  binSet.transparentNodes.sort(boundaryCmp);
-            renderTransparentNodes(binSet.transparentNodes);
-        }
-        canvas.context.flush();
-    }
-
-    function renderOpaqueNodes(nodes) {
-        for (var i = 0, len = nodes.length; i < len; i++) {
-            nodeRenderer.renderNode(nodes[i]);
+            //  binSet.transpNodes.sort(boundaryCmp);
+            renderTransparentNodes(binSet.transpNodes);
         }
     }
 
-    function renderTransparentNodes(nodes) {
+    function renderOpaqueNodes(opaqueNodes) {
+        for (var i = 0, len = opaqueNodes.length; i < len; i++) {
+            NodeRenderer.renderNode(opaqueNodes[i]);
+        }
+    }
+
+    function renderTransparentNodes(transpNodes) {
         var context = canvas.context;
         context.blendFunc(context.SRC_ALPHA, context.ONE);
+        //context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
         context.enable(context.BLEND);
 
-        for (var i = 0, len = nodes.length; i < len; i++) {
-            nodeRenderer.renderNode(nodes[i]);
+        for (var i = 0, len = transpNodes.length; i < len; i++) {
+            NodeRenderer.renderNode(transpNodes[i]);
         }
         context.disable(context.BLEND);
         context.blendFunc(context.SRC_ALPHA, context.LESS);
     }
 
-    function renderMixedNodes(nodes) {
-        var context = canvas.context;
-        var node;
-        for (var i = 0, len = nodes.length; i < len; i++) {
-            node = nodes[i];
-            if (node.materialState.material.opacity < 1.0) {
-                context.blendFunc(context.SRC_ALPHA, context.ONE);
-                context.enable(context.BLEND);
-                //   context.disable(context.CULL_FACE);
-                nodeRenderer.renderNode(node);
-                context.disable(context.BLEND);
-                context.blendFunc(context.SRC_ALPHA, context.LESS);
-                // context.enable(context.CULL_FACE);
-            } else {
-                nodeRenderer.renderNode(node);
-            }
-        }
-    }
-
-    //    function renderBins() {
-    //
-    //        var hash;
-    //        var nodes;
-    //        var i;
-    //        var context = canvas.context;
-    //
-    //        nodeRenderer.init();
-    //
-    //        /* Render opaque bin
-    //         */
-    //        for (hash in bins.opaqueBin) {
-    //            if (bins.opaqueBin.hasOwnProperty(hash)) {
-    //                nodes = bins.opaqueBin[hash].nodes;
-    //                nodes.sort(texCmp);
-    //                // nodes.sort(geoCmp);
-    //                for (i = nodes.length - 1; i >= 0; i--) {
-    //                    nodeRenderer.renderNode(nodes[i]);
-    //                }
-    //            }
-    //        }
-    //
-    //        /* Render transparent bin
-    //         */
-    //        context.blendFunc(context.SRC_ALPHA, context.ONE);
-    //        context.enable(context.BLEND);
-    //        context.disable(context.CULL_FACE);
-    //        //    context.disable(context.DEPTH_TEST);
-    //
-    //        for (hash in bins.transparentBin) {
-    //            if (bins.transparentBin.hasOwnProperty(hash)) {
-    //                nodes = bins.transparentBin[hash].nodes;
-    //                nodes.sort(boundaryCmp);
-    //                for (i = nodes.length - 1; i >= 0; i--) {
-    //                    nodeRenderer.renderNode(nodes[i]);
-    //                }
-    //            }
-    //        }
-    //        context.disable(context.BLEND);
-    //        canvas.context.blendFunc(context.SRC_ALPHA, context.LESS);
-    //        context.enable(context.CULL_FACE);
-    //        // context.enable(context.DEPTH_TEST);
-    //
-    //        canvas.context.flush();
-    //    }
-
+    /* Comparator function for sorting nodes by program
+     */
     var programCmp = function(node1, node2) {
-        return node1.program.id - node2.program.id;
+        if (node1.program.id < node2.program.id) {         // TODO: faster ID for comparison
+            return -1;
+        } else if (node1.program.id > node2.program.id) {
+            return 1;
+        } else {
+            return 0;
+        }
     };
 
+    /* Comparator function for sorting nodes by geometry
+     */
     var geoCmp = function(node1, node2) {
         return node1.geoState._stateId - node2.geoState._stateId;
     };
 
+    /* Comparator function for sorting nodes by texture
+     */
     var texCmp = function(node1, node2) {
         return node1.texState._stateId - node2.texState._stateId;
     };
 
+    /* Comparator function for sorting nodes by boundary view-space Z-depth
+     */
     function boundaryCmp(a, b) {
         if (!a.boundaryState.boundary) {  // Non-bounded opaqueBin to front of list
             return -1;
@@ -570,38 +577,40 @@ SceneJS._shaderModule = new (function() {
         return (a.boundaryState.boundary.max[2] - b.boundaryState.boundary.max[2]);
     }
 
-    /* Renders a node, retaining the IDs of various WebGL state
+    /**
+     * State node renderer
      */
-    const nodeRenderer = new (function() {
+    const NodeRenderer = new (function() {
 
+        /**
+         * Called before we render all state nodes for a frame.
+         * Forgets any program that was used for the last node rendered, which causes it
+         * to forget all states for that node.
+         */
         this.init = function() {
             this._program = null;
             this._lastRendererState = null;
-
-            this._stateStats = {
-                program: 0,
-                geo : 0,
-                renderer: 0,
-                tex: 0,
-                light: 0,
-                material: 0,
-                viewXForm: 0,
-                modelXForm: 0,
-                projXForm: 0,
-                pick: 0
-            };
+            this._lastImageBufState = null;
         };
 
+        /**
+         * Renders a state node. Makes state changes only where the node's states have different IDs
+         * that the states of the last node. If the node has a different program than the last node
+         * rendered, Renderer forgets all states for the previous node and makes a fresh set of transitions
+         * into all states for this node.
+         */
         this.renderNode = function(node) {
 
             var context = canvas.context;
 
             /* Bind program if none bound, or if node uses different program
-             * to that currently bound. Also flag all buffers as needing to be bound.
+             * to that currently bound.
+             *
+             * Also flag all buffers as needing to be bound.
              */
             if ((!this._program) || (node.program.id != this._lastProgramId)) {
                 if (this._program) {
-                    //  this._program.unbind();
+                    this._program.unbind();
                 }
 
                 this._program = node.program.program;
@@ -615,10 +624,22 @@ SceneJS._shaderModule = new (function() {
                 this._lastModelXFormStateId = -1;
                 this._lastProjXFormStateId = -1;
                 this._lastPickStateId = -1;
+                this._lastImageBufStateId = -1;
 
                 this._lastProgramId = node.program.id;
+            }
 
-                this._stateStats.program++;
+            /* Bind image buffer
+             */
+            if (! node._lastImageBufState || node.imageBufState._stateId != this._lastImageBufState._stateId) {
+                if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
+                    context.flush();
+                    this._lastImageBufState.imageBuf.unbind();
+                }
+                if (node.imageBufState.imageBuf) {
+                    node.imageBufState.imageBuf.bind();
+                }
+                this._lastImageBufState = node.imageBufState;
             }
 
             /* Bind geometry
@@ -648,8 +669,6 @@ SceneJS._shaderModule = new (function() {
                     }
                 }
                 geo.indexBuf.bind();
-
-                this._stateStats.geo++;
             }
 
             /* Set GL props
@@ -671,8 +690,6 @@ SceneJS._shaderModule = new (function() {
                         ? [clearColor.r, clearColor.g, clearColor.b]
                         : [0, 0, 0];
                 this._program.setUniform("uAmbient", clearColor);
-
-                this._stateStats.renderer++;
             }
 
             /* Bind texture layers
@@ -687,7 +704,8 @@ SceneJS._shaderModule = new (function() {
                     }
                 }
                 this._lastTexStateId = node.texState._stateId;
-                this._stateStats.tex++;
+            } else if (!node.texState) {
+                this._lastTexStateId = -1;
             }
 
             /* Bind fog
@@ -705,8 +723,6 @@ SceneJS._shaderModule = new (function() {
                 this._program.setUniform("uVMatrix", node.viewXFormState.mat);
                 this._program.setUniform("uVNMatrix", node.viewXFormState.normalMat);
                 this._lastViewXFormStateId = node.viewXFormState._stateId;
-
-                this._stateStats.viewXForm++;
             }
 
             /* Bind Model matrix
@@ -715,8 +731,6 @@ SceneJS._shaderModule = new (function() {
                 this._program.setUniform("uMMatrix", node.modelXFormState.mat);
                 this._program.setUniform("uMNMatrix", node.modelXFormState.normalMat);
                 this._lastModelXFormStateId = node.modelXFormState._stateId;
-
-                this._stateStats.modelXForm++;
             }
 
             /* Bind Projection matrix
@@ -724,8 +738,6 @@ SceneJS._shaderModule = new (function() {
             if (node.projXFormState._stateId != this._lastProjXFormStateId) {
                 this._program.setUniform("uPMatrix", node.projXFormState.mat);
                 this._lastProjXFormStateId = node.projXFormState._stateId;
-
-                this._stateStats.projXForm++;
             }
 
             /* Bind lights
@@ -764,34 +776,31 @@ SceneJS._shaderModule = new (function() {
                     }
                 }
                 this._lastLightStateId = node.lightState._stateId;
-                this._stateStats.light++;
             }
 
             /*
              */
-            if (node.materialState) {
-
-                var material = node.materialState.material;
+            if (node.materialState && node.materialState != this._lastMaterialStateId) {
 
                 /* Bind Material
                  */
-                if (node.materialState) {
-                    this._program.setUniform("uMaterialBaseColor", material.baseColor);
-                    this._program.setUniform("uMaterialSpecularColor", material.specularColor);
-                    this._program.setUniform("uMaterialSpecular", material.specular);
-                    this._program.setUniform("uMaterialShine", material.shine);
-                    this._program.setUniform("uMaterialEmit", material.emit);
-                    this._program.setUniform("uMaterialAlpha", material.alpha);
+                var material = node.materialState.material;
+                this._program.setUniform("uMaterialBaseColor", material.baseColor);
+                this._program.setUniform("uMaterialSpecularColor", material.specularColor);
+                this._program.setUniform("uMaterialSpecular", material.specular);
+                this._program.setUniform("uMaterialShine", material.shine);
+                this._program.setUniform("uMaterialEmit", material.emit);
+                this._program.setUniform("uMaterialAlpha", material.alpha);
 
-                    this._lastMaterialStateId = node.materialState._stateId;
-                    this._stateStats.material++;
-                }
+                this._lastMaterialStateId = node.materialState._stateId;
 
-                /* If highlighting then override material
+                /* If highlighting then override material's baseColor. We'll also force a
+                 * material state change for the next node, otherwise otherwise the highlight
+                 * may linger in the shader uniform if there is no material state change for the next node.
                  */
                 if (node.highlightState && node.highlightState.highlighted) {
                     this._program.setUniform("uMaterialBaseColor", material.highlightBaseColor);
-                    this._lastMaterialStateId = null; // Otherwise highlight may linger in shader when material state unchanged
+                    this._lastMaterialStateId = null;
                 }
             }
 
@@ -799,22 +808,27 @@ SceneJS._shaderModule = new (function() {
              */
             if (node.pickState && node.pickState._stateId != this._lastPickStateId) {
                 this._program.setUniform("uPickColor", node.pickState.pickColor);
-                this._stateStats.pick++;
             }
 
-            /* Draw
+            /* Draw the geometry
              */
             context.drawElements(
                     node.geoState.geo.primitive,
                     node.geoState.geo.indexBuf.numItems,
                     context.UNSIGNED_SHORT,
                     0);
+
         };
 
-        this.getStateStats = function() {
-            return this._stateStats;
+        /**
+         * Called after all nodes rendered for the current frame
+         */
+        this.cleanup = function() {
+            canvas.context.flush();
+            if (this._program) {
+                this._program.unbind();
+            }
         };
-
     })();
 
 
@@ -1179,6 +1193,10 @@ SceneJS._shaderModule = new (function() {
                 } else {
                     src.push("textureCoord=texturePos.xy;");
                 }
+
+                /* Alpha from Texture
+                 * */
+                //   src.push("alpha = texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).a;");
 
                 /* Texture output
                  */

@@ -279,13 +279,12 @@ SceneJS._textureModule = new (function() {
 
     this.pushTexture = function(layers) {
 
-        /* Touch the cache LRU timestamp on each texture
+        /* Touch the cache LRU timestamp on each texture managed by this module
          */
         for (var i = 0; i < layers.length; i++) {
             if (!textures[layers[i].texture.textureId]) { // TODO: overkill to check for eviction?
                 throw SceneJS._errorModule.fatalError("No such texture loaded \"" + texture.layers[i].texture.textureId + "\"");
             }
-            layers[i].texture.lastUsed = time;
         }
         textureStack.push(layers);
         dirty = true;

@@ -10,12 +10,16 @@ SceneJS.utils.optimize.CollapseInstances = function(cfg) {
     this._cfg = cfg;
 };
 
-SceneJS.utils.optimize.CollapseInstances.execute = function(params, callback) {
-    if (!params.nodeId) {
-        throw "SceneJS.utils.optimise.CollapseInstances.execute expects params.nodeId";
+SceneJS.utils.optimize.CollapseInstances.prototype.execute = function(params, completed) {
+    if (completed) {
+        completed(this);
     }
-    if (!callback) {
-        throw "SceneJS.utils.optimise.CollapseInstances.execute expects callback";
-    }
-    callback();
+    return this;
+};
+
+SceneJS.utils.optimize.CollapseInstances.prototype.setConfigs = function(cfg) {
+};
+
+SceneJS.utils.optimize.CollapseInstances.prototype.getResults = function() {
+    return {};
 };

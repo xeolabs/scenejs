@@ -7,7 +7,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.8',
+    VERSION: '0.7.8.1',
 
     /** Names of supported WebGL canvas contexts
      */
@@ -192,11 +192,25 @@ var SceneJS = {
                 return SceneJS.withNode(nodeGot);
             },
 
+            /** Returns true if a child node matching given ID or index existis on the selected node
+             * @param {Number|String} node Child node index or ID
+             */
+            hasNode: function(node) {
+                if (!node) {
+                    throw "hasNode param 'node' is null or undefined";
+                }
+                var type = typeof node;
+                var nodeGot;
+                if (type == "number") {
+                    nodeGot = targetNode.getNodeAt(node);
+                } else if (type == "string") {
+                    nodeGot = targetNode.getNode(node);
+                } else {
+                    throw "hasNode param 'node' should be either an index number or an ID string";
+                }
+                return (nodeGot != undefined && nodeGot != null);
+            },
 
-//            hasNode: function(node) {
-//
-//            },
-            
             /**
              * Iterates over parent nodes on the path from the selected node to the root, executing a function
              * for each.
@@ -277,8 +291,9 @@ var SceneJS = {
                 if (typeof fn != "function") {
                     throw "eachInstance param 'fn' should be a function";
                 }
-                var instances = SceneJS._nodeInstanceMap[node._id];
-                if (instances) {
+                var nodeInstances = SceneJS._nodeInstanceMap[node._id];
+                if (nodeInstances) {
+                    var instances = nodeInstances.instances;
                     var count = 0;
                     var selector;
                     for (var instanceNodeId in instances) {

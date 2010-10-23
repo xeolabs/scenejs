@@ -16,12 +16,16 @@ SceneJS.utils.optimize.MergeTransforms = function(cfg) {
     this._cfg = cfg;
 };
 
-SceneJS.utils.optimize.MergeTransforms.execute = function(params, callback) {
-    if (!params.nodeId) {
-        throw "SceneJS.utils.optimize.MergeTransforms.execute expects params.nodeId";
+SceneJS.utils.optimize.MergeTransforms.prototype.execute = function(params, completed) {
+    if (completed) {
+        completed(this);
     }
-    if (!callback) {
-        throw "SceneJS.utils.optimize.MergeTransforms.execute expects callback";
-    }
-    callback();
+    return this;
+};
+
+SceneJS.utils.optimize.MergeTransforms.prototype.setConfigs = function(cfg) {
+};
+
+SceneJS.utils.optimize.MergeTransforms.prototype.getResults = function() {
+    return {};
 };

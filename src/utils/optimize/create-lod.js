@@ -16,12 +16,16 @@ SceneJS.utils.optimize.CreateLOD = function(cfg) {
     this._cfg = cfg;
 };
 
-SceneJS.utils.optimize.CreateLOD.execute = function(params, callback) {
-    if (!params.nodeId) {
-        throw "SceneJS.utils.optimize.CreateLOD.execute expects params.nodeId";
+SceneJS.utils.optimize.CreateLOD.prototype.execute = function(params, completed) {
+    if (completed) {
+        completed(this);
     }
-    if (!callback) {
-        throw "SceneJS.utils.optimize.CreateLOD.execute expects callback";
-    }
-    callback();
+    return this;
+};
+
+SceneJS.utils.optimize.CreateLOD.prototype.setConfigs = function(cfg) {
+};
+
+SceneJS.utils.optimize.CreateLOD.prototype.getResults = function() {
+    return {};
 };
