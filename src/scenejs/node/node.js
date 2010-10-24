@@ -117,10 +117,6 @@ SceneJS.Node = function() {
     this._sid = null;
     this._data = {};
 
-    /* Optional symbolic names that were defined for params
-     */
-    this._propNames = {};
-
     /* Child nodes
      */
     this._children = [];
@@ -227,27 +223,6 @@ SceneJS.Node._ArgParser = new (function() {
                         node._NODEINFO = param;
                     } else if (key == "data") {
                         node._data = param;
-                    } else {
-                        if (param.name) {
-
-                            /* Property has a binding for dynamic configuration, which
-                             * specifies a symbolic name and an optional default value.
-                             *
-                             * - symbolic name will be resolved to the property name
-                             *      whenever the node is dynamically configured
-                             *
-                             * - first char of symbolic name is converted to upper case to optimise comparison
-                             *      with preprocessed configs map
-                             *
-                             * - the binding is an object of the form { name: "foo", value: bar }
-                             *
-                             * - map the property's  actual name to the symbolic name and default value
-                             */
-                            node._propNames[param.name] = key.substr(0, 1).toUpperCase() + key.substr(1);
-                            node._params[key] = param.value;
-                        } else {
-                            node._params[key] = param;
-                        }
                     }
                 }
             }
@@ -656,23 +631,6 @@ SceneJS.Node.prototype.addNodes = function(nodes) {
     this._setDirty();
     return this;
 };
-
-//SceneJS.Node.prototype.addNodes = function(nodes) {
-//    if (!nodes) {
-//        throw SceneJS._errorModule.fatalError(
-//                new SceneJS.errors.InvalidSceneGraphException(
-//                        "SceneJS.Node#addNodes - nodes argument is undefined"));
-//    }
-//    if (typeof nodes == "array") {
-//        for (var i = nodes.length - 1; i >= 0; i--) {
-//            this.addNode(nodes[i]);
-//        }
-//    } else {
-//        this.addNode(nodes);
-//    }
-//    this._setDirty();
-//    return this;
-//};
 
 /** Appends a child node
  * @param {SceneJS.Node} node Child node
