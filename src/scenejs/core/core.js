@@ -197,7 +197,7 @@ var SceneJS = {
              */
             hasNode: function(node) {
                 if (!node === null || typeof(node) === "undefined") {
-                    throw "hasNode param 'node' is null or undefined";
+                    throw "hasNode param 'node' is null or undefined ";
                 }
                 var type = typeof node;
                 var nodeGot;
