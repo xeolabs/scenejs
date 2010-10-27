@@ -3,9 +3,9 @@ for model and data visualisation systems.
 
 Some key features:
 
- * JSON API for repurposable content
- * flexible JSON scene update/query API
- * auto GLSL generation - fulluy encapsulated
+ * flexible JSON API for scene graph create/update/query
+ * messaging system for peer-to-peer commands to the JSON API
+ * automatic GLSL generation - fully encapsulated
  * IoC container
  * GL state sorting
  * bounding boxes
@@ -35,11 +35,11 @@ Resources
 Website:
 http://scenejs.org
 
-Author:
-http://www.retaggr.com/page/LindsayStanleyKay
+Contributors:
+http://scenejs.wikispaces.com/Contributors
 
 Live examples:
-http://www.scenejs.org/load-ide.html
+http://scenejs.org/dist/curr/extr/examples/index.html
 
 Wiki:
 http://scenejs.wikispaces.com/
