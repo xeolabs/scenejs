@@ -189,9 +189,12 @@ SceneJS._pickModule = new (function() {
             SceneJS._eventModule.SCENE_RENDERED,
             function() {
                 if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-                    readPickBuffer();
-                    unbindPickBuffer();
-                    SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
+                    try {
+                        readPickBuffer();
+                        unbindPickBuffer();
+                    } finally {
+                        SceneJS._traversalMode = SceneJS._TRAVERSAL_MODE_RENDER;
+                    }
                 }
             });
 

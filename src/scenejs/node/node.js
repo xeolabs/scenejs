@@ -223,6 +223,8 @@ SceneJS.Node._ArgParser = new (function() {
                         node._NODEINFO = param;
                     } else if (key == "data") {
                         node._data = param;
+                    } else {
+                        node._params[key] = param;
                     }
                 }
             }

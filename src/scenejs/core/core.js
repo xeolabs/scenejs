@@ -572,64 +572,17 @@ var SceneJS = {
             if (!message) {
                 throw "sendMessage param 'message' null or undefined";
             }
-            var command = message.command;
-            if (!command) {
+            var commandId = message.command;
+            if (!commandId) {
                 throw "Message element expected: 'command'";
             }
+            var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE);
+            var command = commandService.getCommand(commandId);
 
-            /* Create a node
-             */
-            if (command == "create") {
-                var nodes = message.nodes;
-                if (nodes) {
-                    for (var i = 0; i < nodes.length; i++) {
-                        if (!nodes[i].id) {
-                            throw "Message 'create' must have ID for new node";
-                        }
-                        SceneJS.createNode(nodes[i]);
-                    }
-                }
-
-                /* Update a target node
-                 */
-            } else if (command == "update") {
-                var target = message.target;
-                if (target) {
-                    var targetNode = SceneJS._nodeIDMap[target];
-                    if (!targetNode) {
-                        throw "Message 'update' target node not found: " + target;
-                    }
-
-                    var sett = message["set"];
-                    if (sett) {
-                        SceneJS._callNodeMethods("set", sett, targetNode);
-                    }
-
-                    var insert = message.insert;
-                    if (insert) {
-                        SceneJS._callNodeMethods("insert", insert, targetNode);
-                    }
-
-                    var add = message.add;
-                    if (add) {
-                        SceneJS._callNodeMethods("add", add, targetNode);
-                    }
-
-                    var remove = message.remove;
-                    if (remove) {
-                        SceneJS._callNodeMethods("remove", remove, targetNode);
-                    }
-                }
+            if (!command) {
+                throw "Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?";
             }
-
-            /* Further messages
-             */
-            var messages = message.messages;
-            if (messages) {
-                for (var i = 0; i < messages.length; i++) {
-                    this.sendMessage(messages[i]);
-                }
-            }
+            command.execute(message);        
         };
 
 
@@ -672,6 +625,25 @@ var SceneJS = {
         /* TODO: event should be queued and consumed to avoid many of these events accumulating
          */
         targetNode._fireEvent("updated", { attr: attr });
+    },
+
+    _executeUtils : function(utils, targetNode) {
+        var utilsService = SceneJS.Services.getService(SceneJS.Services.NODE_UTILS_SERVICE_ID);
+        var cfg;
+        var util;
+        for (var utilityId in utils) {
+            if (utils.hasOwnProperty(utilityId)) {
+                cfg = utils[utilityId];
+                if (!cfg.id) {
+                    throw "Message property missing: 'id' on 'utils' element of 'update' message for target node '" + targetNode.getID() + "'";
+                }
+                util = utilsService.getUtil(cfg.id);
+                if (!util) {
+                    throw "Cannot find utility '" + cfg.id + "' for 'update' message for target node '" + targetNode.getID() + "'";
+                }
+                util.execute(cfg.params || {});
+            }
+        }
     } ,
 
 
