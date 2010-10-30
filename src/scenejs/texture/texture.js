@@ -263,6 +263,12 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
                                 function(texture) { // Success
                                     l.texture = texture;
                                     l.state = SceneJS.TextureLayer.STATE_LOADED;
+
+                                    /**
+                                     * Need scene graph to keep rendering so that
+                                     * this texture layer can create and apply the texture
+                                     */
+                                    SceneJS._needFrame = true;
                                 },
 
                                 function() { // General error, probably 404
