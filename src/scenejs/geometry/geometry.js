@@ -104,6 +104,7 @@ SceneJS.Geometry.prototype._init = function(params) {
     this._geo = null;    // Holds geometry when configured as arrays
     this._create = null; // Callback to create geometry
     this._handle = null; // Handle to created geometry
+    this._solid = true;
 
     this._resource = params.resource;       // Optional - can be null
     if (params.create instanceof Function) {
@@ -115,11 +116,61 @@ SceneJS.Geometry.prototype._init = function(params) {
             colors : params.colors || [],
             indices : params.indices || [],
             uv : params.uv || [],
+            uv2 : params.uv2 || [],
             primitive : params.primitive || "triangles"
         };
     }
 };
 
+/** Returns this Geometry's positions array
+ * @return {[Number]} Flat array of position elements
+ */
+SceneJS.Geometry.prototype.getPositions = function() {
+    return this._geo.positions;
+};
+
+
+/** Returns this Geometry's normals array
+ * @return {[Number]} Flat array of normal elements
+ */
+SceneJS.Geometry.prototype.getNormals = function() {
+    return this._geo.normals;
+};
+
+/** Returns this Geometry's colors array
+ * @return {[Number]} Flat array of color elements
+ */
+SceneJS.Geometry.prototype.getColors = function() {
+    return this._geo.colors;
+};
+
+/** Returns this Geometry's indices array
+ * @return {[Number]} Flat array of index elements
+ */
+SceneJS.Geometry.prototype.getIndices = function() {
+    return this._geo.indices;
+};
+
+/** Returns this Geometry's UV coordinates array
+ * @return {[Number]} Flat array of UV coordinate elements
+ */
+SceneJS.Geometry.prototype.getUv = function() {
+    return this._geo.uv;
+};
+
+/** Returns this Geometry's UV2 coordinates array
+ * @return {[Number]} Flat array of UV2 coordinate elements
+ */
+SceneJS.Geometry.prototype.getUv2 = function() {
+    return this._geo.uv2;
+};
+
+/** Returns this Geometry's primitive type
+ * @return {String} Primitive type -  "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
+ */
+SceneJS.Geometry.prototype.getPrimitive = function() {
+    return this._geo.primitive;
+};
 
 /** Returns the local-space boundary of this Geometry's positions
  * @return { xmin: Number, ymin: Number, zmin: Number, xmax: Number, ymax: Number, zmax: Number} The local-space boundary
@@ -162,6 +213,28 @@ SceneJS.Geometry.prototype.getBoundary = function() {
     return boundary;
 };
 
+
+/**
+ * When set true, causes triangle primitives to be rendered as wireframe.
+ * @param {Boolean} solid True when geometry is solid else false
+ * @returns {SceneJS.Geometry} this
+ */
+SceneJS.Geometry.prototype.setSolid = function(solid) {
+    solid = (solid == null || solid == undefined) ? true : solid;
+    this._solid = solid;
+    this._setDirty();
+    return this;
+};
+
+/**
+ * Returns whether this geometry is currently set as solid or not. When not solid then
+ * triangle primitives will be rendered as wireframe.
+ * @returns {Boolean} True when geometry is solid else false
+ */
+SceneJS.Geometry.prototype.getSolid = function() {
+    return this._solid;
+};
+
 // @private
 SceneJS.Geometry.prototype._render = function(traversalContext) {
     if (this._handle) { // Was created before - test if not evicted since
@@ -176,7 +249,7 @@ SceneJS.Geometry.prototype._render = function(traversalContext) {
             this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._geo);
         }
     }
-    SceneJS._geometryModule.pushGeometry(this._handle);
+    SceneJS._geometryModule.pushGeometry(this._handle, { solid: this._solid });
     this._renderNodes(traversalContext);
     SceneJS._geometryModule.popGeometry();
 

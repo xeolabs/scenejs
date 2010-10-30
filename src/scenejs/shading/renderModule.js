@@ -402,11 +402,11 @@ SceneJS._shaderModule = new (function() {
             SceneJS._eventModule.GEOMETRY_EXPORTED,
             function(geo) {
 
-                /* Add geometry to state soup
+                /* Add geometry to state soup.
                  */
                 geoState = {
                     _stateId : nextStateId++,
-                    geo:geo,
+                    geo:       geo,
                     hash: ([
                         geo.normalBuf ? "t" : "f",
                         geo.uvBuf ? "t" : "f",
@@ -495,7 +495,7 @@ SceneJS._shaderModule = new (function() {
             /* Bin set contains no transparent nodes, so we'll just render the opaque ones, Sort them
              * first by program, to minimise the number of shader re-binds we do.
              */
-        //    binSet.opaqueNodes.sort(programCmp);
+            //    binSet.opaqueNodes.sort(programCmp);
             renderOpaqueNodes(binSet.opaqueNodes);
         }
 

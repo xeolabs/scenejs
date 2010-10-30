@@ -42,6 +42,7 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/withNode.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/message.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
