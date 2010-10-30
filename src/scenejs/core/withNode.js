@@ -149,7 +149,7 @@ SceneJS._WithNode.prototype.eachInstance = function(fn) {
     if (typeof fn != "function") {
         throw "eachInstance param 'fn' should be a function";
     }
-    var nodeInstances = SceneJS._nodeInstanceMap[node._id];
+    var nodeInstances = SceneJS._nodeInstanceMap[this._targetNode._id];
     if (nodeInstances) {
         var instances = nodeInstances.instances;
         var count = 0;
@@ -167,7 +167,7 @@ SceneJS._WithNode.prototype.eachInstance = function(fn) {
 };
 
 SceneJS._WithNode.prototype.numInstances = function() {
-    var instances = SceneJS._nodeInstanceMap[node._id];
+    var instances = SceneJS._nodeInstanceMap[this._targetNode._id];
     return instances ? instances.numInstances : 0;
 };
 
