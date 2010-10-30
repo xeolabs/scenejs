@@ -47,6 +47,7 @@ SceneJS._rendererModule = new (function() {
                     enableScissorTest: false,
                     viewport:{ x : 1, y : 1, width: c.canvas.width, height: canvas.canvas.height }
                 });
+                setProperties(canvas.context, props);
                 _this.pushProps(props);
             });
 
