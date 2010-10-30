@@ -7,7 +7,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.8.1',
+    VERSION: '0.7.9.0',
 
     /** Names of supported WebGL canvas contexts
      */
@@ -176,15 +176,22 @@ var SceneJS = {
             if (!commandId) {
                 throw "Message element expected: 'command'";
             }
-            var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE);
+            var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
             var command = commandService.getCommand(commandId);
 
             if (!command) {
                 throw "Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?";
             }
-            command.execute(message);        
+            command.execute(message);
         };
     })(),
+
+    /**
+     * True when a state change of any sort happens within Scenes, where Scene then need to render another frame.
+     * This is set when updates are made through the JSON Scene Graph API. It is very crude; change in one scene
+     * causes all scenes to render a frame, but then perhaps that is OK, or even a good idea?
+     */
+    _needFrame : true,
 
     /** @private */
     _traversalMode :0x1,

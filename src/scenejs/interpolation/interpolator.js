@@ -29,6 +29,7 @@
  *
  *  </pre></code>
  *
+ * A SceneJS.Interpolator will do nothing while the time is outside its range of time key values.
  * @extends SceneJS.Node
  * @since Version 0.7.4
  * @constructor
@@ -162,7 +163,8 @@ SceneJS.Interpolator.prototype._render = function(traversalContext) {
     }
     this._update((SceneJS._timeModule.getTime() - this._timeStarted) * 0.001);
 
-    if (SceneJS.nodeExists(this._target)) {
+    if (this._outputValue != null// Null when interpolation outside of time range 
+            && SceneJS.nodeExists(this._target)) {
         SceneJS.withNode(this._target).set(this._targetProperty, this._outputValue);
     }
 
@@ -182,7 +184,8 @@ SceneJS.Interpolator.prototype._update = function(key) {
             break;                                          // Time delay before interpolation begins
 
         case this.STATE_AFTER:
-            this._outputValue = this._values[this._values.length - 1];
+            this._outputValue = null;
+            //this._outputValue = this._values[this._values.length - 1];
             if (this._once) {
                 this.destroy();
             }

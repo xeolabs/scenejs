@@ -172,6 +172,12 @@ SceneJS.Instance.prototype._render = function(traversalContext) {
             }
             this._changeState(SceneJS.Instance.STATE_ERROR, exception);
 
+            /**
+             * Need scene graphs to keep rendering so
+             * that this instance can keep checking for its target
+             */
+            SceneJS._needFrame = true;
+
         } else {
             this._changeState(SceneJS.Instance.STATE_RENDERING);
             this._symbol._renderWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
@@ -225,7 +231,7 @@ SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalCon
     };
 };
 
-/** @private  
+/** @private
  */
 SceneJS.Instance.prototype._destroy = function() {
     if (this._target) {

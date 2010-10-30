@@ -82,6 +82,7 @@ SceneJS._WithNode.prototype.eachParent = function(fn) {
     }
     var selector;
     var count = 0;
+    var node = this._targetNode.parent;
     while (node._parent) {
         selector = new SceneJS._WithNode(node._parent);
         if (fn.call(selector, count++) == true) {
@@ -413,6 +414,11 @@ SceneJS._WithNode.prototype._callNodeMethod = function(prefix, attr, value, targ
     var params = {};
     params[attr] = value;
 
+    /* Raise flag so that all Scenes currently
+     * running rendering loops will render another frame.
+     */
+    SceneJS._needFrame = true;
+
     /* TODO: event should be queued and consumed to avoid many of these events accumulating
      */
     targetNode._fireEvent("updated", params);
@@ -431,6 +437,11 @@ SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode
             func.call(targetNode, attr[key]);
         }
     }
+
+    /* Raise flag so that all Scenes currently
+     * running rendering loops will render another frame.
+     */
+    SceneJS._needFrame = true;
 
     /* TODO: optimise - dont fire unless listener exists
      */

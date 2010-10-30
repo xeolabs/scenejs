@@ -1,5 +1,5 @@
 SceneJS.Services.addService(
-        SceneJS.Services.COMMAND_SERVICE,
+        SceneJS.Services.COMMAND_SERVICE_ID,
         (function() {
             var commands = {};
             return {
@@ -7,7 +7,7 @@ SceneJS.Services.addService(
                 addCommand: function(commandId, command) {
                     if (!command.execute) {
                         throw "SceneJS Command Service (ID '"
-                                + SceneJS.Services.COMMAND_SERVICE
+                                + SceneJS.Services.COMMAND_SERVICE_ID
                                 + ") requires an 'execute' method on your '" + commandId + " command implementation";
                     }
                     commands[commandId] = command;
@@ -20,11 +20,28 @@ SceneJS.Services.addService(
 
                 getCommand: function(commandId) {
                     return commands[commandId];
+                },
+
+                executeCommand : function (params) {
+                    if (!params) {
+                        throw "sendMessage param 'message' null or undefined";
+                    }
+                    var commandId = params.command;
+                    if (!commandId) {
+                        throw "Message element expected: 'command'";
+                    }
+                    var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
+                    var command = commandService.getCommand(commandId);
+
+                    if (!command) {
+                        throw "Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?";
+                    }
+                    command.execute(params);
                 }
             };
         })());
 
-SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE).addCommand("create",
+SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID).addCommand("create",
         (function() {
             return {
                 execute: function(params) {
@@ -42,7 +59,9 @@ SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE).addCommand("create
         })());
 
 (function() {
-    SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE).addCommand("update", {
+    var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
+
+    commandService.addCommand("update", {
         execute: function(params) {
             var target = params.target;
             if (target) {
@@ -72,7 +91,7 @@ SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE).addCommand("create
             var messages = params.messages;
             if (messages) {
                 for (var i = 0; i < messages.length; i++) {
-                    SceneJS.sendMessage(messages[i]);
+                    commandService.executeCommand(messages[i]);
                 }
             }
         }

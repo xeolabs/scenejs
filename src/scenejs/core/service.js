@@ -4,9 +4,9 @@
 
 SceneJS.Services = new (function() {
 
-    this.NODE_LOADER_SERVICE = "node-loader";
+    this.NODE_LOADER_SERVICE_ID = "node-loader";
 
-    this.COMMAND_SERVICE = "command";
+    this.COMMAND_SERVICE_ID = "command";
 
     this._services = {};
 
@@ -27,7 +27,7 @@ SceneJS.Services = new (function() {
      * Install stub services
      *---------------------------------------------------*/
 
-    this.addService(this.NODE_LOADER_SERVICE, {
+    this.addService(this.NODE_LOADER_SERVICE_ID, {
         loadNode: function(nodeId) {
         }
     });

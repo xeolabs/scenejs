@@ -246,7 +246,10 @@ SceneJS.Scene.prototype.start = function(cfg) {
                 cfg.idleFunc();
             }
             if (self._running) { // idleFunc may have stopped render loop
-                self._render();
+                if (SceneJS._needFrame) {
+                    SceneJS._needFrame = false;
+                    self._render();
+                }
             }
         };
         this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 100));

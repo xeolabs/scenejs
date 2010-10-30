@@ -162,18 +162,6 @@ SceneJS.createNode({
 });
 
 
-window.render = function() {
-    SceneJS.withNode("the-scene").render();
-};
+SceneJS.withNode("the-scene").start({ fps: 100 });
 
-var pInterval;
 
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
-});
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-pInterval = window.setInterval("window.render()", 10);
