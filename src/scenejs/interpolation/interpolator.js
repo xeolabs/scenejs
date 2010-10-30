@@ -162,15 +162,9 @@ SceneJS.Interpolator.prototype._render = function(traversalContext) {
     }
     this._update((SceneJS._timeModule.getTime() - this._timeStarted) * 0.001);
 
-    /* Send value to target
-     */
-    var message = {
-        command: "update",
-        target: this._target,
-        set: {}
-    };
-    message.set[this._targetProperty] = this._outputValue;
-    SceneJS.Message.sendMessage(message);
+    if (SceneJS.nodeExists(this._target)) {
+        SceneJS.withNode(this._target).set(this._targetProperty, this._outputValue);
+    }
 
     /* Render child nodes
      */
