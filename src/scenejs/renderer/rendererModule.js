@@ -45,7 +45,9 @@ SceneJS._rendererModule = new (function() {
                     enableCullFace: false,
                     depthRange: { zNear: 0, zFar: 1},
                     enableScissorTest: false,
-                    viewport:{ x : 1, y : 1, width: c.canvas.width, height: canvas.canvas.height }
+                    viewport:{ x : 1, y : 1, width: c.canvas.width, height: canvas.canvas.height },
+                    wireframe: false,
+                    highlight: false
                 });
                 setProperties(canvas.context, props);
                 _this.pushProps(props);
@@ -64,11 +66,15 @@ SceneJS._rendererModule = new (function() {
             }
         }
         props = processProps(props);
+
         return {
+
             props: props,
+
             setProps: function(context) {
                 setProperties(context, props);
             },
+
             restoreProps : function(context) {
                 if (restore) {
                     restoreProperties(context, restore);
@@ -461,6 +467,11 @@ SceneJS._rendererModule = new (function() {
 
     this.popProps = function() {
         propStack.pop();
+        var props = propStack[propStack.length - 1];
+        if (props.props.viewport) {
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, props.props.viewport);
+        }
+        dirty = true;
     };
 
 })();
