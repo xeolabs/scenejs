@@ -37,19 +37,44 @@ SceneJS._rendererModule = new (function() {
             function(c) {
                 canvas = c;
                 propStack = [];
-                var props = _this.createProps({
-                    clear: { depth : true, color : true},
+                var props = _this.createProps({  // Dont set props - just define for restoring to on props pop
+                    clear: {
+                        depth : true,
+                        color : true
+                    },
                     clearColor: {r: 0, g : 0, b : 0 },
                     clearDepth: 1.0,
-                    //enableDepthTest:true,
+                    enableDepthTest:true,
                     enableCullFace: false,
-                    depthRange: { zNear: 0, zFar: 1},
+                    frontFace: "ccw",
+                    cullFace: "back",
+                    depthFunc: "less",
+                    depthRange: {
+                        zNear: 0,
+                        zFar: 1
+                    },
                     enableScissorTest: false,
-                    viewport:{ x : 1, y : 1, width: c.canvas.width, height: canvas.canvas.height },
+                    viewport:{
+                        x : 1,
+                        y : 1,
+                        width: c.canvas.width,
+                        height: canvas.canvas.height
+                    },
                     wireframe: false,
                     highlight: false
+                                        ,
+                                        enableBlend: false,
+                                        blendFunc: {
+                                            sfactor: "srcAlpha",
+                                            dfactor: "less"
+                                        }
                 });
+
+
+
+                // Not sure if needed:
                 setProperties(canvas.context, props);
+
                 _this.pushProps(props);
             });
 
@@ -84,9 +109,12 @@ SceneJS._rendererModule = new (function() {
     };
 
     var getSuperProperty = function(name) {
+        var props;
+        var prop;
         for (var i = propStack.length - 1; i >= 0; i--) {
-            var props = propStack[i].props;
-            if (!(props[name] == undefined)) {
+            props = propStack[i].props;
+            prop = props[name];
+            if (prop != undefined && prop != null) {
                 return props[name];
             }
         }
@@ -94,13 +122,15 @@ SceneJS._rendererModule = new (function() {
     };
 
     function processProps(props) {
+        var prop;
         for (var name in props) {
             if (props.hasOwnProperty(name)) {
-                if (!(props[name] == undefined)) {
+                prop = props[name];
+                if (prop != undefined && prop != null) {
                     if (glModeSetters[name]) {
-                        props[name] = glModeSetters[name](null, props[name]);
+                        props[name] = glModeSetters[name](null, prop);
                     } else if (glStateSetters[name]) {
-                        props[name] = glStateSetters[name](null, props[name]);
+                        props[name] = glStateSetters[name](null, prop);
                     }
                 }
             }
@@ -110,9 +140,11 @@ SceneJS._rendererModule = new (function() {
 
     var setProperties = function(context, props) {
         for (var key in props) {        // Set order-insensitive properties (modes)
-            var setter = glModeSetters[key];
-            if (setter) {
-                setter(context, props[key]);
+            if (props.hasOwnProperty(key)) {
+                var setter = glModeSetters[key];
+                if (setter) {
+                    setter(context, props[key]);
+                }
             }
         }
         if (props.viewport) {           // Set order-sensitive properties (states)
@@ -131,10 +163,17 @@ SceneJS._rendererModule = new (function() {
      * have a seperate set and restore semantic - we don't want to keep clearing the buffer.
      */
     var restoreProperties = function(context, props) {
+        var value;
         for (var key in props) {            // Set order-insensitive properties (modes)
-            var setter = glModeSetters[key];
-            if (setter) {
-                setter(context, props[key]);
+            if (props.hasOwnProperty(key)) {
+                value = props[key];
+                //if (value != undefined && value != null) {
+                var setter = glModeSetters[key];
+                if (setter) {
+                    setter(context, value);
+                }
+
+                // }
             }
         }
         if (props.viewport) {               //  Set order-sensitive properties (states)
@@ -202,7 +241,11 @@ SceneJS._rendererModule = new (function() {
                 }
                 return flag;
             }
-            context.enable(context.BLEND, flag);
+            if (flag) {
+                context.enable(context.BLEND);
+            } else {
+                context.disable(context.BLEND);
+            }
         },
 
         blendColor: function(context, color) {
@@ -240,10 +283,10 @@ SceneJS._rendererModule = new (function() {
 
         blendFunc: function(context, funcs) {
             if (!context) {
-                blendFunc = blendFunc || {};
+                funcs = funcs || {};
                 return  {
-                    sfactor : funcs.sfactor || "one",
-                    dfactor : funcs.dfactor || "zero"
+                    sfactor : funcs.sfactor || "srcAlpha",
+                    dfactor : funcs.dfactor || "less"
                 };
             }
             context.blendFunc(glEnum(context, funcs.sfactor || "one"), glEnum(context, funcs.dfactor || "zero"));
@@ -361,8 +404,8 @@ SceneJS._rendererModule = new (function() {
             if (!context) {
                 range = range || {};
                 return {
-                    zNear : range.zNear || 0,
-                    zFar : range.zFar || 1
+                    zNear : (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
+                    zFar : (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
                 };
             }
             context.depthRange(range.zNear, range.zFar);
@@ -464,12 +507,14 @@ SceneJS._rendererModule = new (function() {
         }
     };
 
-
     this.popProps = function() {
+        var oldProps = propStack[propStack.length - 1];
         propStack.pop();
-        var props = propStack[propStack.length - 1];
-        if (props.props.viewport) {
-            SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, props.props.viewport);
+        var newProps = propStack[propStack.length - 1];
+        if (oldProps.props.viewport) {
+            SceneJS._eventModule.fireEvent(
+                    SceneJS._eventModule.VIEWPORT_UPDATED,
+                    newProps.props.viewport);
         }
         dirty = true;
     };

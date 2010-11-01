@@ -35,7 +35,6 @@ SceneJS._shaderModule = new (function() {
     var lightState;
     var boundaryState;
     var materialState;
-    var highlightState;
     var fogState;
     var texState;
     var geoState;
@@ -52,6 +51,10 @@ SceneJS._shaderModule = new (function() {
     /** Shader programs currently allocated on all canvases
      */
     var programs = {};
+
+    /** Current scene state hash
+     */
+    var stateHash = null;
 
     /* Volunteer this module with the VRAM memory management module
      * to deallocate programs when memory module needs VRAM.
@@ -144,7 +147,7 @@ SceneJS._shaderModule = new (function() {
                     },
                     hash: ""
                 };
-                highlightState = null;
+
                 fogState = null;
                 texState = {
                     _stateId : nextStateId++,
@@ -160,6 +163,8 @@ SceneJS._shaderModule = new (function() {
                     opaqueNodes : [],
                     transpNodes : []
                 };
+
+                stateHash = null;
             });
 
     /* Import GL flags state
@@ -172,6 +177,7 @@ SceneJS._shaderModule = new (function() {
                     props: props,
                     hash: ""
                 };
+                stateHash = null;
             });
 
     /* When texture state exported, add it to the state soup
@@ -210,6 +216,8 @@ SceneJS._shaderModule = new (function() {
                     texture : texture,
                     hash : hashStr
                 };
+
+                stateHash = null;
             });
 
     /* When lighting state exported, add it to the state soup
@@ -240,6 +248,8 @@ SceneJS._shaderModule = new (function() {
                     lights: lights,
                     hash: hash.join("")
                 };
+
+                stateHash = null;
             });
 
     /* When boundary state exported, add it to the state soup.
@@ -253,6 +263,8 @@ SceneJS._shaderModule = new (function() {
                     boundary: params.boundary,
                     hash: ""
                 };
+
+                stateHash = null;
             });
 
     /* When material state exported, add it to the state soup. We don't need
@@ -277,19 +289,8 @@ SceneJS._shaderModule = new (function() {
                     },
                     hash: ""
                 };
-            });
 
-    /* When highlight state exported, add it to the state soup.
-     * We don't need a hash identity since our GLSL is generic for highlighting.
-     */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.HIGHLIGHT_EXPORTED,
-            function(params) {
-                highlightState = {
-                    _stateId : nextStateId++,
-                    highlighted: params.highlighted,
-                    hash: ""
-                };
+                stateHash = null;
             });
 
     /* When picking state exported, add it to the state soup.
@@ -304,6 +305,8 @@ SceneJS._shaderModule = new (function() {
                     pickColor: params.pickColor,
                     hash: ""
                 };
+
+                stateHash = null;
             });
 
     /* When fog state exported, add it to the state soup and make
@@ -317,6 +320,8 @@ SceneJS._shaderModule = new (function() {
                     fog: fog,
                     hash: fog.mode
                 };
+
+                stateHash = null;
             });
 
     /* When model matrix exported, add it to the state soup.
@@ -331,6 +336,8 @@ SceneJS._shaderModule = new (function() {
                     mat : transform.matrixAsArray,
                     normalMat : transform.normalMatrixAsArray
                 };
+
+                stateHash = null;
             });
 
     /* When view matrix exported, add it to the state soup.
@@ -345,6 +352,8 @@ SceneJS._shaderModule = new (function() {
                     mat : transform.matrixAsArray,
                     normalMat : transform.normalMatrixAsArray
                 };
+
+                stateHash = null;
             });
 
     /* When projection matrix exported, add it to the state soup.
@@ -358,6 +367,8 @@ SceneJS._shaderModule = new (function() {
                     _stateId : nextStateId++,
                     mat : transform.matrixAsArray
                 };
+
+                stateHash = null;
             });
 
     SceneJS._eventModule.addListener(
@@ -367,10 +378,12 @@ SceneJS._shaderModule = new (function() {
                     _stateId : nextStateId++,
                     imageBuf: params.imageBuf
                 };
+
+                stateHash = null;
             });
 
-    /* When geometry exported, add it to the state soup and make
-     * GLSL hash code on the VBOs it provides.
+
+    /* When geometry set, add it to the state soup and make GLSL hash code on the VBOs it provides.
      *
      * Geometry is automatically exported when a scene graph geometry node
      * is rendered.
@@ -398,73 +411,73 @@ SceneJS._shaderModule = new (function() {
      * Finally we put that node into either the opaque or transparent bin within the
      * active bin set, depending on whether the material state is opaque or transparent.
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.GEOMETRY_EXPORTED,
-            function(geo) {
+    this.setGeometry = function(geo) {
 
-                /* Add geometry to state soup.
-                 */
-                geoState = {
-                    _stateId : nextStateId++,
-                    geo:       geo,
-                    hash: ([
-                        geo.normalBuf ? "t" : "f",
-                        geo.uvBuf ? "t" : "f",
-                        geo.uvBuf2 ? "t" : "f"]).join("")
-                };
+        /* Add geometry to state soup.
+         */
+        geoState = {
+            _stateId : nextStateId++,
+            geo:       geo,
+            hash: ([
+                geo.normalBuf ? "t" : "f",
+                geo.uvBuf ? "t" : "f",
+                geo.uvBuf2 ? "t" : "f"]).join("")
+        };
 
-                /* Ensure the rest of the state soup is marshalled
-                 */
-                SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
+        /* Ensure the rest of the state soup is marshalled
+         */
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
 
-                //if (materialState.material.opacity != 1.0) {
-                SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_NEEDS_BOUNDARIES);
-                //}
+        //if (materialState.material.opacity != 1.0) {
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_NEEDS_BOUNDARIES);
+        //}
 
-                /* Identify what GLSL is required for the current state soup elements
-                 */
-                var sceneHash = getSceneHash();
+        /* Identify what GLSL is required for the current state soup elements
+         */
+        if (!stateHash) {
+            stateHash = getSceneHash();
+        }
 
-                /* Create or re-use a program
-                 */
-                var program = getProgram(sceneHash);
+        /* Create or re-use a program
+         */
+        var program = getProgram(stateHash);    // Touches for LRU cache
 
-                /* Create state graph node, with program and
-                 * pointers to current state soup elements
-                 */
-                var node = {
+        /* Create state graph node, with program and
+         * pointers to current state soup elements
+         */
+        var node = {
 
-                    program : {
-                        id: sceneHash,
-                        program: program
-                    },
+            program : {
+                id: stateHash,
+                program: program
+            },
 
-                    /* Pointers into state soup
-                     */
-                    boundaryState: boundaryState,
-                    geoState: geoState,
-                    rendererState: rendererState,
-                    lightState: lightState,
-                    materialState: materialState,
-                    highlightState: highlightState,
-                    fogState : fogState,
-                    modelXFormState: modelXFormState,
-                    viewXFormState: viewXFormState,
-                    projXFormState: projXFormState,
-                    texState: texState,
-                    pickState : pickState ,
-                    imageBufState : imageBufState
-                };
+            /* Pointers into state soup
+             */
+            boundaryState: boundaryState,
+            geoState: geoState,
+            rendererState: rendererState,
+            lightState: lightState,
+            materialState: materialState,
+            fogState : fogState,
+            modelXFormState: modelXFormState,
+            viewXFormState: viewXFormState,
+            projXFormState: projXFormState,
+            texState: texState,
+            pickState : pickState ,
+            imageBufState : imageBufState
+        };
 
-                /* Put node into either the transoarent or opaque bin,
-                 * depending on current material state's opacity
-                 */
-                if (materialState.material.opacity != undefined && materialState.material.opacity != 1.0) {
-                    binSet.transpNodes.push(node);
-                } else {
-                    binSet.opaqueNodes.push(node);
-                }
-            });
+        /* Put node into either the transoarent or opaque bin,
+         * depending on current material state's opacity
+         */
+        if (materialState.material.opacity != undefined && materialState.material.opacity != 1.0) {
+            binSet.transpNodes.push(node);
+        } else {
+            binSet.opaqueNodes.push(node);
+        }
+    };
+
 
     /* When the canvas deactivates, we'll render the node bins.
      */
@@ -495,7 +508,10 @@ SceneJS._shaderModule = new (function() {
             /* Bin set contains no transparent nodes, so we'll just render the opaque ones, Sort them
              * first by program, to minimise the number of shader re-binds we do.
              */
+
+            // BUGGY - not sure why
             //    binSet.opaqueNodes.sort(programCmp);
+
             renderOpaqueNodes(binSet.opaqueNodes);
         }
 
@@ -504,7 +520,10 @@ SceneJS._shaderModule = new (function() {
             /* Bin set contains one transparent node, so we'll sort the opaque nodes by program,
              * render those, then render the solitary transparent node with blending enabled.
              */
-            binSet.opaqueNodes.sort(programCmp);
+
+            // BUGGY - not sure why
+            // binSet.opaqueNodes.sort(programCmp);
+
             renderOpaqueNodes(binSet.opaqueNodes);
             renderTransparentNodes(binSet.transpNodes);
         }
@@ -514,21 +533,29 @@ SceneJS._shaderModule = new (function() {
             /* Bin set contains contains many transparent nodes. We'll sort the opaque nodes by program,
              * render those, then sort the transparent nodes by boundary and render those with blending enabled.
              */
-            binSet.opaqueNodes.sort(programCmp);
+            // BUGGY - not sure why
+            // binSet.opaqueNodes.sort(programCmp);
+
             renderOpaqueNodes(binSet.opaqueNodes);
 
-            //  binSet.transpNodes.sort(boundaryCmp);
+            //binSet.transpNodes.sort(boundaryCmp);
             renderTransparentNodes(binSet.transpNodes);
         }
     }
 
     function renderOpaqueNodes(opaqueNodes) {
+        NodeRenderer.init();
+        var context = canvas.context;
+        context.blendFunc(context.SRC_ALPHA, context.LESS);
+        context.disable(context.BLEND);
         for (var i = 0, len = opaqueNodes.length; i < len; i++) {
             NodeRenderer.renderNode(opaqueNodes[i]);
         }
+        NodeRenderer.cleanup();
     }
 
     function renderTransparentNodes(transpNodes) {
+        NodeRenderer.init();
         var context = canvas.context;
         context.blendFunc(context.SRC_ALPHA, context.ONE);
         //context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
@@ -537,8 +564,9 @@ SceneJS._shaderModule = new (function() {
         for (var i = 0, len = transpNodes.length; i < len; i++) {
             NodeRenderer.renderNode(transpNodes[i]);
         }
-        context.disable(context.BLEND);
         context.blendFunc(context.SRC_ALPHA, context.LESS);
+        context.disable(context.BLEND);
+        NodeRenderer.cleanup();
     }
 
     /* Comparator function for sorting nodes by program
@@ -798,7 +826,7 @@ SceneJS._shaderModule = new (function() {
                  * material state change for the next node, otherwise otherwise the highlight
                  * may linger in the shader uniform if there is no material state change for the next node.
                  */
-                if (node.highlightState && node.highlightState.highlighted) {
+                if (node.rendererState && node.rendererState.props.props.highlight) {
                     this._program.setUniform("uMaterialBaseColor", material.highlightBaseColor);
                     this._lastMaterialStateId = null;
                 }
@@ -810,14 +838,24 @@ SceneJS._shaderModule = new (function() {
                 this._program.setUniform("uPickColor", node.pickState.pickColor);
             }
 
-            /* Draw the geometry
+            /* Draw the geometry;  When wireframe option is set we'll render
+             * triangle primitives as wireframe
+             * TODO: should we also suppress shading in the renderer? This will currently apply phong shading to the lines.                
              */
+            var primitive = node.geoState.geo.primitive;
+            if (node.rendererState && node.rendererState.props.props.wireframe) {
+                if (primitive == context.TRIANGLES ||
+                    primitive == context.TRIANGLE_STRIP ||
+                    primitive == context.TRIANGLE_FAN) {
+
+                    primitive = context.LINES;
+                }
+            }
             context.drawElements(
-                    node.geoState.geo.primitive,
+                    primitive,
                     node.geoState.geo.indexBuf.numItems,
                     context.UNSIGNED_SHORT,
                     0);
-
         };
 
         /**
@@ -825,6 +863,9 @@ SceneJS._shaderModule = new (function() {
          */
         this.cleanup = function() {
             canvas.context.flush();
+            if (this._lastRendererState) {
+                this._lastRendererState.props.restoreProps(canvas.context);
+            }
             if (this._program) {
                 this._program.unbind();
             }
@@ -850,9 +891,9 @@ SceneJS._shaderModule = new (function() {
         }
     }
 
-    function getProgram(sceneHash) {
-        if (!programs[sceneHash]) {
-            SceneJS._loggingModule.info("Creating shader: '" + sceneHash + "'");
+    function getProgram(stateHash) {
+        if (!programs[stateHash]) {
+            SceneJS._loggingModule.info("Creating shader: '" + stateHash + "'");
             var vertexShaderSrc = composeVertexShader();
             var fragmentShaderSrc = composeFragmentShader();
             SceneJS._memoryModule.allocate(
@@ -860,8 +901,8 @@ SceneJS._shaderModule = new (function() {
                     "shader",
                     function() {
                         try {
-                            programs[sceneHash] = new SceneJS._webgl_Program(
-                                    sceneHash,
+                            programs[stateHash] = new SceneJS._webgl_Program(
+                                    stateHash,
                                     time,
                                     canvas.context,
                                     [vertexShaderSrc],
@@ -877,7 +918,7 @@ SceneJS._shaderModule = new (function() {
                         }
                     });
         }
-        var program = programs[sceneHash];
+        var program = programs[stateHash];
         program.lastUsed = time; // For LRU eviction
         return program;
     }

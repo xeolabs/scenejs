@@ -152,7 +152,7 @@ SceneJS.Quaternion.prototype.addRotation = function(q) {
  *
  */
 SceneJS.Quaternion.prototype.getMatrix = function() {
-    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_newMat4FromQuaternion(this._q);    
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_newMat4FromQuaternion(this._q);
 };
 
 
@@ -164,6 +164,19 @@ SceneJS.Quaternion.prototype.normalize = function() {
     this._q = SceneJS._math_normalizeQuaternion(this._q);
     this._setDirty();
     return this;
+};
+
+/**
+ * Returns attributes that were passed to constructor, with any value changes that have been subsequently set
+ * @returns {{String:<value>} Attribute map
+ */
+SceneJS.Quaternion.prototype.getAttributes = function() {
+    return {
+        x: this._q[0],
+        y: this._q[1],
+        z: this._q[2],
+        w: this._q[3]
+    };
 };
 
 SceneJS.Quaternion.prototype._render = function(traversalContext) {

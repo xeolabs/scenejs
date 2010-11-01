@@ -37,6 +37,7 @@ SceneJS.Fog = SceneJS.createNodeType("fog");
 
 // @private
 SceneJS.Fog.prototype._init = function(params) {
+    this._attr = {};
     this.setMode(params.mode);
     this.setColor(params.color);
     this.setDensity(params.density);
@@ -48,7 +49,6 @@ SceneJS.Fog.prototype._init = function(params) {
  Sets the fogging mode. Default is "disabled".
  @function setMode
  @param {string} mode - "disabled", "exp", "exp2" or "linear"
- @returns {SceneJS.Fog} This fog node
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setMode = function(mode) {
@@ -57,9 +57,7 @@ SceneJS.Fog.prototype.setMode = function(mode) {
         throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
                 "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'none', 'exp', 'exp2' or 'linear'"));
     }
-    this._mode = mode;
-    this._setDirty();
-    return this;
+    this._attr.mode = mode;
 };
 
 /**
@@ -69,24 +67,22 @@ SceneJS.Fog.prototype.setMode = function(mode) {
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getMode = function() {
-    return this._mode;
+    return this._attr.mode;
 };
 
 /**
  Sets the fog color
  @function setColor
  @param {object} color - eg. bright red: {r: 1.0, g: 0, b: 0 }
- @returns {SceneJS.Fog} This fog node
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setColor = function(color) {
     color = color || {};
-    this._color = {};
-    this._color.r = color.r != undefined ? color.r : 0.5;
-    this._color.g = color.g != undefined ? color.g : 0.5;
-    this._color.b = color.b != undefined ? color.b : 0.5;
-    this._setDirty();
-    return this;
+    this._attr.color = {
+        r : color.r != undefined ? color.r : 0.5,
+        g : color.g != undefined ? color.g : 0.5,
+        b : color.b != undefined ? color.b : 0.5
+    };
 };
 
 /**
@@ -97,9 +93,9 @@ SceneJS.Fog.prototype.setColor = function(color) {
  */
 SceneJS.Fog.prototype.getColor = function() {
     return {
-        r: this._color.r,
-        g: this._color.g,
-        b: this._color.b
+        r: this._attr.color.r,
+        g: this._attr.color.g,
+        b: this._attr.color.b
     };
 };
 
@@ -107,13 +103,10 @@ SceneJS.Fog.prototype.getColor = function() {
  Sets the fog density
  @function setDensity
  @param {double} density - density factor
- @returns {SceneJS.Fog} This fog node
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setDensity = function(density) {
-    this._density = density || 1.0;
-    this._setDirty();
-    return this;
+    this._attr.density = density || 1.0;
 };
 
 /**
@@ -123,20 +116,17 @@ SceneJS.Fog.prototype.setDensity = function(density) {
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getDensity = function() {
-    return this._density;
+    return this._attr.density;
 };
 
 /**
  Sets the near point on the Z view-axis at which fog begins
  @function setStart
  @param {double} start - location on Z-axis
- @returns {SceneJS.Fog} This fog node
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setStart = function(start) {
-    this._start = start || 0;
-    this._setDirty();
-    return this;
+    this._attr.start = start || 0;
 };
 
 /**
@@ -146,20 +136,17 @@ SceneJS.Fog.prototype.setStart = function(start) {
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getStart = function() {
-    return this._start;
+    return this._attr.start;
 };
 
 /**
  Sets the farr point on the Z view-axis at which fog ends
  @function setEnd
  @param {double} end - location on Z-axis
- @returns {SceneJS.Fog} This fog node
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setEnd = function(end) {
-    this._end = end || 1000.0;
-    this._setDirty();
-    return this;
+    this._attr.end = end || 1000.0;
 };
 
 /**
@@ -169,7 +156,25 @@ SceneJS.Fog.prototype.setEnd = function(end) {
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getEnd = function() {
-    return this._end;
+    return this._attr.end;
+};
+
+/**
+ * Returns attributes that were passed to constructor, with any value changes that have been subsequently set
+ * @returns {{String:<value>} Attribute map
+ */
+SceneJS.Fog.prototype.getAttributes = function() {
+    return {
+        mode: this._attr.mode,
+        color: {
+            r: this._attr.color.r,
+            g: this._attr.color.g,
+            b: this._attr.color.b
+        },
+        density: this._attr.density,
+        start: this._attr.start,
+        end: this._attr.end
+    };
 };
 
 // @private
@@ -177,13 +182,7 @@ SceneJS.Fog.prototype._render = function(traversalContext) {
     if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext); // No fog for pick
     } else {
-        SceneJS._fogModule.pushFog({
-            mode: this._mode,
-            color: this._color,
-            density: this._density,
-            start: this._start,
-            end: this._end
-        });
+        SceneJS._fogModule.pushFog(this._attr);
         this._renderNodes(traversalContext);
         SceneJS._fogModule.popFog();
     }

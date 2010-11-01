@@ -287,7 +287,7 @@ SceneJS._geometryModule = new (function() {
                 normalBuf : normalBuf,
                 indexBuf : indexBuf,
                 uvBuf: uvBuf,
-                uvBuf2: uvBuf2
+                uvBuf2: uvBuf2                
             };
             currentGeoMap[resource] = geo;
             return resource;
@@ -312,7 +312,7 @@ SceneJS._geometryModule = new (function() {
         }
     };
 
-    this.pushGeometry = function(resource, options) {
+    this.pushGeometry = function(resource) {
         var geo = currentGeoMap[resource];
         geo.lastUsed = time;  // Geometry now not evictable during this scene traversal
 
@@ -334,37 +334,14 @@ SceneJS._geometryModule = new (function() {
         if (geo.indexBuf) {
 
             /* We don't render Geometry's that have no index buffer - they merely define
-             * vertex/uv buffers that are indexed by sub-Geometry's in a composite geometry
-             */
-            if (!options.solid) {
-
-                var context = canvas.context;
-
-                /* When solid option is unset we'll render triangle primitives as wireframe
-                 * TODO: should we also suppress shading in the renderer? This will currently apply phong shading to the lines.
-                 */
-                if (geo.primitive == context.TRIANGLES
-                        || geo.primitive == context.TRIANGLE_STRIP
-                        || geo.primitive == context.TRIANGLE_FAN) {
-                    geo = {
-                        primitive: context.LINES,
-                        vertexBuf : geo.vertexBuf,
-                        normalBuf: geo.normalBuf,
-                        uvBuf:  geo.uvBuf,
-                        uvBuf2: geo.uvBuf2,
-                        indexBuf: geo.indexBuf
-                    };
-                }
-            }
-
-            /* We don't render Geometry's that have no index buffer - they merely define
              * vertex/uv buffers that are indexed by sub-Geometry's in a composite geometry  
              */
-            SceneJS._eventModule.fireEvent(
-                    SceneJS._eventModule.GEOMETRY_EXPORTED,
-                    geo);
-        }
+            //            SceneJS._eventModule.fireEvent(
+            //                    SceneJS._eventModule.GEOMETRY_EXPORTED,
+            //                    geo);
 
+            SceneJS._shaderModule.setGeometry(geo);
+        }
         geoStack.push(geo);
     };
 

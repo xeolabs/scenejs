@@ -132,9 +132,22 @@ SceneJS.Rotate.prototype.getZ = function() {
  * @returns {Number[16]} The matrix elements
  */
 SceneJS.Rotate.prototype.getMatrix = function() {
-  return (this._memoLevel > 0)
-          ? this._mat.slice(0)
-          : SceneJS._math_rotationMat4v(this._angle * Math.PI / 180.0, [this._x, this._y, this._z]);
+    return (this._memoLevel > 0)
+            ? this._mat.slice(0)
+            : SceneJS._math_rotationMat4v(this._angle * Math.PI / 180.0, [this._x, this._y, this._z]);
+};
+
+/**
+ * Returns attributes that were passed to constructor, with any value changes that have been subsequently set
+ * @returns {{String:<value>} Attribute map
+ */
+SceneJS.Rotate.prototype.getAttributes = function() {
+    return {
+        x: this._x,
+        y: this._y,
+        z: this._z,
+        angle : this._angle
+    };
 };
 
 SceneJS.Rotate.prototype._render = function(traversalContext) {
@@ -173,3 +186,5 @@ SceneJS.Rotate.prototype._render = function(traversalContext) {
     this._renderNodes(traversalContext);
     SceneJS._modelViewTransformModule.setTransform(superXForm);
 };
+
+

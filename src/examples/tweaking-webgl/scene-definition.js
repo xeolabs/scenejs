@@ -107,7 +107,7 @@ SceneJS.createNode({
              * one_minus_src_color, one_minus_constant_color, one_minus_constant_alpha,
              * dts_color, dst_alpha, one_minus_dst_alpha, one_minus_dst_color
              */
-            blendFuc: {
+            blendFunc: {
                 sfactor: "one",
                 dfactor: 'zero'
             },

@@ -963,6 +963,16 @@ SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
     return list;
 };
 
+
+/**
+ * Returns an object containing the attributes that were given when creating the node. Obviously, the map will have
+ * the current values, plus any attributes that were later added through set/add methods on the node
+ *
+ */
+SceneJS.Node.prototype.getJson = function() {
+    return this._attr;
+};
+
 /** Factory function that returns a new {@link SceneJS.Node} instance
  * @param {Object} [cfg] Static configuration object
  * @param {SceneJS.node, ...} arguments Zero or more child nodes

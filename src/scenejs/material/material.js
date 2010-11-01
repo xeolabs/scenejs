@@ -296,12 +296,12 @@ SceneJS.Material.prototype.setOpacity = function(opacity) {
 };
 
 /**
- Returns the amount of alpha
- @function {float} getAlpha
+ Returns the opacity factor
+ @function {float} getOpacity
  @returns {float}
  */
-SceneJS.Material.prototype.getAlpha = function() {
-    return this._material.alpha;
+SceneJS.Material.prototype.getOpacity = function() {
+    return this._material.opacity;
 };
 
 

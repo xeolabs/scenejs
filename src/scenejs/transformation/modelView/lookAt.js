@@ -227,6 +227,30 @@ SceneJS.LookAt.prototype.getMatrix = function() {
             this._upX, this._upY, this._upZ);
 };
 
+/**
+ * Returns attributes that were passed to constructor, with any value changes that have been subsequently set
+ * @returns {{String:<value>} Attribute map
+ */
+SceneJS.LookAt.prototype.getAttributes = function() {
+    return {
+        look: {
+            x: this._lookX,
+            y: this._lookY,
+            z: this._lookZ
+        },
+        eye: {
+            x: this._eyeX,
+            y: this._eyeY,
+            z: this._eyeZ
+        },
+        up: {
+            x: this._upX,
+            y: this._upY,
+            z: this._upZ
+        }
+    };
+};
+
 SceneJS.LookAt.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {

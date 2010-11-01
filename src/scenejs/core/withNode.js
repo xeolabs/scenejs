@@ -231,7 +231,7 @@ SceneJS._WithNode.prototype.remove = function(attr, value) {
  */
 SceneJS._WithNode.prototype.get = function(attr) {
     if (!attr) {
-        throw "get param 'attr' null or undefined";
+        return this._targetNode.getJson();
     }
     var funcName = "get" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
     var func = this._targetNode[funcName];

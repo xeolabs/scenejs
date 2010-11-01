@@ -80,7 +80,7 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererConfigModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
@@ -116,9 +116,6 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/material/materialModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/highlight/highlightModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/highlight/highlight.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
 
@@ -196,7 +193,7 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
 
-            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererModule.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererConfigModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>

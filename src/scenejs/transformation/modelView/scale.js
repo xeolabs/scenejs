@@ -113,6 +113,18 @@ SceneJS.Scale.prototype.getMatrix = function() {
     return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_scalingMat4v([this._x, this._y, this._z]);
 };
 
+/**
+ * Returns attributes that were passed to constructor, with any value changes that have been subsequently set
+ * @returns {{String:<value>} Attribute map
+ */
+SceneJS.Scale.prototype.getAttributes = function() {
+    return {
+        x: this._x,
+        y: this._y,
+        z: this._z
+    };
+};
+
 SceneJS.Scale.prototype._render = function(traversalContext) {
 
     var origMemoLevel = this._memoLevel;

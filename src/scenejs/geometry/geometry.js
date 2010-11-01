@@ -104,7 +104,6 @@ SceneJS.Geometry.prototype._init = function(params) {
     this._geo = null;    // Holds geometry when configured as arrays
     this._create = null; // Callback to create geometry
     this._handle = null; // Handle to created geometry
-    this._solid = true;
 
     this._resource = params.resource;       // Optional - can be null
     if (params.create instanceof Function) {
@@ -214,27 +213,6 @@ SceneJS.Geometry.prototype.getBoundary = function() {
 };
 
 
-/**
- * When set true, causes triangle primitives to be rendered as wireframe.
- * @param {Boolean} solid True when geometry is solid else false
- * @returns {SceneJS.Geometry} this
- */
-SceneJS.Geometry.prototype.setSolid = function(solid) {
-    solid = (solid == null || solid == undefined) ? true : solid;
-    this._solid = solid;
-    this._setDirty();
-    return this;
-};
-
-/**
- * Returns whether this geometry is currently set as solid or not. When not solid then
- * triangle primitives will be rendered as wireframe.
- * @returns {Boolean} True when geometry is solid else false
- */
-SceneJS.Geometry.prototype.getSolid = function() {
-    return this._solid;
-};
-
 // @private
 SceneJS.Geometry.prototype._render = function(traversalContext) {
     if (this._handle) { // Was created before - test if not evicted since
@@ -249,7 +227,7 @@ SceneJS.Geometry.prototype._render = function(traversalContext) {
             this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._geo);
         }
     }
-    SceneJS._geometryModule.pushGeometry(this._handle, { solid: this._solid });
+    SceneJS._geometryModule.pushGeometry(this._handle);
     this._renderNodes(traversalContext);
     SceneJS._geometryModule.popGeometry();
 

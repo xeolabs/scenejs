@@ -87,7 +87,7 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "material",
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    baseColor:      { r: 0.6, g: 0.3, b: 0.3 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                     specular:       0.9,
                                                     shine:          6.0,
@@ -238,7 +238,203 @@ SceneJS.createNode({
                                     ]
                                 }
                             ]
+                        },
+
+                        /*
+                         * "teapot5" subgraph - teapot highlighted when picked
+                         */
+                        {
+                            type: "node",
+                            id : "teapot5",
+                            nodes : [
+                                {
+                                    type: "renderer",
+                                    id: "teapot5-renderer",
+
+                                    // We'll toggle this on pick
+
+                                    highlight: false,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            baseColor:          { r: 0.3, g: 0.3, b: 0.9 },
+                                            specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
+
+                                            // Color for highlight mode
+
+                                            highlightBaseColor: { r: 1.0, g: 1.0, b: 0.3 },
+                                            specular:           0.9,
+                                            shine:              6.0,
+                                            nodes: [
+                                                {
+                                                    type: "translate",
+                                                    x   : 7,
+                                                    y   : -7,
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        /*
+                         * "teapot6" subgraph - teapot wireframe when picked
+                         */
+                        {
+                            type: "node",
+                            id : "teapot6",
+                            nodes : [
+                                {
+                                    type: "renderer",
+                                    id: "teapot6-renderer",
+
+                                    // We'll toggle this on pick
+
+                                    wireframe: false,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            baseColor:          { r: 0.3, g: 0.3, b: 0.9 },
+                                            specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
+                                            specular:           0.9,
+                                            shine:              6.0,
+
+                                            nodes: [
+                                                {
+                                                    type: "translate",
+                                                    x   : 0,
+                                                    y   : -7,
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        /*
+                         * "teapot7" subgraph
+                         */
+                        {
+                            type: "node",
+                            id : "teapot7",
+                            nodes : [
+                                {
+                                    type: "renderer",
+                                    id: "teapot7-renderer",
+
+                                    // We'll toggle this on pick
+
+                                    frontFace: false,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            baseColor:          { r: 0.3, g: 0.3, b: 0.9 },
+                                            specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
+                                            specular:           0.9,
+                                            shine:              6.0,
+
+                                            nodes: [
+                                                {
+                                                    type: "translate",
+                                                    x   : -7,
+                                                    y   : -7,
+                                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        /*
+                         * "teapot8" subgraph
+                         */
+                        {
+                            type: "renderer",
+                            id : "teapot8",
+                            nodes : [
+
+                                        {
+                                            type: "translate",
+                                            x   : -14,
+                                            y   : -7,
+                                            nodes: [
+                                                {
+                                                    type: "material",
+                                                    id: "teapot8-material",
+
+                                                    baseColor:          { r: 0.6, g: 0.3, b: 0.9 },
+                                                    specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
+                                                    specular:           0.9,
+                                                    shine:              6.0,
+
+                                                    nodes: [
+                                                             {
+                                    type: "renderer",
+                                    id: "teapot8-renderer",
+
+                                    nodes: [
+                                                        {
+                                                            type: "teapot"
+                                                        }
+                                            ]
+                                                             }
+                                                    ]
+                                                },
+                                                {
+                                                    type: "material",
+                                                    baseColor:          { r: 0.4, g: 0.4, b: 0.4 },
+                                                    specularColor:      { r: 0.7, g: 0.7, b: 0.7 },
+                                                    specular:           0.9,
+                                                    shine:              6.0,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "translate",
+                                                            z   : 2,
+                                                            x :-1,
+                                                            y: 2,
+                                                            nodes: [
+                                                                {
+                                                                    type: "scale",
+                                                                    x: 1.0,
+                                                                    y: 3,
+                                                                    z: 1.0,
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "cube"
+                                                                        }
+                                                                    ]
+                                                                }
+
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
                         }
+
                     ]
                 }
 
@@ -248,16 +444,22 @@ SceneJS.createNode({
 });
 
 
+/* Rotate teapot 1 on picked
+ */
 SceneJS.withNode("teapot1").bind("picked",
         function(event) {
             SceneJS.withNode("teapot1-rotate").set("angle", 60);
         });
 
+/* Destroy teapot 2 when picked
+ */
 SceneJS.withNode("teapot2").bind("picked",
         function(event) {
             SceneJS.withNode("remove-from-here").remove("nodes", "remove-me");
         });
 
+/* Move teapot 3 to it's alternative material parent when picked
+ */
 SceneJS.withNode("teapot3").bind("picked",
         function(event) {
             SceneJS.Message.sendMessage({
@@ -278,6 +480,8 @@ SceneJS.withNode("teapot3").bind("picked",
             });
         });
 
+/* Insert interpolators to animate teapot 4 when picked
+ */
 SceneJS.withNode("teapot4").bind("picked",
         function(event) {
             this.add("nodes", [
@@ -318,6 +522,71 @@ SceneJS.withNode("teapot4").bind("picked",
                 }
             ]);
         });
+
+
+/* Toggle highlight for teapot 5 when picked
+ */
+SceneJS.withNode("teapot5").bind("picked",
+        function(event) {
+            SceneJS.withNode("teapot5-renderer").set("highlight", true);
+        });
+
+/* Toggle wireframe for teapot 6 when picked
+ */
+SceneJS.withNode("teapot6").bind("picked",
+        function(event) {
+            SceneJS.withNode("teapot6-renderer").set({
+
+                /* Render triangles as poly lines
+                 */
+                wireframe: true,
+
+                /* Set line width
+                 */
+                lineWidth: 0.5
+            });
+        });
+
+/* Toggle backface clipping for teapot 7 when picked
+ */
+SceneJS.withNode("teapot7").bind("picked",
+        function(event) {
+            SceneJS.withNode("teapot7-renderer").set({
+
+                /* Specify front/back-facing mode. Accepted values are cw or ccw
+                 */
+                frontFace: "cw",
+
+                /* Enable/disable face culling
+                 */
+                enableCullFace: true,
+
+                /* Specify facet culling mode, accepted values are: front, back, front_and_back
+                 */
+                cullFace: "front"
+            });
+        });
+
+//SceneJS.withNode("teapot8").bind("picked",
+//        function(event) {
+//            SceneJS.withNode("teapot8-material").set({
+//                opacity: 0.6
+//            });
+//        });
+
+SceneJS.withNode("teapot8").bind("picked",
+        function(event) {
+            SceneJS.withNode("teapot8-renderer").set({
+
+                enableBlend: true,
+
+                blendFunc: {
+                    sfactor: "srcAlpha",
+                    dfactor: "one"
+                }
+            });
+        });
+
 
 var pInterval;
 

@@ -19,7 +19,6 @@
  *  @private
  */
 SceneJS._materialModule = new (function() {
-
     var materialStack = [];
     var dirty;
 
