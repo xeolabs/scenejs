@@ -167,8 +167,7 @@ SceneJS.BoundingBox.prototype.getState = function() {
  */
 SceneJS.BoundingBox.prototype.setXMin = function(xmin) {
     this._xmin = xmin;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /**
@@ -191,8 +190,7 @@ SceneJS.BoundingBox.prototype.getXMin = function() {
  */
 SceneJS.BoundingBox.prototype.setYMin = function(ymin) {
     this._ymin = ymin;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /**
@@ -215,8 +213,7 @@ SceneJS.BoundingBox.prototype.getYMin = function() {
  */
 SceneJS.BoundingBox.prototype.setZMin = function(zmin) {
     this._zmin = zmin;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /**
@@ -239,8 +236,7 @@ SceneJS.BoundingBox.prototype.getZMin = function() {
  */
 SceneJS.BoundingBox.prototype.setXMax = function(xmax) {
     this._xmax = xmax;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /**
@@ -263,8 +259,7 @@ SceneJS.BoundingBox.prototype.getXMax = function() {
  */
 SceneJS.BoundingBox.prototype.setYMax = function(ymax) {
     this._ymax = ymax;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /**
@@ -287,8 +282,7 @@ SceneJS.BoundingBox.prototype.getYMax = function() {
  */
 SceneJS.BoundingBox.prototype.setZMax = function(zmax) {
     this._zmax = zmax;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /**
@@ -321,8 +315,7 @@ SceneJS.BoundingBox.prototype.setBoundary = function(boundary) {
     this._xmax = boundary.xmax || 0;
     this._ymax = boundary.ymax || 0;
     this._zmax = boundary.zmax || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /**
@@ -403,17 +396,16 @@ SceneJS.BoundingBox.prototype.getCanvasSize = function() {
 
 // @private
 SceneJS.BoundingBox.prototype._render = function(traversalContext) {
-
     if (this._levels) {
         if (this._levels.length != this._children.length) {
             throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                    ("SceneJS.boundingBox levels property should have a value for each child node"));
+                    ("boundingBox levels property should have a value for each child node"));
         }
 
         for (var i = 1; i < this._levels.length; i++) {
             if (this._levels[i - 1] >= this._levels[i]) {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                        ("SceneJS.boundingBox levels property should be an ascending list of unique values"));
+                        ("boundingBox levels property should be an ascending list of unique values"));
             }
         }
     }
@@ -429,7 +421,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
         modelTransform = SceneJS._modelTransformModule.getTransform();
         if (!modelTransform.identity) {
 
-            /* Model transform exists
+            /* Model transform exists - prepare model coords from AABB
              */
             this._localCoords = [
                 [this._xmin, this._ymin, this._zmin],
@@ -521,7 +513,13 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
 
                     /* Export model-space boundary
                      */
-                    SceneJS._boundaryModule.pushBoundary(this._modelBox);
+                    var isectListeners = this._listeners["intersect"];
+
+                    SceneJS._boundaryModule.pushBoundary(
+                            this._modelBox,
+                            this._id,
+                            (isectListeners != undefined &&
+                             isectListeners != null)); // Observed
 
                     if (this._levels) { // Level-of-detail mode
                         //var size = SceneJS._frustumModule.getProjectedSize(this._modelBox);

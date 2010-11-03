@@ -38,9 +38,7 @@ SceneJS._boundaryModule = new (function() {
                     if (topBoundary && !topBoundary.viewBox) {
                         topBoundary.viewBox = transformModelBoundaryToView(topBoundary.modelBox);
                     }
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.BOUNDARY_EXPORTED,
-                    { boundary: topBoundary ? topBoundary.viewBox : null });
+                    SceneJS._eventModule.fireEvent(SceneJS._eventModule.BOUNDARY_EXPORTED, topBoundary);
                     dirty = false;
                 }
             });
@@ -65,10 +63,12 @@ SceneJS._boundaryModule = new (function() {
                 dirty = true;
             });
 
-    this.pushBoundary = function(modelBox) {
+    this.pushBoundary = function(modelBox, nodeId, observed) {
         boundaryStack[stackLen++] = {
             modelBox: modelBox,
-            viewBox: null
+            viewBox: null,
+            nodeId: nodeId,
+            observed: observed
         };
         dirty = true;
     };

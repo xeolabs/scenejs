@@ -159,6 +159,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/core/message.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
+             <fileset dir="${SRC_DIR}" includes="scenejs/services/jobService.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
 
