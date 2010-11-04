@@ -56,12 +56,6 @@ SceneJS._shaderModule = new (function() {
      */
     var stateHash = null;
 
-    var boundaries = new Array(1000);
-    var numBoundaries;
-
-    var observedBoundaries = new Array(500);
-    var numObservedBoundaries;
-
     /* Volunteer this module with the VRAM memory management module
      * to deallocate programs when memory module needs VRAM.
      */
@@ -171,11 +165,6 @@ SceneJS._shaderModule = new (function() {
                 };
 
                 stateHash = null;
-
-                /* Number of intersection test boundaries
-                 */
-                numBoundaries = 0;
-                numObservedBoundaries = 0;
             });
 
     /* Import GL flags state
@@ -274,11 +263,6 @@ SceneJS._shaderModule = new (function() {
                     boundary: boundary.viewBox,
                     hash: ""
                 };
-                if (boundary.observed) {
-                    observedBoundaries[numObservedBoundaries++] = boundary;
-                } else {
-                    boundaries[numBoundaries++] = boundary;
-                }
                 stateHash = null;
             });
 
@@ -502,37 +486,8 @@ SceneJS._shaderModule = new (function() {
                 NodeRenderer.init();
                 renderBinSet(binSet);
                 NodeRenderer.cleanup();
-                canvas = null;
-                if (numObservedBoundaries > 0) {
-                    findBoundaryIntersections(observedBoundaries, numObservedBoundaries, boundaries, numBoundaries);
-                }
+                canvas = null;              
             });
-
-    function findBoundaryIntersections(list1, len1, list2, len2) {
-        var b1, b2;
-        var isects = [];
-        for (var i = 0; i < len1; i++) {
-            for (var j = 0; j < len2; j++) {
-                if (list1[i].nodeId != list2[j].nodeId) {
-                    b1 = list1[i].viewBox;
-                    b2 = list2[j].viewBox;
-                    if (b1.max[0] < b2.min[0] ||
-                        b2.max[0] < b1.min[0] ||
-                        b1.max[1] < b2.min[1] ||
-                        b2.max[1] < b1.min[1] ||
-                        b1.max[2] < b2.min[2] ||
-                        b2.max[2] < b1.min[2]) {
-                    } else {
-                        isects.push(list2[j].nodeId);
-                    }
-                }
-                if (isects.length > 0) {
-                    SceneJS._nodeIDMap[list1[i].nodeId]._fireEvent("intersect", { nodeIds: isects });
-                    isects = [];
-                }
-            }
-        }
-    }
 
     //    this.redraw = function() {
     //        NodeRenderer.init();

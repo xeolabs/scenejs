@@ -105,6 +105,8 @@ SceneJS.BoundingBox.prototype._init = function(params) {
     if (params.levels) {
         this._levels = params.levels;
     }
+
+    this._validated = false;        // true when params validated
 };
 
 /**
@@ -396,16 +398,18 @@ SceneJS.BoundingBox.prototype.getCanvasSize = function() {
 
 // @private
 SceneJS.BoundingBox.prototype._render = function(traversalContext) {
-    if (this._levels) {
-        if (this._levels.length != this._children.length) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                    ("boundingBox levels property should have a value for each child node"));
-        }
-
-        for (var i = 1; i < this._levels.length; i++) {
-            if (this._levels[i - 1] >= this._levels[i]) {
+    if (!this._validated) {
+        if (this._levels) {
+            if (this._levels.length != this._children.length) {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                        ("boundingBox levels property should be an ascending list of unique values"));
+                        ("boundingBox levels property should have a value for each child node"));
+            }
+
+            for (var i = 1; i < this._levels.length; i++) {
+                if (this._levels[i - 1] >= this._levels[i]) {
+                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
+                            ("boundingBox levels property should be an ascending list of unique values"));
+                }
             }
         }
     }
@@ -413,12 +417,11 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
     var origLevel = this._level; // We'll fire a "lod-changed" if LOD level changes
     var origState = this._state; // We'll fire "state-changed" if state changes from this during render
     var newState;
-    var modelTransform;
+    var modelTransform = SceneJS._modelTransformModule.getTransform();
 
     if (this._memoLevel == 0) {
         this._state = SceneJS.BoundingBox.STATE_INITIAL;
         this._memoLevel = 1;
-        modelTransform = SceneJS._modelTransformModule.getTransform();
         if (!modelTransform.identity) {
 
             /* Model transform exists - prepare model coords from AABB
@@ -517,9 +520,9 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
 
                     SceneJS._boundaryModule.pushBoundary(
                             this._modelBox,
+                            this._viewBox,
                             this._id,
-                            (isectListeners != undefined &&
-                             isectListeners != null)); // Observed
+                            (isectListeners != undefined && isectListeners != null)); // Observed
 
                     if (this._levels) { // Level-of-detail mode
                         //var size = SceneJS._frustumModule.getProjectedSize(this._modelBox);
