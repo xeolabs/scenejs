@@ -61,15 +61,13 @@ SceneJS._rendererModule = new (function() {
                         height: canvas.canvas.height
                     },
                     wireframe: false,
-                    highlight: false
-                                        ,
-                                        enableBlend: false,
-                                        blendFunc: {
-                                            sfactor: "srcAlpha",
-                                            dfactor: "less"
-                                        }
+                    highlight: false,
+                    enableBlend: false,
+                    blendFunc: {
+                        sfactor: "srcAlpha",
+                        dfactor: "less"
+                    }
                 });
-
 
 
                 // Not sure if needed:

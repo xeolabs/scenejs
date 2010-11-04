@@ -542,18 +542,18 @@ SceneJS._shaderModule = new (function() {
     }
 
     function renderOpaqueNodes(opaqueNodes) {
-        NodeRenderer.init();
+        //NodeRenderer.init();
         var context = canvas.context;
         context.blendFunc(context.SRC_ALPHA, context.LESS);
         context.disable(context.BLEND);
         for (var i = 0, len = opaqueNodes.length; i < len; i++) {
             NodeRenderer.renderNode(opaqueNodes[i]);
         }
-        NodeRenderer.cleanup();
+        //NodeRenderer.cleanup();
     }
 
     function renderTransparentNodes(transpNodes) {
-        NodeRenderer.init();
+        //NodeRenderer.init();
         var context = canvas.context;
         context.blendFunc(context.SRC_ALPHA, context.ONE);
         //context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
@@ -564,7 +564,7 @@ SceneJS._shaderModule = new (function() {
         }
         context.blendFunc(context.SRC_ALPHA, context.LESS);
         context.disable(context.BLEND);
-        NodeRenderer.cleanup();
+        //NodeRenderer.cleanup();
     }
 
     /* Comparator function for sorting nodes by program

@@ -195,7 +195,7 @@ SceneJS._sceneModule = new (function() {
         }
         activeSceneId = sceneId;
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERING, { sceneId: sceneId, canvas : scene.canvas });
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_ACTIVATED, scene.canvas);
     };
 
