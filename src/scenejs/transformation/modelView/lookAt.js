@@ -31,48 +31,80 @@ SceneJS.LookAt.prototype._init = function(params) {
  * Don't allow this position to be the same as the position being looked at.
  *
  * @param {Object} eye - Eg. { x: 0.0, y: 10.0, z: -15 }
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setEye = function(eye) {
     eye = eye || {};
     this._eyeX = (eye.x != undefined && eye.x != null) ? eye.x : 0;
     this._eyeY = (eye.y != undefined && eye.y != null) ? eye.y : 0;
     this._eyeZ = (eye.z != undefined && eye.z != null) ? eye.z : 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the eye X position.
  *
  * @param {float} x Eye X position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setEyeX = function(x) {
     this._eyeX = x || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the eye Y position.
  *
  * @param {float} y Eye Y position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setEyeY = function(y) {
     this._eyeY = y || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
+};
+
+/** Moves the eye position.
+ * Don't allow this position to be the same as the position being looked at.
+ *
+ * @param {Object} eye increment - Eg. { x: 0.0, y: 10.0, z: -15 }
+ */
+SceneJS.LookAt.prototype.incEye = function(eye) {
+    eye = eye || {};
+    this._eyeX += (eye.x != undefined && eye.x != null) ? eye.x : 0;
+    this._eyeY += (eye.y != undefined && eye.y != null) ? eye.y : 0;
+    this._eyeZ += (eye.z != undefined && eye.z != null) ? eye.z : 0;
+    this._memoLevel = 0;
+};
+
+/** Increments the eye X position
+ *
+ * @param x
+ */
+SceneJS.LookAt.prototype.incEyeX = function(x) {
+    this._eyeX += x;
+    this._memoLevel = 0;
+};
+
+/** Increments the eye Y position
+ *
+ * @param y
+ */
+SceneJS.LookAt.prototype.incEyeY = function(y) {
+    this._eyeY += y;
+    this._memoLevel = 0;
+};
+
+/** Increments the eye Z position
+ *
+ * @param z
+ */
+SceneJS.LookAt.prototype.incEyeZ = function(z) {
+    this._eyeZ += z;
+    this._memoLevel = 0;
 };
 
 /** Sets the eye Z position.
  *
  * @param {float} z Eye Z position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setEyeZ = function(z) {
     this._eyeZ = z || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the eye position.
@@ -91,48 +123,53 @@ SceneJS.LookAt.prototype.getEye = function() {
  * Don't allow this point to be the same as the eye position.
  *
  * @param {Object} look - Eg. { x: 0.0, y: 2.0, z: 0.0 }
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setLook = function(look) {
     look = look || {};
     this._lookX = (look.x != undefined && look.x != null) ? look.x : 0;
     this._lookY = (look.y != undefined && look.y != null) ? look.y : 0;
     this._lookZ = (look.z != undefined && look.z != null) ? look.z : 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the look X position.
  *
  * @param {float} x Look X position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setLookX = function(x) {
     this._lookX = x || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the look Y position.
  *
  * @param {float} y Look Y position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setLookY = function(y) {
     this._lookY = y || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the look Z position.
  *
  * @param {float} z Look Z position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setLookZ = function(z) {
     this._lookZ = z || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
+};
+
+/** Moves the look position.
+ * Don't allow this position to be the same as the position being looked at.
+ *
+ * @param {Object} look increment - Eg. { x: 0.0, y: 10.0, z: -15 }
+ */
+SceneJS.LookAt.prototype.incLook = function(look) {
+    look = look || {};
+    this._lookX += (look.x != undefined && look.x != null) ? look.x : 0;
+    this._lookY += (look.y != undefined && look.y != null) ? look.y : 0;
+    this._lookZ += (look.z != undefined && look.z != null) ? look.z : 0;
+    this._memoLevel = 0;
 };
 
 /** Returns the position being looked at.
@@ -149,7 +186,6 @@ SceneJS.LookAt.prototype.getLook = function() {
 /** Sets the "up" vector - the direction that is considered "upwards".
  *
  * @param {Object} up - Eg. { x: 0.0, y: 1.0, z: 0.0 }
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setUp = function(up) {
     up = up || { y: 1.0 };
@@ -164,41 +200,34 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     this._upX = x;
     this._upY = y;
     this._upZ = z;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the up X position.
  *
  * @param {float} x Up X position
- * @returns {SceneJS.UpAt} this
  */
 SceneJS.LookAt.prototype.setUpX = function(x) {
     this._upX = x || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the up Y position.
  *
  * @param {float} y Up Y position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setUpY = function(x) {
     this._upY = y || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Sets the up Z position.
  *
  * @param {float} z Up Z position
- * @returns {SceneJS.LookAt} this
  */
 SceneJS.LookAt.prototype.setUpZ = function(x) {
     this._upZ = z || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 
@@ -212,6 +241,19 @@ SceneJS.LookAt.prototype.getUp = function() {
         y: this._upY,
         z: this._upZ
     };
+};
+
+/**
+ * Moves the up vector.
+ *
+ * @param {Object} up increment - Eg. { x: 0.0, y: 10.0, z: -15 }
+ */
+SceneJS.LookAt.prototype.incUp = function(up) {
+    up = up || {};
+    this._upX += (up.x != undefined && up.x != null) ? up.x : 0;
+    this._upY += (up.y != undefined && up.y != null) ? up.y : 0;
+    this._upZ += (up.z != undefined && up.z != null) ? up.z : 0;
+    this._memoLevel = 0;
 };
 
 /**

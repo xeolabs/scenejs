@@ -54,8 +54,8 @@ SceneJS._processModule = new (function() {
                             if ((process.timeoutSecs > -1) && (elapsed > (process.timeoutSecs * 1000))) {
 
                                 SceneJS._loggingModule.warn("Process timed out after " +
-                                                           process.timeoutSecs +
-                                                           " seconds: " + process.description);
+                                                            process.timeoutSecs +
+                                                            " seconds: " + process.description);
 
                                 /* Process timed out - notify listeners
                                  */
@@ -133,6 +133,8 @@ SceneJS._processModule = new (function() {
                     timeStarted : time,
                     timeRunning: 0,
                     description : cfg.description || "",
+                    type: cfg.type,
+                    info: cfg.info,
                     timeoutSecs : cfg.timeoutSecs || 30, // Thirty second default timout
                     onTimeout : cfg.onTimeout
                 };
@@ -147,6 +149,8 @@ SceneJS._processModule = new (function() {
                         id: process.id,
                         timeStarted : process.timeStarted,
                         description: process.description,
+                        type: process.type,
+                        info: process.info,
                         timeoutSecs: process.timeoutSecs
                     }
                 });
@@ -174,6 +178,8 @@ SceneJS._processModule = new (function() {
                     id: process.id,
                     timeStarted : process.timeStarted,
                     description: process.description,
+                    type: process.type,
+                    info: process.info,
                     timeoutSecs: process.timeoutSecs
                 }
             });

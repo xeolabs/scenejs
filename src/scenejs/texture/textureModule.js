@@ -190,19 +190,35 @@ SceneJS._textureModule = new (function() {
         var _canvas = canvas;
         var _context = canvas.context;
         if (cfg.uri) {
-            var process = SceneJS._processModule.createProcess({ // To support monitor of image loads through SceneJS PROCESS_XXX events
+
+            /* Start a SceneJS process for the texture load and creation
+             */
+            var process = SceneJS._processModule.createProcess({
                 description:"creating texture: uri = " + cfg.uri,
+                type: "create-texture",
+                info: {  
+                    uri: cfg.uri
+                },
                 timeoutSecs: -1 // Relying on Image object for timeout
             });
+
+            /* Kill process on successful load and creation
+             */
             image.onload = function() {
                 var textureId = allocateTexture(_canvas, _context, image, cfg);
                 SceneJS._processModule.killProcess(process);
                 onSuccess(textures[textureId]);
             };
+
+            /* Kill process on error
+             */
             image.onerror = function() {
                 SceneJS._processModule.killProcess(process);
                 onError();
             };
+
+            /* Kill process on abort
+             */
             image.onabort = function() {
                 SceneJS._processModule.killProcess(process);
                 onAbort();

@@ -82,7 +82,7 @@ SceneJS.BoundingBox = SceneJS.createNodeType("boundingBox");
 
 // @private
 SceneJS.BoundingBox.prototype._init = function(params) {
-
+   
     /* Local extents
      */
     this._xmin = params.xmin || 0;
@@ -517,7 +517,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                     /* Export model-space boundary
                      */
                     var isectListeners = this._listeners["intersect"];
-
+                        
                     SceneJS._boundaryModule.pushBoundary(
                             this._modelBox,
                             this._viewBox,

@@ -149,7 +149,8 @@ SceneJS.Node = function() {
     /* Register again by whatever ID we now have
      */
     if (!this._id) {
-        this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
+      //  this._id = SceneJS._createUUID();
+      this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
     }
     SceneJS._nodeIDMap[this._id] = this;
 
@@ -223,6 +224,8 @@ SceneJS.Node._ArgParser = new (function() {
                         node._NODEINFO = param;
                     } else if (key == "data") {
                         node._data = param;
+                    } else if (key == "enabled") {
+                        node._enabled = param;
                     } else {
                         node._params[key] = param;
                     }

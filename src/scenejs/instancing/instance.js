@@ -10,7 +10,10 @@
  * {@link SceneJS.Instance}, as shown below. The target node may be anywhere in the scene graph. <p>
  * <pre><code>
  * new SceneJS.Cube({ id: "myBox" }),
- * new SceneJS.Instance( { target: "myBox" })
+ * new SceneJS.Instance( {
+ *      target: "myBox",
+ *      retry: false         // Stop trying to instance if target not found - default is true to keep trying
+ * })
  * </code></pre>
  *
  * <p><b>Example 2.</b></p><p>Often you'll want to define target nodes within {@link SceneJS.Library} nodes in order
@@ -48,6 +51,7 @@ SceneJS.Instance.prototype._init = function(params) {
     this._symbol = null;
     this.setTarget(params.target);
     this._mustExist = params.mustExist;
+    this._retry = (params.retry == null || params.retry == undefined) ? false : params.retry;
 
     if (this._target) {
         this._state = this._target
@@ -164,6 +168,9 @@ SceneJS.Instance.prototype._render = function(traversalContext) {
         this._symbol = SceneJS._instancingModule.acquireInstance(nodeId);
 
         if (!this._symbol) {
+
+            /* Couldn't find target
+             */
             var exception;
             if (this._mustExist) {
                 throw SceneJS._errorModule.fatalError(
@@ -173,10 +180,15 @@ SceneJS.Instance.prototype._render = function(traversalContext) {
             this._changeState(SceneJS.Instance.STATE_ERROR, exception);
 
             /**
-             * Need scene graphs to keep rendering so
-             * that this instance can keep checking for its target
+             * If we're going to keep trying to find the
+             * target, then we'll need the scene graph to
+             * keep rendering so that this instance can
+             * keep trying. Otherwise, we'll wait for the next
+             * render.
              */
-            SceneJS._needFrame = true;
+            if (this._retry) {
+                SceneJS._needFrame = true;
+            }
 
         } else {
             this._changeState(SceneJS.Instance.STATE_RENDERING);

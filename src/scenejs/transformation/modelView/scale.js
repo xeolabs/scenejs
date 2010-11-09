@@ -105,6 +105,32 @@ SceneJS.Scale.prototype.getZ = function() {
     return this._z;
 };
 
+/** Increments the X component of the scale factor
+ *
+ * @param x
+ */
+SceneJS.Scale.prototype.incX = function(x) {
+    this._x += x;
+    this._memoLevel = 0;
+};
+
+/** Increments the Y component of the scale factor
+ *
+ * @param y
+ */
+SceneJS.Scale.prototype.incY = function(y) {
+    this._y += y;
+};
+
+/** Increments the Z component of the scale factor
+ *
+ * @param z
+ */
+SceneJS.Scale.prototype.incZ = function(z) {
+    this._z += z;
+    this._memoLevel = 0;
+};
+
 /**
  * Returns a copy of the matrix as a 1D array of 16 elements
  * @returns {Number[16]} The matrix elements

@@ -42,7 +42,7 @@ SceneJS._rendererModule = new (function() {
                         depth : true,
                         color : true
                     },
-                    clearColor: {r: 0, g : 0, b : 0 },
+                    // clearColor: {r: 0, g : 0, b : 0 },
                     clearDepth: 1.0,
                     enableDepthTest:true,
                     enableCullFace: false,
@@ -165,13 +165,13 @@ SceneJS._rendererModule = new (function() {
         for (var key in props) {            // Set order-insensitive properties (modes)
             if (props.hasOwnProperty(key)) {
                 value = props[key];
-                //if (value != undefined && value != null) {
-                var setter = glModeSetters[key];
-                if (setter) {
-                    setter(context, value);
-                }
+                if (value != undefined && value != null) {
+                    var setter = glModeSetters[key];
+                    if (setter) {
+                        setter(context, value);
+                    }
 
-                // }
+                }
             }
         }
         if (props.viewport) {               //  Set order-sensitive properties (states)

@@ -80,26 +80,30 @@ SceneJS._boundaryModule = new (function() {
 
     function findViewBoundingBoxIntersects(list1, len1, list2, len2) {
         var b1, b2;
-        var isects = [];
+        var isects = {};
+        var numIntersects = 0;
         for (var i = 0; i < len1; i++) {
             for (var j = 0; j < len2; j++) {
                 if (list1[i].nodeId != list2[j].nodeId) {
                     b1 = list1[i].viewBox;
                     b2 = list2[j].viewBox;
+
                     if (b1.max[0] < b2.min[0] ||
-                        b2.max[0] < b1.min[0] ||
                         b1.max[1] < b2.min[1] ||
-                        b2.max[1] < b1.min[1] ||
                         b1.max[2] < b2.min[2] ||
+
+                        b2.max[0] < b1.min[0] ||
+                        b2.max[1] < b1.min[1] ||
                         b2.max[2] < b1.min[2]) {
                     } else {
-                        isects.push(list2[j].nodeId);
+                        isects[list2[j].nodeId] = true;
+                        numIntersects ++;
                     }
                 }
-                if (isects.length > 0) {
-                    SceneJS._nodeIDMap[list1[i].nodeId]._fireEvent("intersect", { nodeIds: isects });
-                    isects = [];
-                }
+            }
+            if (numIntersects > 0) {
+                SceneJS._nodeIDMap[list1[i].nodeId]._fireEvent("intersect", { nodeIds: isects });
+                isects = {};
             }
         }
     }

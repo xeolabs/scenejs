@@ -26,7 +26,6 @@ SceneJS.Translate.prototype._init = function(params) {
 /**
  * Sets the translation vector
  * @param {object} xyz The vector - eg. {x: 0, y: 1, z: 0}
- * @returns {SceneJS.Translate} this
  */
 SceneJS.Translate.prototype.setXYZ = function(xyz) {
     xyz = xyz || {};
@@ -36,8 +35,7 @@ SceneJS.Translate.prototype.setXYZ = function(xyz) {
     this._x = x;
     this._y = y;
     this._z = z;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the translation vector
@@ -58,8 +56,7 @@ SceneJS.Translate.prototype.getXYZ = function() {
  */
 SceneJS.Translate.prototype.setX = function(x) {
     this._x = x;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the X component of the translation vector
@@ -77,8 +74,7 @@ SceneJS.Translate.prototype.getX = function() {
  */
 SceneJS.Translate.prototype.setY = function(y) {
     this._y = y;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the Y component of the translation vector
@@ -92,12 +88,10 @@ SceneJS.Translate.prototype.getY = function() {
 /** Sets the Z component of the translation vector
  *
  * @param z
- * @returns {SceneJS.Translate} this
  */
 SceneJS.Translate.prototype.setZ = function(z) {
     this._z = z;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Gets the Z component of the translation vector
@@ -106,6 +100,33 @@ SceneJS.Translate.prototype.setZ = function(z) {
  */
 SceneJS.Translate.prototype.getZ = function() {
     return this._z;
+};
+
+/** Increments the X component of the translation vector
+ *
+ * @param x
+ */
+SceneJS.Translate.prototype.incX = function(x) {
+    this._x += x;
+    this._memoLevel = 0;
+};
+
+/** Increments the Y component of the translation vector
+ *
+ * @param y
+ * @returns {SceneJS.Translate} this
+ */
+SceneJS.Translate.prototype.incY = function(y) {
+    this._y += y;
+};
+
+/** Inccrements the Z component of the translation vector
+ *
+ * @param z
+ */
+SceneJS.Translate.prototype.incZ = function(z) {
+    this._z += z;
+    this._memoLevel = 0;
 };
 
 /**

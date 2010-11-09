@@ -28,12 +28,11 @@ SceneJS.Rotate.prototype._init = function(params) {
 
 /** Sets the rotation angle
  * @param {float} angle Rotation angle in degrees
- * @returns {SceneJS.Rotate} this
+
  */
 SceneJS.Rotate.prototype.setAngle = function(angle) {
     this._angle = angle || 0;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the rotation angle
@@ -46,7 +45,6 @@ SceneJS.Rotate.prototype.getAngle = function() {
 /**
  * Sets the rotation axis vector. The vector must not be of zero length.
  * @param {object} xyz The vector - eg. {x: 0, y: 1, z: 0}
- * @returns {SceneJS.Rotate} this
  */
 SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     xyz = xyz || {};
@@ -56,8 +54,7 @@ SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     this._x = x;
     this._y = y;
     this._z = z;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the rotation axis vector.
@@ -78,8 +75,7 @@ SceneJS.Rotate.prototype.getXYZ = function() {
  */
 SceneJS.Rotate.prototype.setX = function(x) {
     this._x = x;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the rotation axis vector's X component
@@ -93,12 +89,10 @@ SceneJS.Rotate.prototype.getX = function() {
 /** Sets the rotation axis vector's Y component
  *
  * @param y
- * @returns {SceneJS.Rotate} this
  */
 SceneJS.Rotate.prototype.setY = function(y) {
     this._y = y;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the rotation axis vector's Y component
@@ -112,12 +106,10 @@ SceneJS.Rotate.prototype.getY = function() {
 /** Sets the rotation axis vector's Z component
  *
  * @param z
- * @returns {SceneJS.Rotate} this
  */
 SceneJS.Rotate.prototype.setZ = function(z) {
     this._z = z;
-    this._setDirty();
-    return this;
+    this._memoLevel = 0;
 };
 
 /** Returns the rotation axis vector's Z component
@@ -125,6 +117,42 @@ SceneJS.Rotate.prototype.setZ = function(z) {
  */
 SceneJS.Rotate.prototype.getZ = function() {
     return this._z;
+};
+
+/** Increments the X component of the rotation vector
+ *
+ * @param x
+ */
+SceneJS.Rotate.prototype.incX = function(x) {
+    this._x += x;
+    this._memoLevel = 0;
+};
+
+/** Increments the Y component of the rotation vector
+ *
+ * @param y
+ * @returns {SceneJS.Rotate} this
+ */
+SceneJS.Rotate.prototype.incY = function(y) {
+    this._y += y;
+};
+
+/** Inccrements the Z component of the rotation vector
+ *
+ * @param z
+ */
+SceneJS.Rotate.prototype.incZ = function(z) {
+    this._z += z;
+    this._memoLevel = 0;
+};
+
+/** Increments the angle
+ *
+ * @param angle
+ */
+SceneJS.Rotate.prototype.incAngle = function(angle) {
+    this._angle += angle;
+    this._memoLevel = 0;
 };
 
 /**
