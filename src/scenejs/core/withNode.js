@@ -82,7 +82,7 @@ SceneJS._WithNode.prototype.eachParent = function(fn) {
     }
     var selector;
     var count = 0;
-    var node = this._targetNode.parent;
+    var node = this._targetNode._parent;
     while (node._parent) {
         selector = new SceneJS._WithNode(node._parent);
         if (fn.call(selector, count++) == true) {
@@ -125,7 +125,7 @@ SceneJS._WithNode.prototype.eachNode = function(fn, options) {
         // TODO: breadth-first
     }
     if (stoppedNode) {
-        return new SceneJS._WithNode(stoppedNode);
+        return stoppedNode;
     }
     return undefined; // IDE happy now
 };
@@ -244,22 +244,34 @@ SceneJS._WithNode.prototype.get = function(attr) {
 /** Binds a listener to an event on the selected node
  *
  * @param {String} name Event name
- * @param {Function} fn Event handler
+ * @param {Function} handler Event handler
  */
-SceneJS._WithNode.prototype.bind = function(name, fn) {
+SceneJS._WithNode.prototype.bind = function(name, handler) {
     if (!name) {
         throw "bind param 'name' null or undefined";
     }
     if (typeof name != "string") {
         throw "bind param 'name' should be a string";
     }
-    if (!fn) {
-        throw "bind param 'fn' null or undefined";
+    if (!handler) {
+        throw "bind param 'handler' null or undefined";
     }
-    if (typeof fn != "function") {
+    if (typeof handler != "function") {
         throw "bind param 'fn' should be a function";
+    } else {
+        this._targetNode.addListener(name, handler, { scope: this });
     }
-    this._targetNode.addListener(name, fn, { scope: this });
+    //else {
+    //        var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
+    //        if (!handler.target) {
+    //            handler.target = this._targetNode.getID();
+    //        }
+    //        this._targetNode.addListener(
+    //                name,
+    //                function(params) {
+    //                    commandService.executeCommand(handler);
+    //                }, { scope: this });
+    //    }
     return this;
 };
 
