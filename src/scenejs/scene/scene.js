@@ -331,6 +331,8 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
     if (!this._running) {
         this._render(); // Pick-mode traversal - get picked element and fire events
         this._render(); // Render-mode traversal 
+    } else {
+        SceneJS._needFrame = true;
     }
 };
 

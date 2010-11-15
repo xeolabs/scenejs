@@ -153,11 +153,14 @@ SceneJS._pickModule = new (function() {
                 nodeStack.push(node);
                 nodeLookup.push(node);
 
-                /* Next pick index color
+                /* Next pick index color (cheers Paul Brunt for this mapping)
                  */
-                color.g = parseFloat(Math.round((nodeIndex + 1) / 256) / 256);
-                color.r = parseFloat((nodeIndex - color.g * 256 + 1) / 256);
-                color.b = 1.0;
+                var b = nodeIndex >> 16 & 0xFF;
+                var g = nodeIndex >> 8 & 0xFF;
+                var r = nodeIndex & 0xFF;
+                color.g = g / 255;
+                color.r = r / 255;
+                color.b = b / 255;
 
                 nodeIndex++;
             }
@@ -204,23 +207,13 @@ SceneJS._pickModule = new (function() {
         var x = pickX;
         var y = canvas.height - pickY;
 
-        var pix;
-        try {
-            pix = context.readPixels(x, y, 1, 1, context.RGBA, context.UNSIGNED_BYTE);
-        } catch (e) {
-        }
-        if (!pix) {
-            try {
-                pix = new WebGLUnsignedByteArray(4);
-            } catch (e) {
-                pix = new Uint8Array(4);
-            }
-            context.readPixels(x, y, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
-        }
+        var pix = new Uint8Array(4);
+        context.readPixels(x, y, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
+
         if (debugCfg.logTrace) {
             SceneJS._loggingModule.info("Reading pick buffer - picked pixel(" + x + ", " + y + ") = {r:" + pix[0] + ", g:" + pix[1] + ", b:" + pix[2] + "}");
         }
-        pickedNodeIndex = (pix[0] + pix[1] * 256) - 1;
+        pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
         if (pickedNodeIndex >= 0) {
             var node = nodeLookup[pickedNodeIndex];
             if (node) {
