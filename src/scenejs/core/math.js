@@ -1417,23 +1417,32 @@ SceneJS._math_Box3 = function(min, max) {
 
     /** @private */
     this.fromPoints = function(points) {
-        var points2 = [];
         var pointsLength = points.length;
-        for (var i = 0; i < pointsLength; ++i) {
-            var points_i3 = points[i][3];
-            points2.push([points[i][0] / points_i3, points[i][1] / points_i3, points[i][2] / points_i3]);
-        }
-        points = points2;
-        pointsLength = points.length;
+    
         for (i = 0; i < pointsLength; ++i) {
-            var v = points[i];
-            for (var j = 0; j < 3; ++j) {
-                if (v[j] < this.min[j]) {
-                    this.min[j] = v[j];
-                }
-                if (v[j] > this.max[j]) {
-                    this.max[j] = v[j];
-                }
+            var points_i3 = points[i][3];
+            var pDiv0 = points[i][0] / points_i3;
+            var pDiv1 = points[i][1] / points_i3;
+            var pDiv2 = points[i][2] / points_i3;
+    
+            if (pDiv0 < this.min[0]) {
+                this.min[0] = pDiv0;
+            }
+            if (pDiv1 < this.min[1]) {
+                this.min[1] = pDiv1;
+            }
+            if (pDiv2 < this.min[2]) {
+                this.min[2] = pDiv2;
+            }
+    
+            if (pDiv0 > this.max[0]) {
+                this.max[0] = pDiv0;
+            }
+            if (pDiv1 > this.max[1]) {
+                this.max[1] = pDiv1;
+            }
+            if (pDiv2 > this.max[2]) {
+                this.max[2] = pDiv2;
             }
         }
         return this;
