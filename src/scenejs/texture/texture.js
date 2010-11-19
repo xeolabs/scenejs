@@ -376,16 +376,15 @@ SceneJS.Texture.prototype._rebuildTextureMatrix = function(layer) {
 // @private
 SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
     var matrix = null;
-    var t;
     if (translate) {
         matrix = SceneJS._math_translationMat4v([ translate.x || 0, translate.y || 0, 0]);
     }
     if (scale) {
-        t = SceneJS._math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
+        var t = SceneJS._math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
         matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
     }
     if (rotate) {
-        t = SceneJS._math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
+        var t = SceneJS._math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
         matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
     }
     return matrix;

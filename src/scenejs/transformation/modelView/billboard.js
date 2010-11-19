@@ -34,9 +34,9 @@ SceneJS.Billboard.prototype._renderOLD = function(traversalContext) {
     var up = superViewXForm.lookAt.up;
     up = SceneJS._math_normalizeVec3([up.x, up.y, up.z]);
 
-    var right = SceneJS._math_cross3Vec3(look, up);
-
-    up = SceneJS._math_cross3Vec3(right, look);
+    var right = SceneJS._math_mat4(); 
+    SceneJS._math_cross3Vec3(look, up, right);
+    SceneJS._math_cross3Vec3(right, look, up);
 
     var r1 = right[0], r2 = right[1], r3 = right[2],
             u1 = up[0], u2 = up[1], u3 = up[2],
@@ -52,7 +52,8 @@ SceneJS.Billboard.prototype._renderOLD = function(traversalContext) {
 
     //var modelMat = SceneJS._math_translationMat4v(pos);
     var modelMat = SceneJS._math_identityMat4();
-    var viewMat = SceneJS._math_mulMat4(superViewXForm.matrix, mat);
+    var viewMat = SceneJS._math_mat4(); 
+    SceneJS._math_mulMat4(superViewXForm.matrix, mat, viewMat);
 
     SceneJS._viewTransformModule.setTransform({ matrix: viewMat });
     SceneJS._modelTransformModule.setTransform({ matrix: modelMat});
@@ -84,9 +85,9 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
         SceneJS._math_getCellMat4(superViewXForm.matrix, 2, 1)
     ]);
 
-    var right = SceneJS._math_cross3Vec3(look, up);
-
-    up = SceneJS._math_cross3Vec3(right, look);
+    var right = SceneJS._math_mat4(); 
+    SceneJS._math_cross3Vec3(look, up, right);
+    SceneJS._math_cross3Vec3(right, look, up);
 
     var mat = [
         right[0],    up[0],    look[0],    0,
@@ -97,7 +98,8 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
 
     var modelMat = SceneJS._math_translationMat4v([-pos[0], -pos[1], -pos[2]]);
    // var modelMat = SceneJS._math_identityMat4();
-    var viewMat = SceneJS._math_mulMat4(superViewXForm.matrix, mat);
+    var viewMat = SceneJS._math_mat4(); 
+    SceneJS._math_mulMat4(superViewXForm.matrix, mat, viewMat);
 
     SceneJS._viewTransformModule.setTransform({ matrix: viewMat });
     SceneJS._modelTransformModule.setTransform({ matrix: modelMat});

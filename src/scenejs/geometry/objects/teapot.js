@@ -5770,10 +5770,10 @@ SceneJS.Teapot = function() {
                 var v2 = positions[j1];
                 var v3 = positions[j2];
 
-                var va = SceneJS._math_subVec4(v2, v1);
-                var vb = SceneJS._math_subVec4(v3, v1);
+                SceneJS._math_subVec4(v2, v1);
+                SceneJS._math_subVec4(v3, v1);
 
-                var n = SceneJS._math_normalizeVec4(SceneJS._math_cross3Vec4(va, vb));
+                var n = SceneJS._math_normalizeVec4(SceneJS._math_cross3Vec4(v2, v3));
 
                 if (!nvecs[j0]) nvecs[j0] = [];
                 if (!nvecs[j1]) nvecs[j1] = [];

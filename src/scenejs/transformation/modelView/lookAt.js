@@ -304,7 +304,8 @@ SceneJS.LookAt.prototype._render = function(traversalContext) {
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (this._memoLevel < 2 || (!superXform.fixed)) {
-        var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
+        var tempMat = SceneJS._math_mat4(); 
+        SceneJS._math_mulMat4(superXform.matrix, this._mat, tempMat);
         this._xform = {
             type: "lookat",
             matrix: tempMat,

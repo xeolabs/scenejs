@@ -80,11 +80,13 @@ SceneJS.Matrix.prototype._render = function(traversalContext) {
         /* When building a view transform, apply the inverse of the matrix
          * to correctly transform the SceneJS.Camera
          */
-        var mat = SceneJS._modelViewTransformModule.isBuildingViewTransform()
-                ? SceneJS._math_inverseMat4(this._mat)
+        var mat = SceneJS._math_mat4();
+        mat = SceneJS._modelViewTransformModule.isBuildingViewTransform()
+                ? SceneJS._math_inverseMat4(this._mat, mat)
                 : this._mat;
 
-        var tempMat = SceneJS._math_mulMat4(superXform.matrix, mat);
+        var tempMat = SceneJS._math_mat4(); 
+        SceneJS._math_mulMat4(superXform.matrix, mat, tempMat);
 
         this._xform = {
             localMatrix: this._mat,
