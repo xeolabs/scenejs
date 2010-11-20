@@ -1,11 +1,5 @@
 /**
- * SceneJS Example - Switchable Geometry using the Selector Node.
  *
- * A Selector node is a branch node that selects which among its children are currently active.
- *
- * In this example, a Selector contains four Teapot nodes, of which it initially selects the first,
- * second and fourth. By editing its "selection" property, you can change which of the Teapots
- * are rendered.
  *
  * Lindsay Kay
  * lindsay.kay@xeolabs.com
@@ -60,25 +54,52 @@ SceneJS.createNode({
                             shine:          6.0,
 
                             nodes: [
-
-                                //----------------------------------------------------------------------------------
-                                // Our Selector node selects three of its four sub-graphs to display three Teapots.
-                                // Try changing the indices in its "selection" property to change its selection.
-                                //----------------------------------------------------------------------------------
-
                                 {
-                                    type: "selector",
-                                    selection: [0, 1, 3],
+                                    type:"translate",
+                                    id: "cursor-pos",
 
                                     nodes: [
                                         {
-                                            type:"translate",
-                                            y : 15,
+                                            type: "boundingBox",
+                                            id: "teapot-bbox-1",
+
+                                            xmin: -2,
+                                            ymin: -2,
+                                            zmin: -2,
+                                            xmax:  2,
+                                            ymax:  2,
+                                            zmax:  2,
                                             nodes: [
                                                 {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 0",
+                                                    type: "cube",
+                                                    xSize: 2,
+                                                    ySize: 2,
+                                                    zSize: 2
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                {
+                                    type:"translate",
+                                    y : 15,
+                                    nodes: [
+                                        {
+                                            type: "text",
+                                            size: 80,
+                                            text: "     Teapot 1",
+                                            nodes: [
+                                                {
+                                                    type: "boundingBox",
+                                                    id: "teapot-bbox-2",
+
+                                                    xmin: -2,
+                                                    ymin: -2,
+                                                    zmin: -2,
+                                                    xmax:  2,
+                                                    ymax:  2,
+                                                    zmax:  2,
                                                     nodes: [
                                                         {
                                                             type: "teapot"
@@ -86,15 +107,28 @@ SceneJS.createNode({
                                                     ]
                                                 }
                                             ]
-                                        },
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "translate",
+                                    y : 5,
+                                    nodes: [
                                         {
-                                            type: "translate",
-                                            y : 5,
+                                            type: "text",
+                                            size: 80,
+                                            text: "     Teapot 2",
                                             nodes: [
                                                 {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 1",
+                                                    type: "boundingBox",
+                                                    id: "teapot-bbox-3",
+
+                                                    xmin: -2,
+                                                    ymin: -2,
+                                                    zmin: -2,
+                                                    xmax:  2,
+                                                    ymax:  2,
+                                                    zmax:  2,
                                                     nodes: [
                                                         {
                                                             type: "teapot"
@@ -102,15 +136,27 @@ SceneJS.createNode({
                                                     ]
                                                 }
                                             ]
-                                        },
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "translate",
+                                    y : -5,
+                                    nodes: [
                                         {
-                                            type: "translate",
-                                            y : -5,
+                                            type: "text",
+                                            size: 80,
+                                            text: "     Teapot 3",
                                             nodes: [
                                                 {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 2",
+                                                    type: "boundingBox",
+                                                    id: "teapot-bbox-4",
+                                                    xmin: -2,
+                                                    ymin: -2,
+                                                    zmin: -2,
+                                                    xmax:  2,
+                                                    ymax:  2,
+                                                    zmax:  2,
                                                     nodes: [
                                                         {
                                                             type: "teapot"
@@ -118,15 +164,27 @@ SceneJS.createNode({
                                                     ]
                                                 }
                                             ]
-                                        },
+                                        }
+                                    ]
+                                },
+                                {
+                                    type: "translate",
+                                    y : -15,
+                                    nodes: [
                                         {
-                                            type: "translate",
-                                            y : -15,
+                                            type: "text",
+                                            size: 80,
+                                            text: "     Teapot 4",
                                             nodes: [
                                                 {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 3",
+                                                    type: "boundingBox",
+                                                    id: "teapot-bbox-5",
+                                                    xmin: -2,
+                                                    ymin: -2,
+                                                    zmin: -2,
+                                                    xmax:  2,
+                                                    ymax:  2,
+                                                    zmax:  2,
                                                     nodes: [
                                                         {
                                                             type: "teapot"
@@ -146,8 +204,55 @@ SceneJS.createNode({
     ]
 });
 
+var dragging = false;
+var lastX, lastY;
+var x = 0, y = 0, z = 0;
 
-/* Throw the switch, Igor!
+var canvas = document.getElementById("theCanvas");
 
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+/* On a mouse drag, we'll re-render the scene, passing in
+ * incremented angles in each time.
  */
-SceneJS.withNode("theScene").render();
+function mouseMove(event) {
+    if (dragging) {
+
+        x += (event.clientX - lastX) * 0.1;
+        y -= (event.clientY - lastY) * 0.1;
+
+        lastX = event.clientX;
+        lastY = event.clientY;
+
+        SceneJS.withNode("cursor-pos").set({
+            x: x,
+            y: y
+        });
+    }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+
+
+SceneJS.withNode("teapot-bbox-1")
+        .bind("intersect",
+        function(e) {
+      //      alert(JSON.stringify(e.params.nodeIds));
+        });
+
+SceneJS.withNode("theScene").start({
+    fps: 60,
+    idleFunc: function() {
+
+    }
+});
