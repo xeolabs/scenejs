@@ -159,7 +159,6 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/core/message.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
-             <fileset dir="${SRC_DIR}" includes="scenejs/services/jobService.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
 
@@ -273,7 +272,8 @@
 
     <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
 
-    <target name="package" depends="assemble-lib, package-index, package-examples, package-lib-utils">
+    <target name="package" depends="assemble-lib, package-index, package-examples, package-lib-utils, package-lib-plugins">
+
         <!-- Compress JS file list -->
 
         <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
@@ -344,8 +344,16 @@
     </target>
 
     <target name="package-lib-utils" depends="docs">
+          <!--<target name="package-lib-utils">-->
         <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
             <fileset dir="${basedir}/src/utils"/>
+        </copy>
+    </target>
+
+    <target name="package-lib-plugins" depends="docs">
+        <!--<target name="package-lib-plugins">-->
+        <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
+            <fileset dir="${basedir}/src/plugins"/>
         </copy>
     </target>
 
@@ -357,6 +365,7 @@
         <mkdir dir="${EXTRACTED_DIST_DIR}"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
+        <mkdir dir="${EXTRACTED_DIST_DIR}/lib/plugins"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/api-docs"/>
     </target>

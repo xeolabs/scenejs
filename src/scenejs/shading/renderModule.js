@@ -486,7 +486,7 @@ SceneJS._shaderModule = new (function() {
                 NodeRenderer.init();
                 renderBinSet(binSet);
                 NodeRenderer.cleanup();
-                canvas = null;              
+                canvas = null;
             });
 
     //    this.redraw = function() {
@@ -556,11 +556,15 @@ SceneJS._shaderModule = new (function() {
         //NodeRenderer.init();
         var context = canvas.context;
         context.blendFunc(context.SRC_ALPHA, context.ONE);
-        //context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
+        // context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
         context.enable(context.BLEND);
 
+        var flags = {
+            transparent : true
+        };
+
         for (var i = 0, len = transpNodes.length; i < len; i++) {
-            NodeRenderer.renderNode(transpNodes[i]);
+            NodeRenderer.renderNode(transpNodes[i], flags);
         }
         context.blendFunc(context.SRC_ALPHA, context.LESS);
         context.disable(context.BLEND);
@@ -625,7 +629,9 @@ SceneJS._shaderModule = new (function() {
          * rendered, Renderer forgets all states for the previous node and makes a fresh set of transitions
          * into all states for this node.
          */
-        this.renderNode = function(node) {
+        this.renderNode = function(node, flags) {
+
+            flags = flags || {};
 
             var context = canvas.context;
 
@@ -738,9 +744,9 @@ SceneJS._shaderModule = new (function() {
              */
             if (node.fogState && node.fogState.fog.mode != "disabled") {
                 this._program.setUniform("uFogColor", node.fogState.fog.color);
-                this._program.setUniform("uFogDensity", node.fogState.fog.density);
-                this._program.setUniform("uFogStart", node.fogState.fog.start);
-                this._program.setUniform("uFogEnd", node.fogState.fog.end);
+                this._program.setUniform("uFogDensity", flags.transparent ? node.fogState.fog.density : 0.0);
+                this._program.setUniform("uFogStart", flags.transparent ? node.fogState.fog.start : 0.0);
+                this._program.setUniform("uFogEnd", flags.transparent ? node.fogState.fog.end : 10000);
             }
 
             /* Bind View matrix
@@ -1136,6 +1142,7 @@ SceneJS._shaderModule = new (function() {
         src.push("uniform float uMaterialAlpha;");
 
         if (lighting) {
+            src.push("varying vec3 n;");
             src.push("varying vec3 vNormal;");                  // View-space normal
             src.push("varying vec3 vEyeVec;");                  // Direction of view-space vertex from eye
 
@@ -1176,19 +1183,36 @@ SceneJS._shaderModule = new (function() {
             src.push("uniform float uFogEnd;");
         }
 
+        //--------------------------------------------------------------------------
+        // Main
+        //--------------------------------------------------------------------------
+
         src.push("void main(void) {");
         src.push("  vec3    color   = uMaterialBaseColor;");
         src.push("  float   alpha   = uMaterialAlpha;");
 
+        //--------------------------------------------------------------------------
+        //
+        //--------------------------------------------------------------------------
+
         if (lighting) {
+
+
+            // TODO: Cutaway mode should be available for no lighting
+
+            //            src.push("  float dotEyeNorm = dot(vNormal,vEyeVec);");
+            //            src.push("  if (dotEyeNorm > 0.3 || dotEyeNorm < -0.3) discard;");
+
             src.push("  vec3    ambientValue=uAmbient;");
             src.push("  float   emit    = uMaterialEmit;");
 
-            src.push("  vec4    normalmap = vec4(vNormal,0.0);");
+
             src.push("  float   specular=uMaterialSpecular;");
             src.push("  vec3    specularColor=uMaterialSpecularColor;");
             src.push("  float   shine=uMaterialShine;");
             src.push("  float   attenuation = 1.0;");
+
+            src.push("  vec3    normalVec=vNormal;");            
         }
 
         if (texturing) {
@@ -1202,7 +1226,7 @@ SceneJS._shaderModule = new (function() {
                  */
                 if (layer.applyFrom == "normal" && lighting) {
                     if (geoState.geo.normalBuf) {
-                        src.push("texturePos=vec4(vNormal.xyz, 1.0);");
+                        src.push("texturePos=vec4(normalVec.xyz, 1.0);");
                     } else {
                         SceneJS._loggingModule.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
                         continue;
@@ -1246,6 +1270,14 @@ SceneJS._shaderModule = new (function() {
                         src.push("color  = color + texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
                     }
                 }
+
+                if (layer.applyTo == "normals") {
+                    src.push("vec3 bump = normalize(texture2D(uSampler" + i + ", textureCoord).xyz * 2.0 - 1.0);");
+
+                                      
+                    //src.push("float dotN = max( dot(lightVec, bump), 0.0 );");
+                       src.push("normalVec *= bump;");
+                }
             }
         }
 
@@ -1265,7 +1297,7 @@ SceneJS._shaderModule = new (function() {
                 /* Point Light
                  */
                 if (light.mode == "point") {
-                    src.push("dotN = max(dot(vNormal,lightVec),0.0);");
+                    src.push("dotN = max(dot(normalVec, lightVec),0.0);");
                     src.push("if (dotN > 0.0) {");
                     src.push("  attenuation = 1.0 / (" +
                              "  uLightAttenuation" + i + "[0] + " +
@@ -1276,7 +1308,7 @@ SceneJS._shaderModule = new (function() {
                     }
                     if (light.specular) {
                         src.push("specularValue += attenuation * specularColor * uLightColor" + i +
-                                 " * specular  * pow(max(dot(reflect(lightVec, vNormal), vEyeVec),0.0), shine);");
+                                 " * specular  * pow(max(dot(reflect(lightVec, normalVec), vEyeVec),0.0), shine);");
                     }
                     src.push("}");
                 }
@@ -1284,13 +1316,14 @@ SceneJS._shaderModule = new (function() {
                 /* Directional Light
                  */
                 if (light.mode == "dir") {
-                    src.push("dotN = max(dot(vNormal,lightVec),0.0);");
+
+                    src.push("dotN = max(dot(normalVec,lightVec),0.0);");
                     if (light.diffuse) {
                         src.push("lightValue += dotN * uLightColor" + i + ";");
                     }
                     if (light.specular) {
                         src.push("specularValue += specularColor * uLightColor" + i +
-                                 " * specular  * pow(max(dot(reflect(lightVec, vNormal),normalize(vEyeVec)),0.0), shine);");
+                                 " * specular  * pow(max(dot(reflect(lightVec, normalVec),normalize(vEyeVec)),0.0), shine);");
                     }
                 }
 
@@ -1300,7 +1333,7 @@ SceneJS._shaderModule = new (function() {
                     src.push("spotFactor = max(dot(normalize(uLightDir" + i + "), lightVec));");
                     src.push("if ( spotFactor > 20) {");
                     src.push("  spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
-                    src.push("  dotN = max(dot(vNormal,normalize(lightVec)),0.0);");
+                    src.push("  dotN = max(dot(normalVec,normalize(lightVec)),0.0);");
                     src.push("      if(dotN>0.0){");
 
                     //                            src.push("          attenuation = spotFactor / (" +
@@ -1314,7 +1347,7 @@ SceneJS._shaderModule = new (function() {
                     }
                     if (light.specular) {
                         src.push("specularValue += attenuation * specularColor * uLightColor" + i +
-                                 " * specular  * pow(max(dot(reflect(normalize(lightVec), vNormal),normalize(vEyeVec)),0.0), shine);");
+                                 " * specular  * pow(max(dot(reflect(normalize(lightVec), normalVec),normalize(vEyeVec)),0.0), shine);");
                     }
 
                     src.push("      }");
