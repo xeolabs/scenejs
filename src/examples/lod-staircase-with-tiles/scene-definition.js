@@ -117,21 +117,6 @@ var moveAngleInc = 0;
 
 var canvas = document.getElementById("theCanvas");
 
-SceneJS.withNode("lod-stairs")
-        .bind("rendering",
-        function(event) {
-            if (this.get("state") == "visible") {
-
-                /* We can get the model and view-space boundaries from the BoundingBox
-                 * while it intersects the view frustum
-                 */
-
-                // alert("Model boundary = " + JSON.stringify(this.getModelBoundary()));
-                // alert("View boundary = " + JSON.stringify(this.getViewBoundary()));
-            }
-        });
-
-
 function mouseDown(event) {
     lastX = event.clientX;
     lastY = event.clientY;

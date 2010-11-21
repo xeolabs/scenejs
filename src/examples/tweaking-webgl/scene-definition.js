@@ -109,16 +109,16 @@ SceneJS.createNode({
              */
             blendFunc: {
                 sfactor: "one",
-                dfactor: 'zero'
+                dfactor: 'one'
             },
 
             /* Set the RGB and alpha blend functions separately
              */
             blendFuncSeperate: {
-                srcRGB: "zero",
-                dstRGB: "zero",
-                srcAlpha: "zero",
-                dstAlpha: "zero"
+                srcRGB: "one",
+                dstRGB: "one",
+                srcAlpha: "one",
+                dstAlpha: "one"
             },
 
 

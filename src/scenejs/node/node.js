@@ -149,8 +149,7 @@ SceneJS.Node = function() {
     /* Register again by whatever ID we now have
      */
     if (!this._id) {
-      //  this._id = SceneJS._createUUID();
-      this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
+        this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
     }
     SceneJS._nodeIDMap[this._id] = this;
 
@@ -872,8 +871,9 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params) {
             params = {};
         }
         var event = { name: eventName, params : params };
-        for (var i = 0; i < list.length; i++) {
-            var listener = list[i];
+        var listener;
+        for (var i = 0, len = list.length; i < len; i++) {
+            listener = list[i];
             if (listener.options.scope) {
                 listener.fn.call(listener.options.scope, event);
             } else {

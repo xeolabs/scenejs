@@ -1,19 +1,15 @@
 /**
- * SceneJS Example - Basic picking
+ * SceneJS Example - Binding Messages to Triggers
  *
- * This is a basic example that shows how picking can be used with a SceneJS.WithConfigs node.
- *
- * The WithConfigs node listens for "picked" events on its subgraph, handling them by either pushing new
- * configurations down into the subgraph or replacing nodes, depending on the origin of the event.
- *
- * Scroll down to the WithConfigs node for more details.
+ * The Message API from V0.7.9 onwards allows us to specify messages to be automatically sent whenever given trigger
+ * conditions occur. A trigger may be the elapse of a given time interval, or the occurrence of some observed event
+ * within SceneJS. For each trigger condition, we can specify whether the message is sent once for the first occurrence
+ * of the trigger, or every time the trigger occurs.
  *
  * Lindsay Kay
- * lindsay.kay AT xeolabs.com
- * March 2010
- *
+ * lindsay.kay@xeolabs.com
+ * November 2010
  */
-
 SceneJS.createNode({
     type: "scene",
     id: "my-scene",
@@ -65,8 +61,7 @@ SceneJS.createNode({
                         },
 
                         /*
-                         * When "teapot1" is picked, we'll push a new angle at
-                         * its "teapot1-rotate" node to spin it around
+                         * Teapot 1
                          */
                         {
                             type: "node",
@@ -87,6 +82,7 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "material",
+                                                    id: "teapot1-material",
                                                     baseColor:      { r: 0.6, g: 0.3, b: 0.3 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                     specular:       0.9,
@@ -107,8 +103,7 @@ SceneJS.createNode({
 
 
                         /*
-                         * "teapot2" subgraph - note the "remove-from-here" and "remove-me" nodes, which are there
-                         * to enable us to remove the latter from the former when this is picked.
+                         * Teapot 2
                          */
 
                         {
@@ -144,7 +139,7 @@ SceneJS.createNode({
 
 
                         /*
-                         * "teapot3"
+                         * Teapot 3
                          */
 
                         {
@@ -185,7 +180,7 @@ SceneJS.createNode({
                         },
 
                         /*
-                         * "teapot4"
+                         * Teapot 4
                          */
 
                         {
@@ -241,7 +236,7 @@ SceneJS.createNode({
                         },
 
                         /*
-                         * "teapot5" subgraph - teapot highlighted when picked
+                         * Teapot 5
                          */
                         {
                             type: "node",
@@ -285,7 +280,7 @@ SceneJS.createNode({
                         },
 
                         /*
-                         * "teapot6" subgraph - teapot wireframe when picked
+                         * Teapot 6
                          */
                         {
                             type: "node",
@@ -326,7 +321,7 @@ SceneJS.createNode({
                         },
 
                         /*
-                         * "teapot7" subgraph
+                         * Teapot 7
                          */
                         {
                             type: "node",
@@ -365,8 +360,9 @@ SceneJS.createNode({
                                 }
                             ]
                         },
+
                         /*
-                         * "teapot8" subgraph
+                         * Teapot 8
                          */
                         {
                             type: "renderer",
@@ -444,169 +440,73 @@ SceneJS.createNode({
 });
 
 
-/* Rotate teapot 1 on picked
+/*-------------------------------------------------------------------------
+ * Define our custom commands
+ *------------------------------------------------------------------------*/
+
+var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
+
+/* Command to set a target material node's baseColor attribute to red
  */
-SceneJS.withNode("teapot1").bind("picked",
-        function(event) {
-            SceneJS.withNode("teapot1-rotate").set("angle", 60);
-        });
-
-/* Destroy teapot 2 when picked
- */
-SceneJS.withNode("teapot2").bind("picked",
-        function(event) {
-            SceneJS.withNode("remove-from-here").remove("nodes", "remove-me");
-        });
-
-/* Move teapot 3 to it's alternative material parent when picked
- */
-SceneJS.withNode("teapot3").bind("picked",
-        function(event) {
-            SceneJS.Message.sendMessage({
-                command: "update",
-                target: "teapot3-material1",
-                remove: {
-                    node: "teapot3-object"
-                },
-                messages: [
-                    {
-                        command: "update",
-                        target:"teapot3-material2",
-                        add: {
-                            node: "teapot3-object"
-                        }
-                    }
-                ]
-            });
-        });
-
-/* Insert interpolators to animate teapot 4 when picked
- */
-SceneJS.withNode("teapot4").bind("picked",
-        function(event) {
-            this.add("nodes", [
-                {
-                    type: "interpolator",
-                    target: "teapot4-pos",
-                    targetProperty: "x",
-                    keys: [0, 3, 6],
-                    values: [0, 20, 15]
-                },
-                {
-                    type: "interpolator",
-                    target: "teapot4-pos",
-                    targetProperty: "y",
-                    keys: [0, 3],
-                    values: [0, 3]
-                },
-                {
-                    type: "interpolator",
-                    target: "teapot4-pos",
-                    targetProperty: "z",
-                    keys: [0, 6],
-                    values: [0, -30]
-                },
-                {
-                    type: "interpolator",
-                    target: "teapot4-tumble",
-                    targetProperty: "angle",
-                    keys: [0, 6],
-                    values: [0, 720]
-                },
-                {
-                    type: "interpolator",
-                    target: "teapot4-spin",
-                    targetProperty: "angle",
-                    keys: [0, 6],
-                    values: [0, 720]
-                }
-            ]);
-        });
-
-
-/* Toggle highlight for teapot 5 when picked
- */
-SceneJS.withNode("teapot5").bind("picked",
-        function(event) {
-            SceneJS.withNode("teapot5-renderer").set("highlight", true);
-        });
-
-/* Toggle wireframe for teapot 6 when picked
- */
-SceneJS.withNode("teapot6").bind("picked",
-        function(event) {
-            SceneJS.withNode("teapot6-renderer").set({
-
-                /* Render triangles as poly lines
-                 */
-                wireframe: true,
-
-                /* Set line width
-                 */
-                lineWidth: 0.5
-            });
-        });
-
-/* Toggle backface clipping for teapot 7 when picked
- */
-SceneJS.withNode("teapot7").bind("picked",
-        function(event) {
-            SceneJS.withNode("teapot7-renderer").set({
-
-                /* Specify front/back-facing mode. Accepted values are cw or ccw
-                 */
-                frontFace: "cw",
-
-                /* Enable/disable face culling
-                 */
-                enableCullFace: true,
-
-                /* Specify facet culling mode, accepted values are: front, back, front_and_back
-                 */
-                cullFace: "front"
-            });
-        });
-
-//SceneJS.withNode("teapot8").bind("picked",
-//        function(event) {
-//            SceneJS.withNode("teapot8-material").set({
-//                opacity: 0.6
-//            });
-//        });
-
-SceneJS.withNode("teapot8").bind("picked",
-        function(event) {
-            SceneJS.withNode("teapot8-renderer").set({
-
-                enableBlend: true,
-
-                blendFunc: {
-                    sfactor: "srcAlpha",
-                    dfactor: "one"
-                }
-            });
-        });
-
-
-var pInterval;
-
-var x = 0;
-window.render = function() {
-    SceneJS.withNode("my-scene").render();
-};
-
-SceneJS.bind("error", function(e) {
-    window.clearInterval(pInterval);
-    alert(e.exception.message ? e.exception.message : e.exception);
+commandService.addCommand("set-material-red", {
+    execute: function(params) {
+        var node = SceneJS.withNode(params.target);
+        if (node.get("type") == "material") {
+            node.set("baseColor", { r: 1, g: 0, b: 1});
+        }
+    }
 });
 
-pInterval = setInterval("window.render()", 10);
+/* Command to increment a target rotate node's angle attribute
+ */
+commandService.addCommand("inc-rotate", {
+    execute: function(params) {
+        var node = SceneJS.withNode(params.target);
+        if (node.get("type") == "rotate") {
+            node.set("angle", node.get("angle") + 1.0);
+        }
+    }
+});
 
-var canvas = document.getElementById("theCanvas");
+/*-------------------------------------------------------------------------
+ * Now schedule the commands
+ *------------------------------------------------------------------------*/
 
-canvas.addEventListener(
-        'mousedown',
-        function (event) {
-            SceneJS.withNode("my-scene").pick(event.offsetX, event.offsetY);
-        }, true);
+/* Whenever SceneJS initilizes, set "teapot1"'s color to red
+ */
+SceneJS.Message.sendMessage({
+
+    command: "bind",
+    bindId: "teapot1-red-on-init",
+    triggers: {
+        "init": {
+            once: false
+        }
+    },
+    message: {
+        command: "set-material-red",
+        target: "teapot1-material"
+    },
+
+    messages:[
+
+        /* Whenever our scene is about to render, rotate teapot1 by one degree
+         */
+        {
+            command: "bind",
+            bindId: "teapot1-rotate-on-rendering",
+            triggers: {
+                "scene-rendering": {
+                    once: false
+                }
+            },
+            message: {
+                command: "inc-rotate",
+                target: "teapot1-rotate"
+            }
+        }
+    ]
+});
+
+SceneJS.withNode("my-scene").start();
 

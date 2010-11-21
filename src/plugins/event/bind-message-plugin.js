@@ -1,75 +1,75 @@
 (function() {
 
-    const SHEDULE_SERVICE_ID = "_message_scheduler";
+    const BIND_SERVICE_ID = "_bind_service";
 
-    if (SceneJS.Services.hasService(SHEDULE_SERVICE_ID)) {
+    if (SceneJS.Services.hasService(BIND_SERVICE_ID)) {
         return;
     }
 
     var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
-    var scheduleService;
+
+    var bindService;
 
     SceneJS.Services.addService(
 
-            SHEDULE_SERVICE_ID,
+            BIND_SERVICE_ID,
 
-            scheduleService = (function() {
+            bindService = (function() {
 
-                var commandService;
                 var time;
 
                 /* triggers in which which messages can run
                  */
                 var triggers = {
                     "interval": {           // At timed intervals
-                        jobs: {}
+                        bindings: {}
                     },
                     "init": {               // When SceneJS initilises
-                        jobs: {}
+                        bindings: {}
                     },
                     "error": {              // On error
-                        jobs: {}
+                        bindings: {}
                     },
                     "reset": {              // When SceneJS resets
-                        jobs: {}
+                        bindings: {}
                     },
                     "scene-rendering": {    // When a scene begins a rendering traversal
-                        jobs: {},
-                        nodeJobs: {}
+                        bindings: {},
+                        nodeBindings: {}
                     },
                     "scene-rendered": {     // When a scene finishes a rendering traversal
-                        job: {}
+                        binding: {}
                     },
 
                     "node-created": {       // When a node instance is created
-                        nodeJobs: {},       //    Jobs for particular target nodes
-                        jobs: {}            //    Jobs for any nodes this event occurs on
+                        nodeBindings: {},       //    Bindings for particular target nodes
+                        bindings: {}            //    Bindings for any nodes this event occurs on
                     },
 
                     "node-destroyed": {     // When a node instance is destroyed
-                        nodeJobs: {},       //    Jobs for particular target nodes
-                        jobs: {}            //    Jobs for any nodes this event occurs on
+                        nodeBindings: {},       //    Bindings for particular target nodes
+                        bindings: {}            //    Bindings for any nodes this event occurs on
                     },
 
                     "node-updated": {       // When a node instance is updated
-                        nodeJobs: {},       //    Jobs for particular target nodes
-                        jobs: {}            //    Jobs for any nodes this event occurs on
+                        nodeBindings: {},       //    Bindings for particular target nodes
+                        bindings: {}            //    Bindings for any nodes this event occurs on
                     },
 
                     "node-rendering": {       // When a node is about to render
-                        nodeJobs: {},         //    Jobs for particular target nodes
-                        jobs: {}              //    Jobs for any nodes this event occurs on
+                        nodeBindings: {},         //    Bindings for particular target nodes
+                        bindings: {}              //    Bindings for any nodes this event occurs on
                     },
 
                     "node-rendered": {        // When a node has finished rendering
-                        nodeJobs: {},         //    Jobs for particular target nodes
-                        jobs: {}              //    Jobs for any nodes this event occurs on
+                        nodeBindings: {},         //    Bindings for particular target nodes
+                        bindings: {}              //    Bindings for any nodes this event occurs on
                     }
                     //                    ,
                     //
                     //                    "node-state-changed": {   // When a node declares an explicit state change
-                    //                        nodeJobs: {},         //    Jobs for particular target nodes
-                    //                        jobs: {}              //    Jobs for any nodes thia event occurs on
+                    //                        nodeBindings: {},         //    Bindings for particular target nodes
+                    //                        bindings: {}              //    Bindings for any nodes thia event occurs on
                     //                    }
                 };
 
@@ -89,26 +89,26 @@
                         SceneJS._eventModule.INIT,
                         function() {
                             commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
-                            runJobs("init");
+                            runBindings("init");
                         });
 
                 SceneJS._eventModule.addListener(
                         SceneJS._eventModule.RESET,
                         function() {
-                            runJobs("reset");
+                            runBindings("reset");
                         });
 
                 SceneJS._eventModule.addListener(
                         SceneJS._eventModule.ERROR,
                         function(params) {
-                            runJobs("error");
+                            runBindings("error");
                         });
 
                 SceneJS._eventModule.addListener(
                         SceneJS._eventModule.SCENE_RENDERING,
                         function(params) {
-                            runIntervalJobs();
-                            runJobs("scene-rendering", {
+                            runIntervalBindings();
+                            runBindings("scene-rendering", {
                                 nodeId: params.nodeId,
                                 canvas: params.canvas
                             });
@@ -117,7 +117,7 @@
                 SceneJS._eventModule.addListener(
                         SceneJS._eventModule.SCENE_RENDERED,
                         function(params) {
-                            runJobs("scene-rendered", {
+                            runBindings("scene-rendered", {
                                 nodeId: params.nodeId
                             });
                         });
@@ -125,7 +125,7 @@
                 SceneJS._eventModule.addListener(
                         SceneJS._eventModule.NODE_CREATED,
                         function(params) {
-                            runJobs("node-created", {
+                            runBindings("node-created", {
                                 nodeId: params.nodeId
                             });
                         });
@@ -133,7 +133,7 @@
                 SceneJS._eventModule.addListener(
                         SceneJS._eventModule.NODE_UPDATED,
                         function(params) {
-                            runJobs("node-updated", {
+                            runBindings("node-updated", {
                                 nodeId: params.nodeId
                             });
                         });
@@ -141,37 +141,37 @@
                 SceneJS._eventModule.addListener(
                         SceneJS._eventModule.NODE_DESTROYED,
                         function(params) {
-                            runJobs("node-destroyed", {
+                            runBindings("node-destroyed", {
                                 nodeId: params.nodeId
                             });
                         });
 
 
-                /** Run jobs that execute at timed intervals
+                /** Run bindings that execute at timed intervals
                  */
-                function runIntervalJobs() {
+                function runIntervalBindings() {
                     //                    var trigger = triggers["interval"];
-                    //                    var job;
+                    //                    var binding;
                     //                    var interval;
                     //                    var elapsed;
                     //                    for (var id in trigger) {
                     //                        if (trigger.hasOwnProperty(id)) {
-                    //                            job = trigger[id];
-                    //                            interval = job.triggers.interval;
-                    //                            if (job.interval._startAt == 0) {
-                    //                                commandService.executeCommand(job.message);
+                    //                            binding = trigger[id];
+                    //                            interval = binding.triggers.interval;
+                    //                            if (binding.interval._startAt == 0) {
+                    //                                commandService.executeCommand(binding.message);
                     //                                if (interval.once) {
-                    //                                    this.unbind(job);
+                    //                                    this.unbind(binding);
                     //                                }
                     //                            } else {
-                    //                                if (!interval._started) {              // Starting this job now
+                    //                                if (!interval._started) {              // Starting this binding now
                     //                                    interval._started = time;
                     //                                } else {
                     //                                    elapsed = interval._started - time;
                     //                                    if (elapsed > interval._startAt) {              // At execution interval
-                    //                                        commandService.executeCommand(job.message); // execute job
+                    //                                        commandService.executeCommand(binding.message); // execute binding
                     //                                        if (interval.once) {
-                    //                                            this.unbind(job);                   // one-shot - unschedule for this trigger
+                    //                                            this.unbind(binding);                   // one-shot - unschedule for this trigger
                     //                                        } else {
                     //                                            interval._started = time;               // repeating, ready to go again
                     //                                        }
@@ -185,37 +185,37 @@
 
                 /*
                  */
-                function runJobs(triggerName, params) {
+                function runBindings(triggerName, params) {
                     if (params && params.nodeId) {
-                        var nodeJobs = triggers[triggerName].nodeJobs;
-                        var job = nodeJobs[params.nodeId];
-                        if (job) {
-                            if (!job.message.trigger) {
-                                job.message.trigger = {
+                        var nodeBindings = triggers[triggerName].nodeBindings;
+                        var binding = nodeBindings[params.nodeId];
+                        if (binding) {
+                            if (!binding.message.trigger) {
+                                binding.message.trigger = {
                                     trigger: triggerName,
                                     nodeId: params.nodeId
                                 };
                             }
-                            commandService.executeCommand(job.message);
-                            //                            if (job.trigger.once) {
-                            //                                nodeJobs[params.nodeId] = undefined;
-                            //                                jobs[job.jobId] = undefined;
+                            commandService.executeCommand(binding.message);
+                            //                            if (binding.trigger.once) {
+                            //                                nodeBindings[params.nodeId] = undefined;
+                            //                                bindings[binding.bindId] = undefined;
                             //                            }
                             return;
                         }
                     }
-                    var jobs = triggers[triggerName].jobs;
-                    for (var jobId in jobs) {
-                        if (jobs.hasOwnProperty(jobId)) {
-                            var job = jobs[jobId];
-                            if (!job.message.trigger) {
-                                job.message.trigger = {
+                    var bindings = triggers[triggerName].bindings;
+                    for (var bindId in bindings) {
+                        if (bindings.hasOwnProperty(bindId)) {
+                            var binding = bindings[bindId];
+                            if (!binding.message.trigger) {
+                                binding.message.trigger = {
                                     trigger: triggerName
                                 };
                             }
-                            commandService.executeCommand(job.message);
-                            //                            if (job.trigger.once) {
-                            //                                jobs[jobId] = undefined;
+                            commandService.executeCommand(binding.message);
+                            //                            if (binding.trigger.once) {
+                            //                                bindings[bindId] = undefined;
                             //                            }
                         }
                     }
@@ -223,23 +223,23 @@
 
                 return {
 
-                    bind: function(job) {
-                        if (!job.jobId) {
-                            throw "job element missing: jobId";
+                    bind: function(binding) {
+                        if (!binding.bindId) {
+                            throw "binding element missing: bindId";
                         }
-                        if (!job.triggers) {
-                            throw "job '" + job.jobId + "' element missing: triggers";
+                        if (!binding.triggers) {
+                            throw "binding '" + binding.bindId + "' element missing: triggers";
                         }
-                        if (!job.message) {
-                            throw "job '" + job.jobId + "' element missing: message";
+                        if (!binding.message) {
+                            throw "binding '" + binding.bindId + "' element missing: message";
                         }
                         var trigger;
-                        for (var triggerName in job.triggers) {
-                            if (job.triggers.hasOwnProperty(triggerName)) {
+                        for (var triggerName in binding.triggers) {
+                            if (binding.triggers.hasOwnProperty(triggerName)) {
                                 if (!triggers[triggerName]) {
-                                    throw "job '" + job.jobId + "' trigger not supported: '" + triggerName + "'";
+                                    throw "binding '" + binding.bindId + "' trigger not supported: '" + triggerName + "'";
                                 }
-                                trigger = job.triggers[triggerName];
+                                trigger = binding.triggers[triggerName];
                                 switch (triggerName) {
                                     case "interval":
                                         var startAt = 0;
@@ -253,14 +253,14 @@
                                             startAt += trigger.interval.minutes * 1000;
                                         }
                                         trigger.interval._startAt = startAt;
-                                        triggers[triggerName] = job;
+                                        triggers[triggerName] = binding;
                                         break;
 
                                     case "interval":
                                     case "init":
                                     case "error":
                                     case "reset":
-                                        addJob(triggerName, job);
+                                        addBinding(triggerName, binding);
                                         break;
 
                                     case "scene-rendering":
@@ -270,47 +270,42 @@
                                     case "node-updated":
                                     case "node-rendering":
                                     case "node-rendered":
-                                        addJobForTarget(triggerName, job);
+                                        addBindingForTarget(triggerName, binding);
                                         break;
                                 }
                             }
                         }
                     },
 
-                    unbind: function(job) {
-                        for (var trigger in job.triggers) {
-                            if (job.triggers.hasOwnProperty(trigger)) {
-                                triggers[triggers][job.id] = undefined;
+                    unbind: function(binding) {
+                        for (var trigger in binding.triggers) {
+                            if (binding.triggers.hasOwnProperty(trigger)) {
+                                triggers[triggers][binding.id] = undefined;
                             }
                         }
                     }
                 };
 
-                function addJob(triggerName, job) {
-                    var trigger = job.triggers[triggerName];
-                    triggers[triggerName].jobs[job.jobId] = job;
+                function addBinding(triggerName, binding) {
+                    var trigger = binding.triggers[triggerName];
+                    triggers[triggerName].bindings[binding.bindId] = binding;
                 }
 
-                function addJobForTarget(triggerName, job) {
-                    var trigger = job.triggers[triggerName];
+                function addBindingForTarget(triggerName, binding) {
+                    var trigger = binding.triggers[triggerName];
                     var nodeId = trigger.nodeId;
                     if (nodeId) {
-                        triggers[triggerName].nodeJobs[nodeId] = job;
+                        triggers[triggerName].nodeBindings[nodeId] = binding;
                     }
-                    triggers[triggerName].jobs[job.jobId] = job;
+                    triggers[triggerName].bindings[binding.bindId] = binding;
                 }
-            }
-
-                    )
-                    ()
-            )
-            ;
+            })());
 
     commandService.addCommand("bind",
             (function() {
                 return {
                     execute: function(params) {
-                        scheduleService.bind(params);
+                        bindService.bind(params);
                     }
                 };
             })());
@@ -319,7 +314,7 @@
             (function() {
                 return {
                     execute: function(params) {
-                        scheduleService.unbind(params);
+                        bindService.unbind(params);
                     }
                 };
             })());

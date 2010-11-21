@@ -22,7 +22,7 @@ SceneJS.Services = new (function() {
     this.getService = function(name) {
         return this._services[name];
     };
-   
+
     /*----------------------------------------------------
      * Install stub services
      *---------------------------------------------------*/

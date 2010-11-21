@@ -1,7 +1,7 @@
 SceneJS._boundaryModule = new (function() {
 
     var viewMat;
-    var boundaryStack = new Array(400);
+    var boundaryStack = new Array(1000);
     var stackLen = 0;
     var dirty;
     var boundaries = new Array(1000);
@@ -44,15 +44,15 @@ SceneJS._boundaryModule = new (function() {
                 }
             });
 
-    this.pushBoundary = function(modelBox, viewBox, nodeId, observed) {
+    this.pushBoundary = function(modelBox, viewBox, nodeId, isectState, observed) {
         var boundary = {
             modelBox: modelBox,
             viewBox: viewBox,
-            nodeId: nodeId
+            nodeId: nodeId ,
+            isectState : isectState
         };
         boundaryStack[stackLen++] = boundary;
         dirty = true;
-
         if (observed) {
             observedBoundaries[numObservedBoundaries++] = boundary;
         } else {
