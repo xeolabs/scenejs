@@ -35,14 +35,14 @@ SceneJS.Stationary.prototype._render = function(traversalContext) {
     var lookAt = superXform.lookAt;
     if (lookAt) {
         if (this._memoLevel == 0 || (!superXform.fixed)) {
-
-            this._xform = {
-                matrix: SceneJS._math_mulMat4(
-                        superXform.matrix,
+            var tempMat = SceneJS._math_mat4();
+            SceneJS._math_mulMat4(superXform.matrix,
                         SceneJS._math_translationMat4c(
                                 lookAt.eye.x,
                                 lookAt.eye.y,
-                                lookAt.eye.z)),
+                                lookAt.eye.z), tempMat)
+            this._xform = {
+                matrix: tempMat,
                 lookAt: lookAt,
                 fixed: origMemoLevel == 1
             };

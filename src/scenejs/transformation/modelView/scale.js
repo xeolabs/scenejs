@@ -163,7 +163,8 @@ SceneJS.Scale.prototype._render = function(traversalContext) {
     if (origMemoLevel < 2 || (!superXform.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
 
-        var tempMat = SceneJS._math_mulMat4(superXform.matrix, this._mat);
+        var tempMat = SceneJS._math_mat4(); 
+        SceneJS._math_mulMat4(superXform.matrix, this._mat, tempMat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,

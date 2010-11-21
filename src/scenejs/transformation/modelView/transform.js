@@ -286,7 +286,7 @@ SceneJS.Transform.prototype._render = function(traversalContext) {
             var mat2 = SceneJS._math_rotationMat4v(buildingViewXForm ? -this._rotate.y : this._rotate.y * Math.PI / 180.0, [0, 1, 0]);
             var mat3 = SceneJS._math_rotationMat4v(buildingViewXForm ? -this._rotate.z : this._rotate.z * Math.PI / 180.0, [0, 0, 1]);
 
-            this._mat = SceneJS._math_mulMat4(mat3, SceneJS._math_mulMat4(mat2, SceneJS._math_mulMat4(mat1, this._mat)));
+            SceneJS._math_mulMat4(mat3, SceneJS._math_mulMat4(mat2, SceneJS._math_mulMat4(mat1, this._mat)), this._mat);
         } else {
             this._mat = SceneJS._math_identityMat4();
         }
@@ -300,9 +300,9 @@ SceneJS.Transform.prototype._render = function(traversalContext) {
                 /* When building a view transform, apply the negated translation vector
                  * to correctly transform the SceneJS.Camera
                  */
-                this._mat = SceneJS._math_mulMat4(this._mat, SceneJS._math_translationMat4v([-this._translate.x, -this._translate.y, -this._translate.z]));
+                SceneJS._math_mulMat4(this._mat, SceneJS._math_translationMat4v([-this._translate.x, -this._translate.y, -this._translate.z]));
             } else {
-                this._mat = SceneJS._math_mulMat4(this._mat, SceneJS._math_translationMat4v([ this._translate.x,  this._translate.y,  this._translate.z]));
+                SceneJS._math_mulMat4(this._mat, SceneJS._math_translationMat4v([ this._translate.x,  this._translate.y,  this._translate.z]));
             }
         }
 
@@ -312,7 +312,8 @@ SceneJS.Transform.prototype._render = function(traversalContext) {
     if (origMemoLevel < 2 || (!superXForm.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
 
-        var tempMat = SceneJS._math_mulMat4(superXForm.matrix, this._mat);
+        var tempMat = SceneJS._math_mat4(); 
+        SceneJS._math_mulMat4(superXForm.matrix, this._mat, tempMat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,

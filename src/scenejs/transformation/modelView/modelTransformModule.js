@@ -50,7 +50,7 @@ SceneJS._modelTransformModule = new (function() {
                     if (!transform.normalMatrixAsArray) {
                         transform.normalMatrixAsArray = new Float32Array(
                                 SceneJS._math_transposeMat4(
-                                        SceneJS._math_inverseMat4(transform.matrix)));
+                                        SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
                     }
                     SceneJS._eventModule.fireEvent(
                             SceneJS._eventModule.MODEL_TRANSFORM_EXPORTED,

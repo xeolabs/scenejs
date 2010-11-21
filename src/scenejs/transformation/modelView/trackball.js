@@ -88,12 +88,13 @@ SceneJS.Trackball.prototype._transformOnSphere = function(m, x, y) {
 
 /** @private */
 SceneJS.Trackball.prototype._translate = function(offset, f) {
-    var invMat = SceneJS._math_inverseMat4(this._mat);
+    var invMat = SceneJS._math_mat4(); 
+    SceneJS._math_inverseMat4(this._mat, invMat);
     var t = [offset[0], offset[1], offset[2], 0.0];  // vec3 to 4
     t = SceneJS._math_mulMat4v4(invMat, t);
     t = SceneJS._math_mulVec4Scalar(t, f);
     var trMat = SceneJS._math_translationMat4v(t);
-    this._mat = SceneJS._math_mulMat4(this._mat, trMat);
+    SceneJS._math_mulMat4(this._mat, trMat);
 };
 
 /** @private */
@@ -104,9 +105,11 @@ SceneJS.Trackball.prototype.rotate = function(m) {
     var v0 = this._transformOnSphere(mInv, this._pts[0][0], this._pts[0][1]);
     var v1 = this._transformOnSphere(mInv, this._pts[1][0], this._pts[1][1]);
 
-    var axis = SceneJS._math_cross3Vec3(v0, v1);
-    var angle = SceneJS._math_lenVec3(axis);
-    var rotMat = SceneJS._math_rotationMat4v(angle, axis);
+    // v0 = axis
+    SceneJS._math_cross3Vec3(v0, v1);
+    
+    var angle = SceneJS._math_lenVec3(v0);
+    var rotMat = SceneJS._math_rotationMat4v(angle, v0);
 
     this._mat = SceneJS._math_mulMat4(rotMat, this._mat);
 };
