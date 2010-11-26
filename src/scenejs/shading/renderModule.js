@@ -43,6 +43,7 @@ SceneJS._shaderModule = new (function() {
     var projXFormState;
     var pickState;
     var imageBufState;
+    var clipState;
 
     /** Bin set for the currently-active canvas
      */
@@ -163,6 +164,8 @@ SceneJS._shaderModule = new (function() {
                     opaqueNodes : [],
                     transpNodes : []
                 };
+
+                clipState = null;
 
                 stateHash = null;
             });
@@ -323,6 +326,32 @@ SceneJS._shaderModule = new (function() {
                 stateHash = null;
             });
 
+    /* When clip state exported, add it to the state soup and make
+     * hash code for its GLSL fragment
+     */
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.CLIP_EXPORTED,
+            function(clips) {
+
+                /* Make hash
+                 */
+                var hash = [];
+                for (var i = 0; i < clips.length; i++) {
+                    var clip = clips[i];
+                    hash.push(clip.mode);
+                }
+
+                /* Add to state soup
+                 */
+                clipState = {
+                    _stateId : nextStateId++,
+                    clips: clips,
+                    hash: hash.join("")
+                };
+
+                stateHash = null;
+            });
+
     /* When model matrix exported, add it to the state soup.
      * We don't need a GLSL hash for it since our GLSL always
      * expects a modelling matrix.
@@ -464,7 +493,8 @@ SceneJS._shaderModule = new (function() {
             projXFormState: projXFormState,
             texState: texState,
             pickState : pickState ,
-            imageBufState : imageBufState
+            imageBufState : imageBufState,
+            clipState : clipState
         };
 
         /* Put node into either the transoarent or opaque bin,
@@ -650,6 +680,7 @@ SceneJS._shaderModule = new (function() {
 
                 this._lastGeoStateId = -1;
                 this._lastLightStateId = -1;
+                this._lastClipStateId = -1;
                 this._lastTexStateId = -1;
                 this._lastMaterialStateId = -1;
                 this._lastViewXFormStateId = -1;
@@ -810,6 +841,25 @@ SceneJS._shaderModule = new (function() {
                 this._lastLightStateId = node.lightState._stateId;
             }
 
+            /* Bind clip planes
+             */
+            if (node.clipState && node.clipState._stateId != this._lastClipStateId) {
+                var clip;
+                for (var k = 0; k < node.clipState.clips.length; k++) {
+                    clip = node.clipState.clips[k];
+                    this._program.setUniform("uClipNormal" + k, clip.normal);
+                    this._program.setUniform("uClipDist" + k, clip.dist);
+                    if (clip.mode == "inside") {
+                        this._program.setUniform("uClipMode" + k, 0);
+                    } else if (clip.mode == "outside") {
+                        this._program.setUniform("uClipMode" + k, 1);
+                    } else { // disabled
+                        this._program.setUniform("uClipMode" + k, 2);
+                    }
+                }
+                this._lastClipStateId = node.clipState._stateId;
+            }
+
             /*
              */
             if (node.materialState && node.materialState != this._lastMaterialStateId) {
@@ -891,6 +941,7 @@ SceneJS._shaderModule = new (function() {
                 fogState.hash,
                 lightState.hash,
                 texState.hash,
+                clipState.hash,
                 geoState.hash]).join(";");
         }
     }
@@ -1112,6 +1163,7 @@ SceneJS._shaderModule = new (function() {
     function composeRenderingFragmentShader() {
         var texturing = texState && texState.texture.layers.length > 0 && geoState && geoState.geo.uvBuf || geoState.geo.uvBuf2;
         var lighting = lightState && lightState.lights.length > 0 && geoState && geoState.geo.normalBuf;
+        var clipping = clipState && clipState.clips.length > 0;
 
         var src = ["\n"];
 
@@ -1120,6 +1172,13 @@ SceneJS._shaderModule = new (function() {
         src.push("#endif");
 
         src.push("varying vec4 vViewVertex;");              // View-space vertex
+
+        if (clipping) {
+            for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("uniform vec3  uClipNormal" + i + ";");
+                src.push("uniform float uClipDist" + i + ";");
+            }
+        }
 
         if (texturing) {
             if (geoState.geo.uvBuf) {
@@ -1195,6 +1254,16 @@ SceneJS._shaderModule = new (function() {
         //
         //--------------------------------------------------------------------------
 
+
+        if (clipping) {
+            src.push("  float   dist;");
+            for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("    dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i +";");
+                src.push("    if (dist < 0.0) { discard; }");
+            }
+        }
+
+
         if (lighting) {
 
 
@@ -1212,7 +1281,7 @@ SceneJS._shaderModule = new (function() {
             src.push("  float   shine=uMaterialShine;");
             src.push("  float   attenuation = 1.0;");
 
-            src.push("  vec3    normalVec=vNormal;");            
+            src.push("  vec3    normalVec=vNormal;");
         }
 
         if (texturing) {
@@ -1274,9 +1343,9 @@ SceneJS._shaderModule = new (function() {
                 if (layer.applyTo == "normals") {
                     src.push("vec3 bump = normalize(texture2D(uSampler" + i + ", textureCoord).xyz * 2.0 - 1.0);");
 
-                                      
+
                     //src.push("float dotN = max( dot(lightVec, bump), 0.0 );");
-                       src.push("normalVec *= bump;");
+                    src.push("normalVec *= bump;");
                 }
             }
         }
@@ -1362,6 +1431,7 @@ SceneJS._shaderModule = new (function() {
              */
             src.push("vec4 fragColor = vec4(color.rgb, alpha);");
         }
+
 
         /* Fog
          */

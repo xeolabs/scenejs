@@ -132,6 +132,9 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
 
+        <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
+
         <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
@@ -248,6 +251,9 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
 
+            <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
+
             <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
@@ -272,7 +278,8 @@
 
     <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
 
-    <target name="package" depends="assemble-lib, package-index, package-examples, package-lib-utils, package-lib-plugins">
+    <target name="package"
+            depends="assemble-lib, package-index, package-examples, package-lib-utils, package-lib-plugins">
 
         <!-- Compress JS file list -->
 
@@ -344,7 +351,7 @@
     </target>
 
     <target name="package-lib-utils" depends="docs">
-          <!--<target name="package-lib-utils">-->
+        <!--<target name="package-lib-utils">-->
         <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
             <fileset dir="${basedir}/src/utils"/>
         </copy>
