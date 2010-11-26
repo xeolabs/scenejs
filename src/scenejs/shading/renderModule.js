@@ -165,7 +165,11 @@ SceneJS._shaderModule = new (function() {
                     transpNodes : []
                 };
 
-                clipState = null;
+                clipState = {
+                    _stateId : nextStateId++,
+                    clips: [],
+                    hash: ""
+                };
 
                 stateHash = null;
             });
@@ -1016,11 +1020,15 @@ SceneJS._shaderModule = new (function() {
             "attribute vec3 aVertex;",
             "uniform mat4 uMMatrix;",
             "uniform mat4 uVMatrix;",
-            "uniform mat4 uPMatrix;",
-            "void main(void) {",
-            "  gl_Position = uPMatrix * (uVMatrix * (uMMatrix * vec4(aVertex, 1.0)));",
-            "}"
-        ];
+            "uniform mat4 uPMatrix;"];
+
+        src.push("varying vec4 vViewVertex;");
+        src.push("void main(void) {");
+        src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+        src.push("  vViewVertex = tmpVertex;");
+        src.push("  gl_Position = uPMatrix * vViewVertex;");
+        src.push("}");
+
         if (debugCfg.logScripts == true) {
             SceneJS._loggingModule.info(src);
         }
@@ -1032,18 +1040,37 @@ SceneJS._shaderModule = new (function() {
      * @private
      */
     function composePickingFragmentShader() {
-        //        var g = parseFloat(Math.round((10 + 1) / 256) / 256);  // TODO: use exported pick color
-        //        var r = parseFloat((10 - g * 256 + 1) / 256);
+        var clipping = clipState && clipState.clips.length > 0;
+
         var src = [
             "#ifdef GL_ES",
             "   precision highp float;",
-            "#endif",
+            "#endif"];
 
-            "uniform vec3 uPickColor;",
-            "void main(void) {",,
-            "    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ",
-            "}"
-        ];
+        src.push("uniform vec3 uPickColor;");
+
+        if (clipping) {
+            src.push("varying vec4 vViewVertex;");              // View-space vertex
+            for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("uniform vec3  uClipNormal" + i + ";");
+                src.push("uniform float uClipDist" + i + ";");
+            }
+        }
+
+        src.push("void main(void) {");
+
+        if (clipping) {
+            src.push("  float   dist;");
+            for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("    dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i + ";");
+                src.push("    if (dist < 0.0) { discard; }");
+            }
+        }
+
+        src.push("    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ");
+
+        src.push("}");
+
         if (debugCfg.logScripts == true) {
             SceneJS._loggingModule.info(src);
         }
@@ -1258,7 +1285,7 @@ SceneJS._shaderModule = new (function() {
         if (clipping) {
             src.push("  float   dist;");
             for (var i = 0; i < clipState.clips.length; i++) {
-                src.push("    dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i +";");
+                src.push("    dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i + ";");
                 src.push("    if (dist < 0.0) { discard; }");
             }
         }
