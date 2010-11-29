@@ -105,7 +105,7 @@ SceneJS.Text.prototype.setText = function(params) {
     }
     
     return text;
-}
+};
 
 SceneJS.Text.prototype._render = function(traversalContext) {
     if (this._mode == "bitmap") {
