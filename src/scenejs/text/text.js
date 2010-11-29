@@ -9,7 +9,7 @@ SceneJS.Text.prototype._init = function(params) {
     }
     this.font = params.font || "Helvetica",
     this.size = params.size || 10;
-    this.text = params.text || "";
+    this.text = params.text || " ";
     this.color = [1,1,1,1]; 
     
     this._mode = mode;
