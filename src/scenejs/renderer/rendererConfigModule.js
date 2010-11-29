@@ -62,6 +62,7 @@ SceneJS._rendererModule = new (function() {
                     },
                     wireframe: false,
                     highlight: false,
+                    enableClip: undefined,
                     enableBlend: false,
                     blendFunc: {
                         sfactor: "srcAlpha",
@@ -170,7 +171,6 @@ SceneJS._rendererModule = new (function() {
                     if (setter) {
                         setter(context, value);
                     }
-
                 }
             }
         }

@@ -146,7 +146,7 @@ SceneJS.Fog.prototype.getStart = function() {
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.setEnd = function(end) {
-    this._attr.end = end || 1000.0;
+    this._attr.end = end || 0;
 };
 
 /**
