@@ -155,14 +155,14 @@ SceneJS._pickModule = new (function() {
 
                 /* Next pick index color (cheers Paul Brunt for this mapping)
                  */
+                nodeIndex++;
+
                 var b = nodeIndex >> 16 & 0xFF;
                 var g = nodeIndex >> 8 & 0xFF;
                 var r = nodeIndex & 0xFF;
                 color.g = g / 255;
                 color.r = r / 255;
                 color.b = b / 255;
-
-                nodeIndex++;
             }
         }
     };
@@ -214,8 +214,8 @@ SceneJS._pickModule = new (function() {
             SceneJS._loggingModule.info("Reading pick buffer - picked pixel(" + x + ", " + y + ") = {r:" + pix[0] + ", g:" + pix[1] + ", b:" + pix[2] + "}");
         }
         pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
-        if (pickedNodeIndex >= 0) {
-            var node = nodeLookup[pickedNodeIndex];
+        if (pickedNodeIndex >= 1) {
+            var node = nodeLookup[pickedNodeIndex-1];
             if (node) {
                 node._fireEvent("picked", { canvasX: pickX, canvasY: pickY });
             }

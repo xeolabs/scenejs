@@ -5757,7 +5757,6 @@ SceneJS.Teapot = function() {
             [1401,1422,1418]
         ];
 
-        // @private
         var calculateNormals = function(positions, indices) {
             var nvecs = new Array(positions.length);
 
@@ -5770,10 +5769,10 @@ SceneJS.Teapot = function() {
                 var v2 = positions[j1];
                 var v3 = positions[j2];
 
-                SceneJS._math_subVec4(v2, v1);
-                SceneJS._math_subVec4(v3, v1);
+                v2 = SceneJS._math_subVec4(v2, v1, [0,0,0,0]);
+                v3 = SceneJS._math_subVec4(v3, v1, [0,0,0,0]);
 
-                var n = SceneJS._math_normalizeVec4(SceneJS._math_cross3Vec4(v2, v3));
+                var n = SceneJS._math_normalizeVec4(SceneJS._math_cross3Vec4(v2, v3, [0,0,0,0]), [0,0,0,0]);
 
                 if (!nvecs[j0]) nvecs[j0] = [];
                 if (!nvecs[j1]) nvecs[j1] = [];

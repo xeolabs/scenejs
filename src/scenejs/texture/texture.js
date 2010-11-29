@@ -36,7 +36,7 @@
  *                           internalFormat:"lequal",               // (default)
  *                           sourceFormat:"alpha",                  // (default)
  *                           sourceType: "unsignedByte",            // (default)
- *                           applyTo:"baseColor",                   // Options so far are “baseColor” (default) or “diffuseColor”
+ *                           applyTo: "baseColor",                   // Options so far are “baseColor” (default), “diffuseColor” and "normals" for bump mapping
  *                           blendMode: "multiply",                 // Options are "add" or "multiply" (default)
  *
  *                           // Optional transforms
@@ -155,7 +155,8 @@ SceneJS.Texture.prototype._init = function(params) {
             }
             if (layerParam.applyTo) {
                 if (layerParam.applyTo != "baseColor" && // Colour map
-                    layerParam.applyTo != "diffuseColor") {
+                    layerParam.applyTo != "diffuseColor" &&
+                    layerParam.applyTo != "normals") {
                     throw SceneJS._errorModule.fatalError(
                             new SceneJS.errors.InvalidNodeConfigException(
                                     "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
@@ -367,7 +368,7 @@ SceneJS.Texture.prototype._rebuildTextureMatrix = function(layer) {
     if (layer.rebuildMatrix) {
         if (layer.translate || layer.rotate || layer.scale) {
             layer.matrix = SceneJS.Texture.prototype._getMatrix(layer.translate, layer.rotate, layer.scale);
-            layer.matrixAsArray = new Float32Array(layer.matrix)
+            layer.matrixAsArray = new Float32Array(layer.matrix);
             layer.rebuildMatrix = false;
         }
     }

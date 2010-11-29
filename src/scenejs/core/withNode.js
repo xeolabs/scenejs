@@ -85,7 +85,7 @@ SceneJS._WithNode.prototype.eachParent = function(fn) {
     var node = this._targetNode._parent;
     while (node._parent) {
         selector = new SceneJS._WithNode(node._parent);
-        if (fn.call(selector, count++) == true) {
+        if (fn.call(selector, count++) === true) {
             return selector;
         }
         node = node._parent;
@@ -113,7 +113,7 @@ SceneJS._WithNode.prototype.eachNode = function(fn, options) {
     options = options || {};
     var count = 0;
     if (options.andSelf) {
-        if (fn.call(this, count++) == true) {
+        if (fn.call(this, count++) === true) {
             return this;
         }
     }
@@ -157,7 +157,7 @@ SceneJS._WithNode.prototype.eachInstance = function(fn) {
         for (var instanceNodeId in instances) {
             if (instances.hasOwnProperty(instanceNodeId)) {
                 selector = new SceneJS._WithNode(instanceNodeId);
-                if (fn.call(selector, count++) == true) {
+                if (fn.call(selector, count++) === true) {
                     return selector;
                 }
             }
@@ -257,7 +257,7 @@ SceneJS._WithNode.prototype.bind = function(name, handler) {
         throw "bind param 'handler' null or undefined";
     }
     if (typeof handler != "function") {
-        throw "bind param 'fn' should be a function";
+        throw "bind param 'handler' should be a function";
     } else {
         this._targetNode.addListener(name, handler, { scope: this });
     }

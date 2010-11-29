@@ -16,6 +16,8 @@ if (!SceneJS.utils.query) {
  *
  * See the Utility API documentation at: http://scenejs.wikispaces.com/SceneJS.utils
  *
+ * See how we can specify a <b>localPos</b>, which is an optional position within the node's local coordinate system.
+ *
  * <p><b>Example usage</b>: querying the
  *
  *  // Create the query - we want the canvas position,
@@ -28,9 +30,12 @@ if (!SceneJS.utils.query) {
  *
  *  // Execute the query:
  *
- *  query.execute({ nodeId: "my-node" },
+ *  query.execute({
+ *         nodeId: "my-node",
+ *         localPos: { x: 0, y: 0, z: 0 }          // Optional offset with node's local coordinate space
+ *      },
  *
- *      function(_query) {                        // Query successfully completed
+ *      function(_query) {                         // Query successfully completed
  *
  *          var result = _query.getResults();      // Now get results from query
  *
@@ -98,8 +103,15 @@ SceneJS.utils.query.QueryNodePos.prototype.setConfigs = function(cfg) {
     if (!this._cfg) {
         this._cfg = {};
     }
-    this._cfg.canvasWidth = cfg.canvasWidth || this._cfg.canvasWidth;
-    this._cfg.canvasHeight = cfg.canvasHeight || this._cfg.canvasHeight;
+    if (!cfg) {
+        cfg = {};
+    }
+    if (cfg.canvasWidth) {
+        this._cfg.canvasWidth = cfg.canvasWidth;
+    }
+    if (cfg.canvasHeight) {
+        this._cfg.canvasHeight = cfg.canvasHeight;
+    }
     return this;
 };
 
@@ -108,22 +120,31 @@ SceneJS.utils.query.QueryNodePos.prototype.setConfigs = function(cfg) {
  * @function {SceneJS.utils.query.QueryNodePos.execute} execute
  * @param {Object} params Execution parameters
  * @param {String} params.nodeId ID of node from which to obtain origin
+ * @param {{x: Number, y: Number, z: Number}} params.localPos Optional offset within the node's local space
  * @returns {this}
  */
 SceneJS.utils.query.QueryNodePos.prototype.execute = function(params, completed) {
     if (!params.nodeId) {
         throw "SceneJS.utils.query.QueryNodePos.execute expects params.nodeId";
     }
-    if (!this._cfg.canvasWidth) {
-        throw "SceneJS.utils.query.QueryNodePos misconfigured - canvasHeight given, but canvasWidth omitted";
-    }
-    if (!this._cfg.canvasWidth) {
-        throw "SceneJS.utils.query.QueryNodePos misconfigured - canvasWidth given, but canvasHeight omitted";
+    if (this._cfg.canvasWidth || this._cfg.canvasHeight) {
+        if (!this._cfg.canvasWidth) {
+            throw "SceneJS.utils.query.QueryNodePos misconfigured - canvasHeight given, but canvasWidth omitted";
+        } else if (!this._cfg.canvasHeight) {
+            throw "SceneJS.utils.query.QueryNodePos misconfigured - canvasWidth given, but canvasHeight omitted";
+        }
     }
     var node = SceneJS.withNode(params.nodeId);
-    var data = this._walkUpBranch(node, null);
+
+    var localPos = params.localPos || {};
+    localPos.x = localPos.x || 0;
+    localPos.y = localPos.y || 0;
+    localPos.z = localPos.z || 0;
+
+    var data = this._walkUpBranch({ localPos : [localPos.x, localPos.y, localPos.z] }, node, null);
 
     this._queryResult = {
+        localPos: localPos,
         worldPos : {
             x: data.worldPos[0],
             y: data.worldPos[1],
@@ -171,10 +192,11 @@ SceneJS.utils.query.QueryNodePos.prototype.getResults = function() {
  * as soon as the path encounters a "library" node or the scene root
  * @private
  */
-SceneJS.utils.query.QueryNodePos.prototype._walkUpBranch = function(node, data) {
+SceneJS.utils.query.QueryNodePos.prototype._walkUpBranch = function(params, node, data) {
     if (!data) {
         data = {
-            worldPos : [0,0,0]
+            localPos : params.localPos,
+            worldPos : params.localPos
         };
     }
     var mat;
@@ -245,7 +267,7 @@ SceneJS.utils.query.QueryNodePos.prototype._walkUpBranch = function(node, data) 
     }
     var parent = node.parent();
     if (parent) {
-        data = this._walkUpBranch(parent, data);
+        data = this._walkUpBranch(params, parent, data);
     }
     return data;
 };
