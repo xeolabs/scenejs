@@ -148,8 +148,11 @@ SceneJS._shaderModule = new (function() {
                     },
                     hash: ""
                 };
-
-                fogState = null;
+                fogState = {
+                    _stateId : nextStateId++,
+                    fog: null,
+                    hash: ""
+                };
                 texState = {
                     _stateId : nextStateId++,
                     layers: [],
@@ -320,11 +323,11 @@ SceneJS._shaderModule = new (function() {
      */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.FOG_EXPORTED,
-            function(fog) {
+            function(params) {
                 fogState = {
                     _stateId : nextStateId++,
-                    fog: fog,
-                    hash: fog.mode
+                    fog: params.fog,
+                    hash: params.fog ? params.fog.mode : ""
                 };
 
                 stateHash = null;
@@ -692,6 +695,7 @@ SceneJS._shaderModule = new (function() {
                 this._lastProjXFormStateId = -1;
                 this._lastPickStateId = -1;
                 this._lastImageBufStateId = -1;
+                this._lastFogStateId = -1;
 
                 this._lastProgramId = node.program.id;
             }
@@ -777,11 +781,29 @@ SceneJS._shaderModule = new (function() {
 
             /* Bind fog
              */
-            if (node.fogState && node.fogState.fog.mode != "disabled") {
-                this._program.setUniform("uFogColor", node.fogState.fog.color);
-                this._program.setUniform("uFogDensity", flags.transparent ? node.fogState.fog.density : 0.0);
-                this._program.setUniform("uFogStart", flags.transparent ? node.fogState.fog.start : 0.0);
-                this._program.setUniform("uFogEnd", flags.transparent ? node.fogState.fog.end : 10000);
+            if (node.fogState && node.fogState.fog && node.fogState._stateId != this._lastFogStateId) {
+                var fog = node.fogState.fog;
+                if (node.rendererState.props.props.enableFog === false
+                        || fog.mode == "disabled") {
+
+                    // When fog is disabled, don't bother loading any of its parameters
+                    // because they will be ignored by the shader
+
+                    this._program.setUniform("uFogMode", 0.0);
+                } else {
+                    if (fog.mode == "linear") {
+                        this._program.setUniform("uFogMode", 1.0);
+                    } else if (fog.mode == "exp") {
+                        this._program.setUniform("uFogMode", 2.0);
+                    } else {
+                        this._program.setUniform("uFogMode", 3.0); // mode is "exp2"
+                    }
+                    this._program.setUniform("uFogColor", fog.color);
+                    this._program.setUniform("uFogDensity", fog.density);
+                    this._program.setUniform("uFogStart", fog.start);
+                    this._program.setUniform("uFogEnd", fog.end);
+                }
+                this._lastFogStateId = node.fogState._stateId;
             }
 
             /* Bind View matrix
@@ -853,12 +875,15 @@ SceneJS._shaderModule = new (function() {
                     clip = node.clipState.clips[k];
                     this._program.setUniform("uClipNormal" + k, clip.normal);
                     this._program.setUniform("uClipDist" + k, clip.dist);
-                    if (clip.mode == "inside") {
+
+                    if (node.rendererState.props.props.enableClip === false) { // Renderer node disables clipping
                         this._program.setUniform("uClipMode" + k, 0);
+                    } else if (clip.mode == "inside") {
+                        this._program.setUniform("uClipMode" + k, 2);
                     } else if (clip.mode == "outside") {
                         this._program.setUniform("uClipMode" + k, 1);
                     } else { // disabled
-                        this._program.setUniform("uClipMode" + k, 2);
+                        this._program.setUniform("uClipMode" + k, 0);
                     }
                 }
                 this._lastClipStateId = node.clipState._stateId;
@@ -898,7 +923,7 @@ SceneJS._shaderModule = new (function() {
 
             /* Draw the geometry;  When wireframe option is set we'll render
              * triangle primitives as wireframe
-             * TODO: should we also suppress shading in the renderer? This will currently apply phong shading to the lines.                
+             * TODO: should we also suppress shading in the renderer? This will currently apply phong shading to the lines.
              */
             var primitive = node.geoState.geo.primitive;
             if (node.rendererState && node.rendererState.props.props.wireframe) {
@@ -1017,6 +1042,9 @@ SceneJS._shaderModule = new (function() {
      */
     function composePickingVertexShader() {
         var src = [
+            "#ifdef GL_ES",
+            "   precision highp float;",
+            "#endif",
             "attribute vec3 aVertex;",
             "uniform mat4 uMMatrix;",
             "uniform mat4 uVMatrix;",
@@ -1049,9 +1077,13 @@ SceneJS._shaderModule = new (function() {
 
         src.push("uniform vec3 uPickColor;");
 
+        /* User-defined clipping vars
+         */
+
         if (clipping) {
             src.push("varying vec4 vViewVertex;");              // View-space vertex
             for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("uniform float uClipMode" + i + ";");
                 src.push("uniform vec3  uClipNormal" + i + ";");
                 src.push("uniform float uClipDist" + i + ";");
             }
@@ -1059,11 +1091,21 @@ SceneJS._shaderModule = new (function() {
 
         src.push("void main(void) {");
 
+        /* User-defined clipping logic
+         */
+
         if (clipping) {
             src.push("  float   dist;");
             for (var i = 0; i < clipState.clips.length; i++) {
-                src.push("    dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i + ";");
-                src.push("    if (dist < 0.0) { discard; }");
+                src.push("    if (uClipMode" + i + " != 0.0) {");
+                src.push("        dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i + ";");
+                src.push("        if (uClipMode" + i + " == 1.0) {");
+                src.push("            if (dist < 0.0) { discard; }");
+                src.push("        }");
+                src.push("        if (uClipMode" + i + " == 2.0) {");
+                src.push("            if (dist > 0.0) { discard; }");
+                src.push("        }");
+                src.push("    }");
             }
         }
 
@@ -1086,7 +1128,11 @@ SceneJS._shaderModule = new (function() {
         var texturing = texState.texture.layers.length > 0 && (geoState.geo.uvBuf || geoState.geo.uvBuf2);
         var lighting = (lightState.lights.length > 0 && geoState.geo.normalBuf);
 
-        var src = ["\n"];
+        var src = [
+            "#ifdef GL_ES",
+            "   precision highp float;",
+            "#endif"
+        ];
         src.push("attribute vec3 aVertex;");                // World coordinates
 
         if (lighting) {
@@ -1190,6 +1236,7 @@ SceneJS._shaderModule = new (function() {
     function composeRenderingFragmentShader() {
         var texturing = texState && texState.texture.layers.length > 0 && geoState && geoState.geo.uvBuf || geoState.geo.uvBuf2;
         var lighting = lightState && lightState.lights.length > 0 && geoState && geoState.geo.normalBuf;
+        var fogging = fogState.fog && true;
         var clipping = clipState && clipState.clips.length > 0;
 
         var src = ["\n"];
@@ -1200,8 +1247,11 @@ SceneJS._shaderModule = new (function() {
 
         src.push("varying vec4 vViewVertex;");              // View-space vertex
 
+        /* User-defined clipping vars
+         */
         if (clipping) {
             for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("uniform float uClipMode" + i + ";");
                 src.push("uniform vec3  uClipNormal" + i + ";");
                 src.push("uniform float uClipDist" + i + ";");
             }
@@ -1262,7 +1312,8 @@ SceneJS._shaderModule = new (function() {
 
         /* Fog uniforms
          */
-        if (fogState.fog.mode != "disabled") {
+        if (fogging) {
+            src.push("uniform float uFogMode;");
             src.push("uniform vec3  uFogColor;");
             src.push("uniform float uFogDensity;");
             src.push("uniform float uFogStart;");
@@ -1277,19 +1328,23 @@ SceneJS._shaderModule = new (function() {
         src.push("  vec3    color   = uMaterialBaseColor;");
         src.push("  float   alpha   = uMaterialAlpha;");
 
-        //--------------------------------------------------------------------------
-        //
-        //--------------------------------------------------------------------------
-
+        /* User-defined clipping logic
+         */
 
         if (clipping) {
             src.push("  float   dist;");
             for (var i = 0; i < clipState.clips.length; i++) {
-                src.push("    dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i + ";");
-                src.push("    if (dist < 0.0) { discard; }");
+                src.push("    if (uClipMode" + i + " != 0.0) {");
+                src.push("        dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i + ";");
+                src.push("        if (uClipMode" + i + " == 1.0) {");
+                src.push("            if (dist < 0.0) { discard; }");
+                src.push("        }");
+                src.push("        if (uClipMode" + i + " == 2.0) {");
+                src.push("            if (dist > 0.0) { discard; }");
+                src.push("        }");
+                src.push("    }");
             }
         }
-
 
         if (lighting) {
 
@@ -1459,23 +1514,33 @@ SceneJS._shaderModule = new (function() {
             src.push("vec4 fragColor = vec4(color.rgb, alpha);");
         }
 
-
         /* Fog
          */
-        if (fogState.fog.mode != "disabled") {
-            src.push("float fogFact=1.0;");
-            if (fogState.fog.mode == "exp") {
-                src.push("fogFact=clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);");
-            } else if (fogState.fog.mode == "linear") {
-                src.push("fogFact=clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);");
-            }
-            src.push("gl_FragColor = fragColor * fogFact + vec4(uFogColor, 1) * (1.0 - fogFact);");
+        if (fogging) {
+            src.push("    if (uFogMode != 0.0) {");          // not "disabled"
+            src.push("        float fogFact=1.0;");
+            src.push("        if (uFogEnd != uFogStart) {"); // fog is a fixed amount when start == end 
+            src.push("            if (uFogMode == 1.0) {");  // "linear"
+            src.push("                fogFact=clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);");
+            src.push("            } else {");                // "exp" or "exp2"
+            src.push("                fogFact=clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);");
+            src.push("            }");
+            src.push("        } else { fogFact = 0.3; }");
+            src.push("        gl_FragColor = fragColor * fogFact + vec4(uFogColor, 1) * (1.0 - fogFact);");
+            src.push("    } else {");
+
+            // Fog disabled, either by "disabled" mode on fog node, or by enableFog == false on renderer node
+
+            src.push("        gl_FragColor = fragColor;");
+            src.push("    }");
         } else {
-            src.push("gl_FragColor = fragColor;");
+            src.push("    gl_FragColor = fragColor;");
         }
+
         if (debugCfg.whitewash == true) {
-            src.push("gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+            src.push("    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         }
+
         src.push("}");
         if (debugCfg.logScripts == true) {
             SceneJS._loggingModule.info(src);
@@ -1483,4 +1548,7 @@ SceneJS._shaderModule = new (function() {
         return src.join("\n");
     }
 
-})();
+}
+
+        )
+        ();

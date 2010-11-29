@@ -38,7 +38,7 @@ SceneJS._fogModule = new (function() {
                 color: colourToArray(f.color, [ 0.5,  0.5, 0.5 ]),
                 density: f.density || 1.0,
                 start: f.start || 0,
-                end: f.end || 1.0
+                end: f.end || 0
             };
         }
     }
@@ -46,9 +46,7 @@ SceneJS._fogModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
-                fogStack = [
-                    _createFog()
-                ];
+                fogStack = [];
                 dirty = true;
             });
 
@@ -63,8 +61,9 @@ SceneJS._fogModule = new (function() {
             function() {
                 if (dirty) {
                     SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.FOG_EXPORTED,
-                            fogStack[fogStack.length - 1]);
+                            SceneJS._eventModule.FOG_EXPORTED, {
+                        fog: fogStack.length > 0 ? fogStack[fogStack.length - 1] : null
+                    });
                     dirty = false;
                 }
             });
@@ -82,6 +81,7 @@ SceneJS._fogModule = new (function() {
 
     this.popFog = function() {
         fogStack.pop();
+        dirty = true;
     };
 
 })();

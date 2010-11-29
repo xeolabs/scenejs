@@ -296,6 +296,24 @@ SceneJS.Renderer.prototype.getHighlight = function() {
     return this._attr.highlight;
 };
 
+SceneJS.Renderer.prototype.setEnableClip = function(enableClip) {
+    this._attr.enableClip = enableClip;
+    this._memoLevel = 0;
+};
+
+SceneJS.Renderer.prototype.getEnableClip = function() {
+    return this._attr.enableClip;
+};
+
+SceneJS.Renderer.prototype.setEnableFog = function(enableFog) {
+    this._attr.enableFog = enableFog;
+    this._memoLevel = 0;
+};
+
+SceneJS.Renderer.prototype.getEnableFog = function() {
+    return this._attr.enableFog;
+};
+
 // @private
 SceneJS.Renderer.prototype._render = function(traversalContext) {
     if (this._memoLevel == 0) {
