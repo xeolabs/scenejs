@@ -3,40 +3,21 @@ SceneJS.Text = SceneJS.createNodeType("text");
 // @private
 SceneJS.Text.prototype._init = function(params) {
     var mode = params.mode || "bitmap";
+    
+    // Save defaults to be reused during runtime if setText is called
+    this.font = params.font || "Helvetica";
+    this.size = params.size || 10;
+    this.text = params.text || " ";
+    this.color = params.color || [1,1,1,1];
+    
     if (mode != "vector" && mode != "bitmap") {
         throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
                 "SceneJS.Text unsupported mode - should be 'vector' or 'bitmap'"));
     }
     this._mode = mode;
     if (this._mode == "bitmap") {
-        var text = SceneJS._bitmapTextModule.createText("Helvetica", params.size || 1, params.text || "");
-        this._layer = {
-            creationParams: {
-                image: text.image,
-                minFilter: "linear",
-                magFilter: "linear",
-                isDepth: false,
-                depthMode:"luminance",
-                depthCompareMode: "compareRToTexture",
-                depthCompareFunc: "lequal",
-                flipY: false,
-                width: 1,
-                height: 1,
-                internalFormat:"lequal",
-                sourceFormat:"alpha",
-                sourceType: "unsignedByte",
-                applyTo:"baseColor",
-                blendMode:"add"
-            },
-            texture: null,
-            applyFrom: "uv",
-            applyTo: "baseColor",
-            blendMode: "add",
-            scale : null,
-            translate : null,
-            rotate : null,
-            rebuildMatrix : true
-        };
+        var text = this.setText(params);
+        
         var w = text.width / 16;
         var h = text.height / 16;
 
@@ -89,6 +70,42 @@ SceneJS.Text.prototype._init = function(params) {
         });
     }
 };
+
+SceneJS.Text.prototype.setText = function(params) {
+    var text;
+    if (this._mode == "bitmap") {
+        text = SceneJS._bitmapTextModule.createText(params.font || this.font, params.size || this.size, params.color || this.color, params.text || this.text);
+        this._layer = {
+            creationParams: {
+                image: text.image,
+                minFilter: "linear",
+                magFilter: "linear",
+                isDepth: false,
+                depthMode:"luminance",
+                depthCompareMode: "compareRToTexture",
+                depthCompareFunc: "lequal",
+                flipY: false,
+                width: 1,
+                height: 1,
+                internalFormat:"lequal",
+                sourceFormat:"alpha",
+                sourceType: "unsignedByte",
+                applyTo:"baseColor",
+                blendMode:"add"
+            },
+            texture: null,
+            applyFrom: "uv",
+            applyTo: "baseColor",
+            blendMode: "add",
+            scale : null,
+            translate : null,
+            rotate : null,
+            rebuildMatrix : true
+        };
+    }
+    
+    return text;
+}
 
 SceneJS.Text.prototype._render = function(traversalContext) {
     if (this._mode == "bitmap") {
