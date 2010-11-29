@@ -9,7 +9,7 @@ SceneJS.Text.prototype._init = function(params) {
     }
     this._mode = mode;
     if (this._mode == "bitmap") {
-        var text = SceneJS._bitmapTextModule.createText("Helvetica", params.size || 1, params.text || "");
+        var text = SceneJS._bitmapTextModule.createText(params.font || "Helvetica", params.size || 1, params.text || "", params.color || [1.0,1.0,1.0,1.0]);
         this._layer = {
             creationParams: {
                 image: text.image,
@@ -54,13 +54,14 @@ SceneJS.Text.prototype._init = function(params) {
         }
 
         this.addNode({
-            type: "material",
-            emit: 0,
-            baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
-            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-            specular:       0.9,
-            shine:          100.0,
-            nodes: [
+             type: "material",
+             emit: 1,
+             baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
+             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+             specular:       0.9,
+             shine:          100.0,
+             
+             nodes: [
                 {
                     type: "geometry",
                     primitive: "triangles",
