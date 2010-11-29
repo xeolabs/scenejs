@@ -7,9 +7,38 @@ SceneJS.Text.prototype._init = function(params) {
         throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
                 "SceneJS.Text unsupported mode - should be 'vector' or 'bitmap'"));
     }
+    this.font = params.font || "Helvetica",
+    this.size = params.size || 10;
+    this.text = params.text || "";
+    this.color = [1,1,1,1]; 
+    
     this._mode = mode;
+    
     if (this._mode == "bitmap") {
-        var text = SceneJS._bitmapTextModule.createText(params.font || "Helvetica", params.size || 1, params.text || "", params.color || [1.0,1.0,1.0,1.0]);
+        this.setText(params);
+    } else {
+        this.addNode({
+            type: "geometry",
+            create: function() {
+                var geo = SceneJS._vectorTextModule.getGeometry(3, 0, 0, params.text); // Unit size
+                return {
+                    resource: this._id, // Assuming text geometry varies a lot - don't try to share VBOs
+                    primitive : "lines",
+                    positions : geo.positions,
+                    normals: [],
+                    uv : [],
+                    indices : geo.indices,
+                    colors:[]
+                };
+            }
+        });
+    }
+};
+
+SceneJS.Text.prototype.setText = function(params) {
+    if (this._mode == "bitmap") {
+        // Default to initial values if parameters are not included
+        var text = SceneJS._bitmapTextModule.createText(params.font || this.font, params.size || this.size, params.text || this.text, params.color || this.color);
         this._layer = {
             creationParams: {
                 image: text.image,
@@ -52,9 +81,18 @@ SceneJS.Text.prototype._init = function(params) {
             uv = uv.concat([0, 0, 1, 0, 1, 1, 0, 1]);
             indices = indices.concat([4,5,6, 4,6,7]);
         }
-
+        var matSid = "text-material";
+        var geoSid = "text-geometry";
+        
+        // Remove any of the previous text nodes
+        var matIndex = this.findNodeIndex(matSid);
+        if (matIndex >= 0)
+            this.removeNodeAt(matIndex);
+            
+           
         this.addNode({
              type: "material",
+             sid: matSid,
              emit: 1,
              baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
              specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
@@ -64,6 +102,7 @@ SceneJS.Text.prototype._init = function(params) {
              nodes: [
                 {
                     type: "geometry",
+                    sid: geoSid,
                     primitive: "triangles",
                     positions : positions,
                     normals : normals,
@@ -72,24 +111,8 @@ SceneJS.Text.prototype._init = function(params) {
                 }
             ]
         });
-    } else {
-        this.addNode({
-            type: "geometry",
-            create: function() {
-                var geo = SceneJS._vectorTextModule.getGeometry(3, 0, 0, params.text); // Unit size
-                return {
-                    resource: this._id, // Assuming text geometry varies a lot - don't try to share VBOs
-                    primitive : "lines",
-                    positions : geo.positions,
-                    normals: [],
-                    uv : [],
-                    indices : geo.indices,
-                    colors:[]
-                };
-            }
-        });
     }
-};
+}
 
 SceneJS.Text.prototype._render = function(traversalContext) {
     if (this._mode == "bitmap") {
