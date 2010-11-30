@@ -4,6 +4,8 @@ SceneJS.Text = SceneJS.createNodeType("text");
 SceneJS.Text.prototype._init = function(params) {
     var mode = params.mode || "bitmap";
     
+    this._dirtyText = false;
+    
     // Save defaults to be reused during runtime if setText is called
     this.font = params.font || "Helvetica";
     this.size = params.size || 10;
@@ -16,42 +18,18 @@ SceneJS.Text.prototype._init = function(params) {
     }
     this._mode = mode;
     if (this._mode == "bitmap") {
-        var text = this.setText(params);
-        
-        var w = text.width / 16;
-        var h = text.height / 16;
-
-        var positions = [ w, h, 0.01, 0, h, 0.1, 0,0, 0.1, w,0, 0.01 ];
-        var normals = [ 0, 0, -1,  0, 0, -1,  0, 0, -1,  0, 0, -1 ];
-        var uv = [1, 1,  0, 1,  0, 0, 1, 0];
-        var indices = [0, 1, 2,  0, 2, 3];
-
-        if (params.doubleSided) {
-            var z = 0.01;
-            positions = positions.concat([w,0,-z, 0,0,-z, 0, h,-z, w, h,-z]);
-            normals = normals.concat([0, 0,1, 0, 0,1, 0, 0,1,  0, 0,1]);
-            uv = uv.concat([0, 0, 1, 0, 1, 1, 0, 1]);
-            indices = indices.concat([4,5,6, 4,6,7]);
-        }
-
         this.addNode({
             type: "material",
+            id: this.getMatGeoId(),
             emit: 0,
             baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
             specular:       0.9,
-            shine:          100.0,
-            nodes: [
-                {
-                    type: "geometry",
-                    primitive: "triangles",
-                    positions : positions,
-                    normals : normals,
-                    uv : uv,
-                    indices : indices
-                }
-            ]
+            shine:          100.0
         });
+        
+        var text = this.setText(params);
+        
     } else {
         this.addNode({
             type: "geometry",
@@ -71,7 +49,59 @@ SceneJS.Text.prototype._init = function(params) {
     }
 };
 
-SceneJS.Text.prototype.setText = function(params) {
+SceneJS.Text.prototype.getGeoId = function () {
+    return this._id + "-text-geometry";
+}
+SceneJS.Text.prototype.getMatGeoId = function () {
+    return this._id + "-text-material";
+}
+
+SceneJS.Text.prototype._updateGeometry = function (width, height, params) {
+    var w = width / 16;
+    var h = height / 16;
+
+    var positions = [ w, h, 0.01, 0, h, 0.1, 0,0, 0.1, w,0, 0.01 ];
+    var normals = [ 0, 0, -1,  0, 0, -1,  0, 0, -1,  0, 0, -1 ];
+    var uv = [1, 1,  0, 1,  0, 0, 1, 0];
+    var indices = [0, 1, 2,  0, 2, 3];
+
+    if (params.doubleSided) {
+        var z = 0.01;
+        positions = positions.concat([w,0,-z, 0,0,-z, 0, h,-z, w, h,-z]);
+        normals = normals.concat([0, 0,1, 0, 0,1, 0, 0,1,  0, 0,1]);
+        uv = uv.concat([0, 0, 1, 0, 1, 1, 0, 1]);
+        indices = indices.concat([4,5,6, 4,6,7]);
+    }
+    
+    var geoId = this.getGeoId();
+    var matNode;
+    
+    if (SceneJS.nodeExists(this.getGeoId()))
+    {
+        // Get rid of the existing node        
+        matNode = SceneJS.withNode(geoId).parent();
+        matNode.remove("node",geoId);
+    }
+
+    if (!matNode) {
+        matNode = SceneJS.withNode(this.getMatGeoId());
+    } 
+    matNode.add("node",
+       {
+            type: "geometry",
+            id: geoId, 
+            primitive: "triangles",
+            positions : positions,
+            normals : normals,
+            uv : uv,
+            indices : indices
+        }
+    );
+};
+
+
+
+SceneJS.Text.prototype.setText = function (params) {
     var text;
     if (this._mode == "bitmap") {
         text = SceneJS._bitmapTextModule.createText(params.font || this.font, params.size || this.size, params.color || this.color, params.text || this.text);
@@ -102,14 +132,22 @@ SceneJS.Text.prototype.setText = function(params) {
             rotate : null,
             rebuildMatrix : true
         };
+        
+        this._updateGeometry(text.width, text.height, params);
     }
+    
+    this._dirtyText = true;
     
     return text;
 };
 
 SceneJS.Text.prototype._render = function(traversalContext) {
     if (this._mode == "bitmap") {
-        if (!this._layer.texture && !this._error) {
+        if ((!this._layer.texture || this._dirtyText) && !this._error) {
+            // If we have a dirty text get rid of the previous texture
+            if (this._dirtyTexture) {
+                SceneJs._textureModule.deleteTexture(this._layer.texture);
+            }
             var self = this;
             (function() {
 
@@ -117,6 +155,7 @@ SceneJS.Text.prototype._render = function(traversalContext) {
                         self._layer.creationParams,
                         function(texture) { // Success
                             self._layer.texture = texture;
+                            self._dirtyTexture = false;
                         },
                         function() { // General error
                             self._error = true;

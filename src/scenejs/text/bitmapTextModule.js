@@ -28,14 +28,14 @@ SceneJS._bitmapTextModule = new (function() {
 
         var width = cx.measureText(text).width;
         canvas.width = width;
-        canvas.height = size;
+        canvas.height = size*1.2;
 
         cx.font = size + "px " + font;
         cx.textBaseline = "middle";
         cx.fillStyle = getHTMLColor(color);
 
         var x = 0;
-        var y = (size / 2);
+        var y = (canvas.height / 2);
         cx.fillText(text, x, y);
         
         return {
