@@ -4,6 +4,9 @@ SceneJS.Text = SceneJS.createNodeType("text");
 SceneJS.Text.prototype._init = function(params) {
     var mode = params.mode || "bitmap";
     
+    this.geoId = this._id + "-text-geometry";
+    this.matGeoId = this._id + "-text-material";
+    
     // Save defaults to be reused during runtime if setText is called
     this.font = params.font || "Helvetica";
     this.size = params.size || 10;
@@ -18,7 +21,7 @@ SceneJS.Text.prototype._init = function(params) {
     if (this._mode == "bitmap") {
         this.addNode({
             type: "material",
-            id: this.getMatGeoId(),
+            id: this.matGeoId,
             emit: 0,
             baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
@@ -47,11 +50,11 @@ SceneJS.Text.prototype._init = function(params) {
     }
 };
 
-SceneJS.Text.prototype.getGeoId = function () {
-    return this._id + "-text-geometry";
-}
 SceneJS.Text.prototype.getMatGeoId = function () {
-    return this._id + "-text-material";
+    return this.matGeoId;
+}
+SceneJS.Text.prototype.getGeoId = function () {
+    return this.geoId;
 }
 
 SceneJS.Text.prototype._updateGeometry = function (width, height, params) {
@@ -71,23 +74,22 @@ SceneJS.Text.prototype._updateGeometry = function (width, height, params) {
         indices = indices.concat([4,5,6, 4,6,7]);
     }
     
-    var geoId = this.getGeoId();
     var matNode;
     
-    if (SceneJS.nodeExists(this.getGeoId()))
+    if (SceneJS.nodeExists(this.geoId))
     {
         // Get rid of the existing node        
-        matNode = SceneJS.withNode(geoId).parent();
-        matNode.remove("node",geoId);
+        matNode = SceneJS.withNode(this.geoId).parent();
+        matNode.remove("node",this.geoId);
     }
 
     if (!matNode) {
-        matNode = SceneJS.withNode(this.getMatGeoId());
+        matNode = SceneJS.withNode(this.matGeoId);
     } 
     matNode.add("node",
        {
             type: "geometry",
-            id: geoId, 
+            id: this.geoId, 
             primitive: "triangles",
             positions : positions,
             normals : normals,
