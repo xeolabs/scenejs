@@ -4,8 +4,6 @@ SceneJS.Text = SceneJS.createNodeType("text");
 SceneJS.Text.prototype._init = function(params) {
     var mode = params.mode || "bitmap";
     
-    this._dirtyText = false;
-    
     // Save defaults to be reused during runtime if setText is called
     this.font = params.font || "Helvetica";
     this.size = params.size || 10;
@@ -136,18 +134,12 @@ SceneJS.Text.prototype.setText = function (params) {
         this._updateGeometry(text.width, text.height, params);
     }
     
-    this._dirtyText = true;
-    
     return text;
 };
 
 SceneJS.Text.prototype._render = function(traversalContext) {
     if (this._mode == "bitmap") {
-        if ((!this._layer.texture || this._dirtyText) && !this._error) {
-            // If we have a dirty text get rid of the previous texture
-            if (this._dirtyTexture) {
-                SceneJs._textureModule.deleteTexture(this._layer.texture);
-            }
+        if ((!this._layer.texture) && !this._error) {
             var self = this;
             (function() {
 
@@ -155,7 +147,6 @@ SceneJS.Text.prototype._render = function(traversalContext) {
                         self._layer.creationParams,
                         function(texture) { // Success
                             self._layer.texture = texture;
-                            self._dirtyTexture = false;
                         },
                         function() { // General error
                             self._error = true;
