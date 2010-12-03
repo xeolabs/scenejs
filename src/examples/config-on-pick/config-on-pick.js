@@ -604,9 +604,41 @@ pInterval = setInterval("window.render()", 10);
 
 var canvas = document.getElementById("theCanvas");
 
-canvas.addEventListener(
-        'mousedown',
-        function (event) {
-            SceneJS.withNode("my-scene").pick(event.offsetX, event.offsetY);
-        }, true);
 
+/* On mouse down, we render the scene in picking mode, passing in the
+ * mouse canvas coordinates. This will cause a scene render traversal in which
+ * all the "picked" listeners will fire on nodes situated above whatever
+ * geometry node was picked, as those nodes are visited.
+ *
+ */
+
+canvas.addEventListener('mousedown', mouseDown, false);
+
+
+function mouseDown(event) {
+    var coords = clickCoordsWithinElement(event);
+    SceneJS.withNode("my-scene").pick(coords.x, coords.y);
+}
+
+function clickCoordsWithinElement(event) {
+    var coords = { x: 0, y: 0};
+    if (!event) {
+        event = window.event;
+        coords.x = event.x;
+        coords.y = event.y;
+    } else {
+        var element = event.target ;
+        var totalOffsetLeft = 0;
+        var totalOffsetTop = 0 ;
+
+        while (element.offsetParent)
+        {
+            totalOffsetLeft += element.offsetLeft;
+            totalOffsetTop += element.offsetTop;
+            element = element.offsetParent;
+        }
+        coords.x = event.pageX - totalOffsetLeft;
+        coords.y = event.pageY - totalOffsetTop;
+    }
+    return coords;
+}

@@ -171,6 +171,11 @@ SceneJS._pickModule = new (function() {
         if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
             if (nodeStack.length > 0 && nodeStack[nodeStack.length - 1].getID() == node.getID()) {
                 nodeStack.pop();
+                if (nodeStack.length == 0) {   // White for the non-pick colour - should probably be black?
+                    color.g = 1;
+                    color.r = 1;
+                    color.b = 1;
+                }
             }
         }
     };
@@ -215,7 +220,7 @@ SceneJS._pickModule = new (function() {
         }
         pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
         if (pickedNodeIndex >= 1) {
-            var node = nodeLookup[pickedNodeIndex-1];
+            var node = nodeLookup[pickedNodeIndex - 1];
             if (node) {
                 node._fireEvent("picked", { canvasX: pickX, canvasY: pickY });
             }

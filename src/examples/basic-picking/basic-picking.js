@@ -265,9 +265,32 @@ var canvas = document.getElementById("theCanvas");
  *
  */
 function mouseDown(event) {
-    SceneJS.withNode("theScene").pick(event.offsetX, event.offsetY);
+    var coords = clickCoordsWithinElement(event);
+    SceneJS.withNode("theScene").pick(coords.x, coords.y);
 }
 
 canvas.addEventListener('mousedown', mouseDown, false);
 
 
+function clickCoordsWithinElement(event) {
+    var coords = { x: 0, y: 0};
+    if (!event) {
+        event = window.event;
+        coords.x = event.x;
+        coords.y = event.y;
+    } else {
+        var element = event.target ;
+        var totalOffsetLeft = 0;
+        var totalOffsetTop = 0 ;
+
+        while (element.offsetParent)
+        {
+            totalOffsetLeft += element.offsetLeft;
+            totalOffsetTop += element.offsetTop;
+            element = element.offsetParent;
+        }
+        coords.x = event.pageX - totalOffsetLeft;
+        coords.y = event.pageY - totalOffsetTop;
+    }
+    return coords;
+}

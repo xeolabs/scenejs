@@ -27,7 +27,7 @@ SceneJS.createNode({
          */
         {
             type: "clip",
-            mode: "inside",
+            mode: "outside",
             a: { x:-4, y: -2, z: -10 },
             b: { x:0, y:  0, z:  10 },
             c: { x: 0, y:  2, z: -10 },
@@ -65,7 +65,7 @@ SceneJS.createNode({
                                  * if you want to move them around.
                                  */
                                 {
-                                    type: "light",
+                                    type:                   "light",
                                     mode:                   "dir",
                                     color:                  { r: 1.0, g: 0.5, b: 0.5 },
                                     diffuse:                true,
@@ -74,7 +74,7 @@ SceneJS.createNode({
                                 },
 
                                 {
-                                    type: "light",
+                                    type:                   "light",
                                     mode:                   "dir",
                                     color:                  { r: 0.5, g: 1.0, b: 0.5 },
                                     diffuse:                true,
@@ -83,7 +83,7 @@ SceneJS.createNode({
                                 },
 
                                 {
-                                    type: "light",
+                                    type:                   "light",
                                     mode:                   "dir",
                                     color:                  { r: 0.2, g: 0.2, b: 1.0 },
                                     diffuse:                true,
@@ -107,7 +107,7 @@ SceneJS.createNode({
                                          */
                                         {
                                             type: "clip",
-                                            mode: "inside",
+                                            mode: "outside",
                                             a: { x:-10, y: -2, z: -10 },
                                             b: { x: 10, y:  0, z:  10 },
                                             c: { x: -10, y:  2, z: -10 },
@@ -124,11 +124,12 @@ SceneJS.createNode({
                                                         /* Another clipping plane
                                                          */
                                                         {
-                                                            type: "clip",
-                                                            mode: "inside",
-                                                            a: { x:2, y: -10, z: -10 },
-                                                            b: { x: 0, y:  10, z:  10 },
-                                                            c: { x: -2, y:  10, z: -10 },
+                                                            type: "renderer",
+                                                         //   enableClip: true,
+//                                                            ,
+//                                                            a: { x:2, y: -10, z: -10 },
+//                                                            b: { x: 0, y:  10, z:  10 },
+//                                                            c: { x: -2, y:  10, z: -10 },
 
                                                             nodes:[
 
