@@ -136,8 +136,9 @@ SceneJS._imageBufModule = new (function() {
             /** Unbinds image buffer, the default buffer then becomes the rendering target
              */
             unbind:function() {
-                //  gl.bindFramebuffer(gl.RENDERBUFFER, null);
                 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+                gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuf);
                 rendered = true;
             },
 
@@ -150,7 +151,18 @@ SceneJS._imageBufModule = new (function() {
             /** Gets the texture from this image buffer
              */
             getTexture: function() {
-                return texture;
+                return {
+
+                    bind: function(unit) {
+                        gl.activeTexture(gl["TEXTURE" + unit]);
+                        gl.bindTexture(gl.TEXTURE_2D, texture);
+                    },
+
+                    unbind : function(unit) {
+                        gl.activeTexture(gl["TEXTURE" + unit]);
+                        gl.bindTexture(this.target, null);
+                    }
+                };
             }
         };
 
@@ -184,7 +196,7 @@ SceneJS._imageBufModule = new (function() {
 
     };
 
-    /** Gets an image buffer      
+    /** Gets an image buffer
      */
     this.getImageBuffer = function(bufId) {
         return currentSceneBufs[bufId];
