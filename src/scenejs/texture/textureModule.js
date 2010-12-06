@@ -297,11 +297,11 @@ SceneJS._textureModule = new (function() {
 
         /* Touch the cache LRU timestamp on each texture managed by this module
          */
-        for (var i = 0; i < layers.length; i++) {
-            if (!textures[layers[i].texture.textureId]) { // TODO: overkill to check for eviction?
-                throw SceneJS._errorModule.fatalError("No such texture loaded \"" + texture.layers[i].texture.textureId + "\"");
-            }
-        }
+//        for (var i = 0; i < layers.length; i++) {
+//            if (!textures[layers[i].texture.textureId]) { // TODO: overkill to check for eviction?
+//                throw SceneJS._errorModule.fatalError("No such texture loaded \"" + texture.layers[i].texture.textureId + "\"");
+//            }
+//        }
         textureStack.push(layers);
         dirty = true;
     };

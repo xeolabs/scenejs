@@ -700,14 +700,16 @@ SceneJS._shaderModule = new (function() {
                 this._lastProgramId = node.program.id;
             }
 
-            /* Bind image buffer
+            /* Bind image buffer so that subsequently rendered geometry is drawn to it
              */
             if (! node._lastImageBufState || node.imageBufState._stateId != this._lastImageBufState._stateId) {
                 if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
                     context.flush();
                     this._lastImageBufState.imageBuf.unbind();
+
                 }
                 if (node.imageBufState.imageBuf) {
+                    
                     node.imageBufState.imageBuf.bind();
                 }
                 this._lastImageBufState = node.imageBufState;

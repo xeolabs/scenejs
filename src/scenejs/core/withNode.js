@@ -199,6 +199,20 @@ SceneJS._WithNode.prototype.add = function(attr, value) {
     return this;
 };
 
+/** Increments an attribute to the selected node
+ */
+SceneJS._WithNode.prototype.inc = function(attr, value) {
+    if (!attr) {
+        throw "inc param 'attr' null or undefined";
+    }
+    if (typeof attr == "string") {
+        this._callNodeMethod("inc", attr, value, this._targetNode);
+    } else {
+        this._callNodeMethods("inc", attr, this._targetNode);
+    }
+    return this;
+};
+
 /** Inserts an attribute or child node into the selected node
  */
 SceneJS._WithNode.prototype.insert = function(attr, value) {
@@ -417,7 +431,7 @@ SceneJS._WithNode.prototype._callNodeMethod = function(prefix, attr, value, targ
     var funcName = prefix + attr.substr(0, 1).toUpperCase() + attr.substr(1);
     var func = targetNode[funcName];
     if (!func) {
-        throw "Attribute '" + attr + "' not found on node '" + targetNode.getID() + "'";
+        throw "Attribute '" + attr + "' not found on node '" + targetNode.getID() + "' for " + prefix;
     }
     func.call(targetNode, value);
 
@@ -444,7 +458,7 @@ SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode
             var funcName = prefix + key.substr(0, 1).toUpperCase() + key.substr(1);
             var func = targetNode[funcName];
             if (!func) {
-                throw "Attribute '" + key + "' not found on node '" + targetNode.getID() + "'";
+                throw "Attribute '" + key + "' not found on node '" + targetNode.getID() + "' for " + prefix;
             }
             func.call(targetNode, attr[key]);
         }
