@@ -255,6 +255,21 @@ SceneJS._WithNode.prototype.get = function(attr) {
     return func.call(this._targetNode);
 };
 
+/** 
+ * @return true if node has attribute, false otherwise
+ */
+SceneJS._WithNode.prototype.hasAttribute = function(attr) {
+    if (!attr) {
+        return false;
+    }
+    var funcName = "get" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
+    var func = this._targetNode[funcName];
+    if (!func) {
+        return false;
+    }
+    return true;
+};
+
 /** Binds a listener to an event on the selected node
  *
  * @param {String} name Event name
