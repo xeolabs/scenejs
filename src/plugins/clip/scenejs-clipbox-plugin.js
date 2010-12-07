@@ -10,18 +10,18 @@
     // clip.clipbox.create
     //----------------------------------------------------------------
 
-    commandService.addCommand("clip.clipbox.create",
-            (function() {
-                return {
-                    execute: function(params) {
-                        var target = params.target;
-                        if (!target) {
-                            throw "Attribute 'target' expected on command 'clip.clipbox.create'";
-                        }
-                        clipbox(target, params);
-                    }
-                };
-            })());
+    commandService.addCommand("clip.clipbox.create", {
+
+        // Command always has an execute method
+
+        execute: function(params) {
+            var target = params.target;
+            if (!target) {
+                throw "Attribute 'target' expected on command 'clip.clipbox.create'";
+            }
+            clipbox(target, params);
+        }
+    });
 
 
     function clipbox(nodeId, params) {
@@ -202,126 +202,121 @@
     // clip.clipbox.resize
     //----------------------------------------------------------------
 
-    commandService.addCommand("clip.clipbox.update",
-            (function() {
-                return {
-                    execute: function(params) {
-                        var target = params.target;
-                        if (!target) {
-                            throw "Attribute 'target' expected on command 'clip.clipbox.update'";
-                        }
+    commandService.addCommand("clip.clipbox.update", {
 
-                        var node = SceneJS.withNode(target);
-                        var rootData = node.get("data");
+        execute: function(params) {
+            var target = params.target;
+            if (!target) {
+                throw "Attribute 'target' expected on command 'clip.clipbox.update'";
+            }
 
-                        if (!rootData._clipbox) {
-                            throw "No 'clip.clipbox' exists at target node for 'clip.clipbox.update'";
-                        }
+            var node = SceneJS.withNode(target);
+            var rootData = node.get("data");
 
-                        var id = node.get("id");
+            if (!rootData._clipbox) {
+                throw "No 'clip.clipbox' exists at target node for 'clip.clipbox.update'";
+            }
 
-                        var translate = params.translate || {};
+            var id = node.get("id");
 
-                        var zmin = ((params.zmin != undefined) ? params.zmin : -1) + (translate.z || 0);
-                        var zmax = ((params.zmax != undefined) ? params.zmax : 1) + (translate.z || 0);
-                        var xmin = ((params.xmin != undefined) ? params.xmin : -1) + (translate.x || 0);
-                        var xmax = ((params.xmax != undefined) ? params.xmax : 1) + (translate.x || 0);
-                        var ymin = ((params.ymin != undefined) ? params.ymin : -1) + (translate.y || 0);
-                        var ymax = ((params.ymax != undefined) ? params.ymax : 1) + (translate.y || 0);
+            var translate = params.translate || {};
 
-                        var rotate = params.rotate || {};
-                        var xrot = rotate.x || 0;
-                        var yrot = rotate.y || 0;
-                        var zrot = rotate.z || 0;
-                        var angle = rotate.angle || 0;
+            var zmin = ((params.zmin != undefined) ? params.zmin : -1) + (translate.z || 0);
+            var zmax = ((params.zmax != undefined) ? params.zmax : 1) + (translate.z || 0);
+            var xmin = ((params.xmin != undefined) ? params.xmin : -1) + (translate.x || 0);
+            var xmax = ((params.xmax != undefined) ? params.xmax : 1) + (translate.x || 0);
+            var ymin = ((params.ymin != undefined) ? params.ymin : -1) + (translate.y || 0);
+            var ymax = ((params.ymax != undefined) ? params.ymax : 1) + (translate.y || 0);
 
-                        var xtra = (xmax + xmin) * 0.5;
-                        var ytra = (ymax + ymin) * 0.5;
-                        var ztra = (zmax + zmin) * 0.5;
+            var rotate = params.rotate || {};
+            var xrot = rotate.x || 0;
+            var yrot = rotate.y || 0;
+            var zrot = rotate.z || 0;
+            var angle = rotate.angle || 0;
 
-                        var xsca = (xmax - xmin) * 0.5;
-                        var ysca = (ymax - ymin) * 0.5;
-                        var zsca = (zmax - zmin) * 0.5;
+            var xtra = (xmax + xmin) * 0.5;
+            var ytra = (ymax + ymin) * 0.5;
+            var ztra = (zmax + zmin) * 0.5;
 
-                        /* Update the cube
-                         */
-                        SceneJS.withNode(id + ".clipbox.cube.xmax.tra").set({
-                            x: xtra,
-                            y: ytra,
-                            z: ztra
-                        });
-                        SceneJS.withNode(id + ".clipbox.cube.xmax.sca").set({
-                            x: xsca,
-                            y: ysca,
-                            z: zsca
-                        });
+            var xsca = (xmax - xmin) * 0.5;
+            var ysca = (ymax - ymin) * 0.5;
+            var zsca = (zmax - zmin) * 0.5;
 
-                        /* Update the clip planes
-                         */
-                        SceneJS.withNode(id + ".clipbox.planes.xmin").set({
-                            a: { x: xmax, y: 1, z: 1 },
-                            b: { x: xmax, y: 0, z: 0 },
-                            c: { x: xmax, y: 0, z: 1 }
+            /* Update the cube
+             */
+            SceneJS.withNode(id + ".clipbox.cube.xmax.tra").set({
+                x: xtra,
+                y: ytra,
+                z: ztra
+            });
+            SceneJS.withNode(id + ".clipbox.cube.xmax.sca").set({
+                x: xsca,
+                y: ysca,
+                z: zsca
+            });
 
-                        });
-                        SceneJS.withNode(id + ".clipbox.planes.xmax").set({
-                            a: { x: xmin, y: 1, z: 0 },
-                            b: { x: xmin, y: 0, z: 1 },
-                            c: { x: xmin, y: 0, z: 0 }
-                        });
-                        SceneJS.withNode(id + ".clipbox.planes.ymin").set({
-                            a: { x:    1, y: ymin, z:  1 },
-                            b: { x:   -1, y: ymin, z: -1 },
-                            c: { x:   -1, y: ymin, z:  1 }
+            /* Update the clip planes
+             */
+            SceneJS.withNode(id + ".clipbox.planes.xmin").set({
+                a: { x: xmax, y: 1, z: 1 },
+                b: { x: xmax, y: 0, z: 0 },
+                c: { x: xmax, y: 0, z: 1 }
 
-                        });
-                        SceneJS.withNode(id + ".clipbox.planes.ymax").set({
-                            a: { x:   -1, y: ymax, z:  1 },
-                            b: { x:   -1, y: ymax, z: -1 },
-                            c: { x:    1, y: ymax, z:  1 }
-                        });
-                        SceneJS.withNode(id + ".clipbox.planes.zmin").set({
-                            a: { x:   -1, y: -1, z: zmin },
-                            b: { x:    1, y: -1, z: zmin },
-                            c: { x:    1, y:  1, z: zmin }
-                        });
-                        SceneJS.withNode(id + ".clipbox.planes.zmax").set({
-                            a: { x:  1, y:   1, z: zmax },
-                            b: { x:  1, y:  -1, z: zmax },
-                            c: { x: -1, y:  -1, z: zmax }
-                        });
-                    }
-                };
-            })());
+            });
+            SceneJS.withNode(id + ".clipbox.planes.xmax").set({
+                a: { x: xmin, y: 1, z: 0 },
+                b: { x: xmin, y: 0, z: 1 },
+                c: { x: xmin, y: 0, z: 0 }
+            });
+            SceneJS.withNode(id + ".clipbox.planes.ymin").set({
+                a: { x:    1, y: ymin, z:  1 },
+                b: { x:   -1, y: ymin, z: -1 },
+                c: { x:   -1, y: ymin, z:  1 }
+
+            });
+            SceneJS.withNode(id + ".clipbox.planes.ymax").set({
+                a: { x:   -1, y: ymax, z:  1 },
+                b: { x:   -1, y: ymax, z: -1 },
+                c: { x:    1, y: ymax, z:  1 }
+            });
+            SceneJS.withNode(id + ".clipbox.planes.zmin").set({
+                a: { x:   -1, y: -1, z: zmin },
+                b: { x:    1, y: -1, z: zmin },
+                c: { x:    1, y:  1, z: zmin }
+            });
+            SceneJS.withNode(id + ".clipbox.planes.zmax").set({
+                a: { x:  1, y:   1, z: zmax },
+                b: { x:  1, y:  -1, z: zmax },
+                c: { x: -1, y:  -1, z: zmax }
+            });
+
+        }
+    });
 
     //----------------------------------------------------------------
     // clip.clipbox.destroy
     //----------------------------------------------------------------
 
-    commandService.addCommand("clip.clipbox.destroy",
-            (function() {
-                return {
-                    execute: function(params) {
-                        var target = params.target;
-                        if (!target) {
-                            return;
-                        }
+    commandService.addCommand("clip.clipbox.destroy", {
 
-                        var node = SceneJS.withNode(target);
-                        var rootData = node.get("data");
+        execute: function(params) {
+            var target = params.target;
+            if (!target) {
+                return;
+            }
 
-                        if (!rootData._clipbox) {
-                            return
-                        }
+            var node = SceneJS.withNode(target);
+            var rootData = node.get("data");
 
-                        var id = node.get("id");
-                        node.parent().remove({
-                            node: id
-                        });
+            if (!rootData._clipbox) {
+                return;
+            }
 
-
-                    }
-                };
-            })());
+            var id = node.get("id");
+            node.parent().remove({
+                node: id
+            });
+        }
+    });
 })();
 
