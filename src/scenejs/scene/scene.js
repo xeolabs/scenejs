@@ -157,6 +157,7 @@ SceneJS.Scene.prototype._init = function(params) {
         this._canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
     }
     this._loggingElementId = params.loggingElementId;
+    this.setLayers(params.layers);
     this._destroyed = false;
 };
 
@@ -173,6 +174,24 @@ SceneJS.Scene.DEFAULT_LOGGING_ELEMENT_ID = "_scenejs-default-logging";
  */
 SceneJS.Scene.prototype.getCanvasId = function() {
     return this._canvasId;
+};
+
+/**
+ Sets which layers are included in the next render of this scene, along with their priorities (default priority is 0)
+ @param {{String:Number}} layers - render priority for each layer defined in scene
+ @since Version 0.7.9
+ */
+SceneJS.Scene.prototype.setLayers = function(layers) {
+    this._layers = layers || {};
+};
+
+/**
+ Gets which layers are included in the next render of this scene, along with their priorities (default priority is 0)
+ @returns {{String:Number}} layers - render priority for each layer defined in scene
+ @since Version 0.7.9
+ */
+SceneJS.Scene.prototype.getLayers = function() {
+    return this._layers;
 };
 
 /**
@@ -286,8 +305,10 @@ SceneJS.Scene.prototype._render = function() {
             loggingElementId: this._loggingElementId
         });
     }
-    SceneJS._actionNodeDestroys();
+
+    SceneJS._actionNodeDestroys();  // Destroy any nodes within SceneJS that are marked for destruction
     SceneJS._sceneModule.activateScene(this._sceneId);
+    SceneJS._layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
     var traversalContext = {};
     this._renderNodes(traversalContext);
     SceneJS._sceneModule.deactivateScene();

@@ -45,9 +45,10 @@ SceneJS._shaderModule = new (function() {
     var imageBufState;
     var clipState;
 
-    /** Bin set for the currently-active canvas
+    /** Bin sets for the currently-active canvas, organsed into layers,
+     * initialised on CANVAS_ACTIVATED event below
      */
-    var binSet;
+    var layers = {};
 
     /** Shader programs currently allocated on all canvases
      */
@@ -163,10 +164,7 @@ SceneJS._shaderModule = new (function() {
 
                 /* Prepare initial set of empty node bins
                  */
-                binSet = {
-                    opaqueNodes : [],
-                    transpNodes : []
-                };
+                createLayer(SceneJS._layerModule.DEFAULT_LAYER_NAME);
 
                 clipState = {
                     _stateId : nextStateId++,
@@ -176,6 +174,16 @@ SceneJS._shaderModule = new (function() {
 
                 stateHash = null;
             });
+
+    function createLayer(layerName) {
+        layers[layerName] = {
+            binSet : {
+                opaqueNodes : [],
+                transpNodes : []
+            }
+        };
+    }
+
 
     /* Import GL flags state
      */
@@ -448,6 +456,18 @@ SceneJS._shaderModule = new (function() {
      */
     this.setGeometry = function(geo) {
 
+        var layer;
+
+        var layerName = SceneJS._layerModule.getLayer();
+        if (layerName) {
+            if (!layers[layerName]) {
+                createLayer(layerName);
+            }
+            layer = layers[layerName];
+        } else {
+            layer = layers[SceneJS._layerModule.DEFAULT_LAYER_NAME];
+        }
+
         /* Add geometry to state soup.
          */
         geoState = {
@@ -462,10 +482,6 @@ SceneJS._shaderModule = new (function() {
         /* Ensure the rest of the state soup is marshalled
          */
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
-
-        //if (materialState.material.opacity != 1.0) {
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_NEEDS_BOUNDARIES);
-        //}
 
         /* Identify what GLSL is required for the current state soup elements
          */
@@ -508,9 +524,9 @@ SceneJS._shaderModule = new (function() {
          * depending on current material state's opacity
          */
         if (materialState.material.opacity != undefined && materialState.material.opacity != 1.0) {
-            binSet.transpNodes.push(node);
+            layer.binSet.transpNodes.push(node);
         } else {
-            binSet.opaqueNodes.push(node);
+            layer.binSet.opaqueNodes.push(node);
         }
     };
 
@@ -521,14 +537,23 @@ SceneJS._shaderModule = new (function() {
             SceneJS._eventModule.CANVAS_DEACTIVATED,
             function() {
                 NodeRenderer.init();
-                renderBinSet(binSet);
+
+                var layerOrder = SceneJS._layerModule.getLayerOrder();
+                var layer;
+
+                for (var i = 0, len = layerOrder.length; i < len; i++) {
+                    layer = layers[layerOrder[i].name];
+                    if (layer) {
+                        renderBinSet(layer.binSet);
+                    }
+                }
                 NodeRenderer.cleanup();
                 canvas = null;
             });
 
     //    this.redraw = function() {
     //        NodeRenderer.init();
-    //        renderBinSet(binSet);
+    //        renderBinSet(layers.__default.binSet);
     //    };
 
 
@@ -540,40 +565,15 @@ SceneJS._shaderModule = new (function() {
 
         if (nTransparent == 0) {
 
-            /* Bin set contains no transparent nodes, so we'll just render the opaque ones, Sort them
-             * first by program, to minimise the number of shader re-binds we do.
+            /* Bin set contains no transparent nodes, so we'll just render the opaque ones.
              */
-
-            // BUGGY - not sure why
-            //    binSet.opaqueNodes.sort(programCmp);
-
             renderOpaqueNodes(binSet.opaqueNodes);
-        }
+        } else {
 
-        if (nTransparent == 1) {
-
-            /* Bin set contains one transparent node, so we'll sort the opaque nodes by program,
-             * render those, then render the solitary transparent node with blending enabled.
+            /* Bin set contains contains many transparent nodes. Render opaque nodes wihout blending,
+             * then render transparent nodes with blending.
              */
-
-            // BUGGY - not sure why
-            // binSet.opaqueNodes.sort(programCmp);
-
             renderOpaqueNodes(binSet.opaqueNodes);
-            renderTransparentNodes(binSet.transpNodes);
-        }
-
-        if (nTransparent > 1) {
-
-            /* Bin set contains contains many transparent nodes. We'll sort the opaque nodes by program,
-             * render those, then sort the transparent nodes by boundary and render those with blending enabled.
-             */
-            // BUGGY - not sure why
-            // binSet.opaqueNodes.sort(programCmp);
-
-            renderOpaqueNodes(binSet.opaqueNodes);
-
-            //binSet.transpNodes.sort(boundaryCmp);
             renderTransparentNodes(binSet.transpNodes);
         }
     }
@@ -592,9 +592,13 @@ SceneJS._shaderModule = new (function() {
     function renderTransparentNodes(transpNodes) {
         //NodeRenderer.init();
         var context = canvas.context;
-        context.blendFunc(context.SRC_ALPHA, context.ONE);
-        // context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
+
         context.enable(context.BLEND);
+
+        /* Order independent blend; unfortunately tends to wash out against a
+         * white background because all colours are basically added
+         */
+        context.blendFunc(context.SRC_ALPHA, context.ONE);
 
         var flags = {
             transparent : true
@@ -631,18 +635,6 @@ SceneJS._shaderModule = new (function() {
     var texCmp = function(node1, node2) {
         return node1.texState._stateId - node2.texState._stateId;
     };
-
-    /* Comparator function for sorting nodes by boundary view-space Z-depth
-     */
-    function boundaryCmp(a, b) {
-        if (!a.boundaryState.viewBox) {  // Non-bounded opaqueBin to front of list
-            return -1;
-        }
-        if (!b.boundaryState.viewBox) {
-            return 1;
-        }
-        return (a.boundaryState.viewBox.max[2] - b.boundaryState.viewBox.max[2]);
-    }
 
     /**
      * State node renderer
@@ -709,7 +701,7 @@ SceneJS._shaderModule = new (function() {
 
                 }
                 if (node.imageBufState.imageBuf) {
-                    
+
                     node.imageBufState.imageBuf.bind();
                 }
                 this._lastImageBufState = node.imageBufState;
