@@ -24,9 +24,9 @@ SceneJS.createNode({
         {
             type: "fog",
             mode:"linear",
-            color: { r:.50, g:.50,b:.50 },
+            color: { r:.0, g:0.0,  b:.0 },
             start: 0,
-            end:600  ,
+            end:2000  ,
             density:300.0,
 
             nodes: [

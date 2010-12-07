@@ -176,10 +176,6 @@ SceneJS.Node._ArgParser = new (function() {
             return {};
         };
         node._params = {};
-
-        /* Parse first argument - expected to be either a config object or a child node
-         * @private
-         */
         if (args.length > 0) {
             var arg = args[0];
             if (!arg) {
@@ -205,7 +201,7 @@ SceneJS.Node._ArgParser = new (function() {
 
         var cfg = arg;
 
-        /* Seperate out basic node configs (such as SID, info and listeners) from other configs - set those
+        /* Seperate out basic node configs from other configs - set those
          * directly on the node and set the rest on an intermediate config object.
          */
         var param;
@@ -214,17 +210,21 @@ SceneJS.Node._ArgParser = new (function() {
                 param = cfg[key];
                 if (param != null) {
                     if (key == "id") {
+                        //                        if (SceneJS._nodeIDMap[param]) {
+                        //                            throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
+                        //                                    ("Node with this ID already defined: '" + param + "'"));
+                        //                        }
                         node._id = param;
-                    } else if (key == "listeners") {
-                        this._parseListeners(param, node);
-                    } else if (key == "sid") {
+                    } else if (key == "sid") {        //  TODO: Deprecate
                         node._sid = param;
-                    } else if (key == "info") {
+                    } else if (key == "info") {       //  TODO: Deprecate
                         node._NODEINFO = param;
-                    } else if (key == "data") {
+                    } else if (key == "data") {       // User-attached data map
                         node._data = param;
-                    } else if (key == "enabled") {
+                    } else if (key == "enabled") {    // Traversal enabled/disabled
                         node._enabled = param;
+                    } else if (key == "layer") {     // Rendering layers
+                        node._nodeLayer = param;
                     } else {
                         node._params[key] = param;
                     }
@@ -249,42 +249,6 @@ SceneJS.Node._ArgParser = new (function() {
             } else {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         ("Unexpected type for node argument " + i + " - expected a child node"));
-            }
-        }
-    };
-
-    /** Parses listeners on a configuration object and registers them on
-     * the given node.
-     * @private
-     */
-    this._parseListeners = function(listeners, node) {
-        for (var eventName in listeners) {
-            if (listeners.hasOwnProperty(eventName)) {
-                var l = listeners[eventName];
-
-                /* A listener can be either an object containing a function
-                 * and options, or just the function for brevity
-                 */
-                if (l instanceof Function) {
-                    l = {
-                        fn: l
-                    };
-                } else {
-                    if (!l.fn) {
-                        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                                ("Listener 'fn' missing in node config"));
-                    }
-                    if (!(l.fn instanceof Function)) {
-                        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                                ("Listener 'fn' invalid in node config - is not a function"));
-                    }
-                }
-                l.options = l.options || {};
-                if (!node._listeners[eventName]) {
-                    node._listeners[eventName] = [];
-                }
-                node._listeners[eventName].push(l);
-                node._numListeners++;
             }
         }
     };
@@ -334,6 +298,11 @@ SceneJS.Node.prototype._resetMemoLevel = function() {
     for (var i = 0; i < this._children.length; i++) {
         this._children[i]._resetMemoLevel();
     }
+};
+
+/** @private */
+SceneJS.Node.prototype._render = function(traversalContext) {
+    this._renderNodes(traversalContext);
 };
 
 /** @private
@@ -399,6 +368,21 @@ SceneJS.Node.prototype._renderNodes = function(
  * Wraps _render to fire built-in events either side of rendering.
  * @private */
 SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
+
+    /* Track any user-defined explicit node layer attribute as we traverse the
+     * the graph. This is used by state sorting to organise geometries into layers.
+     */
+    if (this._nodeLayer) {
+
+        /* Only render layers that are enabled
+         */
+        if (!SceneJS._layerModule.layerEnabled(this._nodeLayer)) {
+            return;
+        }
+
+        SceneJS._layerModule.pushLayer(this._nodeLayer);
+    }
+
     if (this._numListeners == 0) {
         this._render(traversalContext);
     } else {
@@ -410,19 +394,18 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
             this._fireEvent("rendered", { });
         }
     }
+
+    if (this._nodeLayer) {
+        SceneJS._layerModule.popLayer();
+    }
 };
 
 
 /** @private */
-SceneJS.Node.prototype._render = function(traversalContext) {
-    this._renderNodes(traversalContext);
-};
-
-/** @private */
-SceneJS.Node.prototype._renderNode = function(index, traversalContext) {
+SceneJS.Node.prototype._renderNodeAtIndex = function(index, traversalContext) {
     if (index >= 0 && index < this._children.length) {
         var child = this._children[index];
-        child._render.call(child, traversalContext);
+        child._renderWithEvents.call(child, traversalContext);
     }
 };
 
@@ -470,6 +453,7 @@ SceneJS.Node.prototype.setData = function(data) {
  * Returns the node's optional subidentifier, which must be unique within the scope
  * of the parent node.
  * @returns {string} Node SID
+ *  @deprecated
  */
 SceneJS.Node.prototype.getSID = function() {
     return this._sid;
@@ -478,6 +462,7 @@ SceneJS.Node.prototype.getSID = function() {
 /**
  * Returns the node's optional information string. The string will be empty if never set.
  * @returns {string} Node info string
+ * @deprecated
  */
 SceneJS.Node.prototype.getInfo = function() {
     return this._NODEINFO || "";
@@ -486,6 +471,7 @@ SceneJS.Node.prototype.getInfo = function() {
 /**
  * Sets the node's optional information string. The string will be empty if never set.
  * @param {string} info Node info string
+ * @deprecated
  */
 SceneJS.Node.prototype.setInfo = function(info) {
     this._NODEINFO = info; // Doesnt require re-render

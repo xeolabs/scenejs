@@ -30,9 +30,9 @@ SceneJS.Scale.prototype._init = function(params) {
  */
 SceneJS.Scale.prototype.setXYZ = function(xyz) {
     xyz = xyz || {};
-    this._x = (xyz.x != undefined) ? xyz.x : 0;
-    this._y = (xyz.y != undefined) ? xyz.y : 0;
-    this._z = (xyz.z != undefined) ? xyz.z : 0;
+    this._x = (xyz.x != undefined) ? xyz.x : 1;
+    this._y = (xyz.y != undefined) ? xyz.y : 1;
+    this._z = (xyz.z != undefined) ? xyz.z : 1;
     this._setDirty();
     return this;
 };

@@ -535,7 +535,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                                     /* Child provided for each LOD - select one
                                      * for the projected boundary canvas size
                                      */
-                                    this._renderNode(i, traversalContext);
+                                    this._renderNodeAtIndex(i, traversalContext);
                                 } else {
 
                                     /* Zero or one child provided for all LOD -
