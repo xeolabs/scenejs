@@ -11,13 +11,14 @@ SceneJS._bitmapTextModule = new (function() {
             });
 
     function getHTMLColor(color) {
+        var htmlColor = [];
         if (color.length != 4) {
             return color;
         }
         for (var i = 0; i < color.length; i++) {
-            color[i] *= 255;
+            htmlColor[i] = color[i]*255;
         }
-        return 'rgba(' + color.join(',') + ')';
+        return 'rgba(' + htmlColor.join(',') + ')';
     }
 
     this.createText = function(font, size, color, text) {
