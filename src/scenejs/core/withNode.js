@@ -455,10 +455,7 @@ SceneJS._WithNode.prototype._callNodeMethod = function(prefix, attr, value, targ
     var params = {};
     params[attr] = value;
 
-    /* Raise flag so that all Scenes currently
-     * running rendering loops will render another frame.
-     */
-    SceneJS._needFrame = true;
+    SceneJS._needFrame = true;  // Flag another scene render pass needed
 
     /* TODO: event should be queued and consumed to avoid many of these events accumulating
      */
@@ -476,6 +473,8 @@ SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode
                 throw "Attribute '" + key + "' not found on node '" + targetNode.getID() + "' for " + prefix;
             }
             func.call(targetNode, attr[key]);
+
+            SceneJS._needFrame = true;  // Flag another scene render pass needed
         }
     }
 
