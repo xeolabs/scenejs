@@ -267,7 +267,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
             if (self._running) { // idleFunc may have stopped render loop
                 if (SceneJS._needFrame) {
                     SceneJS._needFrame = false;
-                    self._render();
+                    self._renderWithEvents();
                 }
             }
         };
@@ -292,7 +292,7 @@ SceneJS.Scene.prototype.render = function() {
                 ("Attempted render on Scene that has been destroyed");
     }
     if (!this._running) {
-        this._render();
+        this._renderWithEvents();
     }
 };
 
@@ -350,8 +350,8 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
     }
     SceneJS._pickModule.pick(canvasX, canvasY); // Enter pick mode
     if (!this._running) {
-        this._render(); // Pick-mode traversal - get picked element and fire events
-        this._render(); // Render-mode traversal 
+        this._renderWithEvents(); // Pick-mode traversal - get picked element and fire events
+        this._renderWithEvents(); // Render-mode traversal 
     } else {
         SceneJS._needFrame = true;
     }
