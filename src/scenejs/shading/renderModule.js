@@ -600,12 +600,8 @@ SceneJS._shaderModule = new (function() {
          */
         context.blendFunc(context.SRC_ALPHA, context.ONE);
 
-        var flags = {
-            transparent : true
-        };
-
         for (var i = 0, len = transpNodes.length; i < len; i++) {
-            NodeRenderer.renderNode(transpNodes[i], flags);
+            NodeRenderer.renderNode(transpNodes[i]);
         }
         context.blendFunc(context.SRC_ALPHA, context.LESS);
         context.disable(context.BLEND);
@@ -658,9 +654,7 @@ SceneJS._shaderModule = new (function() {
          * rendered, Renderer forgets all states for the previous node and makes a fresh set of transitions
          * into all states for this node.
          */
-        this.renderNode = function(node, flags) {
-
-            flags = flags || {};
+        this.renderNode = function(node) {
 
             var context = canvas.context;
 
@@ -1542,7 +1536,4 @@ SceneJS._shaderModule = new (function() {
         return src.join("\n");
     }
 
-}
-
-        )
-        ();
+} )();

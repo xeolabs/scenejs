@@ -282,9 +282,8 @@ SceneJS.Scene.prototype.isRunning = function() {
 };
 
 /**
- * Immediately renders one frame of the scene, applying any config  values given to
- * {#link #setConfigs}, retaining those values in the scene afterwards. Has no effect if the scene has been
- * {@link #start}ed and is currently rendering in a loop.
+ * Renders one frame of the scene. If started, schedules a frame to be rendered on next interval,
+ * otherwise immediately renders a frame.
  */
 SceneJS.Scene.prototype.render = function() {
     if (this._destroyed) {
@@ -293,6 +292,8 @@ SceneJS.Scene.prototype.render = function() {
     }
     if (!this._running) {
         this._renderWithEvents();
+    } else {
+        SceneJS._needFrame = true;
     }
 };
 
