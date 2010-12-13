@@ -267,7 +267,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
             if (self._running) { // idleFunc may have stopped render loop
                 if (SceneJS._needFrame) {
                     SceneJS._needFrame = false;
-                    self._render();
+                    self._renderWithEvents();
                 }
             }
         };
@@ -282,9 +282,8 @@ SceneJS.Scene.prototype.isRunning = function() {
 };
 
 /**
- * Immediately renders one frame of the scene, applying any config  values given to
- * {#link #setConfigs}, retaining those values in the scene afterwards. Has no effect if the scene has been
- * {@link #start}ed and is currently rendering in a loop.
+ * Renders one frame of the scene. If started, schedules a frame to be rendered on next interval,
+ * otherwise immediately renders a frame.
  */
 SceneJS.Scene.prototype.render = function() {
     if (this._destroyed) {
@@ -292,7 +291,9 @@ SceneJS.Scene.prototype.render = function() {
                 ("Attempted render on Scene that has been destroyed");
     }
     if (!this._running) {
-        this._render();
+        this._renderWithEvents();
+    } else {
+        SceneJS._needFrame = true;
     }
 };
 
@@ -350,8 +351,8 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
     }
     SceneJS._pickModule.pick(canvasX, canvasY); // Enter pick mode
     if (!this._running) {
-        this._render(); // Pick-mode traversal - get picked element and fire events
-        this._render(); // Render-mode traversal 
+        this._renderWithEvents(); // Pick-mode traversal - get picked element and fire events
+        this._renderWithEvents(); // Render-mode traversal 
     } else {
         SceneJS._needFrame = true;
     }
