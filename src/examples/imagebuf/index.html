@@ -31,15 +31,14 @@
                 &lt;canvas&gt; feature.</p>
         </canvas>
         <div id="info">
-            <h2>Introducing the imageBuf Node</h2>
+            <h2>Rendering to a texture using the imageBuf Node</h2>
 
             <p>An <b>imageBuf</b> node renders its subgraph to a hidden image buffer, which may then be referenced as a texture
-                source by texture nodes. An imageBuf can do this continuously, refreshing the buffer with each frame, so
-                that the buffer works as a live a sort of video feed of the subgraph.</p>
+                source by texture nodes. Better yet, it do this continuously, refreshing the buffer with each frame, so
+                that the buffer works as a sort of video feed of the subgraph.</p>
 
-            <p>In this example, we´re defining an imageBuf that captures a rotating teapot as a texture, which is then
-                applied to a cube. The imageBuf recaptures the teapot with each frame, to provide an animated
-                texture.</p>
+            <p>In this example we´re dynamically capturing a rotating teapot as a texture, then
+                applying that to a cube. </p>
             <br/>
 
             <ul>
