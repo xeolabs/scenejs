@@ -16,7 +16,12 @@ SceneJS._bitmapTextModule = new (function() {
             return color;
         }
         for (var i = 0; i < color.length; i++) {
-            htmlColor[i] = color[i]*255;
+            // We don't want to alter the alpha value by 255
+            if (i !== 3) {
+                htmlColor[i] = color[i]*255;
+            } else {
+                htmlColor[i] = color[i];
+            }
         }
         return 'rgba(' + htmlColor.join(',') + ')';
     }
