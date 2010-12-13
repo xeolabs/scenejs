@@ -82,7 +82,7 @@ SceneJS._WithNode.prototype.eachParent = function(fn) {
     }
     var selector;
     var count = 0;
-    var node = this._targetNode._parent;
+    var node = this._targetNode;
     while (node._parent) {
         selector = new SceneJS._WithNode(node._parent);
         if (fn.call(selector, count++) === true) {

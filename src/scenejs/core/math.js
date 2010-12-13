@@ -1960,7 +1960,7 @@ SceneJS._math_slerp = function(t, q1, q2) {
 };
 
 SceneJS._math_normalizeQuaternion = function(q) {
-    var len = SceneJS._math_lenVec3([q[0], q[1], q[2]]);
+    var len = SceneJS._math_lenVec4([q[0], q[1], q[2], q[3]]);
     return [ q[0] / len, q[1] / len, q[2] / len, q[3] / len ];
 };
 
