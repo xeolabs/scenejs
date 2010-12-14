@@ -1398,7 +1398,7 @@ SceneJS._shaderModule = new (function() {
 
                 /* Alpha from Texture
                  * */
-                //   src.push("alpha = texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).a;");
+                src.push("alpha = texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).a;");
 
                 /* Texture output
                  */
@@ -1494,7 +1494,7 @@ SceneJS._shaderModule = new (function() {
                 }
             }
             src.push("if (emit>0.0) lightValue = vec3(1.0, 1.0, 1.0);");
-            src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb, alpha);");
+            src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb * alpha, alpha);");
         } else {
 
             /* No lighting

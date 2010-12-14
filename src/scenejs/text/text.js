@@ -5,7 +5,6 @@ SceneJS.Text.prototype._init = function(params) {
     var mode = params.mode || "bitmap";
     
     this.geoId = this._id + "-text-geometry";
-    this.matGeoId = this._id + "-text-material";
     
     // Save defaults to be reused during runtime if setText is called
     this.font = params.font || "Helvetica";
@@ -19,16 +18,6 @@ SceneJS.Text.prototype._init = function(params) {
     }
     this._mode = mode;
     if (this._mode == "bitmap") {
-        this.addNode({
-            type: "material",
-            id: this.matGeoId,
-            emit: 0,
-            baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
-            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-            specular:       0.9,
-            shine:          100.0
-        });
-        
         var text = this.setText(params);
         
     } else {
@@ -50,9 +39,6 @@ SceneJS.Text.prototype._init = function(params) {
     }
 };
 
-SceneJS.Text.prototype.getMatGeoId = function () {
-    return this.matGeoId;
-}
 SceneJS.Text.prototype.getGeoId = function () {
     return this.geoId;
 }
@@ -74,19 +60,12 @@ SceneJS.Text.prototype._updateGeometry = function (width, height, params) {
         indices = indices.concat([4,5,6, 4,6,7]);
     }
     
-    var matNode;
-    
     if (SceneJS.nodeExists(this.geoId))
     {
-        // Get rid of the existing node        
-        matNode = SceneJS.withNode(this.geoId).parent();
-        matNode.remove("node",this.geoId);
+        this.removeNode(this.geoId);
     }
 
-    if (!matNode) {
-        matNode = SceneJS.withNode(this.matGeoId);
-    } 
-    matNode.add("node",
+    this.addNode(
        {
             type: "geometry",
             id: this.geoId, 
