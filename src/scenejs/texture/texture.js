@@ -155,12 +155,12 @@ SceneJS.Texture.prototype._init = function(params) {
             }
             if (layerParam.applyTo) {
                 if (layerParam.applyTo != "baseColor" && // Colour map
-                    layerParam.applyTo != "diffuseColor" &&
+                 //   layerParam.applyTo != "diffuseColor" &&
                     layerParam.applyTo != "normals") {
                     throw SceneJS._errorModule.fatalError(
                             new SceneJS.errors.InvalidNodeConfigException(
                                     "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
-                                    "should be either 'baseColor', 'diffuseColor'"));
+                                    "should be either 'baseColor' or 'normals'"));
                 }
             }
             this._layers.push({
