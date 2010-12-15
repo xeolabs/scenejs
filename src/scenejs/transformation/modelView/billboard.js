@@ -85,8 +85,9 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
         SceneJS._math_getCellMat4(superViewXForm.matrix, 2, 1)
     ]);
 
-    var right = SceneJS._math_mat4(); 
+    var right = [0,0,0];
     SceneJS._math_cross3Vec3(look, up, right);
+    right = SceneJS._math_normalizeVec3(right);
     SceneJS._math_cross3Vec3(right, look, up);
 
     var mat = [
