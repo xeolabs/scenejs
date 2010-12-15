@@ -1393,9 +1393,9 @@ SceneJS._math_Plane3 = function (normal, offset, normalize) {
 };
 
 /** @private */
-SceneJS._math_MAX_DOUBLE = 1000000000000.0;
+SceneJS._math_MAX_DOUBLE = Number.MAX_VALUE;
 /** @private */
-SceneJS._math_MIN_DOUBLE = -1000000000000.0;
+SceneJS._math_MIN_DOUBLE = Number.MIN_VALUE;
 
 /** @private
  *
