@@ -1392,17 +1392,12 @@ SceneJS._math_Plane3 = function (normal, offset, normalize) {
     }
 };
 
-/** @private */
-SceneJS._math_MAX_DOUBLE = 1000000000000.0;
-/** @private */
-SceneJS._math_MIN_DOUBLE = -1000000000000.0;
-
 /** @private
  *
  */
 SceneJS._math_Box3 = function(min, max) {
-    this.min = min || [ SceneJS._math_MAX_DOUBLE,SceneJS._math_MAX_DOUBLE,SceneJS._math_MAX_DOUBLE ];
-    this.max = max || [ SceneJS._math_MIN_DOUBLE,SceneJS._math_MIN_DOUBLE,SceneJS._math_MIN_DOUBLE ];
+    this.min = min || [ Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE ];
+    this.max = max || [ Number.Min_VALUE, Number.Min_VALUE, Number.Min_VALUE ];
 
     /** @private */
     this.init = function(min, max) {
