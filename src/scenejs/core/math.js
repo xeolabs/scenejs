@@ -1756,8 +1756,8 @@ SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
         //    max: [-10000000, -10000000]
         //};
         // separate variables instead of indexing an array
-        var canvasBoxMin0 = 10000000, canvasBoxMin1 = 10000000;
-        var canvasBoxMax0 = -10000000, canvasBoxMax1 = -10000000;
+        var canvasBoxMin0 = Number.MAX_VALUE, canvasBoxMin1 = Number.MAX_VALUE;
+        var canvasBoxMax0 = Number.MIN_VALUE, canvasBoxMax1 = Number.MIN_VALUE;
 
         var v, x, y;
 

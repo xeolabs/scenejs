@@ -176,12 +176,12 @@ SceneJS.Geometry.prototype.getPrimitive = function() {
  */
 SceneJS.Geometry.prototype.getBoundary = function() {
     var boundary = {
-        xmin : 100000,
-        ymin : 100000,
-        zmin : 100000,
-        xmax : -100000,
-        ymax : -100000,
-        zmax : -100000
+        xmin : Number.MAX_VALUE,
+        ymin : Number.MAX_VALUE,
+        zmin : Number.MAX_VALUE,
+        xmax : Number.MIN_VALUE,
+        ymax : Number.MIN_VALUE,
+        zmax : Number.MIN_VALUE
     };
     var x, y, z;
     for (var i = 0, len = this._geo.positions.length - 3; i < len; i += 3) {
