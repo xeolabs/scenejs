@@ -88,9 +88,9 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/box.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/rectangle.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/quad.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/text/vectorTextModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/text/bitmapTextModule.js"/>
@@ -205,8 +205,9 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/box.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/quad.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/text/vectorTextModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/text/bitmapTextModule.js"/>

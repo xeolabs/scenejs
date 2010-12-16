@@ -1,5 +1,5 @@
 /*
- This example demonstrates how to define geometry, in this case a simple square sprite
+ This example demonstrates how to define geometry, in this case a simple quad sprite
  object that supports texturing.
 
  Lindsay S. Kay,
@@ -23,7 +23,7 @@ SceneJS.createNode({
             layers: [ { uri: "images/avatar.png" } ],
             nodes: [
                 {
-                    type: "square",
+                    type: "quad",
                     xSize: 1.2, ySize: 1.2
                 }
             ]
@@ -91,7 +91,7 @@ SceneJS.createNode({
                                                     type: "texture",
                                                     layers: [ { uri: "images/mars.jpg", flipY: false } ],
                                                     nodes: [
-                                                        { type: "sphere", slices: 15, rings: 15 }
+                                                        { type: "sphere" }
                                                     ]
                                                 },
                                                 {
