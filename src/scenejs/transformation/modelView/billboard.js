@@ -79,31 +79,42 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
     var eye = superViewXForm.lookAt.eye;
     var look = SceneJS._math_normalizeVec3(SceneJS._math_subVec3([eye.x, eye.y, eye.z], pos));
 
-    var up = SceneJS._math_normalizeVec3([
-        SceneJS._math_getCellMat4(superViewXForm.matrix, 0, 1),
-        SceneJS._math_getCellMat4(superViewXForm.matrix, 1, 1),
-        SceneJS._math_getCellMat4(superViewXForm.matrix, 2, 1)
+    var viewMat = superViewXForm.matrix;
+
+    var viewUp = SceneJS._math_normalizeVec3([
+        viewMat[0 * 4 + 1],
+        viewMat[1 * 4 + 1],
+        viewMat[2 * 4 + 1]
     ]);
 
-    var right = [0,0,0];
-    SceneJS._math_cross3Vec3(look, up, right);
-    right = SceneJS._math_normalizeVec3(right);
-    SceneJS._math_cross3Vec3(right, look, up);
+    /*var viewRight = SceneJS._math_normalizeVec3([
+        viewMat[0 * 4 + 0],
+        viewMat[1 * 4 + 0],
+        viewMat[2 * 4 + 0]
+    ]);
+
+    var viewLook = SceneJS._math_normalizeVec3([
+        viewMat[0 * 4 + 2],
+        viewMat[1 * 4 + 2],
+        viewMat[2 * 4 + 2]
+    ]);*/
+
+    var xx = Array(3);
+    var yy = viewUp;
+    var zz = look;
+    SceneJS._math_cross3Vec3(zz, yy, xx);
+    xx = SceneJS._math_normalizeVec3(xx);
+    SceneJS._math_cross3Vec3(xx, zz, yy);
 
     var mat = [
-        right[0],    up[0],    look[0],    0,
-        right[1],    up[1],    look[1],    0,
-        right[2],    up[2],    look[2],    0,
-        0,    0,    0,    1
+        xx[0],    xx[1],    xx[2],    0,
+        yy[0],    yy[1],    yy[2],    0,
+        zz[0],    zz[1],    zz[2],    0,
+        -pos[0],  -pos[1],  -pos[2],    1
     ];
 
-    var modelMat = SceneJS._math_translationMat4v([-pos[0], -pos[1], -pos[2]]);
-   // var modelMat = SceneJS._math_identityMat4();
-    var viewMat = SceneJS._math_mat4(); 
-    SceneJS._math_mulMat4(superViewXForm.matrix, mat, viewMat);
-
-    SceneJS._viewTransformModule.setTransform({ matrix: viewMat });
-    SceneJS._modelTransformModule.setTransform({ matrix: modelMat});
+    //SceneJS._viewTransformModule.setTransform({ matrix: superViewXForm.matrix });
+    SceneJS._modelTransformModule.setTransform({ matrix: mat});
 
     this._renderNodes(traversalContext);
 
