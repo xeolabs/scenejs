@@ -1,5 +1,5 @@
 /*
- This example demonstrates how to define geometry, in this case a simple cube
+ This example demonstrates how to define geometry, in this case a simple quad sprite
  object that supports texturing.
 
  Lindsay S. Kay,
@@ -14,6 +14,24 @@
 
  */
 
+SceneJS.createNode({
+    id: "SalomonSprite",
+    type: "billboard",
+    nodes: [
+        {
+            type: "texture",
+            layers: [ { uri: "images/avatar.png" } ],
+            nodes: [
+                {
+                    type: "quad",
+                    xSize: 1.2, ySize: 1.2
+                }
+            ]
+        }
+    ]
+});
+
+
 
 SceneJS.createNode({
     type: "scene",
@@ -24,8 +42,8 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 40.0, y: 10.0, z: -35 },
-            look : { x:13.0, y: -2.0, z: -5.0 },
+            eye : { x: 0, y: 1, z: -25 },
+            look : { x: 0, y: 1, z: 0 },
             up : { y: 1.0 },
 
             nodes: [
@@ -40,36 +58,61 @@ SceneJS.createNode({
                     },
                     nodes: [
                         {
-                            type: "material",
-                            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                            specular:       0.9,
-                            shine:          6.0,
+                            type: "light",
+                            mode: "dir",
+                            color: { r: 1, g: 1, b: 1 },
+                            dir: {x:0, y:4, z:5},
+                            diffuse: true,
+                            specular: false,
+                        },
+                        {
+                            type: "light",
+                            mode: "dir",
+                            color: { r: 1, g: 1, b: 1 },
+                            dir: {x:0, y:4, z:-5},
+                            diffuse: true,
+                            specular: false,
+                        },
+                        {
+                            type: "rotate",
+                            id: "yaw",
+                            y: 1,
                             nodes: [
                                 {
                                     type: "rotate",
-                                    x: 1.0,
-                                    angle: 45.0,
+                                    id: "pitch",
+                                    x: 1,
                                     nodes: [
                                         {
                                             type: "translate",
-                                            y: -2.0, z: -5.0,
+                                            x: 2, y: 0, z: 0,
                                             nodes: [
                                                 {
-                                                    type: "billboard",
+                                                    type: "texture",
+                                                    layers: [ { uri: "images/mars.jpg", flipY: false } ],
+                                                    nodes: [
+                                                        { type: "sphere" }
+                                                    ]
+                                                },
+                                                {
+                                                    type: "translate",
+                                                    x: 1, y: 4, z: 0,
                                                     nodes: [
                                                         {
-                                                            type: "geometry",
-                                                            resource: "my-geometry",
-                                                            primitive: "triangles",
-                                                            positions: [
-                                                                -1,  1, 0,
-                                                                 1,  1, 0,
-                                                                 1, -1, 0,
-                                                                -1, -1, 0 ],
-                                                            indices: [ 0, 1, 2, 0, 2, 3 ]
+                                                            type: "instance",
+                                                            target: "SalomonSprite"
                                                         }
                                                     ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            x: -3, y: 0, z: -1,
+                                            nodes: [
+                                                {
+                                                    type: "instance",
+                                                    target: "SalomonSprite"
                                                 }
                                             ]
                                         }
@@ -85,8 +128,8 @@ SceneJS.createNode({
 });
 
 
-var yaw = 30;
-var pitch = -30;
+var yaw = 0;
+var pitch = 0;
 var lastX;
 var lastY;
 var dragging = false;
@@ -120,9 +163,11 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
+pitch = 0;
+
 window.render = function() {
-    /*SceneJS.withNode("pitch").set("angle", pitch);
-    SceneJS.withNode("yaw").set("angle", yaw);*/
+    SceneJS.withNode("pitch").set("angle", pitch);
+    SceneJS.withNode("yaw").set("angle", yaw);
     SceneJS.withNode("the-scene").render();
 };
 
@@ -140,10 +185,3 @@ SceneJS.bind("reset", function() {
 });
 
 pInterval = window.setInterval("window.render()", 10);
-
-
-
-
-
-
-

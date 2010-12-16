@@ -1,34 +1,34 @@
 SceneJS._namespace("SceneJS.objects");
 
 /**
- * @class A scene node that defines cube geometry.
+ * @class A scene node that defines box geometry.
  * <p>The geometry is complete with normals for shading and one layer of UV coordinates for
- * texture-mapping. A Cube may be configured with an optional half-size for each axis. Where
+ * texture-mapping. A Box may be configured with an optional half-size for each axis. Where
  * not specified, the half-size on each axis will be 1 by default. It can also be configured as solid (default),
  * to construct it from triangles with normals for shading and one layer of UV coordinates for texture-mapping
  * one made of triangles. When not solid, it will be a wireframe drawn as line segments.</p>
- * <p><b>Example Usage</b></p><p>Definition of solid cube that is 6 units long on the X axis and 2 units long on the
+ * <p><b>Example Usage</b></p><p>Definition of solid box that is 6 units long on the X axis and 2 units long on the
  * Y and Z axis:</b></p><pre><code>
- * var c = new SceneJS.Cube({
+ * var c = new SceneJS.Box({
  *          xSize : 3,
- *          solid: true // Optional - when true (default) cube is solid, otherwise it is wireframe
+ *          solid: true // Optional - when true (default) box is solid, otherwise it is wireframe
  *     })
  * </pre></code>
  * @extends SceneJS.Geometry
  * @since Version 0.7.4
  * @constructor
- * Create a new SceneJS.Cube
+ * Create a new SceneJS.Box
  * @param {Object} [cfg] Static configuration object
  * @param {float} [cfg.xSize=1.0] Half-width on X-axis
  * @param {float} [cfg.ySize=1.0] Half-width on Y-axis
  * @param {float} [cfg.zSize=1.0] Half-width on Z-axis
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
-SceneJS.Cube = SceneJS.createNodeType("cube", "geometry");
+SceneJS.Box = SceneJS.createNodeType("box", "geometry");
 
 // @private
-SceneJS.Cube.prototype._init = function(params) {
-    this._nodeType = "cube";
+SceneJS.Box.prototype._init = function(params) {
+    this._nodeType = "box";
 
     var x = params.xSize || 1;
     var y = params.ySize || 1;
@@ -36,12 +36,12 @@ SceneJS.Cube.prototype._init = function(params) {
 
     var solid = (params.solid != undefined) ? params.solid : true;
 
-    /* Resource ID ensures that we reuse any scube that has already been created with
+    /* Resource ID ensures that we reuse any sbox that has already been created with
      * these parameters instead of wasting memory
      */
-    this._resource = "cube_" + x + "_" + y + "_" + z + (solid ? "_solid" : "wire");
+    this._resource = "box_" + x + "_" + y + "_" + z + (solid ? "_solid" : "wire");
 
-    /* Callback that does the creation in case we can't find matching cube to reuse
+    /* Callback that does the creation in case we can't find matching box to reuse
      */
     this._create = function() {
         var positions = [
@@ -170,3 +170,6 @@ SceneJS.Cube.prototype._init = function(params) {
         };
     };
 };
+
+// Compatibility
+SceneJS.Box = SceneJS.createNodeType("cube", "box");
