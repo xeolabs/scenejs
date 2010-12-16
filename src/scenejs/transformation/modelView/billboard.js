@@ -79,31 +79,31 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
     var eye = superViewXForm.lookAt.eye;
     var look = SceneJS._math_normalizeVec3(SceneJS._math_subVec3([eye.x, eye.y, eye.z], pos));
 
+    /* 3. Get the world space up vector of the camera
+     */
     var up = SceneJS._math_normalizeVec3([
-        SceneJS._math_getCellMat4(superViewXForm.matrix, 0, 1),
-        SceneJS._math_getCellMat4(superViewXForm.matrix, 1, 1),
-        SceneJS._math_getCellMat4(superViewXForm.matrix, 2, 1)
+        superViewXForm.matrix[0 * 4 + 1],
+        superViewXForm.matrix[1 * 4 + 1],
+        superViewXForm.matrix[2 * 4 + 1]
     ]);
 
-    var right = [0,0,0];
+    /* 4. Calculate a new coordinate basis for the billboard using the 
+     *    camera up vector and the look-at vector.
+     */
+    var right = Array(3);
     SceneJS._math_cross3Vec3(look, up, right);
     right = SceneJS._math_normalizeVec3(right);
     SceneJS._math_cross3Vec3(right, look, up);
 
     var mat = [
-        right[0],    up[0],    look[0],    0,
-        right[1],    up[1],    look[1],    0,
-        right[2],    up[2],    look[2],    0,
-        0,    0,    0,    1
+        right[0], right[1], right[2],   0,
+        up[0],    up[1],    up[2],      0,
+        look[0],  look[1],  look[2],    0,
+        pos[0],   pos[1],   pos[2],    1
     ];
 
-    var modelMat = SceneJS._math_translationMat4v([-pos[0], -pos[1], -pos[2]]);
-   // var modelMat = SceneJS._math_identityMat4();
-    var viewMat = SceneJS._math_mat4(); 
-    SceneJS._math_mulMat4(superViewXForm.matrix, mat, viewMat);
-
-    SceneJS._viewTransformModule.setTransform({ matrix: viewMat });
-    SceneJS._modelTransformModule.setTransform({ matrix: modelMat});
+    //SceneJS._viewTransformModule.setTransform({ matrix: superViewXForm.matrix });
+    SceneJS._modelTransformModule.setTransform({ matrix: mat});
 
     this._renderNodes(traversalContext);
 
