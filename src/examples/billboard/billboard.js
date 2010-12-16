@@ -25,7 +25,7 @@ SceneJS.createNode({
         {
             type: "lookAt",
             eye : { x: 40.0, y: 10.0, z: -35 },
-            look : { y:1.0 },
+            look : { x:13.0, y: -2.0, z: -5.0 },
             up : { y: 1.0 },
 
             nodes: [
