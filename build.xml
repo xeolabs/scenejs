@@ -90,6 +90,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/cube.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/square.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/text/vectorTextModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/text/bitmapTextModule.js"/>
