@@ -21,12 +21,13 @@ SceneJS._fogModule = new (function() {
         f = f || {};
         if (f.mode &&
             (f.mode != "disabled"
+                    && f.mode != "constant"
                     && f.mode != "exp"
                     && f.mode != "exp2"
                     && f.mode != "linear")) {
             throw SceneJS._errorModule.fatalError(
                     new SceneJS.errors.InvalidNodeConfigException(
-                            "SceneJS.fog node has a mode of unsupported type - should be 'none', 'exp', 'exp2' or 'linear'"));
+                            "SceneJS.fog node has a mode of unsupported type - should be 'disabled', 'constant', 'exp', 'exp2' or 'linear'"));
         }
         if (f.mode == "disabled") {
             return {

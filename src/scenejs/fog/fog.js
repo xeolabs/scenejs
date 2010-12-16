@@ -26,7 +26,7 @@
  * @constructor
  * Creates a new SceneJS.Fog
  * @param {Object} [cfg] Static configuration object
- * @param {String} [cfg.mode = "linear"] The fog mode - "disabled", "exp", "exp2" or "linear"
+ * @param {String} [cfg.mode = "linear"] The fog mode - "disabled", "constant", "exp", "exp2" or "linear"
  * @param {Object} [cfg.color = {r: 0.5, g: 0.5, b: 0.5 } The fog color
  * @param {double} [cfg.density = 1.0] The fog density factor
  * @param {double} [cfg.start = 1.0] Point on Z-axis at which fog effect begins
@@ -53,9 +53,9 @@ SceneJS.Fog.prototype._init = function(params) {
  */
 SceneJS.Fog.prototype.setMode = function(mode) {
     mode = mode || "disabled";
-    if (mode != "disabled" && mode != "exp" && mode != "exp2" && mode != "linear") {
+    if (mode != "disabled" && mode != "constant" && mode != "exp" && mode != "exp2" && mode != "linear") {
         throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'disabled', 'exp', 'exp2' or 'linear'"));
+                "SceneJS.fog has a mode of unsupported type: '" + mode + " - should be 'disabled', 'constant', 'exp', 'exp2' or 'linear'"));
     }
     this._attr.mode = mode;
 };
@@ -63,7 +63,7 @@ SceneJS.Fog.prototype.setMode = function(mode) {
 /**
  Returns fogging mode
  @function {string} getMode
- @returns {string} The fog mode - "disabled", "exp", "exp2" or "linear"
+ @returns {string} The fog mode - "disabled", "constant", "exp", "exp2" or "linear"
  @since Version 0.7.4
  */
 SceneJS.Fog.prototype.getMode = function() {

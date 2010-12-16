@@ -59,6 +59,7 @@ SceneJS._eventModule = new (function() {
     this.NODE_DESTROYED = 43;
     this.IMAGEBUFFER_EXPORTED = 44;
     this.CLIP_EXPORTED = 45;
+    this.FLAGS_EXPORTED = 46;
 
     /* Priority queue for each type of event
      */

@@ -270,6 +270,16 @@ var SceneJS = {
     _isArray : function(testObject) {
         return testObject && !(testObject.propertyIsEnumerable('length'))
                 && typeof testObject === 'object' && typeof testObject.length === 'number';
+    },
+
+    _shallowClone : function(o) {
+        var o2 = {};
+        for (var name in o) {
+            if (o.hasOwnProperty(name)) {
+                o2[name] = o[name]
+            }
+        }
+        return o2;
     }
 } ;
 

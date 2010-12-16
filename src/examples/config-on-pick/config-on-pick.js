@@ -248,8 +248,8 @@ SceneJS.createNode({
                             id : "teapot5",
                             nodes : [
                                 {
-                                    type: "renderer",
-                                    id: "teapot5-renderer",
+                                    type: "flags",
+                                    id: "teapot5-flags",
 
                                     // We'll toggle this on pick
 
@@ -373,58 +373,58 @@ SceneJS.createNode({
                             id : "teapot8",
                             nodes : [
 
+                                {
+                                    type: "translate",
+                                    x   : -14,
+                                    y   : -7,
+                                    nodes: [
                                         {
-                                            type: "translate",
-                                            x   : -14,
-                                            y   : -7,
+                                            type: "material",
+                                            id: "teapot8-material",
+
+                                            baseColor:          { r: 0.6, g: 0.3, b: 0.9 },
+                                            specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
+                                            specular:           0.9,
+                                            shine:              6.0,
+
                                             nodes: [
                                                 {
-                                                    type: "material",
-                                                    id: "teapot8-material",
-
-                                                    baseColor:          { r: 0.6, g: 0.3, b: 0.9 },
-                                                    specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:           0.9,
-                                                    shine:              6.0,
+                                                    type: "flags",
+                                                    id: "teapot8-flags",
 
                                                     nodes: [
-                                                             {
-                                    type: "renderer",
-                                    id: "teapot8-renderer",
-
-                                    nodes: [
                                                         {
                                                             type: "teapot"
                                                         }
-                                            ]
-                                                             }
                                                     ]
-                                                },
-                                                {
-                                                    type: "material",
-                                                    baseColor:          { r: 0.4, g: 0.4, b: 0.4 },
-                                                    specularColor:      { r: 0.7, g: 0.7, b: 0.7 },
-                                                    specular:           0.9,
-                                                    shine:              6.0,
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: "material",
+                                            baseColor:          { r: 0.4, g: 0.4, b: 0.4 },
+                                            specularColor:      { r: 0.7, g: 0.7, b: 0.7 },
+                                            specular:           0.9,
+                                            shine:              6.0,
 
+                                            nodes: [
+                                                {
+                                                    type: "translate",
+                                                    z   : 2,
+                                                    x :-1,
+                                                    y: 2,
                                                     nodes: [
                                                         {
-                                                            type: "translate",
-                                                            z   : 2,
-                                                            x :-1,
-                                                            y: 2,
+                                                            type: "scale",
+                                                            x: 1.0,
+                                                            y: 3,
+                                                            z: 1.0,
                                                             nodes: [
                                                                 {
-                                                                    type: "scale",
-                                                                    x: 1.0,
-                                                                    y: 3,
-                                                                    z: 1.0,
-                                                                    nodes: [
-                                                                        {
-                                                                            type: "cube"
-                                                                        }
-                                                                    ]
+                                                                    type: "cube"
                                                                 }
+                                                            ]
+                                                        }
 
                                                     ]
                                                 }
@@ -528,7 +528,11 @@ SceneJS.withNode("teapot4").bind("picked",
  */
 SceneJS.withNode("teapot5").bind("picked",
         function(event) {
-            SceneJS.withNode("teapot5-renderer").set("highlight", true);
+            SceneJS.withNode("teapot5-flags").set({
+                flags:{
+                    highlight: true
+                }
+            });
         });
 
 /* Toggle wireframe for teapot 6 when picked
@@ -576,13 +580,10 @@ SceneJS.withNode("teapot7").bind("picked",
 
 SceneJS.withNode("teapot8").bind("picked",
         function(event) {
-            SceneJS.withNode("teapot8-renderer").set({
 
-                enableBlend: true,
-
-                blendFunc: {
-                    sfactor: "srcAlpha",
-                    dfactor: "one"
+             SceneJS.withNode("teapot8-flags").set({
+                flags:{
+                    transparent: true
                 }
             });
         });
