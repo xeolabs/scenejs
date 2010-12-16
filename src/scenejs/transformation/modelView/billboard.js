@@ -16,97 +16,50 @@
  */
 SceneJS.Billboard = SceneJS.createNodeType("billboard");
 
-
-SceneJS.Billboard.prototype._renderOLD = function(traversalContext) {
-
-    var superViewXForm = SceneJS._viewTransformModule.getTransform();
-    var superModelXForm = SceneJS._modelTransformModule.getTransform();
-
-    /* 1. Get world-space billboard center
-     */
-    var pos = SceneJS._math_transformPoint3(superModelXForm.matrix, [0,0,0]);
-
-    /* 2. Get world-space vector from eye to billboard center
-     */
-    var eye = superViewXForm.lookAt.eye;
-    var look = SceneJS._math_normalizeVec3(SceneJS._math_subVec3([eye.x, eye.y, eye.z], pos));
-
-    var up = superViewXForm.lookAt.up;
-    up = SceneJS._math_normalizeVec3([up.x, up.y, up.z]);
-
-    var right = SceneJS._math_mat4(); 
-    SceneJS._math_cross3Vec3(look, up, right);
-    SceneJS._math_cross3Vec3(right, look, up);
-
-    var r1 = right[0], r2 = right[1], r3 = right[2],
-            u1 = up[0], u2 = up[1], u3 = up[2],
-            l1 = look[0], l2 = look[1], l3 = look[2],
-            px = pos[0], py = pos[1], pz = pos[2];
-
-    var mat = [
-        r1,    u1,    l1,    px,
-        r2,    u2,    l2,    py,
-        r3,    u3,    l3,    pz,
-        0,    0,    0,    1
-    ];
-
-    //var modelMat = SceneJS._math_translationMat4v(pos);
-    var modelMat = SceneJS._math_identityMat4();
-    var viewMat = SceneJS._math_mat4(); 
-    SceneJS._math_mulMat4(superViewXForm.matrix, mat, viewMat);
-
-    SceneJS._viewTransformModule.setTransform({ matrix: viewMat });
-    SceneJS._modelTransformModule.setTransform({ matrix: modelMat});
-
-    this._renderNodes(traversalContext);
-
-    SceneJS._modelTransformModule.setTransform(superModelXForm);
-    SceneJS._viewTransformModule.setTransform(superViewXForm);
-};
-
-
 SceneJS.Billboard.prototype._render = function(traversalContext) {
-
+    // 0. The base variable
     var superViewXForm = SceneJS._viewTransformModule.getTransform();
-    var superModelXForm = SceneJS._modelTransformModule.getTransform();
-
-    /* 1. Get world-space billboard center
-     */
-    var pos = SceneJS._math_transformPoint3(superModelXForm.matrix, [0,0,0]);
-    
-    /* 2. Get world-space vector from eye to billboard center
-     */
     var eye = superViewXForm.lookAt.eye;
-    var look = SceneJS._math_normalizeVec3(SceneJS._math_subVec3([eye.x, eye.y, eye.z], pos));
+    var look = superViewXForm.lookAt.look;
+    var up = superViewXForm.lookAt.up;
+    var superModelXForm = SceneJS._modelTransformModule.getTransform();
+    var matrix = superModelXForm.matrix.slice(0);
 
-    /* 3. Get the world space up vector of the camera
-     */
-    var up = SceneJS._math_normalizeVec3([
-        superViewXForm.matrix[0 * 4 + 1],
-        superViewXForm.matrix[1 * 4 + 1],
-        superViewXForm.matrix[2 * 4 + 1]
-    ]);
-
-    /* 4. Calculate a new coordinate basis for the billboard using the 
-     *    camera up vector and the look-at vector.
-     */
-    var right = Array(3);
-    SceneJS._math_cross3Vec3(look, up, right);
-    right = SceneJS._math_normalizeVec3(right);
-    SceneJS._math_cross3Vec3(right, look, up);
-
-    var mat = [
-        right[0], right[1], right[2],   0,
-        up[0],    up[1],    up[2],      0,
-        look[0],  look[1],  look[2],    0,
-        pos[0],   pos[1],   pos[2],    1
+    // 1. Invert the model rotation matrix, which will reset the subnodes rotation
+    rotMatrix = [
+        matrix[0], matrix[1], matrix[2],  0,
+        matrix[4], matrix[5], matrix[6],  0,
+        matrix[8], matrix[9], matrix[10], 0,
+        0,         0,         0,          1
     ];
+    SceneJS._math_inverseMat4(rotMatrix);
+    SceneJS._math_mulMat4(matrix, rotMatrix, matrix);
+    
+    // 2. Get the billboard Z vector
+    var ZZ = [];
+    SceneJS._math_subVec3([eye.x, eye.y, eye.z], [look.x, look.y, look.z], ZZ);
+    SceneJS._math_normalizeVec3(ZZ);
+    
+    // 3. Get the billboard X vector
+    var XX = [];
+    SceneJS._math_cross3Vec3([up.x, up.y, up.z], ZZ, XX);
+    SceneJS._math_normalizeVec3(XX);
 
-    //SceneJS._viewTransformModule.setTransform({ matrix: superViewXForm.matrix });
-    SceneJS._modelTransformModule.setTransform({ matrix: mat});
+    // 4. Get the billboard Y vector
+    var YY = [];
+    SceneJS._math_cross3Vec3(ZZ, XX, YY);
+    SceneJS._math_normalizeVec3(YY);
+    
+    // 5. Multiply those billboard vector to the matrix
+    SceneJS._math_mulMat4(matrix, [
+        XX[0], XX[1], XX[2], 0,
+        YY[0], YY[1], YY[2], 0,
+        ZZ[0], ZZ[1], ZZ[2], 0,
+        0,     0,     0,     1
+    ], matrix);
 
+    // 6. Render
+    SceneJS._modelTransformModule.setTransform({matrix: matrix});
     this._renderNodes(traversalContext);
-
     SceneJS._modelTransformModule.setTransform(superModelXForm);
-    SceneJS._viewTransformModule.setTransform(superViewXForm);
 };
