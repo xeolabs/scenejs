@@ -39,29 +39,42 @@ SceneJS.createNode({
                         far : 300.0
                     },
                     nodes: [
-                      {
-                          type: "material",
-                          baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                          specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                          specular:       0.9,
-                          shine:          6.0,
-                          nodes: [
-                              {
-                                  type: "billboard",
-                                  nodes: [
-                                      {
-                                          type: "geometry",
-                                          resource: "my-geometry",
-                                          primitive: "triangles",
-                                          positions: [
-                                              -1,  1, 0,
-                                               1,  1, 0,
-                                               1, -1, 0,
-                                              -1, -1, 0 ],
-                                          indices: [ 0, 1, 2, 0, 2, 3 ]
-                                      }
-                                  ]
-                              }
+                        {
+                            type: "material",
+                            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                            specular:       0.9,
+                            shine:          6.0,
+                            nodes: [
+                                {
+                                    type: "rotate",
+                                    x: 1.0,
+                                    angle: 45.0,
+                                    nodes: [
+                                        {
+                                            type: "translate",
+                                            y: -2.0, z: -5.0,
+                                            nodes: [
+                                                {
+                                                    type: "billboard",
+                                                    nodes: [
+                                                        {
+                                                            type: "geometry",
+                                                            resource: "my-geometry",
+                                                            primitive: "triangles",
+                                                            positions: [
+                                                                -1,  1, 0,
+                                                                 1,  1, 0,
+                                                                 1, -1, 0,
+                                                                -1, -1, 0 ],
+                                                            indices: [ 0, 1, 2, 0, 2, 3 ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
                             ]
                         }
                     ]
