@@ -79,37 +79,26 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
     var eye = superViewXForm.lookAt.eye;
     var look = SceneJS._math_normalizeVec3(SceneJS._math_subVec3([eye.x, eye.y, eye.z], pos));
 
-    var viewMat = superViewXForm.matrix;
-
-    var viewUp = SceneJS._math_normalizeVec3([
-        viewMat[0 * 4 + 1],
-        viewMat[1 * 4 + 1],
-        viewMat[2 * 4 + 1]
+    /* 3. Get the world space up vector of the camera
+     */
+    var up = SceneJS._math_normalizeVec3([
+        superViewXForm.matrix[0 * 4 + 1],
+        superViewXForm.matrix[1 * 4 + 1],
+        superViewXForm.matrix[2 * 4 + 1]
     ]);
 
-    /*var viewRight = SceneJS._math_normalizeVec3([
-        viewMat[0 * 4 + 0],
-        viewMat[1 * 4 + 0],
-        viewMat[2 * 4 + 0]
-    ]);
-
-    var viewLook = SceneJS._math_normalizeVec3([
-        viewMat[0 * 4 + 2],
-        viewMat[1 * 4 + 2],
-        viewMat[2 * 4 + 2]
-    ]);*/
-
-    var xx = Array(3);
-    var yy = viewUp;
-    var zz = look;
-    SceneJS._math_cross3Vec3(zz, yy, xx);
-    xx = SceneJS._math_normalizeVec3(xx);
-    SceneJS._math_cross3Vec3(xx, zz, yy);
+    /* 4. Calculate a new coordinate basis for the billboard using the 
+     *    camera up vector and the look-at vector.
+     */
+    var right = Array(3);
+    SceneJS._math_cross3Vec3(look, up, right);
+    right = SceneJS._math_normalizeVec3(right);
+    SceneJS._math_cross3Vec3(right, look, up);
 
     var mat = [
-        xx[0],    xx[1],    xx[2],    0,
-        yy[0],    yy[1],    yy[2],    0,
-        zz[0],    zz[1],    zz[2],    0,
+        right[0], right[1], right[2],   0,
+        up[0],    up[1],    up[2],      0,
+        look[0],  look[1],  look[2],    0,
         -pos[0],  -pos[1],  -pos[2],    1
     ];
 
