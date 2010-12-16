@@ -2,9 +2,9 @@
  * @class A scene node that defines sphere geometry.
  * <p>The geometry is complete with normals for shading and one layer of UV coordinates for
  * texture-mapping.</p>
- * <p>The radius is 1.0 -  use the SceneJS.Scale node to set the size of a Sphere.</p>
  * <p><b>Example Usage</b></p><p>Definition of sphere with a radius of 6 units:</b></p><pre><code>
  * var c = new SceneJS.Sphere({
+ *			radius: 6
  *          slices: 30,     // Optional number of longitudinal slices (30 is default)
  *          rings: 30      // Optional number of latitudinal slices (30 is default)
  *     })
@@ -25,16 +25,16 @@ SceneJS.Sphere = SceneJS.createNodeType("sphere", "geometry");
 SceneJS.Sphere.prototype._init = function(params) {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
+	var radius = params.radius || 1;
 
     /* Resource ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
      */
-    this._resource = "sphere_" + rings + "_" + slices;
+    this._resource = "sphere_" + radius + "_" + rings + "_" + slices;
 
     /* Callback that does the creation in case we can't find matching sphere to reuse     
      */
     this._create = function() {
-        var radius = 1;
         var positions = [];
         var normals = [];
         var uv = [];
