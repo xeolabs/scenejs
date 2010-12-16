@@ -99,7 +99,7 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
         right[0], right[1], right[2],   0,
         up[0],    up[1],    up[2],      0,
         look[0],  look[1],  look[2],    0,
-        -pos[0],  -pos[1],  -pos[2],    1
+        pos[0],   pos[1],   pos[2],    1
     ];
 
     //SceneJS._viewTransformModule.setTransform({ matrix: superViewXForm.matrix });
