@@ -185,7 +185,7 @@ SceneJS.Material.prototype.getSpecularColor = function() {
  * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setSpecular = function(specular) {
-    this._specular = specular;
+    this._material.specular = specular;
     this._setDirty();
     return this;
 };

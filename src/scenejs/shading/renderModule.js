@@ -35,6 +35,7 @@ SceneJS._shaderModule = new (function() {
     var rendererState;
     var lightState;
     var boundaryState;
+    var colortransState;
     var materialState;
     var fogState;
     var texState;
@@ -140,6 +141,12 @@ SceneJS._shaderModule = new (function() {
                     hash: ""
                 };
                 boundaryState = null;
+                colortransState = {
+                    _stateId : nextStateId++,
+                    trans: {
+                    },
+                    hash: ""
+                };
                 materialState = {
                     material: {
                         _stateId : nextStateId++,
@@ -299,6 +306,23 @@ SceneJS._shaderModule = new (function() {
                 };
                 stateHash = null;
             });
+
+    /**
+     * When color transform set, add it to the state soup
+     */
+    this.setColortrans = function(trans) {
+
+        /* Add colortrans to state soup.
+         */
+        colortransState = {
+            _stateId : nextStateId++,
+            trans:      trans,
+            hash: trans ? "t" : "f"
+        };
+
+        stateHash = null;
+    };
+
 
     /* When material state exported, add it to the state soup. We don't need
      * a GLSL hash for material since our GLSL happens to be generic for
@@ -525,6 +549,7 @@ SceneJS._shaderModule = new (function() {
             flagsState: flagsState,
             rendererState: rendererState,
             lightState: lightState,
+            colortransState : colortransState,
             materialState: materialState,
             fogState : fogState,
             modelXFormState: modelXFormState,
@@ -539,7 +564,7 @@ SceneJS._shaderModule = new (function() {
         /* Put node into either the transoarent or opaque bin,
          * depending on current material state's opacity
          */
-        if (flagsState.flags.transparent === true) {
+        if (materialState.material.opacity != undefined && materialState.material.opacity != 1.0) {
             layer.binSet.transpNodes.push(node);
         } else {
             layer.binSet.opaqueNodes.push(node);
@@ -913,6 +938,21 @@ SceneJS._shaderModule = new (function() {
 
             /*
              */
+            if (node.colortransState && node.colortransState.trans && node.colortransState != this._lastColortransStateId) {
+
+                /* Bind colortrans
+                 */
+                var trans = node.colortransState.trans;
+                var scale = trans.scale;
+                var add = trans.add;
+                this._program.setUniform("uColortransScale", [scale.r, scale.g, scale.b, scale.a]);  // Scale
+                this._program.setUniform("uColortransAdd", [add.r, add.g, add.b, add.a]);  // Scale
+                this._program.setUniform("uColortransSaturation", trans.saturation);  // Saturation
+                this._lastColortransStateId = node.colortransState._stateId;
+            }
+
+            /*
+             */
             if (node.materialState && node.materialState != this._lastMaterialStateId) {
 
                 /* Bind Material
@@ -1260,6 +1300,7 @@ SceneJS._shaderModule = new (function() {
         var lighting = lightState && lightState.lights.length > 0 && geoState && geoState.geo.normalBuf;
         var fogging = fogState.fog && true;
         var clipping = clipState && clipState.clips.length > 0;
+        var colortrans = colortransState && colortransState.trans;
 
         var src = ["\n"];
 
@@ -1332,6 +1373,7 @@ SceneJS._shaderModule = new (function() {
             }
         }
 
+
         /* Fog uniforms
          */
         if (fogging) {
@@ -1340,6 +1382,12 @@ SceneJS._shaderModule = new (function() {
             src.push("uniform float uFogDensity;");
             src.push("uniform float uFogStart;");
             src.push("uniform float uFogEnd;");
+        }
+
+        if (colortrans) {
+            src.push("uniform vec4   uColortransAdd;");
+            src.push("uniform vec4   uColortransScale;");
+            src.push("uniform float  uColortransSaturation;");
         }
 
         //--------------------------------------------------------------------------
@@ -1539,28 +1587,41 @@ SceneJS._shaderModule = new (function() {
         /* Fog
          */
         if (fogging) {
-            src.push("    if (uFogMode != 0.0) {");          // not "disabled"
-            src.push("        float fogFact = (1.0 - uFogDensity);");
-            src.push("        if (uFogMode != 4.0) {");      // not "constant"
-            src.push("                if (uFogMode == 1.0) {");  // "linear"
-            src.push("                    fogFact *= clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);");
-            src.push("                } else {");                // "exp" or "exp2"
-            src.push("                    fogFact *= clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);");
-            src.push("                }");
-            src.push("            }");
-            src.push("            gl_FragColor = fragColor * fogFact + vec4(uFogColor, 1) * (1.0 - fogFact);");
-            src.push("    } else {");
-
-            // Fog disabled, either by "disabled" mode on fog node, or by fog == false on flags node
-
-            src.push("        gl_FragColor = fragColor;");
+            src.push("if (uFogMode != 0.0) {");          // not "disabled"
+            src.push("    float fogFact = (1.0 - uFogDensity);");
+            src.push("    if (uFogMode != 4.0) {");      // not "constant"
+            src.push("       if (uFogMode == 1.0) {");  // "linear"
+            src.push("          fogFact *= clamp(pow(max((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0), 2.0), 0.0, 1.0);");
+            src.push("       } else {");                // "exp" or "exp2"
+            src.push("          fogFact *= clamp((uFogEnd - length(-vViewVertex.xyz)) / (uFogEnd - uFogStart), 0.0, 1.0);");
+            src.push("       }");
             src.push("    }");
-        } else {
-            src.push("    gl_FragColor = fragColor;");
+            src.push("    fragColor = fragColor * (fogFact + vec4(uFogColor, 1)) * (1.0 - fogFact);");
+            src.push("}");
+
+        }
+
+        /* Color transformations
+         */
+        if (colortrans) {
+
+            /* Desaturate
+             */
+            src.push("        if (uColortransSaturation < 0.0) {");
+            src.push("            float intensity = 0.3 * fragColor.r + 0.59 * fragColor.g + 0.11 * fragColor.b;");
+            src.push("            fragColor = vec4((intensity * -uColortransSaturation) + fragColor.rgb * (1.0 + uColortransSaturation), 1.0);");
+            src.push("        }");
+
+            /* Scale/add
+             */
+            src.push("        fragColor = (fragColor * uColortransScale) + uColortransAdd;");
+
         }
 
         if (debugCfg.whitewash == true) {
             src.push("    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+        } else {
+            src.push("    gl_FragColor = fragColor;");
         }
 
         src.push("}");
