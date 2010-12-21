@@ -144,6 +144,9 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
 
+        <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
+
         <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
@@ -266,6 +269,9 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
 

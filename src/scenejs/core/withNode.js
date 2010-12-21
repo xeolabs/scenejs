@@ -433,7 +433,7 @@ SceneJS._WithNode.prototype._callNodeMethod = function(prefix, attr, value, targ
     if (!func) {
         throw "Attribute '" + attr + "' not found on node '" + targetNode.getID() + "' for " + prefix;
     }
-    func.call(targetNode, value);
+    func.call(targetNode, this._parseAttr(attr, value));
 
     /* TODO: optimise - dont fire unless listener exists
      */
@@ -457,7 +457,7 @@ SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode
             if (!func) {
                 throw "Attribute '" + key + "' not found on node '" + targetNode.getID() + "' for " + prefix;
             }
-            func.call(targetNode, attr[key]);
+            func.call(targetNode, this._parseAttr(key, attr[key]));
 
             SceneJS._needFrame = true;  // Flag another scene render pass needed
         }
@@ -473,6 +473,34 @@ SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode
     /* TODO: event should be queued and consumed to avoid many of these events accumulating
      */
     targetNode._fireEvent("updated", { attr: attr });
+};
+
+/** Given an attribute name of the form "alpha.beta" and a value, returns this sort of thing:
+ *
+ * {
+ *     "alpha": {
+ *         "beta": value
+ *     }
+ * }
+ *
+ */
+SceneJS._WithNode.prototype._parseAttr = function(attr, value) {
+    var tokens = attr.split(".");
+    if (tokens.length <= 1) {
+        return value;
+    }
+    var obj = {};
+    var root = obj;
+    var name;
+    var i = 0;
+    var len = tokens.length - 1;
+
+    while (i < len) {
+        obj[tokens[i++]] = value;
+    }
+    obj = obj[name] = {};
+
+    return root;
 };
 
 

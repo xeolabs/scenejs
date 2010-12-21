@@ -96,7 +96,9 @@ SceneJS.createNode({
                             specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
                             specular:       10.9,
                             shine:          20.0,
-                            opacity: 0.5,
+                            flags: {
+                                transparent: true
+                            },
 
                             nodes: [
 

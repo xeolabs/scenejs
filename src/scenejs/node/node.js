@@ -115,6 +115,7 @@ SceneJS.Node = function() {
     this._nodeType = "node";
     this._NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
     this._sid = null;
+    this._flags = null;     // Fast to detect that we have no flags and then bypass processing them
     this._data = {};
 
     /* Child nodes
@@ -221,6 +222,8 @@ SceneJS.Node._ArgParser = new (function() {
                         node._NODEINFO = param;
                     } else if (key == "data") {       // User-attached data map
                         node._data = param;
+                    } else if (key == "flags") {       // 
+                        node._flags = param;
                     } else if (key == "enabled") {    // Traversal enabled/disabled
                         node._enabled = param;
                     } else if (key == "layer") {     // Rendering layers
@@ -320,7 +323,9 @@ SceneJS.Node.prototype._renderNodes = function(
         traversalContext,
         selectedChildren) {             // Selected children - useful for Selector node
 
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+    /* When in picking pass and pick enabled for node, push on pick module
+     */
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && SceneJS._flagsModule.flags.picking) {
         SceneJS._pickModule.pushNode(this);
     }
 
@@ -334,11 +339,17 @@ SceneJS.Node.prototype._renderNodes = function(
         for (i = 0; i < numChildren; i++) {
             child = children[i];
             if (child._enabled) { // Node can be disabled with #setEnabled(false)
-                childTraversalContext = {
-                    insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
-                    callback : traversalContext.callback
-                };
-                child._renderWithEvents.call(child, childTraversalContext);
+
+                /* Don't render node in picking pass when pick is disabled
+                 * for it by a flags node
+                 */
+                if (!(SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && !SceneJS._flagsModule.flags.picking)) {
+                    childTraversalContext = {
+                        insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
+                        callback : traversalContext.callback
+                    };
+                    child._renderWithEvents.call(child, childTraversalContext);
+                }
             }
         }
     }
@@ -359,7 +370,9 @@ SceneJS.Node.prototype._renderNodes = function(
         }
     }
 
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+    /* When in picking pass and pick enabled for node, pop from pick module
+     */
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && SceneJS._flagsModule.flags.picking) {
         SceneJS._pickModule.popNode(this);
     }
 };
@@ -383,6 +396,10 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
         SceneJS._layerModule.pushLayer(this._nodeLayer);
     }
 
+    if (this._flags) {
+        SceneJS._flagsModule.pushFlags(this._flags);
+    }
+
     if (this._numListeners == 0) {
         this._render(traversalContext);
     } else {
@@ -393,6 +410,10 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
         if (this._listeners["rendered"]) {
             this._fireEvent("rendered", { });
         }
+    }
+
+    if (this._flags) {
+        SceneJS._flagsModule.popFlags();
     }
 
     if (this._nodeLayer) {
@@ -430,6 +451,24 @@ SceneJS.Node.prototype.getId = SceneJS.Node.prototype.getID;
  */
 SceneJS.Node.prototype.getType = function() {
     return this._nodeType;
+};
+
+/**
+ Sets the flags.
+ @param {{String:Boolean}} flags Map of flag booleans
+ @since Version 0.8
+ */
+SceneJS.Node.prototype.setFlags = function(flags) {
+    this._flags = SceneJS._shallowClone(flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
+};
+
+/**
+ Returns the flags
+ @param {{String:Boolean}} Map of flag booleans
+ @since Version 0.8
+ */
+SceneJS.Node.prototype.getFlags = function() {
+    return SceneJS._shallowClone(this._flags || {});  // Flags map is null when none exist
 };
 
 /**

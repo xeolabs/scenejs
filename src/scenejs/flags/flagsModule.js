@@ -12,6 +12,8 @@ SceneJS._flagsModule = new (function() {
     var stackLen = 0;
     var dirty;
 
+    this.flags = {}; // Flags at top of flag stack
+
     /** Creates flag set by inheriting flags off top of stack where not overridden
      */
     function createFlags(flags) {
@@ -29,15 +31,20 @@ SceneJS._flagsModule = new (function() {
         return flags;
     }
 
-    /* Make fresh flag stack for new render pass
+    /* Make fresh flag stack for new render pass, containing default flags
+     * to enable/disable various things for subgraph
      */
+    var self = this;
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
+                self.flags = {
+                    fog: true,
+                    colortrans : true,
+                    picking : true
+                };
                 flagStack = [
-                    {
-                        fog: true
-                    }
+                    self.flags
                 ];
                 stackLen = 1;
                 dirty = true;
@@ -49,22 +56,23 @@ SceneJS._flagsModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.setFlags(flagStack[stackLen - 1]);
+                    SceneJS._shaderModule.setFlags(self.flags);
                     dirty = false;
                 }
             });
 
-    /*  
+    /* Push flags to top of stack - stack top becomes active flags
      */
     this.pushFlags = function(f) {
-        flagStack[stackLen++] = createFlags(f);   // TODO: memoize flags?
+        flagStack[stackLen++] = this.flags = createFlags(f);   // TODO: memoize flags?
         dirty = true;
     };
 
-    /*
+    /* Pop flags off stack - stack top becomes active flags
      */
     this.popFlags = function() {
         stackLen--;
+        this.flags = flagStack[stackLen - 1];
         dirty = true;
     };
 

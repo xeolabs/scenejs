@@ -21,79 +21,70 @@ SceneJS.createNode({
     loggingElementId: "theLoggingDiv",
 
     nodes: [
+
         {
-            type: "fog",
-            mode:"linear",
-            color: { r:.0, g:0.0,  b:.0 },
-            start: 0,
-            end:2000  ,
-            density:300.0,
+            type: "lookAt",
+            id: "the-lookat",
+            eye : { x: 0, y: 10, z: -150 },
+            look : { x :  0, y: 20, z: 0 },
+            up : { y: 1.0 },
 
             nodes: [
                 {
-                    type: "lookAt",
-                    id: "the-lookat",
-                    eye : { x: 0, y: 10, z: -150 },
-                    look : { x :  0, y: 20, z: 0 },
-                    up : { y: 1.0 },
+                    type: "camera",
+                    optics: {
+                        type: "perspective",
+                        fovy : 45.0,
+                        aspect : 1.47,
+                        near : 0.10,
+                        far : 7000.0
+                    },
 
                     nodes: [
+
+                        /* Integrate our sky sphere, which is defined in sky-sphere.js
+                         */
                         {
-                            type: "camera",
-                            optics: {
-                                type: "perspective",
-                                fovy : 45.0,
-                                aspect : 1.47,
-                                near : 0.10,
-                                far : 7000.0
-                            },
+                            type : "instance",
+                            target :"sky-sphere"
+                        },
 
-                            nodes: [
+                        /* Lights, after the sky sphere to avoid applying to it
+                         */
+                        {
+                            type: "light",
+                            mode:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                        },
+                        {
+                            type: "light",
+                            mode:                   "dir",
+                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 2.0, y: 1.0, z: 0.0 }
+                        },
 
-                                /* Integrate our sky sphere, which is defined in sky-sphere.js
-                                 */
-                                {
-                                    type : "instance",
-                                    target :"sky-sphere"
-                                },
+                        /* Instantiate our staircase, defined in staircase.js
+                         */
+                        {
+                            type: "instance",
+                            target: "lod-stairs"
+                        }
+                        ,
 
-                                /* Lights, after the sky sphere to avoid applying to it                                                                     
-                                 */
-                                {
-                                    type: "light",
-                                    mode:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type: "light",
-                                    mode:                   "dir",
-                                    color:                  { r: 0.8, g: 0.8, b: 0.8 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 2.0, y: 1.0, z: 0.0 }
-                                },
-
-                                /* Instantiate our staircase, defined in staircase.js
-                                 */
-                                {
-                                    type: "instance",
-                                    target: "lod-stairs"
-                                }
-                                ,
-
-                                /* Instantiate our tiled floor, defined in tiled-floor.js
-                                 */
-                                {
-                                    type: "instance",
-                                    target: "tiled-floor"
-                                }
-                            ]
+                        /* Instantiate our tiled floor, defined in tiled-floor.js
+                         */
+                        {
+                            type: "instance",
+                            target: "tiled-floor"
                         }
                     ]
                 }
+
             ]
         }
     ]

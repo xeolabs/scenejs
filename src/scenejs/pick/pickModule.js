@@ -147,7 +147,10 @@ SceneJS._pickModule = new (function() {
     }
 
     this.pushNode = function(node) {
-        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+
+        /* Only push node when in pick mode and pick not disabled by flags node
+         */
+        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && SceneJS._flagsModule.flags.picking) {
             if (node.hasListener("picked")) {
 
                 nodeStack.push(node);
@@ -168,7 +171,10 @@ SceneJS._pickModule = new (function() {
     };
 
     this.popNode = function(node) {
-        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+
+        /* Only pop node when in pick mode and pick not disabled by flags node
+         */
+        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && SceneJS._flagsModule.flags.picking) {
             if (nodeStack.length > 0 && nodeStack[nodeStack.length - 1].getID() == node.getID()) {
                 nodeStack.pop();
                 if (nodeStack.length == 0) {   // White for the non-pick colour - should probably be black?
@@ -185,7 +191,10 @@ SceneJS._pickModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
-                if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+
+                /* Only export pick color when in pick mode and pick not disabled by flags node
+                 */
+                if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && SceneJS._flagsModule.flags.picking) {
                     SceneJS._eventModule.fireEvent(
                             SceneJS._eventModule.PICK_COLOR_EXPORTED, { pickColor: [color.r,color.g,color.b]});
                 }
