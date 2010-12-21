@@ -1,5 +1,5 @@
 /*
- This example demonstrates how to define geometry, in this case a simple quad sprite
+ This example demonstrates how to define billboards, in this case a simple quad sprite
  object that supports texturing.
 
  Lindsay S. Kay,
@@ -8,9 +8,6 @@
  This example assumes that you have looked at a few of the other examples
  and now have an understanding of concepts such as basic SceneJS syntax,
  lighting, material, data flow etc.
-
- Scroll down to the SceneJS.geometry node about one third of the way down
- this file and I'll guide you from there.
 
  */
 
@@ -63,7 +60,7 @@ SceneJS.createNode({
                             color: { r: 1, g: 1, b: 1 },
                             dir: {x:0, y:4, z:5},
                             diffuse: true,
-                            specular: false,
+                            specular: false
                         },
                         {
                             type: "light",
@@ -71,7 +68,7 @@ SceneJS.createNode({
                             color: { r: 1, g: 1, b: 1 },
                             dir: {x:0, y:4, z:-5},
                             diffuse: true,
-                            specular: false,
+                            specular: false
                         },
                         {
                             type: "rotate",
@@ -163,25 +160,10 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-pitch = 0;
-
-window.render = function() {
-    SceneJS.withNode("pitch").set("angle", pitch);
-    SceneJS.withNode("yaw").set("angle", yaw);
-    SceneJS.withNode("the-scene").render();
-};
-
-/* Render loop until error or reset
- * (which IDE does whenever you hit that run again button)
- */
-var pInterval;
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
+SceneJS.withNode("the-scene").start({
+    idleFunc: function() {
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
+        SceneJS.withNode("the-scene").render();
+    }
 });
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-pInterval = window.setInterval("window.render()", 10);

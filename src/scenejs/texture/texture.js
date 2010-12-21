@@ -155,12 +155,14 @@ SceneJS.Texture.prototype._init = function(params) {
             }
             if (layerParam.applyTo) {
                 if (layerParam.applyTo != "baseColor" && // Colour map
-                 //   layerParam.applyTo != "diffuseColor" &&
+                    layerParam.applyTo != "specular" && // Specular map
+                    layerParam.applyTo != "emit" && // Emission map
+                    //   layerParam.applyTo != "diffuseColor" &&
                     layerParam.applyTo != "normals") {
                     throw SceneJS._errorModule.fatalError(
                             new SceneJS.errors.InvalidNodeConfigException(
                                     "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
-                                    "should be either 'baseColor' or 'normals'"));
+                                    "should be either 'baseColor', 'specular' or 'normals'"));
                 }
             }
             this._layers.push({
