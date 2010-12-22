@@ -90,51 +90,25 @@ SceneJS.createNode({
     ]
 });
 
-
-/*----------------------------------------------------------------------
- * Scene rendering loop and mouse handler stuff follows
- *---------------------------------------------------------------------*/
-
-var eye = { x: 0, y: 10, z: -150 };
-var look = { x :  0, y: 20, z: 0 };
-var speed = 0;
-var yaw = 0;
-var pitch = 0;
-var lastX;
-var lastY;
-var dragging = false;
-var moveAngle = 0;
-var moveAngleInc = 0;
-
 var canvas = document.getElementById("theCanvas");
 
-function mouseDown(event) {
-    lastX = event.clientX;
-    lastY = event.clientY;
-    dragging = true;
-}
+var origin = null;
+var speed = null;
+canvas.addEventListener('mousedown', function(e) {
+	origin = {x: e.clientX, y: e.clientY};
+}, false);
 
-function mouseUp() {
-    dragging = false;
-    speed = 0;
-    moveAngleInc = 0;
-}
+canvas.addEventListener('mouseup', function(e) {
+	origin = null;
+	speed = null;
+}, false);
 
-/* On a mouse drag, we'll re-render the scene, passing in
- * incremented angles in each time.
- */
-function mouseMove(event) {
-    if (!lastX) {
-        lastX = event.clientX;
-        lastY = event.clientY;
-    }
-    if (dragging) {
-        moveAngleInc = (event.clientX - lastX) * 0.002;
-        speed = (lastY - event.clientY) * 0.01;
-    }
-}
+canvas.addEventListener('mousemove', function(e) {
+	if (origin)
+		speed = {x: e.clientX - origin.x, y: e.clientY - origin.y};
+}, false);
 
-function mouseWheel(event) {
+canvas.addEventListener('mousewheel', function(e) {
     var delta = 0;
     if (!event) event = window.event;
     if (event.wheelDelta) {
@@ -153,64 +127,25 @@ function mouseWheel(event) {
     if (event.preventDefault)
         event.preventDefault();
     event.returnValue = false;
-}
+}, true);
 
-canvas.addEventListener('mousedown', mouseDown, true);
-canvas.addEventListener('mousemove', mouseMove, true);
-canvas.addEventListener('mouseup', mouseUp, true);
-canvas.addEventListener('mousewheel', mouseWheel, true);
+SceneJS.withNode("the-scene").start({
+	fps: 60,
+	idleFunc: function(e) {
+		if (speed && speed.y)
+			SceneJS.Message.sendMessage({
+				command: "lookAt.move",
+				target: "the-lookat",
+				distance: -speed.y / 100,
+				ignoreY: true
+			});
 
-canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
-
-//var count = 0;
-
-window.render = function() {
-
-    moveAngle -= moveAngleInc;
-
-    /* Using Sylvester Matrix Library to create this matrix
-     */
-    var rotMat = Matrix.Rotation(moveAngle * 0.0174532925, $V([0,1,0]));
-    var moveVec = rotMat.multiply($V([0,0,1])).elements;
-    if (speed) {
-        eye.x += moveVec[0] * speed;
-        eye.z += moveVec[2] * speed;
-    }
-
-    /* Send message to the lookat node to update it off the mouse input.
-     *
-     * We could also use SceneJS.withNode("the-lookat").set({ eye: eye, look: { ... } });
-     */
-    SceneJS.Message.sendMessage({
-        command: "update",
-        target: "the-lookat",
-        set: {
-            eye: eye,
-            look: { x: eye.x + moveVec[0], y: eye.y, z : eye.z + moveVec[2] }
-        }
-    });
-
-    /* Render the scene graph
-     */
-    SceneJS.withNode("the-scene").render();
-};
-
-var pInterval;
-
-SceneJS.bind("error", function(e) {
-    alert(e.exception.message);
-    window.clearInterval(pInterval);
+		if (speed && speed.x)
+			SceneJS.Message.sendMessage({
+				command: "lookAt.rotate",
+				target: "the-lookat",
+				angle: -speed.x / 420,
+				ignoreY: true
+			});
+	}
 });
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-
-pInterval = window.setInterval("window.render()", 30);
-
-
-
-
-
-
