@@ -11,11 +11,12 @@ SceneJS._bitmapTextModule = new (function() {
             });
 
     function getHMTLColor(color) {
+		var htmlColor = [];
         if (color.length != 4) {
             return color;
         }
         for (var i = 0; i < color.length; i++) {
-            color[i] *= 255;
+            htmlColor[i] = color[i]*255;
         }
         return 'rgba(' + color.join(',') + ')';
     }
