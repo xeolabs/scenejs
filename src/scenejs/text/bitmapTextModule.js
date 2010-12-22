@@ -10,7 +10,7 @@ SceneJS._bitmapTextModule = new (function() {
 
             });
 
-    function getHMTLColor(color) {
+    function getHTMLColor(color) {
 		var htmlColor = [];
         if (color.length != 4) {
             return color;
@@ -33,7 +33,7 @@ SceneJS._bitmapTextModule = new (function() {
 
         cx.font = size + "px " + font;
         cx.textBaseline = "middle";
-        cx.fillStyle = getHMTLColor([.5, 10, 30, .5]);
+        cx.fillStyle = getHTMLColor([.5, 10, 30, .5]);
         cx.fillStyle = "#FFFF00";
 
 
