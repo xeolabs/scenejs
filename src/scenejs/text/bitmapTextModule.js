@@ -21,10 +21,10 @@ SceneJS._bitmapTextModule = new (function() {
 		// alpha value should be 0 to 1, not multiplied by 255
 		htmlColor[3] = color[3];
 		
-        return 'rgba(' + color.join(',') + ')';
+        return 'rgba(' + htmlColor.join(',') + ')';
     }
 
-    this.createText = function(font, size, text) {
+    this.createText = function(font, size, text, color) {
         var canvas = document.createElement("canvas");
         var cx = canvas.getContext('2d');
 
@@ -36,9 +36,7 @@ SceneJS._bitmapTextModule = new (function() {
 
         cx.font = size + "px " + font;
         cx.textBaseline = "middle";
-        cx.fillStyle = getHTMLColor([.5, 10, 30, .5]);
-        cx.fillStyle = "#FFFF00";
-
+        cx.fillStyle = getHTMLColor(color);
 
         var x = 0;
         var y = (size / 2);

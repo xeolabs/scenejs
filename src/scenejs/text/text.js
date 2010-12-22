@@ -9,7 +9,7 @@ SceneJS.Text.prototype._init = function(params) {
     }
     this._mode = mode;
     if (this._mode == "bitmap") {
-        var text = SceneJS._bitmapTextModule.createText("Helvetica", params.size || 1, params.text || "");
+        var text = SceneJS._bitmapTextModule.createText("Helvetica", params.size || 1, params.text || "", params.color || [1,1,1,1]);
         this._layer = {
             creationParams: {
                 image: text.image,
