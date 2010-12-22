@@ -3,7 +3,6 @@
  */
 SceneJS._bitmapTextModule = new (function() {
 
-
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.INIT,
             function() {
