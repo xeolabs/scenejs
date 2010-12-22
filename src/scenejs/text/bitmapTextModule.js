@@ -15,9 +15,12 @@ SceneJS._bitmapTextModule = new (function() {
         if (color.length != 4) {
             return color;
         }
-        for (var i = 0; i < color.length; i++) {
+        for (var i = 0; i < color.length-1; i++) {
             htmlColor[i] = color[i]*255;
         }
+		// alpha value should be 0 to 1, not multiplied by 255
+		htmlColor[3] = color[3];
+		
         return 'rgba(' + color.join(',') + ')';
     }
 
@@ -41,11 +44,6 @@ SceneJS._bitmapTextModule = new (function() {
         var y = (size / 2);
         cx.fillText(text, x, y);
 
-
-        //cx.fillText(text, 0, size);
-
-        //                canvas.width = 400;
-        //        canvas.height = 400;
         return {
             image: canvas,
             width: canvas.width,
