@@ -104,6 +104,12 @@ SceneJS.Text.prototype._updateGeometry = function (width, height, params) {
 SceneJS.Text.prototype.setText = function (params) {
     var text;
     if (this._mode === "bitmap") {
+		// Save new parameters to be reused when setText is called next
+		this.font = params.font || this.font;
+		this.size = params.size || this.size;
+		this.color = params.color || this.color;
+		this.text = params.text || this.text;
+	
         text = SceneJS._bitmapTextModule.createText(params.font || this.font, params.size || this.size, params.text || this.text, params.color || this.color);
         this._layer = {
             creationParams: {
