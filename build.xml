@@ -43,7 +43,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/withNode.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/message.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
 
@@ -117,7 +116,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightingModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/material/materialModule.js"/>
@@ -174,7 +172,6 @@
                 outputdir="${basedir}/docs/">
             <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/message.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
 
@@ -280,9 +277,6 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/imagebuf/imageBuf.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/imagebuf/imageBufModule.js"/>
