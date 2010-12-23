@@ -14,7 +14,8 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0, y: 0, z: -15 },
+            id: "the-lookat",
+            eye : { x: 0, y: 0, z: -10 },
             look : { x: 0, y: 0, z: 0 },
             up : { y: 1.0 },
 
@@ -103,7 +104,7 @@ SceneJS.createNode({
                                                         {
                                                             type: "rotate",
                                                             z: 1,
-                                                           angle : 195,
+                                                            angle : 195,
                                                             nodes: [
                                                                 {
                                                                     type: "rotate",
@@ -148,6 +149,8 @@ var lastX;
 var lastY;
 var dragging = false;
 
+var posZ = -10;
+
 var earthRotate = 0;
 
 var canvas = document.getElementById("theCanvas");
@@ -175,16 +178,45 @@ function mouseMove(event) {
     }
 }
 
+function mouseWheel(event) {
+    var delta = 0;
+    if (!event) event = window.event;
+    if (event.wheelDelta) {
+        delta = event.wheelDelta / 120;
+        if (window.opera) delta = -delta;
+    } else if (event.detail) {
+        delta = -event.detail / 3;
+    }
+    if (delta) {
+        if (delta < 0) {
+            posZ -= 0.6;
+        } else {
+            posZ += 0.6;
+        }
+    }
+    if (event.preventDefault)
+        event.preventDefault();
+    event.returnValue = false;
+
+
+}
+
+
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('mousewheel', mouseWheel, true);
+
+canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
+
 
 SceneJS.withNode("the-scene").start({
     idleFunc: function() {
         SceneJS.withNode("earth-rotate").set("angle", earthRotate);
         SceneJS.withNode("pitch").set("angle", pitch);
         SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("the-scene").render();
+        SceneJS.withNode("yaw").set("angle", yaw);
+        SceneJS.withNode("the-lookat").set({ eye: { x: 0, y: 0, z: posZ } });
 
         earthRotate -= 0.4;
     }

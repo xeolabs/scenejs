@@ -84,10 +84,14 @@ SceneJS._geometryModule = new (function() {
             SceneJS._eventModule.RESET,
             function() {
                 for (var canvasId in geoMaps) {    // Destroy geometries on all canvases
-                    var geoMap = geoMaps[canvasId];
-                    for (var resource in geoMap) {
-                        var geometry = geoMap[resource];
-                        destroyGeometry(geometry);
+                    if (geoMaps.hasOwnProperty(canvasId)) {
+                        var geoMap = geoMaps[canvasId];
+                        for (var resource in geoMap) {
+                            if (geoMap.hasOwnProperty(resource)) {
+                                var geometry = geoMap[resource];
+                                destroyGeometry(geometry);
+                            }
+                        }
                     }
                 }
                 canvas = null;
@@ -109,7 +113,7 @@ SceneJS._geometryModule = new (function() {
             if (geo.normalBuf) {
                 geo.normalBuf.destroy();
             }
-            if (geo.normalBuf) {
+            if (geo.indexBuf) {
                 geo.indexBuf.destroy();
             }
             if (geo.uvBuf) {
@@ -134,15 +138,19 @@ SceneJS._geometryModule = new (function() {
                 var earliest = time;
                 var evictee;
                 for (var canvasId in geoMaps) {
-                    var geoMap = geoMaps[canvasId];
-                    if (geoMap) {
-                        for (var resource in geoMap) {
-                            var geometry = geoMap[resource];
-                            if (geometry) {
-                                if (geometry.lastUsed < earliest
-                                        && document.getElementById(geometry.canvas.canvasId)) { // Canvas must still exist
-                                    evictee = geometry;
-                                    earliest = geometry.lastUsed;
+                    if (geoMaps.hasOwnProperty(canvasId)) {
+                        var geoMap = geoMaps[canvasId];
+                        if (geoMap) {
+                            for (var resource in geoMap) {
+                                if (geoMap.hasOwnProperty(resource)) {
+                                    var geometry = geoMap[resource];
+                                    if (geometry) {
+                                        if (geometry.lastUsed < earliest
+                                                && document.getElementById(geometry.canvas.canvasId)) { // Canvas must still exist
+                                            evictee = geometry;
+                                            earliest = geometry.lastUsed;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -287,7 +295,7 @@ SceneJS._geometryModule = new (function() {
                 normalBuf : normalBuf,
                 indexBuf : indexBuf,
                 uvBuf: uvBuf,
-                uvBuf2: uvBuf2                
+                uvBuf2: uvBuf2
             };
             currentGeoMap[resource] = geo;
             return resource;

@@ -147,6 +147,9 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
 
+        <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometryModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
+
         <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
@@ -272,6 +275,9 @@
 
             <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
+
+            <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometryModule.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
 

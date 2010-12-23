@@ -47,26 +47,26 @@ SceneJS.Quad.prototype._init = function(params) {
             x, y, 0,
             -x, y, 0,
             -x,-y, 0,
-            x,-y, 0,
+            x,-y, 0
         ];
 
         var normals = [
             0, 0, -1,
             0, 0, -1,
             0, 0, -1,
-            0, 0, -1,
+            0, 0, -1
         ];
 
         var uv = [
             1, 1,
             0, 1,
             0, 0,
-            1, 0,
+            1, 0
         ];
 
         var indices = [
             0, 1, 2,
-            0, 2, 3,
+            0, 2, 3
         ];
 
         return {

@@ -73,4 +73,3 @@ SceneJS._deformModule = new (function() {
     };
 
 })();
-

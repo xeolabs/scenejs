@@ -41,7 +41,7 @@ SceneJS.createNode({
 });
 
 /*----------------------------------------------------------------------
- * Define a simple scene graph containing a blue sphere
+ * Define a simple scene graph containing a blue teapot
  *---------------------------------------------------------------------*/
 
 SceneJS.createNode({
@@ -117,7 +117,7 @@ SceneJS.createNode({
                         },
 
 
-                        /* Next, modelling transforms to orient our sphere. See how these have IDs,
+                        /* Next, modelling transforms to orient our teapot. See how these have IDs,
                          * so we can access them to set their angle attributes.
                          */
                         {
@@ -137,7 +137,7 @@ SceneJS.createNode({
 
                                         /*-----------------------------------------------------------------------------
                                          * With a deformation node we'll define six control points around
-                                         * the sphere. These each have a positive weight with an
+                                         * the teapot. These each have a positive weight with an
                                          * exponential mode, causing them to repel eache vertex of the
                                          * teapot by an amount that is in exponential inverse proportion
                                          * to their distance from the vertex.
@@ -165,8 +165,6 @@ SceneJS.createNode({
                                                     x: 4.0,
                                                     y: 0,
                                                     z: 0,
-
-
                                                     mode: "exp",
                                                     weight: 4
                                                 },

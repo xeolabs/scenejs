@@ -47,6 +47,7 @@ SceneJS._shaderModule = new (function() {
     var imageBufState;
     var clipState;
     var deformState;
+    var morphState;
 
     /** Bin sets for the currently-active canvas, organsed into layers,
      * initialised on CANVAS_ACTIVATED event below
@@ -187,6 +188,12 @@ SceneJS._shaderModule = new (function() {
                 deformState = {
                     _stateId : nextStateId++,
                     deform: null,
+                    hash: ""
+                };
+
+                morphState = {
+                    _stateId : nextStateId++,
+                    morph: null,
                     hash: ""
                 };
 
@@ -423,8 +430,35 @@ SceneJS._shaderModule = new (function() {
             hash: deform ? "d" + deform.verts.length : ""
         };
         stateHash = null;
+    };
+
+    /**
+     *
+     */
+    this.setMorph = function(morph) {
+
+        /* Make hash
+         */
+        var hash;
+        if (morph) {
+            hash = [];
+            var target1 = morph.target1;
+            hash = ([
+                target1.vertexBuf ? "t" : "f",
+                target1.normalBuf ? "t" : "f",
+                target1.uvBuf ? "t" : "f",
+                target1.uvBuf2 ? "t" : "f"]).join("")
+        } else {
+            hash = "";
+        }
+        morphState = {
+            _stateId : nextStateId++,
+            morph: morph,
+            hash: hash
+        };
         stateHash = null;
     };
+
 
     /* When model matrix exported, add it to the state soup.
      * We don't need a GLSL hash for it since our GLSL always
@@ -564,22 +598,23 @@ SceneJS._shaderModule = new (function() {
 
             /* Pointers into state soup
              */
-            boundaryState: boundaryState,
-            geoState: geoState,
-            flagsState: flagsState,
-            rendererState: rendererState,
-            lightState: lightState,
+            boundaryState:    boundaryState,
+            geoState:         geoState,
+            flagsState:       flagsState,
+            rendererState:    rendererState,
+            lightState:       lightState,
             colortransState : colortransState,
-            materialState: materialState,
-            fogState : fogState,
-            modelXFormState: modelXFormState,
-            viewXFormState: viewXFormState,
-            projXFormState: projXFormState,
-            texState: texState,
-            pickState : pickState ,
-            imageBufState : imageBufState,
-            clipState : clipState,
-            deformState : deformState
+            materialState:    materialState,
+            fogState :        fogState,
+            modelXFormState:  modelXFormState,
+            viewXFormState:   viewXFormState,
+            projXFormState:   projXFormState,
+            texState:         texState,
+            pickState :       pickState ,
+            imageBufState :   imageBufState,
+            clipState :       clipState,
+            deformState :     deformState,
+            morphState :      morphState
         };
 
         /* Put node into either the transoarent or opaque bin,
@@ -670,30 +705,6 @@ SceneJS._shaderModule = new (function() {
         //NodeRenderer.cleanup();
     }
 
-    /* Comparator function for sorting nodes by program
-     */
-    var programCmp = function(node1, node2) {
-        if (node1.program.id < node2.program.id) {         // TODO: faster ID for comparison
-            return -1;
-        } else if (node1.program.id > node2.program.id) {
-            return 1;
-        } else {
-            return 0;
-        }
-    };
-
-    /* Comparator function for sorting nodes by geometry
-     */
-    var geoCmp = function(node1, node2) {
-        return node1.geoState._stateId - node2.geoState._stateId;
-    };
-
-    /* Comparator function for sorting nodes by texture
-     */
-    var texCmp = function(node1, node2) {
-        return node1.texState._stateId - node2.texState._stateId;
-    };
-
     /**
      * State node renderer
      */
@@ -738,6 +749,7 @@ SceneJS._shaderModule = new (function() {
                 this._lastLightStateId = -1;
                 this._lastClipStateId = -1;
                 this._lastDeformStateId = -1;
+                this._lastMorphStateId = -1;
                 this._lastTexStateId = -1;
                 this._lastMaterialStateId = -1;
                 this._lastViewXFormStateId = -1;
@@ -750,8 +762,10 @@ SceneJS._shaderModule = new (function() {
                 this._lastProgramId = node.program.id;
             }
 
-            /*
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * flags
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (! node._lastFlagsState || node.flagsState._stateId != this._lastFlagsState._stateId) {
 
                 /*
@@ -759,8 +773,10 @@ SceneJS._shaderModule = new (function() {
                 this._lastFlagsState = node.flagsState;
             }
 
-            /* Bind image buffer so that subsequently rendered geometry is drawn to it
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * imagebuf
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (! node._lastImageBufState || node.imageBufState._stateId != this._lastImageBufState._stateId) {
                 if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
                     context.flush();
@@ -774,24 +790,85 @@ SceneJS._shaderModule = new (function() {
                 this._lastImageBufState = node.imageBufState;
             }
 
-            /* Bind geometry
-             */
-            if (node.geoState._stateId != this._lastGeoStateId) {
+            /*----------------------------------------------------------------------------------------------------------
+             * geometry or morphGeometry
+             *
+             * 1. Disable VBOs
+             * 2. If new morphGeometry then bind target VBOs and remember which arrays we bound
+             * 3. If new geometry then bind VBOs for whatever is not already bound
+             *--------------------------------------------------------------------------------------------------------*/
 
-                var geo = node.geoState.geo;
+            if ((node.geoState._stateId != this._lastGeoStateId)  // New geometry
+                    || (node.morphState.morph && node.morphState._stateId != this._lastMorphStateId)) {   // New morphGeometry
 
                 /* Disable all vertex arrays
                  */
                 for (var k = 0; k < 8; k++) {
                     context.disableVertexAttribArray(k);
                 }
+
+                var vertexBufBound = false;
+                var normalBufBound = false;
+                var uvBufBound = false;
+                var uvBuf2Bound = false;
+
+                var morph;
+                var target1, target2;
+
+                var geo = node.geoState.geo;
+
+                if (node.morphState.morph && node.morphState._stateId != this._lastMorphStateId) {
+
+                    /* Bind morph VBOs
+                     */
+
+                    morph = node.morphState.morph;
+
+                    target1 = morph.target1;
+                    target2 = morph.target2;
+
+                    if (target1.vertexBuf) {
+                        this._program.bindFloatArrayBuffer("aVertex", target1.vertexBuf);
+                        this._program.bindFloatArrayBuffer("aMorphVertex", target2.vertexBuf);
+                        vertexBufBound = true;
+                    }
+
+                    if (target1.normalBuf) {
+                        this._program.bindFloatArrayBuffer("aNormal", target1.normalBuf);
+                        this._program.bindFloatArrayBuffer("aMorphNormal", target2.normalBuf);
+                        normalBufBound = true;
+                    }
+
+                    if (target1.uvBuf) {
+                        this._program.bindFloatArrayBuffer("aUVCoord", target1.uvBuf);
+                        this._program.bindFloatArrayBuffer("aMorphUVCoord", target2.uvBuf);
+                        uvBufBound = true;
+                    }
+
+                    if (target1.uvBuf2) {
+                        this._program.bindFloatArrayBuffer("aUVCoord2", target1.uvBuf);
+                        this._program.bindFloatArrayBuffer("aMorphUVCoord2", target2.uvBuf);
+                        uvBuf2Bound = true;
+                    }
+
+                    this._program.setUniform("uMorphFactor", morph.factor);
+                    this._lastMorphStateId = node.morphState._stateId;
+                }
+
+                /* Bind geometry VBOs - do that in any case, since we'll always have a geometry
+                 * within a morphGeometry
+                 */
+
                 this._lastGeoStateId = node.geoState._stateId;
-                if (geo.vertexBuf) {
+
+                if (!vertexBufBound && geo.vertexBuf) {
                     this._program.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
                 }
-                if (geo.normalBuf) {
+
+                if (!normalBufBound && geo.normalBuf) {
                     this._program.bindFloatArrayBuffer("aNormal", geo.normalBuf);
                 }
+                // TODO
                 if (node.texState && node.texState.texture.layers.length > 0) {
                     if (geo.uvBuf) {
                         this._program.bindFloatArrayBuffer("aUVCoord", geo.uvBuf);
@@ -800,6 +877,7 @@ SceneJS._shaderModule = new (function() {
                         this._program.bindFloatArrayBuffer("aUVCoord2", geo.uvBuf2);
                     }
                 }
+
                 geo.indexBuf.bind();
             }
 
@@ -824,8 +902,10 @@ SceneJS._shaderModule = new (function() {
                 this._program.setUniform("uAmbient", clearColor);
             }
 
-            /* Bind texture layers
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * texture
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.texState && node.texState._stateId != this._lastTexStateId) {
                 var layer;
                 for (var j = 0; j < node.texState.texture.layers.length; j++) {
@@ -840,8 +920,10 @@ SceneJS._shaderModule = new (function() {
                 this._lastTexStateId = -1;
             }
 
-            /* Bind fog
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * fog
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.fogState && node.fogState.fog && node.fogState._stateId != this._lastFogStateId) {
                 var fog = node.fogState.fog;
                 if (node.flagsState.flags.fog === false || fog.mode == "disabled") {
@@ -875,31 +957,39 @@ SceneJS._shaderModule = new (function() {
                 this._lastFogStateId = node.fogState._stateId;
             }
 
-            /* Bind View matrix
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * view matrix
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.viewXFormState._stateId != this._lastViewXFormStateId) {
                 this._program.setUniform("uVMatrix", node.viewXFormState.mat);
                 this._program.setUniform("uVNMatrix", node.viewXFormState.normalMat);
                 this._lastViewXFormStateId = node.viewXFormState._stateId;
             }
 
-            /* Bind Model matrix
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * model matrix
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.modelXFormState._stateId != this._lastModelXFormStateId) {
                 this._program.setUniform("uMMatrix", node.modelXFormState.mat);
                 this._program.setUniform("uMNMatrix", node.modelXFormState.normalMat);
                 this._lastModelXFormStateId = node.modelXFormState._stateId;
             }
 
-            /* Bind Projection matrix
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * projection matrix
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.projXFormState._stateId != this._lastProjXFormStateId) {
                 this._program.setUniform("uPMatrix", node.projXFormState.mat);
                 this._lastProjXFormStateId = node.projXFormState._stateId;
             }
 
-            /* Bind lights
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * lights
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.lightState && node.lightState._stateId != this._lastLightStateId) {
                 var ambient;
                 var light;
@@ -936,8 +1026,10 @@ SceneJS._shaderModule = new (function() {
                 this._lastLightStateId = node.lightState._stateId;
             }
 
-            /* Bind clip planes
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * clip planes
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.clipState && node.clipState._stateId != this._lastClipStateId) {
                 var clip;
                 for (var k = 0; k < node.clipState.clips.length; k++) {
@@ -958,8 +1050,10 @@ SceneJS._shaderModule = new (function() {
                 this._lastClipStateId = node.clipState._stateId;
             }
 
-            /* Bind deform
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * deform
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.deformState && node.deformState.deform && node.deformState._stateId != this._lastDeformStateId) {
                 var verts = node.deformState.deform.verts;
                 var vert;
@@ -976,8 +1070,11 @@ SceneJS._shaderModule = new (function() {
                 this._lastDeformStateId = node.deformState._stateId;
             }
 
-            /*
-             */
+
+            /*----------------------------------------------------------------------------------------------------------
+             * colortrans
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.colortransState && node.colortransState.trans && node.colortransState != this._lastColortransStateId) {
 
                 /* Bind colortrans
@@ -996,8 +1093,10 @@ SceneJS._shaderModule = new (function() {
                 }
             }
 
-            /*
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * material
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.materialState && node.materialState != this._lastMaterialStateId) {
 
                 /* Bind Material
@@ -1022,16 +1121,20 @@ SceneJS._shaderModule = new (function() {
                 }
             }
 
-            /* Bind pick color
-             */
+            /*----------------------------------------------------------------------------------------------------------
+             * pick color
+             *--------------------------------------------------------------------------------------------------------*/
+
             if (node.pickState && node.pickState._stateId != this._lastPickStateId) {
                 this._program.setUniform("uPickColor", node.pickState.pickColor);
             }
 
-            /* Draw the geometry;  When wireframe option is set we'll render
+            /*----------------------------------------------------------------------------------------------------------
+             * Draw the geometry;  When wireframe option is set we'll render
              * triangle primitives as wireframe
              * TODO: should we also suppress shading in the renderer? This will currently apply phong shading to the lines.
-             */
+             *--------------------------------------------------------------------------------------------------------*/
+
             var primitive = node.geoState.geo.primitive;
             if (node.rendererState && node.rendererState.props.props.wireframe) {
                 if (primitive == context.TRIANGLES ||
@@ -1046,8 +1149,7 @@ SceneJS._shaderModule = new (function() {
                     node.geoState.geo.indexBuf.numItems,
                     context.UNSIGNED_SHORT,
                     0);
-        }
-                ;
+        };
 
         /**
          * Called after all nodes rendered for the current frame
@@ -1082,6 +1184,7 @@ SceneJS._shaderModule = new (function() {
                 texState.hash,
                 clipState.hash,
                 deformState.hash,
+                morphState.hash,
                 geoState.hash]).join(";");
         }
     }
@@ -1180,7 +1283,6 @@ SceneJS._shaderModule = new (function() {
      */
     function composePickingFragmentShader() {
         var clipping = clipState && clipState.clips.length > 0;
-        var deforming = deformState.deform;
 
         var src = [
             "#ifdef GL_ES",
@@ -1197,16 +1299,6 @@ SceneJS._shaderModule = new (function() {
                 src.push("uniform float uClipMode" + i + ";");
                 src.push("uniform vec3  uClipNormal" + i + ";");
                 src.push("uniform float uClipDist" + i + ";");
-            }
-        }
-
-        /* Deformation vertices
-         */
-        if (deforming) {
-            for (var i = 0, len = deformState.deform.verts.length; i < len; i++) {
-                src.push("uniform float uDeformMode" + i + ";");
-                src.push("uniform vec3  uDeformVertex" + i + ";");
-                src.push("uniform float uDeformWeight" + i + ";");
             }
         }
 
@@ -1241,14 +1333,42 @@ SceneJS._shaderModule = new (function() {
     }
 
 
-    /**
-     * @private
-     */
+    /*===================================================================================================================
+     *
+     * Rendering vertex shader
+     *
+     *==================================================================================================================*/
+
+    function isTexturing() {
+        if (texState.texture.layers.length > 0) {
+            if (geoState.geo.uvBuf || geoState.geo.uvBuf2) {
+                return true;
+            }
+            if (morphState.morph && morphState.morph.target1.uvBuf || morphState.morph.target1.uvBuf2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function isLighting() {
+        if (lightState.lights.length > 0) {
+            if (geoState.geo.normalBuf) {
+                return true;
+            }
+            if (morphState.morph && morphState.morph.target1.normalBuf) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function composeRenderingVertexShader() {
 
-        var texturing = texState.texture.layers.length > 0 && (geoState.geo.uvBuf || geoState.geo.uvBuf2);
-        var lighting = (lightState.lights.length > 0 && geoState.geo.normalBuf);
-        var deforming = deformState.deform;
+        var texturing = isTexturing();
+        var lighting = isLighting();
+        var deforming = deformState.deform && true;
+        var morphing = morphState.morph && true;
 
         var src = [
             "#ifdef GL_ES",
@@ -1259,11 +1379,11 @@ SceneJS._shaderModule = new (function() {
 
         if (lighting) {
             src.push("attribute vec3 aNormal;");            // Normal vectors
-            src.push("uniform mat4 uMNMatrix;");            // Model normal matrix
-            src.push("uniform mat4 uVNMatrix;");            // View normal matrix
+            src.push("uniform   mat4 uMNMatrix;");            // Model normal matrix
+            src.push("uniform   mat4 uVNMatrix;");            // View normal matrix
 
-            src.push("varying vec3 vNormal;");              // Output view normal vector
-            src.push("varying vec3 vEyeVec;");              // Output view eye vector
+            src.push("varying   vec3 vNormal;");              // Output view normal vector
+            src.push("varying   vec3 vEyeVec;");              // Output view eye vector
 
             for (var i = 0; i < lightState.lights.length; i++) {
                 var light = lightState.lights[i];
@@ -1305,7 +1425,21 @@ SceneJS._shaderModule = new (function() {
             }
         }
 
-        /* Deformation vertices
+        /* Morphing - declare uniforms for target and interpolation factor
+         */
+        if (morphing) {
+            src.push("uniform float uMorphFactor;");       // LERP factor for morph
+            if (morphState.morph.target1.vertexBuf) {      // target2 has these arrays also
+                src.push("attribute vec3 aMorphVertex;");
+            }
+            if (lighting) {
+                if (morphState.morph.target1.normalBuf) {
+                    src.push("attribute vec3 aMorphNormal;");
+                }
+            }
+        }
+
+        /* Deformation - declare uniforms for control points
          */
         if (deforming) {
             for (var i = 0, len = deformState.deform.verts.length; i < len; i++) {
@@ -1316,16 +1450,32 @@ SceneJS._shaderModule = new (function() {
         }
 
         src.push("void main(void) {");
-        if (lighting) {
-            src.push("  vec4 tmpVNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
-            src.push("  vNormal = normalize(tmpVNormal.xyz);");
-        }
+
         src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
 
-        /*
-         * Mesh deformation
-         */
+        if (lighting) {
+            src.push("  vec4 tmpNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
+        }
 
+        /*
+         * Morphing - transform morph targets and interpolate towards it
+         */
+        if (morphing) {
+            if (morphState.morph.target1.vertexBuf) {
+                src.push("  vec4 vMorphVertex = uVMatrix * (uMMatrix * vec4(aMorphVertex, 1.0)); ");
+                src.push("  tmpVertex = vec4(tmpVertex.xyz + mix(tmpVertex.xyz, vMorphVertex.xyz, uMorphFactor), 1.0); ");
+            }
+            if (lighting) {
+                if (morphState.morph.target1.normalBuf) {
+                     src.push("  vec4 vMorphNormal = uVMatrix * (uMMatrix * vec4(aMorphNormal, 1.0)); ");
+                     src.push("  tmpNormal = vec4(tmpNormal.xyz + mix(tmpNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
+                }
+            }
+        }
+
+        /*
+         * Deformation
+         */
         if (deforming) {
             src.push("  vec3 deformVec;");
             src.push("  float deformLen;");
@@ -1343,6 +1493,11 @@ SceneJS._shaderModule = new (function() {
             }
 
             src.push("tmpVertex = vec4(deformVecSum.xyz + tmpVertex.xyz, 1.0);");
+        }
+
+        if (lighting) {
+            src.push("  vNormal = normalize(tmpNormal.xyz);");
+
         }
 
         src.push("  vViewVertex = tmpVertex;");
@@ -1382,9 +1537,9 @@ SceneJS._shaderModule = new (function() {
             }
         }
         src.push("}");
-        if (debugCfg.logScripts == true) {
-            SceneJS._loggingModule.info(src);
-        }
+        //   if (debugCfg.logScripts === true) {
+        SceneJS._loggingModule.info(src);
+        //}
         return src.join("\n");
     }
 
@@ -1392,8 +1547,8 @@ SceneJS._shaderModule = new (function() {
      * @private
      */
     function composeRenderingFragmentShader() {
-        var texturing = texState && texState.texture.layers.length > 0 && geoState && geoState.geo.uvBuf || geoState.geo.uvBuf2;
-        var lighting = lightState && lightState.lights.length > 0 && geoState && geoState.geo.normalBuf;
+        var texturing = isTexturing();
+        var lighting = isLighting();
         var fogging = fogState.fog && true;
         var clipping = clipState && clipState.clips.length > 0;
         var colortrans = colortransState && colortransState.trans;
@@ -1744,4 +1899,5 @@ SceneJS._shaderModule = new (function() {
         return src.join("\n");
     }
 
-} )();
+} )
+        ();
