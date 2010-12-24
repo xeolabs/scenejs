@@ -1344,7 +1344,7 @@ SceneJS._shaderModule = new (function() {
             if (geoState.geo.uvBuf || geoState.geo.uvBuf2) {
                 return true;
             }
-            if (morphState.morph && morphState.morph.target1.uvBuf || morphState.morph.target1.uvBuf2) {
+            if (morphState.morph && (morphState.morph.target1.uvBuf || morphState.morph.target1.uvBuf2)) {
                 return true;
             }
         }
