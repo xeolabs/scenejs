@@ -119,9 +119,9 @@ canvas.addEventListener('mousewheel', function(e) {
     }
     if (delta) {
         if (delta < 0) {
-            speed -= 0.2;
+            speed.y -= 0.2;
         } else {
-            speed += 0.2;
+            speed.y += 0.2;
         }
     }
     if (event.preventDefault)
@@ -136,7 +136,7 @@ SceneJS.withNode("the-scene").start({
 			SceneJS.Message.sendMessage({
 				command: "lookAt.move",
 				target: "the-lookat",
-				distance: -speed.y / 100,
+				z: -speed.y / 100,
 				ignoreY: true
 			});
 
