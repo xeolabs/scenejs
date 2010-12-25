@@ -1467,8 +1467,8 @@ SceneJS._shaderModule = new (function() {
             }
             if (lighting) {
                 if (morphState.morph.target1.normalBuf) {
-                     src.push("  vec4 vMorphNormal = uVMatrix * (uMMatrix * vec4(aMorphNormal, 1.0)); ");
-                     src.push("  tmpNormal = vec4(tmpNormal.xyz + mix(tmpNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
+                    src.push("  vec4 vMorphNormal = uVMatrix * (uMMatrix * vec4(aMorphNormal, 1.0)); ");
+                    src.push("  tmpNormal = vec4(tmpNormal.xyz + mix(tmpNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
                 }
             }
         }
@@ -1537,9 +1537,9 @@ SceneJS._shaderModule = new (function() {
             }
         }
         src.push("}");
-        //   if (debugCfg.logScripts === true) {
-        SceneJS._loggingModule.info(src);
-        //}
+        if (debugCfg.logScripts === true) {
+            SceneJS._loggingModule.info(src);
+        }
         return src.join("\n");
     }
 
