@@ -46,17 +46,12 @@ SceneJS._viewTransformModule = new (function() {
                     if (!transform.matrixAsArray) {
                         transform.matrixAsArray = new Float32Array(transform.matrix);
                     }
-
                     if (!transform.normalMatrixAsArray) {
                         transform.normalMatrixAsArray = new Float32Array(
                                 SceneJS._math_transposeMat4(
                                         SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
                     }
-
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.VIEW_TRANSFORM_EXPORTED,
-                            transform);
-
+                     SceneJS._shaderModule.addViewMatrices(transform.matrixAsArray, transform.normalMatrixAsArray);
                     dirty = false;
                 }
             });

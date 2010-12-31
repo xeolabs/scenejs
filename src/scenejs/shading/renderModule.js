@@ -338,30 +338,52 @@ SceneJS._shaderModule = new (function() {
     };
 
 
-    /* When material state exported, add it to the state soup. We don't need
-     * a GLSL hash for material since our GLSL happens to be generic for
-     * material attributes.
+    /**
+     *
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.MATERIAL_EXPORTED,
-            function(material) {
-                materialState = {
-                    _stateId : nextStateId++,
-                    material: {
-                        baseColor : material.baseColor || [ 0.0, 0.0, 0.0 ],
-                        highlightBaseColor : material.highlightBaseColor || material.baseColor || [ 0.0, 0.0, 0.0 ],
-                        specularColor : material.specularColor || [ 0.5,  0.5,  0.5 ],
-                        specular : material.specular != undefined ? material.specular : 2,
-                        shine : material.shine != undefined ? material.shine : 0.5,
-                        reflect : material.reflect != undefined ? material.reflect : 0,
-                        alpha : material.alpha != undefined ? material.alpha : 1.0,
-                        emit : material.emit != undefined ? material.emit : 0.0
-                    },
-                    hash: ""
-                };
+    this.addMaterial = function(material) {
+        materialState = {
+            _stateId : nextStateId++,
+            material: {
+                baseColor : material.baseColor || [ 0.0, 0.0, 0.0 ],
+                highlightBaseColor : material.highlightBaseColor || material.baseColor || [ 0.0, 0.0, 0.0 ],
+                specularColor : material.specularColor || [ 0.5,  0.5,  0.5 ],
+                specular : material.specular != undefined ? material.specular : 2,
+                shine : material.shine != undefined ? material.shine : 0.5,
+                reflect : material.reflect != undefined ? material.reflect : 0,
+                alpha : material.alpha != undefined ? material.alpha : 1.0,
+                emit : material.emit != undefined ? material.emit : 0.0
+            },
+            hash: ""
+        };
 
-                stateHash = null;
-            });
+        stateHash = null;
+        return materialState;
+    };
+
+    /**
+     * Updates the material referenced by the given handle. The update must match the
+     * mode specified on the material when that was added.
+     *
+     * @param {Object} materialState Handle to the material
+     * @param {Object} material New material properties
+     */
+    this.updateMaterial = function(materialState, material) {
+
+        // TODO: override material that's already set, not override defaults
+
+        materialState.material = {
+            baseColor : material.baseColor || [ 0.0, 0.0, 0.0 ],
+            highlightBaseColor : material.highlightBaseColor || material.baseColor || [ 0.0, 0.0, 0.0 ],
+            specularColor : material.specularColor || [ 0.5,  0.5,  0.5 ],
+            specular : material.specular != undefined ? material.specular : 2,
+            shine : material.shine != undefined ? material.shine : 0.5,
+            reflect : material.reflect != undefined ? material.reflect : 0,
+            alpha : material.alpha != undefined ? material.alpha : 1.0,
+            emit : material.emit != undefined ? material.emit : 0.0
+        };
+    };
+
 
     /* When picking state exported, add it to the state soup.
      * We don't need a hash identity since we'll just switch to
@@ -379,63 +401,98 @@ SceneJS._shaderModule = new (function() {
                 stateHash = null;
             });
 
-    /* When fog state exported, add it to the state soup and make
-     * hash code for its GLSL fragment
+    /**
+     *
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.FOG_EXPORTED,
-            function(params) {
-                fogState = {
-                    _stateId : nextStateId++,
-                    fog: params.fog,
-                    hash: params.fog ? params.fog.mode : ""
-                };
+    this.addFog = function(fog) {
+        fogState = {
+            _stateId : nextStateId++,
+            fog: fog,
+            hash: fog ? fog.mode : ""
+        };
+        stateHash = null;
+        return fogState;
+    };
 
-                stateHash = null;
-            });
-
-    /* When clip state exported, add it to the state soup and make
-     * hash code for its GLSL fragment
+    /**
+     * Updates the fog referenced by the given handle. The update must match the
+     * mode specified on the fog when that was added.
+     *
+     * @param {Object} fogState Handle to the fog
+     * @param {Object} fog New fog properties
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CLIP_EXPORTED,
-            function(clips) {
-
-                /* Make hash
-                 */
-                var hash = [];
-                for (var i = 0; i < clips.length; i++) {
-                    var clip = clips[i];
-                    hash.push(clip.mode);
-                }
-
-                /* Add to state soup
-                 */
-                clipState = {
-                    _stateId : nextStateId++,
-                    clips: clips,
-                    hash: hash.join("")
-                };
-
-                stateHash = null;
-            });
+    this.updateFog = function(fogState, fog) {
+        if (fogState.fog.mode != fog.mode) {
+            throw "Shader fog update not compatible with fog - different modes";
+        }
+        fogState.fog = fog;
+    };
 
     /**
      *
      */
-    this.setDeform = function(deform) {
+    this.addClips = function(clips) {
+        /* Make hash
+         */
+        var hash = [];
+        for (var i = 0; i < clips.length; i++) {
+            var clip = clips[i];
+            hash.push(clip.mode);
+        }
+
+        /* Add to state soup
+         */
+        clipState = {
+            _stateId : nextStateId++,
+            clips: clips,
+            hash: hash.join("")
+        };
+        stateHash = null;
+        return clipState;
+    };
+
+    /**
+     * Updates the clipping planes referenced by the given handle.
+     *
+     * @param {Object} clipsState Handle to the clips
+     * @param {Object} clips New clips properties
+     */
+    this.updateClips = function(clipsState, clips) {
+        clipsState.clips = clips;
+    };
+
+    /**
+     *
+     */
+    this.addDeform = function(deform) {
         deformState = {
             _stateId : nextStateId++,
             deform: deform,
             hash: deform ? "d" + deform.verts.length : ""
         };
         stateHash = null;
+        return deformState;
+    };
+
+    /**
+     * Updates the deform referenced by the given handle. The update must match the
+     * properties specified on the deform when that was added - it must not omit properties
+     * or introduce new ones.
+     *
+     * @param {Object} deformState Handle to the deform
+     * @param {Object} deform New deform properties
+     */
+    this.updateDeform = function(deformState, deform) {
+        if (deformState.verts.length != deform.verts.length) {
+            throw "Shader deform update not compatible with deform";
+        }
+        deformState.deform = deform;
     };
 
     /**
      *
      */
-    this.setMorph = function(morph) {
+    this.addMorph = function(morph) {
 
         /* Make hash
          */
@@ -457,67 +514,117 @@ SceneJS._shaderModule = new (function() {
             hash: hash
         };
         stateHash = null;
+        return morphState;
+    };
+
+    /**
+     * Updates the morph referenced by the given handle. The update must match the
+     * properties specified on the morph when that was added - it must not omit properties
+     * or introduce new ones.
+     *
+     * @param {Object} morphState Handle to the morph
+     * @param {Object} morph New morph properties
+     */
+    this.updateMorph = function(morphState, morph) {
+        var newHash = ([
+            morph.target1.vertexBuf ? "t" : "f",
+            morph.target1.normalBuf ? "t" : "f",
+            morph.target1.uvBuf ? "t" : "f",
+            morph.target1.uvBuf2 ? "t" : "f"]).join("");
+
+        if (morphState.hash != newHash) {
+            throw "Shader morph update not compatible with morph";
+        }
+        morphState.morph = morph;
     };
 
 
-    /* When model matrix exported, add it to the state soup.
-     * We don't need a GLSL hash for it since our GLSL always
-     * expects a modelling matrix.
+    /**
+     * Sets the current model and normals matrices
+     * @param {Float32Array} modelMat The model matrix as a WebGL array
+     * @param {Float32Array} normalMat The modelling normal matrix as a WebGL array
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.MODEL_TRANSFORM_EXPORTED,
-            function(transform) {
-                modelXFormState = {                  // No hash needed - does not contribute to shader construction
-                    _stateId : nextStateId++,
-                    mat : transform.matrixAsArray,
-                    normalMat : transform.normalMatrixAsArray
-                };
+    this.addModelMatrices = function(modelMat, normalMat) {
+        modelXFormState = {                  // No hash needed - does not contribute to shader construction
+            _stateId : nextStateId++,
+            mat : modelMat,
+            normalMat : normalMat
+        };
+        stateHash = null;
+    };
 
-                stateHash = null;
-            });
-
-    /* When view matrix exported, add it to the state soup.
-     * We don't need a GLSL hash for it since our GLSL always
-     * expects a view matrix.
+    /**
+     * Updates the model matrices referenced by the given handle.
+     * @param {modelXFormState} object Handle to the model matrices
+     * @param {Float32Array} modelMat The modeling matrix as a WebGL array
+     * @param {Float32Array} normalMat The modeling normal matrix as a WebGL array
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.VIEW_TRANSFORM_EXPORTED,
-            function(transform) {
-                viewXFormState = {                  // No hash needed - does not contribute to shader construction
-                    _stateId : nextStateId++,
-                    mat : transform.matrixAsArray,
-                    normalMat : transform.normalMatrixAsArray
-                };
+    this.updateModelMatrices = function(modelXFormState, modelMat, normalMat) {
+        modelXFormState.mat = modelMat;
+        modelXFormState.normalMat = normalMat;
+    };
 
-                stateHash = null;
-            });
-
-    /* When projection matrix exported, add it to the state soup.
-     * We don't need a GLSL hash for it since our GLSL always
-     * expects a projection matrix.
+    /**
+     * Sets the current view matrix and returns a handle to it. The handle is just a pointer, not to be modified an any way.
+     * @param {Float32Array} viewMat The viewing matrix as a WebGL array
+     * @param {Float32Array} normalMat The viewing normal matrix as a WebGL array
+     * @return {Object} Handle to a view matrix in this module
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.PROJECTION_TRANSFORM_EXPORTED,
-            function(transform) {
-                projXFormState = {                  // No hash needed - does not contribute to shader construction
-                    _stateId : nextStateId++,
-                    mat : transform.matrixAsArray
-                };
+    this.addViewMatrices = function(viewMat, normalMat) {
+        viewXFormState = {                  // No hash needed - does not contribute to shader construction
+            _stateId : nextStateId++,
+            mat : viewMat,
+            normalMat : normalMat
+        };
+        stateHash = null;
+        return viewXFormState;
+    };
 
-                stateHash = null;
-            });
+    /**
+     * Updates the view matrices referenced by the given handle.
+     * @param {viewXFormState} object Handle to the view matrices
+     * @param {Float32Array} viewMat The viewing matrix as a WebGL array
+     * @param {Float32Array} normalMat The viewing normal matrix as a WebGL array
+     */
+    this.updateViewMatrices = function(viewXFormState, viewMat, normalMat) {
+        viewXFormState.mat = viewMat;
+        viewXFormState.normalMat = normalMat;
+    };
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.IMAGEBUFFER_EXPORTED,
-            function(params) {
-                imageBufState = {
-                    _stateId : nextStateId++,
-                    imageBuf: params.imageBuf
-                };
+    /**
+     * Sets the current camera (projection) matrix and returns a handle to it.
+     * @param {Float32Array} projMat The camera (projection) matrix as a WebGL array
+     * @return {Object} Handle to a projection matrix in this module
+     */
+    this.addProjectionMatrix = function(projMat) {
+        projXFormState = {                  // No hash needed - does not contribute to shader construction
+            _stateId : nextStateId++,
+            mat : projMat
+        };
+        stateHash = null;
+        return projXFormState;
+    };
 
-                stateHash = null;
-            });
+    /**
+     * Updates the projection matrix referenced by the given handle.
+     * @param {projXFormState} object Handle to the projection matrix
+     * @param {Float32Array} projMat The projection matrix as a WebGL array
+     */
+    this.updateProjectionMatrix = function(projXFormState, projMat) {
+        projXFormState.mat = projMat;
+    };
 
+    /**
+     * Sets the current image buffer to source textures from
+     * @param {Object} imageBuf The image buffer object
+     */
+    this.addImageBuf = function(imageBuf) {
+        imageBufState = {
+            _stateId : nextStateId++,
+            imageBuf: imageBuf
+        };
+        stateHash = null;
+    };
 
     /* When geometry set, add it to the state soup and make GLSL hash code on the VBOs it provides.
      *

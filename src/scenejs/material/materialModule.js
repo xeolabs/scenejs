@@ -43,9 +43,7 @@ SceneJS._materialModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.MATERIAL_EXPORTED,
-                            materialStack[materialStack.length - 1]);
+                    SceneJS._shaderModule.addMaterial(materialStack[materialStack.length - 1]);
                     dirty = false;
                 }
             });

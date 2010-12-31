@@ -38,13 +38,9 @@ SceneJS._imageBufModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.IMAGEBUFFER_EXPORTED,
-                    {
-                        imageBuf: (bufStack.length > 0)
-                                ? bufStack[bufStack.length - 1]
-                                : null
-                    });
+                    SceneJS._shaderModule.addImageBuf((bufStack.length > 0)
+                            ? bufStack[bufStack.length - 1]
+                            : null);
                     dirty = false;
                 }
             });

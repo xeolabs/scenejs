@@ -41,7 +41,7 @@ SceneJS._deformModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.setDeform(stackLen > 0 ? deformStack[stackLen - 1] : null);
+                    SceneJS._shaderModule.addDeform(stackLen > 0 ? deformStack[stackLen - 1] : null);
                     dirty = false;
                 }
             });

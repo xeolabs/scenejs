@@ -26,7 +26,7 @@ SceneJS._clipModule = new (function() {
             function() {
                 if (dirty) {
                     if (clipStack.length > 0) {
-                        SceneJS._eventModule.fireEvent(SceneJS._eventModule.CLIP_EXPORTED, clipStack.slice(0));
+                        SceneJS._shaderModule.addClips(clipStack.slice(0));
                     }
                     dirty = false;
                 }

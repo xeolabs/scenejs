@@ -55,7 +55,7 @@ SceneJS._morphGeometryModule = new (function() {
             function() {
                 if (dirty) {
                     if (stackLen == 0) {
-                        SceneJS._shaderModule.setMorph(null);
+                        SceneJS._shaderModule.addMorph(null);
                     } else {
 
                         /* Get top morph on stack
@@ -69,7 +69,7 @@ SceneJS._morphGeometryModule = new (function() {
 
                         /* Set on shader module
                          */
-                        SceneJS._shaderModule.setMorph({
+                        SceneJS._shaderModule.addMorph({
                             factor: morph.factor,
                             target1: target1,
                             target2: target2

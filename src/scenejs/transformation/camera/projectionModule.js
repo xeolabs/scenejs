@@ -46,9 +46,7 @@ SceneJS._projectionModule = new (function() {
                     if (!transform.matrixAsArray) {
                         transform.matrixAsArray = new Float32Array(transform.matrix);
                     }
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.PROJECTION_TRANSFORM_EXPORTED,
-                            transform);
+                    SceneJS._shaderModule.addProjectionMatrix(transform.matrixAsArray);
                     dirty = false;
                 }
             });

@@ -61,10 +61,7 @@ SceneJS._fogModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.FOG_EXPORTED, {
-                        fog: fogStack.length > 0 ? fogStack[fogStack.length - 1] : null
-                    });
+                    SceneJS._shaderModule.addFog(fogStack.length > 0 ? fogStack[fogStack.length - 1] : null);
                     dirty = false;
                 }
             });
