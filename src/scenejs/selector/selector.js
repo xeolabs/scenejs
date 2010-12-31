@@ -71,7 +71,7 @@ SceneJS.Selector.prototype._init = function(params) {
  @returns {SceneJS.Selector} This Selector node
  */
 SceneJS.Selector.prototype.setSelection = function(selection) {
-    this._selection = selection || [];
+    this._attr.selection = selection || [];
     this._setDirty();
     return this;
 };
@@ -82,19 +82,19 @@ SceneJS.Selector.prototype.setSelection = function(selection) {
  * @returns {int []} Array containing indices of selected children.
  */
 SceneJS.Selector.prototype.getSelection = function() {
-    var selection = new Array(this._selection.length);
-    for (var i = 0; i < this._selection.length; i++) {
-        selection[i] = this._selection[i];
+    var selection = new Array(this._attr.selection.length);
+    for (var i = 0; i < this._attr.selection.length; i++) {
+        selection[i] = this._attr.selection[i];
     }
     return selection;
 };
 
 // @private
 SceneJS.Selector.prototype._render = function(traversalContext) {
-    if (this._selection.length > 0) {
+    if (this._attr.selection.length > 0) {
         var children = [];
-        for (var i = 0; i < this._selection.length; i++) {
-            var j = this._selection[i];
+        for (var i = 0, len = this._attr.selection.length; i < len; i++) {
+            var j = this._attr.selection[i];
             if (0 <= j && j < this._children.length) {
                 children.push(this._children[j]);
             }

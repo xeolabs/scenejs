@@ -21,9 +21,11 @@ SceneJS._flagsModule = new (function() {
             return flags;
         }
         var topFlags = flagStack[stackLen - 1];
+        var flag;
         for (var name in topFlags) {
             if (topFlags.hasOwnProperty(name)) {
-                if (flags[name] == "undefined") {
+                flag = flags[name];
+                if (flag == null || flag == undefined) {
                     flags[name] = topFlags[name];
                 }
             }
@@ -39,13 +41,13 @@ SceneJS._flagsModule = new (function() {
             SceneJS._eventModule.SCENE_RENDERING,
             function() {
                 self.flags = {
-                    fog: true,
-                    colortrans : true,
-                    picking : true
+                    fog: true,          // Fog enabled
+                    colortrans : true,  // Effect of colortrans enabled
+                    picking : true,     // Picking enabled
+                    enabled : true,     // Node not culled from traversal
+                    visible : true      // Node visible - when false, everything happens except geometry draw
                 };
-                flagStack = [
-                    self.flags
-                ];
+                flagStack[0] = self.flags;                
                 stackLen = 1;
                 dirty = true;
             });
@@ -64,7 +66,8 @@ SceneJS._flagsModule = new (function() {
     /* Push flags to top of stack - stack top becomes active flags
      */
     this.pushFlags = function(f) {
-        flagStack[stackLen++] = this.flags = createFlags(f);   // TODO: memoize flags?
+        this.flags = createFlags(f);   // TODO: memoize flags?
+        flagStack[stackLen++] = this.flags;
         dirty = true;
     };
 

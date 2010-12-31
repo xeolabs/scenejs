@@ -38,7 +38,7 @@
  */
 SceneJS.Trackball = function() {
     SceneJS.Node.apply(this, arguments);
-    this._nodeType = "trackball";
+    this._attr.nodeType = "trackball";
     this._xform = null;
     this.reset();
     if (this._fixedParams) {

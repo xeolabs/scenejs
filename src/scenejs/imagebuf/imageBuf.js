@@ -10,7 +10,7 @@ SceneJS.ImageBuf.prototype._render = function(traversalContext) {
     /* Create image buffer if we don't have one yet
      */
     if (!this._bufId) {
-        this._bufId = SceneJS._imageBufModule.createImageBuffer(this._id);
+        this._bufId = SceneJS._imageBufModule.createImageBuffer(this._attr.id);
     }
 
     /* Activate image buffer, render child nodes, deactivate again then restore any

@@ -7,8 +7,6 @@ SceneJS.Colortrans = SceneJS.createNodeType("colortrans");
 
 // @private
 SceneJS.Colortrans.prototype._init = function(params) {
-    this._nodeType = "colortrans";
-    this._attr = {};
     this.setScale(params.scale);
     this.setAdd(params.add);
     this.setSaturation(params.saturation);
@@ -21,7 +19,6 @@ SceneJS.Colortrans.prototype._init = function(params) {
  */
 SceneJS.Colortrans.prototype.setSaturation = function(saturation) {
     this._attr.saturation = saturation;
-    this._setDirty();
 };
 
 /**
@@ -47,7 +44,6 @@ SceneJS.Colortrans.prototype.setScale = function(scale) {
         b: scale.b != undefined ? scale.b : 1,
         a: scale.a != undefined ? scale.a : 1
     };
-    this._setDirty();
 };
 
 /**
@@ -72,7 +68,6 @@ SceneJS.Colortrans.prototype.setAdd = function(add) {
         b: add.b != undefined ? add.b : 0,
         a: add.a != undefined ? add.a : 0
     };
-    this._setDirty();
 };
 
 /**
@@ -94,3 +89,4 @@ SceneJS.Colortrans.prototype._render = function(traversalContext) {
         SceneJS._colortransModule.popColortrans();
     }
 };
+

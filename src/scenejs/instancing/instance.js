@@ -31,7 +31,7 @@
  *
  * <h2>States and Events</h2>
  * <p>A SceneJS.Instance has four states which it transitions through during it's lifecycle, as described below. After
- * it transitions into each state, it will fire an event - see {@link SceneJS.Node}. Also, while in {@link #STATE_RENDERING},
+ * it transitions into each state, it will fire an event - see {@link SceneJS.Node}. Also, while in {@link #STATE_CONNECTED},
  * it can provide its target {@link SceneJS.Node} node via {@link #getTargetNode}.<p>
  *
  * @events
@@ -48,29 +48,29 @@ SceneJS.Instance = SceneJS.createNodeType("instance");
 
 // @private
 SceneJS.Instance.prototype._init = function(params) {
-    this._symbol = null;
     this.setTarget(params.target);
-    this._mustExist = params.mustExist;
-    this._retry = (params.retry == null || params.retry == undefined) ? false : params.retry;
+    this._attr.mustExist = params.mustExist;
+    this._attr.retry = (params.retry == null || params.retry == undefined) ? false : params.retry;
+    this._symbol = null;
 
-    if (this._target) {
-        this._state = this._target
-                ? SceneJS.Instance.STATE_READY     // Ready to hunt for target
+    if (this._attr.target) {
+        this._state = this._attr.target
+                ? SceneJS.Instance.STATE_SEARCHING     // Ready to hunt for target
                 : SceneJS.Instance.STATE_INITIAL;  // Will chill out until we get a target
     }
 };
 
 /**
  * Initial state of a SceneJS.Instance, in which it has not been rendered yet and thus not attempted to resolve its
- * target {@link SceneJS.Symbol} yet.
+ * target node yet.
  * @const
  */
 SceneJS.Instance.STATE_INITIAL = "init";
 
 /**
  * State of a SceneJS.Instance in which instantiation has failed. This condition might be temporary (eg. the target
- * {@link SceneJS.Symbol} has just not been rendered yet for some reason), so a SceneJS.Instance will then try
- * instancing again when next rendered, transitioning to {@link STATE_RENDERING} when that succeeds.
+ * node has just not been rendered yet for some reason), so a SceneJS.Instance will then try
+ * instancing again when next rendered, transitioning to {@link STATE_CONNECTED} when that succeeds.
  * @const
  */
 SceneJS.Instance.STATE_ERROR = "error";
@@ -78,23 +78,23 @@ SceneJS.Instance.STATE_ERROR = "error";
 /**
  * State of a SceneJS.Instance in which it will attempt to instantiate its target when next rendered. This is when it
  * is ready to attempt aquisition of its target {@link SceneJS.Symbol}. From here, it will transition to
- * {@link #STATE_RENDERING} if that succeeds, otherwise it will transition to {@link #STATE_ERROR}.
+ * {@link #STATE_CONNECTED} if that succeeds, otherwise it will transition to {@link #STATE_ERROR}.
  * @const
  */
-SceneJS.Instance.STATE_READY = "ready";
+SceneJS.Instance.STATE_SEARCHING = "searching";
 
 
 /**
  * State of an SceneJS.Instance in which it is currently rendering its target {@link SceneJS.Symbol}. While in
  * this state, you can obtain the target {@link SceneJS.Symbol} through {@link #getTargetNode}. From this
- * state, the SceneJS.Instance will transition back to {@link #STATE_READY} once it has completed rendering the target.
+ * state, the SceneJS.Instance will transition back to {@link #STATE_SEARCHING} once it has completed rendering the target.
  * @const
  */
-SceneJS.Instance.STATE_RENDERING = "rendering";
+SceneJS.Instance.STATE_CONNECTED = "connected";
 
 /**
  * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
- * {@link #STATE_READY}, {@link #STATE_ERROR} and {@link #STATE_RENDERING}.
+ * {@link #STATE_SEARCHING}, {@link #STATE_ERROR} and {@link #STATE_CONNECTED}.
  * @returns {int} The state
  */
 SceneJS.Instance.prototype.getState = function() {
@@ -102,21 +102,10 @@ SceneJS.Instance.prototype.getState = function() {
 };
 
 /**
- * While in {@link #STATE_RENDERING}, returns the target {@link SceneJS.Symbol} currently being rendered.
- * @returns {SceneJS.Symbol} Target symbol
- */
-SceneJS.Instance.prototype.getTargetNode = function() {
-    if (this._state != SceneJS.Instance.STATE_RENDERING) {
-        return null;
-    }
-    return this._symbol;
-};
-
-/**
  * Returns the URI on which the Instance looks for its target {@link SceneJS.Node}
  */
 SceneJS.Instance.prototype.getTarget = function() {
-    return this._target;
+    return this._attr.target;
 };
 
 /**
@@ -129,31 +118,31 @@ SceneJS.Instance.prototype.setTarget = function(target) {
     /* Deregister old link
      */
     var map;
-    if (this._target) {
-        map = SceneJS._nodeInstanceMap[this._target];
+    if (this._attr.target) {
+        map = SceneJS._nodeInstanceMap[this._attr.target];
         if (!map) {
-            map = SceneJS._nodeInstanceMap[this._target] = {
+            map = SceneJS._nodeInstanceMap[this._attr.target] = {
                 numInstances: 0,
                 instances: {}
             };
         }
         map.numInstances--;
-        map.instances[this._id] = undefined;
+        map.instances[this._attr.id] = undefined;
     }
-    this._target = target;
+    this._attr.target = target;
 
     /* Register new link
      */
     if (target) {
         map = SceneJS._nodeInstanceMap[target];
         if (!map) {
-            map = SceneJS._nodeInstanceMap[this._target] = {
+            map = SceneJS._nodeInstanceMap[this._attr.target] = {
                 numInstances: 0,
                 instances: {}
             };
         }
         map.numInstances++;
-        map.instances[this._id] = this._id;
+        map.instances[this._attr.id] = this._attr.id;
 
     }
     this._setDirty();
@@ -162,8 +151,8 @@ SceneJS.Instance.prototype.setTarget = function(target) {
 
 // @private
 SceneJS.Instance.prototype._render = function(traversalContext) {
-    if (this._target) {
-        var nodeId = this._target; // Make safe to set #uri while instantiating
+    if (this._attr.target) {
+        var nodeId = this._attr.target; // Make safe to set #uri while instantiating
 
         this._symbol = SceneJS._instancingModule.acquireInstance(nodeId);
 
@@ -172,10 +161,10 @@ SceneJS.Instance.prototype._render = function(traversalContext) {
             /* Couldn't find target
              */
             var exception;
-            if (this._mustExist) {
+            if (this._attr.mustExist) {
                 throw SceneJS._errorModule.fatalError(
                         exception = new SceneJS.errors.SymbolNotFoundException
-                                ("SceneJS.Instance could not find target node: '" + this._target + "'"));
+                                ("SceneJS.Instance could not find target node: '" + this._attr.target + "'"));
             }
             this._changeState(SceneJS.Instance.STATE_ERROR, exception);
 
@@ -186,15 +175,25 @@ SceneJS.Instance.prototype._render = function(traversalContext) {
              * keep trying. Otherwise, we'll wait for the next
              * render.
              */
-            if (this._retry) {
+            if (this._attr.retry) {
                 SceneJS._needFrame = true;
+
+                /* Record this node as still loading, for "loading-status"
+                 * events to include in their reported stats
+                 */
+                SceneJS._loadStatusModule.status.numNodesLoading++;
             }
 
         } else {
-            this._changeState(SceneJS.Instance.STATE_RENDERING);
+
+            /* Record this node as loaded
+             */
+            SceneJS._loadStatusModule.status.numNodesLoaded++;
+
+            this._changeState(SceneJS.Instance.STATE_CONNECTED);
             this._symbol._renderWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
             SceneJS._instancingModule.releaseInstance(nodeId);
-            this._changeState(SceneJS.Instance.STATE_READY);
+            this._changeState(SceneJS.Instance.STATE_SEARCHING);
             this._symbol = null;
         }
     }
@@ -246,11 +245,36 @@ SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalCon
 /** @private
  */
 SceneJS.Instance.prototype._destroy = function() {
-    if (this._target) {
-        var map = SceneJS._nodeInstanceMap[this._target];
+    if (this._attr.target) {
+        var map = SceneJS._nodeInstanceMap[this._attr.target];
         if (map) {
             map.numInstances--;
-            map.instances[this._id] = undefined;
+            map.instances[this._attr.id] = undefined;
         }
     }
+};
+
+
+/*---------------------------------------------------------------------
+ * Query methods - calls to these only legal while node is rendering
+ *-------------------------------------------------------------------*/
+
+/**
+ * Queries the Instance's current render-time state.
+ * This will update after each "state-changed" event.
+ * @returns {String} The state
+ */
+SceneJS.Instance.prototype.queryState = function() {
+    return this._state;
+};
+
+/**
+ * Queries the instance's target node, returning the target only if acquired yet.
+ * @returns {SceneJS.Symbol} Target symbol
+ */
+SceneJS.Instance.prototype.queryTargetNode = function() {
+    if (this._state != SceneJS.Instance.STATE_CONNECTED) {
+        return null;
+    }
+    return SceneJS.withNode(this._symbol);
 };

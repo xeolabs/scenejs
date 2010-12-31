@@ -28,7 +28,7 @@ SceneJS.Box = SceneJS.createNodeType("box", "geometry");
 
 // @private
 SceneJS.Box.prototype._init = function(params) {
-    this._nodeType = "box";
+    this._attr.nodeType = "box";
 
     var x = params.xSize || 1;
     var y = params.ySize || 1;

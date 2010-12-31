@@ -30,9 +30,9 @@ SceneJS.Scale.prototype._init = function(params) {
  */
 SceneJS.Scale.prototype.setXYZ = function(xyz) {
     xyz = xyz || {};
-    this._x = (xyz.x != undefined) ? xyz.x : 1;
-    this._y = (xyz.y != undefined) ? xyz.y : 1;
-    this._z = (xyz.z != undefined) ? xyz.z : 1;
+    this._attr.x = (xyz.x != undefined) ? xyz.x : 1;
+    this._attr.y = (xyz.y != undefined) ? xyz.y : 1;
+    this._attr.z = (xyz.z != undefined) ? xyz.z : 1;
     this._setDirty();
     return this;
 };
@@ -42,9 +42,9 @@ SceneJS.Scale.prototype.setXYZ = function(xyz) {
  */
 SceneJS.Scale.prototype.getXYZ = function() {
     return {
-        x: this._x,
-        y: this._y,
-        z: this._z
+        x: this._attr.x,
+        y: this._attr.y,
+        z: this._attr.z
     };
 };
 
@@ -54,7 +54,7 @@ SceneJS.Scale.prototype.getXYZ = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setX = function(x) {
-    this._x = (x != undefined && x != null) ? x : 1.0;
+    this._attr.x = (x != undefined && x != null) ? x : 1.0;
     this._setDirty();
     return this;
 };
@@ -64,7 +64,7 @@ SceneJS.Scale.prototype.setX = function(x) {
  * @returns {float}
  */
 SceneJS.Scale.prototype.getX = function() {
-    return this._x;
+    return this._attr.x;
 };
 
 /** Sets the Y scale factor
@@ -73,7 +73,7 @@ SceneJS.Scale.prototype.getX = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setY = function(y) {
-    this._y = (y != undefined && y != null) ? y : 1.0;
+    this._attr.y = (y != undefined && y != null) ? y : 1.0;
     this._setDirty();
     return this;
 };
@@ -83,7 +83,7 @@ SceneJS.Scale.prototype.setY = function(y) {
  * @returns {float}
  */
 SceneJS.Scale.prototype.getY = function() {
-    return this._y;
+    return this._attr.y;
 };
 
 /** Sets the Z scale factor
@@ -92,7 +92,7 @@ SceneJS.Scale.prototype.getY = function() {
  * @returns {SceneJS.Scale} this
  */
 SceneJS.Scale.prototype.setZ = function(z) {
-    this._z = (z != undefined && z != null) ? z : 1.0;
+    this._attr.z = (z != undefined && z != null) ? z : 1.0;
     this._setDirty();
     return this;
 };
@@ -102,7 +102,7 @@ SceneJS.Scale.prototype.setZ = function(z) {
  * @returns {float}
  */
 SceneJS.Scale.prototype.getZ = function() {
-    return this._z;
+    return this._attr.z;
 };
 
 /** Increments the X component of the scale factor
@@ -110,7 +110,7 @@ SceneJS.Scale.prototype.getZ = function() {
  * @param x
  */
 SceneJS.Scale.prototype.incX = function(x) {
-    this._x += x;
+    this._attr.x += x;
     this._memoLevel = 0;
 };
 
@@ -119,7 +119,7 @@ SceneJS.Scale.prototype.incX = function(x) {
  * @param y
  */
 SceneJS.Scale.prototype.incY = function(y) {
-    this._y += y;
+    this._attr.y += y;
 };
 
 /** Increments the Z component of the scale factor
@@ -127,7 +127,7 @@ SceneJS.Scale.prototype.incY = function(y) {
  * @param z
  */
 SceneJS.Scale.prototype.incZ = function(z) {
-    this._z += z;
+    this._attr.z += z;
     this._memoLevel = 0;
 };
 
@@ -136,7 +136,7 @@ SceneJS.Scale.prototype.incZ = function(z) {
  * @returns {Number[16]} The matrix elements
  */
 SceneJS.Scale.prototype.getMatrix = function() {
-    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_scalingMat4v([this._x, this._y, this._z]);
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_scalingMat4v([this._attr.x, this._attr.y, this._attr.z]);
 };
 
 /**
@@ -145,9 +145,9 @@ SceneJS.Scale.prototype.getMatrix = function() {
  */
 SceneJS.Scale.prototype.getAttributes = function() {
     return {
-        x: this._x,
-        y: this._y,
-        z: this._z
+        x: this._attr.x,
+        y: this._attr.y,
+        z: this._attr.z
     };
 };
 
@@ -157,7 +157,7 @@ SceneJS.Scale.prototype._render = function(traversalContext) {
 
     if (this._memoLevel == 0) {
         this._memoLevel = 1;
-        this._mat = SceneJS._math_scalingMat4v([this._x, this._y, this._z]);
+        this._mat = SceneJS._math_scalingMat4v([this._attr.x, this._attr.y, this._attr.z]);
     }
     var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {

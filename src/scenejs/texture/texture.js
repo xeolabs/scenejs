@@ -350,6 +350,10 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
                 this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
             }
 
+            /* Record this node as loaded for "loading-status" events
+             */
+            SceneJS._loadStatusModule.status.numNodesLoaded++;
+
             this._renderNodes(traversalContext);
 
             SceneJS._textureModule.popTexture();
@@ -359,6 +363,11 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
                 this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
                 this._changeState(SceneJS.Texture.STATE_LOADING); // Now loading some layers
             }
+
+            /* Record this node as loaded for "loading-status" events
+             */
+            SceneJS._loadStatusModule.status.numNodesLoading++;
+
             this._renderNodes(traversalContext);
         }
     }
@@ -473,4 +482,17 @@ SceneJS.Texture.prototype._changeState = function(newState, params) {
     if (this._listeners["state-changed"]) {
         this._fireEvent("state-changed", params);
     }
+};
+
+/*---------------------------------------------------------------------
+ * Query methods - calls to these only legal while node is rendering
+ *-------------------------------------------------------------------*/
+
+/**
+ * Queries the Texture's current render-time state.
+ * This will update after each "state-changed" event.
+ * @returns {String} The state
+ */
+SceneJS.Texture.prototype.queryState = function() {
+    return this._state;
 };

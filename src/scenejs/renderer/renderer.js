@@ -9,7 +9,11 @@ SceneJS.Renderer = SceneJS.createNodeType("renderer");
 
 // @private
 SceneJS.Renderer.prototype._init = function(params) {
-    this._attr = params || {};
+    for (var key in params) {
+        if (params.hasOwnProperty(key)){
+            this._attr[key] = params[key];
+        }
+    }
 };
 
 SceneJS.Renderer.prototype.setViewport = function(viewport) {

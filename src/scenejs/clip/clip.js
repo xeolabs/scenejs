@@ -6,7 +6,6 @@ SceneJS.Clip = SceneJS.createNodeType("clip");
 
 // @private
 SceneJS.Clip.prototype._init = function(params) {
-    this._attr = {};
     this.setMode(params.mode);
     this.setA(params.a);
     this.setB(params.b);
@@ -214,3 +213,4 @@ SceneJS.Clip.prototype._makePlane = function() {
 
     // this._memoLevel = 1;
 };
+

@@ -26,7 +26,7 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
     var matrix = superModelXForm.matrix.slice(0);
 
     // 1. Invert the model rotation matrix, which will reset the subnodes rotation
-    rotMatrix = [
+    var rotMatrix = [
         matrix[0], matrix[1], matrix[2],  0,
         matrix[4], matrix[5], matrix[6],  0,
         matrix[8], matrix[9], matrix[10], 0,
@@ -34,12 +34,12 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
     ];
     SceneJS._math_inverseMat4(rotMatrix);
     SceneJS._math_mulMat4(matrix, rotMatrix, matrix);
-    
+
     // 2. Get the billboard Z vector
     var ZZ = [];
     SceneJS._math_subVec3([eye.x, eye.y, eye.z], [look.x, look.y, look.z], ZZ);
     SceneJS._math_normalizeVec3(ZZ);
-    
+
     // 3. Get the billboard X vector
     var XX = [];
     SceneJS._math_cross3Vec3([up.x, up.y, up.z], ZZ, XX);
@@ -49,7 +49,7 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
     var YY = [];
     SceneJS._math_cross3Vec3(ZZ, XX, YY);
     SceneJS._math_normalizeVec3(YY);
-    
+
     // 5. Multiply those billboard vector to the matrix
     SceneJS._math_mulMat4(matrix, [
         XX[0], XX[1], XX[2], 0,

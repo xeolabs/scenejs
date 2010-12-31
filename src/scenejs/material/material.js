@@ -63,8 +63,6 @@ SceneJS.Material = SceneJS.createNodeType("material");
 
 // @private
 SceneJS.Material.prototype._init = function(params) {
-    this._nodeType = "material";
-    this._material = {};
     this.setBaseColor(params.baseColor);
     this.setHighlightBaseColor(params.highlightBaseColor);
     this.setSpecularColor(params.specularColor);
@@ -80,16 +78,13 @@ SceneJS.Material.prototype._init = function(params) {
  * Sets the material base color
  * @function {SceneJS.Material} setBaseColor
  * @param {Object} color Eg. { r: 1.0, g: 1.0, b: 0.0 }
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setBaseColor = function(color) {
-    this._material.baseColor = color ? {
+    this._attr.baseColor = color ? {
         r: color.r != undefined && color.r != null ? color.r : 0.0,
         g: color.g != undefined && color.g != null ? color.g : 0.0,
         b: color.b != undefined && color.b != null ? color.b : 0.0
     } : null;
-    this._setDirty();
-    return this;
 };
 
 /**
@@ -98,10 +93,10 @@ SceneJS.Material.prototype.setBaseColor = function(color) {
  @returns {Object} color Eg. { r: 1.0, g: 1.0, b: 0.0 }
  */
 SceneJS.Material.prototype.getBaseColor = function() {
-    return this._material.baseColor ? {
-        r: this._material.baseColor.r,
-        g: this._material.baseColor.g,
-        b: this._material.baseColor.b
+    return this._attr.baseColor ? {
+        r: this._attr.baseColor.r,
+        g: this._attr.baseColor.g,
+        b: this._attr.baseColor.b
     } : null;
 };
 
@@ -109,16 +104,13 @@ SceneJS.Material.prototype.getBaseColor = function() {
  * Sets the material base color for when highlighted
  * @function {SceneJS.Material} setHighlightBaseColor
  * @param {Object} color Eg. { r: 1.0, g: 1.0, b: 0.0 }
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setHighlightBaseColor = function(color) {
-    this._material.highlightBaseColor = color ? {
+    this._attr.highlightBaseColor = color ? {
         r: color.r != undefined && color.r != null ? color.r : 0.0,
         g: color.g != undefined && color.g != null ? color.g : 0.0,
         b: color.b != undefined && color.b != null ? color.b : 0.0
     } : null;
-    this._setDirty();
-    return this;
 };
 
 /**
@@ -127,10 +119,10 @@ SceneJS.Material.prototype.setHighlightBaseColor = function(color) {
  @returns {Object} color Eg. { r: 1.0, g: 1.0, b: 0.0 }
  */
 SceneJS.Material.prototype.getHighlightBaseColor = function() {
-    return this._material.highlightBaseColor ? {
-        r: this._material.highlightBaseColor.r,
-        g: this._material.highlightBaseColor.g,
-        b: this._material.highlightBaseColor.b
+    return this._attr.highlightBaseColor ? {
+        r: this._attr.highlightBaseColor.r,
+        g: this._attr.highlightBaseColor.g,
+        b: this._attr.highlightBaseColor.b
     } : null;
 };
 
@@ -138,16 +130,13 @@ SceneJS.Material.prototype.getHighlightBaseColor = function() {
  * Sets the material specular
  * @function {SceneJS.Material} setSpecularColor
  * @param {Object} color Eg. { r: 1.0, g: 1.0, b: 0.0 }
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setSpecularColor = function(color) {
-    this._material.specularColor = color ? {
+    this._attr.specularColor = color ? {
         r: color.r != undefined && color.r != null ? color.r : 0.5,
         g: color.g != undefined && color.g != null ? color.g : 0.5,
         b: color.b != undefined && color.b != null ? color.b : 0.5
     } : null;
-    this._setDirty();
-    return this;
 };
 
 
@@ -157,10 +146,10 @@ SceneJS.Material.prototype.setSpecularColor = function(color) {
  @returns {Object} color Eg. { r: 1.0, g: 1.0, b: 0.0 }
  */
 SceneJS.Material.prototype.getBaseColor = function() {
-    return this._material.baseColor ? {
-        r: this._material.baseColor.r,
-        g: this._material.baseColor.g,
-        b: this._material.baseColor.b
+    return this._attr.baseColor ? {
+        r: this._attr.baseColor.r,
+        g: this._attr.baseColor.g,
+        b: this._attr.baseColor.b
     } : null;
 };
 
@@ -171,10 +160,10 @@ SceneJS.Material.prototype.getBaseColor = function() {
  @returns {Object} color Eg. { r: 1.0, g: 1.0, b: 0.0 }
  */
 SceneJS.Material.prototype.getSpecularColor = function() {
-    return this._material.specularColor ? {
-        r: this._material.specularColor.r,
-        g: this._material.specularColor.g,
-        b: this._material.specularColor.b
+    return this._attr.specularColor ? {
+        r: this._attr.specularColor.r,
+        g: this._attr.specularColor.g,
+        b: this._attr.specularColor.b
     } : null;
 };
 
@@ -182,12 +171,9 @@ SceneJS.Material.prototype.getSpecularColor = function() {
  * Sets the specular reflection factor
  * @function {SceneJS.Material} setSpecular
  * @param {float} specular
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setSpecular = function(specular) {
-    this._material.specular = specular;
-    this._setDirty();
-    return this;
+    this._attr.specular = specular;
 };
 
 /**
@@ -196,19 +182,16 @@ SceneJS.Material.prototype.setSpecular = function(specular) {
  @returns {float}
  */
 SceneJS.Material.prototype.getSpecular = function() {
-    return this._material.specular;
+    return this._attr.specular;
 };
 
 /**
  * Sets the shininess factor
  * @function {SceneJS.Material} setShine
  * @param {float} shine
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setShine = function(shine) {
-    this._material.shine = shine;
-    this._setDirty();
-    return this;
+    this._attr.shine = shine;
 };
 
 /**
@@ -217,19 +200,16 @@ SceneJS.Material.prototype.setShine = function(shine) {
  @returns {float}
  */
 SceneJS.Material.prototype.getShine = function() {
-    return this._material.shine;
+    return this._attr.shine;
 };
 
 /**
  * Sets the reflectivity factor
  * @function {SceneJS.Material} setReflect
  * @param {float} reflect
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setReflect = function(reflect) {
-    this._material.reflect = reflect;
-    this._setDirty();
-    return this;
+    this._attr.reflect = reflect;
 };
 
 /**
@@ -238,19 +218,16 @@ SceneJS.Material.prototype.setReflect = function(reflect) {
  @returns {float}
  */
 SceneJS.Material.prototype.getReflect = function() {
-    return this._material.reflect;
+    return this._attr.reflect;
 };
 
 /**
  * Sets the emission factor
  * @function {SceneJS.Material} setEmit
  * @param {float} emit
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setEmit = function(emit) {
-    this._material.emit = emit;
-    this._setDirty();
-    return this;
+    this._attr.emit = emit;
 };
 
 /**
@@ -259,19 +236,16 @@ SceneJS.Material.prototype.setEmit = function(emit) {
  @returns {float}
  */
 SceneJS.Material.prototype.getEmit = function() {
-    return this._material.emit;
+    return this._attr.emit;
 };
 
 /**
  * Sets the amount of alpha
  * @function {SceneJS.Material} setAlpha
  * @param {float} alpha
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setAlpha = function(alpha) {
-    this._material.alpha = alpha;
-    this._setDirty();
-    return this;
+    this._attr.alpha = alpha;
 };
 
 /**
@@ -280,19 +254,16 @@ SceneJS.Material.prototype.setAlpha = function(alpha) {
  @returns {float}
  */
 SceneJS.Material.prototype.getAlpha = function() {
-    return this._material.alpha;
+    return this._attr.alpha;
 };
 
 /**
  * Sets the opacity factor
  * @function {SceneJS.Material} setOpacity
  * @param {float} opacity
- * @returns {SceneJS.Material} this
  */
 SceneJS.Material.prototype.setOpacity = function(opacity) {
-    this._material.opacity = opacity;
-    this._setDirty();
-    return this;
+    this._attr.opacity = opacity;
 };
 
 /**
@@ -301,7 +272,7 @@ SceneJS.Material.prototype.setOpacity = function(opacity) {
  @returns {float}
  */
 SceneJS.Material.prototype.getOpacity = function() {
-    return this._material.opacity;
+    return this._attr.opacity;
 };
 
 
@@ -310,7 +281,7 @@ SceneJS.Material.prototype._render = function(traversalContext) {
     if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
         this._renderNodes(traversalContext);  // no need for materials when picking
     } else {
-        SceneJS._materialModule.pushMaterial(this._material);
+        SceneJS._materialModule.pushMaterial(this._attr);
         this._renderNodes(traversalContext);
         SceneJS._materialModule.popMaterial();
     }

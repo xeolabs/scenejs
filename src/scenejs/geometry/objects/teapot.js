@@ -13,7 +13,7 @@
  */
 SceneJS.Teapot = function() {
     SceneJS.Geometry.apply(this, arguments);
-    this._nodeType = "teapot";
+    this._attr.nodeType = "teapot";
 
     /* Resource ID ensures that we save memory by reusing any teapot that has already been created
      */

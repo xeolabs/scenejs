@@ -100,8 +100,6 @@
 SceneJS.Geometry = SceneJS.createNodeType("geometry");
 
 SceneJS.Geometry.prototype._init = function(params) {
-    this._nodeType = "geometry";
-    this._geo = null;    // Holds geometry when configured as arrays
     this._create = null; // Callback to create geometry
     this._handle = null; // Handle to created geometry
 
@@ -109,15 +107,13 @@ SceneJS.Geometry.prototype._init = function(params) {
     if (params.create instanceof Function) {
         this._create = params.create;
     } else {
-        this._geo = {
-            positions : params.positions || [],
-            normals : params.normals || [],
-            colors : params.colors || [],
-            indices : params.indices || [],
-            uv : params.uv || [],
-            uv2 : params.uv2 || [],
-            primitive : params.primitive || "triangles"
-        };
+        this._attr.positions = params.positions || [];
+        this._attr.normals = params.normals || [];
+        this._attr.colors = params.colors || [];
+        this._attr.indices = params.indices || [];
+        this._attr.uv = params.uv || [];
+        this._attr.uv2 = params.uv2 || [];
+        this._attr.primitive = params.primitive || "triangles";
     }
 };
 
@@ -125,7 +121,7 @@ SceneJS.Geometry.prototype._init = function(params) {
  * @return {[Number]} Flat array of position elements
  */
 SceneJS.Geometry.prototype.getPositions = function() {
-    return this._geo.positions;
+    return this._attr.positions;
 };
 
 
@@ -133,42 +129,42 @@ SceneJS.Geometry.prototype.getPositions = function() {
  * @return {[Number]} Flat array of normal elements
  */
 SceneJS.Geometry.prototype.getNormals = function() {
-    return this._geo.normals;
+    return this._attr.normals;
 };
 
 /** Returns this Geometry's colors array
  * @return {[Number]} Flat array of color elements
  */
 SceneJS.Geometry.prototype.getColors = function() {
-    return this._geo.colors;
+    return this._attr.colors;
 };
 
 /** Returns this Geometry's indices array
  * @return {[Number]} Flat array of index elements
  */
 SceneJS.Geometry.prototype.getIndices = function() {
-    return this._geo.indices;
+    return this._attr.indices;
 };
 
 /** Returns this Geometry's UV coordinates array
  * @return {[Number]} Flat array of UV coordinate elements
  */
 SceneJS.Geometry.prototype.getUv = function() {
-    return this._geo.uv;
+    return this._attr.uv;
 };
 
 /** Returns this Geometry's UV2 coordinates array
  * @return {[Number]} Flat array of UV2 coordinate elements
  */
 SceneJS.Geometry.prototype.getUv2 = function() {
-    return this._geo.uv2;
+    return this._attr.uv2;
 };
 
 /** Returns this Geometry's primitive type
  * @return {String} Primitive type -  "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
  */
 SceneJS.Geometry.prototype.getPrimitive = function() {
-    return this._geo.primitive;
+    return this._attr.primitive;
 };
 
 /** Returns the local-space boundary of this Geometry's positions
@@ -184,10 +180,10 @@ SceneJS.Geometry.prototype.getBoundary = function() {
         zmax : Number.MIN_VALUE
     };
     var x, y, z;
-    for (var i = 0, len = this._geo.positions.length - 3; i < len; i += 3) {
-        x = this._geo.positions[i];
-        y = this._geo.positions[i + 1];
-        z = this._geo.positions[i + 2];
+    for (var i = 0, len = this._attr.positions.length - 3; i < len; i += 3) {
+        x = this._attr.positions[i];
+        y = this._attr.positions[i + 1];
+        z = this._attr.positions[i + 2];
 
         if (x < boundary.xmin) {
             boundary.xmin = x;
@@ -222,13 +218,38 @@ SceneJS.Geometry.prototype._render = function(traversalContext) {
     }
     if (!this._handle) { // Either not created yet or has been evicted
         if (this._create) { // Use callback to create
-            this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._create());
+
+            var attr = this._create();
+
+            this._attr.positions = attr.positions;
+            this._attr.normals = attr.normals;
+            this._attr.colors = attr.colors;
+            this._attr.indices = attr.indices;
+            this._attr.uv = attr.uv;
+            this._attr.uv2 = attr.uv2;
+            this._attr.primitive = attr.primitive;
+
+            this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._attr);
         } else { // Or supply arrays
-            this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._geo);
+            this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._attr);
         }
     }
-    SceneJS._geometryModule.pushGeometry(this._handle);
-    this._renderNodes(traversalContext);
-    SceneJS._geometryModule.popGeometry();
 
+    if (!SceneJS._flagsModule.flags.visible) {
+
+        /* This subgraph flagged as invisible - it still "renders",
+         * but the geometry is not actually drawn. This is useful
+         * for when we want to just create textures, geometries etc.
+         * on the GPU.
+         */
+        this._renderNodes(traversalContext);
+
+    } else {
+
+        SceneJS._geometryModule.pushGeometry(this._handle);
+        this._renderNodes(traversalContext);
+        SceneJS._geometryModule.popGeometry();
+    }
 };
+
+

@@ -1,21 +1,19 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
+
     <link href="../web/style.css" rel="stylesheet" type="text/css"/>
 
 </head>
-<body>
 <div id="container">
     <div id="header">
         <div id="header-nav">
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Message System
-                Demo 1
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Geometry
+                Morphing - Wavey Teapot
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -34,19 +32,20 @@
                 &lt;canvas&gt; feature.</p>
         </canvas>
         <div id="info">
-            <h2>Sending "create" and "update" messages to SceneJS</h2>
+            <h2>Deforming geometry vertices with the <b>morphGeometry</b> node</h2>
 
-            <p>Sending a message that inserts a textured instance of a box into a scene.</p>
-
-            <p>1. Add new subgraph - a Teapot wrapped in a Rotate, and add it to the scene graph.</p>
-            <p>2. Update Rotate.</p>
-            <p>3. Add another subgraph - a Teapot wrapped in a Translate, and add it to the scene graph.</p>
-            <p>4. Remove first subgraph.</p>
+            <p>In this example we're copying the vertex positions of a teapot node, multiplying them
+                by a sine wave, then wrapping the teapot in a morphGeometry that uses the new postions as a target.</p>
             <br/>
+
+            <p>We're then animating the morphGeometry 'factor' attribute in the render loop to peform the morphing.</p>
+            <br/>
+
             <ul>
-                <li><a target="_other" href="messages.js">Scene source code</a></li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS+Messaging+System">Wiki article on
-                    the SceneJS messaging system</a></li>
+                <li><a target="_other" href="morphing-random.js">Scene source code</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/morphGeometry+-+Geometry+Morphing">Wiki page
+                    on
+                    geometry morphing</a></li>
             </ul>
         </div>
         <div id="log">
@@ -56,6 +55,7 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="messages.js"></script>
+
+<script type="text/javascript" src="morphing-random.js"></script>
 </body>
 </html>

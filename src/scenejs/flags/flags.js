@@ -7,7 +7,6 @@ SceneJS.Flags = SceneJS.createNodeType("flags");
 
 // @private
 SceneJS.Flags.prototype._init = function(params) {
-    this._attr = {};
     this.setFlags(params.flags);
 };
 

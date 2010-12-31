@@ -31,7 +31,7 @@ SceneJS.Rotate.prototype._init = function(params) {
 
  */
 SceneJS.Rotate.prototype.setAngle = function(angle) {
-    this._angle = angle || 0;
+    this._attr.angle = angle || 0;
     this._memoLevel = 0;
 };
 
@@ -39,7 +39,7 @@ SceneJS.Rotate.prototype.setAngle = function(angle) {
  * @returns {float} The angle in degrees
  */
 SceneJS.Rotate.prototype.getAngle = function() {
-    return this._angle;
+    return this._attr.angle;
 };
 
 /**
@@ -51,9 +51,9 @@ SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     var x = xyz.x || 0;
     var y = xyz.y || 0;
     var z = xyz.z || 0;
-    this._x = x;
-    this._y = y;
-    this._z = z;
+    this._attr.x = x;
+    this._attr.y = y;
+    this._attr.z = z;
     this._memoLevel = 0;
 };
 
@@ -62,9 +62,9 @@ SceneJS.Rotate.prototype.setXYZ = function(xyz) {
  */
 SceneJS.Rotate.prototype.getXYZ = function() {
     return {
-        x: this._x,
-        y: this._y,
-        z: this._z
+        x: this._attr.x,
+        y: this._attr.y,
+        z: this._attr.z
     };
 };
 
@@ -74,7 +74,7 @@ SceneJS.Rotate.prototype.getXYZ = function() {
  * @returns {SceneJS.Rotate} this
  */
 SceneJS.Rotate.prototype.setX = function(x) {
-    this._x = x;
+    this._attr.x = x;
     this._memoLevel = 0;
 };
 
@@ -83,7 +83,7 @@ SceneJS.Rotate.prototype.setX = function(x) {
  * @returns {float}
  */
 SceneJS.Rotate.prototype.getX = function() {
-    return this._x;
+    return this._attr.x;
 };
 
 /** Sets the rotation axis vector's Y component
@@ -91,7 +91,7 @@ SceneJS.Rotate.prototype.getX = function() {
  * @param y
  */
 SceneJS.Rotate.prototype.setY = function(y) {
-    this._y = y;
+    this._attr.y = y;
     this._memoLevel = 0;
 };
 
@@ -100,7 +100,7 @@ SceneJS.Rotate.prototype.setY = function(y) {
  * @returns {float}
  */
 SceneJS.Rotate.prototype.getY = function() {
-    return this._y;
+    return this._attr.y;
 };
 
 /** Sets the rotation axis vector's Z component
@@ -108,7 +108,7 @@ SceneJS.Rotate.prototype.getY = function() {
  * @param z
  */
 SceneJS.Rotate.prototype.setZ = function(z) {
-    this._z = z;
+    this._attr.z = z;
     this._memoLevel = 0;
 };
 
@@ -116,7 +116,7 @@ SceneJS.Rotate.prototype.setZ = function(z) {
  * @returns {float}
  */
 SceneJS.Rotate.prototype.getZ = function() {
-    return this._z;
+    return this._attr.z;
 };
 
 /** Increments the X component of the rotation vector
@@ -124,7 +124,7 @@ SceneJS.Rotate.prototype.getZ = function() {
  * @param x
  */
 SceneJS.Rotate.prototype.incX = function(x) {
-    this._x += x;
+    this._attr.x += x;
     this._memoLevel = 0;
 };
 
@@ -134,7 +134,7 @@ SceneJS.Rotate.prototype.incX = function(x) {
  * @returns {SceneJS.Rotate} this
  */
 SceneJS.Rotate.prototype.incY = function(y) {
-    this._y += y;
+    this._attr.y += y;
 };
 
 /** Inccrements the Z component of the rotation vector
@@ -142,7 +142,7 @@ SceneJS.Rotate.prototype.incY = function(y) {
  * @param z
  */
 SceneJS.Rotate.prototype.incZ = function(z) {
-    this._z += z;
+    this._attr.z += z;
     this._memoLevel = 0;
 };
 
@@ -151,7 +151,7 @@ SceneJS.Rotate.prototype.incZ = function(z) {
  * @param angle
  */
 SceneJS.Rotate.prototype.incAngle = function(angle) {
-    this._angle += angle;
+    this._attr.angle += angle;
     this._memoLevel = 0;
 };
 
@@ -162,7 +162,7 @@ SceneJS.Rotate.prototype.incAngle = function(angle) {
 SceneJS.Rotate.prototype.getMatrix = function() {
     return (this._memoLevel > 0)
             ? this._mat.slice(0)
-            : SceneJS._math_rotationMat4v(this._angle * Math.PI / 180.0, [this._x, this._y, this._z]);
+            : SceneJS._math_rotationMat4v(this._attr.angle * Math.PI / 180.0, [this._attr.x, this._attr.y, this._attr.z]);
 };
 
 /**
@@ -171,10 +171,10 @@ SceneJS.Rotate.prototype.getMatrix = function() {
  */
 SceneJS.Rotate.prototype.getAttributes = function() {
     return {
-        x: this._x,
-        y: this._y,
-        z: this._z,
-        angle : this._angle
+        x: this._attr.x,
+        y: this._attr.y,
+        z: this._attr.z,
+        angle : this._attr.angle
     };
 };
 
@@ -182,15 +182,15 @@ SceneJS.Rotate.prototype._render = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
         this._memoLevel = 1;
-        if (this._x + this._y + this._z > 0) {
+        if (this._attr.x + this._attr.y + this._attr.z > 0) {
 
             /* When building a view transform, apply the negated rotation angle
              * to correctly transform the SceneJS.Camera
              */
             var angle = SceneJS._modelViewTransformModule.isBuildingViewTransform()
-                    ? -this._angle
-                    : this._angle;
-            this._mat = SceneJS._math_rotationMat4v(angle * Math.PI / 180.0, [this._x, this._y, this._z]);
+                    ? -this._attr.angle
+                    : this._attr.angle;
+            this._mat = SceneJS._math_rotationMat4v(angle * Math.PI / 180.0, [this._attr.x, this._attr.y, this._attr.z]);
         } else {
             this._mat = SceneJS._math_identityMat4();
         }

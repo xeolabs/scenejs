@@ -110,7 +110,7 @@ SceneJS.Camera.prototype._init = function(params) {
  */
 SceneJS.Camera.prototype.setOptics = function(optics) {
     if (!optics) {
-        this._optics = {
+        this._attr.optics = {
             type: "perspective",
             fovy : 60.0,
             aspect : 1.0,
@@ -119,7 +119,7 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
         };
     } else {
         if (optics.type == "ortho") {
-            this._optics = {
+            this._attr.optics = {
                 type: optics.type,
                 left : optics.left || -1.0,
                 bottom : optics.bottom || -1.0,
@@ -129,7 +129,7 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
                 far : optics.far || 5000.0
             };
         } else if (optics.type == "frustum") {
-            this._optics = {
+            this._attr.optics = {
                 type: optics.type,
                 left : optics.left || -1.0,
                 bottom : optics.bottom || -1.0,
@@ -139,7 +139,7 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
                 far : optics.far || 5000.0
             };
         } else  if (optics.type == "perspective") {
-            this._optics = {
+            this._attr.optics = {
                 type: optics.type,
                 fovy : optics.fovy || 60.0,
                 aspect: optics.aspect || 1.0,
@@ -168,9 +168,9 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
  */
 SceneJS.Camera.prototype.getOptics = function() {
     var optics = {};
-    for (var key in this._optics) {
-        if (this._optics.hasOwnProperty(key)) {
-            optics[key] = this._optics[key];
+    for (var key in this._attr.optics) {
+        if (this._attr.optics.hasOwnProperty(key)) {
+            optics[key] = this._attr.optics[key];
         }
     }
     return optics;
@@ -202,58 +202,59 @@ SceneJS.Camera.prototype._render = function(traversalContext) {
  */
 SceneJS.Camera.prototype._rebuild = function () {
     if (this._memoLevel == 0) {
-        if (this._optics.type == "ortho") {
+        var optics = this._attr.optics;
+        if (optics.type == "ortho") {
             this._transform = {
-                type: this._optics.type,
+                type: optics.type,
                 optics : {
-                    left: this._optics.left,
-                    right: this._optics.right,
-                    bottom: this._optics.bottom,
-                    top: this._optics.top,
-                    near: this._optics.near,
-                    far : this._optics.far
+                    left: optics.left,
+                    right: optics.right,
+                    bottom: optics.bottom,
+                    top: optics.top,
+                    near: optics.near,
+                    far : optics.far
                 },
                 matrix:SceneJS._math_orthoMat4c(
-                        this._optics.left,
-                        this._optics.right,
-                        this._optics.bottom,
-                        this._optics.top,
-                        this._optics.near,
-                        this._optics.far)
+                        optics.left,
+                        optics.right,
+                        optics.bottom,
+                        optics.top,
+                        optics.near,
+                        optics.far)
             };
-        } else if (this._optics.type == "frustum") {
+        } else if (optics.type == "frustum") {
             this._transform = {
-                type: this._optics.type,
+                type: optics.type,
                 optics : {
-                    left: this._optics.left,
-                    right: this._optics.right,
-                    bottom: this._optics.bottom,
-                    top: this._optics.top,
-                    near: this._optics.near,
-                    far : this._optics.far
+                    left: optics.left,
+                    right: optics.right,
+                    bottom: optics.bottom,
+                    top: optics.top,
+                    near: optics.near,
+                    far : optics.far
                 },
                 matrix: SceneJS._math_frustumMatrix4(
-                        this._optics.left,
-                        this._optics.right,
-                        this._optics.bottom,
-                        this._optics.top,
-                        this._optics.near,
-                        this._optics.far)
+                        optics.left,
+                        optics.right,
+                        optics.bottom,
+                        optics.top,
+                        optics.near,
+                        optics.far)
             };
-        } else if (this._optics.type == "perspective") {
+        } else if (optics.type == "perspective") {
             this._transform = {
-                type: this._optics.type,
+                type: optics.type,
                 optics : {
-                    fovy: this._optics.fovy,
-                    aspect: this._optics.aspect,
-                    near: this._optics.near,
-                    far: this._optics.far
+                    fovy: optics.fovy,
+                    aspect: optics.aspect,
+                    near: optics.near,
+                    far: optics.far
                 },
                 matrix:SceneJS._math_perspectiveMatrix4(
-                        this._optics.fovy * Math.PI / 180.0,
-                        this._optics.aspect,
-                        this._optics.near,
-                        this._optics.far)
+                        optics.fovy * Math.PI / 180.0,
+                        optics.aspect,
+                        optics.near,
+                        optics.far)
             };
         }
         this._memoLevel = 1;

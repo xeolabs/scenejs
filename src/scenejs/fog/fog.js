@@ -37,7 +37,6 @@ SceneJS.Fog = SceneJS.createNodeType("fog");
 
 // @private
 SceneJS.Fog.prototype._init = function(params) {
-    this._attr = {};
     this.setMode(params.mode);
     this.setColor(params.color);
     this.setDensity(params.density);

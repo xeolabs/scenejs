@@ -5,7 +5,6 @@ SceneJS.Deform = SceneJS.createNodeType("deform");
 
 // @private
 SceneJS.Deform.prototype._init = function(params) {
-    this._attr = {};
     this.setVerts(params.verts);
 };
 

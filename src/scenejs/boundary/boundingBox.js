@@ -152,14 +152,6 @@ SceneJS.BoundingBox.prototype._changeState = function(newState, params) {
 };
 
 /**
- * Returns the BoundingBox's current state.
- * @returns {int} The state
- */
-SceneJS.BoundingBox.prototype.getState = function() {
-    return this._state;
-};
-
-/**
  * Sets the minimum X extent
  * @function {SceneJS.BoundingBox} setXMin
  * @param {double} xmin Minimum X extent
@@ -329,64 +321,7 @@ SceneJS.BoundingBox.prototype.getBoundary = function() {
     };
 };
 
-///**
-// * Gets current model-space extents
-// * @function {Object} getModelBoundary
-// * @returns {Object}  The model boundary extents - {xmin: float, ymin: float, zmin: float, xmax: float, ymax: float, zmax: float}
-// * @since Version 0.7.8
-// */
-//SceneJS.BoundingBox.prototype.getModelBoundary = function() {
-//    return {
-//        xmin: this._modelBox.min[0],
-//        ymin: this._modelBox.min[1],
-//        zmin: this._modelBox.min[2],
-//        xmax: this._modelBox.max[0],
-//        ymax: this._modelBox.max[1],
-//        zmax: this._modelBox.max[2]
-//    };
-//};
-//
-///**
-// * Gets current view-space extents
-// * @function {Object} getViewBoundary
-// * @returns {Object}  The view boundary extents - {xmin: float, ymin: float, zmin: float, xmax: float, ymax: float, zmax: float}
-// * @since Version 0.7.8
-// */
-//SceneJS.BoundingBox.prototype.getViewBoundary = function() {
-//    return {
-//        xmin: this._viewBox.min[0],
-//        ymin: this._viewBox.min[1],
-//        zmin: this._viewBox.min[2],
-//        xmax: this._viewBox.max[0],
-//        ymax: this._viewBox.max[1],
-//        zmax: this._viewBox.max[2]
-//    };
-//};
-//
-///**
-// * Gets current canvas-space extents
-// * @function {Object} getCanvasBoundary
-// * @returns {Object}  The canvas boundary extents - {xmin: float, ymin: float, xmax: float, ymax: float }
-// * @since Version 0.7.8
-// */
-//SceneJS.BoundingBox.prototype.getCanvasBoundary = function() {
-//    return {
-//        xmin: this._canvasBox.min[0],
-//        ymin: this._canvasBox.min[1],
-//        xmax: this._canvasBox.max[0],
-//        ymax: this._canvasBox.max[1]
-//    };
-//};
 
-/**
- * Gets current canvas-space size
- * @function {Object} getCanvasSize
- * @returns {Object}  The canvas boundary diagonal size
- * @since Version 0.7.8
- */
-SceneJS.BoundingBox.prototype.getCanvasSize = function() {
-    return this._canvasSize;
-};
 
 // @private
 SceneJS.BoundingBox.prototype._render = function(traversalContext) {
@@ -512,7 +447,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                     SceneJS._boundaryModule.pushBoundary(
                             this._modelBox,
                             this._viewBox,
-                            this._id,
+                            this._attr.id,
                             this._state = newState,
                             (isectListeners != undefined && isectListeners != null)); // Observed
 
@@ -580,3 +515,97 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
         }
     }
 };
+
+/* Returns a JSon representation of this node
+ */
+SceneJS.BoundingBox.prototype.getJSON = function() {
+    return {
+        xmin: this._xmin,
+        ymin: this._ymin,
+        zmin: this._zmin,
+        xmax: this._xmax,
+        ymax: this._ymax,
+        zmax: this._zmax
+    };
+};
+
+/*---------------------------------------------------------------------
+ * Query methods - calls to these only legal while node is rendering
+ *-------------------------------------------------------------------*/
+
+/**
+ * Queries the BoundingBox's current render-time state.
+ * This will update after each "state-changed" event.
+ * @returns {String} The state
+ */
+SceneJS.BoundingBox.prototype.queryState = function() {
+    return this._state;
+};
+
+/**
+ * Queries the BoundingBox's current canvas-space diagonal size.
+ * This will update after each "state-changed" event.
+ * @returns {Number}  The canvas boundary diagonal size
+ */
+SceneJS.BoundingBox.prototype.queryCanvasSize = function() {
+    return this._canvasSize;
+};
+
+/**
+ * Queries the BoundingBox's current selected level of detail.
+ * This will update after each "lod-selected" event.
+ * @returns {Number}  Index of the current level of detail
+ */
+SceneJS.BoundingBox.prototype.queryLevel = function() {
+    return this._level;
+};
+
+///**
+// * Gets current model-space extents
+// * @function {Object} getModelBoundary
+// * @returns {Object}  The model boundary extents - {xmin: float, ymin: float, zmin: float, xmax: float, ymax: float, zmax: float}
+// * @since Version 0.7.8
+// */
+//SceneJS.BoundingBox.prototype.getModelBoundary = function() {
+//    return {
+//        xmin: this._modelBox.min[0],
+//        ymin: this._modelBox.min[1],
+//        zmin: this._modelBox.min[2],
+//        xmax: this._modelBox.max[0],
+//        ymax: this._modelBox.max[1],
+//        zmax: this._modelBox.max[2]
+//    };
+//};
+//
+///**
+// * Gets current view-space extents
+// * @function {Object} getViewBoundary
+// * @returns {Object}  The view boundary extents - {xmin: float, ymin: float, zmin: float, xmax: float, ymax: float, zmax: float}
+// * @since Version 0.7.8
+// */
+//SceneJS.BoundingBox.prototype.getViewBoundary = function() {
+//    return {
+//        xmin: this._viewBox.min[0],
+//        ymin: this._viewBox.min[1],
+//        zmin: this._viewBox.min[2],
+//        xmax: this._viewBox.max[0],
+//        ymax: this._viewBox.max[1],
+//        zmax: this._viewBox.max[2]
+//    };
+//};
+//
+///**
+// * Gets current canvas-space extents
+// * @function {Object} getCanvasBoundary
+// * @returns {Object}  The canvas boundary extents - {xmin: float, ymin: float, xmax: float, ymax: float }
+// * @since Version 0.7.8
+// */
+//SceneJS.BoundingBox.prototype.getCanvasBoundary = function() {
+//    return {
+//        xmin: this._canvasBox.min[0],
+//        ymin: this._canvasBox.min[1],
+//        xmax: this._canvasBox.max[0],
+//        ymax: this._canvasBox.max[1]
+//    };
+//};
+

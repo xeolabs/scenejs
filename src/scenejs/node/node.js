@@ -112,11 +112,22 @@
  * @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
 SceneJS.Node = function() {
-    this._nodeType = "node";
-    this._NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
-    this._sid = null;
-    this._flags = null;     // Fast to detect that we have no flags and then bypass processing them
-    this._data = {};
+
+    /* Public properties are stored on the _attr map
+     */
+    this._attr = {};
+    this._attr.nodeType = "node";
+    this._attr.NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
+    this._attr.sid = null;
+    this._attr.flags = null;     // Fast to detect that we have no flags and then bypass processing them
+    this._attr.data = {};
+    this._attr.enabled = true; // Traversal culls this node when false
+
+
+    /* Rendering flag - set while this node is rendering - while it is true, it is legal
+     * to make render-time queries on the node using SceneJS.withNode(xx).query(xx).
+     */
+    this._rendering = false;
 
     /* Child nodes
      */
@@ -124,8 +135,6 @@ SceneJS.Node = function() {
     this._parent = null;
     this._listeners = {};
     this._numListeners = 0; // Useful for quick check whether node observes any events
-
-    this._enabled = true; // Traversal culls this node when false
 
     /* Used by many node types to track the level at which they can
      * memoise internal state. When rendered, a node increments
@@ -141,18 +150,18 @@ SceneJS.Node = function() {
 
     /* Deregister default ID
      */
-    if (this._id) {
-        SceneJS._nodeIDMap[this._id] = undefined;
+    if (this._attr.id) {
+        SceneJS._nodeIDMap[this._attr.id] = undefined;
     }
 
     SceneJS.Node._ArgParser.parseArgs(arguments, this);
 
     /* Register again by whatever ID we now have
      */
-    if (!this._id) {
-        this._id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
+    if (!this._attr.id) {
+        this._attr.id = SceneJS._createKeyForMap(SceneJS._nodeIDMap, "n");
     }
-    SceneJS._nodeIDMap[this._id] = this;
+    SceneJS._nodeIDMap[this._attr.id] = this;
 
     if (this._init) {
         this._init(this._getParams());
@@ -215,17 +224,17 @@ SceneJS.Node._ArgParser = new (function() {
                         //                            throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         //                                    ("Node with this ID already defined: '" + param + "'"));
                         //                        }
-                        node._id = param;
+                        node._attr.id = param;
                     } else if (key == "sid") {        //  TODO: Deprecate
-                        node._sid = param;
+                        node._attr.sid = param;
                     } else if (key == "info") {       //  TODO: Deprecate
-                        node._NODEINFO = param;
+                        node._attr.NODEINFO = param;
                     } else if (key == "data") {       // User-attached data map
-                        node._data = param;
+                        node._attr.data = param;
                     } else if (key == "flags") {       // 
-                        node._flags = param;
+                        node._attr.flags = param;
                     } else if (key == "enabled") {    // Traversal enabled/disabled
-                        node._enabled = param;
+                        node._attr.enabled = param;
                     } else if (key == "layer") {     // Rendering layers
                         node._nodeLayer = param;
                     } else {
@@ -272,7 +281,7 @@ SceneJS.Node._ArgParser = new (function() {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         ("Node argument " + i + " is null or undefined"));
             }
-            if (arg._nodeType) {
+            if (arg._attr) {
                 this._parseChild(arg, args, i + 1, node);
             } else {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
@@ -323,11 +332,20 @@ SceneJS.Node.prototype._renderNodes = function(
         traversalContext,
         selectedChildren) {             // Selected children - useful for Selector node
 
+    var flags = SceneJS._flagsModule.flags;
+
     /* When in picking pass and pick enabled for node, push on pick module
      */
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && SceneJS._flagsModule.flags.picking) {
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && flags.picking) {
         SceneJS._pickModule.pushNode(this);
     }
+
+    /* Fire "pre-rendered" event if observed
+     */
+    if (this._listeners["pre-rendered"]) {
+        this._fireEvent("pre-rendered", { });
+    }
+
 
     var children = selectedChildren || this._children;  // Set of child nodes we'll be rendering
     var numChildren = children.length;
@@ -338,18 +356,19 @@ SceneJS.Node.prototype._renderNodes = function(
         var childTraversalContext;
         for (i = 0; i < numChildren; i++) {
             child = children[i];
-            if (child._enabled) { // Node can be disabled with #setEnabled(false)
+            if (child._attr.enabled && (!child._attr.flags || child._attr.flags.enabled != false)) { // Node can be disabled with #setEnabled(false)
 
-                /* Don't render node in picking pass when pick is disabled
-                 * for it by a flags node
+                /* Don't render node in picking pass when pick is disabled by a flags node
                  */
-                if (!(SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && !SceneJS._flagsModule.flags.picking)) {
-                    childTraversalContext = {
-                        insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
-                        callback : traversalContext.callback
-                    };
-                    child._renderWithEvents.call(child, childTraversalContext);
+                if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && (child._attr.flags && !child._attr.flags.picking)) {
+                    continue;
                 }
+
+                childTraversalContext = {
+                    insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
+                    callback : traversalContext.callback
+                };
+                child._renderWithEvents.call(child, childTraversalContext);
             }
         }
     }
@@ -372,8 +391,11 @@ SceneJS.Node.prototype._renderNodes = function(
 
     /* When in picking pass and pick enabled for node, pop from pick module
      */
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && SceneJS._flagsModule.flags.picking) {
+    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && flags.picking) {
         SceneJS._pickModule.popNode(this);
+    }
+    if (this._listeners["post-rendering"]) {
+        this._fireEvent("post-rendering", { });
     }
 };
 
@@ -396,23 +418,62 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
         SceneJS._layerModule.pushLayer(this._nodeLayer);
     }
 
-    if (this._flags) {
-        SceneJS._flagsModule.pushFlags(this._flags);
+    /* Flag this node as rendering - while this is true, it is legal
+     * to make render-time queries on the node using SceneJS.withNode(xx).query(xx).
+     */
+    this._rendering = true;
+
+    if (this._attr.flags) {
+        SceneJS._flagsModule.pushFlags(this._attr.flags);
     }
 
-    if (this._numListeners == 0) {
-        this._render(traversalContext);
-    } else {
-        if (this._listeners["rendering"]) {
-            this._fireEvent("rendering", { });
-        }
-        this._render(traversalContext);
-        if (this._listeners["rendered"]) {
-            this._fireEvent("rendered", { });
-        }
+    /*------------------------------------------------------------------------
+     * Note we still fire events in a picking pass because scene may be
+     * dependent on application code processing those and setting things on
+     * scene nodes during the picking pass
+     *-----------------------------------------------------------------------*/
+
+    if (this._listeners["rendering"]) {         // DEPRECATED
+        this._fireEvent("rendering", { });
+    }
+    if (this._listeners["pre-rendering"]) {
+        this._fireEvent("pre-rendering", { });
     }
 
-    if (this._flags) {
+    /* As scene is traversed, SceneJS._loadStatusModule will track the counts
+     * of nodes that are still initialising (ie. texture, instance nodes).
+     *
+     * If we are listening to "loading-status" events on this node, then we'll
+     * get a snapshot of those stats, then report the difference from that
+     * via the event once we have rendered this node.
+     */
+    var loadStatusSnapshot;
+    if (this._listeners["loading-status"]) {
+        loadStatusSnapshot = SceneJS._loadStatusModule.getStatusSnapshot();
+    }
+
+    this._render(traversalContext);
+
+    if (this._listeners["loading-status"]) {
+
+        /* Report diff of loading stats that occurred while rending this node
+         * and its sub-nodes
+         */
+        this._fireEvent("loading-status", SceneJS._loadStatusModule.diffStatus(loadStatusSnapshot));
+    }
+
+    if (this._listeners["rendered"]) {         // DEPRECATED
+        this._fireEvent("rendered", { });
+    }
+    if (this._listeners["post-rendered"]) {
+        this._fireEvent("post-rendered", { });
+    }
+
+    /* Flag this node as no longer rendering - render-time queries are now illegal on this node
+     */
+    this._rendering = false;
+
+    if (this._attr.flags) {
         SceneJS._flagsModule.popFlags();
     }
 
@@ -435,7 +496,7 @@ SceneJS.Node.prototype._renderNodeAtIndex = function(index, traversalContext) {
  * @returns {string} Node's ID
  */
 SceneJS.Node.prototype.getID = function() {
-    return this._id;
+    return this._attr.id;
 };
 
 /**
@@ -450,7 +511,7 @@ SceneJS.Node.prototype.getId = SceneJS.Node.prototype.getID;
  * @returns {string} Type ID
  */
 SceneJS.Node.prototype.getType = function() {
-    return this._nodeType;
+    return this._attr.nodeType;
 };
 
 /**
@@ -459,7 +520,7 @@ SceneJS.Node.prototype.getType = function() {
  @since Version 0.8
  */
 SceneJS.Node.prototype.setFlags = function(flags) {
-    this._flags = SceneJS._shallowClone(flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
+    this._attr.flags = SceneJS._shallowClone(flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
 };
 
 /**
@@ -468,7 +529,7 @@ SceneJS.Node.prototype.setFlags = function(flags) {
  @since Version 0.8
  */
 SceneJS.Node.prototype.getFlags = function() {
-    return SceneJS._shallowClone(this._flags || {});  // Flags map is null when none exist
+    return SceneJS._shallowClone(this._attr.flags || {});  // Flags map is null when none exist
 };
 
 /**
@@ -476,7 +537,7 @@ SceneJS.Node.prototype.getFlags = function() {
  * @returns {Object} data object
  */
 SceneJS.Node.prototype.getData = function() {
-    return this._data;
+    return this._attr.data;
 };
 
 /**
@@ -484,7 +545,7 @@ SceneJS.Node.prototype.getData = function() {
  * @param {Object} data Data object
  */
 SceneJS.Node.prototype.setData = function(data) {
-    this._data = data;
+    this._attr.data = data;
     return this;
 };
 
@@ -495,7 +556,7 @@ SceneJS.Node.prototype.setData = function(data) {
  *  @deprecated
  */
 SceneJS.Node.prototype.getSID = function() {
-    return this._sid;
+    return this._attr.sid;
 };
 
 /**
@@ -504,7 +565,7 @@ SceneJS.Node.prototype.getSID = function() {
  * @deprecated
  */
 SceneJS.Node.prototype.getInfo = function() {
-    return this._NODEINFO || "";
+    return this._attr.NODEINFO || "";
 };
 
 /**
@@ -513,7 +574,7 @@ SceneJS.Node.prototype.getInfo = function() {
  * @deprecated
  */
 SceneJS.Node.prototype.setInfo = function(info) {
-    this._NODEINFO = info; // Doesnt require re-render
+    this._attr.NODEINFO = info; // Doesnt require re-render
 };
 
 /**
@@ -619,7 +680,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
     }
     if (node._render) { //  instance of node
         for (var i = 0; i < this._children.length; i++) {
-            if (this._children[i]._id == node._id) {
+            if (this._children[i]._attr.id == node._attr.id) {
                 this._setDirty();
                 return this.removeNodeAt(i);
             }
@@ -627,7 +688,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
     }
     throw SceneJS._errorModule.fatalError(
             new SceneJS.errors.InvalidSceneGraphException(
-                    "SceneJS.Node#removeNode - child node not found: " + (node._render ? ": " + node._id : node)));
+                    "SceneJS.Node#removeNode - child node not found: " + (node._render ? ": " + node._attr.id : node)));
 };
 
 /** Removes all child nodes and returns them in an array.
@@ -840,7 +901,7 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
  * @return {SceneJS.Node} this
  */
 SceneJS.Node.prototype.setEnabled = function(enabled) {
-    this._enabled = enabled;
+    this._attr.enabled = enabled;
     this._setDirty();
     return this;
 };
@@ -851,7 +912,7 @@ SceneJS.Node.prototype.setEnabled = function(enabled) {
  * @return {boolean} Whether or not this subtree is rendered
  */
 SceneJS.Node.prototype.getEnabled = function() {
-    return this._enabled;
+    return this._attr.enabled;
 };
 
 /**
@@ -874,7 +935,7 @@ SceneJS.Node.prototype._doDestroy = function() {
     if (this._parent) {
         this._parent.removeNode(this);
     }
-    SceneJS._nodeIDMap[this._id] = null;
+    SceneJS._nodeIDMap[this._attr.id] = null;
     if (this._children.length > 0) {
         var children = this._children.slice(0);      // destruction will modify this._children
         for (var i = 0; i < children.length; i++) {
@@ -997,7 +1058,7 @@ SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
  * the current values, plus any attributes that were later added through set/add methods on the node
  *
  */
-SceneJS.Node.prototype.getJson = function() {
+SceneJS.Node.prototype.getJSON = function() {
     return this._attr;
 };
 

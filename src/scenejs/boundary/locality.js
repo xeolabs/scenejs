@@ -27,10 +27,6 @@ SceneJS.Locality = SceneJS.createNodeType("locality");
 
 // @private
 SceneJS.Locality.prototype._init = function(params) {
-    this._radii = {
-        inner : 100000,
-        outer : 200000
-    };
     this.setInner(params.inner);  // TODO: reduntant
     this.setOuter(params.outer);
 };
@@ -43,7 +39,7 @@ SceneJS.Locality.prototype._init = function(params) {
  @since Version 0.7.4
  */
 SceneJS.Locality.prototype.setInner = function(inner) {
-    this._radii.inner = inner || 100000;
+    this._attr.inner = inner || 100000;
     this._setDirty();
     return this;
 };
@@ -55,7 +51,7 @@ SceneJS.Locality.prototype.setInner = function(inner) {
  @since Version 0.7.4
  */
 SceneJS.Locality.prototype.getInner = function() {
-    return this._radii.inner;
+    return this._attr.inner;
 };
 
 /**
@@ -66,7 +62,7 @@ SceneJS.Locality.prototype.getInner = function() {
  @since Version 0.7.4
  */
 SceneJS.Locality.prototype.setOuter = function(outer) {
-    this._radii.outer = outer || 200000;
+    this._attr.outer = outer || 200000;
     this._setDirty();
     return this;
 };
@@ -78,7 +74,7 @@ SceneJS.Locality.prototype.setOuter = function(outer) {
  @since Version 0.7.4
  */
 SceneJS.Locality.prototype.getOuter = function() {
-    return this._radii.outer;
+    return this._attr.outer;
 };
 
 // @private
@@ -87,7 +83,8 @@ SceneJS.Locality.prototype._render = function(traversalContext, data) {
         this._init(this._getParams(data));
     }
     var prevRadii = SceneJS._localityModule.getRadii();
-    SceneJS._localityModule.setRadii(this._radii);
+    SceneJS._localityModule.setRadii(this._attr);
     this._renderNodes(traversalContext, data);
     SceneJS._localityModule.setRadii(prevRadii);
 };
+

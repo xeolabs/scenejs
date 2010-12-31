@@ -32,14 +32,14 @@ var SceneJS = {
         }
         var nodeType = function() {                  // Create class
             supa.nodeClass.apply(this, arguments);
-            this._nodeType = type;
+            this._attr.nodeType = type;
         };
         SceneJS._inherit(nodeType, supa.nodeClass);
 
         var nodeFunc = function() {                // Create factory function
             var n = new nodeType();
             nodeType.prototype.constructor.apply(n, arguments);
-            n._nodeType = type;
+            n._attr.nodeType = type;
             return n;
         };
         this._registerNode(type, nodeType, nodeFunc);

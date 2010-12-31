@@ -77,7 +77,7 @@ SceneJS.Text.prototype._init = function(params) {
             create: function() {
                 var geo = SceneJS._vectorTextModule.getGeometry(3, 0, 0, params.text); // Unit size
                 return {
-                    resource: this._id, // Assuming text geometry varies a lot - don't try to share VBOs
+                    resource: this._attr.id, // Assuming text geometry varies a lot - don't try to share VBOs
                     primitive : "lines",
                     positions : geo.positions,
                     normals: [],

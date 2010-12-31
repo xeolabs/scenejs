@@ -47,14 +47,15 @@ SceneJS.Interpolator = SceneJS.createNodeType("interpolator");
 
 // @private
 SceneJS.Interpolator.prototype._init = function(params) {
+    this._attr.target = params.target;
+    this._attr.targetProperty = params.targetProperty;
+
     this._timeStarted = null;
-    this._target = params.target;
-    this._targetProperty = params.targetProperty;
     this._outputValue = null;
 
     /* Whether to remove this node when finished or keep in scene
      */
-    this._once = params.once;
+    this._attr.once = params.once;
 
     /* Keys and values - verify them if supplied
      */
@@ -80,8 +81,8 @@ SceneJS.Interpolator.prototype._init = function(params) {
                         "SceneJS.Interpolator configuration incomplete: " +
                         "values supplied but no keys - must supply a key for each value"));
     }
-    this._keys = params.keys || [];
-    this._values = params.values || [];
+    this._attr.keys = params.keys || [];
+    this._attr.values = params.values || [];
     this._key1 = 0;
     this._key2 = 1;
 
@@ -119,8 +120,8 @@ SceneJS.Interpolator.prototype._init = function(params) {
          break;
          */
     }
-    this._mode = params.mode;
-    this._once = params.once;
+    this._attr.mode = params.mode;
+    this._attr.once = params.once;
 };
 
 // @private
@@ -144,13 +145,13 @@ SceneJS.Interpolator.prototype._render = function(traversalContext) {
      * next render, since it might appear in the scene later.
      */
 
-    if (!this._target) {
+    if (!this._attr.target) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.NodeConfigExpectedException(
                         "SceneJS.Interpolator config expected: target"));
     }
 
-    if (!this._targetProperty) {
+    if (!this._attr.targetProperty) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.NodeConfigExpectedException(
                         "SceneJS.Interpolator config expected: targetProperty"));
@@ -164,8 +165,8 @@ SceneJS.Interpolator.prototype._render = function(traversalContext) {
     this._update((SceneJS._timeModule.getTime() - this._timeStarted) * 0.001);
 
     if (this._outputValue != null// Null when interpolation outside of time range 
-            && SceneJS.nodeExists(this._target)) {
-        SceneJS.withNode(this._target).set(this._targetProperty, this._outputValue);
+            && SceneJS.nodeExists(this._attr.target)) {
+        SceneJS.withNode(this._attr.target).set(this._attr.targetProperty, this._outputValue);
     }
 
     /* Render child nodes
@@ -185,8 +186,8 @@ SceneJS.Interpolator.prototype._update = function(key) {
 
         case this.STATE_AFTER:
             this._outputValue = null;
-            //this._outputValue = this._values[this._values.length - 1];
-            if (this._once) {
+            //this._outputValue = this._attr.values[this._attr.values.length - 1];
+            if (this._attr.once) {
                 this.destroy();
             }
             break;
@@ -202,20 +203,20 @@ SceneJS.Interpolator.prototype._update = function(key) {
 
 // @private
 SceneJS.Interpolator.prototype._findEnclosingFrame = function(key) {
-    if (this._keys.length == 0) {
+    if (this._attr.keys.length == 0) {
         return this.STATE_OUTSIDE;
     }
-    if (key < this._keys[0]) {
+    if (key < this._attr.keys[0]) {
         return this.STATE_BEFORE;
     }
-    if (key > this._keys[this._keys.length - 1]) {
+    if (key > this._attr.keys[this._attr.keys.length - 1]) {
         return this.STATE_AFTER;
     }
-    while (this._keys[this._key1] > key) {
+    while (this._attr.keys[this._key1] > key) {
         this._key1--;
         this._key2--;
     }
-    while (this._keys[this._key2] < key) {
+    while (this._attr.keys[this._key2] < key) {
         this._key1++;
         this._key2++;
     }
@@ -224,7 +225,7 @@ SceneJS.Interpolator.prototype._findEnclosingFrame = function(key) {
 
 // @private
 SceneJS.Interpolator.prototype._interpolate = function(k) {
-    switch (this._mode) {
+    switch (this._attr.mode) {
         case 'linear':
             return this._linearInterpolate(k);
         case 'cosine':
@@ -238,45 +239,45 @@ SceneJS.Interpolator.prototype._interpolate = function(k) {
         default:
             throw SceneJS._errorModule.fatalError(
                     new SceneJS.errors.InternalException("SceneJS.Interpolator internal error - interpolation mode not switched: '"
-                            + this._mode + "'"));
+                            + this._attr.mode + "'"));
     }
 };
 
 // @private
 SceneJS.Interpolator.prototype._linearInterpolate = function(k) {
-    var u = this._keys[this._key2] - this._keys[this._key1];
-    var v = k - this._keys[this._key1];
-    var w = this._values[this._key2] - this._values[this._key1];
-    return this._values[this._key1] + ((v / u) * w);
+    var u = this._attr.keys[this._key2] - this._attr.keys[this._key1];
+    var v = k - this._attr.keys[this._key1];
+    var w = this._attr.values[this._key2] - this._attr.values[this._key1];
+    return this._attr.values[this._key1] + ((v / u) * w);
 };
 
 // @private
 SceneJS.Interpolator.prototype._constantInterpolate = function(k) {
-    if (Math.abs((k - this._keys[this._key1])) < Math.abs((k - this._keys[this._key2]))) {
-        return this._keys[this._key1];
+    if (Math.abs((k - this._attr.keys[this._key1])) < Math.abs((k - this._attr.keys[this._key2]))) {
+        return this._attr.keys[this._key1];
     } else {
-        return this._keys[this._key2];
+        return this._attr.keys[this._key2];
     }
 };
 
 // @private
 SceneJS.Interpolator.prototype._cosineInterpolate = function(k) {
     var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
-    return (this._keys[this._key1] * (1 - mu2) + this._keys[this._key2] * mu2);
+    return (this._attr.keys[this._key1] * (1 - mu2) + this._attr.keys[this._key2] * mu2);
 };
 
 // @private
 SceneJS.Interpolator.prototype._cubicInterpolate = function(k) {
-    if (this._key1 == 0 || this._key2 == (this._keys.length - 1)) {
+    if (this._key1 == 0 || this._key2 == (this._attr.keys.length - 1)) {
 
         /* Between first or last pair of keyframes - need four keyframes for cubic, so fall back on cosine
          */
         return this._cosineInterpolate(k);
     }
-    var y0 = this._keys[this._key1 - 1];
-    var y1 = this._keys[this._key1];
-    var y2 = this._keys[this._key2];
-    var y3 = this._keys[this._key2 + 1];
+    var y0 = this._attr.keys[this._key1 - 1];
+    var y1 = this._attr.keys[this._key1];
+    var y2 = this._attr.keys[this._key2];
+    var y3 = this._attr.keys[this._key2 + 1];
     var mu2 = k * k;
     var a0 = y3 - y2 - y0 + y1;
     var a1 = y0 - y1 - a0;
@@ -287,9 +288,9 @@ SceneJS.Interpolator.prototype._cubicInterpolate = function(k) {
 
 // @private
 SceneJS.Interpolator.prototype._slerp = function(k) {
-    var u = this._keys[this._key2] - this._keys[this._key1];
-    var v = k - this._keys[this._key1];
-    return SceneJS._math_slerp((v / u), this._values[this._key1], this._values[this._key2]);
+    var u = this._attr.keys[this._key2] - this._attr.keys[this._key1];
+    var v = k - this._attr.keys[this._key1];
+    return SceneJS._math_slerp((v / u), this._attr.values[this._key1], this._attr.values[this._key2]);
 };
 
 

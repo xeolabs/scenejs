@@ -28,7 +28,7 @@ SceneJS.Quad = SceneJS.createNodeType("quad", "geometry");
 
 // @private
 SceneJS.Quad.prototype._init = function(params) {
-    this._nodeType = "quad";
+    this._attr.nodeType = "quad";
 
     var x = params.xSize || 1;
     var y = params.ySize || 1;

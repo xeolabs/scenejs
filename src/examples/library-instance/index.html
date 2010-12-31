@@ -3,14 +3,9 @@
 <html>
 <head>
     <title></title>
-
-    <link rel="stylesheet" type="text/css" href="../web/jquery/jquery-ui.css">
-    <link href="../web/style.css" rel="stylesheet" type="text/css"/>
-
-    <script type="text/javascript" src="../web/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="../web/jquery/jquery-ui.min.js"></script>
-
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
+
+    <link href="../web/style.css" rel="stylesheet" type="text/css"/>
 
 </head>
 <div id="container">
@@ -19,8 +14,8 @@
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Texture
-                Layers Demo
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Instance
+                Demo: Creating a Materials Library
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -39,18 +34,19 @@
                 &lt;canvas&gt; feature.</p>
         </canvas>
         <div id="info">
-            <h2>Texture Layers</h2>
+            <h2>Instance
+                Demo: Creating a Materials Library</h2>
 
-            <p>Demonstration of how to apply textures separately to the diffuse, specular and emission components of a
-                material.</p>
+            <p>In this example we define two materials, then within our scene we create
+                two boxes, each wrapped with an instance of one of the materials.</p>
+
+            <p>This example demonstrates how you can use instances to create material
+                libraries like those used in Collada and Wavefront files.</p>
 
             <br/>
             <ul>
-                <li><a target="_other" href="texture-layers-scene.js">Scene source code</a></li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.Texture">Wiki page on
-                    textures</a></li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.bind+-+Monitoring+Scene+Loading">Wiki page on
-                    monitoring scene loading</a></li>
+                <li><a target="_other" href="library-instancing-scene.js">Scene source code</a></li>
+
             </ul>
         </div>
         <div id="log">
@@ -59,12 +55,8 @@
             <div id="theLoggingDiv"></div>
         </div>
     </div>
-</div>
 
-<div id="loading-dialog" title="Loading textures..">
-    <p>Just a second please, loading the textures for this example.</p>
 </div>
-
-<script type="text/javascript" src="texture-layers-scene.js"></script>
+<script type="text/javascript" src="library-instancing-scene.js"></script>
 </body>
 </html>

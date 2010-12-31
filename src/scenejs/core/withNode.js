@@ -149,7 +149,7 @@ SceneJS._WithNode.prototype.eachInstance = function(fn) {
     if (typeof fn != "function") {
         throw "eachInstance param 'fn' should be a function";
     }
-    var nodeInstances = SceneJS._nodeInstanceMap[this._targetNode._id];
+    var nodeInstances = SceneJS._nodeInstanceMap[this._targetNode._attr.id];
     if (nodeInstances) {
         var instances = nodeInstances.instances;
         var count = 0;
@@ -167,7 +167,7 @@ SceneJS._WithNode.prototype.eachInstance = function(fn) {
 };
 
 SceneJS._WithNode.prototype.numInstances = function() {
-    var instances = SceneJS._nodeInstanceMap[this._targetNode._id];
+    var instances = SceneJS._nodeInstanceMap[this._targetNode._attr.id];
     return instances ? instances.numInstances : 0;
 };
 
@@ -245,12 +245,27 @@ SceneJS._WithNode.prototype.remove = function(attr, value) {
  */
 SceneJS._WithNode.prototype.get = function(attr) {
     if (!attr) {
-        return this._targetNode.getJson();
+        return this._targetNode.getJSON();
     }
     var funcName = "get" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
     var func = this._targetNode[funcName];
     if (!func) {
         throw "Attribute '" + attr + "' not found on node '" + this._targetNode.getID() + "'";
+    }
+    return func.call(this._targetNode);
+};
+
+/** Queries some render-time state on the selected node. This is only valid when
+ * the node is currently rendering, ie. between "rendering" and "rendered" events.
+ */
+SceneJS._WithNode.prototype.query = function(attr) {
+    if (!this._targetNode._rendering) {
+        throw "Node is not rendering - cannot do render-time query for '" + attr + "' on node '" + this._targetNode.getID() + "'";
+    }
+    var funcName = "query" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
+    var func = this._targetNode[funcName];
+    if (!func) {
+        throw "Render-time query for '" + attr + "' not available on node '" + this._targetNode.getID() + "'";
     }
     return func.call(this._targetNode);
 };
@@ -369,22 +384,22 @@ SceneJS._WithNode.prototype.destroy = function() {
  */
 SceneJS._WithNode.prototype.data = function(data, value) {
     if (!data) {
-        return this._targetNode._data;
+        return this._targetNode._attr.data;
     }
-    this._targetNode._data = this._targetNode._data || {};
+    this._targetNode._attr.data = this._targetNode._attr.data || {};
     if (typeof data == "string") {
         if (value != undefined) {
-            this._targetNode._data[data] = value;
+            this._targetNode._attr.data[data] = value;
             return this;
         } else {
-            return this._targetNode._data[data];
+            return this._targetNode._attr.data[data];
         }
     } else {
         if (value != undefined) {
-            this._targetNode._data = value;
+            this._targetNode._attr.data = value;
             return this;
         } else {
-            return this._targetNode._data;
+            return this._targetNode._attr.data;
         }
     }
 };

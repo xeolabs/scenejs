@@ -5,7 +5,6 @@ SceneJS.MorphGeometry = SceneJS.createNodeType("morphGeometry");
 
 // @private
 SceneJS.MorphGeometry.prototype._init = function(params) {
-    this._attr = {};
 
     /*--------------------------------------------------------------------------
      * 1. Check we have enough targets for interpolation
@@ -56,7 +55,7 @@ SceneJS.MorphGeometry.prototype._init = function(params) {
     }
 
     this._attr.targets = targets;
-    this._attr.factor = 0;
+    this._attr.factor = params.factor || 0;
 };
 
 /**

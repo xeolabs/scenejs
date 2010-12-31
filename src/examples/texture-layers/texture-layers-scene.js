@@ -201,7 +201,6 @@ function mouseWheel(event) {
 
 }
 
-
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
@@ -221,6 +220,47 @@ SceneJS.withNode("the-scene").start({
         earthRotate -= 0.4;
     }
 });
+
+
+/*------------------------------------------------------------------
+ * Observe "loading-status" events on the scene graph - these will
+ * tell us the count of texture nodes that have finished loading
+ * their textures. We'll open a "please wait" dialog when there
+ * are textures loading, then close it when all textures have
+ * loaded.
+ *
+ * See here for more info on "loading-status" events:
+ *  
+ *
+ *-----------------------------------------------------------------*/
+
+var $dialog = $('<div></div>')
+        .html('<br/><p>Loading textures, please wait</p>')
+        .dialog({
+    autoOpen: false,
+    title: 'Just a second..'
+});
+
+
+var dialogOpen = false;
+
+SceneJS.withNode("the-scene").bind("loading-status",
+
+        function(event) {
+            var params = event.params;
+
+            if (params.numNodesLoading > 0) {
+                if (!dialogOpen) {
+                    $dialog.dialog('open');
+                    dialogOpen = true;
+                }
+            } else {
+                if (dialogOpen) {
+                    $dialog.dialog('close');
+                    dialogOpen = false;
+                }
+            }
+        });
 
 
 

@@ -32,9 +32,9 @@ SceneJS.Translate.prototype.setXYZ = function(xyz) {
     var x = xyz.x || 0;
     var y = xyz.y || 0;
     var z = xyz.z || 0;
-    this._x = x;
-    this._y = y;
-    this._z = z;
+    this._attr.x = x;
+    this._attr.y = y;
+    this._attr.z = z;
     this._memoLevel = 0;
 };
 
@@ -43,9 +43,9 @@ SceneJS.Translate.prototype.setXYZ = function(xyz) {
  */
 SceneJS.Translate.prototype.getXYZ = function() {
     return {
-        x: this._x,
-        y: this._y,
-        z: this._z
+        x: this._attr.x,
+        y: this._attr.y,
+        z: this._attr.z
     };
 };
 
@@ -55,7 +55,7 @@ SceneJS.Translate.prototype.getXYZ = function() {
  * @returns {SceneJS.Translate} this
  */
 SceneJS.Translate.prototype.setX = function(x) {
-    this._x = x;
+    this._attr.x = x;
     this._memoLevel = 0;
 };
 
@@ -64,7 +64,7 @@ SceneJS.Translate.prototype.setX = function(x) {
  * @returns {float}
  */
 SceneJS.Translate.prototype.getX = function() {
-    return this._x;
+    return this._attr.x;
 };
 
 /** Sets the Y component of the translation vector
@@ -73,7 +73,7 @@ SceneJS.Translate.prototype.getX = function() {
  * @returns {SceneJS.Translate} this
  */
 SceneJS.Translate.prototype.setY = function(y) {
-    this._y = y;
+    this._attr.y = y;
     this._memoLevel = 0;
 };
 
@@ -82,7 +82,7 @@ SceneJS.Translate.prototype.setY = function(y) {
  * @returns {float}
  */
 SceneJS.Translate.prototype.getY = function() {
-    return this._y;
+    return this._attr.y;
 };
 
 /** Sets the Z component of the translation vector
@@ -90,7 +90,7 @@ SceneJS.Translate.prototype.getY = function() {
  * @param z
  */
 SceneJS.Translate.prototype.setZ = function(z) {
-    this._z = z;
+    this._attr.z = z;
     this._memoLevel = 0;
 };
 
@@ -99,7 +99,7 @@ SceneJS.Translate.prototype.setZ = function(z) {
  * @returns {float}
  */
 SceneJS.Translate.prototype.getZ = function() {
-    return this._z;
+    return this._attr.z;
 };
 
 /** Increments the X component of the translation vector
@@ -107,7 +107,7 @@ SceneJS.Translate.prototype.getZ = function() {
  * @param x
  */
 SceneJS.Translate.prototype.incX = function(x) {
-    this._x += x;
+    this._attr.x += x;
     this._memoLevel = 0;
 };
 
@@ -117,7 +117,7 @@ SceneJS.Translate.prototype.incX = function(x) {
  * @returns {SceneJS.Translate} this
  */
 SceneJS.Translate.prototype.incY = function(y) {
-    this._y += y;
+    this._attr.y += y;
 };
 
 /** Inccrements the Z component of the translation vector
@@ -125,7 +125,7 @@ SceneJS.Translate.prototype.incY = function(y) {
  * @param z
  */
 SceneJS.Translate.prototype.incZ = function(z) {
-    this._z += z;
+    this._attr.z += z;
     this._memoLevel = 0;
 };
 
@@ -134,7 +134,7 @@ SceneJS.Translate.prototype.incZ = function(z) {
  * @returns {Number[16]} The matrix elements
  */
 SceneJS.Translate.prototype.getMatrix = function() {
-    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_translationMat4v([this._x, this._y, this._z]);
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_translationMat4v([this._attr.x, this._attr.y, this._attr.z]);
 };
 
 /**
@@ -143,9 +143,9 @@ SceneJS.Translate.prototype.getMatrix = function() {
  */
 SceneJS.Translate.prototype.getAttributes = function() {
     return {
-        x: this._x,
-        y: this._y,
-        z: this._z
+        x: this._attr.x,
+        y: this._attr.y,
+        z: this._attr.z
     };
 };
 
@@ -157,9 +157,9 @@ SceneJS.Translate.prototype._render = function(traversalContext) {
             /* When building a view transform, apply the negated translation vector
              * to correctly transform the SceneJS.Camera
              */
-            this._mat = SceneJS._math_translationMat4v([-this._x, -this._y, -this._z]);
+            this._mat = SceneJS._math_translationMat4v([-this._attr.x, -this._attr.y, -this._attr.z]);
         } else {
-            this._mat = SceneJS._math_translationMat4v([this._x, this._y, this._z]);
+            this._mat = SceneJS._math_translationMat4v([this._attr.x, this._attr.y, this._attr.z]);
         }
         this._memoLevel = 1;
     }
