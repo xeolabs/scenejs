@@ -40,6 +40,7 @@
  * @param {String} [cfg.targetProperty] Name of target property on target node
  * @param {double[]} [cfg.keys=[]] Time key values in seconds
  * @param {double[]} [cfg.values=[]] Output key values
+ * @param {Boolean} [cfg.autoDestroy] True to destroy node once completed
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.Interpolator = SceneJS.createNodeType("interpolator");
@@ -54,7 +55,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
 
     /* Whether to remove this node when finished or keep in scene
      */
-    this._once = params.once;
+    this._autoDestroy = params.autoDestroy;
 
     /* Keys and values - verify them if supplied
      */
@@ -120,7 +121,7 @@ SceneJS.Interpolator.prototype._init = function(params) {
          */
     }
     this._mode = params.mode;
-    this._once = params.once;
+    this._autoDestroy = params.autoDestroy;
 };
 
 // @private
@@ -186,7 +187,7 @@ SceneJS.Interpolator.prototype._update = function(key) {
         case this.STATE_AFTER:
             this._outputValue = null;
             //this._outputValue = this._values[this._values.length - 1];
-            if (this._once) {
+            if (this._autoDestroy) {
                 this.destroy();
             }
             break;
