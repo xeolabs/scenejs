@@ -143,7 +143,8 @@ SceneJS.createNode({
                             targetProperty: "y",
                             keys: [2.0, 3.0, 4.0, 5.0],
                             values: [1.0, 2.0, .3, 1.0],
-                            autoDestroy: true
+                            autoDestroy: true,
+                            repeat: 3
                         },
                         {
                             type: "interpolator",
