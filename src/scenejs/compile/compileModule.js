@@ -146,7 +146,7 @@ SceneJS._compileModule = new (function() {
 
                 debugCfg = SceneJS._debugModule.getConfigs("compilation");
 
-                self._enableCompile = (debugCfg.enabled != false);  
+                self._enableCompile = (debugCfg.enabled === false) ? false : true;  
 
                 /* Start with a fresh compilation queue on SceneJS init
                  */
@@ -253,22 +253,22 @@ SceneJS._compileModule = new (function() {
                 attr: {
 
 //                    "enabled": {
-//                        level: this.COMPILE_BRANCH // Until we can do shader optimization
+//                        level: this.COMPILE_BRANCH
 //                    },
 
                     "flags": {
                         attr: {
                             transparent: {
-                                level: this.COMPILE_PATH
+                                level: this.COMPILE_SCENE
                             },
                             enabled: {
-                                level: this.COMPILE_SCENE // Until we can do shader optimization
+                                level: this.COMPILE_SCENE
                             },
                             picking: {
-                                level: this.COMPILE_PATH // Until we can do shader optimization
+                                level: this.COMPILE_SCENE
                             },
                             colortrans: {
-                                level: this.COMPILE_PATH // Until we can do shader optimization
+                                level: this.COMPILE_PATH
                             }
                         },
                         level: this.COMPILE_SCENE
@@ -286,16 +286,16 @@ SceneJS._compileModule = new (function() {
                         attr: {
 
                             transparent: {
-                                level: this.COMPILE_PATH
+                                level: this.COMPILE_SCENE
                             },
                             enabled: {
-                                level: this.COMPILE_SCENE // Until we can do shader optimization
+                                level: this.COMPILE_SCENE
                             },
                             picking: {
-                                level: this.COMPILE_PATH // Until we can do shader optimization
+                                level: this.COMPILE_SCENE
                             },
                             colortrans: {
-                                level: this.COMPILE_PATH // Until we can do shader optimization
+                                level: this.COMPILE_PATH
                             }
                         },
 
@@ -313,12 +313,21 @@ SceneJS._compileModule = new (function() {
                     }
                 },
                 level: this.COMPILE_SCENE
+            },
+
+            "insert" : {
+                attr: {
+                    "node" : {
+                        level: this.COMPILE_SCENE
+                    }
+                },
+                level: this.COMPILE_SCENE
             }
         },
 
         "scene" : {
             "created" : {
-                level: this.COMPILE_SCENE  // Initial compile for new scene
+                level: this.COMPILE_SCENE
             }
         },
 
@@ -339,28 +348,28 @@ SceneJS._compileModule = new (function() {
          */
         "scale": {
             set: {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_SCENE
             },
             inc: {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_SCENE
             }
         },
 
         "rotate": {
             set: {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_SCENE
             },
             inc: {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_SCENE
             }
         },
 
         "translate": {
             set: {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_SCENE
             },
             inc: {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_SCENE
             }
         },
 
@@ -889,39 +898,4 @@ SceneJS._compileModule = new (function() {
         }
     };
 
-    //    this._visitnode = function(node, traversalContext) {
-    //        if (SceneJS._compileModule._subtreeRootsToCompile[node._attr.id]) {
-    //
-    //        }
-    //    };
-
-    //    /*----------------------------------------------------------------------------------
-    //     * Push and pop nodes during traversal so compilation module can keep track of
-    //     * which nodes are within instanced subgraphs
-    //     *---------------------------------------------------------------------------------*/
-    //
-    //    this.pushNode = function(node) {
-    //        nodeStack[stackLen++] = node;
-    //
-    //        /* Track nodes within instanced subgraphs
-    //         */
-    //        this.instancedNodes[node._attr.id] = (countInstanceLinks > 0);
-    //
-    //        /* Track instances
-    //         */
-    //        if (node._attr.nodeType == "instance") {
-    //            countInstanceLinks++;
-    //        }
-    //    };
-    //
-    //
-    //    this.popNode = function() {
-    //        var node = nodeStack[stackLen - 1];
-    //        if (node._attr.nodeType == "instance") {
-    //            countInstanceLinks--;
-    //        }
-    //        stackLen--;
-    //    };
-}
-        )
-        ();
+})();
