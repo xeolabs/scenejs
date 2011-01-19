@@ -146,7 +146,7 @@ SceneJS._compileModule = new (function() {
 
                 debugCfg = SceneJS._debugModule.getConfigs("compilation");
 
-                self._enableCompile = (debugCfg.enabled === true);  // Off by default TODO: On by default when ready
+                self._enableCompile = (debugCfg.enabled != false);  
 
                 /* Start with a fresh compilation queue on SceneJS init
                  */
