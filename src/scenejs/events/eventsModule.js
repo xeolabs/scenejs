@@ -18,8 +18,8 @@ SceneJS._eventModule = new (function() {
     this.RESET = 2;                          // SceneJS framework reset
     this.TIME_UPDATED = 3;                   // System time updated
     this.SCENE_CREATED = 4;                  // Scene has just been created
-    this.SCENE_RENDERING = 5;                // Scene about to be traversed
-    this.SCENE_RENDERED = 6;              // Scene just been completely traversed
+    this.SCENE_COMPILING = 5;                // Scene about to be traversed
+    this.SCENE_COMPILED = 6;              // Scene just been completely traversed
     this.SCENE_DESTROYED = 7;                // Scene just been destroyed
     this.RENDERER_UPDATED = 8;                // Current WebGL context has been updated to the given state
     this.RENDERER_EXPORTED = 9;               // Export of the current WebGL context state
@@ -296,7 +296,7 @@ SceneJS.bind = function(name, func) {
             break;
 
         case "scene-rendering" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.SCENE_RENDERING,
+                SceneJS._eventModule.SCENE_COMPILING,
                 function(params) {
                     func({
                         sceneId : params.sceneId
@@ -335,7 +335,7 @@ SceneJS.bind = function(name, func) {
             break;
 
         case "scene-rendered" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.SCENE_RENDERED,
+                SceneJS._eventModule.SCENE_COMPILED,
                 function(params) {
                     func({
                         sceneId : params.sceneId

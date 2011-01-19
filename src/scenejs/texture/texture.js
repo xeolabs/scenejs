@@ -210,14 +210,24 @@ SceneJS.Texture.prototype.getState = function() {
     return this._state;
 };
 
-SceneJS.Texture.prototype._render = function(traversalContext) {
+
+// @private
+SceneJS.Texture.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Texture.prototype._preCompile = function(traversalContext) {
+
+    this._countLayersReady = 0;
 
     /*-----------------------------------------------------
      * On each render, update state of each texture layer
      * and count how many are ready to apply
      *-----------------------------------------------------*/
 
-    var countLayersReady = 0;
     var layer;
     for (var i = 0; i < this._layers.length; i++) {
         layer = this._layers[i];
@@ -249,7 +259,7 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
         switch (layer.state) {
 
             case SceneJS.TextureLayer.STATE_LOADED: // Layer ready to apply
-                countLayersReady++;
+                this._countLayersReady++;
                 this._rebuildTextureMatrix(layer);
                 break;
 
@@ -268,10 +278,10 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
                                     l.state = SceneJS.TextureLayer.STATE_LOADED;
 
                                     /**
-                                     * Need scene graph to keep rendering so that
-                                     * this texture layer can create and apply the texture
+                                     * Need re-compile so that this texture layer
+                                     * can create and apply the texture
                                      */
-                                    SceneJS._needFrame = true;
+                                    SceneJS._compileModule.nodeUpdated(self, "loadedImage");
                                 },
 
                                 function() { // General error, probably 404
@@ -313,6 +323,12 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
 
                             layer.texture = texture;
                             layer.state = SceneJS.TextureLayer.STATE_LOADED;
+
+                            /**
+                             * Need re-compile so that this texture layer
+                             * can create and apply the texture
+                             */
+                            SceneJS._compileModule.nodeUpdated(this, "loadedImagebuf");
                         }
                     }
                 }
@@ -323,55 +339,88 @@ SceneJS.Texture.prototype._render = function(traversalContext) {
         }
     }
 
-    /*------------------------------------------------
-     * Render this node
-     *-----------------------------------------------*/
 
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
+    /* Fastest strategy is to allow the complete set of layers to load
+     * before applying any of them. There would be a huge performance penalty
+     * if we were to apply the incomplete set as layers are still loading -
+     * SceneJS._renderModule would then have to generate a new shader for each new
+     * layer loaded, which would become redundant as soon as the next layer is loaded.
+     */
 
-        /* Don't need textures in pick traversal
-         * TODO: Picking for textures that create holes
+    if (this._countLayersReady == this._layers.length) {  // All layers loaded
+
+        SceneJS._textureModule.pushTexture(this._attr.id, this._layers);
+
+        if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
+            this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
+            this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
+        }
+
+        /* Record this node as loaded for "loading-status" events
          */
-        this._renderNodes(traversalContext);
+        SceneJS._loadStatusModule.status.numNodesLoaded++;
+
     } else {
 
-        /* Fastest strategy is to allow the complete set of layers to load
-         * before applying any of them. There would be a huge performance penalty
-         * if we were to apply the incomplete set as layers are still loading -
-         * SceneJS._shaderModule would then have to generate a new shader for each new
-         * layer loaded, which would become redundant as soon as the next layer is loaded.
-         */
-
-        if (countLayersReady == this._layers.length) {  // All layers loaded
-            SceneJS._textureModule.pushTexture(this._layers);
-
-            if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
-                this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
-                this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
-            }
-
-            /* Record this node as loaded for "loading-status" events
-             */
-            SceneJS._loadStatusModule.status.numNodesLoaded++;
-
-            this._renderNodes(traversalContext);
-
-            SceneJS._textureModule.popTexture();
-        } else {
-
-            if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
-                this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
+        if (this._state != SceneJS.Texture.STATE_ERROR) { // Not stuck in STATE_ERROR
+            if (this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
                 this._changeState(SceneJS.Texture.STATE_LOADING); // Now loading some layers
             }
-
-            /* Record this node as loaded for "loading-status" events
-             */
-            SceneJS._loadStatusModule.status.numNodesLoading++;
-
-            this._renderNodes(traversalContext);
         }
+
+        /* Record this node as loaded for "loading-status" events
+         */
+        SceneJS._loadStatusModule.status.numNodesLoading++;
     }
 };
+
+//    // @private
+//    SceneJS.Texture.prototype._compileNodes = function(traversalContext) {
+//
+//        /* Fastest strategy is to allow the complete set of layers to load
+//         * before applying any of them. There would be a huge performance penalty
+//         * if we were to apply the incomplete set as layers are still loading -
+//         * SceneJS._renderModule would then have to generate a new shader for each new
+//         * layer loaded, which would become redundant as soon as the next layer is loaded.
+//         */
+//
+//        if (countLayersReady == this._layers.length) {  // All layers loaded
+//            SceneJS._textureModule.pushTexture(this._attr.id, this._layers);
+//
+//            if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
+//                this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
+//                this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
+//            }
+//
+//            /* Record this node as loaded for "loading-status" events
+//             */
+//            SceneJS._loadStatusModule.status.numNodesLoaded++;
+//
+//            SceneJS.Node.prototype._compileNodes.call(this, traversalContext);
+//
+//            SceneJS._textureModule.popTexture();
+//        } else {
+//
+//            if (this._state != SceneJS.Texture.STATE_ERROR) { // Not stuck in STATE_ERROR
+//                if (this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
+//                    this._changeState(SceneJS.Texture.STATE_LOADING); // Now loading some layers
+//                }
+//            }
+//
+//            /* Record this node as loaded for "loading-status" events
+//             */
+//            SceneJS._loadStatusModule.status.numNodesLoading++;
+//
+//            SceneJS.Node.prototype._compileNodes.call(this, traversalContext);
+//        }
+//    };
+
+SceneJS.Texture.prototype._postCompile = function(traversalContext) {
+    if (this._countLayersReady == this._layers.length) {  // All layers loaded
+        SceneJS._textureModule.popTexture();
+    }
+};
+
 
 /* Returns texture transform matrix
  */

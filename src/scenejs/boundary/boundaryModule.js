@@ -10,7 +10,7 @@ SceneJS._boundaryModule = new (function() {
     var numObservedBoundaries;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 viewMat = SceneJS._math_identityMat4();
                 stackLen = 0;

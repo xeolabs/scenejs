@@ -8,29 +8,43 @@
  */
 SceneJS._flagsModule = new (function() {
 
+    var idStack = new Array(255);
     var flagStack = new Array(255);
     var stackLen = 0;
     var dirty;
+
+    var DEFAULT_FLAGS = {
+        fog: true,          // Fog enabled
+        colortrans : true,  // Effect of colortrans enabled
+        picking : true,     // Picking enabled
+        clipping : true,    // User-defined clipping enabled
+        enabled : true,     // Node not culled from traversal
+        visible : true,     // Node visible - when false, everything happens except geometry draw
+        transparent: false
+    };
 
     this.flags = {}; // Flags at top of flag stack
 
     /** Creates flag set by inheriting flags off top of stack where not overridden
      */
     function createFlags(flags) {
-        if (flagStack.length == 0) {
-            return flags;
-        }
-        var topFlags = flagStack[stackLen - 1];
+        var newFlags = {};
+        var topFlags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
         var flag;
+        for (var name in flags) {
+            if (flags.hasOwnProperty(name)) {
+                newFlags[name] = flags[name];
+            }
+        }
         for (var name in topFlags) {
             if (topFlags.hasOwnProperty(name)) {
-                flag = flags[name];
+                flag = newFlags[name];
                 if (flag == null || flag == undefined) {
-                    flags[name] = topFlags[name];
+                    newFlags[name] = topFlags[name];
                 }
             }
         }
-        return flags;
+        return newFlags;
     }
 
     /* Make fresh flag stack for new render pass, containing default flags
@@ -38,17 +52,10 @@ SceneJS._flagsModule = new (function() {
      */
     var self = this;
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
-                self.flags = {
-                    fog: true,          // Fog enabled
-                    colortrans : true,  // Effect of colortrans enabled
-                    picking : true,     // Picking enabled
-                    enabled : true,     // Node not culled from traversal
-                    visible : true      // Node visible - when false, everything happens except geometry draw
-                };
-                flagStack[0] = self.flags;                
-                stackLen = 1;
+                self.flags = DEFAULT_FLAGS;
+                stackLen = 0;
                 dirty = true;
             });
 
@@ -58,26 +65,32 @@ SceneJS._flagsModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.setFlags(self.flags);
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setFlags(idStack[stackLen - 1], self.flags);
+                    } else {
+                        SceneJS._renderModule.setFlags();
+                    }
                     dirty = false;
                 }
             });
 
-    /* Push flags to top of stack - stack top becomes active flags
-     */
-    this.pushFlags = function(f) {
-        this.flags = createFlags(f);   // TODO: memoize flags?
-        flagStack[stackLen++] = this.flags;
-        dirty = true;
+    this.preVisitNode = function(node) {
+        var attr = node._attr;
+       if (attr.flags) {            
+            this.flags = createFlags(attr.flags);
+            idStack[stackLen] = attr.id;
+            flagStack[stackLen] = this.flags;
+            stackLen++;
+            dirty = true;
+        }
     };
 
-    /* Pop flags off stack - stack top becomes active flags
-     */
-    this.popFlags = function() {
-        stackLen--;
-        this.flags = flagStack[stackLen - 1];
-        dirty = true;
+    this.postVisitNode = function(node) {
+        if (stackLen > 0 && idStack[stackLen - 1] === node._attr.id) {
+            stackLen--;
+            this.flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
+            dirty = true;
+        }
     };
-
 })();
 

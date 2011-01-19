@@ -1,5 +1,5 @@
 /**
- * Backend that manages debugging configurations.
+ * Backend that manages configurations.
  *
  * @private
  */
@@ -42,9 +42,9 @@ SceneJS._debugModule = new (function() {
 
 })();
 
-/** Sets debugging configurations. 
+/** Sets configurations.
  */
-SceneJS.setDebugConfigs = function () {
+SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
     if (arguments.length == 1) {
         SceneJS._debugModule.setConfigs(null, arguments[0]);
     } else if (arguments.length == 2) {
@@ -54,9 +54,9 @@ SceneJS.setDebugConfigs = function () {
     }
 };
 
-/** Gets debugging configurations
+/** Gets configurations
  */
-SceneJS.getDebugConfigs = function (path) {
+SceneJS.getConfigs = SceneJS.getDebugConfigs = function (path) {
     return SceneJS._debugModule.getConfigs(path);
 };
 

@@ -11,6 +11,15 @@
  * projected size of it's extents. The switching is done by a bounding box, which selects
  * an appropriate child for its current projected size from among its child nodes.
  */
+
+SceneJS.setDebugConfigs({
+    
+    compilation : {
+        enabled : false
+    }
+});
+
+
 SceneJS.createNode({
 
     type: "scene",
@@ -73,8 +82,7 @@ SceneJS.createNode({
                         {
                             type: "instance",
                             target: "lod-stairs"
-                        }
-                        ,
+                        } ,                   
 
                         /* Instantiate our tiled floor, defined in tiled-floor.js
                          */

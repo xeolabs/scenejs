@@ -88,7 +88,7 @@ SceneJS.Trackball.prototype._transformOnSphere = function(m, x, y) {
 
 /** @private */
 SceneJS.Trackball.prototype._translate = function(offset, f) {
-    var invMat = SceneJS._math_mat4(); 
+    var invMat = SceneJS._math_mat4();
     SceneJS._math_inverseMat4(this._mat, invMat);
     var t = [offset[0], offset[1], offset[2], 0.0];  // vec3 to 4
     t = SceneJS._math_mulMat4v4(invMat, t);
@@ -107,7 +107,7 @@ SceneJS.Trackball.prototype.rotate = function(m) {
 
     // v0 = axis
     SceneJS._math_cross3Vec3(v0, v1);
-    
+
     var angle = SceneJS._math_lenVec3(v0);
     var rotMat = SceneJS._math_rotationMat4v(angle, v0);
 
@@ -164,7 +164,7 @@ SceneJS.Trackball.prototype.track = function(m, action) {
 
 SceneJS.Trackball.prototype._init = function(params) {
     var m = SceneJS._math_identityMat4();
-   
+
     if (params.actions) {
         for (var i = 0; i < params.actions.length; i++) {
             var action = params.actions[i];
@@ -173,7 +173,13 @@ SceneJS.Trackball.prototype._init = function(params) {
     }
 };
 
-SceneJS.Trackball.prototype._render = function(traversalContext, data) {
+SceneJS.Trackball.prototype._compile = function(traversalContext, data) {
+    this._preCompile(traversalContext, data);
+    this._compileNodes(traversalContext, data);
+    this._postCompile(traversalContext, data);
+};
+
+SceneJS.Trackball.prototype._preCompile = function(traversalContext, data) {
     if (this._memoLevel == 0) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
@@ -194,9 +200,11 @@ SceneJS.Trackball.prototype._render = function(traversalContext, data) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext, data);
-    SceneJS._modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+};
+
+SceneJS.Trackball.prototype._postCompile = function(traversalContext, data) {
+    SceneJS._modelViewTransformModule.popTransform();
 };
 
 /** Function wrapper to support functional scene definition

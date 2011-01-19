@@ -6,6 +6,8 @@ SceneJS.Services = new (function() {
 
     this.NODE_LOADER_SERVICE_ID = "node-loader";
 
+    this.GEO_LOADER_SERVICE_ID = "geo-stream";
+
     this.COMMAND_SERVICE_ID = "command";
 
     this._services = {};
@@ -27,8 +29,14 @@ SceneJS.Services = new (function() {
      * Install stub services
      *---------------------------------------------------*/
 
-    this.addService(this.NODE_LOADER_SERVICE_ID, {
+    this.addService(this.GEO_LOADER_SERVICE_ID, {
         loadNode: function(nodeId) {
+        }
+    });
+
+    this.addService(this.GEO_LOADER_SERVICE_ID, {
+        loadGeometry: function (id, params, cb) {
+            throw "SceneJS.Services service not installed: SceneJS.Services.BINARY_GEO_LOADER_SERVICE_ID";
         }
     });
 })();

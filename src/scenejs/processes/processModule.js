@@ -33,13 +33,13 @@ SceneJS._processModule = new (function() {
             });
 
     SceneJS._eventModule.addListener(// Scene traversal begins
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function(params) {
                 activeSceneId = params.sceneId;
             });
 
     SceneJS._eventModule.addListener(// Scene traversed - reap its dead and timed-out processes
-            SceneJS._eventModule.SCENE_RENDERED,
+            SceneJS._eventModule.SCENE_COMPILED,
             function() {
                 var group = groups[activeSceneId];
                 var processes = group.processes;

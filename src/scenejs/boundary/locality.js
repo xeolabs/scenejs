@@ -35,19 +35,15 @@ SceneJS.Locality.prototype._init = function(params) {
  Sets the inner radius
  @function setInner
  @param {double} inner
- @returns {SceneJS.Locality} this
  @since Version 0.7.4
  */
 SceneJS.Locality.prototype.setInner = function(inner) {
     this._attr.inner = inner || 100000;
-    this._setDirty();
-    return this;
 };
 
 /**
  Returns the inner radius
  @function {double} getInner
- @returns {double} Inner radius
  @since Version 0.7.4
  */
 SceneJS.Locality.prototype.getInner = function() {
@@ -58,13 +54,10 @@ SceneJS.Locality.prototype.getInner = function() {
  Sets the outer radius
  @function setOuter
  @param {double} outer
- @returns {SceneJS.Locality} this
  @since Version 0.7.4
  */
 SceneJS.Locality.prototype.setOuter = function(outer) {
     this._attr.outer = outer || 200000;
-    this._setDirty();
-    return this;
 };
 
 /**
@@ -77,14 +70,20 @@ SceneJS.Locality.prototype.getOuter = function() {
     return this._attr.outer;
 };
 
-// @private
-SceneJS.Locality.prototype._render = function(traversalContext, data) {
-    if (!this._fixedParams) {
-        this._init(this._getParams(data));
-    }
-    var prevRadii = SceneJS._localityModule.getRadii();
-    SceneJS._localityModule.setRadii(this._attr);
-    this._renderNodes(traversalContext, data);
-    SceneJS._localityModule.setRadii(prevRadii);
+SceneJS.Locality.prototype._compile = function(traversalContext, data) {
+   this._preCompile(traversalContext, data);
+    this._compileNodes(traversalContext, data);
+    this._postCompile(traversalContext, data);
 };
+
+// @private
+SceneJS.Locality.prototype._preCompile = function(traversalContext, data) {
+    SceneJS._localityModule.pushRadii(this._attr);
+};
+
+// @private
+SceneJS.Locality.prototype._postCompile = function(traversalContext, data) {
+    SceneJS._localityModule.popRadii();
+};
+
 

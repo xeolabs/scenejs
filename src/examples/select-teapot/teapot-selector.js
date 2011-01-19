@@ -147,7 +147,15 @@ SceneJS.createNode({
 });
 
 
+SceneJS.setDebugConfigs({
+
+    compilation : {
+        logTrace : {           
+        }
+    }
+});
+
 /* Throw the switch, Igor!
 
  */
-SceneJS.withNode("theScene").render();
+SceneJS.withNode("theScene").start();

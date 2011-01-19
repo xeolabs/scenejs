@@ -14,7 +14,7 @@
  * TEXTURES_EXPORTED to pass the entire layer stack to the shading backend.
  *
  * Avoids redundant export of the layers with a dirty flag; they are only exported when that is set, which occurs
- * when the stack is pushed or popped by the texture node, or on SCENE_RENDERING, SHADER_ACTIVATED and
+ * when the stack is pushed or popped by the texture node, or on SCENE_COMPILING, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
  * Whenever a texture node pushes or pops the stack, this backend publishes it with a TEXTURES_UPDATED to allow other
@@ -27,9 +27,12 @@ SceneJS._textureModule = new (function() {
     var time = (new Date()).getTime();      // Current system time for LRU caching
     var canvas;
     var textures = {};
-    var textureStack = [];
-    var dirty;
 
+    var idStack = new Array(255);
+    var textureStack = new Array(255);
+    var stackLen = 0;
+
+    var dirty;
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.TIME_UPDATED,
@@ -38,9 +41,9 @@ SceneJS._textureModule = new (function() {
             });
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
-                textureStack = [];
+                stackLen = 0;
                 dirty = true;
             });
 
@@ -68,11 +71,11 @@ SceneJS._textureModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.TEXTURES_EXPORTED,
-                            (textureStack.length > 0)
-                                    ? { layers: textureStack[textureStack.length - 1] }
-                                    : { layers: [] });
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setTexture(idStack[stackLen - 1], textureStack[stackLen - 1]);
+                    } else {
+                        SceneJS._renderModule.setTexture();
+                    }
                     dirty = false;
                 }
             });
@@ -104,7 +107,7 @@ SceneJS._textureModule = new (function() {
             deleteTexture(texture);
         }
         textures = {};
-        textureStack = [];
+        stackLen = 0;
         dirty = true;
     }
 
@@ -196,7 +199,7 @@ SceneJS._textureModule = new (function() {
             var process = SceneJS._processModule.createProcess({
                 description:"creating texture: uri = " + cfg.uri,
                 type: "create-texture",
-                info: {  
+                info: {
                     uri: cfg.uri
                 },
                 timeoutSecs: -1 // Relying on Image object for timeout
@@ -293,21 +296,16 @@ SceneJS._textureModule = new (function() {
         return x + 1;
     }
 
-    this.pushTexture = function(layers) {
+    this.pushTexture = function(id, layers) {
+        idStack[stackLen] = id;
+        textureStack[stackLen] = layers;
+        stackLen++;
 
-        /* Touch the cache LRU timestamp on each texture managed by this module
-         */
-//        for (var i = 0; i < layers.length; i++) {
-//            if (!textures[layers[i].texture.textureId]) { // TODO: overkill to check for eviction?
-//                throw SceneJS._errorModule.fatalError("No such texture loaded \"" + texture.layers[i].texture.textureId + "\"");
-//            }
-//        }
-        textureStack.push(layers);
         dirty = true;
     };
 
     this.popTexture = function() {
-        textureStack.pop();
+        stackLen--;
         dirty = true;
     };
 })();

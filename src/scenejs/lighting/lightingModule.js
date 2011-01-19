@@ -12,7 +12,7 @@
  * LIGHTS_EXPORTED to pass the entire light stack to the shading backend.
  *
  * Avoids redundant export of the sources with a dirty flag; they are only exported when that is set, which occurs
- * when the stack is pushed or popped by the lights node, or on SCENE_RENDERING, SHADER_ACTIVATED and
+ * when the stack is pushed or popped by the lights node, or on SCENE_COMPILING, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
  * Whenever a scene node pushes the stack, this backend publishes it with a LIGHTS_UPDATED to allow other
@@ -23,14 +23,17 @@
 SceneJS._lightingModule = new (function() {
     var viewMat;
     var modelMat;
-    var lightStack = [];
+
+    var idStack = new Array(255);
+    var lightStack = new Array(255);
+    var stackLen = 0;
     var dirty;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 modelMat = viewMat = SceneJS._math_identityMat4();
-                lightStack = [];
+                stackLen = 0;
                 dirty = true;
             });
 
@@ -56,9 +59,7 @@ SceneJS._lightingModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.LIGHTS_EXPORTED,
-                            lightStack);
+                    SceneJS._renderModule.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
                     dirty = false;
                 }
             });
@@ -69,9 +70,11 @@ SceneJS._lightingModule = new (function() {
                 dirty = true;
             });
 
-    this.pushLight = function(light) {
+    this.pushLight = function(id, light) {  // TODO: what to do with ID?
         instanceLight(light);
-        lightStack.push(light);
+        idStack[stackLen] = id;
+        lightStack[stackLen] = light;
+        stackLen++;
         dirty = true;
     };
 

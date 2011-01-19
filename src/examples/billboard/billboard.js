@@ -21,7 +21,8 @@ SceneJS.createNode({
             nodes: [
                 {
                     type: "quad",
-                    xSize: 1.2, ySize: 1.2
+                    xSize: 1.2,
+                    ySize: 1.2
                 }
             ]
         }
@@ -164,6 +165,5 @@ SceneJS.withNode("the-scene").start({
     idleFunc: function() {
         SceneJS.withNode("pitch").set("angle", pitch);
         SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("the-scene").render();
     }
 });

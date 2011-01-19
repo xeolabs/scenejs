@@ -22,7 +22,7 @@ SceneJS._modelViewTransformModule = new (function() {
     var viewSpaceActive = true;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 viewSpaceActive = true;
             });
@@ -37,11 +37,11 @@ SceneJS._modelViewTransformModule = new (function() {
         return viewSpaceActive;
     };
 
-    this.setTransform = function(t) {
+    this.pushTransform = function(id, t) {
         if (viewSpaceActive) {
-            SceneJS._viewTransformModule.setTransform(t);
+            SceneJS._viewTransformModule.pushTransform(id, t);
         } else {
-            SceneJS._modelTransformModule.setTransform(t);
+            SceneJS._modelTransformModule.pushTransform(id, t);
         }
     };
 
@@ -52,4 +52,13 @@ SceneJS._modelViewTransformModule = new (function() {
             return SceneJS._modelTransformModule.getTransform();
         }
     };
+
+    this.popTransform = function(id, t) {
+        if (viewSpaceActive) {
+            SceneJS._viewTransformModule.popTransform(id, t);
+        } else {
+            SceneJS._modelTransformModule.popTransform(id, t);
+        }
+    };
+
 })();

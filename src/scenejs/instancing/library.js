@@ -47,7 +47,7 @@
 SceneJS.Library = SceneJS.createNodeType("library");
 
 // @private
-SceneJS.Library.prototype._render = function() {
+SceneJS.Library.prototype._compile = function() {
 
     /* Bypass child nodes
      */

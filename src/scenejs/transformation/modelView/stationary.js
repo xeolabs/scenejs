@@ -27,7 +27,7 @@
  */
 SceneJS.Stationary = SceneJS.createNodeType("stationary");
 
-SceneJS.Stationary.prototype._render = function(traversalContext) {
+SceneJS.Stationary.prototype._compile = function(traversalContext) {
 
     var origMemoLevel = this._memoLevel;
 
@@ -51,10 +51,12 @@ SceneJS.Stationary.prototype._render = function(traversalContext) {
                 this._memoLevel = 1;
             }
         }
-        SceneJS._viewTransformModule.setTransform(this._xform);
-        this._renderNodes(traversalContext);
-        SceneJS._viewTransformModule.setTransform(superXform);
+        SceneJS._viewTransformModule.pushTransform(this._attr.id, this._xform);
+        this._compileNodes(traversalContext);
+        SceneJS._viewTransformModule.popTransform();
     } else {
-        this._renderNodes(traversalContext);
+        this._compileNodes(traversalContext);
     }
 };
+
+

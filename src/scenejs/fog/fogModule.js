@@ -5,7 +5,9 @@
  */
 SceneJS._fogModule = new (function() {
 
-    var fogStack;
+    var idStack = new Array(255);
+    var fogStack = new Array(255);
+    var stackLen = 0;
     var dirty;
 
     function colourToArray(v, fallback) {
@@ -45,9 +47,9 @@ SceneJS._fogModule = new (function() {
     }
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
-                fogStack = [];
+                stackLen = 0;
                 dirty = true;
             });
 
@@ -61,7 +63,11 @@ SceneJS._fogModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.addFog(fogStack.length > 0 ? fogStack[fogStack.length - 1] : null);
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setFog(idStack[stackLen-1], fogStack[stackLen - 1]);
+                    } else {
+                        SceneJS._renderModule.setFog();
+                    }
                     dirty = false;
                 }
             });
@@ -72,15 +78,16 @@ SceneJS._fogModule = new (function() {
                 dirty = true;
             });
 
-    this.pushFog = function(f) {
-        fogStack.push(_createFog(f));
+    this.pushFog = function(id, fog) {
+        idStack[stackLen] = id;
+        fogStack[stackLen] = _createFog(fog);
+        stackLen++;
         dirty = true;
     };
 
     this.popFog = function() {
-        fogStack.pop();
+        stackLen--;
         dirty = true;
     };
-
 })();
 

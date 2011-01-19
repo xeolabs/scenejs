@@ -108,6 +108,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                             specular:       0.9,
                                                             shine:          6.0,
+                                                            alpha:          0.5,
+                                                            
                                                             flags: {
                                                                 transparent: true
                                                             }

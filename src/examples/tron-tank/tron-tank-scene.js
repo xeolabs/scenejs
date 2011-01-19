@@ -96,6 +96,7 @@ SceneJS.createNode({
                             specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
                             specular:       10.9,
                             shine:          20.0,
+                            alpha: 0.5,
                             flags: {
                                 transparent: true
                             },
@@ -240,7 +241,7 @@ SceneJS.createNode({
                                     ]
                                 }
                             ]
-                        }
+                        }                           
                     ]
                 }
             ]
@@ -333,7 +334,12 @@ canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
-window.render = function() {
+/** Feeds current rotations, positions etc into the scene graph
+ *
+ */
+function updateSceneState() {
+
+
     pitch += pitchInc;
 
     if (pitch < 1) {
@@ -399,8 +405,6 @@ window.render = function() {
         angle: -tankYaw
     });
 
-    SceneJS.withNode("theScene").render();
-
     if (trailYaw > tankYaw) {
         trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
     } else if (trailYaw < tankYaw) {
@@ -421,4 +425,20 @@ SceneJS.bind("reset", function() {
     window.clearInterval(pInterval);
 });
 
-pInterval = window.setInterval("window.render()", 10);
+pInterval = window.setInterval(function() {
+    if (pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0) {
+        return;
+    }
+    updateSceneState();
+}, 10);
+
+
+/* Call once to begin with to set tank transforms etc. to initial states
+ */
+updateSceneState();
+
+SceneJS.withNode("theScene").start({
+    fps: 60
+});
+
+

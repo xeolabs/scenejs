@@ -90,15 +90,37 @@ SceneJS.Selector.prototype.getSelection = function() {
 };
 
 // @private
-SceneJS.Selector.prototype._render = function(traversalContext) {
+SceneJS.Selector.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Selector.prototype._preCompile = function(traversalContext) {
+
     if (this._attr.selection.length > 0) {
-        var children = [];
+        this._selectedChildren = [];
         for (var i = 0, len = this._attr.selection.length; i < len; i++) {
             var j = this._attr.selection[i];
             if (0 <= j && j < this._children.length) {
-                children.push(this._children[j]);
+                this._selectedChildren.push(this._children[j]);
             }
         }
-        this._renderNodes(traversalContext, children);
+    } else {
+        this._selectedChildren = null;
     }
+
+    return {
+        children: this._selectedChildren
+    };
+};
+
+// @private
+SceneJS.Selector.prototype._compileNodes = function(traversalContext) {
+    SceneJS.Node.prototype._compileNodes.call(this, traversalContext, this._selectedChildren);
+};
+
+// @private
+SceneJS.Selector.prototype._postCompile = function(traversalContext) {
 };

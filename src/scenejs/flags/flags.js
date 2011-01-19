@@ -29,8 +29,19 @@ SceneJS.Flags.prototype.getFlags = function() {
 };
 
 // @private
-SceneJS.Flags.prototype._render = function(traversalContext) {
-    SceneJS._flagsModule.pushFlags(this._attr.flags);
-    this._renderNodes(traversalContext);
-    SceneJS._flagsModule.popFlags();
+SceneJS.Flags.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+
+SceneJS.Flags.prototype._preCompile = function(traversalContext) {
+  //  SceneJS._flagsModule.pushFlags(this._attr.id, this._attr.flags);
+};
+
+
+
+SceneJS.Flags.prototype._postCompile = function(traversalContext) {
+  //  SceneJS._flagsModule.popFlags();
 };

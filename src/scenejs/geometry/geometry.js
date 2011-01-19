@@ -81,7 +81,13 @@
  *            // ...
  *        ]
  * });
- *  </pre></code>
+ <p><b>Example Usage</b></p><p>Definition of geometry that loads through a stream provided by a
+ <a href="http://scenejs.wikispaces.com/GeoStreamService" target="_other">GeoStreamService</a> implementation:</b></p><pre><code>
+ * var g = new SceneJS.Geometry({
+ *     stream: "my-stream"
+ * });
+ * <pre><code>
+ * </pre></code>
  * @extends SceneJS.Node
  * @since Version 0.7.4
  * @constructor
@@ -100,13 +106,26 @@
 SceneJS.Geometry = SceneJS.createNodeType("geometry");
 
 SceneJS.Geometry.prototype._init = function(params) {
+
+    this._state = SceneJS.Geometry.STATE_INITIAL;
     this._create = null; // Callback to create geometry
     this._handle = null; // Handle to created geometry
-
     this._resource = params.resource;       // Optional - can be null
+
     if (params.create instanceof Function) {
+
+        /* Factory function
+         */
         this._create = params.create;
+    } else if (params.stream) {
+
+        /* Binary Stream
+         */
+        this._stream = params.stream;
     } else {
+
+        /* Explicit arrays
+         */
         this._attr.positions = params.positions || [];
         this._attr.normals = params.normals || [];
         this._attr.colors = params.colors || [];
@@ -117,11 +136,43 @@ SceneJS.Geometry.prototype._init = function(params) {
     }
 };
 
+/** Ready to create geometry
+ */
+SceneJS.Geometry.STATE_INITIAL = "init";
+
+/** Geometry in the process of loading
+ */
+SceneJS.Geometry.STATE_LOADING = "loading";
+
+/** Geometry loaded - geometry initailised from JSON arrays is immediately in this state and stays here
+ */
+SceneJS.Geometry.STATE_LOADED = "loaded";
+
+/**
+ * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
+ * {@link #STATE_LOADING}, {@link #STATE_LOADED}.
+ * @returns {int} The state
+ */
+SceneJS.Geometry.prototype.getState = function() {
+    return this._state;
+};
+
+// @private
+SceneJS.Geometry.prototype._changeState = function(newState, params) {
+    params = params || {};
+    params.oldState = this._state;
+    params.newState = newState;
+    this._state = newState;
+    if (this._listeners["state-changed"]) {
+        this._fireEvent("state-changed", params);
+    }
+};
+
 /** Returns this Geometry's positions array
  * @return {[Number]} Flat array of position elements
  */
 SceneJS.Geometry.prototype.getPositions = function() {
-    return this._attr.positions;
+    return this._getArrays().positions;
 };
 
 
@@ -129,35 +180,35 @@ SceneJS.Geometry.prototype.getPositions = function() {
  * @return {[Number]} Flat array of normal elements
  */
 SceneJS.Geometry.prototype.getNormals = function() {
-    return this._attr.normals;
+    return this._getArrays().normals;
 };
 
 /** Returns this Geometry's colors array
  * @return {[Number]} Flat array of color elements
  */
 SceneJS.Geometry.prototype.getColors = function() {
-    return this._attr.colors;
+    return this._getArrays().colors;
 };
 
 /** Returns this Geometry's indices array
  * @return {[Number]} Flat array of index elements
  */
 SceneJS.Geometry.prototype.getIndices = function() {
-    return this._attr.indices;
+    return this._getArrays().indices;
 };
 
 /** Returns this Geometry's UV coordinates array
  * @return {[Number]} Flat array of UV coordinate elements
  */
 SceneJS.Geometry.prototype.getUv = function() {
-    return this._attr.uv;
+    return this._getArrays().uv;
 };
 
 /** Returns this Geometry's UV2 coordinates array
  * @return {[Number]} Flat array of UV2 coordinate elements
  */
 SceneJS.Geometry.prototype.getUv2 = function() {
-    return this._attr.uv2;
+    return this._getArrays().uv2;
 };
 
 /** Returns this Geometry's primitive type
@@ -167,11 +218,31 @@ SceneJS.Geometry.prototype.getPrimitive = function() {
     return this._attr.primitive;
 };
 
-/** Returns the local-space boundary of this Geometry's positions
+SceneJS.Geometry.prototype._getArrays = function() {
+    if (this._attr.positions) {
+        return this._attr;
+    } else {
+        if (!this._handle) {
+            throw SceneJS._errorModule.fatalError(new SceneJS.errors.Exception(
+                    "Invalid node state exception: geometry stream not loaded yet - can't get boundary yet"));
+        }
+        return this._handle.arrays;
+    }
+};
+
+/** Returns the local-space boundary of this Geometry's positions. When the geometry is loaded from a stream,
+ * you can only do this once it has been in {@link #STATE_LOADED} at least once.
  * @return { xmin: Number, ymin: Number, zmin: Number, xmax: Number, ymax: Number, zmax: Number} The local-space boundary
  */
 SceneJS.Geometry.prototype.getBoundary = function() {
-    var boundary = {
+
+    if (this._boundary) {
+        return this._boundary;
+    }
+
+    var positions = this._getArrays().positions;
+
+    this._boundary = {
         xmin : Number.MAX_VALUE,
         ymin : Number.MAX_VALUE,
         zmin : Number.MAX_VALUE,
@@ -179,45 +250,50 @@ SceneJS.Geometry.prototype.getBoundary = function() {
         ymax : Number.MIN_VALUE,
         zmax : Number.MIN_VALUE
     };
+
     var x, y, z;
-    for (var i = 0, len = this._attr.positions.length - 3; i < len; i += 3) {
-        x = this._attr.positions[i];
-        y = this._attr.positions[i + 1];
-        z = this._attr.positions[i + 2];
+    for (var i = 0, len = positions.length - 3; i < len; i += 3) {
+        x = positions[i];
+        y = positions[i + 1];
+        z = positions[i + 2];
 
-        if (x < boundary.xmin) {
-            boundary.xmin = x;
+        if (x < this._boundary.xmin) {
+            this._boundary.xmin = x;
         }
-        if (y < boundary.ymin) {
-            boundary.ymin = y;
+        if (y < this._boundary.ymin) {
+            this._boundary.ymin = y;
         }
-        if (z < boundary.zmin) {
-            boundary.zmin = z;
+        if (z < this._boundary.zmin) {
+            this._boundary.zmin = z;
         }
 
-        if (x > boundary.xmax) {
-            boundary.xmax = x;
+        if (x > this._boundary.xmax) {
+            this._boundary.xmax = x;
         }
-        if (y > boundary.ymax) {
-            boundary.ymax = y;
+        if (y > this._boundary.ymax) {
+            this._boundary.ymax = y;
         }
-        if (z > boundary.zmax) {
-            boundary.zmax = z;
+        if (z > this._boundary.zmax) {
+            this._boundary.zmax = z;
         }
     }
-    return boundary;
+
+    return this._boundary;
 };
 
 
 // @private
-SceneJS.Geometry.prototype._render = function(traversalContext) {
-    if (this._handle) { // Was created before - test if not evicted since
-        if (!SceneJS._geometryModule.testGeometryExists(this._handle)) {
-            this._handle = null;
-        }
-    }
-    if (!this._handle) { // Either not created yet or has been evicted
-        if (this._create) { // Use callback to create
+SceneJS.Geometry.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Geometry.prototype._preCompile = function(traversalContext) {
+    if (!this._handle) { // Geometry VBOs not created yet
+
+        if (this._create) { // Factory function
 
             var attr = this._create();
 
@@ -230,26 +306,46 @@ SceneJS.Geometry.prototype._render = function(traversalContext) {
             this._attr.primitive = attr.primitive;
 
             this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._attr);
-        } else { // Or supply arrays
+
+            this._changeState(SceneJS.Geometry.STATE_LOADED);
+
+        } else if (this._stream) { // Stream
+
+            this._changeState(SceneJS.Geometry.STATE_LOADING);
+
+            var self = this;
+
+            SceneJS._geometryModule.createGeometry(
+                    this._resource,
+                    this._stream,
+                    function(handle) {
+
+                        self._handle = handle;
+
+                        self._changeState(SceneJS.Geometry.STATE_LOADED);
+
+                        /**
+                         * Need another compilation to apply freshly-loaded geometry
+                         */
+                        SceneJS._compileModule.nodeUpdated(self, "loaded");
+                    });
+
+        } else { // Arrays
+
             this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._attr);
+
+            this._changeState(SceneJS.Geometry.STATE_LOADED);
         }
     }
-
-    if (!SceneJS._flagsModule.flags.visible) {
-
-        /* This subgraph flagged as invisible - it still "renders",
-         * but the geometry is not actually drawn. This is useful
-         * for when we want to just create textures, geometries etc.
-         * on the GPU.
-         */
-        this._renderNodes(traversalContext);
-
-    } else {
-
-        SceneJS._geometryModule.pushGeometry(this._handle);
-        this._renderNodes(traversalContext);
-        SceneJS._geometryModule.popGeometry();
+    if (this._handle) {
+        SceneJS._geometryModule.pushGeometry(this._attr.id, this._handle.resource);
     }
 };
 
+// @private
+SceneJS.Geometry.prototype._postCompile = function(traversalContext) {
+    if (this._handle) {
+        SceneJS._geometryModule.popGeometry();
+    }
+};
 

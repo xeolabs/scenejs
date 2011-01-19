@@ -199,7 +199,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
       };
 
   opt_onErrorFunc = opt_onErrorFunc || function(err, functionName, args) {
-        log("WebGL error "+ glEnumToString(err) + " in "+
+        alert("WebGL error "+ glEnumToString(err) + " in "+
             formatFunctionCall(functionName, args));
       };
 

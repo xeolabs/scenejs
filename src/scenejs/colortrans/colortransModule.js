@@ -7,20 +7,21 @@
  * setColortrans to set the material properties to the shading backend.
  *
  * Avoids redundant export of the colors transforms with a dirty flag; they are only set when that flag is set, which
- * occurs when color transforms is set by the colortrans node, or on SCENE_RENDERING, SHADER_ACTIVATED and
+ * occurs when color transforms is set by the colortrans node, or on SCENE_COMPILING, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
  *  @private
  */
 SceneJS._colortransModule = new (function() {
-    var colortransStack = new Array(500);  // TODO: auto-grow stack
+    var idStack = new Array(255);
+    var colortransStack = new Array(255);
     var stackLen = 0;
     var dirty;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
-                colortransStack = [];
+                stackLen = 0;
                 dirty = true;
             });
 
@@ -34,7 +35,11 @@ SceneJS._colortransModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.setColortrans(stackLen > 0 ? colortransStack[stackLen - 1] : null);
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setColortrans(idStack[stackLen - 1], colortransStack[stackLen - 1]);
+                    } else {
+                        SceneJS._renderModule.setColortrans();
+                    }
                     dirty = false;
                 }
             });
@@ -46,8 +51,10 @@ SceneJS._colortransModule = new (function() {
             });
 
 
-    this.pushColortrans = function(trans) {
-        colortransStack[stackLen++] = trans;
+    this.pushColortrans = function(id, trans) {
+        idStack[stackLen] = id;
+        colortransStack[stackLen] = trans;
+        stackLen++;
         dirty = true;
     };
 

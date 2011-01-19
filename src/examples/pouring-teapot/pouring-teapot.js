@@ -162,6 +162,6 @@ SceneJS.createNode({
 });
 
 
-SceneJS.withNode("the-scene").start({ fps: 100 });
+SceneJS.withNode("the-scene").start({ fps: 60 });
 
 

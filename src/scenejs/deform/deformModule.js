@@ -4,24 +4,26 @@
  * @private
  */
 SceneJS._deformModule = new (function() {
-    var viewMat;
-    var modelMat;
-
+    var idStack = new Array(255);
     var deformStack = new Array(255);
     var stackLen = 0;
     var dirty;
 
-    /* Make fresh flag stack for new render pass, containing default flags
-     * to enable/disable various things for subgraph
-     */
-    var self = this;
+    var viewMat;
+    var modelMat;
+
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
-                deformStack = [];
                 stackLen = 0;
                 dirty = true;
             });
+
+    SceneJS._eventModule.addListener(
+             SceneJS._eventModule.SHADER_ACTIVATED,
+             function() {
+                 dirty = true;
+             });    
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
@@ -35,20 +37,20 @@ SceneJS._deformModule = new (function() {
                 modelMat = params.matrix;
             });
 
-    /* Export deform when renderer needs them - only when current set not exported (dirty)
-     */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.addDeform(stackLen > 0 ? deformStack[stackLen - 1] : null);
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setDeform(idStack[stackLen - 1], deformStack[stackLen - 1]);
+                    } else {
+                        SceneJS._renderModule.setDeform();
+                    }
                     dirty = false;
                 }
             });
 
-    /* Push deform to top of stack - stack top becomes active deformation
-     */
-    this.pushDeform = function(deform) {
+    this.pushDeform = function(id, deform) {
         var d = {
             verts: []
         };
@@ -61,12 +63,12 @@ SceneJS._deformModule = new (function() {
                 weight: vert.weight
             });
         }
-        deformStack[stackLen++] = d;
+        idStack[stackLen] = id;
+        deformStack[stackLen] = d;
+        stackLen++;
         dirty = true;
     };
 
-    /* Pop deform to top of stack - stack top becomes active deformation
-     */
     this.popDeform = function() {
         stackLen--;
         dirty = true;

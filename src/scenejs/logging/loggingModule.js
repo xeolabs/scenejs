@@ -124,13 +124,13 @@ SceneJS._loggingModule = new (function() {
             });
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING, // Set default logging for scene root
+            SceneJS._eventModule.SCENE_COMPILING, // Set default logging for scene root
             function(params) {
                 activeSceneId = params.sceneId;
             });
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERED, // Set default logging for scene root
+            SceneJS._eventModule.SCENE_COMPILED, // Set default logging for scene root
             function() {
                 activeSceneId = null;
             });

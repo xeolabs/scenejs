@@ -10,7 +10,7 @@
  * The Float32Array is lazy-computed and cached on export to avoid repeatedly regenerating it.
  *
  * Avoids redundant export of the matrix with a dirty flag; the matrix is only exported when the flag is set, which
- * occurs when the matrix is set by scene node, or on SCENE_RENDERING, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
+ * occurs when the matrix is set by scene node, or on SCENE_COMPILING, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
  *
  * Whenever a scene node sets the matrix, this backend publishes it with a PROJECTION_TRANSFORM_UPDATED to allow other
  * dependent backends (such as "view-frustum") to synchronise their resources.
@@ -19,16 +19,30 @@
  */
 SceneJS._projectionModule = new (function() {
 
+    var DEFAULT_TRANSFORM = {
+        matrix : SceneJS._math_identityMat4(),
+        fixed: true,
+        isDefault : true
+    };
+
+    var idStack = new Array(255);
+    var transformStack = new Array(255);
+    var stackLen = 0;
+
+    var nodeId;
     var transform;
+
     var dirty;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
+                stackLen = 0;
+                nodeId = null;
                 transform = {
                     matrix : SceneJS._math_identityMat4(),
-                    isDefault : true,
-                    fixed: true
+                    fixed: true,
+                    isDefault : true
                 };
                 dirty = true;
             });
@@ -43,10 +57,15 @@ SceneJS._projectionModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
+
+                    /* Lazy-create WebGL array
+                     */
                     if (!transform.matrixAsArray) {
                         transform.matrixAsArray = new Float32Array(transform.matrix);
                     }
-                    SceneJS._shaderModule.addProjectionMatrix(transform.matrixAsArray);
+
+                    SceneJS._renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
+
                     dirty = false;
                 }
             });
@@ -57,15 +76,34 @@ SceneJS._projectionModule = new (function() {
                 dirty = true;
             });
 
-    this.setTransform = function(t) {
+    this.pushTransform = function(id, t) {
+        idStack[stackLen] = id;
+        transformStack[stackLen] = t;
+        stackLen++;
+        nodeId = id;
         transform = t;
         dirty = true;
-        SceneJS._eventModule.fireEvent(
-                SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED,
-                transform);
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED, transform);
     };
 
     this.getTransform = function() {
         return transform;
+    };
+
+    this.popTransform = function() {
+        stackLen--;
+        if (stackLen > 0) {
+            nodeId = idStack[stackLen - 1];
+            transform = transformStack[stackLen - 1];
+        } else {
+            nodeId = null;
+            transform = {
+                matrix : SceneJS._math_identityMat4(),
+                fixed: true,
+                isDefault : true
+            };
+        }
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED, transform);
+        dirty = true;
     };
 })();

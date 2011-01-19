@@ -173,17 +173,23 @@ SceneJS.Clip.prototype.getAttributes = function() {
 };
 
 // @private
-SceneJS.Clip.prototype._render = function(traversalContext) {
+SceneJS.Clip.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Clip.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
         this._makePlane();
     }
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-        this._renderNodes(traversalContext); // No clip for pick
-    } else {
-        SceneJS._clipModule.pushClip(this._attr);
-        this._renderNodes(traversalContext);
-        SceneJS._clipModule.popClip();
-    }
+    SceneJS._clipModule.pushClip(this._attr.id, this._attr);
+};
+
+// @private
+SceneJS.Clip.prototype._postCompile = function(traversalContext) {
+    SceneJS._clipModule.popClip();
 };
 
 /** Create succinct plane representation from points A, B & C

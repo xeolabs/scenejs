@@ -20,7 +20,7 @@ SceneJS._loadStatusModule = new (function() {
      */
     var self = this;
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 self.status = {
                     numNodesLoading : 0,

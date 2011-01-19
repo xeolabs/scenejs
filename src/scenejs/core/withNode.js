@@ -10,7 +10,7 @@ SceneJS._WithNode = function(node) {
     if (!node) {
         throw "withNode param 'node' is null or undefined";
     }
-    this._targetNode = node._render ? node : SceneJS._nodeIDMap[node];
+    this._targetNode = node._compile ? node : SceneJS._nodeIDMap[node];
     if (!this._targetNode) {
         throw "withNode node not found: '" + node + "'";
     }
@@ -289,6 +289,7 @@ SceneJS._WithNode.prototype.bind = function(name, handler) {
         throw "bind param 'handler' should be a function";
     } else {
         this._targetNode.addListener(name, handler, { scope: this });
+        SceneJS._compileModule.nodeUpdated(this._targetNode);
     }
     //else {
     //        var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
@@ -380,7 +381,8 @@ SceneJS._WithNode.prototype.destroy = function() {
     return this;
 };
 
-/** Allows us to get or set data of any type on the scene node
+/** Allows us to get or set data of any type on the scene node.
+ *  Modifying data does not trigger rendering.
  */
 SceneJS._WithNode.prototype.data = function(data, value) {
     if (!data) {
@@ -455,13 +457,16 @@ SceneJS._WithNode.prototype._callNodeMethod = function(prefix, attr, value, targ
     var params = {};
     params[attr] = value;
 
-    SceneJS._needFrame = true;  // Flag another scene render pass needed
+    /* Notify of node update
+     */
+    SceneJS._compileModule.nodeUpdated(targetNode, prefix, attr, value);
 
     /* TODO: event should be queued and consumed to avoid many of these events accumulating
      */
     targetNode._fireEvent("updated", params);
     //   SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_UPDATED, { nodeId : node.getID() });
 };
+
 
 SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode) {
     for (var key in attr) {
@@ -474,14 +479,11 @@ SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode
             }
             func.call(targetNode, this._parseAttr(key, attr[key]));
 
-            SceneJS._needFrame = true;  // Flag another scene render pass needed
+            /* Notify of node update
+             */
+            SceneJS._compileModule.nodeUpdated(targetNode, prefix, key, attr[key]);
         }
     }
-
-    /* Raise flag so that all Scenes currently
-     * running rendering loops will render another frame.
-     */
-    SceneJS._needFrame = true;
 
     /* TODO: optimise - dont fire unless listener exists
      */

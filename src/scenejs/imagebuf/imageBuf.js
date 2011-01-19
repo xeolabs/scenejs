@@ -5,22 +5,24 @@ SceneJS.ImageBuf.prototype._init = function(params) {
 };
 
 // @private
-SceneJS.ImageBuf.prototype._render = function(traversalContext) {
+SceneJS.ImageBuf.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
 
-    /* Create image buffer if we don't have one yet
-     */
+// @private
+SceneJS.ImageBuf.prototype._preCompile = function(traversalContext) {
     if (!this._bufId) {
         this._bufId = SceneJS._imageBufModule.createImageBuffer(this._attr.id);
     }
-
-    /* Activate image buffer, render child nodes, deactivate again then restore any
-     * previously active image buffer
-     */
-    SceneJS._imageBufModule.pushImageBuffer(this._bufId);
-    this._renderNodes(traversalContext);
-    SceneJS._imageBufModule.popImageBuffer();
+    SceneJS._imageBufModule.pushImageBuffer(this._attr.id, this._bufId);
 };
 
+// @private
+SceneJS.ImageBuf.prototype._postCompile = function(traversalContext) {
+    SceneJS._imageBufModule.popImageBuffer();
+};
 
 /**
  * Destroys image buffer when this node is destroyed

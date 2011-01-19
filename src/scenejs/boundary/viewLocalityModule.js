@@ -15,15 +15,17 @@
  */
 SceneJS._localityModule = new (function() {
 
+    var radiiStack = new Array(255);
+    var stackLen = 0;
+    
     var eye;
-    var radii;
     var radii2;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 eye = { x: 0, y: 0, z: 0 };
-                radii = {
+                var radii = {
                     inner : 100000,
                     outer : 200000
                 };
@@ -31,6 +33,8 @@ SceneJS._localityModule = new (function() {
                     inner : radii.inner * radii.inner,
                     outer : radii.outer * radii.outer
                 };
+                radiiStack[0] = radii2;
+                stackLen = 1;
             });
 
     SceneJS._eventModule.addListener(
@@ -64,25 +68,16 @@ SceneJS._localityModule = new (function() {
         return (dmin <= radius2);
     }
 
-    /** Sets radii of inner and outer locality spheres
-     * @private
-     */
-    this.setRadii = function(r) {
-        radii = {
-            outer : r.inner,
-            inner : r.outer
-        };
+    this.pushRadii = function(r) {
         radii2 = {
             inner : r.inner * r.inner,
             outer : r.outer * r.outer
         };
+        radiiStack[stackLen++] = radii2;
     };
 
-    /** Returns current inner and ouer sphere radii
-     * @private
-     */
-    this.getRadii = function() {
-        return radii;
+    this.popRadii = function() {
+        radii2 = radiiStack[--stackLen];
     };
 
     /** Tests the given axis-aligned bounding box for intersection with the outer locality sphere

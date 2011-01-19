@@ -321,10 +321,19 @@ SceneJS.BoundingBox.prototype.getBoundary = function() {
     };
 };
 
-
+// @private
+SceneJS.BoundingBox.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
 
 // @private
-SceneJS.BoundingBox.prototype._render = function(traversalContext) {
+SceneJS.BoundingBox.prototype._preCompile = function(traversalContext) {
+
+    this._compileNodeAtIndex = undefined;
+    this._compileNodes = undefined;
+
     if (!this._validated) {
         if (this._levels) {
             if (this._levels.length != this._children.length) {
@@ -338,6 +347,7 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                 }
             }
         }
+        this._validated = true;
     }
 
     var origLevel = this._level; // We'll fire a "lod-changed" if LOD level changes
@@ -470,22 +480,26 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
                                     /* Child provided for each LOD - select one
                                      * for the projected boundary canvas size
                                      */
-                                    this._renderNodeAtIndex(i, traversalContext);
+                                    this._compileNodeAtIndex = i;
+                                    //this._compileNodeAtIndex(i, traversalContext);
                                 } else {
 
                                     /* Zero or one child provided for all LOD -
                                      * just render it if there is one
                                      */
-                                    this._renderNodes(traversalContext);
+                                    this._compileNodes = true;
+                                    //this._compileNodes(traversalContext);
                                 }
                                 return;
                             }
                         }
                     } else {
-                        this._renderNodes(traversalContext);
+
+                        this._compileNodes = true;
+                        //this._compileNodes(traversalContext);
                     }
 
-                    SceneJS._boundaryModule.popBoundary();
+                    //      SceneJS._boundaryModule.popBoundary();
 
                     break;
 
@@ -507,7 +521,8 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
 
             // TODO:
 
-            this._renderNodes(traversalContext);
+            this._compileNodes = true;
+            //this._compileNodes(traversalContext);
         }
     } else {
         if (newState != origState) {
@@ -515,6 +530,24 @@ SceneJS.BoundingBox.prototype._render = function(traversalContext) {
         }
     }
 };
+
+SceneJS.BoundingBox.prototype._compileNodes = function(traversalContext) {
+
+    if (this._compileNodeAtIndex && this._compileNodeAtIndex >= 0) { // LOD selection
+
+        SceneJS.Node.prototype._compileNodeAtIndex.call(this, this._compileNodeAtIndex, traversalContext);
+        SceneJS._boundaryModule.popBoundary();
+
+    } else if (this._compileNodes) { // Visibility cull
+
+        SceneJS.Node.prototype._compileNodes.call(this, traversalContext);
+        SceneJS._boundaryModule.popBoundary();
+    }
+};
+
+SceneJS.BoundingBox.prototype._postCompile = function(traversalContext) {
+};
+
 
 /* Returns a JSon representation of this node
  */

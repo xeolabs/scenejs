@@ -319,12 +319,24 @@ SceneJS.Renderer.prototype.getEnableFog = function() {
 };
 
 // @private
-SceneJS.Renderer.prototype._render = function(traversalContext) {
+SceneJS.Renderer.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+
+// @private
+SceneJS.Renderer.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
         this._props = SceneJS._rendererModule.createProps(this._attr);
         this._memoLevel = 1;
     }
-    SceneJS._rendererModule.pushProps(this._props);
-    this._renderNodes(traversalContext);
-    SceneJS._rendererModule.popProps(this._props);
+    SceneJS._rendererModule.pushProps(this._attr.id, this._props);
+};
+
+
+// @private
+SceneJS.Renderer.prototype._postCompile = function(traversalContext) {
+    SceneJS._rendererModule.popProps();
 };

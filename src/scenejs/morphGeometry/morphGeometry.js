@@ -77,16 +77,21 @@ SceneJS.MorphGeometry.prototype.getFactor = function() {
 };
 
 // @private
-SceneJS.MorphGeometry.prototype._render = function(traversalContext) {
-    if (this._handle) { // Was created before - test if not evicted since
-        if (!SceneJS._morphGeometryModule.testMorphGeometryExists(this._handle)) {
-            this._handle = null;
-        }
-    }
-    if (!this._handle) { // Either not created yet or has been evicted
+SceneJS.MorphGeometry.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
+    if (!this._handle) { // Not created yet
         this._handle = SceneJS._morphGeometryModule.createMorphGeometry(this._resource, this._attr);
     }
-    SceneJS._morphGeometryModule.pushMorphGeometry(this._handle, this._attr.factor);
-    this._renderNodes(traversalContext);
+    SceneJS._morphGeometryModule.pushMorphGeometry(this._attr.id, this._handle, this._attr.factor);
+};
+
+// @private
+SceneJS.MorphGeometry.prototype._postCompile = function(traversalContext) {
     SceneJS._morphGeometryModule.popMorphGeometry();
 };

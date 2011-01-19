@@ -99,8 +99,18 @@ SceneJS.Deform.prototype.removeVert = function(index) {
 };
 
 // @private
-SceneJS.Deform.prototype._render = function(traversalContext) {
-    SceneJS._deformModule.pushDeform(this._attr);
-    this._renderNodes(traversalContext);
+SceneJS.Deform.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Deform.prototype._preCompile = function(traversalContext) {
+    SceneJS._deformModule.pushDeform(this._attr.id, this._attr);
+};
+
+// @private
+SceneJS.Deform.prototype._postCompile = function(traversalContext) {
     SceneJS._deformModule.popDeform();
 };

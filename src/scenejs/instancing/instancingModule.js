@@ -21,7 +21,7 @@ SceneJS._instancingModule = new function() {
             });
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 countInstances = 0;
                 instances = {};

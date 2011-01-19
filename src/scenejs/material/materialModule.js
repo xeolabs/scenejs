@@ -7,10 +7,10 @@
  * MATERIAL_EXPORTED to pass the material properties to the shading backend.
  *
  * Avoids redundant export of the material properties with a dirty flag; they are only exported when that is set, which
- * occurs when material is set by the SceneJS.material node, or on SCENE_RENDERING, SHADER_ACTIVATED and
+ * occurs when material is set by the SceneJS.material node, or on SCENE_COMPILING, SHADER_ACTIVATED and
  * SHADER_DEACTIVATED events.
  *
- * Sets the properties to defaults on SCENE_RENDERING.
+ * Sets the properties to defaults on SCENE_COMPILING.
  *
  * Whenever a SceneJS.material sets the material properties, this backend publishes it with a MATERIAL_UPDATED to allow
  * other dependent backends to synchronise their resources. One such backend is the shader backend, which taylors the
@@ -19,17 +19,16 @@
  *  @private
  */
 SceneJS._materialModule = new (function() {
-    var materialStack = [];
+
+    var idStack = new Array(255);
+    var materialStack = new Array(255);
+    var stackLen = 0;
     var dirty;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
-                materialStack = [
-                    {
-                        override : false
-                    }
-                ];
+                stackLen = 0;
                 dirty = true;
             });
 
@@ -43,7 +42,11 @@ SceneJS._materialModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.addMaterial(materialStack[materialStack.length - 1]);
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setMaterial(idStack[stackLen - 1], materialStack[stackLen - 1]);
+                    } else {
+                        SceneJS._renderModule.setMaterial();
+                    }
                     dirty = false;
                 }
             });
@@ -54,13 +57,22 @@ SceneJS._materialModule = new (function() {
                 dirty = true;
             });
 
-    this.pushMaterial = function(m) {
-        var top = materialStack[materialStack.length - 1];
+    this.pushMaterial = function(id, m) {
+        var top;
+        if (stackLen > 0) {
+            top = materialStack[stackLen - 1];
+        } else {
+            top = {
+                override : false
+            };
+        }
+
+        idStack[stackLen] = id;
 
         /* Copy the material because the Material node might be
          * mutated during the rest of the traversal
          */
-        materialStack.push({
+        materialStack[stackLen] = {
             highlightBaseColor : (m.highlightBaseColor != undefined && !(top.override && top.highlightBaseColor != undefined)) ? [ m.highlightBaseColor.r, m.highlightBaseColor.g, m.highlightBaseColor.b ] : top.baseColor,
             baseColor : (m.baseColor != undefined && !(top.override && top.baseColor != undefined)) ? [ m.baseColor.r, m.baseColor.g, m.baseColor.b ] : top.baseColor,
             specularColor: (m.specularColor != undefined && !(top.override && top.specularColor != undefined)) ? [ m.specularColor.r, m.specularColor.g, m.specularColor.b ] : top.specularColor,
@@ -70,12 +82,14 @@ SceneJS._materialModule = new (function() {
             alpha : (m.alpha != undefined && !(top.override && top.alpha != undefined )) ? m.alpha : top.alpha,
             emit : (m.emit != undefined && !(top.override && top.emit != undefined)) ? m.emit : top.emit,
             opacity : (m.opacity != undefined && !(top.override && top.opacity != undefined)) ? m.opacity : top.opacity
-        });
+        };
+
+        stackLen++;
         dirty = true;
     };
 
     this.popMaterial = function() {
-        materialStack.pop();
+        stackLen--;
         dirty = true;
     };
 

@@ -7,7 +7,7 @@ SceneJS._timeModule = new (function() {
     var time = (new Date()).getTime();
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 time = (new Date()).getTime();
                 SceneJS._eventModule.fireEvent(SceneJS._eventModule.TIME_UPDATED, time);

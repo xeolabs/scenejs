@@ -151,10 +151,16 @@ SceneJS.Scale.prototype.getAttributes = function() {
     };
 };
 
-SceneJS.Scale.prototype._render = function(traversalContext) {
+// @private
+SceneJS.Scale.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
 
+// @private
+SceneJS.Scale.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
-
     if (this._memoLevel == 0) {
         this._memoLevel = 1;
         this._mat = SceneJS._math_scalingMat4v([this._attr.x, this._attr.y, this._attr.z]);
@@ -163,7 +169,7 @@ SceneJS.Scale.prototype._render = function(traversalContext) {
     if (origMemoLevel < 2 || (!superXform.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
 
-        var tempMat = SceneJS._math_mat4(); 
+        var tempMat = SceneJS._math_mat4();
         SceneJS._math_mulMat4(superXform.matrix, this._mat, tempMat);
         this._xform = {
             localMatrix: this._mat,
@@ -175,7 +181,10 @@ SceneJS.Scale.prototype._render = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext);
-    SceneJS._modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+};
+
+// @private
+SceneJS.Scale.prototype._postCompile = function(traversalContext) {
+    SceneJS._modelViewTransformModule.popTransform();
 };

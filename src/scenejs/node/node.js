@@ -121,8 +121,6 @@ SceneJS.Node = function() {
     this._attr.sid = null;
     this._attr.flags = null;     // Fast to detect that we have no flags and then bypass processing them
     this._attr.data = {};
-    this._attr.enabled = true; // Traversal culls this node when false
-
 
     /* Rendering flag - set while this node is rendering - while it is true, it is legal
      * to make render-time queries on the node using SceneJS.withNode(xx).query(xx).
@@ -192,7 +190,7 @@ SceneJS.Node._ArgParser = new (function() {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
                         ("First element in node config is null or undefined"));
             }
-            if (arg._render) {   // Determines arg to be a node
+            if (arg._compile) {   // Determines arg to be a node
                 this._parseChild(arg, args, 1, node);
             } else {
                 this._parseConfigObject(arg, args, 1, node);
@@ -256,7 +254,7 @@ SceneJS.Node._ArgParser = new (function() {
          */
         if (i < args.length) {
             arg = args[i];
-            if (arg._render) { // Determines arg to be a node
+            if (arg._compile) { // Determines arg to be a node
                 this._parseChild(arg, args, i + 1, node);
             } else {
                 throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
@@ -313,8 +311,8 @@ SceneJS.Node.prototype._resetMemoLevel = function() {
 };
 
 /** @private */
-SceneJS.Node.prototype._render = function(traversalContext) {
-    this._renderNodes(traversalContext);
+SceneJS.Node.prototype._compile = function(traversalContext) {
+    this._compileNodes(traversalContext);
 };
 
 /** @private
@@ -328,17 +326,11 @@ SceneJS.Node.prototype._render = function(traversalContext) {
  * by the Instance node that is intiating it. The callback is then called to render the
  * Instance's child nodes as if they were children of the last node.
  */
-SceneJS.Node.prototype._renderNodes = function(
-        traversalContext,
-        selectedChildren) {             // Selected children - useful for Selector node
+SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildren) { // Selected children - useful for Selector node
 
-    var flags = SceneJS._flagsModule.flags;
+    SceneJS._pickingModule.preVisitNode(this);
 
-    /* When in picking pass and pick enabled for node, push on pick module
-     */
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && flags.picking) {
-        SceneJS._pickModule.pushNode(this);
-    }
+    // SceneJS._nodeEventsModule.preVisitNode(this);
 
     /* Fire "pre-rendered" event if observed
      */
@@ -346,63 +338,87 @@ SceneJS.Node.prototype._renderNodes = function(
         this._fireEvent("pre-rendered", { });
     }
 
-
     var children = selectedChildren || this._children;  // Set of child nodes we'll be rendering
     var numChildren = children.length;
     var child;
+    var childId;
     var i;
+    var needMarshal = true;
 
     if (numChildren > 0) {
         var childTraversalContext;
         for (i = 0; i < numChildren; i++) {
             child = children[i];
-            if (child._attr.enabled && (!child._attr.flags || child._attr.flags.enabled != false)) { // Node can be disabled with #setEnabled(false)
+            childId = child._attr.id;
 
-                /* Don't render node in picking pass when pick is disabled by a flags node
-                 */
-                if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && (child._attr.flags && !child._attr.flags.picking)) {
-                    continue;
-                }
+
+            /* Compile module culls child traversal when child compilation not required.
+             */
+            if (SceneJS._compileModule.preVisitNode(child)) {
+
+
+                SceneJS._flagsModule.preVisitNode(child);
 
                 childTraversalContext = {
+
+                    /* For instancing mechanism, track if we are traversing down right fringe
+                     * and pass down the callback.
+                     *
+                     * DOCS: http://scenejs.wikispaces.com/Instancing+Algorithm
+                     */
                     insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
                     callback : traversalContext.callback
                 };
-                child._renderWithEvents.call(child, childTraversalContext);
+                child._compileWithEvents.call(child, childTraversalContext);
+
+                SceneJS._flagsModule.postVisitNode(child);
+
+            } else {
+                needMarshal = true;
             }
+
+            SceneJS._compileModule.postVisitNode(child);
+
+            /* If compile or flag modules prevented descent into any child then we are performing a partial
+             * re-compilation in which we are updating some existing states held by the renderer module.
+             *
+             * During full compilations, we rely on geometry nodes to cause the renderer module to
+             * marshal dirty states accumulated by traversed nodes, however in this case we may not be
+             * visiting those geometries, so we'll trigger that explicitly.
+             */
+            // if (needMarshal) {
+            SceneJS._renderModule.marshallStates();
+            needMarshal = false;
+            //}
+
+
         }
     }
 
     if (numChildren == 0) {
-        if (! traversalContext.insideRightFringe) {
-
-            /* No child nodes and on the right fringe - this is the last node in the subtree
-             */
-            if (traversalContext.callback) {
-
-                /* The node is within the subtree of an instantiated node - Instance has provided a
-                 * callback to render the Instance's child nodes as if they were children
-                 * of the last node in the subtree
-                 */
-                traversalContext.callback(traversalContext);
+        SceneJS._renderModule.marshallStates();
+        needMarshal = true;
+        if (! traversalContext.insideRightFringe) { // Last node in the subtree
+            if (traversalContext.callback) { // Within subtree of instanced
+                traversalContext.callback(traversalContext); // Visit instance's children as temp children of last node
             }
         }
     }
 
-    /* When in picking pass and pick enabled for node, pop from pick module
-     */
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING && flags.picking) {
-        SceneJS._pickModule.popNode(this);
-    }
+    SceneJS._pickingModule.postVisitNode(this);
+
+    //   SceneJS._nodeEventsModule.postVisitNode(this);
+
     if (this._listeners["post-rendering"]) {
         this._fireEvent("post-rendering", { });
     }
 };
 
+
 /**
- * Wraps _render to fire built-in events either side of rendering.
+ * Wraps _compile to fire built-in events either side of rendering.
  * @private */
-SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
+SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
 
     /* Track any user-defined explicit node layer attribute as we traverse the
      * the graph. This is used by state sorting to organise geometries into layers.
@@ -422,10 +438,6 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
      * to make render-time queries on the node using SceneJS.withNode(xx).query(xx).
      */
     this._rendering = true;
-
-    if (this._attr.flags) {
-        SceneJS._flagsModule.pushFlags(this._attr.flags);
-    }
 
     /*------------------------------------------------------------------------
      * Note we still fire events in a picking pass because scene may be
@@ -452,7 +464,7 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
         loadStatusSnapshot = SceneJS._loadStatusModule.getStatusSnapshot();
     }
 
-    this._render(traversalContext);
+    this._compile(traversalContext);
 
     if (this._listeners["loading-status"]) {
 
@@ -473,10 +485,6 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
      */
     this._rendering = false;
 
-    if (this._attr.flags) {
-        SceneJS._flagsModule.popFlags();
-    }
-
     if (this._nodeLayer) {
         SceneJS._layerModule.popLayer();
     }
@@ -484,10 +492,10 @@ SceneJS.Node.prototype._renderWithEvents = function(traversalContext) {
 
 
 /** @private */
-SceneJS.Node.prototype._renderNodeAtIndex = function(index, traversalContext) {
+SceneJS.Node.prototype._compileNodeAtIndex = function(index, traversalContext) {
     if (index >= 0 && index < this._children.length) {
         var child = this._children[index];
-        child._renderWithEvents.call(child, traversalContext);
+        child._compileWithEvents.call(child, traversalContext);
     }
 };
 
@@ -521,6 +529,19 @@ SceneJS.Node.prototype.getType = function() {
  */
 SceneJS.Node.prototype.setFlags = function(flags) {
     this._attr.flags = SceneJS._shallowClone(flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
+};
+
+/**
+ Applies flag values where they are currently undefined or null on node
+ @param {{String:Boolean}} flags Map of flag booleans
+ @since Version 0.8
+ */
+SceneJS.Node.prototype.addFlags = function(flags) {
+    if (this._attr.flags) {
+        SceneJS._apply(flags, this._attr.flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
+    } else {
+        this._attr.flags = SceneJS._shallowClone(flags);
+    }
 };
 
 /**
@@ -667,7 +688,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#removeNode - node argument undefined"));
     }
-    if (!node._render) {
+    if (!node._compile) {
         if (typeof node == "string") {
             var gotNode = SceneJS._nodeIDMap[node];
             if (!gotNode) {
@@ -678,7 +699,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
             node = gotNode;
         }
     }
-    if (node._render) { //  instance of node
+    if (node._compile) { //  instance of node
         for (var i = 0; i < this._children.length; i++) {
             if (this._children[i]._attr.id == node._attr.id) {
                 this._setDirty();
@@ -688,7 +709,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
     }
     throw SceneJS._errorModule.fatalError(
             new SceneJS.errors.InvalidSceneGraphException(
-                    "SceneJS.Node#removeNode - child node not found: " + (node._render ? ": " + node._attr.id : node)));
+                    "SceneJS.Node#removeNode - child node not found: " + (node._compile ? ": " + node._attr.id : node)));
 };
 
 /** Removes all child nodes and returns them in an array.
@@ -732,7 +753,7 @@ SceneJS.Node.prototype.addNode = function(node) {
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#addNode - node argument is undefined"));
     }
-    if (!node._render) {
+    if (!node._compile) {
         if (typeof node == "string") {
             var gotNode = SceneJS._nodeIDMap[node];
             if (!gotNode) {
@@ -745,7 +766,7 @@ SceneJS.Node.prototype.addNode = function(node) {
             node = SceneJS._parseNodeJSON(node);
         }
     }
-    if (!node._render) {
+    if (!node._compile) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#addNode - node argument is not a SceneJS.Node or subclass!"));
@@ -785,10 +806,10 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#insertNode - node argument is undefined"));
     }
-    if (!node._render) {
+    if (!node._compile) {
         node = SceneJS._parseNodeJSON(node);
     }
-    if (!node._render) {
+    if (!node._compile) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#insertNode - node argument is not a SceneJS.Node or subclass!"));
@@ -814,7 +835,7 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
         leaf.addNodes(children);
         this.addNode(node);
 
-    } else if (i <= 0) {
+    } else if (i < 0) {
         throw SceneJS._errorModule.fatalError(
                 new SceneJS.errors.InvalidSceneGraphException(
                         "SceneJS.Node#insertNode - node index out of range: -1"));
@@ -898,21 +919,20 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
 /**
  * Specifies whether or not this node and its subtree will be rendered when next visited during traversal
  * @param {Boolean} enabled Will only be rendered when true
- * @return {SceneJS.Node} this
+ * @deprecated - Use setFlags instead
  */
 SceneJS.Node.prototype.setEnabled = function(enabled) {
-    this._attr.enabled = enabled;
-    this._setDirty();
-    return this;
+    throw "node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead";
 };
 
 /**
  * Returns whether or not this node and its subtree will be rendered when next visited during traversal, as earlier
  * specified with {@link SceneJS.Node#setEnabled}.
  * @return {boolean} Whether or not this subtree is rendered
+ * @deprecated - Use getFlags instead
  */
 SceneJS.Node.prototype.getEnabled = function() {
-    return this._attr.enabled;
+    throw "node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead";
 };
 
 /**

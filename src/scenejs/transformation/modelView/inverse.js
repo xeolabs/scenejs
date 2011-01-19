@@ -19,7 +19,15 @@
  */
 SceneJS.Inverse = SceneJS.createNodeType("inverse");
 
-SceneJS.Inverse.prototype._render = function(traversalContext) {
+// @private
+SceneJS.Inverse.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Inverse.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
 
     if (this._memoLevel == 0) {
@@ -28,7 +36,7 @@ SceneJS.Inverse.prototype._render = function(traversalContext) {
     var superXform = SceneJS._modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
-        var tempMat = SceneJS._math_mat4(); 
+        var tempMat = SceneJS._math_mat4();
         SceneJS._math_inverseMat4(superXform.matrix, this._mat, tempMat);
 
         this._xform = {
@@ -41,7 +49,10 @@ SceneJS.Inverse.prototype._render = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext);
-    SceneJS._modelViewTransformModule.setTransform(superXform);
+    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+};
+
+// @private
+SceneJS.Inverse.prototype._postCompile = function(traversalContext) {
+    SceneJS._modelViewTransformModule.popTransform();
 };

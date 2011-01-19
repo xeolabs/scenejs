@@ -188,14 +188,23 @@ SceneJS.Camera.prototype.getMatrix = function() {
 };
 
 // Override
-SceneJS.Camera.prototype._render = function(traversalContext) {
+SceneJS.Camera.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// Override
+SceneJS.Camera.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
         this._rebuild();
     }
-    var prevTransform = SceneJS._projectionModule.getTransform();
-    SceneJS._projectionModule.setTransform(this._transform);
-    this._renderNodes(traversalContext);
-    SceneJS._projectionModule.setTransform(prevTransform);
+    SceneJS._projectionModule.pushTransform(this._attr.id, this._transform);
+};
+
+// Override
+SceneJS.Camera.prototype._postCompile = function(traversalContext) {
+    SceneJS._projectionModule.popTransform();
 };
 
 /** @private

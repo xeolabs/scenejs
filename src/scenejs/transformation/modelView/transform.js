@@ -265,7 +265,15 @@ SceneJS.Transform.prototype.getRotateZ = function() {
     return this._rotate.z;
 };
 
-SceneJS.Transform.prototype._render = function(traversalContext) {
+// @private
+SceneJS.Transform.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Transform.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
         var buildingViewXForm = SceneJS._modelViewTransformModule.isBuildingViewTransform();
@@ -312,7 +320,7 @@ SceneJS.Transform.prototype._render = function(traversalContext) {
     if (origMemoLevel < 2 || (!superXForm.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
 
-        var tempMat = SceneJS._math_mat4(); 
+        var tempMat = SceneJS._math_mat4();
         SceneJS._math_mulMat4(superXForm.matrix, this._mat, tempMat);
         this._xform = {
             localMatrix: this._mat,
@@ -324,7 +332,10 @@ SceneJS.Transform.prototype._render = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext);
-    SceneJS._modelViewTransformModule.setTransform(superXForm);
+    SceneJS._modelViewTransformModule.pushTransform(thia._attr.id, this._xform);
+};
+
+// @private
+SceneJS.Transform.prototype._postCompile = function(traversalContext) {
+    SceneJS._modelViewTransformModule.popTransform();
 };

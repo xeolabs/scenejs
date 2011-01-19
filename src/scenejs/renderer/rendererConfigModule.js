@@ -5,8 +5,17 @@
 SceneJS._rendererModule = new (function() {
 
     var canvas;         // Currently active canvas
-    var propStack;
+    var idStack = new Array(255);
+    var propStack = new Array(255);
+    var stackLen = 0;
     var dirty;
+
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SCENE_COMPILING,
+            function() {
+                stackLen = 0;
+                dirty = true;
+            });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_ACTIVATED,
@@ -18,9 +27,11 @@ SceneJS._rendererModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._eventModule.fireEvent(
-                            SceneJS._eventModule.RENDERER_EXPORTED,
-                            propStack[propStack.length - 1]);
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
+                    } else {
+                        SceneJS._renderModule.setRenderer();
+                    }
                     dirty = false;
                 }
             });
@@ -36,7 +47,7 @@ SceneJS._rendererModule = new (function() {
             SceneJS._eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
-                propStack = [];
+                stackLen = 0;
                 var props = _this.createProps({  // Dont set props - just define for restoring to on props pop
                     clear: {
                         depth : true,
@@ -74,12 +85,12 @@ SceneJS._rendererModule = new (function() {
                 // Not sure if needed:
                 setProperties(canvas.context, props);
 
-                _this.pushProps(props);
+                _this.pushProps("__scenejs_default_props", props);
             });
 
     this.createProps = function(props) {
         var restore;
-        if (propStack.length > 0) {  // can't restore when no previous props set
+        if (stackLen > 0) {  // can't restore when no previous props set
             restore = {};
             for (var name in props) {
                 if (props.hasOwnProperty(name)) {
@@ -110,7 +121,7 @@ SceneJS._rendererModule = new (function() {
     var getSuperProperty = function(name) {
         var props;
         var prop;
-        for (var i = propStack.length - 1; i >= 0; i--) {
+        for (var i = stackLen - 1; i >= 0; i--) {
             props = propStack[i].props;
             prop = props[name];
             if (prop != undefined && prop != null) {
@@ -182,8 +193,12 @@ SceneJS._rendererModule = new (function() {
         }
     };
 
-    this.pushProps = function(props) {
-        propStack.push(props);
+    this.pushProps = function(id, props) {
+        idStack[stackLen] = id;
+        propStack[stackLen] = props;
+
+        stackLen++;
+
         if (props.props.viewport) {
             SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, props.props.viewport);
         }
@@ -506,9 +521,9 @@ SceneJS._rendererModule = new (function() {
     };
 
     this.popProps = function() {
-        var oldProps = propStack[propStack.length - 1];
-        propStack.pop();
-        var newProps = propStack[propStack.length - 1];
+        var oldProps = propStack[stackLen - 1];
+        stackLen--;
+        var newProps = propStack[stackLen - 1];
         if (oldProps.props.viewport) {
             SceneJS._eventModule.fireEvent(
                     SceneJS._eventModule.VIEWPORT_UPDATED,

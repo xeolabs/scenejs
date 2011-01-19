@@ -149,7 +149,15 @@ SceneJS.Translate.prototype.getAttributes = function() {
     };
 };
 
-SceneJS.Translate.prototype._render = function(traversalContext) {
+// @private
+SceneJS.Translate.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Translate.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
         if (SceneJS._modelViewTransformModule.isBuildingViewTransform()) {
@@ -167,7 +175,7 @@ SceneJS.Translate.prototype._render = function(traversalContext) {
     if (origMemoLevel < 2 || (!superXForm.fixed)) {
         var instancing = SceneJS._instancingModule.instancing();
 
-        var tempMat = SceneJS._math_mat4(); 
+        var tempMat = SceneJS._math_mat4();
         SceneJS._math_mulMat4(superXForm.matrix, this._mat, tempMat);
         this._xform = {
             localMatrix: this._mat,
@@ -179,7 +187,10 @@ SceneJS.Translate.prototype._render = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.setTransform(this._xform);
-    this._renderNodes(traversalContext);
-    SceneJS._modelViewTransformModule.setTransform(superXForm);
+    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+};
+
+// @private
+SceneJS.Translate.prototype._postCompile = function(traversalContext) {
+    SceneJS._modelViewTransformModule.popTransform();
 };

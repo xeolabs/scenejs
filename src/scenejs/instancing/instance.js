@@ -149,55 +149,143 @@ SceneJS.Instance.prototype.setTarget = function(target) {
     return this;
 };
 
+
 // @private
-SceneJS.Instance.prototype._render = function(traversalContext) {
-    if (this._attr.target) {
-        var nodeId = this._attr.target; // Make safe to set #uri while instantiating
-
-        this._symbol = SceneJS._instancingModule.acquireInstance(nodeId);
-
-        if (!this._symbol) {
-
-            /* Couldn't find target
-             */
-            var exception;
-            if (this._attr.mustExist) {
-                throw SceneJS._errorModule.fatalError(
-                        exception = new SceneJS.errors.SymbolNotFoundException
-                                ("SceneJS.Instance could not find target node: '" + this._attr.target + "'"));
-            }
-            this._changeState(SceneJS.Instance.STATE_ERROR, exception);
-
-            /**
-             * If we're going to keep trying to find the
-             * target, then we'll need the scene graph to
-             * keep rendering so that this instance can
-             * keep trying. Otherwise, we'll wait for the next
-             * render.
-             */
-            if (this._attr.retry) {
-                SceneJS._needFrame = true;
-
-                /* Record this node as still loading, for "loading-status"
-                 * events to include in their reported stats
-                 */
-                SceneJS._loadStatusModule.status.numNodesLoading++;
-            }
-
-        } else {
-
-            /* Record this node as loaded
-             */
-            SceneJS._loadStatusModule.status.numNodesLoaded++;
-
-            this._changeState(SceneJS.Instance.STATE_CONNECTED);
-            this._symbol._renderWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
-            SceneJS._instancingModule.releaseInstance(nodeId);
-            this._changeState(SceneJS.Instance.STATE_SEARCHING);
-            this._symbol = null;
-        }
-    }
+SceneJS.Instance.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
 };
+
+//(function() {
+//
+//    var nodeId;
+//
+//    // @private
+//    SceneJS.Instance.prototype._preCompile = function(traversalContext) {
+//
+//        if (this._attr.target) {
+//
+//            nodeId = this._attr.target; // Make safe to set #uri while instantiating
+//
+//            this._symbol = SceneJS._instancingModule.acquireInstance(nodeId);
+//
+//            if (!this._symbol) {
+//
+//                /* Couldn't find target
+//                 */
+//                var exception;
+//                if (this._attr.mustExist) {
+//                    throw SceneJS._errorModule.fatalError(
+//                            exception = new SceneJS.errors.SymbolNotFoundException
+//                                    ("SceneJS.Instance could not find target node: '" + this._attr.target + "'"));
+//                }
+//                this._changeState(SceneJS.Instance.STATE_ERROR, exception);
+//
+//                /**
+//                 * If we're going to keep trying to find the
+//                 * target, then we'll need the scene graph to
+//                 * keep rendering so that this instance can
+//                 * keep trying. Otherwise, we'll wait for the next
+//                 * render.
+//                 */
+//                if (this._attr.retry) {
+//
+//                    SceneJS._compileModule.nodeUpdated(this, "searching");
+//
+//                    /* Record this node as still loading, for "loading-status"
+//                     * events to include in their reported stats
+//                     */
+//                    SceneJS._loadStatusModule.status.numNodesLoading++;
+//                }
+//
+//            } else {
+//                /* Record this node as loaded
+//                 */
+//                SceneJS._loadStatusModule.status.numNodesLoaded++;
+//                this._changeState(SceneJS.Instance.STATE_CONNECTED);
+//            }
+//        }
+//
+//
+////        if (this._attr.target && this._symbol) {
+////            this._symbol._compileWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
+////        }
+//
+//        return {
+//             target: this._symbol
+//        };
+//    };
+//
+//    SceneJS.Instance.prototype._compileNodes = function(traversalContext) {
+//        if (this._attr.target && this._symbol) {
+//            this._symbol._compileWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
+//        }
+//    };
+//
+//    SceneJS.Instance.prototype._postCompile = function(traversalContext) {
+//        if (nodeId && this._symbol) {
+//            SceneJS._instancingModule.releaseInstance(nodeId);
+//            this._changeState(SceneJS.Instance.STATE_SEARCHING);
+//            this._symbol = null;
+//            nodeId = null;
+//        }
+//    };
+//
+//})();
+
+    // @private
+    SceneJS.Instance.prototype._compile = function(traversalContext) {
+        if (this._attr.target) {
+            var nodeId = this._attr.target; // Make safe to set #uri while instantiating
+
+            this._symbol = SceneJS._instancingModule.acquireInstance(nodeId);
+
+            if (!this._symbol) {
+
+                /* Couldn't find target
+                 */
+                var exception;
+                if (this._attr.mustExist) {
+                    throw SceneJS._errorModule.fatalError(
+                            exception = new SceneJS.errors.SymbolNotFoundException
+                                    ("SceneJS.Instance could not find target node: '" + this._attr.target + "'"));
+                }
+                this._changeState(SceneJS.Instance.STATE_ERROR, exception);
+
+                /**
+                 * If we're going to keep trying to find the
+                 * target, then we'll need the scene graph to
+                 * keep rendering so that this instance can
+                 * keep trying. Otherwise, we'll wait for the next
+                 * render.
+                 */
+                if (this._attr.retry) {
+
+                    SceneJS._compileModule.nodeUpdated(this, "searching");
+
+                    /* Record this node as still loading, for "loading-status"
+                     * events to include in their reported stats
+                     */
+                    SceneJS._loadStatusModule.status.numNodesLoading++;
+                }
+
+            } else {
+
+                /* Record this node as loaded
+                 */
+                SceneJS._loadStatusModule.status.numNodesLoaded++;
+
+                this._changeState(SceneJS.Instance.STATE_CONNECTED);
+                this._symbol._compileWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
+                SceneJS._instancingModule.releaseInstance(nodeId);
+                this._changeState(SceneJS.Instance.STATE_SEARCHING);
+                this._symbol = null;
+            }
+        }
+    };
+
+
 
 // @private
 SceneJS.Instance.prototype._changeState = function(newState, exception) {
@@ -226,17 +314,29 @@ SceneJS.Instance.prototype._changeState = function(newState, exception) {
  */
 SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalContext, target) {
     this._superCallback = traversalContext.callback;
-    var _this = this;
+    var self = this;
     if (!this._callback) {
         this._callback = function(traversalContext) {
             var subTraversalContext = {
-                callback : _this._superCallback,
-                insideRightFringe : _this._children.length > 1
+
+                /* Continue deep traversal if forced or node
+                 * is within a subtree flagged for compilation
+                 */
+                deepTraversal : traversalContext.deepTraversal || SceneJS._compileModule._nodesWithinBranches[self._attr.id],
+
+                /* For instancing mechanism, track if we are traversing down right fringe
+                 * and pass down the callback.
+                 * 
+                 * DOCS: http://scenejs.wikispaces.com/Instancing+Algorithm
+                 */
+                insideRightFringe : self._children.length > 1,
+                callback : self._superCallback
             };
-            _this._renderNodes(subTraversalContext);
+            self._compileNodes(subTraversalContext);
         };
     }
     return {
+        deepTraversal : traversalContext.deepTraversal,
         callback: this._callback,
         insideRightFringe:  target._children.length > 1
     };

@@ -118,23 +118,33 @@ SceneJS.createNode({
                                             shine:          100.0,
 
                                             nodes: [
-
                                                 {
-                                                    type: "translate", // Example translation
-                                                    x:0.0,
-                                                    y:0.0,
-                                                    z:0.0,
+                                                    type: "colortrans",
+
+                                                    add: { r: 0.5 },
+
 
                                                     nodes : [
                                                         {
-                                                            type: "scale",  // Example scaling
-                                                            x:1.0,
-                                                            y:1.0,
-                                                            z:1.0,
+                                                            type: "translate",
+                                                            // Example translation
+                                                            x:0.0,
+                                                            y:0.0,
+                                                            z:0.0,
 
-                                                            nodes: [
+                                                            nodes : [
                                                                 {
-                                                                    type : "teapot"
+                                                                    type: "scale",
+                                                                    // Example scaling
+                                                                    x:1.0,
+                                                                    y:1.0,
+                                                                    z:1.0,
+
+                                                                    nodes: [
+                                                                        {
+                                                                            type : "teapot"
+                                                                        }
+                                                                    ]
                                                                 }
                                                             ]
                                                         }
@@ -162,6 +172,13 @@ var pitch = 0;
 var lastX;
 var lastY;
 var dragging = false;
+
+//SceneJS.setDebugConfigs({
+//
+//    shading : {
+//        whitewash : true
+//    }
+//});
 
 SceneJS.withNode("theScene").render();
 

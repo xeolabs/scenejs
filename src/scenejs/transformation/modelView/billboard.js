@@ -16,7 +16,15 @@
  */
 SceneJS.Billboard = SceneJS.createNodeType("billboard");
 
-SceneJS.Billboard.prototype._render = function(traversalContext) {
+// @private
+SceneJS.Billboard.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
     // 0. The base variable
     var superViewXForm = SceneJS._viewTransformModule.getTransform();
     var eye = superViewXForm.lookAt.eye;
@@ -59,7 +67,10 @@ SceneJS.Billboard.prototype._render = function(traversalContext) {
     ], matrix);
 
     // 6. Render
-    SceneJS._modelTransformModule.setTransform({matrix: matrix});
-    this._renderNodes(traversalContext);
-    SceneJS._modelTransformModule.setTransform(superModelXForm);
+    SceneJS._modelTransformModule.pushTransform(this._attr.id,  { matrix: matrix }); // TODO : memoize!
+};
+
+// @private
+SceneJS.Billboard.prototype._postCompile = function(traversalContext) {
+    SceneJS._modelTransformModule.popTransform();
 };

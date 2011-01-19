@@ -215,7 +215,7 @@ SceneJS.createNode({
                             specular:       0.9,
                             shine:          6.0,
 
-                            nodes: [
+                            nodes: [                               
                                 {
                                     type: "texture",
                                     id: "theTexture",

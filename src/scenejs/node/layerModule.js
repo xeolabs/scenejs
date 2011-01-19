@@ -22,7 +22,7 @@ SceneJS._layerModule = new (function() {
     var self = this;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 self.setActiveLayers(null);
                 stackLen = 0;

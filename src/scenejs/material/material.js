@@ -48,7 +48,8 @@
  *              specularColor:           { r: 0.9, g: 0.9, b: 0.2 },
  *              emit:                     0.0,
  *              specular:                 0.9,
- *              shine:                    6.0
+ *              shine:                    6.0,
+ *              alpha: 1.0
  *          },
  *
  *          new SceneJS.Cube()))
@@ -275,14 +276,19 @@ SceneJS.Material.prototype.getOpacity = function() {
     return this._attr.opacity;
 };
 
+// @private
+SceneJS.Material.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
 
 // @private
-SceneJS.Material.prototype._render = function(traversalContext) {
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-        this._renderNodes(traversalContext);  // no need for materials when picking
-    } else {
-        SceneJS._materialModule.pushMaterial(this._attr);
-        this._renderNodes(traversalContext);
-        SceneJS._materialModule.popMaterial();
-    }
+SceneJS.Material.prototype._preCompile = function(traversalContext) {
+    SceneJS._materialModule.pushMaterial(this._attr.id, this._attr);
+};
+
+// @private
+SceneJS.Material.prototype._postCompile = function(traversalContext) {
+    SceneJS._materialModule.popMaterial();
 };

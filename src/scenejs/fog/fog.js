@@ -177,12 +177,18 @@ SceneJS.Fog.prototype.getAttributes = function() {
 };
 
 // @private
-SceneJS.Fog.prototype._render = function(traversalContext) {
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-        this._renderNodes(traversalContext); // No fog for pick
-    } else {
-        SceneJS._fogModule.pushFog(this._attr);
-        this._renderNodes(traversalContext);
-        SceneJS._fogModule.popFog();
-    }
+SceneJS.Fog.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+
+// @private
+SceneJS.Fog.prototype._preCompile = function(traversalContext) {
+    SceneJS._fogModule.pushFog(this._attr.id, this._attr);
+};
+
+SceneJS.Fog.prototype._postCompile = function(traversalContext) {
+    SceneJS._fogModule.popFog();
 };

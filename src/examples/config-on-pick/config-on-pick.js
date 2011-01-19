@@ -248,12 +248,14 @@ SceneJS.createNode({
                             id : "teapot5",
                             nodes : [
                                 {
-                                    type: "flags",
+                                    type: "node",
                                     id: "teapot5-flags",
 
                                     // We'll toggle this on pick
 
-                                    highlight: false,
+                                    flags: {
+                                        highlight: false
+                                    },
 
                                     nodes: [
                                         {
@@ -389,7 +391,7 @@ SceneJS.createNode({
 
                                             nodes: [
                                                 {
-                                                    type: "flags",
+                                                    type: "node",
                                                     id: "teapot8-flags",
 
                                                     nodes: [
@@ -581,7 +583,7 @@ SceneJS.withNode("teapot7").bind("picked",
 SceneJS.withNode("teapot8").bind("picked",
         function(event) {
 
-             SceneJS.withNode("teapot8-flags").set({
+            SceneJS.withNode("teapot8-flags").set({
                 flags:{
                     transparent: true
                 }

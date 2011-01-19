@@ -2,10 +2,14 @@
  *  @private
  */
 SceneJS._imageBufModule = new (function() {
+
     var sceneBufs = {};
     var currentSceneBufs = null;
-    var bufStack = [];
-    var boundBuf = null;
+
+    var idStack = new Array(255);
+    var bufStack = new Array(255);
+    var stackLen = 0;
+
     var canvas;
     var dirty;
 
@@ -13,18 +17,18 @@ SceneJS._imageBufModule = new (function() {
             SceneJS._eventModule.INIT,
             function() {
                 sceneBufs = {};
-                boundBuf = null;
+                currentSceneBufs = null;
             });
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function(e) {
                 canvas = e.canvas;
                 currentSceneBufs = sceneBufs[e.sceneId];
                 if (!currentSceneBufs) {
                     currentSceneBufs = sceneBufs[e.sceneId] = {};
                 }
-                bufStack = [];
+                stackLen = 0;
                 dirty = true;
             });
 
@@ -38,9 +42,11 @@ SceneJS._imageBufModule = new (function() {
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._shaderModule.addImageBuf((bufStack.length > 0)
-                            ? bufStack[bufStack.length - 1]
-                            : null);
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setImagebuf(idStack[stackLen - 1], bufStack[stackLen - 1]);
+                    } else {
+                        SceneJS._renderModule.setImagebuf(); // No imageBuf
+                    }
                     dirty = false;
                 }
             });
@@ -169,40 +175,33 @@ SceneJS._imageBufModule = new (function() {
         return bufId;
     };
 
-    /** Pushes image buffer onto active buffer stack, makes it the active buffer
-     */
-    this.pushImageBuffer = function(bufId) {
+    this.pushImageBuffer = function(id, bufId) {
         var buf = currentSceneBufs[bufId];
         if (!buf) {
             throw "Image buffer not found: " + bufId;
         }
-        bufStack.push(buf);
+        idStack[stackLen] = id;
+        bufStack[stackLen] = buf;
+        stackLen++;
         dirty = true;
     };
-
-    /** Pops top image buffer off active stack, activates the next on the stack, if any
-     */
-    this.popImageBuffer = function() {
-        bufStack.pop();
-        dirty = true;
-    };
-
 
     this.destroyImageBuffer = function(bufId) {
 
     };
 
-    /** Gets an image buffer
-     */
     this.getImageBuffer = function(bufId) {
         return currentSceneBufs[bufId];
     };
 
-    /** Gets texture from an image buffer
-     */
     this.getTexture = function(bufId) {
         var buf = currentSceneBufs[bufId];
         return buf ? buf.getTexture() : null;
+    };
+
+    this.popImageBuffer = function() {
+        stackLen--;
+        dirty = true;
     };
 
     SceneJS._eventModule.addListener(

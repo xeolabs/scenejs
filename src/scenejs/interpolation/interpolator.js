@@ -137,7 +137,14 @@ SceneJS.Interpolator.prototype.STATE_AFTER = "complete";     // Alpha after last
 SceneJS.Interpolator.prototype.STATE_RUNNING = "running";    // Found keys before and after alpha
 
 // @private
-SceneJS.Interpolator.prototype._render = function(traversalContext) {
+SceneJS.Interpolator.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
+
+// @private
+SceneJS.Interpolator.prototype._preCompile = function(traversalContext) {
 
     /* Not bound to a target node setter mode yet.
      *
@@ -164,15 +171,16 @@ SceneJS.Interpolator.prototype._render = function(traversalContext) {
     }
     this._update((SceneJS._timeModule.getTime() - this._timeStarted) * 0.001);
 
-    if (this._outputValue != null// Null when interpolation outside of time range 
+    if (this._outputValue != null // Null when interpolation outside of time range
             && SceneJS.nodeExists(this._attr.target)) {
         SceneJS.withNode(this._attr.target).set(this._attr.targetProperty, this._outputValue);
     }
-
-    /* Render child nodes
-     */
-    this._renderNodes(traversalContext);
 };
+
+
+// @private
+SceneJS.Interpolator.prototype._postCompile = function(traversalContext) {
+}
 
 // @private
 SceneJS.Interpolator.prototype._update = function(key) {
@@ -180,9 +188,12 @@ SceneJS.Interpolator.prototype._update = function(key) {
         case this.STATE_OUTSIDE:
             break;
 
-        case this.STATE_BEFORE:                            // Before first key
-            this._setDirty();                               // Need at least one more scene render to find first key
-            break;                                          // Time delay before interpolation begins
+        case this.STATE_BEFORE:  // Before first key
+
+            /* Need at least one more scene render to find first key
+             */
+            SceneJS._compileModule.nodeUpdated(this, "before");
+            break;  // Time delay before interpolation begins
 
         case this.STATE_AFTER:
             this._outputValue = null;
@@ -192,9 +203,13 @@ SceneJS.Interpolator.prototype._update = function(key) {
             }
             break;
 
-        case this.STATE_RUNNING:                                   // Found key pair
+        case this.STATE_RUNNING:  // Found key pair
             this._outputValue = this._interpolate((key));   // Do interpolation
-            this._setDirty();                               // Need at least one more scene render to apply output
+
+            /* Flag recompile for this interpolator. Recompile will be flagged
+             * for target as that is updated.
+             */
+            SceneJS._compileModule.nodeUpdated(this, "running");
             break;
         default:
             break;

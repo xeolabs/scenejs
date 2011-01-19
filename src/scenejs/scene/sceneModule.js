@@ -103,7 +103,7 @@ SceneJS._sceneModule = new (function() {
             try {
                 if (SceneJS._debugModule.getConfigs("webgl.logTrace") == true) {
 
-                    context = canvas.getContext(contextNames[i]);
+                    context = canvas.getContext(contextNames[i] /*, { antialias: true} */);
                     if (context) {
                         // context = WebGLDebugUtils.makeDebugContext(context);
 
@@ -162,8 +162,9 @@ SceneJS._sceneModule = new (function() {
             loggingElement: loggingElement
         };
         nScenes++;
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_CREATED, {sceneId : sceneId });
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_CREATED, { sceneId : sceneId, canvas: canvas });
         SceneJS._loggingModule.info("Scene defined: " + sceneId);
+        SceneJS._compileModule.nodeUpdated(scene, "created");
         return sceneId;
     };
 
@@ -195,7 +196,7 @@ SceneJS._sceneModule = new (function() {
         }
         activeSceneId = sceneId;
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_COMPILING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_ACTIVATED, scene.canvas);
     };
 
@@ -210,7 +211,7 @@ SceneJS._sceneModule = new (function() {
             throw SceneJS._errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_ACTIVATED, scene.canvas);
-        SceneJS._shaderModule.redraw();
+        SceneJS._renderModule.redraw();
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_DEACTIVATED, scene.canvas);
     };
 
@@ -260,6 +261,6 @@ SceneJS._sceneModule = new (function() {
             throw SceneJS._errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.CANVAS_DEACTIVATED, scene.canvas);
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_RENDERED, {sceneId : sceneId });
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_COMPILED, {sceneId : sceneId });
     };
 })();

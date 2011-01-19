@@ -90,7 +90,7 @@ SceneJS.Text.prototype._init = function(params) {
     }
 };
 
-SceneJS.Text.prototype._render = function(traversalContext) {
+SceneJS.Text.prototype._compile = function(traversalContext) {
     if (this._mode == "bitmap") {
         if (!this._layer.texture && !this._error) {
             var self = this;
@@ -100,6 +100,12 @@ SceneJS.Text.prototype._render = function(traversalContext) {
                         self._layer.creationParams,
                         function(texture) { // Success
                             self._layer.texture = texture;
+
+                            /**
+                             * Need re-compile so that this texture layer
+                             * can create and apply the texture
+                             */
+                            SceneJS._compileModule.nodeUpdated(self, "loadedImage");
                         },
                         function() { // General error
                             self._error = true;
@@ -114,16 +120,13 @@ SceneJS.Text.prototype._render = function(traversalContext) {
             })();
         }
 
-        if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-            this._renderNodes(traversalContext);
-        } else {
-            if (this._layer) {
-                SceneJS._textureModule.pushTexture([this._layer]);
-                this._renderNodes(traversalContext);
-                SceneJS._textureModule.popTexture();
-            }
+
+        if (this._layer) {
+            SceneJS._textureModule.pushTexture(this._attr.id, [this._layer]);
+            this._compileNodes(traversalContext);
+            SceneJS._textureModule.popTexture();
         }
     } else {
-        this._renderNodes(traversalContext);
+        this._compileNodes(traversalContext);
     }
 };

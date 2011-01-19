@@ -256,17 +256,18 @@ SceneJS.Light.prototype.getQuadraticAttenuation = function() {
     return this._light.quadraticAttenuation;
 };
 
+// @private
+SceneJS.Light.prototype._compile = function(traversalContext) {
+    this._preCompile(traversalContext);
+    this._compileNodes(traversalContext);
+    this._postCompile(traversalContext);
+};
 
 // @private
-SceneJS.Light.prototype._render = function(traversalContext) {
-    if (SceneJS._traversalMode == SceneJS._TRAVERSAL_MODE_PICKING) {
-        this._renderNodes(traversalContext);
-    } else {
+SceneJS.Light.prototype._preCompile = function(traversalContext) {
+    SceneJS._lightingModule.pushLight(this._attr.id, this._light);
+};
 
-        /* Light remain defined for remainder of scene traversal,
-         * illuminating all subsubsequently-visited nodes.
-         */
-        SceneJS._lightingModule.pushLight(this._light);
-        this._renderNodes(traversalContext);
-    }
+// @private
+SceneJS.Light.prototype._postCompile = function(traversalContext) {
 };

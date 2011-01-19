@@ -1,70 +1,66 @@
 /**
  *
  *
- * @private
+ *  @private
  */
 SceneJS._nodeEventsModule = new (function() {
-    var sceneId;
-    var scenes = {};
-    var scene;
+    var idStack = new Array(255);
+    var listenerStack = new Array(255);
+    var stackLen = 0;
+    var dirty;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
-            function(params) {
-                sceneId = params.sceneId;
-                scene = scenes[params.sceneId];
-                if (!scene) {
-                    scenes[params.sceneId] = {
-                        nodes: {}
-                    };
-                }
+            SceneJS._eventModule.SCENE_COMPILING,
+            function() {
+                stackLen = 0;
+                dirty = true;
             });
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_DESTROYED,
-            function(params) {
-                sceneId = params.sceneId;
-                scene = scenes[params.sceneId];
-                if (scene) {
-                    scenes[params.sceneId] = undefined;
-                }
+            SceneJS._eventModule.SHADER_ACTIVATED,
+            function() {
+                dirty = true;
             });
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.NODE_DESTROYED,
-            function(params) {
-                var nodeId = params.nodeId;
-                for (var sceneId in scenes) {
-                    if (scenes.hasOwnProperty(sceneId)) {
-                        scene = scenes[sceneId];
-                        if (scene.nodes[nodeId]) {
-                            scene.nodes[nodeId] = undefined;
-                        }
+            SceneJS._eventModule.SHADER_RENDERING,
+            function() {
+                if (dirty) {
+                    if (stackLen > 0) {
+                        SceneJS._renderModule.setMatrixListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
+                    } else {
+                        SceneJS._renderModule.setMatrixListeners();
                     }
+                    dirty = false;
                 }
+            });
+
+    SceneJS._eventModule.addListener(
+            SceneJS._eventModule.SHADER_DEACTIVATED,
+            function() {
+                dirty = true;
             });
 
     this.preVisitNode = function(node) {
-        scene.nodes[node.getId()] = node;
-    };
+        var listener = node._listeners["matrices"];
+        if (listener) {
+            idStack[stackLen] = node._attr.id;
 
-    this.postVisitNode = function() {
+            listenerStack[stackLen] = listener;
+            listenerStack[stackLen] = function (params) {
+                node._fireEvent("matrices", params);
+            };
 
-    };
-
-    this.fireEvent = function(event) {
-
-    };
-
-    this.getSceneUpdated = function(nodeId) {
-        for (var sceneId in scenes) {
-            if (scenes.hasOwnProperty(sceneId)) {
-                scene = scenes[sceneId];
-                if (scene.nodes[nodeId]) {
-                    scene.updated = undefined;
-                }
-            }
+            stackLen++;
+            dirty = true;
         }
     };
 
+    this.postVisitNode = function(node) {
+        if (node._attr.id == idStack[stackLen - 1]) {
+            stackLen--;
+            dirty = true;
+        }
+    };
 })();
+

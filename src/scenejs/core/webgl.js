@@ -143,6 +143,10 @@ SceneJS._webgl_ProgramUniform = function(context, program, name, type, size, loc
     this.getValue = function() {
         return context.getUniform(program, location);
     };
+
+    this.getLocation = function() {
+      return location;
+    };
 }
 
 /** @private */

@@ -105,7 +105,7 @@
                         });
 
                 SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.SCENE_RENDERING,
+                        SceneJS._eventModule.SCENE_COMPILING,
                         function(params) {
                             runIntervalBindings();
                             runBindings("scene-rendering", {
@@ -115,7 +115,7 @@
                         });
 
                 SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.SCENE_RENDERED,
+                        SceneJS._eventModule.SCENE_COMPILED,
                         function(params) {
                             runBindings("scene-rendered", {
                                 nodeId: params.nodeId

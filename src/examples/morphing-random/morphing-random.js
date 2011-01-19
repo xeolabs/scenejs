@@ -125,18 +125,20 @@ SceneJS.createNode({
 
 var morphCreated = false;
 
-SceneJS.withNode("the-teapot").bind("rendered",
+SceneJS.withNode("theScene").bind("rendered",
         function() {
+
+            var teapot = SceneJS.withNode("the-teapot");
 
             if (!morphCreated) {
 
-                var positions = this.get("positions");
+                var positions = teapot.get("positions");
                 var positions2 = [];
                 for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
                     positions2.push(positions[i] * (1 + (Math.sin(i * 0.003) * 0.1)));
                 }
 
-                this.parent().insert({
+                teapot.parent().insert({
                     node: {
                         type: "morphGeometry",
                         id: "my-morphGeometry",

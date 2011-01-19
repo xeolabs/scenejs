@@ -7,7 +7,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.7.9.0',
+    VERSION: '0.8',
 
     /** Names of supported WebGL canvas contexts
      */
@@ -68,20 +68,65 @@ var SceneJS = {
         return SceneJS.withNode(newNode);
     },
 
-    _parseNodeJSON : function(json) {
+    /**
+     * Parses JSON into a subgraph of nodes using iterative depth-first search
+     */
+    _parseNodeJSON : function(v) {
+        v.__visited = true;
+        v.__node = this._createNode(v);
+        var s = [];
+        var i, len;
+        if (v.nodes) {
+            for (i = 0,len = v.nodes.length; i < len; i++) {
+                var child = v.nodes[i];
+                child.__node = this._createNode(child);
+                child.__parent = v;
+                s.push(child);
+            }
+        }
+        var w;
+        var u;
+        while (s.length > 0) {
+            w = s.pop();
+            w.__parent.__node.insertNode(w.__node, 0);
+
+            if (w.nodes) {
+                for (i = 0,len = w.nodes.length; i < len; i++) {
+                    u = w.nodes[i];
+                    if (!u.__parent) {
+                        u.__node = this._createNode(u);
+                        u.__parent = w;
+                        s.push(u);
+                    }
+                }
+            }
+        }
+        return v.__node;
+    },
+
+    _createNode : function(json) {
         json.type = json.type || "node";
         var nodeType = this._nodeTypes[json.type];
         if (!nodeType) {
             throw "Failed to parse JSON node definition - unknown node type: '" + json.type + "'";
         }
-        var newNode = new nodeType.nodeClass(this._copyCfg(json));   // Faster to instantiate class directly
-        if (json.nodes) {
-            var len = json.nodes.length;
-            for (var i = 0; i < len; i++) {
-                newNode.addNode(SceneJS._parseNodeJSON(json.nodes[i]));
-            }
+        return new nodeType.nodeClass(this._copyCfg(json));   // Faster to instantiate class directly
+    },
+
+    /** Returns true if the {@link SceneJS.Node} with the given ID exists
+     *
+     * @param id ID of {@link SceneJS.Node} to find
+     * @returns {Boolean} True if node exists else false
+     */
+    nodeExists : function(id) {
+        if (!id) {
+            throw "nodeExists param 'id' null or undefined";
         }
-        return newNode;
+        if (typeof id != "string") {
+            throw "nodeExists param 'id' not a string";
+        }
+        var node = SceneJS._nodeIDMap[id];
+        return (node != undefined && node != null);
     },
 
     /**
@@ -144,24 +189,12 @@ var SceneJS = {
      */
     _nodeInstanceMap : {},
 
-    /** Returns true if the {@link SceneJS.Node} with the given ID exists
+    /*----------------------------------------------------------------------------------------------------------------
+     * Messaging System
      *
-     * @param id ID of {@link SceneJS.Node} to find
-     * @returns {Boolean} True if node exists else false
-     */
-    nodeExists : function(id) {
-        if (!id) {
-            throw "nodeExists param 'id' null or undefined";
-        }
-        if (typeof id != "string") {
-            throw "nodeExists param 'id' not a string";
-        }
-        var node = SceneJS._nodeIDMap[id];
-        return (node != undefined && node != null);
-    },
+     *
+     *--------------------------------------------------------------------------------------------------------------*/
 
-    /** SceneJS messaging system
-     */
     Message : new (function() {
 
         /** Sends a message to SceneJS - docs at http://scenejs.wikispaces.com/SceneJS+Messaging+System
@@ -187,25 +220,9 @@ var SceneJS = {
     })(),
 
     /**
-     * True when a state change of any sort happens within Scenes, where Scene then need to render another frame.
-     * This is set when updates are made through the JSON Scene Graph API. It is very crude; change in one scene
-     * causes all scenes to render a frame, but then perhaps that is OK, or even a good idea?
-     */
-    _needFrame : true,
-
-    /** @private */
-    _traversalMode :0x1,
-
-    /** @private */
-    _TRAVERSAL_MODE_RENDER:0x1,
-
-    /** @private */
-    _TRAVERSAL_MODE_PICKING:0x2,
-
-    /**
      * @private
      */
-    _inherit:function(DerivedClassName, BaseClassName) {
+    _inherit : function(DerivedClassName, BaseClassName) {
         DerivedClassName.prototype = new BaseClassName();
         DerivedClassName.prototype.constructor = DerivedClassName;
     },
@@ -240,20 +257,6 @@ var SceneJS = {
         }
     },
 
-    /** Applies properties on o2 to o1 where not already on o1
-     *
-     * @param o1
-     * @param o2
-     * @private
-     */
-    _applyIf : function(o1, o2) {
-        for (var key in o2) {
-            if (!o1[key]) {
-                o1[key] = o2[key];
-            }
-        }
-        return o1;
-    },
 
     _getBaseURL : function(url) {
         var i = url.lastIndexOf("/");
@@ -280,8 +283,32 @@ var SceneJS = {
             }
         }
         return o2;
+    } ,
+
+    /** Add properties of o to o2 where undefined or null on o2
+     */
+    _applyIf : function(o, o2) {
+        for (var name in o) {
+            if (o.hasOwnProperty(name)) {
+                if (o2[name] == undefined || o2[name] == null) {
+                    o2[name] = o[name];
+                }
+            }
+        }
+        return o2;
+    },
+
+    /** Add properties of o to o2, overwriting them on o2 if already there
+     */
+    _apply : function(o, o2) {
+        for (var name in o) {
+            if (o.hasOwnProperty(name)) {
+                o2[name] = o[name];
+            }
+        }
+        return o2;
     }
-} ;
+};
 
 SceneJS._namespace("SceneJS");
 

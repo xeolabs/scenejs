@@ -22,7 +22,7 @@ SceneJS._frustumModule = new (function() {
     var frustum;
 
     SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_RENDERING,
+            SceneJS._eventModule.SCENE_COMPILING,
             function() {
                 projMat = viewMat = SceneJS._math_identityMat4();
                 viewport = [0,0,1,1];

@@ -194,7 +194,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
           argStr += ((ii == 0) ? '' : ', ') + 
               glFunctionArgToString(functionName, ii, args[ii]);
         }
-        log("WebGL error "+ glEnumToString(err) + " in "+ functionName +
+        alert("WebGL error "+ glEnumToString(err) + " in "+ functionName +
             "(" + argStr + ")");
       };
 
