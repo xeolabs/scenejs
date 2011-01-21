@@ -256,6 +256,17 @@ SceneJS.Scene.prototype.start = function(cfg) {
         throw new SceneJS.errors.InvalidSceneGraphException
                 ("Attempted start on Scene that has been destroyed");
     }
+
+    /*
+     * Lazy scene creation
+     */
+    if (!this._sceneId) {
+        this._sceneId = SceneJS._sceneModule.createScene(this, {
+            canvasId: this._canvasId,
+            loggingElementId: this._loggingElementId
+        });
+    }
+
     if (!this._running) {
         cfg = cfg || {};
         this._running = true;
@@ -274,6 +285,11 @@ SceneJS.Scene.prototype.start = function(cfg) {
 
                     self._compileWithEvents();
                 }
+                //                if (SceneJS._picking) {
+                //                    alert("pick");
+                //                SceneJS._renderModule.pick(SceneJS._picking);
+                //                    SceneJS._picking = null;
+                //                }
             }
         };
         this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 100));
@@ -296,10 +312,22 @@ SceneJS.Scene.prototype.render = function() {
         throw new SceneJS.errors.InvalidSceneGraphException
                 ("Attempted render on Scene that has been destroyed");
     }
+
+    /*
+     * Lazy scene creation
+     */
+    if (!this._sceneId) {
+        this._sceneId = SceneJS._sceneModule.createScene(this, {
+            canvasId: this._canvasId,
+            loggingElementId: this._loggingElementId
+        });
+    }
+
     if (!this._running) {
         this._compileWithEvents();
     }
 };
+
 
 /**
  * Picks whatever {@link SceneJS.Geometry} will be rendered at the given canvas coordinates. When this is called within
@@ -311,32 +339,22 @@ SceneJS.Scene.prototype.render = function() {
  * @param canvasX Canvas X-coordinate
  * @param canvasY Canvas Y-coordinate
  */
-//SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
-//    if (this._destroyed) {
-//        throw new SceneJS.errors.InvalidSceneGraphException
-//                ("Attempted pick on Scene that has been destroyed");
-//    }
-//    if (!this._sceneId) {
-//        throw new SceneJS.errors.InvalidSceneGraphException
-//                ("Attempted pick on Scene that has not yet rendered");
-//    }
-//    var wasRunning = this._running;
-//    this._running = false;
-//
-//    SceneJS._compileModule.setForceSceneCompile(true);    // Force traversal for pick
-//    SceneJS._pickModule.pick(canvasX, canvasY);           // Enters pick mode
-//    this._compileWithEvents();                             // Pick-mode traversal - get picked, fire events, exits pick mode
-//
-//    SceneJS._compileModule.setForceSceneCompile(true);    // Force another traversal for render (really needed? since we render to pick buffer?)
-//    this._compileWithEvents();                             // Render-mode traversal              (really needed? since we render to pick buffer?)
-//
-//    this._running = wasRunning;
-//};
-
-/**
- *
- */
 SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
+    if (this._destroyed) {
+        throw new SceneJS.errors.InvalidSceneGraphException
+                ("Attempted pick on Scene that has been destroyed");
+    }
+    if (!this._sceneId) {
+        throw new SceneJS.errors.InvalidSceneGraphException
+                ("Attempted pick on Scene that has not yet rendered");
+    }
+
+    //    SceneJS._picking = {
+    //        sceneId: this._sceneId,
+    //        canvasX : canvasX,
+    //        canvasY : canvasY
+    //    };
+
     SceneJS._renderModule.pick({
         sceneId: this._sceneId,
         canvasX : canvasX,
@@ -344,60 +362,7 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
     });
 };
 
-/** @private
- */
-SceneJS.Scene.prototype._compileORIGINAL = function() {
-
-    /*
-     * Lazy scene creation
-     */
-
-    if (!this._sceneId) {
-        this._sceneId = SceneJS._sceneModule.createScene(this, {
-            canvasId: this._canvasId,
-            loggingElementId: this._loggingElementId
-        });
-    }
-
-    SceneJS._actionNodeDestroys();
-
-    SceneJS._sceneModule.activateScene(this._sceneId);
-
-    if (SceneJS._compileModule.preVisitNode(this)) {
-
-        SceneJS._layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
-
-        var traversalContext = {};
-        this._compileNodes(traversalContext);
-
-        /*        
-         */
-        //        SceneJS._compileModule.withSubTreesToCompile(function(node) {
-        //            node._compile(traversalContext);
-        //        });
-    }
-
-    SceneJS._compileModule.postVisitNode(this);
-
-    SceneJS._sceneModule.deactivateScene();
-
-
-    SceneJS._actionNodeDestroys();
-};
-
-
 SceneJS.Scene.prototype._compile = function() {
-
-    /*
-     * Lazy scene creation
-     */
-
-    if (!this._sceneId) {
-        this._sceneId = SceneJS._sceneModule.createScene(this, {
-            canvasId: this._canvasId,
-            loggingElementId: this._loggingElementId
-        });
-    }
 
     SceneJS._actionNodeDestroys();
     SceneJS._sceneModule.activateScene(this._sceneId);
@@ -411,11 +376,10 @@ SceneJS.Scene.prototype._compile = function() {
         if (SceneJS._compileModule.preVisitNode(this)) {
             SceneJS._layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
             var traversalContext = {};
-            
+
             this._compileNodes(traversalContext);
 
-            /*
-             */
+           
             //        SceneJS._compileModule.withSubTreesToCompile(function(node) {
             //            node._compile(traversalContext);
             //        });
@@ -435,117 +399,117 @@ SceneJS.Scene.prototype._compile = function() {
     SceneJS.Scene.prototype.__queue = new Array();
     SceneJS.Scene.prototype.__callbackStack = [];
 
-SceneJS.Scene.prototype._compileBranch = function(root, last, instanceChildren) {
+    SceneJS.Scene.prototype._compileBranch = function(root, last, instanceChildren) {
 
-    this.__queue.push({
+        this.__queue.push({
             node: root,
             last: last,
             fringe: last
         });
 
-    this.__callbackStack = [];
+        this.__callbackStack = [];
 
-    while (this.__queue.length > 0) {
+        while (this.__queue.length > 0) {
 
-        var p = this.__queue.pop();
+            var p = this.__queue.pop();
 
-        if (!p.preCompiled) {  // Node not preCompiled
+            if (!p.preCompiled) {  // Node not preCompiled
 
-            /*----------------------------------------------------------------
-             * Pre-visit
-             *--------------------------------------------------------------*/
+                /*----------------------------------------------------------------
+                 * Pre-visit
+                 *--------------------------------------------------------------*/
 
-            SceneJS._pickingModule.preVisitNode(p.node);
+                SceneJS._pickingModule.preVisitNode(p.node);
 
-            var nodeFlagsProcessed = false;
+                var nodeFlagsProcessed = false;
 
-            if (SceneJS._compileModule.preVisitNode(p.node)) {
+                if (SceneJS._compileModule.preVisitNode(p.node)) {
 
-                if (SceneJS._flagsModule.preVisitNode(p.node)) {
+                    if (SceneJS._flagsModule.preVisitNode(p.node)) {
 
-                    if (p.node._listeners["pre-rendered"]) {
-                        p.node._fireEvent("pre-rendered", { });
-                    }
+                        if (p.node._listeners["pre-rendered"]) {
+                            p.node._fireEvent("pre-rendered", { });
+                        }
 
-                    var result;
+                        var result;
 
-                    if (p.node._preCompile) {
-                        result = p.node._preCompile({});
-                    } else {
-                        result = null;
-                    }
+                        if (p.node._preCompile) {
+                            result = p.node._preCompile({});
+                        } else {
+                            result = null;
+                        }
 
-                    p.preCompiled = true;
+                        p.preCompiled = true;
 
-                    this.__queue.push(p);
+                        this.__queue.push(p);
 
-                    if (result && result.target) {
+                        if (result && result.target) {
 
-                        this.__queue.push({
-                            node: result.target,
-                            fringe: true,
-                            last: true
-                        });
+                            this.__queue.push({
+                                node: result.target,
+                                fringe: true,
+                                last: true
+                            });
 
-                        result = null;
+                            result = null;
 
-                        this.__callbackStack.push(p.node._children);
+                            this.__callbackStack.push(p.node._children);
 
-                    } else {
+                        } else {
 
-                        var i, children = p.node._children;
+                            var i, children = p.node._children;
 
-                        if (children.length == 0 && p.fringe) {
-                            if (this.__callbackStack.length > 0) {
-                                children = this.__callbackStack.pop();
+                            if (children.length == 0 && p.fringe) {
+                                if (this.__callbackStack.length > 0) {
+                                    children = this.__callbackStack.pop();
+                                }
+                            }
+
+                            for (i = children.length - 1; i >= 0; i--) {
+                                last = (i == children.length - 1);
+                                this.__queue.push({
+                                    node: children[i],
+                                    fringe: p.last && last,
+                                    last: last
+                                });
                             }
                         }
-
-                        for (i = children.length - 1; i >= 0; i--) {
-                            last = (i == children.length - 1);
-                            this.__queue.push({
-                                node: children[i],
-                                fringe: p.last && last,
-                                last: last
-                            });
-                        }
                     }
+
+                    nodeFlagsProcessed = true;
                 }
 
-                nodeFlagsProcessed = true;
+                /* If compile module prevented descent into any child then we are performing a partial
+                 * re-compilation in which we are updating some existing states held by the renderer module.
+                 * During full compilations, we rely on geometry nodes to cause the renderer module to
+                 * gather dirty states accumulated by traversed nodes, however in this case we may not be
+                 * visiting those geometries, so we'll trigger that explicitly.
+                 */
+
+                if (nodeFlagsProcessed) {
+                    SceneJS._renderModule.marshallStates();
+                }
+
+            } else {                        // Node was preCompiled
+
+                /*----------------------------------------------------------------
+                 * Post-visit
+                 *--------------------------------------------------------------*/
+
+                if (p.node._listeners["post-rendering"]) {
+                    p.node._fireEvent("post-rendering", { });
+                }
+
+                if (p.node._postCompile) {
+                    p.node._postCompile({});
+                }
+
+                SceneJS._flagsModule.postVisitNode(p.node); // Must postVisit even if preVisit returned false
+                SceneJS._compileModule.postVisitNode(p.node);
+                SceneJS._pickingModule.postVisitNode(p.node);
             }
-
-            /* If compile module prevented descent into any child then we are performing a partial
-             * re-compilation in which we are updating some existing states held by the renderer module.
-             * During full compilations, we rely on geometry nodes to cause the renderer module to
-             * gather dirty states accumulated by traversed nodes, however in this case we may not be
-             * visiting those geometries, so we'll trigger that explicitly.
-             */
-
-            if (nodeFlagsProcessed) {
-                SceneJS._renderModule.marshallStates();
-            }
-
-        } else {                        // Node was preCompiled
-
-            /*----------------------------------------------------------------
-             * Post-visit
-             *--------------------------------------------------------------*/
-
-            if (p.node._listeners["post-rendering"]) {
-                p.node._fireEvent("post-rendering", { });
-            }
-
-            if (p.node._postCompile) {
-                p.node._postCompile({});
-            }
-
-            SceneJS._flagsModule.postVisitNode(p.node); // Must postVisit even if preVisit returned false
-            SceneJS._compileModule.postVisitNode(p.node);
-            SceneJS._pickingModule.postVisitNode(p.node);
         }
-    }
-};
+    };
 
 })();
 

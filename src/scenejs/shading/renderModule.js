@@ -123,7 +123,7 @@ SceneJS._renderModule = new (function() {
     };
 
     var DEFAULT_LISTENERS = {
-        listener : []
+        listeners : []
     };
 
     /*----------------------------------------------------------------------
@@ -824,27 +824,34 @@ SceneJS._renderModule = new (function() {
         NodeRenderer.cleanup();
     }
 
-    function renderBin(bin) {
+    function renderBin(bin, picking) {
 
         /* Render opaque nodes while buffering transparent nodes
          */
         var nTransparent = 0;
         var node;
         var i, len = bin.length;
+        var flags;
 
         for (i = 0; i < len; i++) {
             node = bin[i];
-            if (node.flagsState.flags.enabled != false) {                   // Skip disabled node
-                if (node.flagsState.flags.transparent === true) {           // Buffer transparent node
-                    transparentBin[nTransparent++] = node;
-                } else {
-                    NodeRenderer.renderNode(node);                          // Render opaque node
-                }
+            flags = node.flagsState.flags;
+
+            if (flags.enabled === false) {                   // Skip disabled node
+                continue;
+            }
+
+            if (picking && flags.picking === false) {        // When picking, skip unpickable node
+                continue;
+            }
+
+            if (!picking && flags.transparent === true) {    // Buffer transparent node when not picking
+                transparentBin[nTransparent++] = node;
+
+            } else {
+                NodeRenderer.renderNode(node);               // Render node if opaque or in picking mode
             }
         }
-
-        // Thought this fixed flickering, but no
-        //   NodeRenderer.cleanup();
 
         /* Render transparent nodes with blending
          */
@@ -1297,14 +1304,18 @@ SceneJS._renderModule = new (function() {
                     this._lastLightStateId = node.lightState._stateId;
                 }
 
-            } else {
+            }
 
-                /*----------------------------------------------------------------------------------------------------------
-                 * Pick listeners
-                 *--------------------------------------------------------------------------------------------------------*/
+            /*----------------------------------------------------------------------------------------------------------
+             * Pick listeners
+             *--------------------------------------------------------------------------------------------------------*/
+
+            if (this._picking) {
 
                 if (! this._lastPickListenersState || node.pickListenersState._stateId != this._lastPickListenersState._stateId) {
-                    if (node.pickListenersState) {
+
+                    if (node.pickListenersState.listeners.length > 0) {
+
                         this._pickListeners[this._pickIndex++] = node.pickListenersState;
 
                         var b = this._pickIndex >> 16 & 0xFF;
@@ -1315,47 +1326,50 @@ SceneJS._renderModule = new (function() {
                         b = b / 255;
 
                         this._program.setUniform("uPickColor", [r,g,b]);
-                        this._lastPickListenersState = node.pickListenersState;
                     }
+                    this._lastPickListenersState = node.pickListenersState;
                 }
             }
 
-            /*----------------------------------------------------------------------------------------------------------
-             * Matrix listeners
-             *--------------------------------------------------------------------------------------------------------*/
+            if (!this._picking) {
 
-            if (! this._lastMatrixListenersState || node.matrixListenersState._stateId != this._lastMatrixListenersState._stateId) {
-                if (node.matrixListenersState) {
-                    var listeners = node.matrixListenersState.listeners;
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        listeners[i]({
-                            projMatrix: node.projXFormState.mat.slice(0),
-                            viewMatrix: node.viewXFormState.mat.slice(0),
-                            modelMatrix: node.modelXFormState.mat.slice(0)
-                        });
+                /*----------------------------------------------------------------------------------------------------------
+                 * Matrix listeners
+                 *--------------------------------------------------------------------------------------------------------*/
+
+                if (! this._lastMatrixListenersState || node.matrixListenersState._stateId != this._lastMatrixListenersState._stateId) {
+                    if (node.matrixListenersState) {
+                        var listeners = node.matrixListenersState.listeners;
+                        for (var i = listeners.length - 1; i >= 0; i--) {
+                            listeners[i]({
+                                projMatrix: node.projXFormState.mat.slice(0),
+                                viewMatrix: node.viewXFormState.mat.slice(0),
+                                modelMatrix: node.modelXFormState.mat.slice(0)
+                            });
+                        }
+                        this._lastMatrixListenersState = node.matrixListenersState;
                     }
-                    this._lastMatrixListenersState = node.matrixListenersState;
+
                 }
 
+                /*----------------------------------------------------------------------------------------------------------
+                 * Render listeners
+                 *--------------------------------------------------------------------------------------------------------*/
+
+                //            if (! this._lastRenderListenersState || node.renderListenersState._stateId != this._lastRenderListenersState._stateId) {
+                //                if (node.renderListenersState) {
+                //                    var listeners = node.renderListenersState.listeners;
+                //                    for (var i = listeners.length - 1; i >= 0; i--) {
+                //                        listeners[i]({
+                //                            projMatrix: node.projXFormState.mat,
+                //                            viewMatrix: node.viewXFormState.mat,
+                //                            modelMatrix: node.modelXFormState.mat
+                //                        });
+                //                    }
+                //                }
+                //                this._lastRenderListenersState = node.renderListenersState;
+                //            }
             }
-
-            /*----------------------------------------------------------------------------------------------------------
-             * Render listeners
-             *--------------------------------------------------------------------------------------------------------*/
-
-            //            if (! this._lastRenderListenersState || node.renderListenersState._stateId != this._lastRenderListenersState._stateId) {
-            //                if (node.renderListenersState) {
-            //                    var listeners = node.renderListenersState.listeners;
-            //                    for (var i = listeners.length - 1; i >= 0; i--) {
-            //                        listeners[i]({
-            //                            projMatrix: node.projXFormState.mat,
-            //                            viewMatrix: node.viewXFormState.mat,
-            //                            modelMatrix: node.modelXFormState.mat
-            //                        });
-            //                    }
-            //                }
-            //                this._lastRenderListenersState = node.renderListenersState;
-            //            }
 
             /*----------------------------------------------------------------------------------------------------------
              * Draw the geometry;  When wireframe option is set we'll render
@@ -1397,6 +1411,15 @@ SceneJS._renderModule = new (function() {
             //            if (this._program) {
             //                this._program.unbind();
             //            }
+
+
+            ////////////////////////////////////////////
+            //             if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
+            //                    context.flush();
+            //                    this._lastImageBufState.imageBuf.unbind();
+            //                 this._lastImageBufState = null;
+            //                }
+            ////////////////////////////////////////////
 
             if (this._program) {
                 this._program.unbind();
@@ -2112,6 +2135,47 @@ SceneJS._renderModule = new (function() {
         return src.join("\n");
     }
 
+    function pickFrame(canvasX, canvasY) {
+
+        /* Set up pick buffer
+         */
+        createPickBuffer();
+        bindPickBuffer();
+
+        /* Render display list in pick mode
+         */
+        NodeRenderer.init(true);
+        var layerOrder = SceneJS._layerModule.getLayerOrder();
+        var layer;
+        for (var i = 0, len = layerOrder.length; i < len; i++) {
+            layer = states.layers[layerOrder[i].name];
+            if (layer) {
+                renderBin(layer.bin, true);
+            }
+        }
+
+        /* Read pick buffer
+         */
+        var pickIndex = readPickBuffer(canvasX, canvasY);
+
+        /* Notify listeners
+         */
+        if (pickIndex >= 0) {
+            var pickListeners = NodeRenderer._pickListeners[pickIndex];
+            if (pickListeners) {
+                var listeners = pickListeners.listeners;
+                for (var i = listeners.length - 1; i >= 0; i--) {
+                    listeners[i]({ canvasX: canvasX, canvasY: canvasY });
+                }
+            }
+        }
+
+        /* Clean up
+         */
+        unbindPickBuffer();
+        NodeRenderer.cleanup();
+    }
+
     function createPickBuffer() {
         var canvas = states.canvas;
         var gl = canvas.context;
@@ -2119,10 +2183,28 @@ SceneJS._renderModule = new (function() {
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
 
-        var pickBuf = states.pickBuf = {
+        var pickBuf = states.pickBuf;
+
+        if (pickBuf) { // Current have a pick buffer
+
+            if (pickBuf.width == width && pickBuf.height) { // Canvas size unchanged, buffer still good
+
+                return;
+
+            } else { // Buffer needs reallocation for new canvas size
+
+                gl.deleteTexture(pickBuf.texture);
+                gl.deleteFramebuffer(pickBuf.frameBuf);
+                gl.deleteRenderbuffer(pickBuf.renderBuf);
+            }
+        }
+
+        pickBuf = states.pickBuf = {
             frameBuf : gl.createFramebuffer(),
             renderBuf : gl.createRenderbuffer(),
-            texture : gl.createTexture()
+            texture : gl.createTexture(),
+            width: width,
+            height: height
         };
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
@@ -2172,32 +2254,6 @@ SceneJS._renderModule = new (function() {
         }
     }
 
-    function pickFrame(canvasX, canvasY) {
-        createPickBuffer();
-        bindPickBuffer();
-        NodeRenderer.init(true);
-        var layerOrder = SceneJS._layerModule.getLayerOrder();
-        var layer;
-        for (var i = 0, len = layerOrder.length; i < len; i++) {
-            layer = states.layers[layerOrder[i].name];
-            if (layer) {
-                renderBin(layer.bin);
-            }
-        }
-        var pickIndex = readPickBuffer(canvasX, canvasY);
-        if (pickIndex >= 0) {
-            var pickListeners = NodeRenderer._pickListeners[pickIndex];
-            if (pickListeners) {
-                var listeners = pickListeners.listeners;
-                for (var i = listeners.length - 1; i >= 0; i--) {
-                    listeners[i]({ canvasX: canvasX, canvasY: canvasY });
-                }
-            }
-        }
-        unbindPickBuffer();
-        NodeRenderer.cleanup();
-    }
-
     function bindPickBuffer() {
         var context = states.canvas.context;
         context.bindFramebuffer(context.FRAMEBUFFER, states.pickBuf.frameBuf);
@@ -2210,7 +2266,7 @@ SceneJS._renderModule = new (function() {
     function readPickBuffer(pickX, pickY) {
         var canvas = states.canvas.canvas;
         var context = states.canvas.context;
-        var pickBuf = states.pickBuf;
+
         var x = pickX;
         var y = canvas.height - pickY;
         var pix = new Uint8Array(4);
