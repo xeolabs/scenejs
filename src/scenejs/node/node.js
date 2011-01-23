@@ -330,7 +330,7 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
 
     SceneJS._pickingModule.preVisitNode(this);
 
-    // SceneJS._nodeEventsModule.preVisitNode(this);
+    SceneJS._nodeEventsModule.preVisitNode(this);
 
     /* Fire "pre-rendered" event if observed
      */
@@ -407,7 +407,7 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
 
     SceneJS._pickingModule.postVisitNode(this);
 
-    //   SceneJS._nodeEventsModule.postVisitNode(this);
+    SceneJS._nodeEventsModule.postVisitNode(this);
 
     if (this._listeners["post-rendering"]) {
         this._fireEvent("post-rendering", { });
@@ -474,9 +474,7 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
         this._fireEvent("loading-status", SceneJS._loadStatusModule.diffStatus(loadStatusSnapshot));
     }
 
-    if (this._listeners["rendered"]) {         // DEPRECATED
-        this._fireEvent("rendered", { });
-    }
+  
     if (this._listeners["post-rendered"]) {
         this._fireEvent("post-rendered", { });
     }
@@ -969,14 +967,19 @@ SceneJS.Node.prototype._doDestroy = function() {
  * Fires an event at this node, immediately calling listeners registered for the event
  * @param {String} eventName Event name
  * @param {Object} params Event parameters
+ * @param {Object} options Event options
  */
-SceneJS.Node.prototype._fireEvent = function(eventName, params) {
+SceneJS.Node.prototype._fireEvent = function(eventName, params, options) {
     var list = this._listeners[eventName];
     if (list) {
         if (!params) {
             params = {};
         }
-        var event = { name: eventName, params : params };
+        var event = {
+            name: eventName,
+            params : params,
+            options: options || {}
+        };
         var listener;
         for (var i = 0, len = list.length; i < len; i++) {
             listener = list[i];

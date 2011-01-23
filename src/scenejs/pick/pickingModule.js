@@ -42,13 +42,11 @@ SceneJS._pickingModule = new (function() {
             });
 
     this.preVisitNode = function(node) {
-        var listener = node._listeners["picked"];
-        if (listener) {
-            idStack[stackLen] = node._attr.id;
-
-            listenerStack[stackLen] = listener;
-            listenerStack[stackLen] = function (params) {
-                node._fireEvent("picked", params);
+        var listeners = node._listeners["picked"];
+        if (listeners) {
+            idStack[stackLen] = node._attr.id;            
+            listenerStack[stackLen] = function (params, options) {
+                node._fireEvent("picked", params, options);
             };
 
             stackLen++;

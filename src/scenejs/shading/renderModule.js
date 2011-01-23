@@ -178,7 +178,7 @@ SceneJS._renderModule = new (function() {
     var deformState;
     var morphState;
     var pickListenersState;
-    var matrixListenersState;
+    var renderListenersState;
 
     /** Current scene state hash
      */
@@ -328,7 +328,7 @@ SceneJS._renderModule = new (function() {
             projXFormState = DEFAULT_PROJ_TRANSFORM;
             viewXFormState = DEFAULT_VIEW_TRANSFORM;
             pickListenersState = DEFAULT_LISTENERS;
-            matrixListenersState = DEFAULT_LISTENERS;
+            renderListenersState = DEFAULT_LISTENERS;
 
             rebuildBins = true;              // Rebuild render bins
             rebuildShaders = true;           // Rebuilding shaders - always when rebuilding state graph
@@ -364,9 +364,9 @@ SceneJS._renderModule = new (function() {
     /**
      * Immediately render a frame of the given scene while performing a pick on it
      */
-    this.pick = function(params) {
+    this.pick = function(params, options) {
         states = sceneStates[params.sceneId];
-        pickFrame(params.canvasX, params.canvasY);
+        pickFrame(params.canvasX, params.canvasY, options);
     };
 
     this.marshallStates = function() {
@@ -629,9 +629,9 @@ SceneJS._renderModule = new (function() {
 
     /**
      */
-    this.setMatrixListeners = function(id, listeners) {
-        matrixListenersState = getState(id || "___DEFAULT_MATRIX_LISTENERS");
-        matrixListenersState.listeners = listeners || [];
+    this.setRenderListeners = function(id, listeners) {
+        renderListenersState = getState(id || "___DEFAULT_RENDER_LISTENERS");
+        renderListenersState.listeners = listeners || [];
     };
 
 
@@ -749,7 +749,7 @@ SceneJS._renderModule = new (function() {
             deformState :       deformState,
             morphState :        morphState,
             pickListenersState: pickListenersState,
-            matrixListenersState: matrixListenersState
+            renderListenersState: renderListenersState
         };
 
         nodeMap[id] = node;
@@ -870,12 +870,84 @@ SceneJS._renderModule = new (function() {
         }
     }
 
+
     /**
      * State node renderer
      */
     const NodeRenderer = new (function() {
 
         this._pickListeners = new Array(this.MAX_PICK_LISTENERS);
+
+        /** Facade to support node state queries while node rendering
+         */
+        this._queryFacade = {
+
+            _node: null,
+
+            _setNode: function(node) {
+                this._node = node;
+                this._mem = {};
+            },
+
+            getCameraMatrix : function() {
+                return this._mem.camMat ? this._mem.camMat : this._mem.camMat = this._node.projXFormState.mat.slice(0);
+            },
+
+            getViewMatrix : function() {
+                return this._mem.viewMat ? this._mem.viewMat : this._mem.viewMat = this._node.viewXFormState.mat.slice(0);
+            },
+
+            getModelMatrix : function() {
+                return this._mem.modelMat ? this._mem.modelMat : this._mem.modelMat = this._node.modelXFormState.mat.slice(0);
+            },
+
+            getCanvasPos : function(offset) {
+                if (this._mem.cp && (!offset)) {
+                    return this._mem.cp;
+                }
+
+                this.getProjPos(offset);
+
+                if (!this._mem.canvasWidth) {
+                    this._mem.canvasWidth = states.canvas.canvas.width;
+                    this._mem.canvasHeight = states.canvas.canvas.height;
+                }
+
+                /* Projection division and map to canvas
+                 */
+                var pc = this._mem.pc;
+                var x = (pc[0] / pc[3]) * this._mem.canvasWidth * 0.5;
+                var y = (pc[1] / pc[3]) * this._mem.canvasHeight * 0.5;
+                return this._mem.cp = {
+                    x: x + (states.canvas.canvas.width * 0.5),
+                    y: this._mem.canvasHeight - y - (this._mem.canvasHeight * 0.5)
+                };
+            },
+
+            getProjPos : function(offset) {
+                if (!this._mem.pc || offset) {
+                    this.getViewPos(offset);
+                    this._mem.pc = SceneJS._math_transformPoint3(this._node.projXFormState.mat, this._mem.vc);
+                }
+                return { x: this._mem.pc[0], y: this._mem.pc[1], z: this._mem.pc[2],  w: this._mem.pc[3] };
+            },
+
+            getViewPos : function(offset) {
+                if (!this._mem.vc || offset) {
+                    this.getWorldPos(offset);
+                    this._mem.vc = SceneJS._math_transformPoint3(this._node.viewXFormState.mat, this._mem.wc);
+                }
+                return { x: this._mem.vc[0], y: this._mem.vc[1], z: this._mem.vc[2],  w: this._mem.vc[3] };
+            },
+
+            getWorldPos : function(offset) {
+                if (!this._mem.wc || offset) {
+                    this._mem.wc = SceneJS._math_transformPoint3(this._node.modelXFormState.mat, offset || [0,0,0]);
+                }
+                return { x: this._mem.wc[0], y: this._mem.wc[1], z: this._mem.wc[2],  w: this._mem.wc[3] };
+            }
+        };
+
 
         /**
          * Called before we render all state nodes for a frame.
@@ -897,6 +969,10 @@ SceneJS._renderModule = new (function() {
          * into all states for this node.
          */
         this.renderNode = function(node) {
+
+            /* Prepare query facade
+             */
+            this._queryFacade._setNode(node);
 
             /* Only pick nodes that are enabled for picking
              */
@@ -935,7 +1011,7 @@ SceneJS._renderModule = new (function() {
                 this._lastImageBufStateId = -1;
                 this._lastFogStateId = -1;
                 this._lastPickListenersStateId = -1;
-                this._lastMatrixListenersStateId = -1;
+                this._lastRenderListenersStateId = -1;
 
                 this._lastProgramId = node.program.id;
             }
@@ -1331,44 +1407,21 @@ SceneJS._renderModule = new (function() {
                 }
             }
 
-            if (!this._picking) {
-
-                /*----------------------------------------------------------------------------------------------------------
-                 * Matrix listeners
-                 *--------------------------------------------------------------------------------------------------------*/
-
-                if (! this._lastMatrixListenersState || node.matrixListenersState._stateId != this._lastMatrixListenersState._stateId) {
-                    if (node.matrixListenersState) {
-                        var listeners = node.matrixListenersState.listeners;
-                        for (var i = listeners.length - 1; i >= 0; i--) {
-                            listeners[i]({
-                                projMatrix: node.projXFormState.mat.slice(0),
-                                viewMatrix: node.viewXFormState.mat.slice(0),
-                                modelMatrix: node.modelXFormState.mat.slice(0)
-                            });
-                        }
-                        this._lastMatrixListenersState = node.matrixListenersState;
-                    }
-
-                }
+            if (!this._picking) {    // TODO: do we ever want matrices during a pick pass?
 
                 /*----------------------------------------------------------------------------------------------------------
                  * Render listeners
                  *--------------------------------------------------------------------------------------------------------*/
 
-                //            if (! this._lastRenderListenersState || node.renderListenersState._stateId != this._lastRenderListenersState._stateId) {
-                //                if (node.renderListenersState) {
-                //                    var listeners = node.renderListenersState.listeners;
-                //                    for (var i = listeners.length - 1; i >= 0; i--) {
-                //                        listeners[i]({
-                //                            projMatrix: node.projXFormState.mat,
-                //                            viewMatrix: node.viewXFormState.mat,
-                //                            modelMatrix: node.modelXFormState.mat
-                //                        });
-                //                    }
-                //                }
-                //                this._lastRenderListenersState = node.renderListenersState;
-                //            }
+                if (! this._lastRenderListenersState || node.renderListenersState._stateId != this._lastRenderListenersState._stateId) {
+                    if (node.renderListenersState) {
+                        var listeners = node.renderListenersState.listeners;
+                        for (var i = listeners.length - 1; i >= 0; i--) {
+                            listeners[i](this._queryFacade);             // Call listener with query facade object as scope
+                        }
+                        this._lastRenderListenersState = node.renderListenersState;
+                    }
+                }
             }
 
             /*----------------------------------------------------------------------------------------------------------
@@ -1404,7 +1457,11 @@ SceneJS._renderModule = new (function() {
             //
             //            }
 
-            // states.canvas.context.flush();
+            ///////////////////////////////////////////
+            states.canvas.context.finish();
+            ///////////////////////////////////////////
+
+
             //            if (this._lastRendererState) {
             //                this._lastRendererState.props.restoreProps(canvas.context);
             //            }
@@ -2135,7 +2192,7 @@ SceneJS._renderModule = new (function() {
         return src.join("\n");
     }
 
-    function pickFrame(canvasX, canvasY) {
+    function pickFrame(canvasX, canvasY, options) {
 
         /* Set up pick buffer
          */
@@ -2165,7 +2222,7 @@ SceneJS._renderModule = new (function() {
             if (pickListeners) {
                 var listeners = pickListeners.listeners;
                 for (var i = listeners.length - 1; i >= 0; i--) {
-                    listeners[i]({ canvasX: canvasX, canvasY: canvasY });
+                    listeners[i]({ canvasX: canvasX, canvasY: canvasY }, options);
                 }
             }
         }

@@ -339,7 +339,7 @@ SceneJS.Scene.prototype.render = function() {
  * @param canvasX Canvas X-coordinate
  * @param canvasY Canvas Y-coordinate
  */
-SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
+SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
     if (this._destroyed) {
         throw new SceneJS.errors.InvalidSceneGraphException
                 ("Attempted pick on Scene that has been destroyed");
@@ -358,8 +358,7 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY) {
     SceneJS._renderModule.pick({
         sceneId: this._sceneId,
         canvasX : canvasX,
-        canvasY : canvasY
-    });
+        canvasY : canvasY }, options );
 };
 
 SceneJS.Scene.prototype._compile = function() {
@@ -379,7 +378,7 @@ SceneJS.Scene.prototype._compile = function() {
 
             this._compileNodes(traversalContext);
 
-           
+
             //        SceneJS._compileModule.withSubTreesToCompile(function(node) {
             //            node._compile(traversalContext);
             //        });

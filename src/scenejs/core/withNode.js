@@ -310,7 +310,7 @@ SceneJS._WithNode.prototype.bind = function(name, handler) {
  * @param offsetX Canvas X-coordinate
  * @param offsetY Canvas Y-coordinate
  */
-SceneJS._WithNode.prototype.pick = function(offsetX, offsetY) {
+SceneJS._WithNode.prototype.pick = function(offsetX, offsetY, options) {
     if (!offsetX) {
         throw "pick param 'offsetX' null or undefined";
     }
@@ -326,7 +326,7 @@ SceneJS._WithNode.prototype.pick = function(offsetX, offsetY) {
     if (this._targetNode.getType() != "scene") {
         throw "pick attempted on node that is not a \"scene\" type: '" + this._targetNode.getID() + "'";
     }
-    this._targetNode.pick(offsetX, offsetY);
+    this._targetNode.pick(offsetX, offsetY, options);
     return this;
 };
 

@@ -27,9 +27,9 @@ SceneJS._nodeEventsModule = new (function() {
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setMatrixListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
+                        SceneJS._renderModule.setRenderListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
                     } else {
-                        SceneJS._renderModule.setMatrixListeners();
+                        SceneJS._renderModule.setRenderListeners();
                     }
                     dirty = false;
                 }
@@ -42,13 +42,12 @@ SceneJS._nodeEventsModule = new (function() {
             });
 
     this.preVisitNode = function(node) {
-        var listener = node._listeners["matrices"];
+        var listener = node._listeners["rendered"];
         if (listener) {
             idStack[stackLen] = node._attr.id;
-
-            listenerStack[stackLen] = listener;
+            listenerStack[stackLen] = listener.fn;
             listenerStack[stackLen] = function (params) {
-                node._fireEvent("matrices", params);
+                node._fireEvent("rendered", params);
             };
 
             stackLen++;
