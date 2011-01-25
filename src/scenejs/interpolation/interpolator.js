@@ -52,10 +52,11 @@ SceneJS.Interpolator.prototype._init = function(params) {
 
     this._timeStarted = null;
     this._outputValue = null;
+    this._attr.repeat = params.repeat || 1;
 
     /* Whether to remove this node when finished or keep in scene
      */
-    this._attr.once = params.once;
+    this._attr.autoDestroy = params.autoDestroy;
 
     /* Keys and values - verify them if supplied
      */
@@ -121,8 +122,17 @@ SceneJS.Interpolator.prototype._init = function(params) {
          */
     }
     this._attr.mode = params.mode;
-    this._attr.once = params.once;
 };
+
+// @private
+/**
+ * Resets values to initialized state for repeat runs
+ */
+SceneJS.Interpolator.prototype._resetTime = function() {
+    this._key1 = 0;
+    this._key2 = 1;
+    this._timeStarted = null;
+}
 
 // @private
 SceneJS.Interpolator.prototype.STATE_OUTSIDE = "outside";    // Alpha outside of key sequence
@@ -173,14 +183,35 @@ SceneJS.Interpolator.prototype._preCompile = function(traversalContext) {
 
     if (this._outputValue != null // Null when interpolation outside of time range
             && SceneJS.nodeExists(this._attr.target)) {
-        SceneJS.withNode(this._attr.target).set(this._attr.targetProperty, this._outputValue);
+
+        this._setTargetValue();
     }
 };
 
+SceneJS.Interpolator.prototype._setTargetValue = function() {
+    var propName = this._attr.targetProperty;
+    var d = propName.split(".");
+    if (d.length == 1) {
+        SceneJS.withNode(this._attr.target).set(propName, this._outputValue);
+
+    } else {
+        var root = {};
+        var o = root;
+        for (var j = 0, len = d.length; j < len; j++) {
+            if (j < len - 1) {
+                o[d[j]] = {};
+                o = o[d[j]];
+            } else {
+                o[d[j]] = this._outputValue;
+            }
+        }
+        SceneJS.withNode(this._attr.target).set(root);
+    }
+};
 
 // @private
 SceneJS.Interpolator.prototype._postCompile = function(traversalContext) {
-}
+};
 
 // @private
 SceneJS.Interpolator.prototype._update = function(key) {
@@ -196,10 +227,19 @@ SceneJS.Interpolator.prototype._update = function(key) {
             break;  // Time delay before interpolation begins
 
         case this.STATE_AFTER:
-            this._outputValue = null;
-            //this._outputValue = this._attr.values[this._attr.values.length - 1];
-            if (this._attr.once) {
-                this.destroy();
+            if (this._attr.repeat > 1) {
+                this._resetTime();
+                this._setDirty();
+                this._attr.repeat = this._attr.repeat - 1;
+            } else if (this._attr.repeat === -1) { // repeat forever
+                this._resetTime();
+                this._setDirty();
+            } else {
+                //this._outputValue = null;
+                this._outputValue = this._attr.values[this._attr.values.length - 1];
+                if (this._attr._autoDestroy) {
+                    this.destroy();
+                }
             }
             break;
 
@@ -269,9 +309,9 @@ SceneJS.Interpolator.prototype._linearInterpolate = function(k) {
 // @private
 SceneJS.Interpolator.prototype._constantInterpolate = function(k) {
     if (Math.abs((k - this._attr.keys[this._key1])) < Math.abs((k - this._attr.keys[this._key2]))) {
-        return this._attr.keys[this._key1];
+        return this._attr.values[this._key1];
     } else {
-        return this._attr.keys[this._key2];
+        return this._attr.values[this._key2];
     }
 };
 
