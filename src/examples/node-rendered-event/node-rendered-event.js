@@ -175,8 +175,7 @@ SceneJS.withNode("teapot1").bind(
                     "teapot1",
                     params.getCanvasPos(),
                     params.getProjPos(),
-                // params.getCameraPos(),
-                    null,
+                    params.getCameraPos(),
                     params.getViewPos(),
                     params.getWorldPos());
         });
@@ -189,8 +188,7 @@ SceneJS.withNode("teapot2").bind(
                     "teapot2",
                     params.getCanvasPos(),
                     params.getProjPos(),
-                // params.getCameraPos(),
-                    null,
+                    params.getCameraPos(),
                     params.getViewPos(),
                     params.getWorldPos());
         });
@@ -203,8 +201,7 @@ SceneJS.withNode("teapot3").bind(
                     "teapot3",
                     params.getCanvasPos(),
                     params.getProjPos(),
-                // params.getCameraPos(),
-                    null,
+                    params.getCameraPos(),
                     params.getViewPos(),
                     params.getWorldPos());
         });
@@ -235,7 +232,7 @@ function updateLabelPos(elementId, canvasPos, projPos, cameraPos, viewPos, world
             + "<br/>"
             + "<br/>Canvas: " + Math.round(canvasPos.x) + ", " + Math.round(canvasPos.y)
             + "<br/>Proj  : " + Math.round(projPos.x) + ", " + Math.round(projPos.y)
-        //    + "<br/>Camera  : " + Math.round(cameraPos.x) + ", " + Math.round(cameraPos.y) + ", " + roundFloat(cameraPos.z)
+            + "<br/>Camera  : " + roundFloat(cameraPos.x) + ", " + roundFloat(cameraPos.y) + ", " + roundFloat(cameraPos.z)
             + "<br/>View  : " + roundFloat(viewPos.x) + ", " + roundFloat(viewPos.y) + ", " + roundFloat(viewPos.z)
             + "<br/>World : " + roundFloat(worldPos.x) + ", " + roundFloat(worldPos.y) + ", " + roundFloat(worldPos.z)
             );

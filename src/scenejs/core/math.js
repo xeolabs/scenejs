@@ -287,6 +287,22 @@ SceneJS._math_mulVec3Scalar = function(v, s, dest) {
     return dest;
 };
 
+/**
+ * @param v vec2
+ * @param s scalar
+ * @param dest vec2 - optional destination
+ * @return {vec2} dest if specified, v otherwise
+ * @private
+ */
+SceneJS._math_mulVec2Scalar = function(v, s, dest) {
+    if(!dest) { dest = v; }
+
+    dest[0] = v[0] * s;
+    dest[1] = v[1] * s;
+
+    return dest;
+};
+
 
 /**  
  * @param u vec4
@@ -476,9 +492,15 @@ SceneJS._math_normalizeVec4 = function(v, dest) {
 };
 
 /** @private */
-SceneJS._math_normalizeVec3 = function(v) {
+SceneJS._math_normalizeVec3 = function(v, dest) {
     var f = 1.0 / SceneJS._math_lenVec3(v);
     return SceneJS._math_mulVec3Scalar(v, f);
+};
+
+// @private
+SceneJS._math_normalizeVec2 = function(v, dest) {
+    var f = 1.0 / SceneJS._math_lenVec2(v);
+    return SceneJS._math_mulVec2Scalar(v, f, dest);
 };
 
 /** @private */

@@ -902,8 +902,9 @@ SceneJS._renderModule = new (function() {
             },
 
             getCanvasPos : function(offset) {
-                if (this._mem.cp && (!offset)) {
-                    return this._mem.cp;
+
+                if (this._mem.canvasPos && (!offset)) {
+                    return this._mem.canvasPos;
                 }
 
                 this.getProjPos(offset);
@@ -916,12 +917,22 @@ SceneJS._renderModule = new (function() {
                 /* Projection division and map to canvas
                  */
                 var pc = this._mem.pc;
+
                 var x = (pc[0] / pc[3]) * this._mem.canvasWidth * 0.5;
                 var y = (pc[1] / pc[3]) * this._mem.canvasHeight * 0.5;
-                return this._mem.cp = {
+
+                return this._mem.canvasPos = {
                     x: x + (states.canvas.canvas.width * 0.5),
                     y: this._mem.canvasHeight - y - (this._mem.canvasHeight * 0.5)
                 };
+            },
+
+            getCameraPos : function(offset) {
+                if (!this._mem.camPos || offset) {
+                    this.getProjPos(offset);
+                    this._mem.camPos = SceneJS._math_normalizeVec3(this._mem.pc, [0,0,0]);
+                }
+                return { x: this._mem.camPos[0], y: this._mem.camPos[1], z: this._mem.camPos[2] };
             },
 
             getProjPos : function(offset) {

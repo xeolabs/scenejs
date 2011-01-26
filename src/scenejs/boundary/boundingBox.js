@@ -332,7 +332,7 @@ SceneJS.BoundingBox.prototype._compile = function(traversalContext) {
 SceneJS.BoundingBox.prototype._preCompile = function(traversalContext) {
 
     this._compileNodeAtIndex = undefined;
-    this._compileNodes = undefined;
+    this._nodesToCompile = undefined;
 
     if (!this._validated) {
         if (this._levels) {
@@ -487,7 +487,7 @@ SceneJS.BoundingBox.prototype._preCompile = function(traversalContext) {
                                     /* Zero or one child provided for all LOD -
                                      * just render it if there is one
                                      */
-                                    this._compileNodes = true;
+                                    this._nodesToCompile = true;
                                     //this._compileNodes(traversalContext);
                                 }
                                 return;
@@ -495,7 +495,7 @@ SceneJS.BoundingBox.prototype._preCompile = function(traversalContext) {
                         }
                     } else {
 
-                        this._compileNodes = true;
+                        this._nodesToCompile = true;
                         //this._compileNodes(traversalContext);
                     }
 
@@ -521,7 +521,7 @@ SceneJS.BoundingBox.prototype._preCompile = function(traversalContext) {
 
             // TODO:
 
-            this._compileNodes = true;
+            this._nodesToCompile = true;
             //this._compileNodes(traversalContext);
         }
     } else {
@@ -538,7 +538,7 @@ SceneJS.BoundingBox.prototype._compileNodes = function(traversalContext) {
         SceneJS.Node.prototype._compileNodeAtIndex.call(this, this._compileNodeAtIndex, traversalContext);
         SceneJS._boundaryModule.popBoundary();
 
-    } else if (this._compileNodes) { // Visibility cull
+    } else if (this._nodesToCompile) { // Visibility cull
 
         SceneJS.Node.prototype._compileNodes.call(this, traversalContext);
         SceneJS._boundaryModule.popBoundary();

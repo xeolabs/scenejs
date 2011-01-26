@@ -234,7 +234,7 @@ SceneJS.Node._ArgParser = new (function() {
                     } else if (key == "enabled") {    // Traversal enabled/disabled
                         node._attr.enabled = param;
                     } else if (key == "layer") {     // Rendering layers
-                        node._nodeLayer = param;
+                        node._attr.layer = param;
                     } else {
                         node._params[key] = param;
                     }
@@ -423,15 +423,15 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
     /* Track any user-defined explicit node layer attribute as we traverse the
      * the graph. This is used by state sorting to organise geometries into layers.
      */
-    if (this._nodeLayer) {
+    if (this._attr.layer) {
 
         /* Only render layers that are enabled
          */
-        if (!SceneJS._layerModule.layerEnabled(this._nodeLayer)) {
+        if (!SceneJS._layerModule.layerEnabled(this._attr.layer)) {
             return;
         }
 
-        SceneJS._layerModule.pushLayer(this._nodeLayer);
+        SceneJS._layerModule.pushLayer(this._attr.layer);
     }
 
     /* Flag this node as rendering - while this is true, it is legal
@@ -483,7 +483,7 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
      */
     this._rendering = false;
 
-    if (this._nodeLayer) {
+    if (this._attr.layer) {
         SceneJS._layerModule.popLayer();
     }
 };
@@ -566,6 +566,24 @@ SceneJS.Node.prototype.getData = function() {
 SceneJS.Node.prototype.setData = function(data) {
     this._attr.data = data;
     return this;
+};
+
+/**
+ * Assigns this node to a layer, in order to control the order in which the geometries within it are rendered.
+ * http://scenejs.wikispaces.com/Layers
+ * @param {string} layer The layer name
+ */
+SceneJS.Node.prototype.setLayer = function(layer) {
+    this._attr.layer = layer;
+};
+
+/**
+ * Returns the name of the layer this node is assigned to.
+ * http://scenejs.wikispaces.com/Layers
+ * @return {string} layer The layer name
+ */
+SceneJS.Node.prototype.getLayer = function() {
+    return this._attr.layer;
 };
 
 /**
