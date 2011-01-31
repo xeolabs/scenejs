@@ -31,7 +31,8 @@ ant all
 Create the "dist" directory, which will contain all the SceneJS libraries, JSDocs and examples.
 
 If you are modifying the source code and testing it with a new example or your own project the following 
-ant tasks which complete in just a couple of seconds may be helpful.
+ant tasks which complete in just a couple of seconds may be helpful. These tasks do not clean the dist 
+directory so previously-generated JSDocs will still available
 
 ant package-lib
 

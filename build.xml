@@ -10,7 +10,6 @@
     <property name="SceneJS._JS_NAME" value="scenejs.js"/>
     <property name="SceneJS._MIN_JS_NAME" value="scenejs.min.js"/>
 
-
     <echo>************** Building SceneJS Version ${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}</echo>
 
     <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
@@ -162,6 +161,9 @@
     <target name="all" depends="archive"/>
 
     <target name="docs">
+        <property name="CLEAN_DIST" value="true"/>
+        <antcall target="create-dist-directories"/>
+
         <taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit">
             <classpath>
                 <path refid="jsdoc.classpath"/>
@@ -299,7 +301,7 @@
     <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
 
     <target name="package"
-            depends="package-lib, package-index, package-docs, package-examples, package-lib-utils, package-lib-plugins">
+            depends="package-lib, package-lib-utils, package-lib-plugins, package-index, package-examples, package-docs">
     </target>
 
     <target name="package-lib"
@@ -388,11 +390,17 @@
         </copy>
     </target>
 
-    <target name="create-dist-directories">
+
+    <target name="clean-dist-directory" if="CLEAN_DIST">
         <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
         <delete includeemptydirs="true">
             <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
         </delete>
+    </target>
+
+    <target name="create-dist-directories">
+        <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
+        <antcall target="clean-dist-directory"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
