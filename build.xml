@@ -357,7 +357,7 @@
 
     </target>
 
-    <target name="package-examples" depends="package-lib">
+    <target name="package-examples" depends="package-lib, package-index">
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
         <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
             <fileset dir="${basedir}/resources/web"/>
