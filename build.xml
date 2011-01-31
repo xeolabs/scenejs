@@ -299,7 +299,11 @@
     <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
 
     <target name="package"
-            depends="assemble-lib, package-index, package-examples, package-lib-utils, package-lib-plugins">
+            depends="package-lib, package-index, package-docs, package-examples, package-lib-utils, package-lib-plugins">
+    </target>
+
+    <target name="package-lib"
+            depends="assemble-lib, package-lib-utils, package-lib-plugins">
 
         <!-- Compress JS file list -->
 
@@ -353,7 +357,7 @@
 
     </target>
 
-    <target name="package-examples">
+    <target name="package-examples" depends="package-lib">
         <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
         <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
             <fileset dir="${basedir}/resources/web"/>
@@ -370,14 +374,14 @@
         </copy>
     </target>
 
-    <target name="package-lib-utils" depends="docs">
+    <target name="package-lib-utils" depends="create-dist-directories">
         <!--<target name="package-lib-utils">-->
         <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
             <fileset dir="${basedir}/src/utils"/>
         </copy>
     </target>
 
-    <target name="package-lib-plugins" depends="docs">
+    <target name="package-lib-plugins" depends="create-dist-directories">
         <!--<target name="package-lib-plugins">-->
         <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
             <fileset dir="${basedir}/src/plugins"/>
