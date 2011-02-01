@@ -1,5 +1,5 @@
 /*
- Multiple Canvases SceneJS scene which renders the venerable OpenGL teapot.
+ Multiple Canvases SceneJS scene which renders the venerable OpenGL teapot into four canvases.
 
  Stephen Bannasch
  sbannasch@concord.org
@@ -212,7 +212,7 @@ function mouseMove1(event) {
         SceneJS.withNode("roll2").set("angle", pitch1);
         SceneJS.withNode("theScene2").render();
 
-        SceneJS.withNode("yaw3").set("angle", yaw1);
+        SceneJS.withNode("roll3").set("angle", yaw1);
         SceneJS.withNode("pitch3").set("angle", pitch1);
         SceneJS.withNode("theScene3").render();
 
