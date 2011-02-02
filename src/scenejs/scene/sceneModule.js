@@ -230,6 +230,17 @@ SceneJS._sceneModule = new (function() {
         return scene.canvas.canvas;
     };
 
+    /** Returns the webgl context element the given scene is bound to
+     * @private
+     */
+    this.getSceneContext = function(sceneId) {
+        var scene = scenes[sceneId];
+        if (!scene) {
+            throw SceneJS._errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+        }
+        return scene.canvas.context;
+    };
+
     /** Returns all registered scenes
      * @private
      */
