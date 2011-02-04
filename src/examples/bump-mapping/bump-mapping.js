@@ -76,27 +76,7 @@ SceneJS.createNode({
                                     /* Our first layer texture is the bump map, and is applied within
                                      * the fragment shader to our geometry node's normal vectors.
                                      */
-                                    layers: [
-                                        {
-                                            uri:"normal_map.jpg",
-                                            minFilter: "linear",
-                                            magFilter: "linear",
-                                            wrapS: "repeat",
-                                            wrapT: "repeat",
-                                            isDepth: false,
-                                            depthMode:"luminance",
-                                            depthCompareMode: "compareRToTexture",
-                                            depthCompareFunc: "lequal",
-                                            flipY: false,
-                                            width: 1,
-                                            height: 1,
-                                            internalFormat:"lequal",
-                                            sourceFormat:"alpha",
-                                            sourceType: "unsignedByte",
-                                            applyTo:"normals",
-                                            blendMode: "multiply"
-                                        }
-                                        ,
+                                    layers: [                                            
 
                                         /* Our second texture layer is applied within the fragment
                                          * shader to the baseColor of our material.
@@ -119,7 +99,27 @@ SceneJS.createNode({
                                             sourceType: "unsignedByte",
                                             applyTo:"baseColor",
                                             blendMode: "multiply"
+                                        },
+                                        {
+                                            uri:"normal_map.jpg",
+                                            minFilter: "linear",
+                                            magFilter: "linear",
+                                            wrapS: "repeat",
+                                            wrapT: "repeat",
+                                            isDepth: false,
+                                            depthMode:"luminance",
+                                            depthCompareMode: "compareRToTexture",
+                                            depthCompareFunc: "lequal",
+                                            flipY: false,
+                                            width: 1,
+                                            height: 1,
+                                            internalFormat:"lequal",
+                                            sourceFormat:"alpha",
+                                            sourceType: "unsignedByte",
+                                            applyTo:"normals",
+                                            blendMode: "multiply"
                                         }
+
                                     ],
 
                                     nodes: [
