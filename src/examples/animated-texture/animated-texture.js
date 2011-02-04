@@ -199,9 +199,8 @@ window.render = function() {
     SceneJS.withNode("pitch").set("angle", pitch);
     SceneJS.withNode("yaw").set("angle", yaw);
 
-    SceneJS.withNode("theTexture").set("layer", {
-        index: 0,
-        cfg: {
+    SceneJS.withNode("theTexture").set("layers", {
+        "0":{
             scale: {
                 x: texScale,
                 y: texScale

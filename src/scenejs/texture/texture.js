@@ -480,6 +480,37 @@ SceneJS.Texture.prototype.setLayer = function(cfg) {
 };
 
 /**
+ *
+ * </code></pre>
+ * @param cfg
+ */
+SceneJS.Texture.prototype.setLayers = function(layers) {
+    for (var index in layers) {
+        if (layers.hasOwnProperty(index)) {
+            if (index != undefined || index != null) {
+
+                if (index < 0 || index >= this._layers.length) {
+                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
+                            "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)"));
+                }
+                var cfg = layers[index] || {};
+                var layer = this._layers[index];
+                if (cfg.translate) {
+                    this.setTranslate(layer, cfg.translate);
+                }
+                if (cfg.scale) {
+                    this.setScale(layer, cfg.scale);
+                }
+                if (cfg.rotate) {
+                    this.setRotate(layer, cfg.rotate);
+                }
+            }
+        }
+    }
+    this._setDirty();
+};
+
+/**
  * @private
  */
 SceneJS.Texture.prototype.setTranslate = function(layer, xy) {
