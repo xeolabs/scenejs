@@ -7,12 +7,14 @@ SceneJS._namespace("SceneJS.objects");
  * triangles with normals for shading and one layer of UV coordinates for texture-mapping
  * When not solid, it will be a wireframe drawn as line segments.</p>
  * <p><b>Example Usage</b></p><p>Definition of solid disk that extends 6 units radially from the Y-axis,
- * is 2 units high in the Y-axis and is made up of 48 longitudinal rings:</b></p><pre><code>
+ * is elliptical in shape with a normalized semiMajorAxis of 1.5, is 2 units high in the Y-axis and 
+ * is made up of 48 longitudinal rings:</b></p><pre><code>
  * var c = new SceneJS.Disk({
- *          radius: 6,       // Optional radius (1 is default)
- *          inner_radius: 3  // Optional inner_radius results in ring (default is 0)
- *          height: 2,       // Optional height (1 is default)
- *          rings: 48        // Optional number of longitudinal rings (30 is default)
+ *          radius: 6,          // Optional radius (1 is default)
+ *          inner_radius: 3     // Optional inner_radius results in ring (default is 0)
+ *          semiMajorAxis: 1.5  // Optional semiMajorAxis results in ellipse (default is 1 which is a circle)
+ *          height: 2,          // Optional height (1 is default)
+ *          rings: 48           // Optional number of longitudinal rings (30 is default)
  *     })
  * </pre></code>
  * @extends SceneJS.Geometry
@@ -22,7 +24,8 @@ SceneJS._namespace("SceneJS.objects");
  * @param {Object} [cfg] Static configuration object
  * @param {float} [cfg.radius=1.0] radius extending from Y-axis
  * @param {float} [cfg.inner_radius=0] inner radius extending from Y-axis
- * @param {float} [cfg.height=1.0] height on Y-axis
+ * @param {float} [cfg.inner_radius=0] inner radius extending from Y-axis
+ * @param {float} [cfg.semiMajorAxis=1.0] values other than one generate an ellipse
  * @param {float} [cfg.rings=30]  number of longitudinal rings
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
@@ -39,6 +42,9 @@ SceneJS.Disk.prototype._init = function(params) {
     if (inner_radius > radius) {
         inner_radius = radius
     }
+    
+    var semiMajorAxis =  params.semiMajorAxis || 1;
+    var semiMinorAxis =  1 / semiMajorAxis;
 
     /* Resource ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
@@ -57,8 +63,8 @@ SceneJS.Disk.prototype._init = function(params) {
 
          for (var ringNum = 0; ringNum <= rings; ringNum++) {
              var phi = ringNum * 2 * Math.PI / rings;
-             var sinPhi = Math.sin(phi);
-             var cosPhi = Math.cos(phi);
+             var sinPhi = semiMinorAxis * Math.sin(phi);
+             var cosPhi = semiMajorAxis * Math.cos(phi);
 
              var x = cosPhi;
              var z = sinPhi;
