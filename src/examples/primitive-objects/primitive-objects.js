@@ -118,6 +118,8 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "disk",
+                                                    radius: 1.0,
+                                                    inner_radius: 0.5,
                                                     rings: 12,
                                                 }
                                             ]
@@ -209,6 +211,8 @@ SceneJS.createNode({
 
                                                         {
                                                             type: "disk",
+                                                            radius: 1.0,
+                                                            inner_radius: 0.5,
                                                             rings: 12,
                                                         }
                                                     ]
