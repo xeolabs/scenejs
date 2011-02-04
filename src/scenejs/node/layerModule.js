@@ -30,29 +30,53 @@ SceneJS._layerModule = new (function() {
 
     this.setActiveLayers = function(layers) {
         enabledLayers = {};
+
+        /* Default layer - implicitly enabled
+         */
         layerOrder = [
             {
                 name: this.DEFAULT_LAYER_NAME,
                 priority: 0
             }
         ];
-
         if (layers) {
-            var priority;
-            for (var layerName in layers) {
-                if (layers.hasOwnProperty(layerName)) {
-                    priority = layers[layerName];
-                    insertLayer(layerName, priority);
+            if (SceneJS._isArray(layers)) {
+
+                /* Array of layer names - no sorting
+                 */
+                for (var i = 0, len = layers.length; i < len; i++) {
+                    appendLayer(layers[i], 0);
+                }
+            } else {
+
+                /* Map of layer names - do sorting
+                 */
+                var priority;
+                for (var layerName in layers) {
+                    if (layers.hasOwnProperty(layerName)) {
+                        priority = layers[layerName];
+                        insertLayer(layerName, priority);
+                    }
                 }
             }
         }
     };
 
+    /* Append layer for when sorting not done
+     */
+    function appendLayer(layerName, priority) {
+        enabledLayers[layerName] = true;
+        var newLayer = {
+            name: layerName,
+            priority: priority
+        };
+        layerOrder.push(newLayer);
+    }
+
+    /* Insert layer for when sorting is done
+     */
     function insertLayer(layerName, priority) {
         enabledLayers[layerName] = true;
-
-        /* Insert layer name
-         */
         var newLayer = {
             name: layerName,
             priority: priority
