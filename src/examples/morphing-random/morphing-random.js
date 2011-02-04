@@ -137,11 +137,21 @@ SceneJS.withNode("theScene").bind("rendered",
                 for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
                     positions2.push(positions[i] * (1 + (Math.sin(i * 0.003) * 0.1)));
                 }
+                var positions3 = [];
+                for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
+                    positions3.push(positions[i] * (1 + (Math.sin(i * 0.015) * 0.1)));
+                }
 
                 teapot.parent().insert({
                     node: {
                         type: "morphGeometry",
                         id: "my-morphGeometry",
+
+                        keys: [
+                            0, // Target 1
+                            1, // Target 2
+                            3  // target 3
+                        ],
 
                         targets: [
                             {
@@ -149,6 +159,9 @@ SceneJS.withNode("theScene").bind("rendered",
                             },
                             {
                                 positions: positions2  // Target 2
+                            },
+                            {
+                                positions: positions3  // Target 3
                             }
                         ],
 
@@ -177,7 +190,7 @@ var factor = 0;
 SceneJS.withNode("theScene").start({
     idleFunc: function() {
         if (SceneJS.nodeExists("my-morphGeometry")) {
-            SceneJS.withNode("my-morphGeometry").set("factor", 1.0 + Math.sin(factor));
+            SceneJS.withNode("my-morphGeometry").set("factor", 1.0 + (Math.sin(factor) * 2.0));
             factor += 0.1;
         }
     }

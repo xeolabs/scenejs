@@ -17,6 +17,13 @@ SceneJS.MorphGeometry.prototype._init = function(params) {
                         "morphGeometry node should have at least two targets"));
     }
 
+    var keys = params.keys || [];
+    if (keys.length != targets.length) {
+        throw SceneJS._errorModule.fatalError(
+                new SceneJS.errors.InvalidNodeConfigException(
+                        "morphGeometry node mismatch in number of keys and targets"));
+    }
+
     var positions;
     var normals;
     var uv;
@@ -54,6 +61,7 @@ SceneJS.MorphGeometry.prototype._init = function(params) {
         }
     }
 
+    this._attr.keys = keys;
     this._attr.targets = targets;
     this._attr.factor = params.factor || 0;
 };

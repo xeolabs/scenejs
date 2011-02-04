@@ -54,20 +54,63 @@ SceneJS._morphGeometryModule = new (function() {
                         /* Get top morph on stack
                          */
                         var morph = morphStack[stackLen - 1];
+                        var factor = morph.factor;
 
-                        /* Select target frame
+                        /* Will hold target frame enclosing factor
                          */
-                        var target1 = morph.targets[0];   // Just for testing
-                        var target2 = morph.targets[1];
+                        var key1;
+                        var key2;
 
-                        /* Set on shader module
+                        /* Find the target frame
+                         */
+                        if (factor <= morph.keys[0]) {
+
+                            /* Clamp to first target frame
+                             */
+                            factor = morph.keys[0];
+                            key1 = 0;
+                            key2 = 1;
+
+                        } else {
+
+                            if (factor >= morph.keys[morph.keys.length - 1]) {
+
+                                /* Clamp to last target frame
+                                 */
+                                factor = morph.keys[morph.keys.length - 1];
+                                key1 = morph.keys.length - 2;
+                                key2 = morph.keys.length - 1;
+
+                            } else {
+
+                                /* Find target frame enclosing
+                                 */
+                                for (var i = morph.targets.length - 1; i >= 0; i--) {
+                                    if (factor > morph.keys[i]) {
+                                        key1 = i;
+                                        key2 = i + 1; // Clamping to last ensures this is never out of range
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        /* Normalise factor to range [0.0..1.0] for the target frame
+                         */
+                        var normalizedFactor = (factor - morph.keys[key1]) / (morph.keys[key2] - morph.keys[key1]);
+
+                        /* Set factor and target frame on shader module
                          */
                         SceneJS._renderModule.setMorph(idStack[stackLen - 1], {
-                            factor: morph.factor,
-                            target1: target1,
-                            target2: target2
+                            factor: normalizedFactor,
+                            target1: morph.targets[key1],
+                            target2: morph.targets[key2]
                         });
+
                     } else {
+
+                        /* Set null morph
+                         */
                         SceneJS._renderModule.setMorph();
                     }
                     dirty = false;
