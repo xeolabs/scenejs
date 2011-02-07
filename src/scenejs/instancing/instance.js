@@ -150,12 +150,12 @@ SceneJS.Instance.prototype.setTarget = function(target) {
 };
 
 
-// @private
-SceneJS.Instance.prototype._compile = function(traversalContext) {
-    this._preCompile(traversalContext);
-    this._compileNodes(traversalContext);
-    this._postCompile(traversalContext);
-};
+//// @private
+//SceneJS.Instance.prototype._compile = function(traversalContext) {
+//    this._preCompile(traversalContext);
+//    this._compileNodes(traversalContext);
+//    this._postCompile(traversalContext);
+//};
 
 //(function() {
 //
@@ -234,57 +234,66 @@ SceneJS.Instance.prototype._compile = function(traversalContext) {
 //
 //})();
 
-    // @private
-    SceneJS.Instance.prototype._compile = function(traversalContext) {
-        if (this._attr.target) {
-            var nodeId = this._attr.target; // Make safe to set #uri while instantiating
+// @private
+SceneJS.Instance.prototype._compile = function(traversalContext) {
+    if (this._attr.target) {
+        var nodeId = this._attr.target; // Make safe to set #uri while instantiating
 
-            this._symbol = SceneJS._instancingModule.acquireInstance(nodeId);
+        this._symbol = SceneJS._instancingModule.acquireInstance(this._attr.id, nodeId);
 
-            if (!this._symbol) {
+        if (!this._symbol) {
 
-                /* Couldn't find target
-                 */
-                var exception;
-                if (this._attr.mustExist) {
-                    throw SceneJS._errorModule.fatalError(
-                            exception = new SceneJS.errors.SymbolNotFoundException
-                                    ("SceneJS.Instance could not find target node: '" + this._attr.target + "'"));
-                }
-                this._changeState(SceneJS.Instance.STATE_ERROR, exception);
-
-                /**
-                 * If we're going to keep trying to find the
-                 * target, then we'll need the scene graph to
-                 * keep rendering so that this instance can
-                 * keep trying. Otherwise, we'll wait for the next
-                 * render.
-                 */
-                if (this._attr.retry) {
-
-                    SceneJS._compileModule.nodeUpdated(this, "searching");
-
-                    /* Record this node as still loading, for "loading-status"
-                     * events to include in their reported stats
-                     */
-                    SceneJS._loadStatusModule.status.numNodesLoading++;
-                }
-
-            } else {
-
-                /* Record this node as loaded
-                 */
-                SceneJS._loadStatusModule.status.numNodesLoaded++;
-
-                this._changeState(SceneJS.Instance.STATE_CONNECTED);
-                this._symbol._compileWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
-                SceneJS._instancingModule.releaseInstance(nodeId);
-                this._changeState(SceneJS.Instance.STATE_SEARCHING);
-                this._symbol = null;
+            /* Couldn't find target
+             */
+            var exception;
+            if (this._attr.mustExist) {
+                throw SceneJS._errorModule.fatalError(
+                        exception = new SceneJS.errors.SymbolNotFoundException
+                                ("SceneJS.Instance could not find target node: '" + this._attr.target + "'"));
             }
-        }
-    };
+            this._changeState(SceneJS.Instance.STATE_ERROR, exception);
 
+            /**
+             * If we're going to keep trying to find the
+             * target, then we'll need the scene graph to
+             * keep rendering so that this instance can
+             * keep trying. Otherwise, we'll wait for the next
+             * render.
+             */
+            if (this._attr.retry) {
+
+                SceneJS._compileModule.nodeUpdated(this, "searching");
+
+                /* Record this node as still loading, for "loading-status"
+                 * events to include in their reported stats
+                 */
+                SceneJS._loadStatusModule.status.numNodesLoading++;
+            }
+
+        } else {
+
+            /* Record this node as loaded
+             */
+            SceneJS._loadStatusModule.status.numNodesLoaded++;
+
+            this._changeState(SceneJS.Instance.STATE_CONNECTED);
+
+            if (SceneJS._compileModule.preVisitNode(this._symbol)) {     //////////////
+                SceneJS._flagsModule.preVisitNode(this._symbol);         //////////////
+
+                this._symbol._compileWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
+
+                SceneJS._flagsModule.postVisitNode(this._symbol);       //////////////
+            }
+            SceneJS._compileModule.postVisitNode(this._symbol);         //////////////
+            SceneJS._renderModule.marshallStates();
+
+            SceneJS._instancingModule.releaseInstance(nodeId);
+            this._changeState(SceneJS.Instance.STATE_SEARCHING);
+            this._symbol = null;
+        }
+    }
+};
 
 
 // @private

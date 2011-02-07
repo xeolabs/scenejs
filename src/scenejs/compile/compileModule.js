@@ -10,7 +10,7 @@ SceneJS._compileModule = new (function() {
 
     var debugCfg;
 
-    /* Compile enabled by default
+    /* Compile disabled by default
      */
     this._enableCompile = true;
 
@@ -252,23 +252,23 @@ SceneJS._compileModule = new (function() {
             "set" : {
                 attr: {
 
-//                    "enabled": {
-//                        level: this.COMPILE_BRANCH
-//                    },
+                    //                    "enabled": {
+                    //                        level: this.COMPILE_BRANCH
+                    //                    },
 
                     "flags": {
                         attr: {
                             transparent: {
-                                level: this.COMPILE_SCENE
+                                level: this.COMPILE_BRANCH
                             },
                             enabled: {
-                                level: this.COMPILE_SCENE
+                                level: this.COMPILE_BRANCH
                             },
                             picking: {
-                                level: this.COMPILE_SCENE
+                                level: this.COMPILE_BRANCH
                             },
                             colortrans: {
-                                level: this.COMPILE_PATH
+                                level: this.COMPILE_BRANCH
                             }
                         },
                         level: this.COMPILE_SCENE
@@ -286,16 +286,16 @@ SceneJS._compileModule = new (function() {
                         attr: {
 
                             transparent: {
-                                level: this.COMPILE_SCENE
+                                level: this.COMPILE_BRANCH
                             },
                             enabled: {
-                                level: this.COMPILE_SCENE
+                                level: this.COMPILE_BRANCH
                             },
                             picking: {
-                                level: this.COMPILE_SCENE
+                                level: this.COMPILE_BRANCH
                             },
                             colortrans: {
-                                level: this.COMPILE_PATH
+                                level: this.COMPILE_BRANCH
                             }
                         },
 
@@ -325,11 +325,22 @@ SceneJS._compileModule = new (function() {
             }
         },
 
-        "scene" : {
-            "created" : {
-                level: this.COMPILE_SCENE
+        /*-----------------------------------------------------------------------------------
+         * clip
+         *---------------------------------------------------------------------------------*/
+
+        "clip": {
+            set: {
+                level: this.COMPILE_PATH
+            },
+            inc: {
+                level: this.COMPILE_PATH
             }
         },
+
+        /*-----------------------------------------------------------------------------------
+         * colortrans
+         *---------------------------------------------------------------------------------*/
 
         "colortrans": {
             set: {
@@ -343,33 +354,41 @@ SceneJS._compileModule = new (function() {
             }
         },
 
+        "scene" : {
+            "created" : {
+                level: this.COMPILE_SCENE
+            }
+        },
+
+
         /* Transform nodes require many things below them to recompile,
          * such as transforms and boundingBoxes
          */
+
         "scale": {
             set: {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             },
             inc: {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             }
         },
 
         "rotate": {
             set: {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             },
             inc: {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             }
         },
 
         "translate": {
             set: {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             },
             inc: {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             }
         },
 
@@ -391,7 +410,7 @@ SceneJS._compileModule = new (function() {
          */
         "morphGeometry": {
             set: {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_PATH
             }
         },
 
@@ -413,6 +432,14 @@ SceneJS._compileModule = new (function() {
 
             "loadedImagebuf": {
                 level: this.COMPILE_SCENE   // TODO: got to be a tighter rule - maybe compile imagebuf's subtree then texture's branch?
+            },
+
+            set: {
+                attr: {
+                    layers: {
+                        level: this.COMPILE_PATH
+                    }
+                }
             }
         },
 
@@ -757,13 +784,25 @@ SceneJS._compileModule = new (function() {
     this._recompilePath = function(targetNode) {
         var dirtyNodes = this._dirtyNodes;
         if (dirtyNodes[targetNode._attr.id]) { // Optimise for multiple updates on same node
-                   return;
+            return;
         }
         var nodeInstances;
         var id;
         var node = targetNode;
         while (node) {
             id = node._attr.id;
+
+            /* Ensure that instance allows compilation of the entire subgraph of its symbol
+             * because the updated node will be a temporary child of the symbol subgraph's
+             * rightmost leaf - otherwise the symbol subgraph will cull compilation of the
+             * updated node if the subgraph is not flagged for compilation.  
+             */
+            if (node._attr.nodeType == "instance") {
+                this._nodesWithinBranches[id] = true;
+            }
+
+            /*
+             */
             if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
                 return;
             }
@@ -856,10 +895,7 @@ SceneJS._compileModule = new (function() {
         if (this._subtreeRootsToCompile[nodeId]) {
             return true;
         }
-        var x = 9;
-
-
-        return x != 9;
+        return false;
     };
 
     this.postVisitNode = function(node) {

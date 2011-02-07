@@ -356,7 +356,6 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
              */
             if (SceneJS._compileModule.preVisitNode(child)) {
 
-
                 SceneJS._flagsModule.preVisitNode(child);
 
                 childTraversalContext = {
@@ -386,12 +385,10 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
              * marshal dirty states accumulated by traversed nodes, however in this case we may not be
              * visiting those geometries, so we'll trigger that explicitly.
              */
-            // if (needMarshal) {
-            SceneJS._renderModule.marshallStates();
-            needMarshal = false;
-            //}
-
-
+            if (needMarshal) {
+                SceneJS._renderModule.marshallStates();
+                needMarshal = false;
+            }
         }
     }
 
@@ -474,7 +471,7 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
         this._fireEvent("loading-status", SceneJS._loadStatusModule.diffStatus(loadStatusSnapshot));
     }
 
-  
+
     if (this._listeners["post-rendered"]) {
         this._fireEvent("post-rendered", { });
     }

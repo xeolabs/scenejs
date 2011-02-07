@@ -23,6 +23,28 @@ SceneJS._renderModule = new (function() {
     this._stateSortDelay = this.DEFAULT_STATE_SORT_DELAY;
 
     /*----------------------------------------------------------------------
+     * ID for each state type
+     *--------------------------------------------------------------------*/
+
+    var CLIPS = 0;
+    var COLORTRANS = 1;
+    var DEFORM = 2;
+    var FLAGS = 3;
+    var FOG = 4;
+    var IMAGEBUF = 5;
+    var LIGHTS = 6;
+    var MATERIAL = 7;
+    var MORPH = 8;
+    var PICKCOLOR = 9;
+    var TEXTURE = 10;
+    var RENDERER = 11;
+    var MODEL_TRANSFORM = 12;
+    var PROJ_TRANSFORM = 13;
+    var VIEW_TRANSFORM = 14;
+    var PICK_LISTENERS = 15;
+    var RENDER_LISTENERS = 16;
+
+    /*----------------------------------------------------------------------
      * Default state values
      *--------------------------------------------------------------------*/
 
@@ -149,6 +171,8 @@ SceneJS._renderModule = new (function() {
     var nodeMap;
     var stateMap;
     var nextStateId;
+
+    var idPrefix;
 
     var nextProgramId = 0;
 
@@ -305,6 +329,8 @@ SceneJS._renderModule = new (function() {
 
         stateHash = null;
 
+        idPrefix = null;
+
         if (options.compileMode == SceneJS._renderModule.COMPILE_SCENE) {        // Rebuild display list for entire scene
 
             /* Going to rebuild the state graph as we recompile
@@ -334,6 +360,7 @@ SceneJS._renderModule = new (function() {
             rebuildShaders = true;           // Rebuilding shaders - always when rebuilding state graph
 
             nextStateId = 0;                 // Ready to ID new states
+
             //  nextProgramId = 0;           // Ready to ID new programs
 
             nodeMap = states.nodeMap = {};
@@ -377,15 +404,32 @@ SceneJS._renderModule = new (function() {
      * State setting/updating
      *----------------------------------------------------------------------------------------------------------------*/
 
-    function getState(id) {
+    /**
+     * Set when pre/post compiling instance nodes, this is prefixed to all IDs
+     * by getState to disambiguate when the ID'd nodes are within instances
+     */
+    this.setIDPrefix = function(id) {
+        idPrefix = id;
+    };
+
+    /** Find or create a new state of the given state type and node ID
+     */
+    function getState(stateType, id) {
+        if (idPrefix) {
+            id = idPrefix + id;
+        }
         var state;
+        var typeMap = stateMap[stateType];
+        if (!typeMap) {
+            typeMap = stateMap[stateType] = {};
+        }
         if (compileMode != SceneJS._renderModule.COMPILE_SCENE) {
-            state = stateMap[id];
+            state = typeMap[id];
             if (!state) {
                 state = {
                     _stateId : nextStateId
                 };
-                stateMap[id] = state;
+                typeMap[id] = state;
             }
         } else {
 
@@ -395,7 +439,7 @@ SceneJS._renderModule = new (function() {
                 _stateId : nextStateId
             };
             if (id) {
-                stateMap[id] = state;
+                typeMap[id] = state;
             }
         }
 
@@ -405,6 +449,7 @@ SceneJS._renderModule = new (function() {
             states.layers = {};
             rebuildBins = false;
         }
+        state.id = id;
         return state;
     }
 
@@ -414,7 +459,7 @@ SceneJS._renderModule = new (function() {
      * @param {Array} clips The clipping planes
      */
     this.setClips = function(id, clips) {
-        clipState = getState(id || "___DEFAULT_CLIPS");
+        clipState = getState(CLIPS, id || "___DEFAULT_CLIPS");
         clips = clips || [];
         if (clips.length > 0) {
             var hash = [];
@@ -434,7 +479,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setColortrans = function(id, trans) {
-        colortransState = getState(id || "___DEFAULT_COLOR_TRANS");
+        colortransState = getState(COLORTRANS, id || "___DEFAULT_COLOR_TRANS");
         colortransState.trans = trans;
         colortransState.hash = trans ? "t" : "f";
         stateHash = null;
@@ -444,7 +489,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setDeform = function(id, deform) {
-        deformState = getState(id || "___DEFAULT_DEFORM");
+        deformState = getState(DEFORM, id || "___DEFAULT_DEFORM");
         deformState.deform = deform;
         deformState.hash = deform ? "d" + deform.verts.length : "";
         stateHash = null;
@@ -454,7 +499,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setFlags = function(id, flags) {
-        flagsState = getState(id || "___DEFAULT_FLAGS");
+        flagsState = getState(FLAGS, id || "___DEFAULT_FLAGS");
         flagsState.flags = flags || {
             fog: true,          // Fog enabled
             colortrans : true,  // Effect of colortrans enabled
@@ -471,7 +516,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setFog = function(id, fog) {
-        fogState = getState(id || "___DEFAULT_FOG");
+        fogState = getState(FOG, id || "___DEFAULT_FOG");
         fogState.fog = fog;
         fogState.hash = fog ? fog.mode : "";
         stateHash = null;
@@ -480,7 +525,7 @@ SceneJS._renderModule = new (function() {
     /**
      */
     this.setImagebuf = function(id, imageBuf) {
-        imageBufState = getState(id || "___DEFAULT_IMAGEBUF");
+        imageBufState = getState(IMAGEBUF, id || "___DEFAULT_IMAGEBUF");
         imageBufState.imageBuf = imageBuf;
     };
 
@@ -499,7 +544,7 @@ SceneJS._renderModule = new (function() {
                 hash.push("d");
             }
         }
-        lightState = getState(id || "___DEFAULT_LIGHTS");
+        lightState = getState(LIGHTS, id || "___DEFAULT_LIGHTS");
         lightState.lights = lights;
         lightState.hash = hash.join("");
         stateHash = null;
@@ -509,7 +554,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setMaterial = function(id, material) {
-        materialState = getState(id || "___DEFAULT_MATERIAL");
+        materialState = getState(MATERIAL, id || "___DEFAULT_MATERIAL");
         material = material || {};
         materialState.material = {
             baseColor : material.baseColor || [ 0.0, 0.0, 0.0 ],
@@ -527,7 +572,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setMorph = function(id, morph) {
-        morphState = getState(id || "___DEFAULT_MORPH");
+        morphState = getState(MORPH, id || "___DEFAULT_MORPH");
         var hash;
         if (morph) {
             hash = [];
@@ -549,7 +594,7 @@ SceneJS._renderModule = new (function() {
      * Pick color is only expected to be set within a pick traversal
      */
     this.setPickColor = function(id, pickColor) {
-        pickState = getState(id || "___DEFAULT_PICK");
+        pickState = getState(PICKCOLOR, id || "___DEFAULT_PICK");
         pickState.pickColor = pickColor;
         stateHash = null;
     };
@@ -558,7 +603,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setTexture = function(id, texlayers) {
-        texState = getState(id || "___DEFAULT_TEXTURE");
+        texState = getState(TEXTURE, id || "___DEFAULT_TEXTURE");
 
         texlayers = texlayers || [];
 
@@ -592,7 +637,7 @@ SceneJS._renderModule = new (function() {
      *
      */
     this.setRenderer = function(id, props) {
-        rendererState = getState(id || "___DEFAULT_RENDERER");
+        rendererState = getState(RENDERER, id || "___DEFAULT_RENDERER");
         rendererState.props = props;
         stateHash = null;
     };
@@ -600,22 +645,23 @@ SceneJS._renderModule = new (function() {
     /**
      */
     this.setModelTransform = function(id, mat, normalMat) {
-        modelXFormState = getState(id || "___DEFAULT_MODEL_TRANSFORM");
+        modelXFormState = getState(MODEL_TRANSFORM, id || "___DEFAULT_MODEL_TRANSFORM");
         modelXFormState.mat = mat || DEFAULT_MAT;
         modelXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
+        modelXFormState.id = id;
     };
 
     /**
      */
     this.setProjectionTransform = function(id, mat) {
-        projXFormState = getState(id || "___DEFAULT_PROJ_TRANSFORM");
+        projXFormState = getState(PROJ_TRANSFORM, id || "___DEFAULT_PROJ_TRANSFORM");
         projXFormState.mat = mat || DEFAULT_MAT;
     };
 
     /**
      */
     this.setViewTransform = function(id, mat, normalMat) {
-        viewXFormState = getState(id || "___DEFAULT_VIEW_TRANSFORM");
+        viewXFormState = getState(VIEW_TRANSFORM, id || "___DEFAULT_VIEW_TRANSFORM");
         viewXFormState.mat = mat || DEFAULT_MAT;
         viewXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
     };
@@ -623,14 +669,14 @@ SceneJS._renderModule = new (function() {
     /**
      */
     this.setPickListeners = function(id, listeners) {
-        pickListenersState = getState(id || "___DEFAULT_PICK_LISTENERS");
+        pickListenersState = getState(PICK_LISTENERS, id || "___DEFAULT_PICK_LISTENERS");
         pickListenersState.listeners = listeners || [];
     };
 
     /**
      */
     this.setRenderListeners = function(id, listeners) {
-        renderListenersState = getState(id || "___DEFAULT_RENDER_LISTENERS");
+        renderListenersState = getState(RENDER_LISTENERS, id || "___DEFAULT_RENDER_LISTENERS");
         renderListenersState.listeners = listeners || [];
     };
 
@@ -664,6 +710,14 @@ SceneJS._renderModule = new (function() {
      * active bin set, depending on whether the material state is opaque or transparent.
      */
     this.setGeometry = function(id, geo) {
+
+        if (id) {
+            id += ".gl";
+        }
+
+        if (idPrefix) {
+            id = idPrefix + id;
+        }
 
         /* Pull in dirty states from other modules
          */
@@ -721,7 +775,7 @@ SceneJS._renderModule = new (function() {
 
             /* Node will be pre-sorted on shader
              */
-            sortId: program.id, // Assuming less than 100000 textures
+            sortId: program.id,
 
             //---------------------------------------------------------------------------------------------------------
             // TODO: Sort on shader AND texture when we have debugged why states (stateIds) seem to switch around
@@ -753,7 +807,6 @@ SceneJS._renderModule = new (function() {
         };
 
         nodeMap[id] = node;
-        flagsState.nodeId = id;
 
         layer.bin.push(node);
     };
@@ -987,7 +1040,7 @@ SceneJS._renderModule = new (function() {
 
             /* Only pick nodes that are enabled for picking
              */
-            if (this._picking && node.flagsState.flags.enableClip === false) {
+            if (this._picking && node.flagsState.flags.clipping === false) {
                 return;
             }
 
@@ -1040,8 +1093,6 @@ SceneJS._renderModule = new (function() {
                 //                if (!node.flagState.enabled) {
                 //                    return;
                 //                }
-
-
             }
 
             /*----------------------------------------------------------------------------------------------------------
@@ -1221,14 +1272,17 @@ SceneJS._renderModule = new (function() {
              * clip planes
              *--------------------------------------------------------------------------------------------------------*/
 
-            if (node.clipState && node.clipState._stateId != this._lastClipStateId) {
+            if (node.clipState &&
+                (node.clipState._stateId != this._lastClipStateId ||
+                 node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable clip
+
                 var clip;
                 for (var k = 0; k < node.clipState.clips.length; k++) {
                     clip = node.clipState.clips[k];
                     this._program.setUniform("uClipNormal" + k, clip.normal);
                     this._program.setUniform("uClipDist" + k, clip.dist);
 
-                    if (node.flagsState.flags.enableClip === false) { // Flags disable/enable clipping
+                    if (node.flagsState.flags.clipping === false) { // Flags disable/enable clipping
                         this._program.setUniform("uClipMode" + k, 0);
                     } else if (clip.mode == "inside") {
                         this._program.setUniform("uClipMode" + k, 2);
@@ -1268,8 +1322,12 @@ SceneJS._renderModule = new (function() {
                  * fog
                  *--------------------------------------------------------------------------------------------------------*/
 
-                if (node.fogState && node.fogState.fog && node.fogState._stateId != this._lastFogStateId) {
+                if (node.fogState && node.fogState.fog &&
+                    (node.fogState._stateId != this._lastFogStateId ||
+                     node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable fog
+
                     var fog = node.fogState.fog;
+
                     if (node.flagsState.flags.fog === false || fog.mode == "disabled") {
 
                         // When fog is disabled, don't bother loading any of its parameters
@@ -1305,7 +1363,9 @@ SceneJS._renderModule = new (function() {
                  * colortrans
                  *--------------------------------------------------------------------------------------------------------*/
 
-                if (node.colortransState && node.colortransState.trans && node.colortransState._stateId != this._lastColortransStateId) {
+                if (node.colortransState && node.colortransState.trans
+                        && (node.colortransState._stateId != this._lastColortransStateId ||
+                            node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable colortrans
 
                     /* Bind colortrans
                      */
@@ -1767,12 +1827,12 @@ SceneJS._renderModule = new (function() {
         if (morphing) {
             if (morphState.morph.target1.vertexBuf) {
                 src.push("  vec4 vMorphVertex = uVMatrix * (uMMatrix * vec4(aMorphVertex, 1.0)); ");
-                src.push("  tmpVertex = vec4(tmpVertex.xyz + mix(tmpVertex.xyz, vMorphVertex.xyz, uMorphFactor), 1.0); ");
+                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, uMorphFactor), 1.0); ");
             }
             if (lighting) {
                 if (morphState.morph.target1.normalBuf) {
                     src.push("  vec4 vMorphNormal = uVMatrix * (uMMatrix * vec4(aMorphNormal, 1.0)); ");
-                    src.push("  tmpNormal = vec4(tmpNormal.xyz + mix(tmpNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
+                    src.push("  tmpNormal = vec4( mix(tmpNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
                 }
             }
         }
@@ -2038,7 +2098,7 @@ SceneJS._renderModule = new (function() {
 
                 /* Alpha from Texture
                  * */
-                //   src.push("alpha = texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).a;");
+                src.push("alpha = texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).a;");
 
                 /* Texture output
                  */
