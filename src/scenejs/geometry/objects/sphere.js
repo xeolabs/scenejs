@@ -5,8 +5,10 @@
  * <p><b>Example Usage</b></p><p>Definition of sphere with a radius of 6 units:</b></p><pre><code>
  * var c = new SceneJS.Sphere({
  *			radius: 6
- *          slices: 30,     // Optional number of longitudinal slices (30 is default)
- *          rings: 30      // Optional number of latitudinal slices (30 is default)
+ *          slices: 30,          // Optional number of longitudinal slices (30 is default)
+ *          rings: 30,           // Optional number of latitudinal slices (30 is default)
+ *          semiMajorAxis: 1.5,  // Optional semiMajorAxis results in elliptical sphere (default of 1 creates sphere)
+ *          sweep: 0.75,         // Optional rotational extrusion (1 is default)
  *     })
  * </pre></code>
 * @extends SceneJS.Geometry
@@ -16,6 +18,8 @@
  * @param {Object} [cfg] Static configuration object
  * @param {float} [cfg.slices=30] Number of longitudinal slices
  * @param {float} [cfg.rings=30] Number of longitudinal slices
+ * @param {float} [cfg.semiMajorAxis=1.0] values other than one generate an elliptical sphere
+ * @param {float} [cfg.sweep=1]  rotational extrusion default is 1
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
@@ -26,11 +30,22 @@ SceneJS.Sphere.prototype._init = function(params) {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
 	var radius = params.radius || 1;
+    
+    var semiMajorAxis =  params.semiMajorAxis || 1;
+    var semiMinorAxis =  1 / semiMajorAxis;
+
+    var sweep = params.sweep || 1;
+    if (sweep > 1) {
+        sweep = 1
+    }
+    
+    var ringLimit = rings * sweep;
+    
 
     /* Resource ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
      */
-    this._resource = "sphere_" + radius + "_" + rings + "_" + slices;
+    this._resource = "sphere_" + radius + "_" + rings + "_" + slices + "_" + innerRadius + "_" + semiMajorAxis + "_" + sweep;
 
     /* Callback that does the creation in case we can't find matching sphere to reuse     
      */
@@ -44,9 +59,10 @@ SceneJS.Sphere.prototype._init = function(params) {
             var cosTheta = Math.cos(theta);
 
             for (var ringNum = 0; ringNum <= rings; ringNum++) {
+                if (ringNum > ringLimit) break;
                 var phi = ringNum * 2 * Math.PI / rings;
-                var sinPhi = Math.sin(phi);
-                var cosPhi = Math.cos(phi);
+                var sinPhi = semiMinorAxis * Math.sin(phi);
+                var cosPhi = semiMajorAxis * Math.cos(phi);
 
                 var x = cosPhi * sinTheta;
                 var y = cosTheta;
@@ -66,10 +82,17 @@ SceneJS.Sphere.prototype._init = function(params) {
         }
 
         var indices = [];
+        
+        positions.push(0, 0, 0);
+        normals.push(1, 1, 1);
+        uv.push(1, 1);
+        var center = (ringLimit + 1) *  (slices + 1);
+        
         for (var sliceNum = 0; sliceNum < slices; sliceNum++) {
             for (var ringNum = 0; ringNum < rings; ringNum++) {
-                var first = (sliceNum * (rings + 1)) + ringNum;
-                var second = first + rings + 1;
+                if (ringNum >= ringLimit) break;
+                var first = (sliceNum * (ringLimit + 1)) + ringNum;
+                var second = first + ringLimit + 1;
                 indices.push(first);
                 indices.push(second);
                 indices.push(first + 1);
@@ -78,6 +101,15 @@ SceneJS.Sphere.prototype._init = function(params) {
                 indices.push(second + 1);
                 indices.push(first + 1);
             }
+            if (rings >= ringLimit) {
+                // We aren't sweeping the whole way around so ... 
+                //  indices for a sphere with fours ring-segments when only two are drawn.
+                index = (ringLimit + 1) * sliceNum;
+                //    0,3,15   2,5,15  3,6,15  5,8,15 ...
+                indices.push(index, index + ringLimit + 1, center);
+                indices.push(index + ringLimit, index + ringLimit * 2 + 1, center);
+             }
+            
         }
 
         return {
