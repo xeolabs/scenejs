@@ -11,7 +11,7 @@ SceneJS._namespace("SceneJS.objects");
  * is made up of 48 longitudinal rings:</b></p><pre><code>
  * var c = new SceneJS.Disk({
  *          radius: 6,          // Optional radius (1 is default)
- *          inner_radius: 3     // Optional inner_radius results in ring (default is 0)
+ *          innerRadius: 3     // Optional innerRadius results in ring (default is 0)
  *          semiMajorAxis: 1.5  // Optional semiMajorAxis results in ellipse (default is 1 which is a circle)
  *          height: 2,          // Optional height (1 is default)
  *          rings: 48           // Optional number of longitudinal rings (30 is default)
@@ -23,8 +23,8 @@ SceneJS._namespace("SceneJS.objects");
  * Create a new SceneJS.Disk
  * @param {Object} [cfg] Static configuration object
  * @param {float} [cfg.radius=1.0] radius extending from Y-axis
- * @param {float} [cfg.inner_radius=0] inner radius extending from Y-axis
- * @param {float} [cfg.inner_radius=0] inner radius extending from Y-axis
+ * @param {float} [cfg.innerRadius=0] inner radius extending from Y-axis
+ * @param {float} [cfg.innerRadius=0] inner radius extending from Y-axis
  * @param {float} [cfg.semiMajorAxis=1.0] values other than one generate an ellipse
  * @param {float} [cfg.rings=30]  number of longitudinal rings
  * @param {...SceneJS.Node} [childNodes] Child nodes
@@ -38,9 +38,9 @@ SceneJS.Disk.prototype._init = function(params) {
     var radius = params.radius || 1;
     var height = params.height || 1;
     var rings =  params.rings || 30;
-    var inner_radius = params.inner_radius || 0;
-    if (inner_radius > radius) {
-        inner_radius = radius
+    var innerRadius = params.innerRadius || 0;
+    if (innerRadius > radius) {
+        innerRadius = radius
     }
     
     var semiMajorAxis =  params.semiMajorAxis || 1;
@@ -89,35 +89,46 @@ SceneJS.Disk.prototype._init = function(params) {
              positions.push(ytop);
              positions.push(radius * z);
              
-             if (inner_radius > 0) {
+             if (innerRadius > 0) {
             
                  normals.push(-x);
                  normals.push(-ytop);
                  normals.push(-z);
                  uv.push(u);
                  uv.push(v);
-                 positions.push(inner_radius * x);
+                 positions.push(innerRadius * x);
                  positions.push(ytop);
-                 positions.push(inner_radius * z);
+                 positions.push(innerRadius * z);
                  
                  normals.push(-x);
                  normals.push(-ybot);
                  normals.push(-z);
                  uv.push(u);
                  uv.push(v);
-                 positions.push(inner_radius * x);
+                 positions.push(innerRadius * x);
                  positions.push(ybot);
-                 positions.push(inner_radius * z);
+                 positions.push(innerRadius * z);
             }              
                 
          }
          
          var indices = [];
          
-         if (inner_radius > 0) {
-             
+         if (innerRadius > 0) {
+             var index;
              for (var ringNum = 0; ringNum < rings; ringNum++) {
-                 var index = ringNum * 4;
+                 if (ringNum >= ringLimit) {
+                     // We aren't sweeping the whole way around so create triangles to cap the ends. 
+                     // Example: indices for a disk with fours ring-segments when only two are drawn.
+                     //   0,1,2   0,2,3  8,9,10  8,10,11
+                     indices.push(0, 1, 2);
+                     indices.push(0, 2, 3);                     
+                     index = ringLimit * 4;
+                     indices.push(index, index+ 1, index + 2);
+                     indices.push(index, index+ 2, index + 3);
+                     break;
+                 }
+                 index = ringNum * 4;
 
                  indices.push(index + 0);
                  indices.push(index + 1);
