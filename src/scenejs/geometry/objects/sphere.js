@@ -45,7 +45,7 @@ SceneJS.Sphere.prototype._init = function(params) {
     /* Resource ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
      */
-    this._resource = "sphere_" + radius + "_" + rings + "_" + slices + "_" + innerRadius + "_" + semiMajorAxis + "_" + sweep;
+    this._resource = "sphere_" + radius + "_" + rings + "_" + slices + "_" + semiMajorAxis + "_" + sweep;
 
     /* Callback that does the creation in case we can't find matching sphere to reuse     
      */
