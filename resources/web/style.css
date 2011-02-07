@@ -200,9 +200,18 @@ h4 {
 #content ul.hlist li  {
     line-height: 1.4em;
     color: #444444 !important;    
-    margin-left: 5px;
-    display: inline;
+    margin: 0px 8px 5px 10px;
+    padding-bottom: 10px;
+    display: inline-block;
     list-style-type: none;
+    vertical-align: middle;
+}
+
+#content fieldset {
+    overflow: auto;
+    text-align: left;
+    margin: 0 auto;
+    padding: 3px 10px 5px 10px;
 }
 
 #content p.intro {

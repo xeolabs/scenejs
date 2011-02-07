@@ -26,6 +26,24 @@
         </div>
     </div>
     <div id="content">
+      <ul class="hlist">
+        <li>
+          <form id="choose-object-type">
+            <fieldset>
+              <legend>Look at</legend>
+              <label><input type="radio" name="object-type" value="boxes"> Boxes</input></label>
+              <label><input type="radio" name="object-type" value="spheres"> Spheres</input></label>
+              <label><input type="radio" name="object-type" value="disks" checked> Disks</input></label>
+            </fieldset>
+          </form>
+        </li>
+        <li>
+          <fieldset>
+            <legend>State</legend>
+            <label>rotation: <input id="rotation" type="checkbox" checked/></label>   
+            <label>specular light: <input id="specular-light" type="checkbox" checked/></label>   
+          </fieldset>
+        </li>
         <canvas id="theCanvas" width="1030" height="700">
             <p>This example requires a browser that supports the
                 <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
