@@ -10,11 +10,12 @@ SceneJS._namespace("SceneJS.objects");
  * is elliptical in shape with a normalized semiMajorAxis of 1.5, is 2 units high in the Y-axis and 
  * is made up of 48 longitudinal rings:</b></p><pre><code>
  * var c = new SceneJS.Disk({
- *          radius: 6,          // Optional radius (1 is default)
- *          innerRadius: 3     // Optional innerRadius results in ring (default is 0)
- *          semiMajorAxis: 1.5  // Optional semiMajorAxis results in ellipse (default is 1 which is a circle)
- *          height: 2,          // Optional height (1 is default)
- *          rings: 48           // Optional number of longitudinal rings (30 is default)
+ *          radius: 6,           // Optional radius (1 is default)
+ *          innerRadius: 4,      // Optional innerRadius results in ring (default is 0)
+ *          semiMajorAxis: 1.5,  // Optional semiMajorAxis results in ellipse (default of 1 creates circle)
+ *          height: 2,           // Optional height (1 is default)
+ *          rings: 48,           // Optional number of longitudinal rings (30 is default)
+ *          sweep: 0.75,         // Optional rotational extrusion (1 is default)
  *     })
  * </pre></code>
  * @extends SceneJS.Geometry
@@ -27,6 +28,7 @@ SceneJS._namespace("SceneJS.objects");
  * @param {float} [cfg.innerRadius=0] inner radius extending from Y-axis
  * @param {float} [cfg.semiMajorAxis=1.0] values other than one generate an ellipse
  * @param {float} [cfg.rings=30]  number of longitudinal rings
+ * @param {float} [cfg.sweep=1]  rotational extrusion default is 1
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
 SceneJS.Disk = SceneJS.createNodeType("disk", "geometry");
@@ -46,10 +48,17 @@ SceneJS.Disk.prototype._init = function(params) {
     var semiMajorAxis =  params.semiMajorAxis || 1;
     var semiMinorAxis =  1 / semiMajorAxis;
 
+    var sweep = params.sweep || 1;
+    if (sweep > 1) {
+        sweep = 1
+    }
+    
+    var ringLimit = rings * sweep;
+
     /* Resource ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
      */
-    this._resource = "disk_" + radius + "_" + height + "_" + rings + "_" + inner_radius;
+    this._resource = "disk_" + radius + "_" + height + "_" + rings + "_" + innerRadius + "_" + semiMajorAxis + "_" + sweep;
 
     /* Callback that does the creation in case we can't find matching disk to reuse     
      */
@@ -60,8 +69,9 @@ SceneJS.Disk.prototype._init = function(params) {
 
          var ybot = height * -0.5;
          var ytop = height *  0.5;
-
+         
          for (var ringNum = 0; ringNum <= rings; ringNum++) {
+             if (ringNum > ringLimit) break;
              var phi = ringNum * 2 * Math.PI / rings;
              var sinPhi = semiMinorAxis * Math.sin(phi);
              var cosPhi = semiMajorAxis * Math.cos(phi);
@@ -165,19 +175,18 @@ SceneJS.Disk.prototype._init = function(params) {
                  
          } else {
 
-             var centerBot = rings * 2 + 2;
-
              normals.push(0, -1.0, 0);
              uv.push(1, 0.5);
              positions.push(0, ybot, 0);
-
-             var centerTop = rings * 2 + 3;
+             var centerBot = ringLimit * 2 + 2;
 
              normals.push(0, 1.0, 0);
              uv.push(1, 0.5);
              positions.push(0, ytop, 0);
+             var centerTop = ringLimit * 2 + 3;
              
              for (var ringNum = 0; ringNum < rings; ringNum++) {
+                 if (ringNum >= ringLimit) break;
                  var index = ringNum * 2;
                  indices.push(index);
                  indices.push(index + 1);
@@ -189,6 +198,7 @@ SceneJS.Disk.prototype._init = function(params) {
              }
 
              for (var ringNum = 0; ringNum < rings; ringNum++) {
+                 if (ringNum >= ringLimit) break;
                  var index = ringNum * 2;
                  indices.push(index);
                  indices.push(index + 2);
@@ -198,6 +208,15 @@ SceneJS.Disk.prototype._init = function(params) {
                  indices.push(index + 3);
                  indices.push(centerTop);
              }
+             
+             if (rings >= ringLimit) {
+                 // We aren't sweeping the whole way around so create triangles to cap the ends. 
+                 // Example: indices for a disk with fours ring-segments when only two are drawn.
+                 //   0,1,2   0,2,3  8,9,10  8,10,11
+                 index = ringLimit * 2;
+                 indices.push(0, 1, index);
+                 indices.push(1, index + 1, index);
+              }
              
          }
 
