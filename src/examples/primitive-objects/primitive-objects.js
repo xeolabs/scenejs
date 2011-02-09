@@ -362,9 +362,9 @@ SceneJS.createNode({
                                                                                             slices: 48,
                                                                                             rings: 48,
                                                                                             radius: 4,
-                                                                                            sweep: 0.5,
+                                                                                            sweep: 1.0,
                                                                                             sliceDepth: 0.25,
-                                                                                            semiMajorAxis: 1.5
+                                                                                            semiMajorAxis: 1.0
                                                                                         }
                                                                                     ]
                                                                                 }
