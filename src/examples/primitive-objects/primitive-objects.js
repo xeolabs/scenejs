@@ -219,9 +219,9 @@ SceneJS.createNode({
                                                 
                                                 {
                                                     type: "translate",
-                                                    x: 2.5,
+                                                    x: 3.0,
                                                     y: 1.0,
-                                                    z: 2.0,
+                                                    z: 1.5,
                                 
                                                     nodes: [
                         
@@ -307,6 +307,66 @@ SceneJS.createNode({
                                                                                     rings: 4,
                                                                                     sweep: 1.0,
                                                                                     semiMajorAxis: 1.0
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                
+                                                {
+                                                    type: "translate",
+                                                    x: -0.5,
+                                                    y: -3.0,
+                                                    z: 4.0,
+                                
+                                                    nodes: [
+                        
+                                                        {
+                                                            type: "scale",
+                                                            x: 1.0,
+                                                            y: 1.0,
+                                                            z: 1.0,
+
+                                                            nodes: [
+
+                                                                {
+                                                                    type: "rotate",
+                                                                    angle: -20,
+                                                                    x: 1.0,
+                                                                    
+                                                                    nodes: [
+
+                                                                        {
+                                                                            type: "rotate",
+                                                                            id: "sphere5-rotate",
+                                                                            angle: 10,
+                                                                            y: 1.0,
+                                
+                                                                            nodes: [
+
+                                                                                {
+                                                                                    type: "material",
+                                                                                    baseColor:      { r: 0.8, g: 0.3, b: 0.1 },
+                                                                                    specularColor:  { r: 0.9, g: 0.3, b: 0.6 },
+                                                                                    specular:       0.9,
+                                                                                    shine:          6.0,
+    
+                                                                                    nodes: [
+                                                                                        {
+                                                                                            type: "sphere",
+                                                                                            id: "sphere5",
+                                                                                            slices: 48,
+                                                                                            rings: 48,
+                                                                                            radius: 4,
+                                                                                            sweep: 0.5,
+                                                                                            sliceDepth: 0.25,
+                                                                                            semiMajorAxis: 1.5
+                                                                                        }
+                                                                                    ]
                                                                                 }
                                                                             ]
                                                                         }
@@ -607,9 +667,14 @@ SceneJS.createNode({
                                                                         
                                                                         {
                                                                             type: "translate",
-                                                                            x: 2.5,
-                                                                            y: -0.75,
-                                                                            z: 2.5,
+                                                                            
+                                                                            x: 3.0,
+                                                                            y: 1.0,
+                                                                            z: 1.5,
+                                                                            
+                                                                            x: 3.25,
+                                                                            y: -2.0,
+                                                                            z: 2.0,
 
                                                                             nodes: [
                                                     
@@ -651,6 +716,42 @@ SceneJS.createNode({
                                                                                         {
                                                                                             type: "instance",
                                                                                             target: "sphere4"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        
+                                                                        {
+                                                                            type: "translate",
+                                                                            
+                                                                            x: -0.5,
+                                                                            y: -4.0,
+                                                                            z: 5.0,
+                                                                            
+                                                                            nodes: [
+
+                                                                                {
+                                                                                    type: "scale",
+                                                                                    x: 0.75,
+                                                                                    y: 0.75,
+                                                                                    z: 0.75,
+
+                                                                                    nodes: [
+                                                    
+                                                                                        {
+                                                                                            type: "rotate",
+                                                                                            id: "wireframe-sphere5-rotate",
+                                                                                            angle: -10,
+                                                                                            y: 1.0,
+
+                                                                                            nodes: [                                                        
+        
+                                                                                                {
+                                                                                                    type: "instance",
+                                                                                                    target: "sphere5"
+                                                                                                }
+                                                                                            ]
                                                                                         }
                                                                                     ]
                                                                                 }
@@ -861,10 +962,12 @@ var sphere1_rotate = SceneJS.withNode("sphere1-rotate");
 var sphere2_rotate = SceneJS.withNode("sphere2-rotate");
 var sphere3_rotate = SceneJS.withNode("sphere3-rotate");
 var sphere4_rotate = SceneJS.withNode("sphere4-rotate");
+var sphere5_rotate = SceneJS.withNode("sphere5-rotate");
 var wireframe_sphere1_rotate = SceneJS.withNode("wireframe-sphere1-rotate");
 var wireframe_sphere2_rotate = SceneJS.withNode("wireframe-sphere2-rotate");
 var wireframe_sphere3_rotate = SceneJS.withNode("wireframe-sphere3-rotate");
 var wireframe_sphere4_rotate = SceneJS.withNode("wireframe-sphere4-rotate");
+var wireframe_sphere5_rotate = SceneJS.withNode("wireframe-sphere5-rotate");
 
 var box_rotate = SceneJS.withNode("box-rotate");
 var wireframe_box_rotate = SceneJS.withNode("wireframe-box-rotate");
@@ -920,10 +1023,12 @@ window.render = function() {
         sphere2_rotate.set("angle", angle);
         sphere3_rotate.set("angle", angle);
         sphere4_rotate.set("angle", angle);
+        sphere5_rotate.set("angle", angle);
         wireframe_sphere1_rotate.set("angle", angle);
         wireframe_sphere2_rotate.set("angle", angle);
         wireframe_sphere3_rotate.set("angle", angle);
         wireframe_sphere4_rotate.set("angle", angle);
+        wireframe_sphere5_rotate.set("angle", angle);
 
         box_rotate.set("angle", angle);
         wireframe_box_rotate.set("angle", angle);
