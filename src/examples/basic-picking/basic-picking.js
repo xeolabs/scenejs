@@ -254,7 +254,21 @@ SceneJS.withNode("left-green-sphere").bind("picked",
         });
 
 
-SceneJS.withNode("theScene").render();
+/*------------------------------------------------------------------------------------------------------------------
+ * SceneJS debug modes
+ *----------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+
+    /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
+     */
+    compilation : {
+        enabled: true
+//        logTrace : {}
+    }
+});
+
+SceneJS.withNode("theScene").start();
 
 var canvas = document.getElementById("theCanvas");
 

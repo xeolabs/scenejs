@@ -123,14 +123,14 @@ SceneJS.createNode({
                                         {
                                             type: "rotate",
                                             id: "pitch",
-                                            angle: 0.0,
+                                            angle: -30.0,
                                             x : 1.0,
 
                                             nodes: [
                                                 {
                                                     type: "rotate",
                                                     id: "yaw",
-                                                    angle: 0.0,
+                                                    angle: -30.0,
                                                     y : 1.0,
 
                                                     nodes: [
@@ -152,8 +152,23 @@ SceneJS.createNode({
     ]
 });
 
+/*------------------------------------------------------------------------------------------------------------------
+ * SceneJS debug modes
+ *
+ *----------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+
+    /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
+     */
+    compilation : {
+        enabled: true
+//        logTrace : {}
+    }
+});
+
 /*----------------------------------------------------------------------
- * Scene rendering loop and mouse handler stuff follows
+ * Scene rendering loop and mouse handler stuff
  *---------------------------------------------------------------------*/
 
 var yaw = -30;
@@ -187,6 +202,9 @@ function mouseMove(event) {
         pitch += (event.clientY - lastY) * -0.5;
         lastX = event.clientX;
         lastY = event.clientY;
+
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
     }
 }
 
@@ -194,11 +212,9 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
+SceneJS.withNode("theScene").start();
 
-    SceneJS.withNode("pitch").set("angle", pitch);
-    SceneJS.withNode("yaw").set("angle", yaw);
-
+window.updateAnimations = function() {
     SceneJS.withNode("theTexture").set("layers", {
         "0":{
             scale: {
@@ -208,20 +224,12 @@ window.render = function() {
             rotate: texAngle
         }
     });
-
-    SceneJS.withNode("theScene").render();
-
     texAngle += 0.4;
     texScale = (texScale + 0.01) % 10.0;
-
 };
 
 SceneJS.bind("error", function() {
     window.clearInterval(pInterval);
 });
 
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-var pInterval = setInterval("window.render()", 10);
+var pInterval = setInterval("window.updateAnimations()", 10);

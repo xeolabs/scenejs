@@ -17,7 +17,11 @@ SceneJS.createNode({
     nodes: [
         {
             type: "texture",
-            layers: [ { uri: "images/avatar.png" } ],
+            layers: [
+                {
+                    uri: "images/avatar.png"
+                }
+            ],
             nodes: [
                 {
                     type: "quad",
@@ -28,7 +32,6 @@ SceneJS.createNode({
         }
     ]
 });
-
 
 
 SceneJS.createNode({
@@ -83,18 +86,29 @@ SceneJS.createNode({
                                     nodes: [
                                         {
                                             type: "translate",
-                                            x: 2, y: 0, z: 0,
+                                            x: 2,
+                                            y: 0,
+                                            z: 0,
                                             nodes: [
                                                 {
                                                     type: "texture",
-                                                    layers: [ { uri: "images/mars.jpg", flipY: false } ],
+                                                    layers: [
+                                                        {
+                                                            uri: "images/mars.jpg",
+                                                            flipY: false
+                                                        }
+                                                    ],
                                                     nodes: [
-                                                        { type: "sphere" }
+                                                        {
+                                                            type: "sphere"
+                                                        }
                                                     ]
                                                 },
                                                 {
                                                     type: "translate",
-                                                    x: 1, y: 4, z: 0,
+                                                    x: 1,
+                                                    y: 4,
+                                                    z: 0,
                                                     nodes: [
                                                         {
                                                             type: "instance",
@@ -106,7 +120,9 @@ SceneJS.createNode({
                                         },
                                         {
                                             type: "translate",
-                                            x: -3, y: 0, z: -1,
+                                            x: -3,
+                                            y: 0,
+                                            z: -1,
                                             nodes: [
                                                 {
                                                     type: "instance",
@@ -126,13 +142,29 @@ SceneJS.createNode({
 });
 
 
+/*------------------------------------------------------------------------------------------------------------------
+ * SceneJS debug modes
+ *----------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+
+    /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
+     */
+    compilation : {
+        enabled: true
+        //        logTrace : {}
+    }
+});
+
+/*----------------------------------------------------------------------
+ * Scene rendering loop and mouse handler stuff follows
+ *---------------------------------------------------------------------*/
+
 var yaw = 0;
 var pitch = 0;
 var lastX;
 var lastY;
 var dragging = false;
-
-var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -152,18 +184,25 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * -0.5;
 
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
+
         lastX = event.clientX;
         lastY = event.clientY;
     }
 }
 
+var canvas = document.getElementById("theCanvas");
+
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
+/* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
+ */
 SceneJS.withNode("the-scene").start({
+    fpd: 60,
     idleFunc: function() {
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        // ...
     }
 });

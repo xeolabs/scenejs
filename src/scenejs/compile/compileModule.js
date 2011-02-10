@@ -783,28 +783,36 @@ SceneJS._compileModule = new (function() {
      */
     this._recompilePath = function(targetNode) {
         var dirtyNodes = this._dirtyNodes;
-        if (dirtyNodes[targetNode._attr.id]) { // Optimise for multiple updates on same node
-            return;
-        }
+//        if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
+//                return;
+//            }
+//        if (this._nodesWithinBranches[targetNode._attr.id]) { // Optimise for multiple updates on same node
+//            return;
+//        }
         var nodeInstances;
         var id;
         var node = targetNode;
         while (node) {
             id = node._attr.id;
 
-            /* Ensure that instance allows compilation of the entire subgraph of its symbol
-             * because the updated node will be a temporary child of the symbol subgraph's
-             * rightmost leaf - otherwise the symbol subgraph will cull compilation of the
-             * updated node if the subgraph is not flagged for compilation.  
-             */
-            if (node._attr.nodeType == "instance") {
-                this._nodesWithinBranches[id] = true;
-            }
+
 
             /*
              */
-            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
-                return;
+//            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
+//                return;
+//            }
+//             if (this._nodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
+//                return;
+//            }
+
+              /* Ensure that instance allows compilation of the entire subgraph of its symbol
+             * because the updated node will be a temporary child of the symbol subgraph's
+             * rightmost leaf - otherwise the symbol subgraph will cull compilation of the
+             * updated node if the subgraph is not flagged for compilation.
+             */
+            if (node._attr.nodeType == "instance") {
+                this._nodesWithinBranches[id] = true;
             }
             dirtyNodes[id] = true;
             nodeInstances = SceneJS._nodeInstanceMap[id];

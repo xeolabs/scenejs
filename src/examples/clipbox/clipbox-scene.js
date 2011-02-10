@@ -13,8 +13,6 @@
 
  */
 
-
-
 /*----------------------------------------------------------------------
  * Define a simple scene graph containing a blue sphere
  *---------------------------------------------------------------------*/
@@ -119,8 +117,8 @@ SceneJS.createNode({
 
                                             nodes:[
 
-                                                    /* Blue colour for our shere
-                                                     */
+                                                /* Blue colour for our shere
+                                                 */
                                                 {
                                                     type: "material",
                                                     emit: 0,
@@ -138,6 +136,44 @@ SceneJS.createNode({
                                                             x:1.3,
                                                             y:1.3,
                                                             z:1.3,
+
+                                                            nodes: [
+
+                                                                /* Sphere geometry
+                                                                 */
+                                                                {
+                                                                    type : "sphere"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+
+                                                /* Red colour for our inner shere
+                                                 */
+                                                {
+                                                    type: "material",
+                                                    emit: 0,
+                                                    baseColor:      { r: 0.9, g: 0.3, b: 0.3 },
+                                                    specularColor:  { r: 0.9, g: 0.3, b: 0.3 },
+                                                    specular:       0.9,
+                                                    shine:          100.0,
+
+                                                    /* Disable clipping for the inner red sphere
+                                                     */
+                                                    flags: {
+                                                        clipping: false
+                                                    },
+
+                                                    nodes: [
+
+                                                        /** Pump the sphere size up a bit:
+                                                         */
+                                                        {
+                                                            type: "scale",
+                                                            x:.8,
+                                                            y:.8,
+                                                            z:.8,
 
                                                             nodes: [
 
@@ -200,6 +236,21 @@ SceneJS.Message.sendMessage({
 });
 
 
+/*------------------------------------------------------------------------------------------------------------------
+ * SceneJS debug modes
+ *----------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+
+    /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
+     */
+    compilation : {
+        enabled: true
+        //        ,
+        //        logTrace : {}
+    }
+});
+
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
@@ -235,8 +286,6 @@ function mouseMove(event) {
         SceneJS.withNode("yaw").set("angle", yaw);
         SceneJS.withNode("pitch").set("angle", pitch);
 
-        SceneJS.withNode("theScene").render();
-
         lastX = event.clientX;
         lastY = event.clientY;
     }
@@ -247,6 +296,40 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 
+/* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
+ */
+SceneJS.withNode("theScene").start({
+    fpd: 60,
+    idleFunc: function() {
+        // ...
+    }
+});
 
+var factor = 0.0;
+
+window.updateAnimations = function() {
+
+    /* We'll periodically issue the "clip.clipbox.update" command to tweak the
+     * boundary of the clipbox, to extend its extents on X,Y,Z axis:
+     */
+    var extent = 1.0 + Math.sin(factor) * 1.0;
+    factor += 0.008;
+
+    SceneJS.Message.sendMessage({
+
+        command:"clip.clipbox.update",
+
+        target: "insert-clipbox-here",
+
+        ymax: extent
+    });
+
+};
+
+SceneJS.bind("error", function() {
+    window.clearInterval(pInterval);
+});
+
+var pInterval = setInterval("window.updateAnimations()", 10);
 
 

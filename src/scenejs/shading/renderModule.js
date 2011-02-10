@@ -10,7 +10,7 @@ SceneJS._renderModule = new (function() {
     this.MAX_PICK_LISTENERS = 50000;
     this.MAX_NODE_DEPTH = 500;
     this.MAX_SHADERS = 10000;
-    this.DEFAULT_STATE_SORT_DELAY = 5;
+    this.DEFAULT_STATE_SORT_DELAY = 1;
 
     /* Number of frames after each complete display list rebuild at which GL state is re-sorted.
      * To enable sort, is set to a positive number like 5, to prevent continuous re-sort when
@@ -20,7 +20,7 @@ SceneJS._renderModule = new (function() {
      *
      * Set to -1 to never sort.
      */
-    this._stateSortDelay = this.DEFAULT_STATE_SORT_DELAY;
+    var stateSortDelay = this.DEFAULT_STATE_SORT_DELAY;
 
     /*----------------------------------------------------------------------
      * ID for each state type
@@ -269,15 +269,18 @@ SceneJS._renderModule = new (function() {
                 nextProgramId = 0;
             });
 
+    var self = this;
+
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_CREATED,
             function(params) {
                 if (!sceneStates[params.sceneId]) {
                     sceneStates[params.sceneId] = {
                         canvas: params.canvas,
-                        layers: {},
+                        bin: [],
                         nodeMap: {},
-                        stateMap: {}
+                        stateMap: {},
+                        rendersUntilSort: stateSortDelay
                     };
                 }
             });
@@ -311,14 +314,13 @@ SceneJS._renderModule = new (function() {
      * @param stateSortDelay
      */
     this.setStateSortDelay = function(stateSortDelay) {
-        this._stateSortDelay = typeof stateSortDelay == "number" ? stateSortDelay == undefined : this.DEFAULT_STATE_SORT_DELAY;
+        stateSortDelay = typeof stateSortDelay == "number" ? stateSortDelay == undefined : this.DEFAULT_STATE_SORT_DELAY;
     };
 
     /**
      * Prepares renderer for new scene graph compilation pass
      */
     this.renderScene = function(params, options) {
-
         options = options || {};
 
         /* Activate states for scene
@@ -446,7 +448,7 @@ SceneJS._renderModule = new (function() {
         nextStateId++;
 
         if (rebuildBins) {
-            states.layers = {};
+            states.bin = [];
             rebuildBins = false;
         }
         state.id = id;
@@ -743,16 +745,16 @@ SceneJS._renderModule = new (function() {
             geo.uvBuf ? "t" : "f",
             geo.uvBuf2 ? "t" : "f"]).join("");
 
-        /* Lazy-create layer
-         */
-        var layer;
-        var layerName = SceneJS._layerModule.getLayer() || SceneJS._layerModule.DEFAULT_LAYER_NAME;
-        layer = states.layers[layerName];
-        if (!layer) {
-            layer = states.layers[layerName] = {
-                bin: []
-            };
-        }
+        //        /* Lazy-create layer
+        //         */
+        //        var layer;
+        //        var layerName = SceneJS._layerModule.getLayer() || SceneJS._layerModule.DEFAULT_LAYER_NAME;
+        //        layer = states.layers[layerName];
+        //        if (!layer) {
+        //            layer = states.layers[layerName] = {
+        //                bin: []
+        //            };
+        //        }
 
         /* Identify what GLSL is required for the current state soup elements
          */
@@ -764,10 +766,20 @@ SceneJS._renderModule = new (function() {
          */
         program = getProgram(stateHash);    // Touches for LRU cache
 
+        var layerPriority;
+
+        var layerName = SceneJS._layerModule.getLayer();
+        layerPriority = layerName ? SceneJS._layerModule.getLayerPriority(layerName) : 0;
+
         /* Create state graph node, with program and
          * pointers to current state soup elements
          */
         // nodeMap[nextStateId++] =
+
+        if (layerPriority >= 0) {
+            layerPriority++;
+        }
+        var sortId = (layerPriority * 100000) + program.id;
 
         node = {
 
@@ -775,7 +787,7 @@ SceneJS._renderModule = new (function() {
 
             /* Node will be pre-sorted on shader
              */
-            sortId: program.id,
+            sortId: sortId,
 
             //---------------------------------------------------------------------------------------------------------
             // TODO: Sort on shader AND texture when we have debugged why states (stateIds) seem to switch around
@@ -808,7 +820,7 @@ SceneJS._renderModule = new (function() {
 
         nodeMap[id] = node;
 
-        layer.bin.push(node);
+        states.bin.push(node);
     };
 
 
@@ -822,9 +834,9 @@ SceneJS._renderModule = new (function() {
                     preSortBins();
                     states.needSort = false;
                 } else {
-                    if (this._stateSortDelay >= 0) {
+                    if (stateSortDelay >= 0) {
                         states.rendersUntilSort--;
-                        if (states.rendersUntilSort <= 0) {
+                        if (states.rendersUntilSort == 0) { // Will not sort again until >= 0
                             states.needSort = true;
                         }
                     }
@@ -837,7 +849,7 @@ SceneJS._renderModule = new (function() {
      *----------------------------------------------------------------------------------------------------------------*/
 
     function setNeedBinSort() {
-        states.rendersUntilSort = this._stateSortDelay;
+        states.rendersUntilSort = stateSortDelay;
         states.needSort = false;
     }
 
@@ -846,18 +858,11 @@ SceneJS._renderModule = new (function() {
      * pathological because they force all other state switches.
      */
     function preSortBins() {
-        var layers = states.layers;
-        var layer;
-        for (var name in layers) {
-            if (layers.hasOwnProperty(name)) {
-                layer = layers[name];
-                layer.bin.sort(sortNodes);
-            }
-        }
+        states.bin.sort(sortNodes);
     }
 
     var sortNodes = function(a, b) {
-        return b.sortId - a.sortId;
+        return a.sortId - b.sortId;
     };
 
     /*-----------------------------------------------------------------------------------------------------------------
@@ -866,18 +871,13 @@ SceneJS._renderModule = new (function() {
 
     function renderFrame() {
         NodeRenderer.init();
-        var layerOrder = SceneJS._layerModule.getLayerOrder();
-        var layer;
-        for (var i = 0, len = layerOrder.length; i < len; i++) {
-            layer = states.layers[layerOrder[i].name];
-            if (layer) {
-                renderBin(layer.bin);
-            }
-        }
+        renderBin(states.bin, false); // Not picking
         NodeRenderer.cleanup();
     }
 
     function renderBin(bin, picking) {
+
+        var context = states.canvas.context;
 
         /* Render opaque nodes while buffering transparent nodes
          */
@@ -906,10 +906,12 @@ SceneJS._renderModule = new (function() {
             }
         }
 
+        //context.flush();
+
         /* Render transparent nodes with blending
          */
         if (nTransparent > 0) {
-            var context = states.canvas.context;
+
             context.enable(context.BLEND);
 
             //    context.blendFunc(context.SRC_ALPHA, context.ONE);  // TODO: make blend func configurable on flags?
@@ -2273,14 +2275,8 @@ SceneJS._renderModule = new (function() {
         /* Render display list in pick mode
          */
         NodeRenderer.init(true);
-        var layerOrder = SceneJS._layerModule.getLayerOrder();
-        var layer;
-        for (var i = 0, len = layerOrder.length; i < len; i++) {
-            layer = states.layers[layerOrder[i].name];
-            if (layer) {
-                renderBin(layer.bin, true);
-            }
-        }
+
+        renderBin(states.bin, true);
 
         /* Read pick buffer
          */

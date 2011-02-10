@@ -9,7 +9,7 @@
 
 SceneJS.createNode({
     type: "scene",
-    id: "theScene",
+    id: "the-scene",
     canvasId: "theCanvas",
 
     nodes: [
@@ -76,7 +76,7 @@ SceneJS.createNode({
                                     /* Our first layer texture is the bump map, and is applied within
                                      * the fragment shader to our geometry node's normal vectors.
                                      */
-                                    layers: [                                            
+                                    layers: [
 
                                         /* Our second texture layer is applied within the fragment
                                          * shader to the baseColor of our material.
@@ -126,14 +126,14 @@ SceneJS.createNode({
                                         {
                                             type: "rotate",
                                             id: "pitch",
-                                            angle: 0.0,
+                                            angle: -30.0,
                                             x : 1.0,
 
                                             nodes: [
                                                 {
                                                     type: "rotate",
                                                     id: "yaw",
-                                                    angle: 0.0,
+                                                    angle: -30.0,
                                                     y : 1.0,
 
                                                     nodes: [
@@ -155,6 +155,21 @@ SceneJS.createNode({
     ]
 });
 
+
+/*------------------------------------------------------------------------------------------------------------------
+ * SceneJS debug modes
+ *----------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+
+    /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
+     */
+    compilation : {
+        enabled: true
+        //        logTrace : {}
+    }
+});
+
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
@@ -168,8 +183,6 @@ var dragging = false;
 /* For texture animation
  */
 var timeLast = (new Date()).getTime();
-
-var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
     lastX = event.clientX;
@@ -185,28 +198,27 @@ function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * -0.5;
+
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
+
         lastX = event.clientX;
         lastY = event.clientY;
     }
 }
 
+
+var canvas = document.getElementById("theCanvas");
+
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
-    SceneJS.withNode("pitch").set("angle", pitch);
-    SceneJS.withNode("yaw").set("angle", yaw);
-
-    SceneJS.withNode("theScene").render();
-};
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
+/* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
+ */
+SceneJS.withNode("the-scene").start({
+    fpd: 60,
+    idleFunc: function() {
+        // ...
+    }
 });
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-var pInterval = setInterval("window.render()", 10);

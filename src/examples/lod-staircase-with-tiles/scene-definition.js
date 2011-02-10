@@ -13,9 +13,8 @@
  */
 
 SceneJS.setDebugConfigs({
-    
     compilation : {
-        enabled : false
+        enabled: false
     }
 });
 
@@ -82,7 +81,7 @@ SceneJS.createNode({
                         {
                             type: "instance",
                             target: "lod-stairs"
-                        } ,                   
+                        } ,
 
                         /* Instantiate our tiled floor, defined in tiled-floor.js
                          */
@@ -103,17 +102,17 @@ var canvas = document.getElementById("theCanvas");
 var origin = null;
 var speed = null;
 canvas.addEventListener('mousedown', function(e) {
-	origin = {x: e.clientX, y: e.clientY};
+    origin = {x: e.clientX, y: e.clientY};
 }, false);
 
 canvas.addEventListener('mouseup', function(e) {
-	origin = null;
-	speed = null;
+    origin = null;
+    speed = null;
 }, false);
 
 canvas.addEventListener('mousemove', function(e) {
-	if (origin)
-		speed = {x: e.clientX - origin.x, y: e.clientY - origin.y};
+    if (origin)
+        speed = {x: e.clientX - origin.x, y: e.clientY - origin.y};
 }, false);
 
 canvas.addEventListener('mousewheel', function(e) {
@@ -138,22 +137,22 @@ canvas.addEventListener('mousewheel', function(e) {
 }, true);
 
 SceneJS.withNode("the-scene").start({
-	fps: 60,
-	idleFunc: function(e) {
-		if (speed && speed.y)
-			SceneJS.Message.sendMessage({
-				command: "lookAt.move",
-				target: "the-lookat",
-				z: -speed.y / 100,
-				ignoreY: true
-			});
+    fps: 60,
+    idleFunc: function(e) {
+        if (speed && speed.y)
+            SceneJS.Message.sendMessage({
+                command: "lookAt.move",
+                target: "the-lookat",
+                z: -speed.y / 100,
+                ignoreY: true
+            });
 
-		if (speed && speed.x)
-			SceneJS.Message.sendMessage({
-				command: "lookAt.rotate",
-				target: "the-lookat",
-				angle: -speed.x / 420,
-				ignoreY: true
-			});
-	}
+        if (speed && speed.x)
+            SceneJS.Message.sendMessage({
+                command: "lookAt.rotate",
+                target: "the-lookat",
+                angle: -speed.x / 420,
+                ignoreY: true
+            });
+    }
 });

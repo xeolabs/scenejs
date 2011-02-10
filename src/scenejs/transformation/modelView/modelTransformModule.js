@@ -54,25 +54,25 @@ SceneJS._modelTransformModule = new (function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
-            function() {
-                if (dirty) {
+    SceneJS._eventModule.addListener(SceneJS._eventModule.SHADER_RENDERING, exportTransform);
 
-                    /* Lazy-create WebGL arrays
-                     */
-                    if (!transform.matrixAsArray) {
-                        transform.matrixAsArray = new Float32Array(transform.matrix);
-                    }
-                    if (!transform.normalMatrixAsArray) {
-                        transform.normalMatrixAsArray = new Float32Array(
-                                SceneJS._math_transposeMat4(
-                                        SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
-                    }
-                    SceneJS._renderModule.setModelTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
-                    dirty = false;
-                }
-            });
+    function exportTransform() {
+        if (dirty) {
+
+            /* Lazy-create WebGL arrays
+             */
+            if (!transform.matrixAsArray) {
+                transform.matrixAsArray = new Float32Array(transform.matrix);
+            }
+            if (!transform.normalMatrixAsArray) {
+                transform.normalMatrixAsArray = new Float32Array(
+                        SceneJS._math_transposeMat4(
+                                SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
+            }
+            SceneJS._renderModule.setModelTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
+            dirty = false;
+        }
+    }
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_DEACTIVATED,
@@ -103,8 +103,8 @@ SceneJS._modelTransformModule = new (function() {
             nodeId = null;
             transform = DEFAULT_TRANSFORM;
         }
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.MODEL_TRANSFORM_UPDATED, transform);
         dirty = true;
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.MODEL_TRANSFORM_UPDATED, transform);        
     };
 
 })();

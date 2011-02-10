@@ -69,6 +69,7 @@
                         {
                             type: "material",
                             baseColor: { r: 1, g: 1, b: 1},
+                            emit: 1.0,
                             nodes: [
                                 {
 

@@ -1,15 +1,11 @@
 /**
- * SceneJS Example - Basic picking
  *
- * Lindsay Kay
- * lindsay.kay AT xeolabs.com
- * March 2010
  *
  */
 var rotateX;
 var rotateY;
 
-var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "theLoggingDiv" },
+var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggingElementId: "theLoggingDiv" },
 
         SceneJS.lookAt({
             eye : { x: 0, y: 2, z: -22},
@@ -50,9 +46,11 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                         }),
 
                         rotateX = SceneJS.rotate({
+                            id: "pitch",
                             angle: 0.0, x : 1.0
                         },
                                 rotateY = SceneJS.rotate({
+                                    id: "yaw",
                                     angle: 0.0, y : 1.0
                                 },
 
@@ -109,7 +107,7 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
                                                             specular:       0.9,
                                                             shine:          6.0,
                                                             alpha:          0.5,
-                                                            
+
                                                             flags: {
                                                                 transparent: true
                                                             }
@@ -184,8 +182,8 @@ var exampleScene = SceneJS.scene({ canvasId: 'theCanvas',  loggingElementId: "th
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
-var yaw = -30;
-var pitch = -30;
+var yaw = 0;
+var pitch = 0;
 var lastX;
 var lastY;
 var dragging = false;
@@ -216,6 +214,9 @@ function mouseMove(event) {
         pitch += (event.clientY - lastY) * -0.5;
         lastX = event.clientX;
         lastY = event.clientY;
+
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
     }
 }
 
@@ -223,20 +224,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
-    rotateX.setAngle(pitch);
-    rotateY.setAngle(yaw);
-    exampleScene.render();
-};
+SceneJS.withNode("my-scene").start();
 
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
-});
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-var pInterval = setInterval("window.render()", 10);
 
 

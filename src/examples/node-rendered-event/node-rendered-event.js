@@ -89,7 +89,8 @@ SceneJS.createNode({
 
                                                             nodes: [
                                                                 {
-                                                                    type: "teapot"
+                                                                    type: "teapot",
+                                                                    id: "teapot-geometry"
 
                                                                 }
                                                             ]
@@ -99,7 +100,7 @@ SceneJS.createNode({
                                                 {
                                                     type: "rotate",
                                                     id: "pitch",
-                                                    angle: 0.0,
+                                                    angle: -40.0,
                                                     x : 1.0,
 
                                                     nodes: [
@@ -119,7 +120,8 @@ SceneJS.createNode({
 
                                                                     nodes: [
                                                                         {
-                                                                            type: "teapot"
+                                                                            type: "teapot",
+                                                                            id: "teapot2-geometry"
 
                                                                         }
                                                                     ]
@@ -141,7 +143,8 @@ SceneJS.createNode({
 
                                                                     nodes: [
                                                                         {
-                                                                            type: "teapot"
+                                                                            type: "teapot",
+                                                                            id: "teapot3-geometry"
 
                                                                         }
                                                                     ]
@@ -163,8 +166,28 @@ SceneJS.createNode({
     ]
 });
 
+
+/*------------------------------------------------------------------------------------------------------------------
+ * SceneJS debug modes
+ *----------------------------------------------------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+
+    /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
+     */
+    compilation : {
+        enabled: true
+        //        ,
+        //        logTrace : {}
+    }
+});
+
+/*----------------------------------------------------------------------
+ * Scene rendering loop and mouse handler stuff follows
+ *---------------------------------------------------------------------*/
+
 var yaw = -0;
-var pitch = -00;
+var pitch = -40;
 
 SceneJS.withNode("teapot1").bind(
         "rendered",
@@ -214,12 +237,8 @@ SceneJS.withNode("my-scene").start({
 
         SceneJS.withNode("yaw").set("angle", yaw);
 
-        SceneJS.withNode("my-scene").render();
-
         yaw += 0.1;
         pitch += 0.1;
-
-        //  sychronizeLabels();
     }
 });
 

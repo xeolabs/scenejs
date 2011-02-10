@@ -20,14 +20,14 @@ SceneJS.Translate = SceneJS.createNodeType("translate");
 SceneJS.Translate.prototype._init = function(params) {
     this._mat = null;
     this._xform = null;
-    this.setXYZ({x : params.x, y: params.y, z: params.z });
+    this.setXyz({x : params.x, y: params.y, z: params.z });
 };
 
 /**
  * Sets the translation vector
  * @param {object} xyz The vector - eg. {x: 0, y: 1, z: 0}
  */
-SceneJS.Translate.prototype.setXYZ = function(xyz) {
+SceneJS.Translate.prototype.setXyz = function(xyz) {
     xyz = xyz || {};
     var x = xyz.x || 0;
     var y = xyz.y || 0;
@@ -41,7 +41,7 @@ SceneJS.Translate.prototype.setXYZ = function(xyz) {
 /** Returns the translation vector
  * @returns {Object} the vector, eg. {x: 0, y: 1, z: 0}
  */
-SceneJS.Translate.prototype.getXYZ = function() {
+SceneJS.Translate.prototype.getXyz = function() {
     return {
         x: this._attr.x,
         y: this._attr.y,

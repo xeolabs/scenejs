@@ -14,6 +14,7 @@ SceneJS._layerModule = new (function() {
     this.DEFAULT_LAYER_NAME = "___default";
 
     var enabledLayers;
+    var layerMap;
     var layerOrder;
 
     var layerStack = new Array(500);
@@ -30,12 +31,10 @@ SceneJS._layerModule = new (function() {
 
     this.setActiveLayers = function(layers) {
         enabledLayers = {};
-
-        /* Default layer - implicitly enabled
-         */
+        layerMap = {};
         layerOrder = [
             {
-                name: this.DEFAULT_LAYER_NAME,
+                name: this.DEFAULT_LAYER_NAME, // Default layer - implicitly enabled
                 priority: 0
             }
         ];
@@ -70,6 +69,7 @@ SceneJS._layerModule = new (function() {
             name: layerName,
             priority: priority
         };
+        layerMap[layerName] = newLayer;
         layerOrder.push(newLayer);
     }
 
@@ -81,6 +81,7 @@ SceneJS._layerModule = new (function() {
             name: layerName,
             priority: priority
         };
+        layerMap[layerName] = newLayer;
         var layer;
         for (var i = layerOrder.length - 1; i >= 0; i--) {
             layer = layerOrder[i];
@@ -94,7 +95,18 @@ SceneJS._layerModule = new (function() {
         layerOrder.push(newLayer);
     }
 
-    this.getLayerOrder = function() {
+    /**
+     * Get the priority of an enabled layer.
+     * Returns null if layer undefined or disabled.
+     */
+    this.getLayerPriority = function(layerName) {
+        if (!enabledLayers[layerName]) {
+            return null;
+        }
+        return layerMap[layerName].priority;
+    };
+
+    this.getOrderedLayerNames = function() {
         return layerOrder;
     };
 

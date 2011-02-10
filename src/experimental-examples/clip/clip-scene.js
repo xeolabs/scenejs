@@ -125,7 +125,7 @@ SceneJS.createNode({
                                                          */
                                                         {
                                                             type: "renderer",
-                                                         //   enableClip: true,
+                                                         //   clipping: true,
 //                                                            ,
 //                                                            a: { x:2, y: -10, z: -10 },
 //                                                            b: { x: 0, y:  10, z:  10 },

@@ -44,7 +44,7 @@ SceneJS.Clip.prototype.getMode = function() {
  @param {object} abc - eg. { a: {x: 0, y: 0, z: 0 }, b: {x: 0, y: 5, z: 0 }, c: {x: 5, y: 5, z: 0 } }
  @since Version 0.7.9
  */
-SceneJS.Clip.prototype.setABC = function(abc) {
+SceneJS.Clip.prototype.setAbc = function(abc) {
     abc = abc || {};
     this.setA(abc.a);
     this.setB(abc.b);
@@ -57,7 +57,7 @@ SceneJS.Clip.prototype.setABC = function(abc) {
  @returns {object} Clipping plane - eg. { a: {x: 0, y: 0, z: 0 }, b: {x: 0, y: 5, z: 0 }, c: {x: 5, y: 5, z: 0 } }
  @since Version 0.7.9
  */
-SceneJS.Clip.prototype.getABC = function() {
+SceneJS.Clip.prototype.getAbc = function() {
     return {
         a: this.getA(),
         b: this.getB(),
