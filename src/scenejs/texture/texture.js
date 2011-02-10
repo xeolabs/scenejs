@@ -135,6 +135,10 @@ SceneJS.Texture.prototype._init = function(params) {
     this._layers = [];
     this._state = SceneJS.Texture.STATE_INITIAL;
 
+    /* When set, texture waits for layers to load before compiling children - default is true
+     */
+    this._waitForLoad = (params.waitForLoad === false) ? params.waitForLoad : true;
+
     if (params.layers) {
         for (var i = 0; i < params.layers.length; i++) {
             var layerParam = params.layers[i];
@@ -212,14 +216,14 @@ SceneJS.Texture.prototype.getState = function() {
 
 
 // @private
-SceneJS.Texture.prototype._compile = function(traversalContext) {
-    this._preCompile(traversalContext);
-    this._compileNodes(traversalContext);
-    this._postCompile(traversalContext);
-};
+//SceneJS.Texture.prototype._compile = function(traversalContext) {
+//    this._preCompile(traversalContext);
+//    this._compileNodes(traversalContext);
+//    this._postCompile(traversalContext);
+//};
 
 // @private
-SceneJS.Texture.prototype._preCompile = function(traversalContext) {
+SceneJS.Texture.prototype._compile = function(traversalContext) {
 
     this._countLayersReady = 0;
 
@@ -356,6 +360,10 @@ SceneJS.Texture.prototype._preCompile = function(traversalContext) {
             this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
         }
 
+        /* Render child nodes
+         */
+        this._compileNodes(traversalContext);
+
         /* Record this node as loaded for "loading-status" events
          */
         SceneJS._loadStatusModule.status.numNodesLoaded++;
@@ -368,9 +376,19 @@ SceneJS.Texture.prototype._preCompile = function(traversalContext) {
             }
         }
 
+        if (!this._waitForLoad) {
+            this._compileNodes(traversalContext);
+        }
+        
         /* Record this node as loaded for "loading-status" events
          */
         SceneJS._loadStatusModule.status.numNodesLoading++;
+    }
+
+    /* Post-compile
+     */
+    if (this._countLayersReady == this._layers.length) {  // All layers loaded
+        SceneJS._textureModule.popTexture();
     }
 };
 
@@ -415,11 +433,11 @@ SceneJS.Texture.prototype._preCompile = function(traversalContext) {
 //        }
 //    };
 
-SceneJS.Texture.prototype._postCompile = function(traversalContext) {
-    if (this._countLayersReady == this._layers.length) {  // All layers loaded
-        SceneJS._textureModule.popTexture();
-    }
-};
+//SceneJS.Texture.prototype._postCompile = function(traversalContext) {
+//    if (this._countLayersReady == this._layers.length) {  // All layers loaded
+//        SceneJS._textureModule.popTexture();
+//    }
+//};
 
 
 /* Returns texture transform matrix
