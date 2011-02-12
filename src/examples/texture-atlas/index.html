@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+
+    <link rel="stylesheet" type="text/css" href="../web/jquery/jquery-ui.css">
+    <link href="../web/style.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript" src="../web/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../web/jquery/jquery-ui.min.js"></script>
+
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
+
+</head>
+<div id="container">
+    <div id="header">
+        <div id="header-nav">
+
+        </div>
+        <div id="header-inner">
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Using a Texture
+                Atlas
+            </h1>
+            <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
+                    src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
+                    alt="Share/Bookmark"/></a>
+            <script type="text/javascript">
+                var a2a_linkname = "SceneJS Live Examples";
+                var a2a_linkurl = window.location;
+                var a2a_onclick = 1;</script>
+            <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+        </div>
+    </div>
+    <div id="content">
+        <canvas id="theCanvas" width="1030" height="700">
+            <p>This example requires a browser that supports the
+                <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                &lt;canvas&gt; feature.</p>
+        </canvas>
+        <div id="info">
+            <h2>Using a Texture Atlas</h2>
+
+            <p>With this technique we define one large texture containing an "atlas" of sub-textures, which we use
+                individually on many geometries, each of which have UV coordinates that map to a different region of the
+                texture. In a scene where there are many small textures, this has the benefit of reducing state changes
+                on the graphics hardware by binding once, instead of for each individual texture.</p>
+
+            <br/>
+            <ul>
+                <li><a target="_other" href="texture-atlas.js">Scene source code</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/Using+a+Texture+Atlas">Wiki page on
+                    texture atlases</a></li>
+            </ul>
+        </div>
+        <div id="log">
+            <h3>Log</h3>
+
+            <div id="theLoggingDiv"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="texture-atlas.js"></script>
+</body>
+</html>
