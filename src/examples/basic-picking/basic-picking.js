@@ -6,6 +6,12 @@
  * March 2010
  *
  */
+
+
+/*----------------------------------------------------------------------
+ * Scene graph definition
+ *---------------------------------------------------------------------*/
+
 SceneJS.createNode({
 
     type: "scene",
@@ -228,6 +234,23 @@ SceneJS.createNode({
     ]
 });
 
+/*----------------------------------------------------------------------
+ * Enable scene graph compilation (disabled by default in V0.8).
+ *
+ * This feature is alpha status and may break some scene graphs.
+ *
+ * It can speed your scene graph up by an order of magnitude - we'll
+ * do it here just to show how it's done.
+ *
+ * http://scenejs.wikispaces.com/V0.8+Branch
+ *---------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+    compilation : {
+        enabled : true
+    }
+});
+
 SceneJS.withNode("right-blue-sphere").bind("picked",
         function(event) {
             alert("Picked: 'right-blue-sphere'");
@@ -253,20 +276,6 @@ SceneJS.withNode("left-green-sphere").bind("picked",
             alert("Picked: 'left-green-sphere'");
         });
 
-
-/*------------------------------------------------------------------------------------------------------------------
- * SceneJS debug modes
- *----------------------------------------------------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-
-    /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
-     */
-    compilation : {
-        enabled: true
-//        logTrace : {}
-    }
-});
 
 SceneJS.withNode("theScene").start();
 

@@ -135,6 +135,23 @@ SceneJS.createNode({
     ]
 });
 
+/*----------------------------------------------------------------------
+ * Enable scene graph compilation (disabled by default in V0.8).
+ *
+ * This feature is alpha status and may break some scene graphs.
+ *
+ * It can speed your scene graph up by an order of magnitude - we'll
+ * do it here just to show how it's done.
+ *
+ * http://scenejs.wikispaces.com/V0.8+Branch
+ *---------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+    compilation : {
+        enabled : true
+    }
+});
+
 //------------------------------------------------------------------------------------------------------------------
 // Mouse handler and scene render calls - whenever the mouse is clicked, switch views and re-render scene.
 //------------------------------------------------------------------------------------------------------------------

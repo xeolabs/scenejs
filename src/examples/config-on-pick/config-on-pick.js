@@ -14,6 +14,11 @@
  *
  */
 
+
+/*----------------------------------------------------------------------
+ * Scene graph definition
+ *---------------------------------------------------------------------*/
+
 SceneJS.createNode({
     type: "scene",
     id: "my-scene",
@@ -446,6 +451,23 @@ SceneJS.createNode({
 });
 
 
+/*----------------------------------------------------------------------
+ * Enable scene graph compilation (disabled by default in V0.8).
+ *
+ * This feature is alpha status and may break some scene graphs.
+ *
+ * It can speed your scene graph up by an order of magnitude - we'll
+ * do it here just to show how it's done.
+ *
+ * http://scenejs.wikispaces.com/V0.8+Branch
+ *---------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+    compilation : {
+        enabled : true
+    }
+});
+
 /* Rotate teapot 1 on picked
  */
 SceneJS.withNode("teapot1").bind("picked",
@@ -572,13 +594,6 @@ SceneJS.withNode("teapot7").bind("picked",
                 cullFace: "front"
             });
         });
-
-//SceneJS.withNode("teapot8").bind("picked",
-//        function(event) {
-//            SceneJS.withNode("teapot8-material").set({
-//                opacity: 0.6
-//            });
-//        });
 
 SceneJS.withNode("teapot8").bind("picked",
         function(event) {

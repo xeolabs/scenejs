@@ -3,7 +3,7 @@
  implement a stub of the service in this example, which should give you enough clues for define your own implementation.
 
  Wiki article:
- 
+
  http://scenejs.wikispaces.com/GeoLoaderService
 
  Lindsay S. Kay,
@@ -14,10 +14,10 @@
  lighting, material, data flow etc.
  */
 
-
 /* Define a stub geometry stream service that just provides a mock "stream" through which a simple cube geometry data
-* is available. We'll reference the stream with a geometry node within our scene graph, further below.
+ * is available. We'll reference the stream with a geometry node within our scene graph, further below.
  */
+
 function MyGeoLoader() {
 
     this.loadGeometry = function(id, callback) {
@@ -183,6 +183,24 @@ SceneJS.createNode({
             ]
         }
     ]
+});
+
+
+/*----------------------------------------------------------------------
+ * Enable scene graph compilation (disabled by default in V0.8).
+ *
+ * This feature is alpha status and may break some scene graphs.
+ *
+ * It can speed your scene graph up by an order of magnitude - we'll
+ * do it here just to show how it's done.
+ *
+ * http://scenejs.wikispaces.com/V0.8+Branch
+ *---------------------------------------------------------------------*/
+
+SceneJS.setDebugConfigs({
+    compilation : {
+        enabled : true
+    }
 });
 
 

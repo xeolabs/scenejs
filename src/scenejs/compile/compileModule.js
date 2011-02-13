@@ -12,7 +12,7 @@ SceneJS._compileModule = new (function() {
 
     /* Compile disabled by default
      */
-    this._enableCompile = true;
+    this._enableCompile = false;
 
     /* Stack to track nodes during scene traversal. Public push and pop methods are used with this
      * to track which nodes are within subgraphs that are targeted by instance nodes, in order to flag
@@ -66,10 +66,8 @@ SceneJS._compileModule = new (function() {
      */
     this._needCompileScene = false;
 
-    /**
-     * True when there are nodes that require COMPILE_NODE or COMPILE_SUBTREE
-     */
-    this.need_subtreeRootsToCompile = false;
+
+    this._notifiedNodes = {};
 
     /**
      * IDs of nodes that require re-render
@@ -206,6 +204,7 @@ SceneJS._compileModule = new (function() {
                  */
                 self._needCompileScene = false;
                 self._needCompileSubtrees = false;
+                self._notifiedNodes = {};
                 self._subtreeRootsToCompile = {};
                 self._dirtyNodes = {};
                 self._nodesWithinBranches = {};
@@ -300,6 +299,14 @@ SceneJS._compileModule = new (function() {
                         },
 
                         level: this.COMPILE_SCENE
+                    },
+
+                    "node": {
+                        level: this.COMPILE_BRANCH
+                    },
+
+                    "nodes": {
+                        level: this.COMPILE_BRANCH
                     }
                 },
 
@@ -418,7 +425,7 @@ SceneJS._compileModule = new (function() {
          */
         "instance": {
             "searching": {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             }
         },
 
@@ -448,7 +455,7 @@ SceneJS._compileModule = new (function() {
         "geometry": {
 
             "loaded": {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             }
         },
 
@@ -457,7 +464,7 @@ SceneJS._compileModule = new (function() {
         "text": {
 
             "loadedImage": {
-                level: this.COMPILE_SCENE
+                level: this.COMPILE_BRANCH
             }
         },
 
@@ -570,6 +577,13 @@ SceneJS._compileModule = new (function() {
         if (level == this.COMPILE_NODE) {
             level = this.COMPILE_PATH;
         }
+
+        /* Avoid redundant recompilations of same node
+         */
+        if (this._notifiedNodes[nodeId] <= level) {
+            return;
+        }
+        this._notifiedNodes[nodeId] = level;
 
         var priority = level;
 
@@ -735,7 +749,7 @@ SceneJS._compileModule = new (function() {
                 if (minLevel <= level && level <= maxLevel) {
                     SceneJS._loggingModule.info("Compiling - level: "
                             + levelNameStrings[compilation.level] + ", node: "
-                            + compilation.node._attr.nodeType + ", op: "
+                            + compilation.node._attr.nodeType + ", node ID: " + compilation.node._attr.id + ", op: "
                             + compilation.op + ", attr: "
                             + compilation.attrName);
                 }
@@ -783,12 +797,12 @@ SceneJS._compileModule = new (function() {
      */
     this._recompilePath = function(targetNode) {
         var dirtyNodes = this._dirtyNodes;
-//        if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
-//                return;
-//            }
-//        if (this._nodesWithinBranches[targetNode._attr.id]) { // Optimise for multiple updates on same node
-//            return;
-//        }
+        //        if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
+        //                return;
+        //            }
+        //        if (this._nodesWithinBranches[targetNode._attr.id]) { // Optimise for multiple updates on same node
+        //            return;
+        //        }
         var nodeInstances;
         var id;
         var node = targetNode;
@@ -796,17 +810,16 @@ SceneJS._compileModule = new (function() {
             id = node._attr.id;
 
 
-
             /*
              */
-//            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
-//                return;
-//            }
-//             if (this._nodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
-//                return;
-//            }
+            //            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
+            //                return;
+            //            }
+            //             if (this._nodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
+            //                return;
+            //            }
 
-              /* Ensure that instance allows compilation of the entire subgraph of its symbol
+            /* Ensure that instance allows compilation of the entire subgraph of its symbol
              * because the updated node will be a temporary child of the symbol subgraph's
              * rightmost leaf - otherwise the symbol subgraph will cull compilation of the
              * updated node if the subgraph is not flagged for compilation.
@@ -819,10 +832,12 @@ SceneJS._compileModule = new (function() {
             if (nodeInstances) {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
+                        this._nodesWithinBranches[instanceNodeId] = true;
                         this._recompilePath(SceneJS._nodeIDMap[instanceNodeId]);
                     }
                 }
             }
+
             node = node._parent;
         }
     };

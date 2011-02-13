@@ -168,6 +168,13 @@ SceneJS.Geometry.prototype._changeState = function(newState, params) {
     }
 };
 
+/** Returns this Geometry's stream ID, if any
+ * @return {String} ID of stream
+ */
+SceneJS.Geometry.prototype.getStream = function() {
+    return this._stream;
+};
+
 /** Returns this Geometry's positions array
  * @return {[Number]} Flat array of position elements
  */
@@ -338,6 +345,9 @@ SceneJS.Geometry.prototype._preCompile = function(traversalContext) {
         }
     }
     if (this._handle) {
+
+        /* Apply geometry
+         */
         SceneJS._geometryModule.pushGeometry(this._attr.id, this._handle.resource);
     }
 };
