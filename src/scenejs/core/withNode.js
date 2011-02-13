@@ -464,7 +464,6 @@ SceneJS._WithNode.prototype._callNodeMethod = function(prefix, attr, value, targ
     /* TODO: event should be queued and consumed to avoid many of these events accumulating
      */
     targetNode._fireEvent("updated", params);
-    //   SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_UPDATED, { nodeId : node.getID() });
 };
 
 
