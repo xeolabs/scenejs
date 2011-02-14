@@ -302,11 +302,11 @@ SceneJS._compileModule = new (function() {
                     },
 
                     "node": {
-                        level: this.COMPILE_BRANCH
+                        level: this.COMPILE_SCENE
                     },
 
                     "nodes": {
-                        level: this.COMPILE_BRANCH
+                        level: this.COMPILE_SCENE
                     }
                 },
 
