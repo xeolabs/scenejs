@@ -250,16 +250,16 @@ SceneJS.Geometry.prototype.getBoundary = function() {
     var positions = this._getArrays().positions;
 
     this._boundary = {
-        xmin : Number.MAX_VALUE,
-        ymin : Number.MAX_VALUE,
-        zmin : Number.MAX_VALUE,
-        xmax : Number.MIN_VALUE,
-        ymax : Number.MIN_VALUE,
-        zmax : Number.MIN_VALUE
+        xmin : SceneJS._math_MAX_DOUBLE,
+        ymin : SceneJS._math_MAX_DOUBLE,
+        zmin : SceneJS._math_MAX_DOUBLE,
+        xmax : SceneJS._math_MIN_DOUBLE,
+        ymax : SceneJS._math_MIN_DOUBLE,
+        zmax : SceneJS._math_MIN_DOUBLE
     };
 
     var x, y, z;
-    for (var i = 0, len = positions.length - 3; i < len; i += 3) {
+    for (var i = 0, len = positions.length - 2; i < len; i += 3) {
         x = positions[i];
         y = positions[i + 1];
         z = positions[i + 2];
