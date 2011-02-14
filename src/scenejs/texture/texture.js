@@ -139,51 +139,59 @@ SceneJS.Texture.prototype._init = function(params) {
      */
     this._waitForLoad = (params.waitForLoad === false) ? params.waitForLoad : true;
 
-    if (params.layers) {
-        for (var i = 0; i < params.layers.length; i++) {
-            var layerParam = params.layers[i];
-            if (!layerParam.uri && !layerParam.imageBuf) {
-                throw new SceneJS.errors.NodeConfigExpectedException(
-                        "SceneJS.Texture.layers[" + i + "] has no uri or imageBuf specified");
-            }
-            if (layerParam.applyFrom) {
-                if (layerParam.applyFrom != "uv" &&
-                    layerParam.applyFrom != "uv2" &&
-                    layerParam.applyFrom != "normal" &&
-                    layerParam.applyFrom != "geometry") {
-                    throw SceneJS._errorModule.fatalError(
-                            new SceneJS.errors.InvalidNodeConfigException(
-                                    "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                    "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
-                }
-            }
-            if (layerParam.applyTo) {
-                if (layerParam.applyTo != "baseColor" && // Colour map
-                    layerParam.applyTo != "specular" && // Specular map
-                    layerParam.applyTo != "emit" && // Emission map
-                    //   layerParam.applyTo != "diffuseColor" &&
-                    layerParam.applyTo != "normals") {
-                    throw SceneJS._errorModule.fatalError(
-                            new SceneJS.errors.InvalidNodeConfigException(
-                                    "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
-                                    "should be either 'baseColor', 'specular' or 'normals'"));
-                }
-            }
-            this._layers.push({
-                state : SceneJS.TextureLayer.STATE_INITIAL,
-                process: null,                      // Image load process handle
-                image : null,                       // Initialised when state == IMAGE_LOADED
-                creationParams: layerParam,         // Create texture using this
-                texture: null,                      // Initialised when state == TEXTURE_LOADED
-                applyFrom: layerParam.applyFrom || "uv",
-                applyTo: layerParam.applyTo || "baseColor",
-                blendMode: layerParam.blendMode || "add",
-                scale : layerParam.scale,
-                translate : layerParam.translate,
-                rotate : layerParam.rotate,
-                rebuildMatrix : true
-            });
+    if (!params.layers) {
+        throw new SceneJS.errors.NodeConfigExpectedException(
+                "texture layers missing");
+    }
+
+    if (!SceneJS._isArray(params.layers)) {
+        throw new SceneJS.errors.NodeConfigExpectedException(
+                "texture layers should be an array");
+    }
+
+    for (var i = 0; i < params.layers.length; i++) {
+        var layerParam = params.layers[i];
+        if (!layerParam.uri && !layerParam.imageBuf) {
+            throw new SceneJS.errors.NodeConfigExpectedException(
+                    "SceneJS.Texture.layers[" + i + "] has no uri or imageBuf specified");
         }
+        if (layerParam.applyFrom) {
+            if (layerParam.applyFrom != "uv" &&
+                layerParam.applyFrom != "uv2" &&
+                layerParam.applyFrom != "normal" &&
+                layerParam.applyFrom != "geometry") {
+                throw SceneJS._errorModule.fatalError(
+                        new SceneJS.errors.InvalidNodeConfigException(
+                                "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
+                                "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
+            }
+        }
+        if (layerParam.applyTo) {
+            if (layerParam.applyTo != "baseColor" && // Colour map
+                layerParam.applyTo != "specular" && // Specular map
+                layerParam.applyTo != "emit" && // Emission map
+                //   layerParam.applyTo != "diffuseColor" &&
+                layerParam.applyTo != "normals") {
+                throw SceneJS._errorModule.fatalError(
+                        new SceneJS.errors.InvalidNodeConfigException(
+                                "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
+                                "should be either 'baseColor', 'specular' or 'normals'"));
+            }
+        }
+        this._layers.push({
+            state : SceneJS.TextureLayer.STATE_INITIAL,
+            process: null,                      // Image load process handle
+            image : null,                       // Initialised when state == IMAGE_LOADED
+            creationParams: layerParam,         // Create texture using this
+            texture: null,                      // Initialised when state == TEXTURE_LOADED
+            applyFrom: layerParam.applyFrom || "uv",
+            applyTo: layerParam.applyTo || "baseColor",
+            blendMode: layerParam.blendMode || "add",
+            scale : layerParam.scale,
+            translate : layerParam.translate,
+            rotate : layerParam.rotate,
+            rebuildMatrix : true
+        });
     }
 };
 
@@ -379,7 +387,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
         if (!this._waitForLoad) {
             this._compileNodes(traversalContext);
         }
-        
+
         /* Record this node as loaded for "loading-status" events
          */
         SceneJS._loadStatusModule.status.numNodesLoading++;
@@ -391,53 +399,6 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
         SceneJS._textureModule.popTexture();
     }
 };
-
-//    // @private
-//    SceneJS.Texture.prototype._compileNodes = function(traversalContext) {
-//
-//        /* Fastest strategy is to allow the complete set of layers to load
-//         * before applying any of them. There would be a huge performance penalty
-//         * if we were to apply the incomplete set as layers are still loading -
-//         * SceneJS._renderModule would then have to generate a new shader for each new
-//         * layer loaded, which would become redundant as soon as the next layer is loaded.
-//         */
-//
-//        if (countLayersReady == this._layers.length) {  // All layers loaded
-//            SceneJS._textureModule.pushTexture(this._attr.id, this._layers);
-//
-//            if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
-//                this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
-//                this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
-//            }
-//
-//            /* Record this node as loaded for "loading-status" events
-//             */
-//            SceneJS._loadStatusModule.status.numNodesLoaded++;
-//
-//            SceneJS.Node.prototype._compileNodes.call(this, traversalContext);
-//
-//            SceneJS._textureModule.popTexture();
-//        } else {
-//
-//            if (this._state != SceneJS.Texture.STATE_ERROR) { // Not stuck in STATE_ERROR
-//                if (this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
-//                    this._changeState(SceneJS.Texture.STATE_LOADING); // Now loading some layers
-//                }
-//            }
-//
-//            /* Record this node as loaded for "loading-status" events
-//             */
-//            SceneJS._loadStatusModule.status.numNodesLoading++;
-//
-//            SceneJS.Node.prototype._compileNodes.call(this, traversalContext);
-//        }
-//    };
-
-//SceneJS.Texture.prototype._postCompile = function(traversalContext) {
-//    if (this._countLayersReady == this._layers.length) {  // All layers loaded
-//        SceneJS._textureModule.popTexture();
-//    }
-//};
 
 
 /* Returns texture transform matrix
