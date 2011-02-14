@@ -6,6 +6,30 @@ SceneJS.MorphGeometry = SceneJS.createNodeType("morphGeometry");
 // @private
 SceneJS.MorphGeometry.prototype._init = function(params) {
 
+    this._state = SceneJS.Geometry.STATE_INITIAL;
+
+    if (params.create instanceof Function) {
+
+        /* Factory function
+         */
+        this._create = params.create;
+
+    } else if (params.stream) {
+
+        /* Binary Stream
+         */
+        this._stream = params.stream;
+
+    } else {
+
+        this._setMorph(params);
+    }
+
+    this._attr.factor = params.factor || 0;
+};
+
+SceneJS.MorphGeometry.prototype._setMorph = function(params) {
+
     /*--------------------------------------------------------------------------
      * 1. Check we have enough targets for interpolation
      *-------------------------------------------------------------------------*/
@@ -23,6 +47,11 @@ SceneJS.MorphGeometry.prototype._init = function(params) {
                 new SceneJS.errors.InvalidNodeConfigException(
                         "morphGeometry node mismatch in number of keys and targets"));
     }
+
+    /*--------------------------------------------------------------------------
+     * 2. First target's arrays are defaults for where not given
+     * on subsequent targets
+     *-------------------------------------------------------------------------*/
 
     var positions;
     var normals;
@@ -45,6 +74,7 @@ SceneJS.MorphGeometry.prototype._init = function(params) {
             uv2 = target.uv2.slice(0);
         }
     }
+
     for (var i = 0, len = targets.length; i < len; i++) {
         target = targets[i];
         if (!target.positions) {
@@ -63,8 +93,47 @@ SceneJS.MorphGeometry.prototype._init = function(params) {
 
     this._attr.keys = keys;
     this._attr.targets = targets;
-    this._attr.factor = params.factor || 0;
 };
+
+/** Ready to create MorphGeometry
+ */
+SceneJS.MorphGeometry.STATE_INITIAL = "init";
+
+/** MorphGeometry in the process of loading
+ */
+SceneJS.MorphGeometry.STATE_LOADING = "loading";
+
+/** MorphGeometry loaded - MorphGeometry initailised from JSON arrays is immediately in this state and stays here
+ */
+SceneJS.MorphGeometry.STATE_LOADED = "loaded";
+
+/**
+ * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
+ * {@link #STATE_LOADING}, {@link #STATE_LOADED}.
+ * @returns {int} The state
+ */
+SceneJS.MorphGeometry.prototype.getState = function() {
+    return this._state;
+};
+
+// @private
+SceneJS.MorphGeometry.prototype._changeState = function(newState, params) {
+    params = params || {};
+    params.oldState = this._state;
+    params.newState = newState;
+    this._state = newState;
+    if (this._listeners["state-changed"]) {
+        this._fireEvent("state-changed", params);
+    }
+};
+
+/** Returns this MorphGeometry's stream ID, if any
+ * @return {String} ID of stream
+ */
+SceneJS.MorphGeometry.prototype.getStream = function() {
+    return this._stream;
+};
+
 
 /**
  Sets the morph factor, a value between [0.0 - 1.0]
@@ -93,13 +162,83 @@ SceneJS.MorphGeometry.prototype._compile = function(traversalContext) {
 
 // @private
 SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
+
     if (!this._handle) { // Not created yet
+
         this._handle = SceneJS._morphGeometryModule.createMorphGeometry(this._resource, this._attr);
+
+        this._changeState(SceneJS.MorphGeometry.STATE_LOADED);
     }
     SceneJS._morphGeometryModule.pushMorphGeometry(this._attr.id, this._handle, this._attr.factor);
 };
 
+SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
+    if (!this._handle) {
+
+        /* Morph VBOs not created yet
+         */
+        if (this._create) {
+
+            /* Targets supplied via callback
+             */
+            var params = this._create();
+
+            this._setMorph(params);
+
+            this._handle = SceneJS._morphGeometryModule.createMorphGeometry(
+                    this._resource,
+                    this._attr);
+
+            this._changeState(SceneJS.MorphGeometry.STATE_LOADED);
+
+        } else if (this._stream) {
+
+            /* Targets loaded from stream(s)
+             */
+
+            this._changeState(SceneJS.MorphGeometry.STATE_LOADING);
+
+            var self = this;
+
+            SceneJS._morphGeometryModule.createMorphGeometry(
+                    this._resource,
+                    this._stream,
+                    function(handle) {
+
+                        self._handle = handle;
+
+                        self._changeState(SceneJS.MorphGeometry.STATE_LOADED);
+
+                        /**
+                         * Need another compilation to apply freshly-loaded morphGeometry
+                         */
+                        SceneJS._compileModule.nodeUpdated(self, "loaded");
+                    });
+
+        } else { // Arrays
+
+            this._handle = SceneJS._morphGeometryModule.createMorphGeometry(
+                    this._resource,
+                    this._attr);
+
+            this._changeState(SceneJS.MorphGeometry.STATE_LOADED);
+        }
+    }
+
+    if (this._handle) {
+
+        /* Apply morphGeometry
+         */
+        SceneJS._morphGeometryModule.pushMorphGeometry(
+                this._attr.id,
+                this._handle.resource,
+                this._attr.factor);
+    }
+};
+
 // @private
 SceneJS.MorphGeometry.prototype._postCompile = function(traversalContext) {
-    SceneJS._morphGeometryModule.popMorphGeometry();
+    if (this._handle) {
+        SceneJS._morphGeometryModule.popMorphGeometry();
+    }
 };
