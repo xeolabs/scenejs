@@ -473,8 +473,8 @@ SceneJS._rendererModule = new (function() {
                 return {
                     x : v.x || 1,
                     y : v.y || 1,
-                    width: v.width || canvas.width,
-                    height: v.height || canvas.height
+                    width: v.width || canvas.canvas.width,
+                    height: v.height || canvas.canvas.height
                 };
             }
             context.viewport(v.x, v.y, v.width, v.height);
