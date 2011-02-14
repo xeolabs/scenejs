@@ -152,20 +152,28 @@ SceneJS._geometryModule = new (function() {
     }
 
     this.createGeometry = function(resource, source, callback) {
+
         if (!resource) {
             resource = SceneJS._createKeyForMap(currentGeoMap, "t");
         }
         
         if (typeof source == "string") {
+
+            /* Load from stream
+             */
             var geoService = SceneJS.Services.getService(SceneJS.Services.GEO_LOADER_SERVICE_ID);
             var self = this;
 
-            // http://scenejs.wikispaces.com/GeoLoaderService
+            /* http://scenejs.wikispaces.com/GeoLoaderService
+             */
             geoService.loadGeometry(source,
                     function(data) {
                         callback(self._createGeometry(resource, data));
                     });
         } else {
+
+            /* Arrays specified
+             */
             var data = createTypedArrays(source);
             data.primitive = source.primitive;
             return this._createGeometry(resource, data);
