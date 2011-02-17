@@ -142,10 +142,11 @@ SceneJS.BoundingBox.STATE_INTERSECTING_FRUSTUM = "visible";
 
 // @private
 SceneJS.BoundingBox.prototype._changeState = function(newState, params) {
+    var oldState = this._state;
     this._state = newState;
     if (this._listeners["state-changed"]) {
         params = params || {};
-        params.oldState = this._state;
+        params.oldState = oldState;
         params.newState = newState;
         this._fireEvent("state-changed", params);
     }
