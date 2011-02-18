@@ -305,6 +305,30 @@ SceneJS._WithNode.prototype.bind = function(name, handler) {
     return this;
 };
 
+/** Unbinds a listener for an event on the selected node
+ *
+ * @param {String} name Event name
+ * @param {Function} handler Event handler
+ */
+SceneJS._WithNode.prototype.unbind = function(name, handler) {
+    if (!name) {
+        throw "bind param 'name' null or undefined";
+    }
+    if (typeof name != "string") {
+        throw "bind param 'name' should be a string";
+    }
+    if (!handler) {
+        throw "bind param 'handler' null or undefined";
+    }
+    if (typeof handler != "function") {
+        throw "bind param 'handler' should be a function";
+    } else {
+        this._targetNode.removeListener(name, handler);
+        SceneJS._compileModule.nodeUpdated(this._targetNode);
+    }
+    return this;
+};
+
 /**
  * Performs pick on the selected scene node, which must be a scene.
  * @param offsetX Canvas X-coordinate
