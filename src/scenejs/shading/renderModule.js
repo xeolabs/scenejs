@@ -1103,7 +1103,7 @@ SceneJS._renderModule = new (function() {
 
             if (! this._lastImageBufState || node.imageBufState._stateId != this._lastImageBufState._stateId) {
                 if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
-                    context.flush();
+                    context.finish();
                     this._lastImageBufState.imageBuf.unbind();
                 }
                 if (node.imageBufState.imageBuf) {
@@ -1542,14 +1542,14 @@ SceneJS._renderModule = new (function() {
             //                this._program.unbind();
             //            }
 
+            /*----------------------------------------------------------------------------------------------------------
+             * If an image buffer is active, flush and deactivate it
+             *--------------------------------------------------------------------------------------------------------*/
 
-            ////////////////////////////////////////////
-            //             if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
-            //                    context.flush();
-            //                    this._lastImageBufState.imageBuf.unbind();
-            //                 this._lastImageBufState = null;
-            //                }
-            ////////////////////////////////////////////
+            if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
+                this._lastImageBufState.imageBuf.unbind();
+                this._lastImageBufState = null;
+            }
 
             if (this._program) {
                 this._program.unbind();
@@ -2404,37 +2404,4 @@ SceneJS._renderModule = new (function() {
         var context = states.canvas.context;
         context.bindFramebuffer(context.FRAMEBUFFER, null);
     }
-
-    //
-    //    var MaterialState = function(stateId, material) {
-    //
-    //        this.stateId = stateId;
-    //
-    //        this.baseColor = material.baseColor || [ 0.0, 0.0, 0.0 ];
-    //        this.highlightBaseColor = material.highlightBaseColor || material.baseColor || [ 0.0, 0.0, 0.0 ];
-    //        this.specularColor = material.specularColor || [ 0.5,  0.5,  0.5 ];
-    //        this.specular = material.specular != undefined ? material.specular : 2;
-    //        this.shine = material.shine != undefined ? material.shine : 0.5;
-    //        this.reflect = material.reflect != undefined ? material.reflect : 0;
-    //        this.alpha = material.alpha != undefined ? material.alpha : 1.0;
-    //        this.emit = material.emit != undefined ? material.emit : 0.0;
-    //    };
-    //
-    //    this.findVars = function(program) {
-    //        this.uMaterialBaseColor = program.getLocation("uMaterialBaseColor");
-    //        this.uMaterialSpecularColor = program.getLocation("uMaterialSpecularColor");
-    //        this.uMaterialSpecular = program.getLocation("uMaterialSpecular");
-    //        this.uMaterialShine = program.getLocation("uMaterialShine");
-    //        this.uMaterialEmit = program.getLocation("uMaterialEmit");
-    //        this.uMaterialAlpha = program.getLocation("uMaterialAlpha");
-    //    };
-    //
-    //    this.bind = function(renderer, node, context) {
-    //        context.uniform3fv(this.uMaterialBaseColor, this.baseColor);
-    //        context.uniform3fv(this.uMaterialSpecularColor, this.specularColor);
-    //        context.uniform1fv(this.uMaterialSpecular, this.specular);
-    //        context.uniform1fv(this.uMaterialShine, this.shine);
-    //        context.uniform1fv(this.uMaterialEmit, this.emit);
-    //        context.uniform1fv(this.uMaterialAlpha, this.alpha);
-    //    };
 })();
