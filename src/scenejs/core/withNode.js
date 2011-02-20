@@ -174,7 +174,7 @@ SceneJS._WithNode.prototype.numInstances = function() {
 /** Sets an attribute of the selected node
  */
 SceneJS._WithNode.prototype.set = function(attr, value) {
-    if (attr == null || attr == undefined) {
+    if (!attr) {
         throw "set param 'attr' null or undefined";
     }
     if (typeof attr == "string") {
@@ -188,7 +188,7 @@ SceneJS._WithNode.prototype.set = function(attr, value) {
 /** Adds an attribute to the selected node
  */
 SceneJS._WithNode.prototype.add = function(attr, value) {
-    if (attr == null || attr == undefined) {
+    if (!attr) {
         throw "add param 'attr' null or undefined";
     }
     if (typeof attr == "string") {
@@ -202,7 +202,7 @@ SceneJS._WithNode.prototype.add = function(attr, value) {
 /** Increments an attribute to the selected node
  */
 SceneJS._WithNode.prototype.inc = function(attr, value) {
-    if (attr == null || attr == undefined) {
+    if (!attr) {
         throw "inc param 'attr' null or undefined";
     }
     if (typeof attr == "string") {
@@ -216,7 +216,7 @@ SceneJS._WithNode.prototype.inc = function(attr, value) {
 /** Inserts an attribute or child node into the selected node
  */
 SceneJS._WithNode.prototype.insert = function(attr, value) {
-    if (attr == null || attr == undefined) {
+    if (!attr) {
         throw "insert param 'attr' null or undefined";
     }
     if (typeof attr == "string") {
@@ -230,7 +230,7 @@ SceneJS._WithNode.prototype.insert = function(attr, value) {
 /** Removes an attribute from the selected node
  */
 SceneJS._WithNode.prototype.remove = function(attr, value) {
-    if (attr == null || attr == undefined) {
+    if (!attr) {
         throw "remove param 'attr' null or undefined";
     }
     if (typeof attr == "string") {
@@ -244,7 +244,7 @@ SceneJS._WithNode.prototype.remove = function(attr, value) {
 /** Returns the value of an attribute of the selected node
  */
 SceneJS._WithNode.prototype.get = function(attr) {
-    if (attr == null || attr == undefined) {
+    if (!attr) {
         return this._targetNode.getJSON();
     }
     var funcName = "get" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
