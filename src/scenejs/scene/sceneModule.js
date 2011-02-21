@@ -97,6 +97,12 @@ SceneJS._sceneModule = new (function() {
                 }
             }
         }
+
+        // If the canvas uses css styles to specify the sizes make sure the basic
+        // width and height attributes match or the WebGL context will use 300 x 150
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+
         var context;
         var contextNames = SceneJS.SUPPORTED_WEBGL_CONTEXT_NAMES;
         for (var i = 0; (!context) && i < contextNames.length; i++) {
