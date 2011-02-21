@@ -137,6 +137,11 @@ SceneJS._sceneModule = new (function() {
                             + canvasId
                             + '\' failed to provide a supported WebGL context'));
         }
+
+        var zBufferDepth;
+        zBufferDepth = context.getParameter(context.DEPTH_BITS);
+        SceneJS._loggingModule.info("SceneJS.Scene using webgl context with Z-buffer depth of: " + zBufferDepth + " bits");
+
         context.clearColor(0.0, 0.0, 0.0, 1.0);
         context.clearDepth(1.0);
         context.enable(context.DEPTH_TEST);
@@ -229,6 +234,17 @@ SceneJS._sceneModule = new (function() {
             throw SceneJS._errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         return scene.canvas.canvas;
+    };
+
+    /** Returns the webgl context element the given scene is bound to
+     * @private
+     */
+    this.getSceneContext = function(sceneId) {
+        var scene = scenes[sceneId];
+        if (!scene) {
+            throw SceneJS._errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+        }
+        return scene.canvas.context;
     };
 
     /** Returns all registered scenes
