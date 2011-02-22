@@ -25,28 +25,48 @@ SceneJS.Sphere = SceneJS.createNodeType("sphere", "geometry");
 SceneJS.Sphere.prototype._init = function(params) {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
-	var radius = params.radius || 1;
+    var radius = params.radius || 1;
+
+    var semiMajorAxis =  params.semiMajorAxis || 1;
+    var semiMinorAxis =  1 / semiMajorAxis;
+
+    var sweep = params.sweep || 1;
+    if (sweep > 1) {
+        sweep = 1
+    }
+
+    var sliceDepth = params.sliceDepth || 1;
+    if (sliceDepth > 1) {
+        sliceDepth = 1
+    }
+
+    var ringLimit = rings * sweep;
+    var sliceLimit = slices * sliceDepth;
 
     /* Resource ID ensures that we reuse any sphere that has already been created with
      * these parameters instead of wasting memory
      */
-    this._resource = "sphere_" + radius + "_" + rings + "_" + slices;
+    this._resource = "sphere_" + radius + "_" + rings + "_" + slices + "_" + semiMajorAxis + "_" + sweep + "_" + sliceDepth;
 
-    /* Callback that does the creation in case we can't find matching sphere to reuse     
+    /* Callback that does the creation in case we can't find matching sphere to reuse
      */
     this._create = function() {
         var positions = [];
         var normals = [];
         var uv = [];
-        for (var sliceNum = 0; sliceNum <= slices; sliceNum++) {
+        var ringNum, sliceNum, index;
+
+        for (sliceNum = 0; sliceNum <= slices; sliceNum++) {
+            if (sliceNum > sliceLimit) break;
             var theta = sliceNum * Math.PI / slices;
             var sinTheta = Math.sin(theta);
             var cosTheta = Math.cos(theta);
 
-            for (var ringNum = 0; ringNum <= rings; ringNum++) {
+            for (ringNum = 0; ringNum <= rings; ringNum++) {
+                if (ringNum > ringLimit) break;
                 var phi = ringNum * 2 * Math.PI / rings;
-                var sinPhi = Math.sin(phi);
-                var cosPhi = Math.cos(phi);
+                var sinPhi = semiMinorAxis * Math.sin(phi);
+                var cosPhi = semiMajorAxis * Math.cos(phi);
 
                 var x = cosPhi * sinTheta;
                 var y = cosTheta;
@@ -65,11 +85,30 @@ SceneJS.Sphere.prototype._init = function(params) {
             }
         }
 
+        // create a center point which is only used when sweep or sliceDepth are less than one
+        if (sliceDepth < 1) {
+            var yPos = Math.cos((sliceNum - 1) * Math.PI / slices) * radius;
+            positions.push(0, yPos, 0);
+            normals.push(1, 1, 1);
+            uv.push(1, 1);
+        } else {
+            positions.push(0, 0, 0);
+            normals.push(1, 1, 1);
+            uv.push(1, 1);
+        }
+
+        // index of the center position point in the positions array
+        // var centerIndex = (ringLimit + 1) *  (sliceLimit);
+        var centerIndex = positions.length / 3 - 1;
+
         var indices = [];
-        for (var sliceNum = 0; sliceNum < slices; sliceNum++) {
-            for (var ringNum = 0; ringNum < rings; ringNum++) {
-                var first = (sliceNum * (rings + 1)) + ringNum;
-                var second = first + rings + 1;
+
+        for (sliceNum = 0; sliceNum < slices; sliceNum++) {
+            if (sliceNum >= sliceLimit) break;
+            for (ringNum = 0; ringNum < rings; ringNum++) {
+                if (ringNum >= ringLimit) break;
+                var first = (sliceNum * (ringLimit + 1)) + ringNum;
+                var second = first + ringLimit + 1;
                 indices.push(first);
                 indices.push(second);
                 indices.push(first + 1);
@@ -78,7 +117,24 @@ SceneJS.Sphere.prototype._init = function(params) {
                 indices.push(second + 1);
                 indices.push(first + 1);
             }
+            if (rings >= ringLimit) {
+                // We aren't sweeping the whole way around so ...
+                //  indices for a sphere with fours ring-segments when only two are drawn.
+                index = (ringLimit + 1) * sliceNum;
+                //    0,3,15   2,5,15  3,6,15  5,8,15 ...
+                indices.push(index, index + ringLimit + 1, centerIndex);
+                indices.push(index + ringLimit, index + ringLimit * 2 + 1, centerIndex);
+             }
         }
+
+        if (slices > sliceLimit) {
+            // We aren't sweeping from the top all the way to the bottom so ...
+            for (ringNum = 1; ringNum <= ringLimit; ringNum++) {
+                index = sliceNum * ringLimit + ringNum;
+                indices.push(index, index + 1, centerIndex);
+            }
+            indices.push(index + 1, sliceNum * ringLimit + 1, centerIndex);
+         }
 
         return {
             primitive : "triangles",
@@ -89,4 +145,3 @@ SceneJS.Sphere.prototype._init = function(params) {
         };
     };
 };
-
