@@ -1715,15 +1715,24 @@ SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
         var ret = SceneJS._math_INSIDE_FRUSTUM;
         var bminmax = [ box.min, box.max ];
         var plane = null;
+
+        var normal0;
+        var normal1;
+        var normal2;
+
+        var bminmaxTest0;
+        var bminmaxTest1;
+        var bminmaxTest2;
+
         for (var i = 0; i < 6; ++i) {
             plane = planes[i];
-            var normal0 = plane.normal[0];
-            var normal1 = plane.normal[1];
-            var normal2 = plane.normal[2];
+            normal0 = plane.normal[0];
+            normal1 = plane.normal[1];
+            normal2 = plane.normal[2];
             
-            var bminmaxTest0 = bminmax[plane.testVertex[0]][0];
-            var bminmaxTest1 = bminmax[plane.testVertex[1]][1];
-            var bminmaxTest2 = bminmax[plane.testVertex[2]][2];
+            bminmaxTest0 = bminmax[plane.testVertex[0]][0];
+            bminmaxTest1 = bminmax[plane.testVertex[1]][1];
+            bminmaxTest2 = bminmax[plane.testVertex[2]][2];
             
             
             if (((normal0 * bminmaxTest0) +
