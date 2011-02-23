@@ -1,7 +1,7 @@
 /* 
  * Optimizations made based on glMatrix by Brandon Jones
  */
- 
+
 /*
  * Copyright (c) 2010 Brandon Jones
  *
@@ -26,7 +26,7 @@
  */
 
 
-/**  
+/**
  * @param u vec3
  * @param v vec3
  * @param dest vec3 - optional destination
@@ -34,32 +34,36 @@
  * @private
  */
 SceneJS._math_divVec3 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] / v[0];
     dest[1] = u[1] / v[1];
     dest[2] = u[2] / v[2];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec4
  * @param dest vec4 - optional destination
  * @return {vec4} dest if specified, v otherwise
  * @private
  */
 SceneJS._math_negateVector4 = function(v, dest) {
-    if(!dest) { dest = v; }
+    if (!dest) {
+        dest = v;
+    }
     dest[0] = -v[0];
     dest[1] = -v[1];
     dest[2] = -v[2];
     dest[3] = -v[3];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param u vec4
  * @param v vec4
  * @param dest vec4 - optional destination
@@ -67,18 +71,20 @@ SceneJS._math_negateVector4 = function(v, dest) {
  * @private
  */
 SceneJS._math_addVec4 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] + v[0];
     dest[1] = u[1] + v[1];
     dest[2] = u[2] + v[2];
     dest[3] = u[3] + v[3];
-    
+
     return dest;
 };
 
 
-/**  
+/**
  * @param v vec4
  * @param s scalar
  * @param dest vec4 - optional destination
@@ -86,17 +92,19 @@ SceneJS._math_addVec4 = function(u, v, dest) {
  * @private
  */
 SceneJS._math_addVec4s = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = v[0] + s;
     dest[1] = v[1] + s;
     dest[2] = v[2] + s;
     dest[3] = v[3] + s;
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param u vec3
  * @param v vec3
  * @param dest vec3 - optional destination
@@ -104,16 +112,18 @@ SceneJS._math_addVec4s = function(v, s, dest) {
  * @private
  */
 SceneJS._math_addVec3 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] + v[0];
     dest[1] = u[1] + v[1];
     dest[2] = u[2] + v[2];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec3
  * @param s scalar
  * @param dest vec3 - optional destination
@@ -121,12 +131,14 @@ SceneJS._math_addVec3 = function(u, v, dest) {
  * @private
  */
 SceneJS._math_addVec3s = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = v[0] + s;
     dest[1] = v[1] + s;
     dest[2] = v[2] + s;
-    
+
     return dest;
 };
 
@@ -135,7 +147,7 @@ SceneJS._math_addScalarVec4 = function(s, v, dest) {
     return SceneJS._math_addVec4s(v, s, dest);
 };
 
-/**  
+/**
  * @param u vec4
  * @param v vec4
  * @param dest vec4 - optional destination
@@ -143,17 +155,19 @@ SceneJS._math_addScalarVec4 = function(s, v, dest) {
  * @private
  */
 SceneJS._math_subVec4 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] - v[0];
     dest[1] = u[1] - v[1];
     dest[2] = u[2] - v[2];
     dest[3] = u[3] - v[3];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param u vec3
  * @param v vec3
  * @param dest vec3 - optional destination
@@ -161,12 +175,14 @@ SceneJS._math_subVec4 = function(u, v, dest) {
  * @private
  */
 SceneJS._math_subVec3 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] - v[0];
     dest[1] = u[1] - v[1];
     dest[2] = u[2] - v[2];
-    
+
     return dest;
 };
 
@@ -181,7 +197,7 @@ SceneJS._math_lerpVec3 = function(t, t1, t2, p1, p2) {
 };
 
 
-/**  
+/**
  * @param u vec2
  * @param v vec2
  * @param dest vec2 - optional destination
@@ -189,15 +205,17 @@ SceneJS._math_lerpVec3 = function(t, t1, t2, p1, p2) {
  * @private
  */
 SceneJS._math_subVec2 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] - v[0];
     dest[1] = u[1] - v[1];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec4
  * @param s scalar
  * @param dest vec4 - optional destination
@@ -205,17 +223,19 @@ SceneJS._math_subVec2 = function(u, v, dest) {
  * @private
  */
 SceneJS._math_subVec4Scalar = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = v[0] - s;
     dest[1] = v[1] - s;
     dest[2] = v[2] - s;
     dest[3] = v[3] - s;
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec4
  * @param s scalar
  * @param dest vec4 - optional destination
@@ -223,17 +243,19 @@ SceneJS._math_subVec4Scalar = function(v, s, dest) {
  * @private
  */
 SceneJS._math_subScalarVec4 = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = s - v[0];
     dest[1] = s - v[1];
     dest[2] = s - v[2];
     dest[3] = s - v[3];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param u vec4
  * @param v vec4
  * @param dest vec4 - optional destination
@@ -241,17 +263,19 @@ SceneJS._math_subScalarVec4 = function(v, s, dest) {
  * @private
  */
 SceneJS._math_mulVec4 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] * v[0];
     dest[1] = u[1] * v[1];
     dest[2] = u[2] * v[2];
     dest[3] = u[3] * v[3];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec4
  * @param s scalar
  * @param dest vec4 - optional destination
@@ -259,18 +283,20 @@ SceneJS._math_mulVec4 = function(u, v, dest) {
  * @private
  */
 SceneJS._math_mulVec4Scalar = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = v[0] * s;
     dest[1] = v[1] * s;
     dest[2] = v[2] * s;
     dest[3] = v[3] * s;
-    
+
     return dest;
 };
 
 
-/**  
+/**
  * @param v vec3
  * @param s scalar
  * @param dest vec3 - optional destination
@@ -278,12 +304,14 @@ SceneJS._math_mulVec4Scalar = function(v, s, dest) {
  * @private
  */
 SceneJS._math_mulVec3Scalar = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = v[0] * s;
     dest[1] = v[1] * s;
     dest[2] = v[2] * s;
-    
+
     return dest;
 };
 
@@ -295,7 +323,9 @@ SceneJS._math_mulVec3Scalar = function(v, s, dest) {
  * @private
  */
 SceneJS._math_mulVec2Scalar = function(v, s, dest) {
-    if(!dest) { dest = v; }
+    if (!dest) {
+        dest = v;
+    }
 
     dest[0] = v[0] * s;
     dest[1] = v[1] * s;
@@ -304,7 +334,7 @@ SceneJS._math_mulVec2Scalar = function(v, s, dest) {
 };
 
 
-/**  
+/**
  * @param u vec4
  * @param v vec4
  * @param dest vec4 - optional destination
@@ -312,17 +342,19 @@ SceneJS._math_mulVec2Scalar = function(v, s, dest) {
  * @private
  */
 SceneJS._math_divVec4 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     dest[0] = u[0] / v[0];
     dest[1] = u[1] / v[1];
     dest[2] = u[2] / v[2];
     dest[3] = u[3] / v[3];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec3
  * @param s scalar
  * @param dest vec3 - optional destination
@@ -330,16 +362,18 @@ SceneJS._math_divVec4 = function(u, v, dest) {
  * @private
  */
 SceneJS._math_divScalarVec3 = function(s, v, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = s / v[0];
     dest[1] = s / v[1];
     dest[2] = s / v[2];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec3
  * @param s scalar
  * @param dest vec3 - optional destination
@@ -347,16 +381,18 @@ SceneJS._math_divScalarVec3 = function(s, v, dest) {
  * @private
  */
 SceneJS._math_divVec3s = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = v[0] / s;
     dest[1] = v[1] / s;
     dest[2] = v[2] / s;
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param v vec4
  * @param s scalar
  * @param dest vec4 - optional destination
@@ -364,18 +400,20 @@ SceneJS._math_divVec3s = function(v, s, dest) {
  * @private
  */
 SceneJS._math_divVec4s = function(v, s, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = v[0] / s;
     dest[1] = v[1] / s;
     dest[2] = v[2] / s;
     dest[3] = v[3] / s;
-    
+
     return dest;
 };
 
 
-/**  
+/**
  * @param s scalar
  * @param v vec4
  * @param dest vec4 - optional destination
@@ -383,13 +421,15 @@ SceneJS._math_divVec4s = function(v, s, dest) {
  * @private
  */
 SceneJS._math_divScalarVec4 = function(s, v, dest) {
-    if(!dest) { dest = v; }
-    
+    if (!dest) {
+        dest = v;
+    }
+
     dest[0] = s / v[0];
     dest[1] = s / v[1];
     dest[2] = s / v[2];
     dest[3] = s / v[3];
-    
+
     return dest;
 };
 
@@ -404,13 +444,13 @@ SceneJS._math_cross3Vec4 = function(u, v) {
     var u0 = u[0], u1 = u[1], u2 = u[2];
     var v0 = v[0], v1 = v[1], v2 = v[2];
     return [
-      u1 * v2 - u2 * v1,
-      u2 * v0 - u0 * v2,
-      u0 * v1 - u1 * v0,
-      0.0];
+        u1 * v2 - u2 * v1,
+        u2 * v0 - u0 * v2,
+        u0 * v1 - u1 * v0,
+        0.0];
 };
 
-/**  
+/**
  * @param u vec3
  * @param v vec3
  * @param dest vec3 - optional destination
@@ -418,15 +458,17 @@ SceneJS._math_cross3Vec4 = function(u, v) {
  * @private
  */
 SceneJS._math_cross3Vec3 = function(u, v, dest) {
-    if(!dest) { dest = u; }
-    
+    if (!dest) {
+        dest = u;
+    }
+
     var x = u[0], y = u[1], z = u[2];
     var x2 = v[0], y2 = v[1], z2 = v[2];
-    
-    dest[0] = y*z2 - z*y2;
-    dest[1] = z*x2 - x*z2;
-    dest[2] = x*y2 - y*x2;
-    
+
+    dest[0] = y * z2 - z * y2;
+    dest[1] = z * x2 - x * z2;
+    dest[2] = x * y2 - y * x2;
+
     return dest;
 };
 
@@ -470,7 +512,7 @@ SceneJS._math_lenVec2 = function(v) {
     return Math.sqrt(SceneJS._math_sqLenVec2(v));
 };
 
-/**  
+/**
  * @param v vec3
  * @param dest vec3 - optional destination
  * @return {vec3} dest if specified, v otherwise
@@ -480,7 +522,7 @@ SceneJS._math_rcpVec3 = function(v, dest) {
     return SceneJS._math_divScalarVec3(1.0, v, dest);
 };
 
-/**  
+/**
  * @param v vec4
  * @param dest vec4 - optional destination
  * @return {vec4} dest if specified, v otherwise
@@ -549,16 +591,16 @@ SceneJS._math_setRowMat4s = function(m, r, s) {
 /** @private */
 SceneJS._math_getColMat4 = function(m, c) {
     var i = c * 4;
-    return [m[i], m[i+1],m[i+2],m[i+3]];
+    return [m[i], m[i + 1],m[i + 2],m[i + 3]];
 };
 
 /** @private */
 SceneJS._math_setColMat4v = function(m, c, v) {
     var i = c * 4;
     m[i] = v[0];
-    m[i+1] = v[1];
-    m[i+2] = v[2];
-    m[i+3] = v[3];
+    m[i + 1] = v[1];
+    m[i + 2] = v[2];
+    m[i + 3] = v[3];
 };
 
 /** @private */
@@ -631,21 +673,23 @@ SceneJS._math_isIdentityMat4 = function(m) {
         m[4] !== 0.0 || m[5] !== 1.0 || m[6] !== 0.0 || m[7] !== 0.0 ||
         m[8] !== 0.0 || m[9] !== 0.0 || m[10] !== 1.0 || m[11] !== 0.0 ||
         m[12] !== 0.0 || m[13] !== 0.0 || m[14] !== 0.0 || m[15] !== 1.0)
-      {
+    {
         return false;
-      }
-      
+    }
+
     return true;
 };
 
-/**  
+/**
  * @param m mat4
  * @param dest mat4 - optional destination
  * @return {mat4} dest if specified, m otherwise
  * @private
  */
 SceneJS._math_negateMat4 = function(m, dest) {
-    if(!dest) { dest = m; }
+    if (!dest) {
+        dest = m;
+    }
 
     dest[0] = -m[0];
     dest[1] = -m[1];
@@ -663,11 +707,11 @@ SceneJS._math_negateMat4 = function(m, dest) {
     dest[13] = -m[13];
     dest[14] = -m[14];
     dest[15] = -m[15];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param a mat4
  * @param b mat4
  * @param dest mat4 - optional destination
@@ -675,8 +719,10 @@ SceneJS._math_negateMat4 = function(m, dest) {
  * @private
  */
 SceneJS._math_addMat4 = function(a, b, dest) {
-    if(!dest) { dest = a; }
-    
+    if (!dest) {
+        dest = a;
+    }
+
     dest[0] = a[0] + b[0];
     dest[1] = a[1] + b[1];
     dest[2] = a[2] + b[2];
@@ -693,11 +739,11 @@ SceneJS._math_addMat4 = function(a, b, dest) {
     dest[13] = a[13] + b[13];
     dest[14] = a[14] + b[14];
     dest[15] = a[15] + b[15];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param m mat4
  * @param s scalar
  * @param dest mat4 - optional destination
@@ -705,8 +751,10 @@ SceneJS._math_addMat4 = function(a, b, dest) {
  * @private
  */
 SceneJS._math_addMat4Scalar = function(m, s, dest) {
-    if(!dest) { dest = m; }
-    
+    if (!dest) {
+        dest = m;
+    }
+
     dest[0] = m[0] + s;
     dest[1] = m[1] + s;
     dest[2] = m[2] + s;
@@ -723,7 +771,7 @@ SceneJS._math_addMat4Scalar = function(m, s, dest) {
     dest[13] = m[13] + s;
     dest[14] = m[14] + s;
     dest[15] = m[15] + s;
-    
+
     return dest;
 };
 
@@ -732,7 +780,7 @@ SceneJS._math_addScalarMat4 = function(s, m, dest) {
     return SceneJS._math_addMat4Scalar(m, s, dest);
 };
 
-/**  
+/**
  * @param a mat4
  * @param b mat4
  * @param dest mat4 - optional destination
@@ -740,8 +788,10 @@ SceneJS._math_addScalarMat4 = function(s, m, dest) {
  * @private
  */
 SceneJS._math_subMat4 = function(a, b, dest) {
-    if(!dest) { dest = a; }
-    
+    if (!dest) {
+        dest = a;
+    }
+
     dest[0] = a[0] - b[0];
     dest[1] = a[1] - b[1];
     dest[2] = a[2] - b[2];
@@ -758,11 +808,11 @@ SceneJS._math_subMat4 = function(a, b, dest) {
     dest[13] = a[13] - b[13];
     dest[14] = a[14] - b[14];
     dest[15] = a[15] - b[15];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param m mat4
  * @param s scalar
  * @param dest mat4 - optional destination
@@ -770,8 +820,10 @@ SceneJS._math_subMat4 = function(a, b, dest) {
  * @private
  */
 SceneJS._math_subMat4Scalar = function(m, s, dest) {
-    if(!dest) { dest = m; }
-    
+    if (!dest) {
+        dest = m;
+    }
+
     dest[0] = m[0] - s;
     dest[1] = m[1] - s;
     dest[2] = m[2] - s;
@@ -788,11 +840,11 @@ SceneJS._math_subMat4Scalar = function(m, s, dest) {
     dest[13] = m[13] - s;
     dest[14] = m[14] - s;
     dest[15] = m[15] - s;
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param s scalar
  * @param m mat4
  * @param dest mat4 - optional destination
@@ -800,8 +852,10 @@ SceneJS._math_subMat4Scalar = function(m, s, dest) {
  * @private
  */
 SceneJS._math_subScalarMat4 = function(s, m, dest) {
-    if(!dest) { dest = m; }
-    
+    if (!dest) {
+        dest = m;
+    }
+
     dest[0] = s - m[0];
     dest[1] = s - m[1];
     dest[2] = s - m[2];
@@ -818,11 +872,11 @@ SceneJS._math_subScalarMat4 = function(s, m, dest) {
     dest[13] = s - m[13];
     dest[14] = s - m[14];
     dest[15] = s - m[15];
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param a mat4
  * @param b mat4
  * @param dest mat4 - optional destination
@@ -830,40 +884,42 @@ SceneJS._math_subScalarMat4 = function(s, m, dest) {
  * @private
  */
 SceneJS._math_mulMat4 = function(a, b, dest) {
-    if(!dest) { dest = a; }
-    
+    if (!dest) {
+        dest = a;
+    }
+
     // Cache the matrix values (makes for huge speed increases!)
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
     var a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
     var a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
     var a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
-    
+
     var b00 = b[0], b01 = b[1], b02 = b[2], b03 = b[3];
     var b10 = b[4], b11 = b[5], b12 = b[6], b13 = b[7];
     var b20 = b[8], b21 = b[9], b22 = b[10], b23 = b[11];
     var b30 = b[12], b31 = b[13], b32 = b[14], b33 = b[15];
-    
-    dest[0] = b00*a00 + b01*a10 + b02*a20 + b03*a30;
-    dest[1] = b00*a01 + b01*a11 + b02*a21 + b03*a31;
-    dest[2] = b00*a02 + b01*a12 + b02*a22 + b03*a32;
-    dest[3] = b00*a03 + b01*a13 + b02*a23 + b03*a33;
-    dest[4] = b10*a00 + b11*a10 + b12*a20 + b13*a30;
-    dest[5] = b10*a01 + b11*a11 + b12*a21 + b13*a31;
-    dest[6] = b10*a02 + b11*a12 + b12*a22 + b13*a32;
-    dest[7] = b10*a03 + b11*a13 + b12*a23 + b13*a33;
-    dest[8] = b20*a00 + b21*a10 + b22*a20 + b23*a30;
-    dest[9] = b20*a01 + b21*a11 + b22*a21 + b23*a31;
-    dest[10] = b20*a02 + b21*a12 + b22*a22 + b23*a32;
-    dest[11] = b20*a03 + b21*a13 + b22*a23 + b23*a33;
-    dest[12] = b30*a00 + b31*a10 + b32*a20 + b33*a30;
-    dest[13] = b30*a01 + b31*a11 + b32*a21 + b33*a31;
-    dest[14] = b30*a02 + b31*a12 + b32*a22 + b33*a32;
-    dest[15] = b30*a03 + b31*a13 + b32*a23 + b33*a33;
-    
+
+    dest[0] = b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30;
+    dest[1] = b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31;
+    dest[2] = b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32;
+    dest[3] = b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33;
+    dest[4] = b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30;
+    dest[5] = b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31;
+    dest[6] = b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32;
+    dest[7] = b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33;
+    dest[8] = b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30;
+    dest[9] = b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31;
+    dest[10] = b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32;
+    dest[11] = b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33;
+    dest[12] = b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30;
+    dest[13] = b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31;
+    dest[14] = b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32;
+    dest[15] = b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33;
+
     return dest;
 };
 
-/**  
+/**
  * @param m mat4
  * @param s scalar
  * @param dest mat4 - optional destination
@@ -872,8 +928,10 @@ SceneJS._math_mulMat4 = function(a, b, dest) {
  */
 SceneJS._math_mulMat4s = function(m, s, dest)
 {
-    if(!dest) { dest = m; }
-    
+    if (!dest) {
+        dest = m;
+    }
+
     dest[0] = m[0] * s;
     dest[1] = m[1] * s;
     dest[2] = m[2] * s;
@@ -890,11 +948,11 @@ SceneJS._math_mulMat4s = function(m, s, dest)
     dest[13] = m[13] * s;
     dest[14] = m[14] * s;
     dest[15] = m[15] * s;
-    
+
     return dest;
 };
 
-/**  
+/**
  * @param m mat4
  * @param v vec4
  * @return {vec4}
@@ -902,7 +960,7 @@ SceneJS._math_mulMat4s = function(m, s, dest)
  */
 SceneJS._math_mulMat4v4 = function(m, v) {
     var v0 = v[0], v1 = v[1], v2 = v[2], v3 = v[3];
-    
+
     return [
         m[0] * v0 + m[4] * v1 + m[8] * v2 + m[12] * v3,
         m[1] * v0 + m[5] * v1 + m[9] * v2 + m[13] * v3,
@@ -911,7 +969,7 @@ SceneJS._math_mulMat4v4 = function(m, v) {
     ];
 };
 
-/**  
+/**
  * @param mat mat4
  * @param dest mat4 - optional destination
  * @return {mat4} dest if specified, mat otherwise
@@ -921,26 +979,26 @@ SceneJS._math_transposeMat4 = function(mat, dest) {
     // If we are transposing ourselves we can skip a few steps but have to cache some values
     var m4 = mat[4], m14 = mat[14], m8 = mat[8];
     var m13 = mat[13], m12 = mat[12], m9 = mat[9];
-    if(!dest || mat == dest) { 
-      var a01 = mat[1], a02 = mat[2], a03 = mat[3];
-      var a12 = mat[6], a13 = mat[7];
-      var a23 = mat[11];
-      
-      mat[1] = m4;
-      mat[2] = m8;
-      mat[3] = m12;
-      mat[4] = a01;
-      mat[6] = m9;
-      mat[7] = m13;
-      mat[8] = a02;
-      mat[9] = a12;
-      mat[11] = m14;
-      mat[12] = a03;
-      mat[13] = a13;
-      mat[14] = a23;
-      return mat;
+    if (!dest || mat == dest) {
+        var a01 = mat[1], a02 = mat[2], a03 = mat[3];
+        var a12 = mat[6], a13 = mat[7];
+        var a23 = mat[11];
+
+        mat[1] = m4;
+        mat[2] = m8;
+        mat[3] = m12;
+        mat[4] = a01;
+        mat[6] = m9;
+        mat[7] = m13;
+        mat[8] = a02;
+        mat[9] = a12;
+        mat[11] = m14;
+        mat[12] = a03;
+        mat[13] = a13;
+        mat[14] = a23;
+        return mat;
     }
-    
+
     dest[0] = mat[0];
     dest[1] = m4;
     dest[2] = m8;
@@ -967,63 +1025,65 @@ SceneJS._math_determinantMat4 = function(mat) {
     var a10 = mat[4], a11 = mat[5], a12 = mat[6], a13 = mat[7];
     var a20 = mat[8], a21 = mat[9], a22 = mat[10], a23 = mat[11];
     var a30 = mat[12], a31 = mat[13], a32 = mat[14], a33 = mat[15];
-  
-    return a30*a21*a12*a03 - a20*a31*a12*a03 - a30*a11*a22*a03 + a10*a31*a22*a03 +
-        a20*a11*a32*a03 - a10*a21*a32*a03 - a30*a21*a02*a13 + a20*a31*a02*a13 +
-        a30*a01*a22*a13 - a00*a31*a22*a13 - a20*a01*a32*a13 + a00*a21*a32*a13 +
-        a30*a11*a02*a23 - a10*a31*a02*a23 - a30*a01*a12*a23 + a00*a31*a12*a23 +
-        a10*a01*a32*a23 - a00*a11*a32*a23 - a20*a11*a02*a33 + a10*a21*a02*a33 +
-        a20*a01*a12*a33 - a00*a21*a12*a33 - a10*a01*a22*a33 + a00*a11*a22*a33;
+
+    return a30 * a21 * a12 * a03 - a20 * a31 * a12 * a03 - a30 * a11 * a22 * a03 + a10 * a31 * a22 * a03 +
+           a20 * a11 * a32 * a03 - a10 * a21 * a32 * a03 - a30 * a21 * a02 * a13 + a20 * a31 * a02 * a13 +
+           a30 * a01 * a22 * a13 - a00 * a31 * a22 * a13 - a20 * a01 * a32 * a13 + a00 * a21 * a32 * a13 +
+           a30 * a11 * a02 * a23 - a10 * a31 * a02 * a23 - a30 * a01 * a12 * a23 + a00 * a31 * a12 * a23 +
+           a10 * a01 * a32 * a23 - a00 * a11 * a32 * a23 - a20 * a11 * a02 * a33 + a10 * a21 * a02 * a33 +
+           a20 * a01 * a12 * a33 - a00 * a21 * a12 * a33 - a10 * a01 * a22 * a33 + a00 * a11 * a22 * a33;
 };
 
-/**  
+/**
  * @param mat mat4
  * @param dest mat4 - optional destination
  * @return {mat4} dest if specified, mat otherwise
  * @private
  */
 SceneJS._math_inverseMat4 = function(mat, dest) {
-    if(!dest) { dest = mat; }
-    
+    if (!dest) {
+        dest = mat;
+    }
+
     // Cache the matrix values (makes for huge speed increases!)
     var a00 = mat[0], a01 = mat[1], a02 = mat[2], a03 = mat[3];
     var a10 = mat[4], a11 = mat[5], a12 = mat[6], a13 = mat[7];
     var a20 = mat[8], a21 = mat[9], a22 = mat[10], a23 = mat[11];
     var a30 = mat[12], a31 = mat[13], a32 = mat[14], a33 = mat[15];
-    
-    var b00 = a00*a11 - a01*a10;
-    var b01 = a00*a12 - a02*a10;
-    var b02 = a00*a13 - a03*a10;
-    var b03 = a01*a12 - a02*a11;
-    var b04 = a01*a13 - a03*a11;
-    var b05 = a02*a13 - a03*a12;
-    var b06 = a20*a31 - a21*a30;
-    var b07 = a20*a32 - a22*a30;
-    var b08 = a20*a33 - a23*a30;
-    var b09 = a21*a32 - a22*a31;
-    var b10 = a21*a33 - a23*a31;
-    var b11 = a22*a33 - a23*a32;
-    
+
+    var b00 = a00 * a11 - a01 * a10;
+    var b01 = a00 * a12 - a02 * a10;
+    var b02 = a00 * a13 - a03 * a10;
+    var b03 = a01 * a12 - a02 * a11;
+    var b04 = a01 * a13 - a03 * a11;
+    var b05 = a02 * a13 - a03 * a12;
+    var b06 = a20 * a31 - a21 * a30;
+    var b07 = a20 * a32 - a22 * a30;
+    var b08 = a20 * a33 - a23 * a30;
+    var b09 = a21 * a32 - a22 * a31;
+    var b10 = a21 * a33 - a23 * a31;
+    var b11 = a22 * a33 - a23 * a32;
+
     // Calculate the determinant (inlined to avoid double-caching)
-    var invDet = 1/(b00*b11 - b01*b10 + b02*b09 + b03*b08 - b04*b07 + b05*b06);
-    
-    dest[0] = (a11*b11 - a12*b10 + a13*b09)*invDet;
-    dest[1] = (-a01*b11 + a02*b10 - a03*b09)*invDet;
-    dest[2] = (a31*b05 - a32*b04 + a33*b03)*invDet;
-    dest[3] = (-a21*b05 + a22*b04 - a23*b03)*invDet;
-    dest[4] = (-a10*b11 + a12*b08 - a13*b07)*invDet;
-    dest[5] = (a00*b11 - a02*b08 + a03*b07)*invDet;
-    dest[6] = (-a30*b05 + a32*b02 - a33*b01)*invDet;
-    dest[7] = (a20*b05 - a22*b02 + a23*b01)*invDet;
-    dest[8] = (a10*b10 - a11*b08 + a13*b06)*invDet;
-    dest[9] = (-a00*b10 + a01*b08 - a03*b06)*invDet;
-    dest[10] = (a30*b04 - a31*b02 + a33*b00)*invDet;
-    dest[11] = (-a20*b04 + a21*b02 - a23*b00)*invDet;
-    dest[12] = (-a10*b09 + a11*b07 - a12*b06)*invDet;
-    dest[13] = (a00*b09 - a01*b07 + a02*b06)*invDet;
-    dest[14] = (-a30*b03 + a31*b01 - a32*b00)*invDet;
-    dest[15] = (a20*b03 - a21*b01 + a22*b00)*invDet;
-    
+    var invDet = 1 / (b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06);
+
+    dest[0] = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;
+    dest[1] = (-a01 * b11 + a02 * b10 - a03 * b09) * invDet;
+    dest[2] = (a31 * b05 - a32 * b04 + a33 * b03) * invDet;
+    dest[3] = (-a21 * b05 + a22 * b04 - a23 * b03) * invDet;
+    dest[4] = (-a10 * b11 + a12 * b08 - a13 * b07) * invDet;
+    dest[5] = (a00 * b11 - a02 * b08 + a03 * b07) * invDet;
+    dest[6] = (-a30 * b05 + a32 * b02 - a33 * b01) * invDet;
+    dest[7] = (a20 * b05 - a22 * b02 + a23 * b01) * invDet;
+    dest[8] = (a10 * b10 - a11 * b08 + a13 * b06) * invDet;
+    dest[9] = (-a00 * b10 + a01 * b08 - a03 * b06) * invDet;
+    dest[10] = (a30 * b04 - a31 * b02 + a33 * b00) * invDet;
+    dest[11] = (-a20 * b04 + a21 * b02 - a23 * b00) * invDet;
+    dest[12] = (-a10 * b09 + a11 * b07 - a12 * b06) * invDet;
+    dest[13] = (a00 * b09 - a01 * b07 + a02 * b06) * invDet;
+    dest[14] = (-a30 * b03 + a31 * b01 - a32 * b00) * invDet;
+    dest[15] = (a20 * b03 - a21 * b01 + a22 * b00) * invDet;
+
     return dest;
 };
 
@@ -1076,19 +1136,19 @@ SceneJS._math_rotationMat4v = function(anglerad, axis) {
 
     var m = SceneJS._math_mat4();
 
-    m[0] = (q * x*x) + c;
+    m[0] = (q * x * x) + c;
     m[1] = (q * xy) + zs;
     m[2] = (q * zx) - ys;
     m[3] = 0.0;
 
     m[4] = (q * xy) - zs;
-    m[5] = (q * y*y) + c;
+    m[5] = (q * y * y) + c;
     m[6] = (q * yz) + xs;
     m[7] = 0.0;
 
     m[8] = (q * zx) + ys;
     m[9] = (q * yz) - xs;
-    m[10] = (q * z*z) + c;
+    m[10] = (q * z * z) + c;
     m[11] = 0.0;
 
     m[12] = 0.0;
@@ -1132,68 +1192,70 @@ SceneJS._math_scalingMat4s = function(s) {
  * @return {mat4} dest if specified, a new mat4 otherwise
  */
 SceneJS._math_lookAtMat4v = function(pos, target, up, dest) {
-    if(!dest) { dest = SceneJS._math_mat4(); }
-    
-    var posx = pos[0],
-      posy = pos[1],
-      posz = pos[2],
-      upx = up[0],
-      upy = up[1],
-      upz = up[2],
-      targetx = target[0],
-      targety = target[1],
-      targetz = target[2];
-  
-    if (posx == targetx && posy == targety && posz == targetz) {
-      return SceneJS._math_identityMat4();
+    if (!dest) {
+        dest = SceneJS._math_mat4();
     }
-    
+
+    var posx = pos[0],
+            posy = pos[1],
+            posz = pos[2],
+            upx = up[0],
+            upy = up[1],
+            upz = up[2],
+            targetx = target[0],
+            targety = target[1],
+            targetz = target[2];
+
+    if (posx == targetx && posy == targety && posz == targetz) {
+        return SceneJS._math_identityMat4();
+    }
+
     var z0,z1,z2,x0,x1,x2,y0,y1,y2,len;
-    
+
     //vec3.direction(eye, center, z);
     z0 = posx - targetx;
     z1 = posy - targety;
     z2 = posz - targetz;
-    
+
     // normalize (no check needed for 0 because of early return)
-    len = 1/Math.sqrt(z0*z0 + z1*z1 + z2*z2);
+    len = 1 / Math.sqrt(z0 * z0 + z1 * z1 + z2 * z2);
     z0 *= len;
     z1 *= len;
     z2 *= len;
-    
+
     //vec3.normalize(vec3.cross(up, z, x));
-    x0 = upy*z2 - upz*z1;
-    x1 = upz*z0 - upx*z2;
-    x2 = upx*z1 - upy*z0;
-    len = Math.sqrt(x0*x0 + x1*x1 + x2*x2);
+    x0 = upy * z2 - upz * z1;
+    x1 = upz * z0 - upx * z2;
+    x2 = upx * z1 - upy * z0;
+    len = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2);
     if (!len) {
-      x0 = 0;
-      x1 = 0;
-      x2 = 0;
+        x0 = 0;
+        x1 = 0;
+        x2 = 0;
     } else {
-      len = 1/len;
-      x0 *= len;
-      x1 *= len;
-      x2 *= len;
+        len = 1 / len;
+        x0 *= len;
+        x1 *= len;
+        x2 *= len;
     }
-    
+
     //vec3.normalize(vec3.cross(z, x, y));
-    y0 = z1*x2 - z2*x1;
-    y1 = z2*x0 - z0*x2;
-    y2 = z0*x1 - z1*x0;
-    
-    len = Math.sqrt(y0*y0 + y1*y1 + y2*y2);
+    y0 = z1 * x2 - z2 * x1;
+    y1 = z2 * x0 - z0 * x2;
+    y2 = z0 * x1 - z1 * x0;
+
+    len = Math.sqrt(y0 * y0 + y1 * y1 + y2 * y2);
     if (!len) {
-      y0 = 0;
-      y1 = 0;
-      y2 = 0;
+        y0 = 0;
+        y1 = 0;
+        y2 = 0;
     } else {
-      len = 1/len;
-      y0 *= len;
-      y1 *= len;
-      y2 *= len;
+        len = 1 / len;
+        y0 *= len;
+        y1 *= len;
+        y2 *= len;
     }
-    
+
     dest[0] = x0;
     dest[1] = y0;
     dest[2] = z0;
@@ -1206,11 +1268,11 @@ SceneJS._math_lookAtMat4v = function(pos, target, up, dest) {
     dest[9] = y2;
     dest[10] = z2;
     dest[11] = 0;
-    dest[12] = -(x0*posx + x1*posy + x2*posz);
-    dest[13] = -(y0*posx + y1*posy + y2*posz);
-    dest[14] = -(z0*posx + z1*posy + z2*posz);
+    dest[12] = -(x0 * posx + x1 * posy + x2 * posz);
+    dest[13] = -(y0 * posx + y1 * posy + y2 * posz);
+    dest[14] = -(z0 * posx + z1 * posy + z2 * posz);
     dest[15] = 1;
-    
+
     return dest;
 };
 
@@ -1221,7 +1283,9 @@ SceneJS._math_lookAtMat4c = function(posx, posy, posz, targetx, targety, targetz
 
 /** @private */
 SceneJS._math_orthoMat4c = function(left, right, bottom, top, near, far, dest) {
-    if(!dest) { dest = SceneJS._math_mat4(); }
+    if (!dest) {
+        dest = SceneJS._math_mat4();
+    }
     var rl = (right - left);
     var tb = (top - bottom);
     var fn = (far - near);
@@ -1287,16 +1351,18 @@ SceneJS._math_frustumMat4v = function(fmin, fmax) {
 
 /** @private */
 SceneJS._math_frustumMatrix4 = function(left, right, bottom, top, near, far, dest) {
-    if(!dest) { dest = SceneJS._math_mat4(); }
+    if (!dest) {
+        dest = SceneJS._math_mat4();
+    }
     var rl = (right - left);
     var tb = (top - bottom);
     var fn = (far - near);
-    dest[0] = (near*2) / rl;
+    dest[0] = (near * 2) / rl;
     dest[1] = 0;
     dest[2] = 0;
     dest[3] = 0;
     dest[4] = 0;
-    dest[5] = (near*2) / tb;
+    dest[5] = (near * 2) / tb;
     dest[6] = 0;
     dest[7] = 0;
     dest[8] = (right + left) / rl;
@@ -1305,7 +1371,7 @@ SceneJS._math_frustumMatrix4 = function(left, right, bottom, top, near, far, des
     dest[11] = -1;
     dest[12] = 0;
     dest[13] = 0;
-    dest[14] = -(far*near*2) / fn;
+    dest[14] = -(far * near * 2) / fn;
     dest[15] = 0;
     return dest;
 };
@@ -1346,28 +1412,28 @@ SceneJS._math_transformPoints3 = function(m, points) {
     var len = points.length;
     var p0, p1, p2;
     var pi;
-    
+
     // cache values
     var m0 = m[0], m1 = m[1], m2 = m[2], m3 = m[3];
     var m4 = m[4], m5 = m[5], m6 = m[6], m7 = m[7];
     var m8 = m[8], m9 = m[9], m10 = m[10], m11 = m[11];
     var m12 = m[12], m13 = m[13], m14 = m[14], m15 = m[15];
-    
+
     for (var i = 0; i < len; ++i) {
         // cache values
         pi = points[i];
         p0 = pi[0];
         p1 = pi[1];
         p2 = pi[2];
-        
+
         result[i] = [
-          (m0 * p0) + (m4 * p1) + (m8 * p2) + m12,
-          (m1 * p0) + (m5 * p1) + (m9 * p2) + m13,
-          (m2 * p0) + (m6 * p1) + (m10 * p2) + m14,
-          (m3 * p0) + (m7 * p1) + (m11 * p2) + m15
+            (m0 * p0) + (m4 * p1) + (m8 * p2) + m12,
+            (m1 * p0) + (m5 * p1) + (m9 * p2) + m13,
+            (m2 * p0) + (m6 * p1) + (m10 * p2) + m14,
+            (m3 * p0) + (m7 * p1) + (m11 * p2) + m15
         ];
     }
-    
+
     return result;
 };
 
@@ -1391,7 +1457,7 @@ SceneJS._math_projectVec4 = function(v) {
 /** @private */
 SceneJS._math_Plane3 = function (normal, offset, normalize) {
     this.normal = [0.0, 0.0, 1.0 ];
-    
+
     this.offset = 0.0;
     if (normal && offset) {
         var normal0 = normal[0], normal1 = normal[1], normal2 = normal[2];
@@ -1440,13 +1506,13 @@ SceneJS._math_Box3 = function(min, max) {
     /** @private */
     this.fromPoints = function(points) {
         var pointsLength = points.length;
-    
+
         for (i = 0; i < pointsLength; ++i) {
             var points_i3 = points[i][3];
             var pDiv0 = points[i][0] / points_i3;
             var pDiv1 = points[i][1] / points_i3;
             var pDiv2 = points[i][2] / points_i3;
-    
+
             if (pDiv0 < this.min[0]) {
                 this.min[0] = pDiv0;
             }
@@ -1456,7 +1522,7 @@ SceneJS._math_Box3 = function(min, max) {
             if (pDiv2 < this.min[2]) {
                 this.min[2] = pDiv2;
             }
-    
+
             if (pDiv0 > this.max[0]) {
                 this.max[0] = pDiv0;
             }
@@ -1474,8 +1540,8 @@ SceneJS._math_Box3 = function(min, max) {
     this.isEmpty = function() {
         return (
                 (this.min[0] >= this.max[0]) &&
-                 (this.min[1] >= this.max[1]) && 
-                 (this.min[2] >= this.max[2])
+                (this.min[1] >= this.max[1]) &&
+                (this.min[2] >= this.max[2])
                 );
     };
 
@@ -1539,7 +1605,7 @@ SceneJS._math_Box3 = function(min, max) {
 SceneJS._math_AxisBox3 = function(min, max) {
     var min0 = min[0], min1 = min[1], min2 = min[2];
     var max0 = max[0], max1 = max[1], max2 = max[2];
-    
+
     this.verts = [
         [min0, min1, min2],
         [max0, min1, min2],
@@ -1611,7 +1677,7 @@ SceneJS._math_billboardMat = function(viewMatrix) {
         SceneJS._math_lenVec4(rotVec[2])
     ];
 
-    var scaleVecRcp = SceneJS._math_mat4(); 
+    var scaleVecRcp = SceneJS._math_mat4();
     SceneJS._math_rcpVec3(scaleVec, scaleVecRcp);
     var sMat = SceneJS._math_scalingMat4v(scaleVec);
     //var sMatInv = SceneJS._math_scalingMat4v(scaleVecRcp);
@@ -1653,15 +1719,15 @@ SceneJS._math_INSIDE_FRUSTUM = 5;
 
 /** @private */
 SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
-    var m = SceneJS._math_mat4(); 
+    var m = SceneJS._math_mat4();
     SceneJS._math_mulMat4(projectionMatrix, viewMatrix, m);
-    
+
     // cache m indexes
     var m0 = m[0], m1 = m[1], m2 = m[2], m3 = m[3];
     var m4 = m[4], m5 = m[5], m6 = m[6], m7 = m[7];
     var m8 = m[8], m9 = m[9], m10 = m[10], m11 = m[11];
     var m12 = m[12], m13 = m[13], m14 = m[14], m15 = m[15];
-    
+
     //var q = [ m[3], m[7], m[11] ]; just reuse m indexes instead of making new var
     var planes = [
         new SceneJS._math_FrustumPlane(m3 - m0, m7 - m4, m11 - m8, m15 - m12),
@@ -1700,11 +1766,11 @@ SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
     SceneJS._math_setRowMat4(rotMatInverse, 1, rotVec[1]);
     SceneJS._math_setRowMat4(rotMatInverse, 2, rotVec[2]);
 
-    if(!this.matrix) {
+    if (!this.matrix) {
         this.matrix = SceneJS._math_mat4();
     }
     SceneJS._math_mulMat4(projectionMatrix, viewMatrix, this.matrix);
-    if(!this.billboardMatrix) {
+    if (!this.billboardMatrix) {
         this.billboardMatrix = SceneJS._math_mat4();
     }
     SceneJS._math_mulMat4(sMatInv, SceneJS._math_mulMat4(rotMatInverse, sMat), this.billboardMatrix);
@@ -1716,35 +1782,17 @@ SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
         var bminmax = [ box.min, box.max ];
         var plane = null;
 
-        var normal0;
-        var normal1;
-        var normal2;
-
-        var bminmaxTest0;
-        var bminmaxTest1;
-        var bminmaxTest2;
-
         for (var i = 0; i < 6; ++i) {
             plane = planes[i];
-            normal0 = plane.normal[0];
-            normal1 = plane.normal[1];
-            normal2 = plane.normal[2];
-            
-            bminmaxTest0 = bminmax[plane.testVertex[0]][0];
-            bminmaxTest1 = bminmax[plane.testVertex[1]][1];
-            bminmaxTest2 = bminmax[plane.testVertex[2]][2];
-            
-            
-            if (((normal0 * bminmaxTest0) +
-                 (normal1 * bminmaxTest1) +
-                 (normal2 * bminmaxTest2) +
+            if (((plane.normal[0] * bminmax[plane.testVertex[0]][0]) +
+                 (plane.normal[1] * bminmax[plane.testVertex[1]][1]) +
+                 (plane.normal[2] * bminmax[plane.testVertex[2]][2]) +
                  (plane.offset)) < 0.0) {
                 return SceneJS._math_OUTSIDE_FRUSTUM;
             }
-
-            if (((normal0 * bminmaxTest0) +
-                 (normal1 * bminmaxTest1) +
-                 (normal2 * bminmaxTest2) +
+            if (((plane.normal[0] * bminmax[1 - plane.testVertex[0]][0]) +
+                 (plane.normal[1] * bminmax[1 - plane.testVertex[1]][1]) +
+                 (plane.normal[2] * bminmax[1 - plane.testVertex[2]][2]) +
                  (plane.offset)) < 0.0) {
                 ret = SceneJS._math_INTERSECT_FRUSTUM;
             }
@@ -1781,7 +1829,6 @@ SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
 
         return viewport[2] * Math.abs(p2[0] - p1[0]);
     };
-
 
 
     this.getProjectedState = function(modelCoords) {
@@ -1843,15 +1890,15 @@ SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
         // cache viewport indexes
         var viewport2 = viewport[2], viewport3 = viewport[3];
 
-        canvasBoxMin0 = (canvasBoxMin0 * (viewport2+15));
-        canvasBoxMin1 = (canvasBoxMin1 * (viewport3+15));
-        canvasBoxMax0 = (canvasBoxMax0 * (viewport2+15));
-        canvasBoxMax1 = (canvasBoxMax1 * (viewport3+15));
+        canvasBoxMin0 = (canvasBoxMin0 * (viewport2 + 15));
+        canvasBoxMin1 = (canvasBoxMin1 * (viewport3 + 15));
+        canvasBoxMax0 = (canvasBoxMax0 * (viewport2 + 15));
+        canvasBoxMax1 = (canvasBoxMax1 * (viewport3 + 15));
 
-        var diagCanvasBoxVec = SceneJS._math_mat4(); 
+        var diagCanvasBoxVec = SceneJS._math_mat4();
         SceneJS._math_subVec2([canvasBoxMax0, canvasBoxMax1],
-                              [canvasBoxMin0, canvasBoxMin1], 
-                              diagCanvasBoxVec);
+                [canvasBoxMin0, canvasBoxMin1],
+                diagCanvasBoxVec);
         var diagCanvasBoxSize = SceneJS._math_lenVec2(diagCanvasBoxVec);
 
         if (canvasBoxMin0 < 0) {
@@ -1869,9 +1916,9 @@ SceneJS._math_Frustum = function(viewMatrix, projectionMatrix, viewport) {
         }
         return {
             canvasBox:  {
-                            min: [canvasBoxMin0, canvasBoxMin1 ],
-                            max: [canvasBoxMax0, canvasBoxMax1 ]
-                        },
+                min: [canvasBoxMin0, canvasBoxMin1 ],
+                max: [canvasBoxMax0, canvasBoxMax1 ]
+            },
             canvasSize: diagCanvasBoxSize
         };
     };
@@ -1996,7 +2043,7 @@ SceneJS._math_normalizeQuaternion = function(q) {
 };
 
 SceneJS._math_conjugateQuaternion = function(q) {
-  return[-q[0],-q[1],-q[2],q[3]];
+    return[-q[0],-q[1],-q[2],q[3]];
 };
 
 SceneJS._math_angleAxisFromQuaternion = function(q) {
