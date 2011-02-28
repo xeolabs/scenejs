@@ -133,14 +133,12 @@ SceneJS.createNode({
                                                          */
                                                         {
                                                             type: "scale",
-                                                            x:1.3,
-                                                            y:1.3,
-                                                            z:1.3,
+                                                            x:1.2,
+                                                            y:1.2,
+                                                            z:1.2,
 
                                                             nodes: [
 
-                                                                /* Sphere geometry
-                                                                 */
                                                                 {
                                                                     type : "sphere"
                                                                 }
@@ -171,9 +169,9 @@ SceneJS.createNode({
                                                          */
                                                         {
                                                             type: "scale",
-                                                            x:.8,
-                                                            y:.8,
-                                                            z:.8,
+                                                            x:.7,
+                                                            y:.7,
+                                                            z:.7,
 
                                                             nodes: [
 
@@ -229,12 +227,12 @@ SceneJS.Message.sendMessage({
 
     target: "insert-clipbox-here",
 
-    xmin: -1.0,
-    ymin: -1.0,
-    zmin: -1.0,
-    xmax: 1.0,
-    ymax: 1.0,
-    zmax: 1.0
+    xmin: -1.2,
+    ymin: -1.2,
+    zmin: -1.2,
+    xmax: 1.2,
+    ymax: 1.2,
+    zmax: 1.2
 });
 
 /* Now we'll issue the "clip.clipbox.update" command to tweak the
@@ -261,7 +259,7 @@ SceneJS.setDebugConfigs({
     /* Enable scene compilation - see http://scenejs.wikispaces.com/V0.8+Branch
      */
     compilation : {
-        enabled: true
+        enabled: false
         //        ,
         //        logTrace : {}
     }
