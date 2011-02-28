@@ -79,8 +79,12 @@ SceneJS.Disk.prototype._init = function(params) {
              var u = 1 - (ringNum / rings);
              var v = 0.5;
 
+             //
+             // create the outer set of vertices, 
+             // one for the bottom and one for the top
+             //
              normals.push(-x);
-             normals.push(-ybot);
+             normals.push(1);
              normals.push(-z);
              uv.push(u);
              uv.push(v);
@@ -89,7 +93,7 @@ SceneJS.Disk.prototype._init = function(params) {
              positions.push(radius * z);
 
              normals.push(-x);
-             normals.push(-ytop);
+             normals.push(-1);
              normals.push(-z);
              uv.push(u);
              uv.push(v);
@@ -98,7 +102,11 @@ SceneJS.Disk.prototype._init = function(params) {
              positions.push(radius * z);
              
              if (innerRadius > 0) {
-            
+                 //
+                 // Creating a disk with a hole in the middle ...
+                 // generate the inner set of vertices, 
+                 // one for the bottom and one for the top
+                 //
                  normals.push(-x);
                  normals.push(-ytop);
                  normals.push(-z);
@@ -122,11 +130,21 @@ SceneJS.Disk.prototype._init = function(params) {
          
          var indices = [];
          
+         //
+         // Create indices pointing to vertices for the top, bottom
+         // and optional endcaps for the disk
+         //
+
          if (innerRadius > 0) {
+             //
+             // Creating a disk with a hole in the middle ...
+             // Each ring sengment rquires a quad surface on the top and bottom
+             // so create two traingles for the top and two for the bottom.
+             //
              var index;
              for (var ringNum = 0; ringNum < rings; ringNum++) {
                  if (ringNum >= ringLimit) {
-                     // We aren't sweeping the whole way around so create triangles to cap the ends. 
+                     // We aren't sweeping the whole way around so also create triangles to cap the ends. 
                      // Example: indices for a disk with fours ring-segments when only two are drawn.
                      //   0,1,2   0,2,3  8,9,10  8,10,11
                      indices.push(0, 1, 2);
@@ -172,18 +190,22 @@ SceneJS.Disk.prototype._init = function(params) {
              }
 
          } else {
-
-             normals.push(0, -1.0, 0);
-             uv.push(1, 0.5);
+             //
+             // Create a solid disk without a hole in the middle ...
+             // So only a single top and bottom triangle are needed
+             //
+             normals.push(0, 1.0, 0);
+             uv.push(-1, -1);
              positions.push(0, ybot, 0);
              var centerBot = ringLimit * 2 + 2;
 
-             normals.push(0, 1.0, 0);
-             uv.push(1, 0.5);
+             normals.push(0, -1.0, 0);
+             uv.push(-1, -1);
              positions.push(0, ytop, 0);
              var centerTop = ringLimit * 2 + 3;
              
              for (var ringNum = 0; ringNum < rings; ringNum++) {
+                 //  generate the two outer-facing triangles for each ring segment
                  if (ringNum >= ringLimit) break;
                  var index = ringNum * 2;
                  indices.push(index);
@@ -196,6 +218,7 @@ SceneJS.Disk.prototype._init = function(params) {
              }
 
              for (var ringNum = 0; ringNum < rings; ringNum++) {
+                 //  generate the top and bottom triabgkle for each ring segment
                  if (ringNum >= ringLimit) break;
                  var index = ringNum * 2;
                  indices.push(index);
