@@ -17,7 +17,7 @@
         execute: function(params) {
             var target = params.target;
             if (!target) {
-                throw "Attribute 'target' expected on command 'clip.clipbox.create'";
+                throw "Attribute 'target' for command 'clip.clipbox.create' is null or undefined";
             }
             clipbox(target, params);
         }
@@ -118,7 +118,6 @@
                                     ]
                                 }
                             ]
-
                         },
                         {
                             type: "clip",
@@ -228,7 +227,7 @@
             var xmax = ((params.xmax != undefined) ? params.xmax : 1) + (translate.x || 0);
             var ymin = ((params.ymin != undefined) ? params.ymin : -1) + (translate.y || 0);
             var ymax = ((params.ymax != undefined) ? params.ymax : 1) + (translate.y || 0);
-
+            
             var rotate = params.rotate || {};
             var xrot = rotate.x || 0;
             var yrot = rotate.y || 0;

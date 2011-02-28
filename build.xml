@@ -80,6 +80,8 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
 
+        <!--<fileset dir="${SRC_DIR}" includes="scenejs/shading/bvhModule.js"/>-->
+        <fileset dir="${SRC_DIR}" includes="scenejs/shading/node-renderer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererConfigModule.js"/>
