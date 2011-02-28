@@ -404,11 +404,17 @@ SceneJS._compileModule = new (function() {
         "lookAt": {
             set: {
                 level: this.COMPILE_PATH
+            },
+            inc: {
+                level: this.COMPILE_PATH
             }
         },
 
         "camera": {
             set: {
+                level: this.COMPILE_PATH
+            },
+            inc: {
                 level: this.COMPILE_PATH
             }
         },
@@ -566,9 +572,11 @@ SceneJS._compileModule = new (function() {
             }
         }
 
-        //******************************************
-        // HACKS until we get COMPILE_SUBTREE going
-        //******************************************
+        /*------------------------------------------------------------------------------------------------
+         * HACKS
+         *
+         * Until we get COMPILE_SUBTREE and COMPILE_NODE working, we'll bump those up to COMPILE_BRANCH.
+         *-----------------------------------------------------------------------------------------------*/
 
         if (level == this.COMPILE_SUBTREE) {
             level = this.COMPILE_BRANCH;
