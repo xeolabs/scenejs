@@ -145,7 +145,7 @@ SceneJS.BoundingBox.prototype._changeState = function(newState, params) {
     var oldState = this._state;
     this._state = newState;
     if (this._listeners["state-changed"]) {
-        params = params || {};        
+        params = params || {};
         params.oldState = oldState;
         params.newState = newState;
         this._fireEvent("state-changed", params);

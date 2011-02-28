@@ -197,6 +197,23 @@ h4 {
     margin-left: 20px;
 }
 
+#content ul.hlist li  {
+    line-height: 1.4em;
+    color: #444444 !important;    
+    margin: 0px 8px 5px 10px;
+    padding-bottom: 10px;
+    display: inline-block;
+    list-style-type: none;
+    vertical-align: middle;
+}
+
+#content fieldset {
+    overflow: auto;
+    text-align: left;
+    margin: 0 auto;
+    padding: 3px 10px 5px 10px;
+}
+
 #content p.intro {
     margin: auto;
     color: #CC6600 !important;

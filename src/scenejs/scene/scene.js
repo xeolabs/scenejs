@@ -176,6 +176,17 @@ SceneJS.Scene.prototype.getCanvasId = function() {
     return this._canvasId;
 };
 
+/** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to. 
+ */
+SceneJS.Scene.prototype.getZBufferDepth = function() {
+    var context;
+    if (this._sceneId) {
+        context = SceneJS._sceneModule.getSceneContext(this._sceneId);
+        return context.getParameter(context.DEPTH_BITS)
+    }    
+    return context;
+};
+
 /**
  Sets which layers are included in the next render of this scene, along with their priorities (default priority is 0)
  @param {{String:Number}} layers - render priority for each layer defined in scene

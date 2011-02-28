@@ -5,8 +5,12 @@
  * <p><b>Example Usage</b></p><p>Definition of sphere with a radius of 6 units:</b></p><pre><code>
  * var c = new SceneJS.Sphere({
  *			radius: 6
- *          slices: 30,     // Optional number of longitudinal slices (30 is default)
- *          rings: 30      // Optional number of latitudinal slices (30 is default)
+ *          slices: 30,          // Optional number of longitudinal slices (30 is default)
+ *          rings: 30,           // Optional number of latitudinal slices (30 is default)
+ *          semiMajorAxis: 1.5,  // Optional semiMajorAxis results in elliptical sphere (default of 1 creates sphere)
+ *          sweep: 0.75,         // Optional rotational extrusion (1 is default)
+ *          sliceDepth: 0.25,    // Optional depth of slices to generate from top to bottom (1 is default)
+ (1 is default)
  *     })
  * </pre></code>
 * @extends SceneJS.Geometry
@@ -16,6 +20,9 @@
  * @param {Object} [cfg] Static configuration object
  * @param {float} [cfg.slices=30] Number of longitudinal slices
  * @param {float} [cfg.rings=30] Number of longitudinal slices
+ * @param {float} [cfg.semiMajorAxis=1.0] values other than one generate an elliptical sphere
+ * @param {float} [cfg.sweep=1]  rotational extrusion, default is 1
+ * @param {float} [cfg.sliceDepth=1]  depth of slices to generate, default is 1
  * @param {function(SceneJS.Data):Object} [fn] Dynamic configuration function
  * @param {...SceneJS.Node} [childNodes] Child nodes
  */
@@ -26,7 +33,7 @@ SceneJS.Sphere.prototype._init = function(params) {
     var slices = params.slices || 30;
     var rings = params.rings || 30;
     var radius = params.radius || 1;
-
+    
     var semiMajorAxis =  params.semiMajorAxis || 1;
     var semiMinorAxis =  1 / semiMajorAxis;
 
