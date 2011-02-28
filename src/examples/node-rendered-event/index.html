@@ -77,7 +77,7 @@
         }
     </style>
 
-    <script type="text/javascript" src="../../lib/scenejs.js"></script>    
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
     <script type="text/javascript" src="../web/jquery/jquery.min.js"></script>
 
 </head>
@@ -88,7 +88,8 @@
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Node "rendered" event
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Node
+                "rendered" event
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -109,20 +110,19 @@
         <div id="info">
             <h1>Querying World, View and Canvas-space origins</h1>
 
-            <p>For each of these teapots we're using the <b>SceneJS.utils.query.QueryNodePos</b> utility, which uses the
-                JSON API to walk the nodes up the path to the root while
-                gathering the various modelling and viewing matrices we find along the way. As we do that, we're able to
-                determine the center of each teapot on World, View and Canvas space.</p>
+            <p>Querying node World, View and Canvas-space origins via a "rendered" event.</p>
+
+            <p>For each of these teapots we're listening to "rendered" events on their scene nodes, which report
+                their centre points in various coordinate systems, along with the Model, View and Projection matrices
+                that are applied to them.</p>
 
             <p>Using the Canvas space centers, we can then float a DIV over each teapot on the canvas to report its
                 center points.</p>
-            <br/>
+
             <ul>
                 <li><a target="_other" href="node-rendered-event.js">Scene source code</a></li>
-                <li><a target="_other" href="../../lib/utils/query/scenejs-query-node-pos.js">Utility source code</a>
-                </li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.utils">Wiki page on the SceneJS
-                    Utility API</a></li>
+                <li><a target="_other" href=" More info here: http://scenejs.wikispaces.com/SceneJS.withNode+-+bind">Wiki
+                    docs</a></li>
             </ul>
         </div>
         <div id="log">
