@@ -19,7 +19,7 @@ SceneJS.Clip.prototype._init = function(params) {
  @since Version 0.7.9
  */
 SceneJS.Clip.prototype.setMode = function(mode) {
-    mode = mode || "disabled";
+    mode = mode || "outside";
     if (mode != "disabled" && mode != "inside" && mode != "outside") {
         throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
                 "SceneJS.clip has a mode of unsupported type: '" + mode + " - should be 'disabled', 'inside' or 'outside'"));
@@ -182,9 +182,9 @@ SceneJS.Clip.prototype._compile = function(traversalContext) {
 // @private
 SceneJS.Clip.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
-        this._makePlane();
+        this._makeClip();
     }
-    SceneJS._clipModule.pushClip(this._attr.id, this._attr);
+    SceneJS._clipModule.pushClip(this._attr.id, this._clip);
 };
 
 // @private
@@ -195,28 +195,14 @@ SceneJS.Clip.prototype._postCompile = function(traversalContext) {
 /** Create succinct plane representation from points A, B & C
  *
  */
-SceneJS.Clip.prototype._makePlane = function() {
+SceneJS.Clip.prototype._makeClip = function() {
     var modelMat = SceneJS._modelTransformModule.getTransform().matrix;
-    var viewMat = SceneJS._viewTransformModule.getTransform().matrix;
 
-    var a = SceneJS._math_transformPoint3(viewMat, SceneJS._math_transformPoint3(modelMat, this._attr.a));
-    var b = SceneJS._math_transformPoint3(viewMat, SceneJS._math_transformPoint3(modelMat, this._attr.b));
-    var c = SceneJS._math_transformPoint3(viewMat, SceneJS._math_transformPoint3(modelMat, this._attr.c));
-
-    var q = [
-        b[0] - a[0],
-        b[1] - a[1],
-        b[2] - a[2]
-    ];
-    var v = [
-        b[0] - c[0],
-        b[1] - c[1],
-        b[2] - c[2]
-    ];
-
-    this._attr.normal = SceneJS._math_normalizeVec3(SceneJS._math_cross3Vec3(q, v));
-    this._attr.dist = SceneJS._math_dotVector3(this._attr.normal, [a[0], a[1], a[2]]);   // dist from origin
-
-    // this._memoLevel = 1;
+    this._clip = {
+        mode: this._attr.mode,
+        a : SceneJS._math_transformPoint3(modelMat, this._attr.a),
+        b : SceneJS._math_transformPoint3(modelMat, this._attr.b),
+        c : SceneJS._math_transformPoint3(modelMat, this._attr.c)
+    }
 };
 

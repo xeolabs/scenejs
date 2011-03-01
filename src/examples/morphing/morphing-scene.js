@@ -139,6 +139,8 @@ SceneJS.createNode({
                                                                      */
                                                                     factor: 0.0,
 
+                                                                    keys: [0, 2],
+
                                                                     /* Minimum of two morph targets required
                                                                      */
                                                                     targets: [
