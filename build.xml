@@ -299,540 +299,120 @@
 
            <zip destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
 
-
-       </target>
-
-       <!-- Create compressed javascript lib -->
-
-       <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
-
-       <target name="package"
-               depends="package-lib, package-lib-utils, package-lib-plugins, package-index, package-examples, package-docs">
-       </target>
-
-       <target name="package-lib"
-               depends="assemble-lib, package-lib-utils, package-lib-plugins">
-
-           <!-- Compress JS file list -->
-
-           <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
-               <classpath>
-                   <path refid="yuicompressor.classpath"/>
-               </classpath>
-           </taskdef>
-           <yuicompress linebreak="300" warn="false" munge="no" preserveallsemicolons="true"
-                        outputfolder="${EXTRACTED_DIST_DIR}">
-               <fileset dir="${EXTRACTED_DIST_DIR}/lib/">
-                   <include name="**/*.js"/>
-               </fileset>
-           </yuicompress>
-
-           <!-- Move compressed lib into temp file in lib dir -->
-
-           <move file="${EXTRACTED_DIST_DIR}/${SceneJS._JS_NAME}"
-                 tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}-temp"/>
-
-           <!-- Concat temp file to license yeilding final compressed lib file -->
-
-           <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}">
-               <path id="sourcefiles">
-                   <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
-                   <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="${SceneJS._MIN_JS_NAME}-temp"/>
-               </path>
-           </concat>
-
-           <!-- Delete temp file -->
-
-           <delete>
-               <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="*-temp" defaultexcludes="false"/>
-           </delete>
-
-       </target>
-
-       <target name="assemble-lib" depends="create-dist-directories">
-           <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._JS_NAME}">
-               <path refid="sourcefiles"/>
-           </concat>
-       </target>
-
-       <target name="package-index">
-           <echo file="resources/version.txt" append="false">V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
-           </echo>
-           <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/examples/index.html">
-               <filelist dir="."
-                         files="${basedir}/resources/example-index-p1.html, ${basedir}/resources/version.txt, ${basedir}/resources/example-index-p2.html"/>
-           </concat>
-
-       </target>
-
-       <target name="package-examples" depends="package-lib, package-index">
-           <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
-           <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
-               <fileset dir="${basedir}/resources/web"/>
-           </copy>
-
-           <copy todir="${EXTRACTED_DIST_DIR}/examples">
-               <fileset dir="${SRC_DIR}/examples"/>
-           </copy>
-       </target>
-
-       <target name="package-docs" depends="docs">
-           <copy todir="${EXTRACTED_DIST_DIR}/api-docs">
-               <fileset dir="${basedir}/docs/"/>
-           </copy>
-       </target>
-
-       <target name="package-lib-utils" depends="create-dist-directories">
-           <!--<target name="package-lib-utils">-->
-           <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
-               <fileset dir="${basedir}/src/utils"/>
-           </copy>
-       </target>
-
-       <target name="package-lib-plugins" depends="create-dist-directories">
-           <!--<target name="package-lib-plugins">-->
-           <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
-               <fileset dir="${basedir}/src/plugins"/>
-           </copy>
-       </target>
-
-
-       <target name="clean-dist-directory" if="CLEAN_DIST">
-           <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
-           <delete includeemptydirs="true">
-               <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
-           </delete>
-       </target>
-
-       <target name="create-dist-directories">
-           <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
-           <antcall target="clean-dist-directory"/>
-           <mkdir dir="${EXTRACTED_DIST_DIR}"/>
-           <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
-           <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
-           <mkdir dir="${EXTRACTED_DIST_DIR}/lib/plugins"/>
-           <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
-           <mkdir dir="${EXTRACTED_DIST_DIR}/api-docs"/>
-       </target>
-
-   </project>
-   <project name="" basedir="." default="package">
-
-    <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="8"/>
-    <property name="BUILD_ID" value="0"/>
-    <property name="PATCH_ID" value="0"/>
-
-    <property name="LIB_DIR" location="${basedir}/lib"/>
-    <property name="SRC_DIR" location="${basedir}/src"/>
-    <property name="SceneJS._JS_NAME" value="scenejs.js"/>
-    <property name="SceneJS._MIN_JS_NAME" value="scenejs.min.js"/>
-
-
-    <echo>************** Building SceneJS Version ${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}</echo>
-
-    <property name="DIST_CONTAINER_DIR" location="${basedir}/dist"/>
-
-    <property name="SceneJS._NAME" value="scenejs-${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}"/>
-
-    <property name="SceneJS._LATEST_MIN_JS_NAME" value="scenejs-latest.min.js"/>
-    <property name="EXTRACTED_DIST_DIR" location="${DIST_CONTAINER_DIR}/extracted/${SceneJS._NAME}"/>
-
-
-    <path id="yuicompressor.classpath">
-        <fileset dir="${LIB_DIR}">
-            <include name="**/yuicompressor-2.4.2.jar"/>
-            <include name="**/YUIAnt.jar"/>
-
-        </fileset>
-    </path>
-
-    <path id="jsdoc.classpath">
-        <fileset dir="${LIB_DIR}">
-            <include name="**/jsdoctoolkit-ant-task-1.0.2.jar"/>
-            <include name="**/js.jar"/>
-
-        </fileset>
-    </path>
-
-    <path id="sourcefiles">
-        <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/withNode.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/compile/compileModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/node/layerModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/library.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/selector/selector.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/processes/processModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererConfigModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/flags/flagsModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/flags/flags.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/load-status/loadStatusModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/box.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/quad.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/disk.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/text/vectorTextModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/text/bitmapTextModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/text/text.js"/>
-
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/viewTransformModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelTransformModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelViewTransformModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/rotate.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/translate.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/scale.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/matrix.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/quaternion.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/lookAt.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/stationary.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/billboard.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/inverse.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/projectionModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/querySupport.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightingModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/material/materialModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/colortrans/colortrans.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/colortrans/colortransModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundaryModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometryModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickingModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/imagebuf/imageBuf.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/imagebuf/imageBufModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/node-events/nodeEventsModule.js"/>
-    </path>
-
-    <target name="all" depends="archive"/>
-
-    <target name="docs">
-        <property name="CLEAN_DIST" value="true"/>
-        <antcall target="create-dist-directories"/>
-
-        <taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit">
-            <classpath>
-                <path refid="jsdoc.classpath"/>
-            </classpath>
-        </taskdef>
-
-        <jsdoctoolkit
-            jsdochome="${basedir}/lib/jsdoc-toolkit/"
-            template="jsdoc"
-            outputdir="${basedir}/docs/">
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/debug/debugModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/exceptions/exceptions.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/math.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/node/node.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/compile/compileModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instancingModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/instancing/library.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/selector/selector.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/processes/processModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/sceneModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererConfigModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometryModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/box.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/quad.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/disk.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/text/vectorTextModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/text/bitmapTextModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/text/text.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/viewTransformModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelTransformModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelViewTransformModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/rotate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/translate.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/scale.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/matrix.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/quaternion.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/lookAt.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/stationary.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/billboard.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/inverse.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/projectionModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightingModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightSource.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/material/materialModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/colortrans/colortrans.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/colortrans/colortransModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/highlight/highlightModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/highlight/highlight.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundaryModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/fog/fogModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometryModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/imagebuf/imageBuf.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/imagebuf/imageBufModule.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/node-events/nodeEventsModule.js"/>
-        </jsdoctoolkit>
     </target>
 
-    <target name="archive" depends="package">
-        <tar destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.tar.gz"
-            basedir="${DIST_CONTAINER_DIR}/extracted"
-            compression="gzip"/>
+   <!-- Create compressed javascript lib -->
 
-            <zip destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
+   <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
 
+   <target name="package"
+           depends="package-lib, package-lib-utils, package-lib-plugins, package-index, package-examples, package-docs">
+   </target>
 
-    </target>
+   <target name="package-lib"
+           depends="assemble-lib, package-lib-utils, package-lib-plugins">
 
-    <!-- Create compressed javascript lib -->
+       <!-- Compress JS file list -->
 
-    <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
+       <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
+           <classpath>
+               <path refid="yuicompressor.classpath"/>
+           </classpath>
+       </taskdef>
+       <yuicompress linebreak="300" warn="false" munge="no" preserveallsemicolons="true"
+                    outputfolder="${EXTRACTED_DIST_DIR}">
+           <fileset dir="${EXTRACTED_DIST_DIR}/lib/">
+               <include name="**/*.js"/>
+           </fileset>
+       </yuicompress>
 
-    <target name="package"
-        depends="package-lib, package-lib-utils, package-lib-plugins, package-index, package-examples, package-docs">
-    </target>
+       <!-- Move compressed lib into temp file in lib dir -->
 
-    <target name="package-lib"
-        depends="assemble-lib, package-lib-utils, package-lib-plugins">
+       <move file="${EXTRACTED_DIST_DIR}/${SceneJS._JS_NAME}"
+             tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}-temp"/>
 
-        <!-- Compress JS file list -->
+       <!-- Concat temp file to license yeilding final compressed lib file -->
 
-        <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
-            <classpath>
-                <path refid="yuicompressor.classpath"/>
-            </classpath>
-        </taskdef>
-        <yuicompress linebreak="300" warn="false" munge="no" preserveallsemicolons="true"
-            outputfolder="${EXTRACTED_DIST_DIR}">
-            <fileset dir="${EXTRACTED_DIST_DIR}/lib/">
-                <include name="**/*.js"/>
-            </fileset>
-        </yuicompress>
+       <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}">
+           <path id="sourcefiles">
+               <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
+               <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="${SceneJS._MIN_JS_NAME}-temp"/>
+           </path>
+       </concat>
 
-        <!-- Move compressed lib into temp file in lib dir -->
+       <!-- Delete temp file -->
 
-        <move file="${EXTRACTED_DIST_DIR}/${SceneJS._JS_NAME}"
-            tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}-temp"/>
+       <delete>
+           <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="*-temp" defaultexcludes="false"/>
+       </delete>
 
-        <!-- Concat temp file to license yeilding final compressed lib file -->
+   </target>
 
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}">
-            <path id="sourcefiles">
-                <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
-                <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="${SceneJS._MIN_JS_NAME}-temp"/>
-            </path>
-        </concat>
+   <target name="assemble-lib" depends="create-dist-directories">
+       <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._JS_NAME}">
+           <path refid="sourcefiles"/>
+       </concat>
+   </target>
 
-        <!-- Delete temp file -->
+   <target name="package-index">
+       <echo file="resources/version.txt" append="false">V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
+       </echo>
+       <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/examples/index.html">
+           <filelist dir="."
+                     files="${basedir}/resources/example-index-p1.html, ${basedir}/resources/version.txt, ${basedir}/resources/example-index-p2.html"/>
+       </concat>
 
-        <delete>
-            <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="*-temp" defaultexcludes="false"/>
-        </delete>
+   </target>
 
-    </target>
+   <target name="package-examples" depends="package-lib, package-index">
+       <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
+       <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
+           <fileset dir="${basedir}/resources/web"/>
+       </copy>
 
-    <target name="assemble-lib" depends="create-dist-directories">
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._JS_NAME}">
-            <path refid="sourcefiles"/>
-        </concat>
-    </target>
+       <copy todir="${EXTRACTED_DIST_DIR}/examples">
+           <fileset dir="${SRC_DIR}/examples"/>
+       </copy>
+   </target>
 
-    <target name="package-index">
-        <echo file="resources/version.txt" append="false">V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
-        </echo>
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/examples/index.html">
-            <filelist dir="."
-                files="${basedir}/resources/example-index-p1.html, ${basedir}/resources/version.txt, ${basedir}/resources/example-index-p2.html"/>
-        </concat>
+   <target name="package-docs" depends="docs">
+       <copy todir="${EXTRACTED_DIST_DIR}/api-docs">
+           <fileset dir="${basedir}/docs/"/>
+       </copy>
+   </target>
 
-    </target>
+   <target name="package-lib-utils" depends="create-dist-directories">
+       <!--<target name="package-lib-utils">-->
+       <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
+           <fileset dir="${basedir}/src/utils"/>
+       </copy>
+   </target>
 
-    <target name="package-examples" depends="package-lib, package-index">
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
-        <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
-            <fileset dir="${basedir}/resources/web"/>
-        </copy>
-
-        <copy todir="${EXTRACTED_DIST_DIR}/examples">
-            <fileset dir="${SRC_DIR}/examples"/>
-        </copy>
-    </target>
-
-    <target name="package-docs" depends="docs">
-        <copy todir="${EXTRACTED_DIST_DIR}/api-docs">
-            <fileset dir="${basedir}/docs/"/>
-        </copy>
-    </target>
-
-    <target name="package-lib-utils" depends="create-dist-directories">
-        <!--<target name="package-lib-utils">-->
-        <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
-            <fileset dir="${basedir}/src/utils"/>
-        </copy>
-    </target>
-
-    <target name="package-lib-plugins" depends="create-dist-directories">
-        <!--<target name="package-lib-plugins">-->
-        <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
-            <fileset dir="${basedir}/src/plugins"/>
-        </copy>
-    </target>
+   <target name="package-lib-plugins" depends="create-dist-directories">
+       <!--<target name="package-lib-plugins">-->
+       <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
+           <fileset dir="${basedir}/src/plugins"/>
+       </copy>
+   </target>
 
 
-    <target name="clean-dist-directory" if="CLEAN_DIST">
-        <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
-        <delete includeemptydirs="true">
-            <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
-        </delete>
-    </target>
+   <target name="clean-dist-directory" if="CLEAN_DIST">
+       <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
+       <delete includeemptydirs="true">
+           <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
+       </delete>
+   </target>
 
-    <target name="create-dist-directories">
-        <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
-        <antcall target="clean-dist-directory"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib/plugins"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/api-docs"/>
-    </target>
+   <target name="create-dist-directories">
+       <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
+       <antcall target="clean-dist-directory"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/lib/plugins"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/api-docs"/>
+   </target>
 
 </project>
+
