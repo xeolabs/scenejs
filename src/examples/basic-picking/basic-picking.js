@@ -251,6 +251,19 @@ SceneJS.setDebugConfigs({
     }
 });
 
+
+/* We can observe when nothing is picked with a "notpicked"
+ * listener attached to the scene node:
+  */
+SceneJS.withNode("theScene").bind("notpicked",
+        function(event) {
+            alert("Nothing picked");
+        });
+
+
+/* We'll listen for picking on each of the teapots:
+ */
+
 SceneJS.withNode("right-blue-sphere").bind("picked",
         function(event) {
             alert("Picked: 'right-blue-sphere'");

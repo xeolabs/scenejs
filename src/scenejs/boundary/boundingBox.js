@@ -338,13 +338,13 @@ SceneJS.BoundingBox.prototype._preCompile = function(traversalContext) {
     if (!this._validated) {
         if (this._levels) {
             if (this._levels.length != this._children.length) {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                        ("boundingBox levels property should have a value for each child node"));
+                throw SceneJS._errorModule.fatalError(SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "boundingBox levels property should have a value for each child node");
             }
             for (var i = 1; i < this._levels.length; i++) {
                 if (this._levels[i - 1] >= this._levels[i]) {
-                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.NodeConfigExpectedException
-                            ("boundingBox levels property should be an ascending list of unique values"));
+                    throw SceneJS._errorModule.fatalError(SceneJS.errors.NODE_CONFIG_EXPECTED,
+                            "boundingBox levels property should be an ascending list of unique values");
                 }
             }
         }

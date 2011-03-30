@@ -22,7 +22,8 @@ SceneJS._viewTransformModule = new (function() {
     var DEFAULT_TRANSFORM = {
         matrix : SceneJS._math_identityMat4(),
         fixed: true,
-        identity : true
+        identity : true,
+        lookAt:SceneJS._math_LOOKAT
     };
 
     var idStack = new Array(255);
@@ -68,7 +69,7 @@ SceneJS._viewTransformModule = new (function() {
                                 SceneJS._math_transposeMat4(
                                         SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
                     }
-                    SceneJS._renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
+                    SceneJS._renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray, transform.lookAt);
                     dirty = false;
                 }
             });
@@ -102,7 +103,7 @@ SceneJS._viewTransformModule = new (function() {
             nodeId = null;
             transform = DEFAULT_TRANSFORM;
         }
-         SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEW_TRANSFORM_UPDATED, transform);
+        SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEW_TRANSFORM_UPDATED, transform);
         dirty = true;
     };
 

@@ -1184,6 +1184,15 @@ SceneJS._math_scalingMat4s = function(s) {
 };
 
 /**
+ * Default lookat properties - eye at 0,0,1, looking at 0,0,0, up vector pointing up Y-axis
+ */
+SceneJS._math_LOOKAT = {
+    eye:    {x: 0, y:0, z:1.0 },
+    look:   {x:0, y:0, z:0.0 },
+    up:     {x:0, y:1, z:0.0 }
+};
+
+/**
  * @param pos vec3 position of the viewer
  * @param target vec3 point the viewer is looking at
  * @param up vec3 pointing "up"

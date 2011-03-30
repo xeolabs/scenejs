@@ -1,7 +1,7 @@
-var skySphere = SceneJS.createNode({
+SceneJS.createNode({
 
     // Prevent sky sphere from moving as lookat.eye moves
-    type: "stationary",    
+    type: "stationary",
     id: "sky-sphere",
 
     nodes: [
@@ -10,6 +10,7 @@ var skySphere = SceneJS.createNode({
         {
             type: "fog",
             mode:"disabled",
+            flags: { backfaces: true },
             nodes: [
 
                 // Size of sky sphere
@@ -26,10 +27,23 @@ var skySphere = SceneJS.createNode({
                             layers: [
                                 {
                                     uri: "images/gigapixel-milky-way.gif",
-                                    wrapS: "clampToEdge",
-                                    wrapT: "clampToEdge",
-                                    applyTo:"baseColor",
-                                    blendMode:"multiply"
+                                    minFilter: "linearMipMapLinear",
+                                    magFilter: "linear",
+                                    wrapS: "repeat",
+                                    wrapT: "repeat",
+                                    isDepth: false,
+                                    depthMode:"luminance",
+                                    depthCompareMode: "compareRToTexture",
+                                    depthCompareFunc: "lequal",
+                                    flipY: false,
+                                    width: 1,
+                                    height: 1,
+                                    internalFormat:"lequal",
+                                    sourceFormat:"alpha",
+                                    sourceType: "unsignedByte",
+                                    applyTo:"emit",
+                                    blendMode:"multiply",
+                                    scale: { x: 3, y: 3 }
                                 }
                             ],
                             nodes: [
@@ -41,6 +55,7 @@ var skySphere = SceneJS.createNode({
                                     specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
                                     specular:       0.0,
                                     shine:          0.0,
+                                    emit: 1.0,
                                     nodes: [
 
                                         // Tilt the milky way a little bit
@@ -61,6 +76,7 @@ var skySphere = SceneJS.createNode({
                                                         {
                                                             type: "sphere"
                                                         }
+
                                                     ]
                                                 }
                                             ]

@@ -14,6 +14,7 @@
  * October 2010
  *
  */
+
 SceneJS.createNode({
     type: "scene",
     id: "my-scene",

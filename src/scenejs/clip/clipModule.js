@@ -42,16 +42,22 @@ SceneJS._clipModule = new (function() {
             });
 
     this.pushClip = function(id, clip) {
+        var modelMat = SceneJS._modelTransformModule.getTransform().matrix;
+
+        clip.worldA = SceneJS._math_transformPoint3(modelMat, clip.a);
+        clip.worldB = SceneJS._math_transformPoint3(modelMat, clip.b);
+        clip.worldC = SceneJS._math_transformPoint3(modelMat, clip.c);
+
         clipStack[stackLen] = clip;
         idStack[stackLen] = id;
         stackLen++;
         dirty = true;
     };
 
-    this.popClip = function() {
-        stackLen--;
-        dirty = true;
-    };
+//    this.popClip = function() {
+//        stackLen--;
+//        dirty = true;
+//    };
 
 })();
 

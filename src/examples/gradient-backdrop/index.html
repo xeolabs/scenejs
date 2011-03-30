@@ -1,0 +1,64 @@
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../../lib/scenejs.js"></script>
+     <script type="text/javascript" src="../../plugins/lookat/scenejs-lookat-plugin.js"></script>
+    <link href="../web/style.css" rel="stylesheet" type="text/css"/>
+
+</head>
+<div id="container">
+    <div id="header">
+        <div id="header-nav">
+
+        </div>
+        <div id="header-inner">
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Graded Backdrop
+                Example
+            </h1>
+            <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
+                    src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
+                    alt="Share/Bookmark"/></a>
+            <script type="text/javascript">
+                var a2a_linkname = "SceneJS Live Examples";
+                var a2a_linkurl = window.location;
+                var a2a_onclick = 1;</script>
+            <script type="text/javascript" src="http://static.addtoany.com/menu/page.js"></script>
+        </div>
+    </div>
+    <div id="content">
+        <canvas id="theCanvas" width="1030" height="700">
+            <p>This example requires a browser that supports the
+                <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
+                &lt;canvas&gt; feature.</p>
+        </canvas>
+        <div id="info">
+            <h2>Graded Backdrop Example</h2>
+
+            <p>This example creates a graded backdrop, which is a texture mapped onto a geometry defining two triangles, which form a quad.</p>
+
+            <br/>
+            <p>The geometry has a color for each vertex - the top two are white and the bottom two are light grey. This creates a colour gradient
+            across the quad, which the texture is then multiplied with.</p>
+
+            <br/>
+            <p>The backdrop is wrapped in a stationary node to prevent it from translating when we update the lookAt node. Likewise, it
+                is wrapped in a billboard node, which prevents it from rotating when we update the lookAt.</p>
+            <br/>
+            <ul>
+                <li><a target="_other" href="gradient-backdrop.js">Scene source code</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/Getting+Started+-+A+Newell+Teapot">Wiki page
+                    on
+                    this example</a></li>
+            </ul>
+        </div>
+        <div id="log">
+            <h3>Log</h3>
+
+            <div id="theLoggingDiv"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="gradient-backdrop.js"></script>
+</body>
+</html>

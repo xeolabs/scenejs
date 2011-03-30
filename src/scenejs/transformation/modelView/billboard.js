@@ -18,18 +18,19 @@ SceneJS.Billboard = SceneJS.createNodeType("billboard");
 
 // @private
 SceneJS.Billboard.prototype._compile = function(traversalContext) {
-    this._preCompile(traversalContext);
+    this._preCompile();
     this._compileNodes(traversalContext);
-    this._postCompile(traversalContext);
+    this._postCompile();
 };
 
 // @private
 SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
     // 0. The base variable
     var superViewXForm = SceneJS._viewTransformModule.getTransform();
-    var eye = superViewXForm.lookAt.eye;
-    var look = superViewXForm.lookAt.look;
-    var up = superViewXForm.lookAt.up;
+    var lookAt = superViewXForm.lookAt;
+//    var eye = superViewXForm.lookAt.eye;
+//    var look = superViewXForm.lookAt.look;
+//    var up = superViewXForm.lookAt.up;
     var superModelXForm = SceneJS._modelTransformModule.getTransform();
     var matrix = superModelXForm.matrix.slice(0);
 
@@ -45,12 +46,12 @@ SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
 
     // 2. Get the billboard Z vector
     var ZZ = [];
-    SceneJS._math_subVec3([eye.x, eye.y, eye.z], [look.x, look.y, look.z], ZZ);
+    SceneJS._math_subVec3(lookAt.eye, lookAt.look, ZZ);
     SceneJS._math_normalizeVec3(ZZ);
 
     // 3. Get the billboard X vector
     var XX = [];
-    SceneJS._math_cross3Vec3([up.x, up.y, up.z], ZZ, XX);
+    SceneJS._math_cross3Vec3(lookAt.up, ZZ, XX);
     SceneJS._math_normalizeVec3(XX);
 
     // 4. Get the billboard Y vector

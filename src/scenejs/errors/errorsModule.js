@@ -12,27 +12,21 @@ SceneJS._errorModule = new (function() {
                 SceneJS._eventModule.fireEvent(SceneJS._eventModule.TIME_UPDATED, time);
             });
 
-    // @private
-    this.fatalError = function(e) {
-        e = e.message ? e : new SceneJS.errors.Exception(e);
-
-        /* Dont log because exception should be thrown        
-         */
+    this.fatalError = function(code, message) {
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
-            exception: e,
+            errorName: SceneJS.errors._getErrorName(code) || "ERROR",
+            code: code,
+            exception: message,
             fatal: true
         });
-        return e.message;
+        return new SceneJS.errors.Exception(code, message);
     };
 
-    // @private
-    this.error = function(e) {
-        e = e.message ? e : new SceneJS.errors.Exception(e);
-        SceneJS._loggingModule.error(e.message);
+    this.error = function(code, message) {
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
-            exception: e,
+            code: code,
+            exception: message,
             fatal: false
         });
-        return e.message;
     };
 })();

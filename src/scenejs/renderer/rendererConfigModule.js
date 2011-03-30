@@ -77,7 +77,7 @@ SceneJS._rendererModule = new (function() {
                     enableBlend: false,
                     blendFunc: {
                         sfactor: "srcAlpha",
-                        dfactor: "less"
+                        dfactor: "one"
                     }
                 });
 
@@ -211,18 +211,21 @@ SceneJS._rendererModule = new (function() {
      */
     var glEnum = function(context, name) {
         if (!name) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                    "Null SceneJS.renderer node config: \"" + name + "\""));
+            throw SceneJS._errorModule.fatalError(
+                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Null SceneJS.renderer node config: \"" + name + "\"");
         }
         var result = SceneJS._webgl_enumMap[name];
         if (!result) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                    "Unrecognised SceneJS.renderer node config value: \"" + name + "\""));
+            throw SceneJS._errorModule.fatalError(
+                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
         }
         var value = context[result];
         if (!value) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.errors.WebGLUnsupportedNodeConfigException(
-                    "This browser's WebGL does not support renderer node config value: \"" + name + "\""));
+            throw SceneJS._errorModule.fatalError(
+                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
         }
         return value;
     };
@@ -299,10 +302,10 @@ SceneJS._rendererModule = new (function() {
                 funcs = funcs || {};
                 return  {
                     sfactor : funcs.sfactor || "srcAlpha",
-                    dfactor : funcs.dfactor || "less"
+                    dfactor : funcs.dfactor || "oneMinusSrcAlpha"
                 };
             }
-            context.blendFunc(glEnum(context, funcs.sfactor || "one"), glEnum(context, funcs.dfactor || "zero"));
+            context.blendFunc(glEnum(context, funcs.sfactor || "srcAlpha"), glEnum(context, funcs.dfactor || "oneMinusSrcAlpha"));
         },
 
         blendFuncSeparate: function(context, func) {
@@ -370,7 +373,6 @@ SceneJS._rendererModule = new (function() {
             if (flag) {
                 context.enable(context.CULL_FACE);
             } else {
-                flag = false;
                 context.disable(context.CULL_FACE);
             }
         },

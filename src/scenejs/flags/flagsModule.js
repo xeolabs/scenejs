@@ -13,14 +13,19 @@ SceneJS._flagsModule = new (function() {
     var stackLen = 0;
     var dirty;
 
+    /* These flags are inherited, where not overidden, by all flags in a scene, in order to support
+     * flag reading on randomly-accessed nodes. For example, this allows the renderer to check if
+     * "picking" is set for some random node, without having to know if the flag is set on higher nodes.  
+     */
     var DEFAULT_FLAGS = {
-        fog: true,          // Fog enabled
-        colortrans : true,  // Effect of colortrans enabled
-        picking : true,     // Picking enabled
-        clipping : true,    // User-defined clipping enabled
-        enabled : true,     // Node not culled from traversal
-        visible : true,     // Node visible - when false, everything happens except geometry draw
-        transparent: false
+        fog: true,              // Fog enabled
+        colortrans : true,      // Effect of colortrans enabled
+        picking : true,         // Picking enabled
+        clipping : true,        // User-defined clipping enabled
+        enabled : true,         // Node not culled from traversal
+        visible : true,         // Node visible - when false, everything happens except geometry draw
+        transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
+        backfaces: true
     };
 
     this.flags = {}; // Flags at top of flag stack
@@ -46,6 +51,31 @@ SceneJS._flagsModule = new (function() {
         }
         return newFlags;
     }
+
+    /**
+     * Maps renderer node properties to WebGL context enums
+     * @private
+     */
+    var glEnum = function(context, name) {
+        if (!name) {
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Null SceneJS.renderer node config: \"" + name + "\"");
+        }
+        var result = SceneJS._webgl_enumMap[name];
+        if (!result) {
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
+        }
+        var value = context[result];
+        if (!value) {
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
+        }
+        return value;
+    };
 
     /* Make fresh flag stack for new render pass, containing default flags
      * to enable/disable various things for subgraph
@@ -76,7 +106,7 @@ SceneJS._flagsModule = new (function() {
 
     this.preVisitNode = function(node) {
         var attr = node._attr;
-       if (attr.flags) {            
+        if (attr.flags) {
             this.flags = createFlags(attr.flags);
             idStack[stackLen] = attr.id;
             flagStack[stackLen] = this.flags;

@@ -37,15 +37,15 @@ SceneJS.MorphGeometry.prototype._setMorph = function(params) {
     var targets = params.targets || [];
     if (targets.length < 2) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidNodeConfigException(
-                        "morphGeometry node should have at least two targets"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "morphGeometry node should have at least two targets");
     }
 
     var keys = params.keys || [];
     if (keys.length != targets.length) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidNodeConfigException(
-                        "morphGeometry node mismatch in number of keys and targets"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "morphGeometry node mismatch in number of keys and targets");
     }
 
     /*--------------------------------------------------------------------------

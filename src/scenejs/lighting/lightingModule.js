@@ -21,9 +21,6 @@
  *  @private
  */
 SceneJS._lightingModule = new (function() {
-    var viewMat;
-    var modelMat;
-
     var idStack = new Array(255);
     var lightStack = new Array(255);
     var stackLen = 0;
@@ -32,7 +29,6 @@ SceneJS._lightingModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_COMPILING,
             function() {
-                modelMat = viewMat = SceneJS._math_identityMat4();
                 stackLen = 0;
                 dirty = true;
             });
@@ -41,18 +37,6 @@ SceneJS._lightingModule = new (function() {
             SceneJS._eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
-            });
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
-            function(params) {
-                viewMat = params.matrix;
-            });
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.MODEL_TRANSFORM_UPDATED,
-            function(params) {
-                modelMat = params.matrix;
             });
 
     SceneJS._eventModule.addListener(
@@ -71,19 +55,16 @@ SceneJS._lightingModule = new (function() {
             });
 
     this.pushLight = function(id, light) {  // TODO: what to do with ID?
-        instanceLight(light);
+        var modelMat = SceneJS._modelTransformModule.getTransform().matrix;        
+        if (light.mode == "point") {
+            light.worldPos = SceneJS._math_transformPoint3(modelMat, light.pos);
+        } else if (light.mode == "dir") {
+            light.worldDir = SceneJS._math_transformVector3(modelMat, light.dir);
+        }
         idStack[stackLen] = id;
         lightStack[stackLen] = light;
         stackLen++;
         dirty = true;
     };
-
-    function instanceLight(light) {
-        if (light.mode == "point") {
-            light.viewPos = SceneJS._math_transformPoint3(viewMat, SceneJS._math_transformPoint3(modelMat, light.pos));
-        } else if (light.mode == "dir") {
-            light.viewDir = SceneJS._math_transformVector3(viewMat, SceneJS._math_transformVector3(modelMat, light.dir));
-        }
-    }
 })();
 

@@ -90,9 +90,17 @@ SceneJS.createNode({
                         },
 
 
-                        /* Next, modelling transforms to orient our sphere. See how these have IDs,
+                        /*-------------------------------------------------------------------------------
+                         * First subgraph, which will contain the clipbox when we execute the command
+                         * to insert it.
+                         *
+                         * Note that the clip box (or clip nodes for that matter) can be in a separate
+                         * subgraph to the content that it clips, but must appear before that content.
+                         *
+                         * We have modelling transforms to orient our clipbox - see how these have IDs,
                          * so we can access them to set their angle attributes.
-                         */
+                         *-----------------------------------------------------------------------------*/
+
                         {
                             type: "rotate",
                             id: "pitch",
@@ -108,83 +116,91 @@ SceneJS.createNode({
 
                                     nodes: [
 
-                                        /* This is where we'll insert our clipbox when we
-                                         * issue the "clip.clipbox.create" command:
+                                        /* This is where we'll insert our clipbox when we issue the
+                                         * "clip.clipbox.create" command.
                                          */
                                         {
                                             type: "node",
-                                            id: "insert-clipbox-here",
+                                            id: "insert-clipbox-here"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
 
-                                            nodes:[
 
-                                                /* Blue colour for our shere
-                                                 */
-                                                {
-                                                    type: "material",
-                                                    emit: 0,
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:       0.9,
-                                                    shine:          100.0,
+                        /*-------------------------------------------------------------------------------
+                         * Second subgraph, containing the blue outer sphere
+                         *
+                         * This will be clipped by the clipbox - when scene traversal is at this point,
+                         * the clipbox will have been rendered.
+                         *-----------------------------------------------------------------------------*/
 
-                                                    nodes: [
+                        {
+                            type: "material",
+                            emit: 0,
+                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                            specular:       0.9,
+                            shine:          100.0,
 
-                                                        /** Pump the sphere size up a bit:
-                                                         */
-                                                        {
-                                                            type: "scale",
-                                                            x:1.2,
-                                                            y:1.2,
-                                                            z:1.2,
+                            nodes: [
 
-                                                            nodes: [
+                                /** Pump the sphere size up a bit:
+                                 */
+                                {
+                                    type: "scale",
+                                    x:1.2,
+                                    y:1.2,
+                                    z:1.2,
 
-                                                                {
-                                                                    type : "sphere"
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
+                                    nodes: [
 
-                                                /* Red colour for our inner shere
-                                                 */
-                                                {
-                                                    type: "material",
-                                                    emit: 0,
-                                                    baseColor:      { r: 0.9, g: 0.3, b: 0.3 },
-                                                    specularColor:  { r: 0.9, g: 0.3, b: 0.3 },
-                                                    specular:       0.9,
-                                                    shine:          100.0,
+                                        {
+                                            type : "sphere"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
 
-                                                    /* Disable clipping for the inner red sphere
-                                                     */
-                                                    flags: {
-                                                        clipping: false
-                                                    },
+                        /*-------------------------------------------------------------------------------
+                         * Third subgraph, containing the red inner sphere
+                         *
+                         * This will be clipped by the clipbox - when scene traversal is at this point,  
+                         * the clipbox will have been rendered.
+                         *-----------------------------------------------------------------------------*/
 
-                                                    nodes: [
+                        {
+                            type: "material",
+                            emit: 0,
+                            baseColor:      { r: 0.9, g: 0.3, b: 0.3 },
+                            specularColor:  { r: 0.9, g: 0.3, b: 0.3 },
+                            specular:       0.9,
+                            shine:          100.0,
 
-                                                        /** Pump the sphere size up a bit:
-                                                         */
-                                                        {
-                                                            type: "scale",
-                                                            x:.7,
-                                                            y:.7,
-                                                            z:.7,
+                            /* Disable clipping for the inner red sphere
+                             */
+                            flags: {
+                                clipping: false
+                            },
 
-                                                            nodes: [
+                            nodes: [
 
-                                                                /* Sphere geometry
-                                                                 */
-                                                                {
-                                                                    type : "sphere"
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
+                                /** Pump the sphere size up a bit:
+                                 */
+                                {
+                                    type: "scale",
+                                    x:.7,
+                                    y:.7,
+                                    z:.7,
+
+                                    nodes: [
+
+                                        /* Sphere geometry
+                                         */
+                                        {
+                                            type : "sphere"
                                         }
                                     ]
                                 }
@@ -215,7 +231,7 @@ SceneJS.setDebugConfigs({
 });
 
 /*----------------------------------------------------------------------
- * Insert a clipbox, then tweak it a bit
+ * Insert the clipbox, then tweak it a bit
  *---------------------------------------------------------------------*/
 
 /* Right, lets issue the "clip.clipbox.create" command to

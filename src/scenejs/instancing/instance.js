@@ -248,8 +248,8 @@ SceneJS.Instance.prototype._compile = function(traversalContext) {
             var exception;
             if (this._attr.mustExist) {
                 throw SceneJS._errorModule.fatalError(
-                        exception = new SceneJS.errors.SymbolNotFoundException
-                                ("SceneJS.Instance could not find target node: '" + this._attr.target + "'"));
+                        exception = SceneJS.errors.INSTANCE_TARGET_NOT_FOUND,
+                                "SceneJS.Instance could not find target node: '" + this._attr.target + "'");
             }
             this._changeState(SceneJS.Instance.STATE_ERROR, exception);
 

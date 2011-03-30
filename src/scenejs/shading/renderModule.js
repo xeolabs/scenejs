@@ -26,23 +26,37 @@ SceneJS._renderModule = new (function() {
      * ID for each state type
      *--------------------------------------------------------------------*/
 
-    var CLIPS = 0;
-    var COLORTRANS = 1;
-    var DEFORM = 2;
-    var FLAGS = 3;
-    var FOG = 4;
-    var IMAGEBUF = 5;
-    var LIGHTS = 6;
-    var MATERIAL = 7;
-    var MORPH = 8;
-    var PICKCOLOR = 9;
-    var TEXTURE = 10;
-    var RENDERER = 11;
-    var MODEL_TRANSFORM = 12;
-    var PROJ_TRANSFORM = 13;
-    var VIEW_TRANSFORM = 14;
-    var PICK_LISTENERS = 15;
-    var RENDER_LISTENERS = 16;
+    var GEO = 0;
+    var CLIPS = 1;
+    var COLORTRANS = 2;
+    var DEFORM = 3;
+    var FLAGS = 4;
+    var FOG = 5;
+    var IMAGEBUF = 6;
+    var LIGHTS = 7;
+    var MATERIAL = 8;
+    var MORPH = 9;
+    var PICKCOLOR = 10;
+    var TEXTURE = 11;
+    var RENDERER = 12;
+    var MODEL_TRANSFORM = 13;
+    var PROJ_TRANSFORM = 14;
+    var VIEW_TRANSFORM = 15;
+    var PICK_LISTENERS = 16;
+    var RENDER_LISTENERS = 17;
+    var SPRITE_TRANSFORM = 18;
+
+
+    /*----------------------------------------------------------------------
+     * State synch masks - TODO: expand on this
+     *--------------------------------------------------------------------*/
+
+    var STATE_MASKS = [];
+    STATE_MASKS[VIEW_TRANSFORM] = 0x01;
+
+    var DEPENDENTS = [];
+    DEPENDENTS[VIEW_TRANSFORM] = [SPRITE_TRANSFORM];
+    DEPENDENTS[MODEL_TRANSFORM] = [DEFORM, MORPH, LIGHTS, CLIPS];
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -75,13 +89,13 @@ SceneJS._renderModule = new (function() {
 
     var DEFAULT_FLAGS = {
         flags: {
-            fog: true,          // Fog enabled
-            colortrans : true,  // Effect of colortrans enabled
-            picking : true,     // Picking enabled
-            clipping : true,    // User-defined clipping enabled
-            enabled : true,     // Node not culled from traversal
-            visible : true,     // Node visible - when false, everything happens except geometry draw
-            transparent: false
+            fog: true,              // Fog enabled
+            colortrans : true,      // Effect of colortrans enabled
+            picking : true,         // Picking enabled
+            clipping : true,        // User-defined clipping enabled
+            enabled : true,         // Node not culled from traversal
+            visible : true,         // Node visible - when false, everything happens except geometry draw
+            transparent: false     // Node transparent - works in conjunction with matarial alpha properties
         }
     };
 
@@ -269,8 +283,6 @@ SceneJS._renderModule = new (function() {
                 nextProgramId = 0;
             });
 
-    var self = this;
-
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_CREATED,
             function(params) {
@@ -299,15 +311,6 @@ SceneJS._renderModule = new (function() {
                 }
             });
 
-    /* When a canvas is activated we'll get a reference to it, prepare the default state soup,
-     * and an initial empty set of node bins
-     */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_ACTIVATED,
-            function(activatedCanvas) {
-                canvas = activatedCanvas;
-            });
-
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_DESTROYED,
             function(params) {
@@ -334,7 +337,7 @@ SceneJS._renderModule = new (function() {
     /**
      * Prepares renderer for new scene graph compilation pass
      */
-    this.renderScene = function(params, options) {
+    this.bindScene = function(params, options) {
         options = options || {};
 
         /* Activate states for scene
@@ -383,6 +386,7 @@ SceneJS._renderModule = new (function() {
             stateMap = states.stateMap = {};
 
             setNeedBinSort();
+           // states.needSort = true;
 
         } else if (options.compileMode == SceneJS._renderModule.COMPILE_NODES) {   // Rebuild display list for subtree
 
@@ -405,11 +409,13 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     * Immediately render a frame of the given scene while performing a pick on it
+     * Immediately render a frame of the given scene while performing a pick on it.
+     * Returns true if something was picked.
+     *
      */
     this.pick = function(params, options) {
         states = sceneStates[params.sceneId];
-        pickFrame(params.canvasX, params.canvasY, options);
+        return pickFrame(params.canvasX, params.canvasY, options);
     };
 
     this.marshallStates = function() {
@@ -429,6 +435,8 @@ SceneJS._renderModule = new (function() {
     };
 
     /** Find or create a new state of the given state type and node ID
+     * @param stateType ID of the type of state, eg. DEFORM, TEXTURE etc
+     * @param id ID of scene graph node that is setting this state
      */
     function getState(stateType, id) {
         if (idPrefix) {
@@ -443,7 +451,8 @@ SceneJS._renderModule = new (function() {
             state = typeMap[id];
             if (!state) {
                 state = {
-                    _stateId : nextStateId
+                    _stateId : nextStateId,
+                    _stateType: stateType
                 };
                 typeMap[id] = state;
             }
@@ -452,7 +461,8 @@ SceneJS._renderModule = new (function() {
             /* Recompiling entire scene graph
              */
             state = {
-                _stateId : nextStateId
+                _stateId : nextStateId,
+                _stateType: stateType
             };
             if (id) {
                 typeMap[id] = state;
@@ -465,14 +475,11 @@ SceneJS._renderModule = new (function() {
             states.bin = [];
             rebuildBins = false;
         }
-        state.id = id;
         return state;
     }
 
     /**
-     * Set user-defined clipping planes
-     * @param {String} is State ID
-     * @param {Array} clips The clipping planes
+     * Set the current world-space clipping planes
      */
     this.setClips = function(id, clips) {
         clipState = getState(CLIPS, id || "___DEFAULT_CLIPS");
@@ -492,7 +499,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     *
+     * Set the current color transform
      */
     this.setColortrans = function(id, trans) {
         colortransState = getState(COLORTRANS, id || "___DEFAULT_COLOR_TRANS");
@@ -502,7 +509,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     *
+     * Set the current world-space deformation points
      */
     this.setDeform = function(id, deform) {
         deformState = getState(DEFORM, id || "___DEFAULT_DEFORM");
@@ -512,24 +519,24 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     *
+     * Set the current flags
      */
     this.setFlags = function(id, flags) {
         flagsState = getState(FLAGS, id || "___DEFAULT_FLAGS");
         flagsState.flags = flags || {
-            fog: true,          // Fog enabled
-            colortrans : true,  // Effect of colortrans enabled
-            picking : true,     // Picking enabled
-            clipping : true,    // User-defined clipping enabled
-            enabled : true,     // Node not culled from traversal
-            visible : true,     // Node visible - when false, everything happens except geometry draw
-            transparent: false
+            fog: true,              // Fog enabled
+            colortrans : true,      // Effect of colortrans enabled
+            picking : true,         // Picking enabled
+            clipping : true,        // User-defined clipping enabled
+            enabled : true,         // Node not culled from traversal
+            visible : true,         // Node visible - when false, everything happens except geometry draw
+            transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
+            backfaces: true
         };
-        flagsState.id = id;
     };
 
     /**
-     *
+     * Set the current fog
      */
     this.setFog = function(id, fog) {
         fogState = getState(FOG, id || "___DEFAULT_FOG");
@@ -539,6 +546,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
+     * Set the current image buffer
      */
     this.setImagebuf = function(id, imageBuf) {
         imageBufState = getState(IMAGEBUF, id || "___DEFAULT_IMAGEBUF");
@@ -546,6 +554,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
+     * Set the current world-space light sources
      */
     this.setLights = function(id, lights) { // TODO: what to do with the ID
         lights = lights || [];
@@ -567,7 +576,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     *
+     * Set the current surface material
      */
     this.setMaterial = function(id, material) {
         materialState = getState(MATERIAL, id || "___DEFAULT_MATERIAL");
@@ -585,7 +594,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     *
+     * Set model-space morph targets
      */
     this.setMorph = function(id, morph) {
         morphState = getState(MORPH, id || "___DEFAULT_MORPH");
@@ -616,7 +625,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     *
+     * Set the current textures
      */
     this.setTexture = function(id, texlayers) {
         texState = getState(TEXTURE, id || "___DEFAULT_TEXTURE");
@@ -650,7 +659,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
-     *
+     * Set the current renderer configs
      */
     this.setRenderer = function(id, props) {
         rendererState = getState(RENDERER, id || "___DEFAULT_RENDERER");
@@ -659,15 +668,16 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
+     * Set the current model matrix and model normal matrix
      */
     this.setModelTransform = function(id, mat, normalMat) {
         modelXFormState = getState(MODEL_TRANSFORM, id || "___DEFAULT_MODEL_TRANSFORM");
         modelXFormState.mat = mat || DEFAULT_MAT;
         modelXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
-        modelXFormState.id = id;
     };
 
     /**
+     * Set the current projection matrix
      */
     this.setProjectionTransform = function(id, mat) {
         projXFormState = getState(PROJ_TRANSFORM, id || "___DEFAULT_PROJ_TRANSFORM");
@@ -675,14 +685,17 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
+     * Set the current view matrix and view normal matrix
      */
-    this.setViewTransform = function(id, mat, normalMat) {
+    this.setViewTransform = function(id, mat, normalMat, lookAt) {
         viewXFormState = getState(VIEW_TRANSFORM, id || "___DEFAULT_VIEW_TRANSFORM");
         viewXFormState.mat = mat || DEFAULT_MAT;
         viewXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
+        viewXFormState.lookAt = lookAt || SceneJS._math_LOOKAT;
     };
 
     /**
+     * Set the current pick listeners
      */
     this.setPickListeners = function(id, listeners) {
         pickListenersState = getState(PICK_LISTENERS, id || "___DEFAULT_PICK_LISTENERS");
@@ -690,14 +703,15 @@ SceneJS._renderModule = new (function() {
     };
 
     /**
+     * Set the current node render listeners
      */
     this.setRenderListeners = function(id, listeners) {
         renderListenersState = getState(RENDER_LISTENERS, id || "___DEFAULT_RENDER_LISTENERS");
         renderListenersState.listeners = listeners || [];
     };
 
-
-    /* When geometry set, add it to the state soup and make GLSL hash code on the VBOs it provides.
+    /**
+     * Add a geometry and link it to currently active resources (states)
      *
      * Geometry is automatically exported when a scene graph geometry node
      * is rendered.
@@ -722,18 +736,15 @@ SceneJS._renderModule = new (function() {
      * Then we create the state graph node, which has the program and pointers to
      * the current state soup elements.
      *
-     * Finally we put that node into either the opaque or transparent bin within the
-     * active bin set, depending on whether the material state is opaque or transparent.
+
      */
     this.setGeometry = function(id, geo) {
 
-        if (id) {
-            id += ".gl";
-        }
+//        if (id) {
+//            id += ".gl";
+//        }
 
-        if (idPrefix) {
-            id = idPrefix + id;
-        }
+
 
         /* Pull in dirty states from other modules
          */
@@ -752,23 +763,12 @@ SceneJS._renderModule = new (function() {
 
         /*
          */
-        geoState = getState(id);
+        geoState = getState(GEO, id);
         geoState.geo = geo;
         geoState.hash = ([                           // Safe to build geometry hash here - geometry is immutable
             geo.normalBuf ? "t" : "f",
             geo.uvBuf ? "t" : "f",
             geo.uvBuf2 ? "t" : "f"]).join("");
-
-        //        /* Lazy-create layer
-        //         */
-        //        var layer;
-        //        var layerName = SceneJS._layerModule.getLayer() || SceneJS._layerModule.DEFAULT_LAYER_NAME;
-        //        layer = states.layers[layerName];
-        //        if (!layer) {
-        //            layer = states.layers[layerName] = {
-        //                bin: []
-        //            };
-        //        }
 
         /* Identify what GLSL is required for the current state soup elements
          */
@@ -788,13 +788,12 @@ SceneJS._renderModule = new (function() {
         /* Create state graph node, with program and
          * pointers to current state soup elements
          */
-        // nodeMap[nextStateId++] =
-
-        if (layerPriority >= 0) {
-            layerPriority++;
-        }
         var sortId = (layerPriority * 100000) + program.id;
 
+         if (idPrefix) {
+            id = idPrefix + id;
+        }
+        
         node = {
 
             id: id,
@@ -807,24 +806,24 @@ SceneJS._renderModule = new (function() {
 
             program : program,
 
-            geoState:           geoState,
-            flagsState:         flagsState,
-            rendererState:      rendererState,
-            lightState:         lightState,
-            colortransState :   colortransState,
-            materialState:      materialState,
-            fogState :          fogState,
-            modelXFormState:    modelXFormState,
-            viewXFormState:     viewXFormState,
-            projXFormState:     projXFormState,
-            texState:           texState,
-            pickState :         pickState,        // Will be DEFAULT_PICK because we are compiling whole scene here
-            imageBufState :     imageBufState,
-            clipState :         clipState,
-            deformState :       deformState,
-            morphState :        morphState,
-            pickListenersState: pickListenersState,
-            renderListenersState: renderListenersState
+            geoState:               geoState,
+            flagsState:             flagsState,
+            rendererState:          rendererState,
+            lightState:             lightState,
+            colortransState :       colortransState,
+            materialState:          materialState,
+            fogState :              fogState,
+            modelXFormState:        modelXFormState,
+            viewXFormState:         viewXFormState,
+            projXFormState:         projXFormState,
+            texState:               texState,
+            pickState :             pickState,        // Will be DEFAULT_PICK because we are compiling whole scene here
+            imageBufState :         imageBufState,
+            clipState :             clipState,
+            deformState :           deformState,
+            morphState :            morphState,
+            pickListenersState:     pickListenersState,
+            renderListenersState:   renderListenersState
         };
 
         nodeMap[id] = node;
@@ -836,13 +835,11 @@ SceneJS._renderModule = new (function() {
         //  SceneJS._bvhModule.insertNode(geo.boundary, states.sceneId, id);
     };
 
-
     /* When the canvas deactivates, we'll render the node bins.
      */
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.CANVAS_DEACTIVATED,
             function() {
-
                 if (states.needSort) {
                     preSortBins();
                     states.needSort = false;
@@ -933,7 +930,7 @@ SceneJS._renderModule = new (function() {
 
             context.enable(context.BLEND);
 
-            //    context.blendFunc(context.SRC_ALPHA, context.ONE);  // TODO: make blend func configurable on flags?
+            //   context.blendFunc(context.SRC_ALPHA, context.ONE);  // TODO: make blend func configurable on flags?
 
             context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
             for (i = 0,len = nTransparent; i < len; i++) {
@@ -943,7 +940,6 @@ SceneJS._renderModule = new (function() {
             context.disable(context.BLEND);
         }
     }
-
 
     //-----------------------------------------------------------------------------------------------------------------
     //  Shader generation
@@ -959,12 +955,16 @@ SceneJS._renderModule = new (function() {
             clipState.hash,
             deformState.hash,
             morphState.hash,
-            geoState.hash]).join(";");
+            geoState.hash
+        ]).join(";");
     }
 
     function getProgram(stateHash) {
         if (!programs[stateHash]) {
-            SceneJS._loggingModule.info("Creating render and pick shaders: '" + stateHash + "'");
+            if (debugCfg.logScripts === true) {
+                SceneJS._loggingModule.info("Creating render and pick shaders: '" + stateHash + "'");
+            }
+
             programs[stateHash] = {
                 id: nextProgramId++,
                 render: createShader(composeRenderingVertexShader(), composeRenderingFragmentShader()),
@@ -996,7 +996,7 @@ SceneJS._renderModule = new (function() {
                         SceneJS._loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
                         SceneJS._loggingModule.debug("Fragment shader:");
                         SceneJS._loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-                        throw SceneJS._errorModule.fatalError(e);
+                        throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create shader: " + e.message || e);
                     }
                 });
         return p;
@@ -1007,6 +1007,9 @@ SceneJS._renderModule = new (function() {
     }
 
     function composePickingVertexShader() {
+
+        var clipping = clipState && clipState.clips.length > 0;
+
         var src = [
             "#ifdef GL_ES",
             "   precision highp float;",
@@ -1016,10 +1019,57 @@ SceneJS._renderModule = new (function() {
             "uniform mat4 uVMatrix;",
             "uniform mat4 uPMatrix;"];
 
+        /*-----------------------------------------------------------------------------------
+         * Variables - Clipping
+         *----------------------------------------------------------------------------------*/
+
+        if (clipping) {
+
+            for (var i = 0; i < clipState.clips.length; i++) {
+
+                /* INPUT: Clip planes
+                 */
+                src.push("uniform float uClipMode" + i + ";");
+                src.push("uniform vec4  uClipA" + i + ";");
+                src.push("uniform vec4  uClipB" + i + ";");
+                src.push("uniform vec4  uClipC" + i + ";");
+
+                /* OUTPUT: view-space normal and distance from origin
+                 */
+                src.push("varying vec4  vClipNormalAndDist" + i + ";");
+            }
+        }
+
         src.push("varying vec4 vViewVertex;");
         src.push("void main(void) {");
         src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
         src.push("  vViewVertex = tmpVertex;");
+
+        /*-----------------------------------------------------------------------------------
+         * Logic - Clipping
+         *----------------------------------------------------------------------------------*/
+
+        if (clipping) {
+            src.push("  vec4    tempA;");
+            src.push("  vec4    tempB;");
+            src.push("  vec4    tempC;");
+            src.push("  vec3    tempNormal;");
+
+            for (var i = 0; i < clipState.clips.length; i++) {
+
+                src.push("    if (uClipMode" + i + " != 0.0) {");
+
+                src.push("        tempA = uVMatrix * uClipA" + i + ";");
+                src.push("        tempB = uVMatrix * uClipB" + i + ";");
+                src.push("        tempC = uVMatrix * uClipC" + i + ";");
+
+                src.push("        tempNormal = normalize(cross(normalize(tempB.xyz - tempA.xyz), normalize(tempB.xyz - tempC.xyz)));");
+
+                src.push("        vClipNormalAndDist" + i + " = vec4(tempNormal.xyz, dot(tempNormal, tempA.xyz));");
+                src.push("    }");
+            }
+        }
+
         src.push("  gl_Position = uPMatrix * vViewVertex;");
         src.push("}");
 
@@ -1041,29 +1091,31 @@ SceneJS._renderModule = new (function() {
             "   precision highp float;",
             "#endif"];
 
+        src.push("varying vec4 vViewVertex;");
         src.push("uniform vec3 uPickColor;");
 
-        /* User-defined clipping vars
-         */
+        /*-----------------------------------------------------------------------------------
+         * Variables - Clipping
+         *----------------------------------------------------------------------------------*/
+
         if (clipping) {
-            src.push("varying vec4 vViewVertex;");              // View-space vertex
             for (var i = 0; i < clipState.clips.length; i++) {
                 src.push("uniform float uClipMode" + i + ";");
-                src.push("uniform vec3  uClipNormal" + i + ";");
-                src.push("uniform float uClipDist" + i + ";");
+                src.push("varying vec4  vClipNormalAndDist" + i + ";");
             }
         }
 
         src.push("void main(void) {");
 
-        /* User-defined clipping logic
-         */
+        /*-----------------------------------------------------------------------------------
+         * Logic - Clipping
+         *----------------------------------------------------------------------------------*/
 
         if (clipping) {
             src.push("  float   dist;");
             for (var i = 0; i < clipState.clips.length; i++) {
                 src.push("    if (uClipMode" + i + " != 0.0) {");
-                src.push("        dist = dot(vViewVertex.xyz, uClipNormal" + i + ") - uClipDist" + i + ";");
+                src.push("        dist = dot(vViewVertex.xyz, vClipNormalAndDist" + i + ".xyz) - vClipNormalAndDist" + i + ".w;");
                 src.push("        if (uClipMode" + i + " == 1.0) {");
                 src.push("            if (dist < 0.0) { discard; }");
                 src.push("        }");
@@ -1073,7 +1125,6 @@ SceneJS._renderModule = new (function() {
                 src.push("    }");
             }
         }
-
         src.push("    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ");
 
         src.push("}");
@@ -1115,10 +1166,6 @@ SceneJS._renderModule = new (function() {
         return false;
     }
 
-    /*-----------------------------------------------------------------------------------------------------------------
-     * Rendering vertex shader
-     *---------------------------------------------------------------------------------------------------------------*/
-
     function composeRenderingVertexShader() {
 
         var texturing = isTexturing();
@@ -1132,15 +1179,21 @@ SceneJS._renderModule = new (function() {
             "   precision highp float;",
             "#endif"
         ];
-        src.push("attribute vec3 aVertex;");                // World coordinates
+        src.push("attribute vec3 aVertex;");                // Model coordinates
+
+        /*-----------------------------------------------------------------------------------
+         * Variables - Lighting
+         *----------------------------------------------------------------------------------*/
 
         if (lighting) {
-            src.push("attribute vec3 aNormal;");            // Normal vectors
-            src.push("uniform   mat4 uMNMatrix;");            // Model normal matrix
-            src.push("uniform   mat4 uVNMatrix;");            // View normal matrix
+            src.push("attribute vec3 aEye;");           // World-space eye position
 
-            src.push("varying   vec3 vNormal;");              // Output view normal vector
-            src.push("varying   vec3 vEyeVec;");              // Output view eye vector
+            src.push("attribute vec3 aNormal;");        // Normal vectors
+            src.push("uniform   mat4 uMNMatrix;");      // Model normal matrix
+            src.push("uniform   mat4 uVNMatrix;");      // View normal matrix
+
+            src.push("varying   vec3 vNormal;");        // Output view normal vector
+            src.push("varying   vec3 vEyeVec;");        // Output view eye vector
 
             for (var i = 0; i < lightState.lights.length; i++) {
                 var light = lightState.lights[i];
@@ -1168,6 +1221,14 @@ SceneJS._renderModule = new (function() {
                 src.push("attribute vec2 aUVCoord2;");     // UV2 coords
             }
         }
+
+        /* Vertex color variables
+         */
+        if (geoState.geo.colorBuf) {
+            src.push("attribute vec4 aVertexColor;");     // UV2 coords
+            src.push("varying vec4 vColor;");
+        }
+
         src.push("uniform mat4 uMMatrix;");                // Model matrix
         src.push("uniform mat4 uVMatrix;");                // View matrix
         src.push("uniform mat4 uPMatrix;");                 // Projection matrix
@@ -1183,8 +1244,10 @@ SceneJS._renderModule = new (function() {
             }
         }
 
-        /* Morphing - declare uniforms for target and interpolation factor
-         */
+        /*-----------------------------------------------------------------------------------
+         * Variables - Morphing
+         *----------------------------------------------------------------------------------*/
+
         if (morphing) {
             src.push("uniform float uMorphFactor;");       // LERP factor for morph
             if (morphState.morph.target1.vertexBuf) {      // target2 has these arrays also
@@ -1222,7 +1285,7 @@ SceneJS._renderModule = new (function() {
                 src.push("uniform vec4  uClipB" + i + ";");
                 src.push("uniform vec4  uClipC" + i + ";");
 
-                /* OUTPUT: view-space normal and distance from origin                
+                /* OUTPUT: view-space normal and distance from origin
                  */
                 src.push("varying vec4  vClipNormalAndDist" + i + ";");
             }
@@ -1230,30 +1293,40 @@ SceneJS._renderModule = new (function() {
 
         src.push("void main(void) {");
 
-        src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+        src.push("  vec4 modelVertex = vec4(aVertex, 1.0); ");
 
         if (lighting) {
-            src.push("  vec4 tmpNormal = uVNMatrix * (uMNMatrix * vec4(aNormal, 1.0)); ");
+            src.push("  vec4 modelNormal = vec4(aNormal, 0.0); ");
         }
 
         /*
-         * Morphing - transform morph targets and interpolate towards it
+         * Morphing - morph targets are in same model space as the geometry
          */
         if (morphing) {
             if (morphState.morph.target1.vertexBuf) {
-                src.push("  vec4 vMorphVertex = uVMatrix * (uMMatrix * vec4(aMorphVertex, 1.0)); ");
-                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, uMorphFactor), 1.0); ");
+                src.push("  vec4 vMorphVertex = vec4(aMorphVertex, 1.0); ");
+                src.push("  modelVertex = vec4(mix(modelVertex.xyz, vMorphVertex.xyz, uMorphFactor), 1.0); ");
             }
             if (lighting) {
                 if (morphState.morph.target1.normalBuf) {
-                    src.push("  vec4 vMorphNormal = uVMatrix * (uMMatrix * vec4(aMorphNormal, 1.0)); ");
-                    src.push("  tmpNormal = vec4( mix(tmpNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
+                    src.push("  vec4 vMorphNormal = vec4(aMorphNormal, 1.0); ");
+                    src.push("  modelNormal = vec4( mix(modelNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
                 }
             }
         }
 
+        src.push("  vec4 worldVertex = uMMatrix * modelVertex; ");
+
+
+        if (lighting) {
+
+            /* Transform normal from model to view space
+             */
+            src.push("  vec4 worldNormal = uMNMatrix * modelNormal; ");
+        }
+
         /*
-         * Deformation
+         * Deformation - apply world-space deform points to world-space vertex
          */
         if (deforming) {
             src.push("  vec3 deformVec;");
@@ -1261,51 +1334,56 @@ SceneJS._renderModule = new (function() {
             src.push("  vec3 deformVecSum = vec3(0.0, 0.0, 0.0);");
             src.push("  float deformScalar;");
             for (var i = 0, len = deformState.deform.verts.length; i < len; i++) {
-                src.push("deformVec = uDeformVertex" + i + ".xyz - tmpVertex.xyz;");
+                src.push("deformVec = vec4(uDeformVertex" + i + ".xyz, 1.0).xyz - worldVertex.xyz;");
                 src.push("deformLen = length(deformVec);");
                 src.push("if (uDeformMode" + i + " == 0.0) {");
                 src.push("    deformScalar = deformLen;");
                 src.push("} else {");
                 src.push("    deformScalar = deformLen * deformLen;");
                 src.push("}");
-                src.push("deformVecSum += deformVec * -uDeformWeight" + i + " * (1.0 / deformScalar);"); // TODO: weight
+                src.push("deformVecSum += (deformVec * -uDeformWeight" + i + " * (1.0 / deformScalar));"); // TODO: weight
             }
 
-            src.push("tmpVertex = vec4(deformVecSum.xyz + tmpVertex.xyz, 1.0);");
+            src.push("worldVertex = vec4(deformVecSum.xyz + worldVertex.xyz, 1.0);");
         }
+
+        src.push("  vec4 viewVertex  = uVMatrix * worldVertex; ");
 
         if (lighting) {
-            src.push("  vNormal = normalize(tmpNormal.xyz);");
-
+            src.push("  vNormal = normalize(worldNormal.xyz);");
         }
 
-        src.push("  vViewVertex = tmpVertex;");
+        src.push("  vViewVertex = viewVertex;");
         src.push("  gl_Position = uPMatrix * vViewVertex;");
 
-        /* Lighting
-         */
-        src.push("  vec3 tmpVec;");
+        /*-----------------------------------------------------------------------------------
+         * Logic - Lighting
+         *
+         * Transform the world-space lights into view space
+         *----------------------------------------------------------------------------------*/
+
+        src.push("  vec3 tmpVec3;");
         if (lighting) {
+            var light;
             for (var i = 0; i < lightState.lights.length; i++) {
-                var light = lightState.lights[i];
+                light = lightState.lights[i];
                 if (light.mode == "dir") {
-                    src.push("tmpVec = -uLightDir" + i + ";");
-                    src.push("vLightVecAndDist" + i + " = vec4(normalize(tmpVec), 0.0);");
+                    src.push("vLightVecAndDist" + i + " = vec4(-normalize(uLightDir" + i + "), 0.0);");
                 }
                 if (light.mode == "point") {
-                    src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
-                    src.push("vLightVecAndDist" + i + " = vec4(normalize(tmpVec), length(tmpVec));");
+                    src.push("tmpVec3 = -(uLightPos" + i + ".xyz - worldVertex.xyz);");
+                    src.push("vLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
                 }
                 if (light.mode == "spot") {
-                    src.push("tmpVec = -(uLightPos" + i + ".xyz - tmpVertex.xyz);");
-                    src.push("vLightVecAndDist" + i + " = vec4(normalize(tmpVec), length(tmpVec));");
+
                 }
             }
-            src.push("vEyeVec = normalize(-vViewVertex.xyz);");
         }
 
         /*-----------------------------------------------------------------------------------
          * Logic - Clipping
+         *
+         *
          *----------------------------------------------------------------------------------*/
 
         if (clipping) {
@@ -1327,7 +1405,10 @@ SceneJS._renderModule = new (function() {
                 src.push("        vClipNormalAndDist" + i + " = vec4(tempNormal.xyz, dot(tempNormal, tempA.xyz));");
                 src.push("    }");
             }
-            src.push("vEyeVec = normalize(-vViewVertex.xyz);");
+        }
+
+        if (lighting) {
+            src.push("vEyeVec = -normalize(aEye - worldVertex.xyz);");
         }
 
         if (texturing) {
@@ -1338,6 +1419,13 @@ SceneJS._renderModule = new (function() {
                 src.push("vUVCoord2 = aUVCoord2;");
             }
         }
+
+        /* Vertex colouring
+         */
+        if (geoState.geo.colorBuf) {
+            src.push("vColor = aVertexColor;");
+        }
+
         src.push("}");
         if (debugCfg.logScripts === true) {
             SceneJS._loggingModule.info(src);
@@ -1392,6 +1480,13 @@ SceneJS._renderModule = new (function() {
             }
         }
 
+
+        /* Vertex color variable
+         */
+        if (geoState.geo.colorBuf) {
+            src.push("varying vec4 vColor;");
+        }
+
         src.push("uniform vec3  uMaterialBaseColor;");
         src.push("uniform float uMaterialAlpha;");
 
@@ -1414,18 +1509,13 @@ SceneJS._renderModule = new (function() {
                 var light = lightState.lights[i];
                 src.push("uniform vec3  uLightColor" + i + ";");
                 if (light.mode == "point") {
-                    src.push("uniform vec4  uLightPos" + i + ";");
                     src.push("uniform vec3  uLightAttenuation" + i + ";");
                 }
-                if (light.mode == "dir") {
-                    src.push("uniform vec3   uLightDir" + i + ";");
-                }
-                if (light.mode == "spot") {
-                    src.push("uniform vec4   uLightPos" + i + ";");
-                    src.push("uniform vec3   uLightDir" + i + ";");
-                    src.push("uniform float  uLightSpotCosCutOff" + i + ";");
-                    src.push("uniform float  uLightSpotExp" + i + ";");
-                }
+                //                if (light.mode == "spot") {
+                //                   src.push("uniform vec3   uLightDir" + i + ";");
+                //                    src.push("uniform float  uLightSpotCosCutOff" + i + ";");
+                //                    src.push("uniform float  uLightSpotExp" + i + ";");
+                //                }
                 src.push("varying vec4  vLightVecAndDist" + i + ";");         // Vector from light to vertex
             }
         }
@@ -1453,8 +1543,13 @@ SceneJS._renderModule = new (function() {
         //--------------------------------------------------------------------------
 
         src.push("void main(void) {");
-        src.push("  vec3    color   = uMaterialBaseColor;");
-        src.push("  float   alpha   = uMaterialAlpha;");
+        if (geoState.geo.colorBuf) {
+            src.push("  vec3    color   = vColor.rgb;");
+            src.push("  float   alpha   = vColor.a;");
+        } else {
+            src.push("  vec3    color   = uMaterialBaseColor;");
+            src.push("  float   alpha   = uMaterialAlpha;");
+        }
 
         /*-----------------------------------------------------------------------------------
          * Logic - Clipping
@@ -1536,7 +1631,13 @@ SceneJS._renderModule = new (function() {
 
                 /* Alpha from Texture
                  * */
-                src.push("alpha = texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).a;");
+                if (layer.applyTo == "alpha") {
+                    if (layer.blendMode == "multiply") {
+                        src.push("alpha = alpha * texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b;");
+                    } else if (layer.blendMode == "add") {
+                        src.push("alpha = alpha + texture2D(uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b;");
+                    }
+                }
 
                 /* Texture output
                  */
@@ -1584,7 +1685,7 @@ SceneJS._renderModule = new (function() {
 
             for (var i = 0; i < lightState.lights.length; i++) {
                 var light = lightState.lights[i];
-                src.push("lightVec = normalize(vLightVecAndDist" + i + ".xyz);");
+                src.push("lightVec = vLightVecAndDist" + i + ".xyz;");
 
                 /* Point Light
                  */
@@ -1613,6 +1714,7 @@ SceneJS._renderModule = new (function() {
                 if (light.mode == "dir") {
 
                     src.push("dotN = max(dot(normalVec,lightVec),0.0);");
+
                     if (light.diffuse) {
                         src.push("lightValue += dotN * uLightColor" + i + ";");
                     }
@@ -1626,13 +1728,13 @@ SceneJS._renderModule = new (function() {
                  */
                 if (light.mode == "spot") {
 
-                    src.push("lightDist = vLightVecAndDist" + i + ".w;");
-
-                    src.push("spotFactor = max(dot(normalize(uLightDir" + i + "), lightVec));");
-                    src.push("if ( spotFactor > 20) {");
-                    src.push("  spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
-                    src.push("  dotN = max(dot(normalVec,lightVec),0.0);");
-                    src.push("      if(dotN>0.0){");
+                    //                    src.push("lightDist = vLightVecAndDist" + i + ".w;");
+                    //
+                    //                    src.push("spotFactor = max(dot(normalize(uLightDir" + i + "), lightVec));");
+                    //                    src.push("if ( spotFactor > 20) {");
+                    //                    src.push("  spotFactor = pow(spotFactor, uLightSpotExp" + i + ");");
+                    //                    src.push("  dotN = max(dot(normalVec,lightVec),0.0);");
+                    //                    src.push("      if(dotN>0.0){");
 
                     //                            src.push("          attenuation = spotFactor / (" +
                     //                                     "uLightAttenuation" + i + "[0] + " +
@@ -1652,8 +1754,8 @@ SceneJS._renderModule = new (function() {
                     src.push("}");
                 }
             }
-            src.push("if (emit>0.0) lightValue = vec3(1.0, 1.0, 1.0);");
-            src.push("vec4 fragColor = vec4(specularValue.rgb + color.rgb * (emit+1.0) * lightValue.rgb, alpha);");
+
+            src.push("vec4 fragColor = vec4((specularValue.rgb + color.rgb * lightValue.rgb) + (emit * color.rgb), alpha);");
         } else {
 
             /* No lighting
@@ -1682,6 +1784,7 @@ SceneJS._renderModule = new (function() {
         if (colortrans) {
 
             src.push("    if (uColortransMode != 0.0) {");     // Not disabled
+
             /* Desaturate
              */
             src.push("        if (uColortransSaturation < 0.0) {");
@@ -1725,9 +1828,11 @@ SceneJS._renderModule = new (function() {
          */
         var pickIndex = readPickBuffer(canvasX, canvasY);
 
+        var wasPicked = (pickIndex >= 0);
+
         /* Notify listeners
          */
-        if (pickIndex >= 0) {
+        if (wasPicked) {
             var pickListeners = states.nodeRenderer._pickListeners[pickIndex];
             if (pickListeners) {
                 var listeners = pickListeners.listeners;
@@ -1741,6 +1846,10 @@ SceneJS._renderModule = new (function() {
          */
         unbindPickBuffer();
         states.nodeRenderer.cleanup();
+
+        /* Notify caller whether pick was made or not
+         */
+        return wasPicked;
     }
 
     function createPickBuffer() {

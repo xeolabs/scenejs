@@ -108,7 +108,7 @@ var SceneJS_NodeRenderer = function(cfg) {
 
     /**
      * Renders a state node. Makes state changes only where the node's states have different IDs
-     * that the states of the last node. If the node has a different program than the last node
+     * than the states of the last node. If the node has a different program than the last node
      * rendered, Renderer forgets all states for the previous node and makes a fresh set of transitions
      * into all states for this node.
      */
@@ -169,11 +169,26 @@ var SceneJS_NodeRenderer = function(cfg) {
 
             /*
              */
-            this._lastFlagsState = node.flagsState;
+            var newFlags = node.flagsState.flags;
+            var oldFlags = this._lastFlagsState ? this._lastFlagsState.flags : null;
 
-            //                if (!node.flagState.enabled) {
-            //                    return;
-            //                }
+            if (!oldFlags || newFlags.backfaces != oldFlags.backfaces) {
+                if (newFlags.backfaces) {
+                    gl.disable(gl.CULL_FACE);
+                } else {
+                    gl.enable(gl.CULL_FACE);
+                }
+            }
+
+            if (!oldFlags || newFlags.blendFunc != oldFlags.blendFunc) {
+                if (newFlags.blendFunc) {
+                    gl.blendFunc(glEnum(gl, newFlags.blendFunc.sfactor || "one"), glEnum(gl, newFlags.blendFunc.dfactor || "zero"));
+                } else {
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Not redundant, because of inequality test above
+                }
+            }
+
+            this._lastFlagsState = node.flagsState;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -204,9 +219,9 @@ var SceneJS_NodeRenderer = function(cfg) {
 
             /* Disable all vertex arrays
              */
-            //            for (var k = 0; k < 8; k++) {
-            //                gl.disableVertexAttribArray(k);
-            //            }
+            for (var k = 0; k < 8; k++) {
+                gl.disableVertexAttribArray(k);
+            }
 
             var vertexBufBound = false;
             var normalBufBound = false;
@@ -279,6 +294,10 @@ var SceneJS_NodeRenderer = function(cfg) {
                 }
             }
 
+            if (geo.colorBuf) {
+                program.bindFloatArrayBuffer("aVertexColor", geo.colorBuf);
+            }
+
             geo.indexBuf.bind();
         }
 
@@ -321,12 +340,13 @@ var SceneJS_NodeRenderer = function(cfg) {
         }
 
         /*----------------------------------------------------------------------------------------------------------
-         * view matrix
+         * view matrix and eye position
          *--------------------------------------------------------------------------------------------------------*/
 
         if (node.viewXFormState._stateId != this._lastViewXFormStateId) {
             program.setUniform("uVMatrix", node.viewXFormState.mat);
             program.setUniform("uVNMatrix", node.viewXFormState.normalMat);
+            program.setUniform("uEye", node.viewXFormState.lookAt.eye);
             this._lastViewXFormStateId = node.viewXFormState._stateId;
         }
 
@@ -371,9 +391,9 @@ var SceneJS_NodeRenderer = function(cfg) {
                     program.setUniform("uClipMode" + k, 0);
                 }
 
-                program.setUniform("uClipA" + k, clip.a);
-                program.setUniform("uClipB" + k, clip.b);
-                program.setUniform("uClipC" + k, clip.c);
+                program.setUniform("uClipA" + k, clip.worldA);
+                program.setUniform("uClipB" + k, clip.worldB);
+                program.setUniform("uClipC" + k, clip.worldC);
             }
             this._lastClipStateId = node.clipState._stateId;
         }
@@ -387,7 +407,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             var vert;
             for (var k = 0, len = verts.length; k < len; k++) {
                 vert = verts[k];
-                program.setUniform("uDeformVertex" + k, vert.pos);
+                program.setUniform("uDeformVertex" + k, vert.worldPos);
                 program.setUniform("uDeformWeight" + k, vert.weight);
                 if (vert.mode == "linear") {
                     program.setUniform("uDeformMode" + k, 0.0);
@@ -507,7 +527,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                     program.setUniform("uLightColor" + k, light.color);
                     program.setUniform("uLightDiffuse" + k, light.diffuse);
                     if (light.mode == "dir") {
-                        program.setUniform("uLightDir" + k, light.viewDir);
+                        program.setUniform("uLightDir" + k, light.worldDir);
                     } else if (light.mode == "ambient") {
                         ambient = ambient ? [
                             ambient[0] + light.color[0],
@@ -516,11 +536,11 @@ var SceneJS_NodeRenderer = function(cfg) {
                         ] : light.color;
                     } else {
                         if (light.mode == "point") {
-                            program.setUniform("uLightPos" + k, light.viewPos);
+                            program.setUniform("uLightPos" + k, light.worldPos);
                         }
                         if (light.mode == "spot") {
-                            program.setUniform("uLightPos" + k, light.viewPos);
-                            program.setUniform("uLightDir" + k, light.viewDir);
+                            program.setUniform("uLightPos" + k, light.worldPos);
+                            program.setUniform("uLightDir" + k, light.worldDir);
                             program.setUniform("uLightSpotCosCutOff" + k, light.spotCosCutOff);
                             program.setUniform("uLightSpotExp" + k, light.spotExponent);
                         }
@@ -534,7 +554,6 @@ var SceneJS_NodeRenderer = function(cfg) {
                 }
                 this._lastLightStateId = node.lightState._stateId;
             }
-
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -586,7 +605,7 @@ var SceneJS_NodeRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         var primitive = node.geoState.geo.primitive;
-        if (node.rendererState && node.flagsState.flags.wireframe) {
+        if (node.flagsState && node.flagsState.flags.wireframe) {
             if (primitive == gl.TRIANGLES ||
                 primitive == gl.TRIANGLE_STRIP ||
                 primitive == gl.TRIANGLE_FAN) {
@@ -601,6 +620,28 @@ var SceneJS_NodeRenderer = function(cfg) {
                 gl.UNSIGNED_SHORT,
                 0);
     };
+
+    var glEnum = function(context, name) {
+        if (!name) {
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Null SceneJS.renderer node config: \"" + name + "\"");
+        }
+        var result = SceneJS._webgl_enumMap[name];
+        if (!result) {
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
+        }
+        var value = context[result];
+        if (!value) {
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.WEBGL_UNSUPPORTED_NODE_CONFIG,
+                    "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
+        }
+        return value;
+    };
+
 
     /**
      * Called after all nodes rendered for the current frame
@@ -639,4 +680,5 @@ var SceneJS_NodeRenderer = function(cfg) {
         }
         return this._pickListeners;
     };
-};
+}
+        ;

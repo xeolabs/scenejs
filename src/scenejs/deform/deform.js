@@ -15,8 +15,9 @@ SceneJS.Deform.prototype.setVerts = function(verts) {
     for (var i = 0, len = verts.length; i < len; i++) {
         vert = verts[i];
         if (vert.mode && (vert.mode != "linear" && vert.mode != "exp")) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                    "Can't set deform vertex " + i + " - unsupported mode - should be 'linear' or 'exp'"));
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Can't set deform vertex " + i + " - unsupported mode - should be 'linear' or 'exp'");
         }
         tmpVerts.push({
             x: vert.x || 0.0,
@@ -32,16 +33,19 @@ SceneJS.Deform.prototype.setVerts = function(verts) {
 SceneJS.Deform.prototype.setVert = function(vert) {
     vert = vert || {};
     if (vert.index == undefined) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't set deform vertex - attribute missing: 'index'"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't set deform vertex - attribute missing: 'index'");
     }
     if (vert.index < 0 || vert.index >= this._attr.verts.length) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't set deform vertex - index " + vert.indx + " out of range of existing vertices [0-" + this._attr.verts.length + "]"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't set deform vertex - index " + vert.indx + " out of range of existing vertices [0-" + this._attr.verts.length + "]");
     }
     if (vert.mode && (vert.mode != "linear" && vert.mode != "exp")) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't set deform vertex - unsupported mode - should be 'linear' or 'exp'"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't set deform vertex - unsupported mode - should be 'linear' or 'exp'");
     }
     var temp = this._attr.verts[vert.index];
 
@@ -56,12 +60,14 @@ SceneJS.Deform.prototype.setVert = function(vert) {
 
 SceneJS.Deform.prototype.getVert = function(index) {
     if (index == undefined) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't get deform vertex - attribute missing: 'index'"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't get deform vertex - attribute missing: 'index'");
     }
     if (index < 0 || index > this._attr.verts.length) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't get deform vertex - index out of range of existing vertices"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't get deform vertex - index out of range of existing vertices");
     }
     return SceneJS._shallowClone(this._attr.verts[index]);
 };
@@ -69,8 +75,9 @@ SceneJS.Deform.prototype.getVert = function(index) {
 SceneJS.Deform.prototype.addVert = function(vert) {
     vert = vert || {};
     if (vert.mode && (vert.mode != "linear" && vert.mode != "exp")) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't add deform vertex - unsupported mode - should be 'linear' or 'exp'"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't add deform vertex - unsupported mode - should be 'linear' or 'exp'");
     }
     var temp = {
         x: vert.x || 0.0,
@@ -88,12 +95,14 @@ SceneJS.Deform.prototype.addVert = function(vert) {
 
 SceneJS.Deform.prototype.removeVert = function(index) {
     if (index == undefined) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't remove deform vertex - attribute undefined: 'index'"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't remove deform vertex - attribute undefined: 'index'");
     }
     if (index < 0 || index > this._attr.verts.length) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Can't remove deform vertex - index out of range of existing vertices"));
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Can't remove deform vertex - index out of range of existing vertices");
     }
     this._attr.verts.splice(index, 1);
 };

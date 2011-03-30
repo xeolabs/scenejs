@@ -194,8 +194,8 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     var z = (up.z != undefined && up.z != null) ? up.z : 0;
     if (x + y + z == 0) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidNodeConfigException(
-                        "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero"));
+                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero");
     }
     this._upX = x;
     this._upY = y;
@@ -318,9 +318,9 @@ SceneJS.LookAt.prototype._preCompile = function(traversalContext) {
             type: "lookat",
             matrix: tempMat,
             lookAt : {
-                eye: { x: this._eyeX, y: this._eyeY, z: this._eyeZ },
-                look: { x: this._lookX, y: this._lookY, z: this._lookZ },
-                up:  { x: this._upX, y: this._upY, z: this._upZ }
+                eye: [this._eyeX, this._eyeY, this._eyeZ ],
+                look: [this._lookX, this._lookY, this._lookZ ],
+                up:  [this._upX, this._upY, this._upZ ]
             },
             fixed: origMemoLevel == 2
         };

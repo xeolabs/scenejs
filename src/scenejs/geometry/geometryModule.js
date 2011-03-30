@@ -115,6 +115,9 @@ SceneJS._geometryModule = new (function() {
             if (geo.uvBuf2) {
                 geo.uvBuf2.destroy();
             }
+            if (geo.colorBuf) {
+                geo.colorBuf.destroy();
+            }
         }
         var geoMap = geoMaps[geo.canvas.canvasId];
         if (geoMap) {
@@ -143,11 +146,12 @@ SceneJS._geometryModule = new (function() {
             case "triangle-fan":
                 return context.TRIANGLE_FAN;
             default:
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(// Logs and throws
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "SceneJS.geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
-                        "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'"));
+                        "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
         }
     }
 
@@ -186,6 +190,7 @@ SceneJS._geometryModule = new (function() {
             normals: data.normals ? new Float32Array(data.normals) : undefined,
             uv: data.uv ? new Float32Array(data.uv) : undefined,
             uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
+            colors: data.colors ? new Float32Array(data.colors) : undefined,
             indices: data.indices ? new Int32Array(data.indices) : undefined
         };
     }
@@ -194,8 +199,8 @@ SceneJS._geometryModule = new (function() {
 
         if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.NodeConfigExpectedException(
-                            "SceneJS.geometry node property expected : primitive"));
+                    SceneJS.errors.NODE_CONFIG_EXPECTED, 
+                    "SceneJS.geometry node property expected : primitive");
         }
         var context = canvas.context;
         var usage = context.STATIC_DRAW;
@@ -205,6 +210,7 @@ SceneJS._geometryModule = new (function() {
         var normalBuf;
         var uvBuf;
         var uvBuf2;
+        var colorBuf;
         var indexBuf;
 
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
@@ -229,6 +235,12 @@ SceneJS._geometryModule = new (function() {
                 }
             }
 
+            if (data.colors && data.colors.length > 0) {
+                if (data.colors) {
+                    colorBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.colors, data.colors.length, 4, usage);
+                }
+            }
+
             var primitive;
             if (data.indices && data.indices.length > 0) {
                 primitive = getPrimitiveType(context, data.primitive);
@@ -247,11 +259,12 @@ SceneJS._geometryModule = new (function() {
                 indexBuf : indexBuf,
                 uvBuf: uvBuf,
                 uvBuf2: uvBuf2,
+                colorBuf: colorBuf,
                 arrays: data          // Retain the arrays for geometric ops
             };
 
             if (data.positions) {
-               // geo.boundary = getBoundary(data.positions);
+                // geo.boundary = getBoundary(data.positions);
             }
 
             currentGeoMap[resource] = geo;
@@ -271,6 +284,9 @@ SceneJS._geometryModule = new (function() {
             }
             if (uvBuf2) {
                 uvBuf2.destroy();
+            }
+            if (colorBuf) {
+                colorBuf.destroy();
             }
             if (indexBuf) {
                 indexBuf.destroy();
@@ -353,6 +369,7 @@ SceneJS._geometryModule = new (function() {
             normalBuf: geo.normalBuf,
             uvBuf: geo.uvBuf,
             uvBuf2: geo.uvBuf2,
+            colorBuf: geo.colorBuf,
             indexBuf: geo.indexBuf
         };
         for (var i = stackLen - 1; i >= 0; i--) {
@@ -362,6 +379,7 @@ SceneJS._geometryModule = new (function() {
                 geo2.normalBuf = geoStack[i].normalBuf;
                 geo2.uvBuf = geoStack[i].uvBuf;           // Vertex and UVs are a package
                 geo2.uvBuf2 = geoStack[i].uvBuf2;
+                geo2.colorBuf = geoStack[i].colorBuf;
                 return geo2;
             }
         }

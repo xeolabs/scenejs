@@ -135,6 +135,75 @@ SceneJS.createNode({
                                     nodes: [
 
                                         /*-----------------------------------------------------------------------------
+                                         * Spheres indicating the locations or our deform's control points
+                                         *----------------------------------------------------------------------------*/
+                                        {
+                                            type: "translate",
+                                            x:    -4.0,
+                                            nodes: [
+                                                {
+                                                    type: "instance",
+                                                    target: "control-point-sphere"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            x:    4.0,
+                                            nodes: [
+                                                {
+                                                    type: "instance",
+                                                    target: "control-point-sphere"
+                                                }
+
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            y: 4.0,
+                                            nodes: [
+                                                {
+                                                    type: "instance",
+                                                    target: "control-point-sphere"
+                                                }
+
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            y: -4.0,
+                                            nodes: [
+                                                {
+                                                    type: "instance",
+                                                    target: "control-point-sphere"
+                                                }
+
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            z: 4.0,
+                                            nodes: [
+                                                {
+                                                    type: "instance",
+                                                    target: "control-point-sphere"
+                                                }
+
+                                            ]
+                                        },
+                                        {
+                                            type: "translate",
+                                            z: -4.0,
+                                            nodes: [
+                                                {
+                                                    type: "instance",
+                                                    target: "control-point-sphere"
+                                                }
+
+                                            ]
+                                        },
+
+                                        /*-----------------------------------------------------------------------------
                                          * With a deformation node we'll define six control points around
                                          * the teapot. These each have a positive weight with an
                                          * exponential mode, causing them to repel eache vertex of the
@@ -202,112 +271,42 @@ SceneJS.createNode({
                                                     mode: "exp",
                                                     weight:  4
                                                 }
-                                            ],
-
-                                            nodes:[
-
-                                                /*----------------------------------------------------------------------
-                                                 * The teapot we're deforming
-                                                 *--------------------------------------------------------------------*/
-                                                {
-                                                    type: "material",
-                                                    emit: 0,
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:       0.9,
-                                                    shine:          100.0,
-
-                                                    nodes: [
-                                                        {
-                                                            type: "translate",
-                                                            y: -1,
-
-                                                            nodes: [
-                                                                {
-                                                                    type: "scale",
-                                                                    x:.7,
-                                                                    y:.7,
-                                                                    z:.7,
-
-                                                                    nodes: [
-                                                                        {
-                                                                            type : "teapot"
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
                                             ]
-                                        },
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
 
-                                        /*-----------------------------------------------------------------------------
-                                         * Spheres indicating the locations or our deform's control points
-                                         *----------------------------------------------------------------------------*/
+
+                        /*----------------------------------------------------------------------
+                         * The teapot we're deforming
+                         *--------------------------------------------------------------------*/
+
+                        {
+                            type: "material",
+                            emit: 0,
+                            baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                            specular:       0.9,
+                            shine:          100.0,
+
+                            nodes: [
+                                {
+                                    type: "translate",
+                                    y: -1,
+
+                                    nodes: [
                                         {
-                                            type: "translate",
-                                            x:    -4.0,
+                                            type: "scale",
+                                            x:.7,
+                                            y:.7,
+                                            z:.7,
+
                                             nodes: [
                                                 {
-                                                    type: "instance",
-                                                    target: "control-point-sphere"
+                                                    type : "teapot"
                                                 }
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            x:    4.0,
-                                            nodes: [
-                                                {
-                                                    type: "instance",
-                                                    target: "control-point-sphere"
-                                                }
-
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            y: 4.0,
-                                            nodes: [
-                                                {
-                                                    type: "instance",
-                                                    target: "control-point-sphere"
-                                                }
-
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            y: -4.0,
-                                            nodes: [
-                                                {
-                                                    type: "instance",
-                                                    target: "control-point-sphere"
-                                                }
-
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            z: 4.0,
-                                            nodes: [
-                                                {
-                                                    type: "instance",
-                                                    target: "control-point-sphere"
-                                                }
-
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            z: -4.0,
-                                            nodes: [
-                                                {
-                                                    type: "instance",
-                                                    target: "control-point-sphere"
-                                                }
-
                                             ]
                                         }
                                     ]
@@ -319,6 +318,7 @@ SceneJS.createNode({
             ]
         }
     ]
+
 });
 
 
@@ -333,27 +333,27 @@ SceneJS.createNode({
 
 /*
  SceneJS.withNode("my-deform").set("vert", {
-     index: 0,
-     x: -4.0,
-     y: 0,
-     z: 0,
-     mode: "exp",
-     weight: 6
+ index: 0,
+ x: -4.0,
+ y: 0,
+ z: 0,
+ mode: "exp",
+ weight: 6
  });
  */
 
 /*
  SceneJS.withNode("my-deform").add("vert", {
-     x: 0,
-     y: -5,
-     z: 0,
-     weight: -3
+ x: 0,
+ y: -5,
+ z: 0,
+ weight: -3
  });
  */
 
 /*
  SceneJS.withNode("my-deform").remove("vert", {
-     index: 2
+ index: 2
  });
  */
 

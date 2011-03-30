@@ -9,9 +9,6 @@ SceneJS._deformModule = new (function() {
     var stackLen = 0;
     var dirty;
 
-    var viewMat;
-    var modelMat;
-
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SCENE_COMPILING,
             function() {
@@ -24,18 +21,6 @@ SceneJS._deformModule = new (function() {
              function() {
                  dirty = true;
              });    
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
-            function(params) {
-                viewMat = params.matrix;
-            });
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.MODEL_TRANSFORM_UPDATED,
-            function(params) {
-                modelMat = params.matrix;
-            });
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_RENDERING,
@@ -51,26 +36,20 @@ SceneJS._deformModule = new (function() {
             });
 
     this.pushDeform = function(id, deform) {
-        var d = {
-            verts: []
-        };
+        var modelMat = SceneJS._modelTransformModule.getTransform().matrix;
         var vert;
         for (var i = 0, len = deform.verts.length; i < len; i++) {
             vert = deform.verts[i];
-            d.verts.push({
-                pos: SceneJS._math_transformPoint3(viewMat, SceneJS._math_transformPoint3(modelMat, [vert.x, vert.y, vert.z])) ,
-                mode: vert.mode,
-                weight: vert.weight
-            });
+            vert.worldPos = SceneJS._math_transformPoint3(modelMat, [vert.x, vert.y, vert.z]);
         }
         idStack[stackLen] = id;
-        deformStack[stackLen] = d;
+        deformStack[stackLen] = deform;
         stackLen++;
         dirty = true;
     };
 
     this.popDeform = function() {
-        stackLen--;
+     //   stackLen--;
         dirty = true;
     };
 

@@ -241,7 +241,7 @@ SceneJS.createNode({
                                     ]
                                 }
                             ]
-                        }                           
+                        }
                     ]
                 }
             ]
@@ -262,8 +262,9 @@ SceneJS.createNode({
 
 SceneJS.setDebugConfigs({
     compilation : {
-        enabled : false
+        enabled : true
     }
+
 });
 
 

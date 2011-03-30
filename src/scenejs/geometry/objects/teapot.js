@@ -5806,7 +5806,7 @@ SceneJS.Teapot = function() {
             var result = [];
             for (var i = 0; i < ar.length; i++) {
                 if (numPerElement && ar[i].length != numPerElement)
-                    throw new SceneJS.errors.InvalidNodeConfigException("Bad geometry array element");
+                    throw "Bad geometry array element";
                 for (var j = 0; j < ar[i].length; j++)
                     result.push(ar[i][j]);
             }

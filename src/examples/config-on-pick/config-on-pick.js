@@ -465,6 +465,9 @@ SceneJS.createNode({
 SceneJS.setDebugConfigs({
     compilation : {
         enabled : true
+    },
+     webgl: {
+        logTrace: false
     }
 });
 

@@ -134,9 +134,9 @@ SceneJS.Material.prototype.getHighlightBaseColor = function() {
  */
 SceneJS.Material.prototype.setSpecularColor = function(color) {
     this._attr.specularColor = color ? {
-        r: color.r != undefined && color.r != null ? color.r : 0.5,
-        g: color.g != undefined && color.g != null ? color.g : 0.5,
-        b: color.b != undefined && color.b != null ? color.b : 0.5
+        r: color.r != undefined && color.r != null ? color.r : 0.0,
+        g: color.g != undefined && color.g != null ? color.g : 0.0,
+        b: color.b != undefined && color.b != null ? color.b : 0.0
     } : null;
 };
 
