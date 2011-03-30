@@ -172,7 +172,7 @@ SceneJS.createNode({
 
                                                             flags: {
                                                                 transparent: true,
-                                                                backfaces: false ,
+                                                                backfaces: true ,
                                                                 enabled: true,
                                                                 specular:false
                                                                 ,
