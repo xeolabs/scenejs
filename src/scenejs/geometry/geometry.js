@@ -65,6 +65,20 @@
  *
  *        ],
  *
+ *        // Optional colours for vertices
+ *
+ *        colors : [
+ *
+ *            // Vertices 0,1,2,3
+ *
+ *            1.0, 0.0, 0.0, 1.0,
+ *            0.0, 1.0, 0.0, 1.0,
+ *            0.0, 0.0, 1.0, 1.0,
+ *            1.0, 1.0, 1.0  1.0,
+ *
+ *            // ...
+ *        ],
+ *
  *        // Mandatory indices - these organise the positions, normals and uv texture coordinates into geometric
  *        // primitives in accordance with the "primitive" parameter, in this case a set of three indices for each triangle.
  *        // Note that each triangle in this example is specified in counter-clockwise winding order. You can specify them in
@@ -230,8 +244,9 @@ SceneJS.Geometry.prototype._getArrays = function() {
         return this._attr;
     } else {
         if (!this._handle) {
-            throw SceneJS._errorModule.fatalError(new SceneJS.errors.Exception(
-                    "Invalid node state exception: geometry stream not loaded yet - can't get boundary yet"));
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.NODE_ILLEGAL_STATE,
+                    "Invalid node state exception: geometry stream not loaded yet - can't get boundary yet");
         }
         return this._handle.arrays;
     }

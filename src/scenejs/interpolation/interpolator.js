@@ -63,24 +63,24 @@ SceneJS.Interpolator.prototype._init = function(params) {
     if (params.keys) {
         if (!params.values) {
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.InvalidNodeConfigException(
-                            "SceneJS.Interpolator configuration incomplete: " +
-                            "keys supplied but no values - must supply a value for each key"));
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "SceneJS.Interpolator configuration incomplete: " +
+                    "keys supplied but no values - must supply a value for each key");
         }
         for (var i = 1; i < params.keys.length; i++) {
             if (params.keys[i - 1] >= params.keys[i]) {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidNodeConfigException(
-                                "SceneJS.Interpolator configuration invalid: " +
-                                "two invalid keys found ("
-                                        + (i - 1) + " and " + i + ") - key list should contain distinct values in ascending order"));
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "SceneJS.Interpolator configuration invalid: " +
+                        "two invalid keys found ("
+                                + (i - 1) + " and " + i + ") - key list should contain distinct values in ascending order");
             }
         }
     } else if (params.values) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidNodeConfigException(
-                        "SceneJS.Interpolator configuration incomplete: " +
-                        "values supplied but no keys - must supply a key for each value"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Interpolator configuration incomplete: " +
+                "values supplied but no keys - must supply a key for each value");
     }
     this._attr.keys = params.keys || [];
     this._attr.values = params.values || [];
@@ -100,20 +100,20 @@ SceneJS.Interpolator.prototype._init = function(params) {
         case 'cubic':
             if (params.keys.length < 4) {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidNodeConfigException(
+                       SceneJS.errors.ILLEGAL_NODE_CONFIG,
                                 "SceneJS.Interpolator configuration invalid: minimum of four keyframes " +
                                 "required for cubic - only "
                                         + params.keys.length
-                                        + " are specified"));
+                                        + " are specified");
             }
             break;
         case 'slerp':
             break;
         default:
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.InvalidNodeConfigException(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
                             "SceneJS.Interpolator configuration invalid:  mode not supported - " +
-                            "only 'linear', 'cosine', 'cubic', 'constant' and 'slerp' are supported"));
+                            "only 'linear', 'cosine', 'cubic', 'constant' and 'slerp' are supported");
         /*
 
 
@@ -164,14 +164,14 @@ SceneJS.Interpolator.prototype._preCompile = function(traversalContext) {
 
     if (!this._attr.target) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.NodeConfigExpectedException(
-                        "SceneJS.Interpolator config expected: target"));
+                SceneJS.errors.NODE_CONFIG_EXPECTED,
+                "SceneJS.Interpolator config expected: target");
     }
 
     if (!this._attr.targetProperty) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.NodeConfigExpectedException(
-                        "SceneJS.Interpolator config expected: targetProperty"));
+                SceneJS.errors.NODE_CONFIG_EXPECTED,
+                "SceneJS.Interpolator config expected: targetProperty");
     }
 
     /* Generate next value
@@ -293,8 +293,9 @@ SceneJS.Interpolator.prototype._interpolate = function(k) {
             return this._slerp(k);
         default:
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.InternalException("SceneJS.Interpolator internal error - interpolation mode not switched: '"
-                            + this._attr.mode + "'"));
+                    SceneJS.errors.ERROR,
+                    "SceneJS.Interpolator internal error - interpolation mode not switched: '"
+                            + this._attr.mode + "'");
     }
 };
 

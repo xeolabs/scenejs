@@ -1,19 +1,20 @@
 /**
- * Querying the World, View and Canvas-space coordinate origins of scene nodes
+ * Querying node World, View and Canvas-space origins via a "rendered" event
  *
- * For each of these teapots we're using a SceneJS utility that uses the JSON API to walk the nodes up the path to
- * the root while gathering the various modelling and viewing matrices we find along the way. As we do that, we're able
- * to determine the center of each teapot on World, View and Canvas space.
+ * For each of these teapots we're listening to "rendered" events on their scene nodes, which report
+ * their centre points in various coordinate systems, along with the Model, View and Projection matrices
+ * that are applied to them.
  *
  * Using the Canvas space centers, we can then float a DIV over each teapot on the canvas to report its center points.
  *
- * More info on the utility API here: http://scenejs.wikispaces.com/SceneJS.utils
+ * More info here: http://scenejs.wikispaces.com/SceneJS.withNode+-+bind
  *
  * Lindsay Kay
  * lindsay.kay@xeolabs.com
  * October 2010
  *
  */
+
 SceneJS.createNode({
     type: "scene",
     id: "my-scene",

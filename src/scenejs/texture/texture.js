@@ -140,19 +140,22 @@ SceneJS.Texture.prototype._init = function(params) {
     this._waitForLoad = (params.waitForLoad === false) ? params.waitForLoad : true;
 
     if (!params.layers) {
-        throw new SceneJS.errors.NodeConfigExpectedException(
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.NODE_CONFIG_EXPECTED,
                 "texture layers missing");
     }
 
     if (!SceneJS._isArray(params.layers)) {
-        throw new SceneJS.errors.NodeConfigExpectedException(
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.NODE_CONFIG_EXPECTED,
                 "texture layers should be an array");
     }
 
     for (var i = 0; i < params.layers.length; i++) {
         var layerParam = params.layers[i];
         if (!layerParam.uri && !layerParam.imageBuf) {
-            throw new SceneJS.errors.NodeConfigExpectedException(
+            throw SceneJS._errorModule.fatalError(
+                    SceneJS.errors.NODE_CONFIG_EXPECTED,
                     "SceneJS.Texture.layers[" + i + "] has no uri or imageBuf specified");
         }
         if (layerParam.applyFrom) {
@@ -161,21 +164,22 @@ SceneJS.Texture.prototype._init = function(params) {
                 layerParam.applyFrom != "normal" &&
                 layerParam.applyFrom != "geometry") {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidNodeConfigException(
-                                "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
-                                "should be either 'uv', 'uv2', 'normal' or 'geometry'"));
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "SceneJS.Texture.layers[" + i + "].applyFrom value is unsupported - " +
+                        "should be either 'uv', 'uv2', 'normal' or 'geometry'");
             }
         }
         if (layerParam.applyTo) {
             if (layerParam.applyTo != "baseColor" && // Colour map
                 layerParam.applyTo != "specular" && // Specular map
                 layerParam.applyTo != "emit" && // Emission map
+                layerParam.applyTo != "alpha" && // Alpha map
                 //   layerParam.applyTo != "diffuseColor" &&
                 layerParam.applyTo != "normals") {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidNodeConfigException(
-                                "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
-                                "should be either 'baseColor', 'specular' or 'normals'"));
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
+                                "should be either 'baseColor', 'specular' or 'normals'");
             }
         }
         this._layers.push({
@@ -303,7 +307,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
 
                                     if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
                                         self._changeState(SceneJS.Texture.STATE_ERROR, {
-                                            exception: new SceneJS.errors.Exception("SceneJS.Exception - " + message)
+                                            exception: new SceneJS.errors.Exception(SceneJS.errors.ERROR, "SceneJS.Exception - " + message)
                                         });
                                     }
                                 },
@@ -314,7 +318,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
 
                                     if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
                                         self._changeState(SceneJS.Texture.STATE_ERROR, {
-                                            exception: new SceneJS.errors.Exception("SceneJS.Exception - texture image load stopped - user aborted it?")
+                                            exception: new SceneJS.errors.Exception(SceneJS.errors.ERROR, "SceneJS.Exception - texture image load stopped - user aborted it?")
                                         });
                                     }
                                 });
@@ -437,12 +441,14 @@ SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
  */
 SceneJS.Texture.prototype.setLayer = function(cfg) {
     if (cfg.index == undefined || cfg.index == null) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Invalid SceneJS.Texture#setLayerConfig argument: index null or undefined"));
+        throw SceneJS._errorModule.fatalError(
+                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Invalid SceneJS.Texture#setLayerConfig argument: index null or undefined");
     }
     if (cfg.index < 0 || cfg.index >= this._layers.length) {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)"));
+        throw SceneJS._errorModule.fatalError(
+                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)");
     }
     var layer = this._layers[cfg.index];
     cfg = cfg.cfg || {};
@@ -469,8 +475,9 @@ SceneJS.Texture.prototype.setLayers = function(layers) {
             if (index != undefined || index != null) {
 
                 if (index < 0 || index >= this._layers.length) {
-                    throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                            "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)"));
+                    throw SceneJS._errorModule.fatalError(
+                             SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                            "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)");
                 }
                 var cfg = layers[index] || {};
                 var layer = this._layers[index];

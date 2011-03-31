@@ -35,15 +35,15 @@ SceneJS._instancingModule = new function() {
     this.acquireInstance = function(id, nodeID) {
         if (instances[nodeID]) {
             SceneJS._errorModule.error(
-                    new SceneJS.errors.CyclicInstanceException(
-                            "SceneJS.Instance attempted to create cyclic instantiation: " + nodeID));
+                    SceneJS.errors.INSTANCE_CYCLE,
+                    "SceneJS.Instance attempted to create cyclic instantiation: " + nodeID);
             return null;
         }
         var node = SceneJS._nodeIDMap[nodeID];
         if (!node) {
             var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_LOADER_SERVICE_ID);
             if (nodeStore) {
-                node = nodeStore.loadNode(nodeID);                
+                node = nodeStore.loadNode(nodeID);
             }
         }
         if (node) {
@@ -75,6 +75,6 @@ SceneJS._instancingModule = new function() {
         instances[nodeID] = undefined;
         idStack.pop();
         countInstances--;
-        SceneJS._renderModule.setIDPrefix((countInstances > 0) ? idStack[countInstances-1] : null);
+        SceneJS._renderModule.setIDPrefix((countInstances > 0) ? idStack[countInstances - 1] : null);
     };
 }();

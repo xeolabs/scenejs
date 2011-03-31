@@ -115,6 +115,9 @@ SceneJS._geometryModule = new (function() {
             if (geo.uvBuf2) {
                 geo.uvBuf2.destroy();
             }
+            if (geo.colorBuf) {
+                geo.colorBuf.destroy();
+            }
         }
         var geoMap = geoMaps[geo.canvas.canvasId];
         if (geoMap) {
@@ -143,11 +146,12 @@ SceneJS._geometryModule = new (function() {
             case "triangle-fan":
                 return context.TRIANGLE_FAN;
             default:
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(// Logs and throws
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "SceneJS.geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
-                        "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'"));
+                        "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
         }
     }
 
@@ -156,7 +160,7 @@ SceneJS._geometryModule = new (function() {
         if (!resource) {
             resource = SceneJS._createKeyForMap(currentGeoMap, "t");
         }
-        
+
         if (typeof source == "string") {
 
             /* Load from stream
@@ -186,18 +190,17 @@ SceneJS._geometryModule = new (function() {
             normals: data.normals ? new Float32Array(data.normals) : undefined,
             uv: data.uv ? new Float32Array(data.uv) : undefined,
             uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
+            colors: data.colors ? new Float32Array(data.colors) : undefined,
             indices: data.indices ? new Int32Array(data.indices) : undefined
         };
     }
 
     this._createGeometry = function(resource, data) {
 
-        //   SceneJS._loggingModule.debug("Creating geometry: '" + resource + "'");
-
         if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
             throw SceneJS._errorModule.fatalError(
-                    new SceneJS.errors.NodeConfigExpectedException(
-                            "SceneJS.geometry node property expected : primitive"));
+                    SceneJS.errors.NODE_CONFIG_EXPECTED, 
+                    "SceneJS.geometry node property expected : primitive");
         }
         var context = canvas.context;
         var usage = context.STATIC_DRAW;
@@ -207,6 +210,7 @@ SceneJS._geometryModule = new (function() {
         var normalBuf;
         var uvBuf;
         var uvBuf2;
+        var colorBuf;
         var indexBuf;
 
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
@@ -231,6 +235,12 @@ SceneJS._geometryModule = new (function() {
                 }
             }
 
+            if (data.colors && data.colors.length > 0) {
+                if (data.colors) {
+                    colorBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.colors, data.colors.length, 4, usage);
+                }
+            }
+
             var primitive;
             if (data.indices && data.indices.length > 0) {
                 primitive = getPrimitiveType(context, data.primitive);
@@ -249,8 +259,13 @@ SceneJS._geometryModule = new (function() {
                 indexBuf : indexBuf,
                 uvBuf: uvBuf,
                 uvBuf2: uvBuf2,
+                colorBuf: colorBuf,
                 arrays: data          // Retain the arrays for geometric ops
             };
+
+            if (data.positions) {
+                // geo.boundary = getBoundary(data.positions);
+            }
 
             currentGeoMap[resource] = geo;
 
@@ -269,6 +284,9 @@ SceneJS._geometryModule = new (function() {
             }
             if (uvBuf2) {
                 uvBuf2.destroy();
+            }
+            if (colorBuf) {
+                colorBuf.destroy();
             }
             if (indexBuf) {
                 indexBuf.destroy();
@@ -306,20 +324,62 @@ SceneJS._geometryModule = new (function() {
         geoStack[stackLen++] = geo;
     };
 
+    function getBoundary(positions) {
+        var boundary = {
+            xmin : SceneJS._math_MAX_DOUBLE,
+            ymin : SceneJS._math_MAX_DOUBLE,
+            zmin : SceneJS._math_MAX_DOUBLE,
+            xmax : SceneJS._math_MIN_DOUBLE,
+            ymax : SceneJS._math_MIN_DOUBLE,
+            zmax : SceneJS._math_MIN_DOUBLE
+        };
+        var x, y, z;
+        for (var i = 0, len = positions.length - 2; i < len; i += 3) {
+            x = positions[i];
+            y = positions[i + 1];
+            z = positions[i + 2];
+
+            if (x < boundary.xmin) {
+                boundary.xmin = x;
+            }
+            if (y < boundary.ymin) {
+                boundary.ymin = y;
+            }
+            if (z < boundary.zmin) {
+                boundary.zmin = z;
+            }
+
+            if (x > boundary.xmax) {
+                boundary.xmax = x;
+            }
+            if (y > boundary.ymax) {
+                boundary.ymax = y;
+            }
+            if (z > boundary.zmax) {
+                boundary.zmax = z;
+            }
+        }
+        return boundary;
+    }
+
     function inheritVertices(geo) {
         var geo2 = {
             primitive: geo.primitive,
+            boundary: geo.boundary,
             normalBuf: geo.normalBuf,
             uvBuf: geo.uvBuf,
             uvBuf2: geo.uvBuf2,
+            colorBuf: geo.colorBuf,
             indexBuf: geo.indexBuf
         };
         for (var i = stackLen - 1; i >= 0; i--) {
             if (geoStack[i].vertexBuf) {
                 geo2.vertexBuf = geoStack[i].vertexBuf;
+                geo2.boundary = geoStack[i].boundary;
                 geo2.normalBuf = geoStack[i].normalBuf;
                 geo2.uvBuf = geoStack[i].uvBuf;           // Vertex and UVs are a package
                 geo2.uvBuf2 = geoStack[i].uvBuf2;
+                geo2.colorBuf = geoStack[i].colorBuf;
                 return geo2;
             }
         }

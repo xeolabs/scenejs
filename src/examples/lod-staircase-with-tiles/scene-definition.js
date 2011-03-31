@@ -69,6 +69,7 @@ SceneJS.createNode({
                             dir:                    { x: 2.0, y: 1.0, z: 0.0 }
                         },
 
+
                         /* Instantiate our staircase, defined in staircase.js
                          */
                         {
@@ -104,7 +105,7 @@ SceneJS.createNode({
 
 SceneJS.setDebugConfigs({
     compilation : {
-        enabled : false
+        enabled : true
     }
 });
 
@@ -127,7 +128,7 @@ canvas.addEventListener('mousemove', function(e) {
         speed = {x: e.clientX - origin.x, y: e.clientY - origin.y};
 }, false);
 
-canvas.addEventListener('mousewheel', function(e) {
+canvas.addEventListener('mousewheel', function(event) {
     var delta = 0;
     if (!event) event = window.event;
     if (event.wheelDelta) {

@@ -264,8 +264,9 @@ SceneJS.Scene.prototype.getLayers = function() {
  */
 SceneJS.Scene.prototype.start = function(cfg) {
     if (this._destroyed) {
-        throw new SceneJS.errors.InvalidSceneGraphException
-                ("Attempted start on Scene that has been destroyed");
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.NODE_ILLEGAL_STATE,
+                "Attempted start on Scene that has been destroyed");
     }
 
     /*
@@ -286,24 +287,33 @@ SceneJS.Scene.prototype.start = function(cfg) {
 
         /* Render loop
          */
+        var sleeping = false;
+
+        SceneJS._compileModule.nodeUpdated(this, "start");
+
         window[fnName] = function() {
-            if (cfg.idleFunc) {
-                cfg.idleFunc();
-            }
+
             if (self._running) { // idleFunc may have stopped render loop
 
-                if (SceneJS._compileModule._needNewCompile) {
+                if (cfg.idleFunc) {
+                    cfg.idleFunc();
+                }
+
+                if (SceneJS._compileModule.triggerCompile) {
 
                     self._compileWithEvents();
+
+                    sleeping = false;
+
+                } else {
+                    if (!sleeping && cfg.sleepFunc) {
+                        cfg.sleepFunc();
+                    }
+                    sleeping = true;
                 }
-                //                if (SceneJS._picking) {
-                //                    alert("pick");
-                //                SceneJS._renderModule.pick(SceneJS._picking);
-                //                    SceneJS._picking = null;
-                //                }
             }
         };
-        this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 100));
+        this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 60));
     }
 };
 
@@ -320,8 +330,9 @@ SceneJS.Scene.prototype.isRunning = function() {
  */
 SceneJS.Scene.prototype.render = function() {
     if (this._destroyed) {
-        throw new SceneJS.errors.InvalidSceneGraphException
-                ("Attempted render on Scene that has been destroyed");
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.NODE_ILLEGAL_STATE,
+                "Attempted render on Scene that has been destroyed");
     }
 
     /*
@@ -341,62 +352,47 @@ SceneJS.Scene.prototype.render = function() {
 
 
 /**
- * Picks whatever {@link SceneJS.Geometry} will be rendered at the given canvas coordinates. When this is called within
- * the idle function of a currently running render loop (ie. started with {@link #start) then pick will be performed on
- * the next render. When called on a non-running scene, the pick is performed immediately.
+ * Picks whatever {@link SceneJS.Geometry} will be rendered at the given canvas coordinates.
+ *
  * When a node is picked (hit), then all nodes on the traversal path to that node that have "picked" listeners will
  * receive a "picked" event as they are rendered (see examples and wiki for more info).
+ *
+ * You can attach "notpicked" listeners to the {@link SceneJS.Scene} node to catch when
+ * nothing is picked.
  *
  * @param canvasX Canvas X-coordinate
  * @param canvasY Canvas Y-coordinate
  */
 SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
     if (this._destroyed) {
-        throw new SceneJS.errors.InvalidSceneGraphException
-                ("Attempted pick on Scene that has been destroyed");
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.NODE_ILLEGAL_STATE,
+                "Attempted pick on Scene that has been destroyed");
     }
     if (!this._sceneId) {
-        throw new SceneJS.errors.InvalidSceneGraphException
-                ("Attempted pick on Scene that has not yet rendered");
+        throw SceneJS._errorModule.fatalError(
+                SceneJS.errors.NODE_ILLEGAL_STATE,
+                "Attempted pick on Scene that has not been rendered");
     }
 
-    //    SceneJS._picking = {
-    //        sceneId: this._sceneId,
-    //        canvasX : canvasX,
-    //        canvasY : canvasY
-    //    };
-
-    SceneJS._renderModule.pick({
+    if (!SceneJS._renderModule.pick({
         sceneId: this._sceneId,
         canvasX : canvasX,
-        canvasY : canvasY }, options );
+        canvasY : canvasY }, options)) {
+
+        this._fireEvent("notpicked", { }, options);
+    }
 };
 
 SceneJS.Scene.prototype._compile = function() {
-
     SceneJS._actionNodeDestroys();
     SceneJS._sceneModule.activateScene(this._sceneId);
-
-    var iterative = false;
-
-    if (iterative) {
-        this._compileBranch(this, true);
-
-    } else {
-        if (SceneJS._compileModule.preVisitNode(this)) {
-            SceneJS._layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
-            var traversalContext = {};
-
-            this._compileNodes(traversalContext);
-
-
-            //        SceneJS._compileModule.withSubTreesToCompile(function(node) {
-            //            node._compile(traversalContext);
-            //        });
-        }
-        SceneJS._compileModule.postVisitNode(this);
+    if (SceneJS._compileModule.preVisitNode(this)) {
+        SceneJS._layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
+        var traversalContext = {};
+        this._compileNodes(traversalContext);
     }
-
+    SceneJS._compileModule.postVisitNode(this);
     SceneJS._sceneModule.deactivateScene();
     SceneJS._actionNodeDestroys();
 };

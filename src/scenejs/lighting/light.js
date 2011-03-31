@@ -79,8 +79,9 @@ SceneJS.Light.prototype._init = function(params) {
 SceneJS.Light.prototype.setMode = function(mode) {
     mode = mode || "dir";
     if (mode != "dir" && mode != "point") {
-        throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException(
-                "SceneJS.Light unsupported mode - should be 'dir' or 'point' or 'ambient'"));
+          throw SceneJS._errorModule.fatalError(
+                       SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                                "SceneJS.Light unsupported mode - should be 'dir' or 'point' or 'ambient'");
     }
     this._light.mode = mode;
     return this;

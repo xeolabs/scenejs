@@ -88,7 +88,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/flags/flagsModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/flags/flags.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/load-status/loadStatusModule.js"/>
 

@@ -126,7 +126,7 @@ SceneJS.Renderer.prototype.getBlendEquationSeparate = function() {
 SceneJS.Renderer.prototype.setBlendFunc = function(funcs) {
     this._attr.blendFunc = funcs ? {
         sfactor : funcs.sfactor || "srcAlpha",
-        dfactor : funcs.dfactor || "less"
+        dfactor : funcs.dfactor || "one"
     } : undefined;
     this._memoLevel = 0;
 };

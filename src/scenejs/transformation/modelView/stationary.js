@@ -37,10 +37,7 @@ SceneJS.Stationary.prototype._compile = function(traversalContext) {
         if (this._memoLevel == 0 || (!superXform.fixed)) {
             var tempMat = SceneJS._math_mat4();
             SceneJS._math_mulMat4(superXform.matrix,
-                        SceneJS._math_translationMat4c(
-                                lookAt.eye.x,
-                                lookAt.eye.y,
-                                lookAt.eye.z), tempMat)
+                    SceneJS._math_translationMat4v(lookAt.eye), tempMat);
             this._xform = {
                 matrix: tempMat,
                 lookAt: lookAt,
@@ -56,6 +53,8 @@ SceneJS.Stationary.prototype._compile = function(traversalContext) {
         SceneJS._viewTransformModule.popTransform();
     } else {
         this._compileNodes(traversalContext);
+
+        SceneJS._stationaryModule.popStationary();
     }
 };
 

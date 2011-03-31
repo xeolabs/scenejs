@@ -187,8 +187,9 @@ SceneJS.Node._ArgParser = new (function() {
         if (args.length > 0) {
             var arg = args[0];
             if (!arg) {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                        ("First element in node config is null or undefined"));
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "First element in node config is null or undefined");
             }
             if (arg._compile) {   // Determines arg to be a node
                 this._parseChild(arg, args, 1, node);
@@ -257,8 +258,9 @@ SceneJS.Node._ArgParser = new (function() {
             if (arg._compile) { // Determines arg to be a node
                 this._parseChild(arg, args, i + 1, node);
             } else {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                        ("Unexpected type for node argument " + i + " - expected a child node"));
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "Unexpected type for node argument " + i + " - expected a child node");
             }
         }
     };
@@ -276,14 +278,16 @@ SceneJS.Node._ArgParser = new (function() {
         if (i < args.length) {
             arg = args[i];
             if (!arg) {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                        ("Node argument " + i + " is null or undefined"));
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "Node argument " + i + " is null or undefined");
             }
             if (arg._attr) {
                 this._parseChild(arg, args, i + 1, node);
             } else {
-                throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                        ("Unexpected type for node argument " + i + " - expected a child node"));
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "Unexpected type for node argument " + i + " - expected a child node");
             }
         }
     };
@@ -698,16 +702,16 @@ SceneJS.Node.prototype.removeNodeAt = function(index) {
 SceneJS.Node.prototype.removeNode = function(node) {
     if (!node) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#removeNode - node argument undefined"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#removeNode - node argument undefined");
     }
     if (!node._compile) {
         if (typeof node == "string") {
             var gotNode = SceneJS._nodeIDMap[node];
             if (!gotNode) {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidSceneGraphException(
-                                "SceneJS.Node#removeNode - node not found anywhere: '" + node + "'"));
+                        SceneJS.errors.NODE_NOT_FOUND,
+                        "SceneJS.Node#removeNode - node not found anywhere: '" + node + "'");
             }
             node = gotNode;
         }
@@ -721,8 +725,8 @@ SceneJS.Node.prototype.removeNode = function(node) {
         }
     }
     throw SceneJS._errorModule.fatalError(
-            new SceneJS.errors.InvalidSceneGraphException(
-                    "SceneJS.Node#removeNode - child node not found: " + (node._compile ? ": " + node._attr.id : node)));
+            SceneJS.errors.NODE_NOT_FOUND,
+            "SceneJS.Node#removeNode - child node not found: " + (node._compile ? ": " + node._attr.id : node));
 };
 
 /** Removes all child nodes and returns them in an array.
@@ -746,8 +750,8 @@ SceneJS.Node.prototype.removeNodes = function() {
 SceneJS.Node.prototype.addNodes = function(nodes) {
     if (!nodes) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#addNodes - nodes argument is undefined"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#addNodes - nodes argument is undefined");
     }
     for (var i = nodes.length - 1; i >= 0; i--) {
         this.addNode(nodes[i]);
@@ -763,16 +767,16 @@ SceneJS.Node.prototype.addNodes = function(nodes) {
 SceneJS.Node.prototype.addNode = function(node) {
     if (!node) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#addNode - node argument is undefined"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#addNode - node argument is undefined");
     }
     if (!node._compile) {
         if (typeof node == "string") {
             var gotNode = SceneJS._nodeIDMap[node];
             if (!gotNode) {
                 throw SceneJS._errorModule.fatalError(
-                        new SceneJS.errors.InvalidSceneGraphException(
-                                "SceneJS.Node#addNode - node not found: '" + node + "'"));
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "SceneJS.Node#addNode - node not found: '" + node + "'");
             }
             node = gotNode;
         } else {
@@ -781,13 +785,13 @@ SceneJS.Node.prototype.addNode = function(node) {
     }
     if (!node._compile) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#addNode - node argument is not a SceneJS.Node or subclass!"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#addNode - node argument is not a SceneJS.Node or subclass!");
     }
     if (node._parent != null) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#addNode - node argument is still attached to another parent!"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#addNode - node argument is still attached to another parent!");
     }
     this._children.push(node);
     node._parent = this;
@@ -816,21 +820,21 @@ SceneJS.Node.prototype.findNodeIndex = function(sid) {
 SceneJS.Node.prototype.insertNode = function(node, i) {
     if (!node) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#insertNode - node argument is undefined"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#insertNode - node argument is undefined");
     }
     if (!node._compile) {
         node = SceneJS._parseNodeJSON(node);
     }
     if (!node._compile) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#insertNode - node argument is not a SceneJS.Node or subclass!"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#insertNode - node argument is not a SceneJS.Node or subclass!");
     }
     if (node._parent != null) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#insertNode - node argument is still attached to another parent!"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#insertNode - node argument is still attached to another parent!");
     }
 
     if (i == undefined || i == null) {
@@ -850,8 +854,8 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
 
     } else if (i < 0) {
         throw SceneJS._errorModule.fatalError(
-                new SceneJS.errors.InvalidSceneGraphException(
-                        "SceneJS.Node#insertNode - node index out of range: -1"));
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "SceneJS.Node#insertNode - node index out of range: -1");
 
     } else if (i >= this._children.length) {
         this._children.push(node);

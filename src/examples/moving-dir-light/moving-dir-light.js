@@ -48,7 +48,7 @@ SceneJS.createNode({
                             nodes: [
                                 {
                                     type: "light",
-                                    
+
                                     mode: "dir",
 
                                     /* Colour of our light
@@ -96,7 +96,7 @@ SceneJS.createNode({
                                             nodes: [
                                                 {
                                                     type: "scale",
-                                                    x:0.5,
+                                                    x: 0.5,
                                                     y: 0.5,
                                                     z: 0.5,
                                                     nodes: [
@@ -216,7 +216,7 @@ function mouseMove(event) {
         if (Math.abs(roty) > Math.abs(rotx)) {
 
             SceneJS.withNode("myQuaternion").add({
-                rotation:{   
+                rotation:{
                     y: 1,
                     angle: roty
                 }

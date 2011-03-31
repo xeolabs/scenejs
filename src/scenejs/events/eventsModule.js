@@ -245,6 +245,8 @@ SceneJS.bind = function(name, func) {
                 SceneJS._eventModule.ERROR,
                 function(params) {
                     func({
+                        code: params.code,
+                        errorName: params.errorName,
                         exception: params.exception,
                         fatal: params.fatal
                     });
