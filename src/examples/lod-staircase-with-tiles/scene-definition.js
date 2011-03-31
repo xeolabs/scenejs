@@ -67,7 +67,7 @@ SceneJS.createNode({
                             diffuse:                true,
                             specular:               true,
                             dir:                    { x: 2.0, y: 1.0, z: 0.0 }
-                        },
+                        },                      
 
 
                         /* Instantiate our staircase, defined in staircase.js

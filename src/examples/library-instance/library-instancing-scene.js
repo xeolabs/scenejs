@@ -40,7 +40,7 @@ SceneJS.createNode({
 
             baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-            specular:       0.9,
+            specular:       0.2,
             shine:          6.0
         },
 
@@ -54,7 +54,7 @@ SceneJS.createNode({
 
             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-            specular:       0.9,
+            specular:       0.2,
             shine:          6.0,
 
             nodes: [

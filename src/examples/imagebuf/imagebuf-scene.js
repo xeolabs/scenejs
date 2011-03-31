@@ -66,27 +66,12 @@ SceneJS.createNode({
                                 {
                                     type: "light",
                                     mode:                   "dir",
-                                    color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
                                     diffuse:                true,
                                     specular:               true,
-                                    dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                                    dir:                    { x: 0.0, y: 0.0, z: -1.0 }
                                 },
-                                {
-                                    type: "light",
-                                    mode:                   "dir",
-                                    color:                  { r: 0.5, g: 1.0, b: 0.5 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                                },
-                                {
-                                    type: "light",
-                                    mode:                   "dir",
-                                    color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                                },
+
 
                                 /* Light blue backdrop slab
                                  */
@@ -118,7 +103,7 @@ SceneJS.createNode({
                                     ]
                                 },
 
-                                /* Blue teapot, oriented with a couple of rotations
+                                /* Teapot, oriented with a couple of rotations
                                  */
                                 {
                                     type: "rotate",
@@ -138,7 +123,7 @@ SceneJS.createNode({
                                                 {
                                                     type: "material",
                                                     emit: 0,
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    baseColor:      { r: 0.5, g: 0.5, b: 0.9 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                     specular:       0.9,
                                                     shine:          100.0,
@@ -187,7 +172,7 @@ SceneJS.createNode({
                         {
                             type:          "light",
                             mode:          "dir",
-                            color:         { r: 1.0, g: 0.5, b: 0.5 },
+                            color:         { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:       true,
                             specular:      false,
                             dir:           { x: 1.0, y: 1.0, z: -1.0 }
@@ -195,24 +180,16 @@ SceneJS.createNode({
                         {
                             type:          "light",
                             mode:          "dir",
-                            color:         { r: 0.5, g: 1.0, b: 0.5 },
+                            color:         { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:       true,
                             specular:      false,
                             dir:           { x: 0.0, y: 1.0, z: 1.0 }
                         },
                         {
-                            type:          "light",
-                            mode:          "dir",
-                            color:         { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:       true,
-                            specular:      false,
-                            dir:           { x: -1.0, y: 0.0, z: -1.0 }
-                        },
-                        {
                             type: "material",
                             baseColor:      { r: 0.5, g: 0.5, b: 0.5 },
-                            specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
-                            specular:       0.9,
+                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                            specular:       0.2,
                             shine:          6.0,
 
                             nodes: [

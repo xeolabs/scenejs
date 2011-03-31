@@ -11,9 +11,7 @@ SceneJS.createNode({
     canvasId: "theCanvas",
     loggingElementId: "theLoggingDiv",
 
-    flags: {
-        backfaces: true
-    },
+  
 
     nodes: [
         {
@@ -172,10 +170,8 @@ SceneJS.createNode({
 
                                                             flags: {
                                                                 transparent: true,
-                                                                backfaces: true ,
                                                                 enabled: true,
-                                                                specular:false
-                                                                ,
+                                                                specular:false,
                                                                 blendFunc: {
                                                                     sfactor: "srcAlpha",
                                                                     dfactor: "one"

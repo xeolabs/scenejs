@@ -58,35 +58,27 @@ SceneJS.createNode({
                     nodes: [
 
 
-                        /* A lights node inserts  point lights into the world-space.
-                         * You can have many of these, nested within modelling transforms
-                         * if you want to move them around.
+                        /* A lights node inserts point lights into scene, to illuminate everything
+                         * that is encountered after them during scene traversal.
+                         *
+                         * You can have many of these, nested within modelling transforms if you want to move them.
                          */
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: 0.5, z: -1.0 }
                         },
 
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                            color:                  { r: 1.0, g: 1.0, b: 0.8 },
                             diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            specular:               false,
+                            dir:                    { x: 0.0, y: 0.5, z: -1.0 }
                         },
 
                         /* Next, modelling transforms to orient our teapot. See how these have IDs,
@@ -115,37 +107,28 @@ SceneJS.createNode({
                                             emit: 0,
                                             baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                            specular:       0.9,
-                                            shine:          100.0,
+                                            specular:       0.7,
+                                            shine:          10.0,
 
                                             nodes: [
                                                 {
-                                                    type: "colortrans",
-
-                                                    add: { r: 0.5 },
-
+                                                    type: "translate",
+                                                    // Example translation
+                                                    x:0.0,
+                                                    y:0.0,
+                                                    z:0.0,
 
                                                     nodes : [
                                                         {
-                                                            type: "translate",
-                                                            // Example translation
-                                                            x:0.0,
-                                                            y:0.0,
-                                                            z:0.0,
+                                                            type: "scale",
+                                                            // Example scaling
+                                                            x:1.0,
+                                                            y:1.0,
+                                                            z:1.0,
 
-                                                            nodes : [
+                                                            nodes: [
                                                                 {
-                                                                    type: "scale",
-                                                                    // Example scaling
-                                                                    x:1.0,
-                                                                    y:1.0,
-                                                                    z:1.0,
-
-                                                                    nodes: [
-                                                                        {
-                                                                            type : "teapot"
-                                                                        }
-                                                                    ]
+                                                                    type : "teapot"
                                                                 }
                                                             ]
                                                         }

@@ -63,7 +63,7 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                         SceneJS.material({
                                                             baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
                                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                            specular:       0.9,
+                                                            specular:       0.2,
                                                             shine:          6.0
                                                         },
                                                                 SceneJS.node({ sid: "right-blue-sphere" },
@@ -151,7 +151,7 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                         SceneJS.material({
                                                             baseColor:      { r: 0.9, g: 0.3, b: 0.3 },
                                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                            specular:       0.9,
+                                                            specular:       0.2,
                                                             shine:          6.0
 
                                                         },

@@ -43,30 +43,14 @@ SceneJS.createNode({
                         far : 300.0
                     },
 
-                    nodes: [
+                    nodes: [                     
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.5, g: 0.5, b: 0.5 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.7, g: 0.7, b: 0.7 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            dir:                    { x: 0.0, y: 0.0, z: -1.0 }
                         },
 
                         /* Next, modelling transforms to orient our geometry
@@ -90,7 +74,7 @@ SceneJS.createNode({
                                             type: "material",
                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                            specular:       0.9,
+                                            specular:       0.2,
                                             shine:          6.0,
 
                                             nodes: [
@@ -114,7 +98,7 @@ SceneJS.createNode({
                                                             sourceFormat:"alpha",
                                                             sourceType: "unsignedByte",
                                                             applyTo:"baseColor",
-                                                            blendMode:"multiply",
+                                                            blendMode:"add",
 
                                                             /* Texture rotation angle in degrees
                                                              */
@@ -145,7 +129,7 @@ SceneJS.createNode({
                                                          */
                                                         {
 
-                                                            type: "geometry",                                                         
+                                                            type: "geometry",
 
                                                             /* Optional resource name, must be unique among all
                                                              * geometries - if another geometry has already
@@ -359,7 +343,7 @@ SceneJS.createNode({
                                                                 1.0, 0.0, 1.0, 1.0,
                                                                 0.0, 1.0, 1.0, 1.0,
                                                                 1.0, 1.0, 0.0, 1.0,
-                                                                1.0, 1.0, 1.0, 1.0,
+                                                                1.0, 1.0, 1.0, 1.0
                                                             ],
 
                                                             /* Indices - these organise the
