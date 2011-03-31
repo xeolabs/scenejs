@@ -57,22 +57,26 @@ SceneJS._viewTransformModule = new (function() {
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_RENDERING,
             function() {
-                if (dirty) {
-
-                    /* Lazy-compute WebGL matrices
-                     */
-                    if (!transform.matrixAsArray) {
-                        transform.matrixAsArray = new Float32Array(transform.matrix);
-                    }
-                    if (!transform.normalMatrixAsArray) {
-                        transform.normalMatrixAsArray = new Float32Array(
-                                SceneJS._math_transposeMat4(
-                                        SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
-                    }
-                    SceneJS._renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray, transform.lookAt);
-                    dirty = false;
-                }
+                loadTransform();
             });
+
+    function loadTransform() {
+        if (dirty) {
+
+            /* Lazy-compute WebGL matrices
+             */
+            if (!transform.matrixAsArray) {
+                transform.matrixAsArray = new Float32Array(transform.matrix);
+            }
+            if (!transform.normalMatrixAsArray) {
+                transform.normalMatrixAsArray = new Float32Array(
+                        SceneJS._math_transposeMat4(
+                                SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
+            }
+            SceneJS._renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray, transform.lookAt);
+            dirty = false;
+        }
+    }
 
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.SHADER_DEACTIVATED,
@@ -88,6 +92,7 @@ SceneJS._viewTransformModule = new (function() {
         transform = t;
         dirty = true;
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEW_TRANSFORM_UPDATED, transform);
+       loadTransform();
     };
 
     this.getTransform = function() {
@@ -104,6 +109,7 @@ SceneJS._viewTransformModule = new (function() {
             transform = DEFAULT_TRANSFORM;
         }
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEW_TRANSFORM_UPDATED, transform);
+        loadTransform();
         dirty = true;
     };
 

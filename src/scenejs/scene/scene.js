@@ -416,8 +416,6 @@ SceneJS.Scene.prototype._compile = function() {
 
                 SceneJS._pickingModule.preVisitNode(p.node);
 
-                var nodeFlagsProcessed = false;
-
                 if (SceneJS._compileModule.preVisitNode(p.node)) {
 
                     if (SceneJS._flagsModule.preVisitNode(p.node)) {
@@ -470,19 +468,6 @@ SceneJS.Scene.prototype._compile = function() {
                             }
                         }
                     }
-
-                    nodeFlagsProcessed = true;
-                }
-
-                /* If compile module prevented descent into any child then we are performing a partial
-                 * re-compilation in which we are updating some existing states held by the renderer module.
-                 * During full compilations, we rely on geometry nodes to cause the renderer module to
-                 * gather dirty states accumulated by traversed nodes, however in this case we may not be
-                 * visiting those geometries, so we'll trigger that explicitly.
-                 */
-
-                if (nodeFlagsProcessed) {
-                    SceneJS._renderModule.marshallStates();
                 }
 
             } else {                        // Node was preCompiled

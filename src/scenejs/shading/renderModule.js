@@ -88,15 +88,14 @@ SceneJS._renderModule = new (function() {
     };
 
     var DEFAULT_FLAGS = {
-        flags: {
-            fog: true,              // Fog enabled
-            colortrans : true,      // Effect of colortrans enabled
-            picking : true,         // Picking enabled
-            clipping : true,        // User-defined clipping enabled
-            enabled : true,         // Node not culled from traversal
-            visible : true,         // Node visible - when false, everything happens except geometry draw
-            transparent: false     // Node transparent - works in conjunction with matarial alpha properties
-        }
+        fog: true,              // Fog enabled
+        colortrans : true,      // Effect of colortrans enabled
+        picking : true,         // Picking enabled
+        clipping : true,        // User-defined clipping enabled
+        enabled : true,         // Node not culled from traversal
+        visible : true,         // Node visible - when false, everything happens except geometry draw
+        transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
+        backfaces: true
     };
 
     var DEFAULT_FOG = {
@@ -386,7 +385,7 @@ SceneJS._renderModule = new (function() {
             stateMap = states.stateMap = {};
 
             setNeedBinSort();
-           // states.needSort = true;
+            // states.needSort = true;
 
         } else if (options.compileMode == SceneJS._renderModule.COMPILE_NODES) {   // Rebuild display list for subtree
 
@@ -523,16 +522,7 @@ SceneJS._renderModule = new (function() {
      */
     this.setFlags = function(id, flags) {
         flagsState = getState(FLAGS, id || "___DEFAULT_FLAGS");
-        flagsState.flags = flags || {
-            fog: true,              // Fog enabled
-            colortrans : true,      // Effect of colortrans enabled
-            picking : true,         // Picking enabled
-            clipping : true,        // User-defined clipping enabled
-            enabled : true,         // Node not culled from traversal
-            visible : true,         // Node visible - when false, everything happens except geometry draw
-            transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
-            backfaces: true
-        };
+        flagsState.flags = flags || DEFAULT_FLAGS;
     };
 
     /**
@@ -740,9 +730,9 @@ SceneJS._renderModule = new (function() {
      */
     this.setGeometry = function(id, geo) {
 
-//        if (id) {
-//            id += ".gl";
-//        }
+        //        if (id) {
+        //            id += ".gl";
+        //        }
 
 
 
@@ -790,10 +780,10 @@ SceneJS._renderModule = new (function() {
          */
         var sortId = (layerPriority * 100000) + program.id;
 
-         if (idPrefix) {
+        if (idPrefix) {
             id = idPrefix + id;
         }
-        
+
         node = {
 
             id: id,

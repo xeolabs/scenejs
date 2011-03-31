@@ -341,10 +341,10 @@ SceneJS._compileModule = new (function() {
 
         "clip": {
             set: {
-                level: this.COMPILE_PATH
+                level: this.COMPILE_BRANCH
             },
             inc: {
-                level: this.COMPILE_PATH
+                level: this.COMPILE_BRANCH
             }
             //            ,
             //            alwaysCompile: true
@@ -356,13 +356,13 @@ SceneJS._compileModule = new (function() {
 
         "colortrans": {
             set: {
-                level: this.COMPILE_PATH
+                level: this.COMPILE_BRANCH
             },
             inc: {
-                level: this.COMPILE_PATH
+                level: this.COMPILE_BRANCH
             },
             mul: {
-                level: this.COMPILE_PATH
+                level: this.COMPILE_BRANCH
             }
         },
 
@@ -469,11 +469,11 @@ SceneJS._compileModule = new (function() {
             }
         },
 
-        /* Setting state on a morphGeometry does not affect anything else in the scene
+        /*
          */
         "morphGeometry": {
             set: {
-                level: this.COMPILE_PATH
+                level: this.COMPILE_BRANCH
             }
         },
 
@@ -500,7 +500,7 @@ SceneJS._compileModule = new (function() {
             set: {
                 attr: {
                     layers: {
-                        level: this.COMPILE_PATH
+                        level: this.COMPILE_BRANCH
                     }
                 }
             }
