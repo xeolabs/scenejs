@@ -347,7 +347,6 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
     var child;
     var childId;
     var i;
-    var needMarshal = true;
 
     if (numChildren > 0) {
         var childTraversalContext;
@@ -376,29 +375,12 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
 
                 SceneJS._flagsModule.postVisitNode(child);
 
-            } else {
-                needMarshal = true;
             }
-
             SceneJS._compileModule.postVisitNode(child);
-
-            /* If compile or flag modules prevented descent into any child then we are performing a partial
-             * re-compilation in which we are updating some existing states held by the renderer module.
-             *
-             * During full compilations, we rely on geometry nodes to cause the renderer module to
-             * marshal dirty states accumulated by traversed nodes, however in this case we may not be
-             * visiting those geometries, so we'll trigger that explicitly.
-             */
-            if (needMarshal) {
-                SceneJS._renderModule.marshallStates();
-                needMarshal = false;
-            }
         }
     }
 
-    if (numChildren == 0) {
-        SceneJS._renderModule.marshallStates();
-        needMarshal = true;
+    if (numChildren == 0) {                
         if (! traversalContext.insideRightFringe) { // Last node in the subtree
             if (traversalContext.callback) { // Within subtree of instanced
                 traversalContext.callback(traversalContext); // Visit instance's children as temp children of last node

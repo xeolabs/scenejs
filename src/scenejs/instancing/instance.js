@@ -278,14 +278,15 @@ SceneJS.Instance.prototype._compile = function(traversalContext) {
 
             this._changeState(SceneJS.Instance.STATE_CONNECTED);
 
-            if (SceneJS._compileModule.preVisitNode(this._symbol)) {     //////////////
-                SceneJS._flagsModule.preVisitNode(this._symbol);         //////////////
+            if (SceneJS._compileModule.preVisitNode(this._symbol)) {
+                SceneJS._flagsModule.preVisitNode(this._symbol);
 
                 this._symbol._compileWithEvents(this._createTargetTraversalContext(traversalContext, this._symbol));
 
-                SceneJS._flagsModule.postVisitNode(this._symbol);       //////////////
+                SceneJS._flagsModule.postVisitNode(this._symbol);
             }
-            SceneJS._compileModule.postVisitNode(this._symbol);         //////////////
+            SceneJS._compileModule.postVisitNode(this._symbol);
+            
             SceneJS._renderModule.marshallStates();
 
             SceneJS._instancingModule.releaseInstance(nodeId);

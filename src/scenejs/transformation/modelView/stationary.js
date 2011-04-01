@@ -52,9 +52,7 @@ SceneJS.Stationary.prototype._compile = function(traversalContext) {
         this._compileNodes(traversalContext);
         SceneJS._viewTransformModule.popTransform();
     } else {
-        this._compileNodes(traversalContext);
-
-        SceneJS._stationaryModule.popStationary();
+        this._compileNodes(traversalContext);        
     }
 };
 

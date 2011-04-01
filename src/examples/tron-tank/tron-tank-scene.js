@@ -429,7 +429,8 @@ function updateSceneState() {
     } else if (trailYaw < tankYaw) {
         trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
     }
-};
+}
+;
 
 /* Render loop until error or reset
  */

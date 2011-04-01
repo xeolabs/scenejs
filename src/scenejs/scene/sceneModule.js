@@ -9,27 +9,12 @@ SceneJS._sceneModule = new (function() {
     var nScenes = 0;
     var activeSceneId;
 
-    var projMat;
-    var viewMat;
-
     SceneJS._eventModule.addListener(
             SceneJS._eventModule.RESET,
             function() {
                 scenes = {};
                 nScenes = 0;
                 activeSceneId = null;
-            });
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED,
-            function(params) {
-                projMat = params.matrix;
-            });
-
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.VIEW_TRANSFORM_UPDATED,
-            function(params) {
-                viewMat = params.matrix;
             });
 
     /** Locates element in DOM to write logging to
