@@ -919,11 +919,15 @@ SceneJS._compileModule = new (function() {
      */
     this.preVisitNode = function(node) {
 
+
+
         /* Compile indiscriminately if scheduler disabled
          */
         if (!this._enableCompiler) {
             return true;
         }
+
+        var config = compileConfig[node._attr.nodeType];
 
         /* When doing complete indescriminate scene compile, take this opportunity
          * to flag paths to nodes that must always be compiled
@@ -961,7 +965,7 @@ SceneJS._compileModule = new (function() {
         /* Compile entire subtree when within a subtree flagged for complete compile,
          * or when within a node that must always be compiled
          */
-        var config = compileConfig[node._attr.nodeType];
+
         if (this._nodesWithinBranches[nodeId] === true || (config && config.alwaysCompile)) {
             countTraversedSubtreesToCompile++;
         }

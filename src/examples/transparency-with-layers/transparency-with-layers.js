@@ -1,20 +1,17 @@
 /*
  Introductory SceneJS scene which demonstrates the use of layers with transparency blending.
 
- An opaque blue background sphere and a transparent red teapot are defined in the default layer.
+ In this example we have three nested cubes - an inner opaque blue cube, enclosed by a
+ transparent red cube, enclosed by an outer transparent green cube.
 
- Then an opaque white background sphere is defined in a user-specified layer that has a higher
- render order than the default layer. The default layer has a render of zero, while our user-defined
- layer has a render order of one.
+ When SceneJS blends the cubes with (SRC_ALPHA, ONE_MINUS_SRC_ALPHA), we allocate "layers" to
+ the cubes to ensure that they are rendered in the order neccessary for a correct transparency effect.
 
- SceneJS will render the default layer first, causing the teapot to be blended with the blue sphere,
- resulting in a transparent (or translucent) pink teapot.
+ On the transparent cubes we cull backfaces because we can't control the render order within a geometry's faces.
+ We don't want front faces rendering before back faces, which would cause the back faces to be rejected by the
+ depth buffer and deny the opportunity to blend the faces - easy fix is just not to render the backfaces.
 
- Then SceneJS renders our user-defined layer, which positions the white sphere just behind the teapot,
- and just inside the blue sphere, to create a white background.
-
- Our layer is rendered because we enabled it on the scene graph, along with an order value, just
- before we render the scene.
+ Wiki page on layers: http://scenejs.wikispaces.com/node+-+layer
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
@@ -49,70 +46,7 @@ SceneJS.createNode({
                     nodes: [
 
                         /*--------------------------------------------------------------------------------------
-                         * Opaque blue background sphere, enclosing everything. The teapot, which is transparent,
-                         * will be blended with this because this sphere and the teapot are both in the default
-                         * layer.
-                         *------------------------------------------------------------------------------------*/
-
-                        {
-                            type: "material",
-                            baseColor:      { r: 0, g: 0, b: 1 },
-
-                            nodes: [
-
-                                {
-                                    type:"scale",
-                                    x: 100,
-                                    y: 100,
-                                    z: 100,
-
-                                    nodes: [
-                                        {
-                                            type: "sphere"
-                                        }
-
-                                    ]
-                                }
-                            ]
-                        },
-
-
-                        /*--------------------------------------------------------------------------------------
-                         * Opaque white background sphere, fits inside the blue sphere. This will be rendered
-                         * AFTER the blue sphere and the teapot because it is in a user-defined layer with
-                         * a lower render priority than the default layer that contains the sphere and teapot.
-                         *
-                         * Since it is opaque, it will not be blended with them, and since it is inside the
-                         * blue sphere, while enclosing the teapot, it will cause whiteness to be rendered
-                         * behind teh teapot.
-                         *------------------------------------------------------------------------------------*/
-
-                        {
-                            type: "material",
-                            baseColor: { r: 1, g: 1, b: 1 },
-
-                            layer: "white-sphere-layer",
-
-                            nodes: [
-
-                                {
-                                    type:"scale",
-                                    x: 90,
-                                    y: 90,
-                                    z: 90,
-
-                                    nodes: [
-                                        {
-                                            type: "sphere"
-                                        }
-
-                                    ]
-                                }
-                            ]
-                        },
-
-                        /*--------------------------------------------------------------------------------------
-                         * Light sources which will illuminate the teapot, because the teapot is rendered next
+                         * Light sources which will illuminate the cubes, because they are rendered next
                          * in sequence.
                          *------------------------------------------------------------------------------------*/
 
@@ -133,34 +67,127 @@ SceneJS.createNode({
                             dir:                    { x: -2.0, y: -1.0, z: 0.0 }
                         },
 
-
-                        /*--------------------------------------------------------------------------------------
-                         * Transparent red teapot. This is in the default layer along with the opaque blue sphere,
-                         * so it will be blended with the blue sphere. It will not be blended with the opaque white
-                         * sphere because that is in a seperate, lower priority user-defined layer that is rendered
-                         * AFTER the blue sphere and teapot.
-                         *------------------------------------------------------------------------------------*/
-
                         {
-                            type: "material",
-                            baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
-                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                            specular:       0.9,
-                            shine:          6.0,
-                            opacity: 0.2,
+                            type: "rotate",
+                            id: "pitch",
+                            angle: -30.0,
+                            x : 1.0,
 
                             nodes: [
                                 {
-                                    type:"scale",
-                                    x: 5,
-                                    y: 5,
-                                    z: 5,
-
+                                    type: "rotate",
+                                    id: "yaw",
+                                    angle: -30.0,
+                                    y : 1.0,
                                     nodes: [
-                                        {
-                                            type: "teapot"
-                                        }
 
+                                        /*------------------------------------------------------------------------------
+                                         * Inner opaque blue cube in "inner-layer"
+                                         *----------------------------------------------------------------------------*/
+
+                                        {
+                                            type: "material",
+                                            baseColor:      { r: 0.0, g: 0.0, b: 1.0 },
+                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                            specular:       0.3,
+                                            shine:          6.0,
+
+                                            layer: "inner-layer",
+
+                                            nodes: [
+                                                {
+                                                    type:"scale",
+                                                    x: 3,
+                                                    y: 3,
+                                                    z: 3,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "cube"
+                                                        }
+
+                                                    ]
+                                                }
+                                            ]
+                                        },
+
+                                        /*------------------------------------------------------------------------------
+                                         * Transparent red cube in default layer, sandwiched between inner and outer cubes.
+                                         *
+                                         * See how we cull backfaces because we can't control the order in which faces
+                                         * render. We don't want front faces rendering before back faces, which would
+                                         * cause the back faces to be rejected by the depth buffer and deny the
+                                         * opportunity to blend the faces - easy fix is just to not render the backfaces.
+                                         *----------------------------------------------------------------------------*/
+
+                                        {
+                                            type: "material",
+                                            baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
+                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                            specular:       0.3,
+                                            shine:          6.0,
+                                            alpha:          0.2,
+
+                                            flags: {
+                                                transparent: true,
+                                                backfaces: false    // Hide backfaces
+                                            },
+
+                                            // Default layer at order 0
+
+                                            nodes: [
+                                                {
+                                                    type:"scale",
+                                                    x: 6,
+                                                    y: 6,
+                                                    z: 6,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "cube"
+                                                        }
+
+                                                    ]
+                                                }
+                                            ]
+                                        },
+
+                                        /*------------------------------------------------------------------------------
+                                         * Outer transparent green cube in "outer-layer"
+                                         *----------------------------------------------------------------------------*/
+
+                                        {
+                                            type: "material",
+                                            baseColor:      { r: 0.0, g: 1.0, b: 0.0 },
+                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                            specular:       0.3,
+                                            shine:          6.0,
+                                            alpha:          0.2,
+
+                                            flags: {
+                                                transparent: true,
+                                                backfaces: false    // Hide backfaces
+                                            },
+
+
+                                            layer: "outer-layer",
+
+                                            nodes: [
+                                                {
+                                                    type:"scale",
+                                                    x: 9,
+                                                    y: 9,
+                                                    z: 9,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "cube"
+                                                        }
+
+                                                    ]
+                                                }
+                                            ]
+                                        }
                                     ]
                                 }
                             ]
@@ -193,16 +220,61 @@ SceneJS.setDebugConfigs({
 
 
 /*-------------------------------------------------------------------------------------------
- * We're going to render the scene with the white sphere layer enabled and rendered at a lower
- * priority than the default implicit priority-zero layer that contains the blue sphere and
- * teapot.
- *
- * In other words, the default layer containing the blue sphere and teapot will be rendered,
- * THEN our user-defined layer containing the white sphere.
+ * Cause the inner cube to render first, then the middle cube in the default layer,
+ * then the outer cube. This ensures that when SceneJS blends the cubes with
+ * (SRC_ALPHA, ONE_MINUS_SRC_ALPHA), they will be are blended into each other
+ * in the order neccessary for a correct transparency effect.
  *-------------------------------------------------------------------------------------------*/
 
 SceneJS.withNode("theScene").set("layers", {
-    "white-sphere-layer": 1
+    "inner-layer": -1, // Higher priority than default layer's 0 priority
+    "outer-layer":  1  // Lower priority than default layer's 0 priority
 });
 
-SceneJS.withNode("theScene").render();
+/*----------------------------------------------------------------------
+ * Scene rendering loop and mouse handler stuff
+ *---------------------------------------------------------------------*/
+
+var yaw = -30;
+var pitch = -30;
+var lastX;
+var lastY;
+var dragging = false;
+
+var texAngle = 0.0;
+var texScale = 1.0;
+
+/* For texture animation
+ */
+var timeLast = (new Date()).getTime();
+
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+function mouseMove(event) {
+    if (dragging) {
+        yaw += (event.clientX - lastX) * 0.5;
+        pitch += (event.clientY - lastY) * -0.5;
+        lastX = event.clientX;
+        lastY = event.clientY;
+
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
+    }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+
+SceneJS.withNode("theScene").start();
+
