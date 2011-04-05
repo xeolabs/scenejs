@@ -299,31 +299,20 @@ SceneJS.createNode({
                             id : "teapot6",
                             nodes : [
                                 {
-                                    type: "renderer",
-                                    id: "teapot6-renderer",
-
-                                    // We'll toggle this on pick
-
-                                    wireframe: false,
+                                    type: "material",
+                                    baseColor:          { r: 0.3, g: 0.3, b: 0.9 },
+                                    specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
+                                    specular:           0.9,
+                                    shine:              6.0,
 
                                     nodes: [
                                         {
-                                            type: "material",
-                                            baseColor:          { r: 0.3, g: 0.3, b: 0.9 },
-                                            specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
-                                            specular:           0.9,
-                                            shine:              6.0,
-
+                                            type: "translate",
+                                            x   : 0,
+                                            y   : -7,
                                             nodes: [
                                                 {
-                                                    type: "translate",
-                                                    x   : 0,
-                                                    y   : -7,
-                                                    nodes: [
-                                                        {
-                                                            type: "teapot"
-                                                        }
-                                                    ]
+                                                    type: "teapot"
                                                 }
                                             ]
                                         }
@@ -393,20 +382,16 @@ SceneJS.createNode({
                                             specularColor:      { r: 0.9, g: 0.9, b: 0.9 },
                                             specular:           0.9,
                                             shine:              6.0,
+                                            alpha:              1.0,
 
                                             nodes: [
-                                                {
-                                                    type: "node",
-                                                    id: "teapot8-flags",
 
-                                                    nodes: [
-                                                        {
-                                                            type: "teapot"
-                                                        }
-                                                    ]
+                                                {
+                                                    type: "teapot"
                                                 }
                                             ]
                                         },
+
                                         {
                                             type: "material",
                                             baseColor:          { r: 0.4, g: 0.4, b: 0.4 },
@@ -466,7 +451,7 @@ SceneJS.setDebugConfigs({
     compilation : {
         enabled : true
     },
-     webgl: {
+    webgl: {
         logTrace: false
     }
 });
@@ -566,15 +551,11 @@ SceneJS.withNode("teapot5").bind("picked",
  */
 SceneJS.withNode("teapot6").bind("picked",
         function(event) {
-            SceneJS.withNode("teapot6-renderer").set({
+            SceneJS.withNode("teapot6").set("flags", {
 
                 /* Render triangles as poly lines
                  */
-                wireframe: true,
-
-                /* Set line width
-                 */
-                lineWidth: 0.5
+                wireframe: true
             });
         });
 
@@ -582,6 +563,7 @@ SceneJS.withNode("teapot6").bind("picked",
  */
 SceneJS.withNode("teapot7").bind("picked",
         function(event) {
+
             SceneJS.withNode("teapot7-renderer").set({
 
                 /* Specify front/back-facing mode. Accepted values are cw or ccw
@@ -600,11 +582,14 @@ SceneJS.withNode("teapot7").bind("picked",
 
 SceneJS.withNode("teapot8").bind("picked",
         function(event) {
-
-            SceneJS.withNode("teapot8-flags").set({
+            SceneJS.withNode("teapot8").set({
                 flags:{
                     transparent: true
                 }
+            });
+
+            SceneJS.withNode("teapot8-material").set({
+                alpha: 0.5
             });
         });
 
