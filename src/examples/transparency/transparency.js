@@ -54,7 +54,7 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                     angle: 0.0, y : 1.0
                                 },
 
-                                    /* "blue-group" subgraph containing the two blue spheres at the front
+                                    /* "blue-group" subgraph containing the two blue cubes at the front
                                      */
                                         SceneJS.node({ sid: "blue-group" },
 
@@ -66,7 +66,7 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                             specular:       0.2,
                                                             shine:          6.0
                                                         },
-                                                                SceneJS.node({ sid: "right-blue-sphere" },
+                                                                SceneJS.node({ sid: "right-blue-cube" },
                                                                         SceneJS.translate({x: .5, z: -2},
                                                                                 SceneJS.boundingBox({
                                                                                     xmin: -1.0,
@@ -76,11 +76,11 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                                                     ymax: 1.0,
                                                                                     zmax: 1.0
                                                                                 },
-                                                                                        SceneJS.sphere())
+                                                                                        SceneJS.cube())
                                                                                 )
                                                                         ),
 
-                                                                SceneJS.node({ sid: "left-blue-sphere" },
+                                                                SceneJS.node({ sid: "left-blue-cube" },
                                                                         SceneJS.translate({x: +2},
                                                                                 SceneJS.boundingBox({
                                                                                     xmin: -1.0,
@@ -90,13 +90,13 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                                                     ymax: 1.0,
                                                                                     zmax: 1.0
                                                                                 },
-                                                                                        SceneJS.sphere()))
+                                                                                        SceneJS.cube()))
                                                                         )
                                                                 )
                                                         )
                                                 ),
 
-                                    /* "green-group" containing the two green spheres just behind the blue ones
+                                    /* "green-group" containing the two green cubes just behind the blue ones
                                      *
                                      */
                                         SceneJS.node({ sid: "green-group" },
@@ -113,7 +113,7 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                             }
                                                         },
 
-                                                                SceneJS.node({ sid: "right-green-sphere"  },
+                                                                SceneJS.node({ sid: "right-green-cube"  },
                                                                         SceneJS.translate({x: -2},
                                                                                 SceneJS.boundingBox({
                                                                                     xmin: -1.0,
@@ -123,11 +123,11 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                                                     ymax: 1.0,
                                                                                     zmax: 1.0
                                                                                 },
-                                                                                        SceneJS.sphere())
+                                                                                        SceneJS.cube())
                                                                                 )
                                                                         ),
 
-                                                                SceneJS.node({ sid: "left-green-sphere" },
+                                                                SceneJS.node({ sid: "left-green-cube" },
                                                                         SceneJS.translate({x: 1},
                                                                                 SceneJS.boundingBox({
                                                                                     xmin: -1.0,
@@ -137,13 +137,13 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                                                     ymax: 1.0,
                                                                                     zmax: 1.0
                                                                                 },
-                                                                                        SceneJS.sphere()))
+                                                                                        SceneJS.cube()))
                                                                         )
                                                                 )
                                                         )
                                                 ),
 
-                                    /* "red-group" subgraph containing the red sphere at the back
+                                    /* "red-group" subgraph containing the red cube at the back
                                      */
                                         SceneJS.node({ sid: "red-group" },
                                                 SceneJS.translate({x: 2, z: +7},
@@ -155,7 +155,7 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                             shine:          6.0
 
                                                         },
-                                                                SceneJS.node({ sid: "red-group-sphere" },
+                                                                SceneJS.node({ sid: "red-group-cube" },
                                                                         SceneJS.translate({x: -2},
                                                                                 SceneJS.boundingBox({
                                                                                     xmin: -1.0,
@@ -165,7 +165,7 @@ var exampleScene = SceneJS.scene({ id: "my-scene", canvasId: 'theCanvas',  loggi
                                                                                     ymax: 1.0,
                                                                                     zmax: 1.0
                                                                                 },
-                                                                                        SceneJS.sphere())
+                                                                                        SceneJS.cube())
                                                                                 )
                                                                         )
                                                                 )
