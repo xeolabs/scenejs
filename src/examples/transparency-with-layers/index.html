@@ -13,7 +13,7 @@
         </div>
         <div id="header-inner">
             <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Using
-                layers to avoid blending whiteout
+                Layers for Correct Transparency
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -34,25 +34,17 @@
         <div id="info">
             <h2>Introductory SceneJS scene which demonstrates the use of layers with transparency blending. </h2>
 
-            <p>An opaque blue background sphere and a transparent red teapot are defined in the default layer.</p>
+            <p>In this example we have three nested cubes - an inner opaque blue cube, enclosed by a
+                transparent red cube, enclosed by an outer transparent green cube.</p>
 
-            <p>Then an opaque white background sphere is defined in a user-specified layer that has a higher
-                render order than the default layer. The default layer has a render of zero, while our user-defined
-                layer has a render order of one.</p>
-
-            <p>SceneJS will render the default layer first, causing the teapot to be blended with the blue sphere,
-                resulting in a transparent (or translucent) pink teapot.</p>
-
-            <p>Then SceneJS renders our user-defined layer, which positions the white sphere just behind the teapot,
-                and just inside the blue sphere, to create a white background.</p>
-
-            <p>Our layer is rendered because we enabled it on the scene graph, along with an order value, just
-                before we render the scene.</p>
+            <p>When SceneJS blends the cubes with (SRC_ALPHA, ONE_MINUS_SRC_ALPHA), we allocate "layers" to
+                the cubes to ensure that they are rendered in the order neccessary for a correct transparency
+                effect.</p>
             <br/>
             <br/>
             <ul>
                 <li><a target="_other" href="transparency-with-layers.js">Scene source code</a></li>
-                <li><a target="_other" href="http://scenejs.wikispaces.com/Layers">Wiki page on layers</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/node+-+layer">Wiki page on layers</a></li>
             </ul>
         </div>
         <div id="log">
