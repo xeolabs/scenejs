@@ -813,7 +813,9 @@ SceneJS._renderModule = new (function() {
             deformState :           deformState,
             morphState :            morphState,
             pickListenersState:     pickListenersState,
-            renderListenersState:   renderListenersState
+            renderListenersState:   renderListenersState,
+
+            layerName:              layerName
         };
 
         nodeMap[id] = node;
@@ -877,10 +879,8 @@ SceneJS._renderModule = new (function() {
 
     function renderBin(bin, picking) {
 
+        var enabledLayers = SceneJS._layerModule.getEnabledLayers();
         var context = states.canvas.context;
-
-        /* Render opaque nodes while buffering transparent nodes
-         */
         var nTransparent = 0;
         var node;
         var i, len = bin.length;
@@ -888,41 +888,42 @@ SceneJS._renderModule = new (function() {
 
         //  var sceneBVH = SceneJS._bvhModule.sceneBVH[states.sceneId];
 
+        /* Render opaque nodes while buffering transparent nodes.
+        * Layer order is preserved independently within opaque and transparent bins.
+         */
         for (i = 0; i < len; i++) {
             node = bin[i];
 
-            //if (sceneBVH.visibleNodes[node.id]) {                                 // Node within view colume
+            //if (sceneBVH.visibleNodes[node.id]) {                     // Node within view colume
+
+            if (node.layerName && !enabledLayers[node.layerName]) {     // Skip disabled layers
+                continue;
+            }
 
             flags = node.flagsState.flags;
 
-            if (flags.enabled === false) {                  // Skip disabled node
+            if (flags.enabled === false) {                              // Skip disabled node
                 continue;
             }
 
-            if (picking && flags.picking === false) {       // When picking, skip unpickable node
+            if (picking && flags.picking === false) {                   // When picking, skip unpickable node
                 continue;
             }
 
-            if (!picking && flags.transparent === true) {   // Buffer transparent node when not picking
+            if (!picking && flags.transparent === true) {               // Buffer transparent node when not picking
                 transparentBin[nTransparent++] = node;
 
             } else {
-                states.nodeRenderer.renderNode(node);              // Render node if opaque or in picking mode
+                states.nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
             }
             //}
         }
 
-        //context.flush();
-
         /* Render transparent nodes with blending
          */
         if (nTransparent > 0) {
-
             context.enable(context.BLEND);
-
-            //   context.blendFunc(context.SRC_ALPHA, context.ONE);  // TODO: make blend func configurable on flags?
-
-            context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
+            context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);  // Default - may be overridden by flags
             for (i = 0,len = nTransparent; i < len; i++) {
                 node = transparentBin[i];
                 states.nodeRenderer.renderNode(node);
