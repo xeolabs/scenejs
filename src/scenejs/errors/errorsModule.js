@@ -24,6 +24,7 @@ SceneJS._errorModule = new (function() {
 
     this.error = function(code, message) {
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
+            errorName: SceneJS.errors._getErrorName(code) || "ERROR",
             code: code,
             exception: message,
             fatal: false
