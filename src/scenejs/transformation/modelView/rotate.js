@@ -190,7 +190,7 @@ SceneJS.Rotate.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
         this._memoLevel = 1;
-        if (this._attr.x + this._attr.y + this._attr.z > 0) {
+        if (this._attr.x != 0 || this._attr.y != 0 || this._attr.z != 0) {
 
             /* When building a view transform, apply the negated rotation angle
              * to correctly transform the SceneJS.Camera
