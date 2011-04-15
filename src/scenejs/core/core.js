@@ -247,10 +247,11 @@ var SceneJS = {
      * Returns a key for a vacant slot in the given map
      * @private
      */
+    // Add a new function that returns a unique map key.
+    _last_unique_id: 0,
     _createKeyForMap : function(keyMap, prefix) {
-        var i = 0;
         while (true) {
-            var key = prefix + i++;
+            var key = prefix + SceneJS._last_unique_id++;
             if (!keyMap[key]) {
                 return key;
             }
