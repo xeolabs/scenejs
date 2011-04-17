@@ -552,7 +552,7 @@ SceneJS._compileModule = new (function() {
     /**
      * Notifies compilation module that a node has been modified
      *
-     * This function references SceneJS._compileConfig to find the level as
+     * This function references compileConfig to find the level as
      * configured there. It falls back on default levels as configured,
      * falling back on a complete re-compile when no configs can be found.
      *
