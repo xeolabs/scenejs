@@ -28,7 +28,20 @@ To build SceneJS, you'll need Java and ANT. Then at the same level as build.xml,
 
 ant all
 
-That will create the "dist" directory, which will contain SceneJS libraries, JSDocs and examples.
+Create the "dist" directory, which will contain all the SceneJS libraries, JSDocs and examples.
+
+If you are modifying the source code and testing it with a new example or your own project the following 
+ant tasks which complete in just a couple of seconds may be helpful. These tasks do not clean the dist 
+directory so previously-generated JSDocs will still available
+
+ant package-lib
+
+Create the "dist" directory and populate the lib directory with scenejs.js, scenejs.min.js, and the plugins and utils directories.
+
+ant packge-examples
+
+Create the "dist" directory and populate the lib directory and the examples directory.
+
 
 # Resources
 

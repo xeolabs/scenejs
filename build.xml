@@ -224,6 +224,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/box.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/sphere.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/quad.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/disk.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/text/vectorTextModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/text/bitmapTextModule.js"/>
@@ -292,127 +293,126 @@
     </target>
 
     <target name="archive" depends="package">
-        <tar destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.tar.gz"
-             basedir="${DIST_CONTAINER_DIR}/extracted"
-             compression="gzip"/>
+           <tar destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.tar.gz"
+                basedir="${DIST_CONTAINER_DIR}/extracted"
+                compression="gzip"/>
 
-        <zip destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
-
-
-    </target>
-
-    <!-- Create compressed javascript lib -->
-
-    <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
-
-    <target name="package"
-            depends="package-lib, package-lib-utils, package-lib-plugins, package-index, package-examples, package-docs">
-    </target>
-
-    <target name="package-lib"
-            depends="assemble-lib, package-lib-utils, package-lib-plugins">
-
-        <!-- Compress JS file list -->
-
-        <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
-            <classpath>
-                <path refid="yuicompressor.classpath"/>
-            </classpath>
-        </taskdef>
-        <yuicompress linebreak="300" warn="false" munge="no" preserveallsemicolons="true"
-                     outputfolder="${EXTRACTED_DIST_DIR}">
-            <fileset dir="${EXTRACTED_DIST_DIR}/lib/">
-                <include name="**/*.js"/>
-            </fileset>
-        </yuicompress>
-
-        <!-- Move compressed lib into temp file in lib dir -->
-
-        <move file="${EXTRACTED_DIST_DIR}/${SceneJS._JS_NAME}"
-              tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}-temp"/>
-
-        <!-- Concat temp file to license yeilding final compressed lib file -->
-
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}">
-            <path id="sourcefiles">
-                <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
-                <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="${SceneJS._MIN_JS_NAME}-temp"/>
-            </path>
-        </concat>
-
-        <!-- Delete temp file -->
-
-        <delete>
-            <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="*-temp" defaultexcludes="false"/>
-        </delete>
+           <zip destfile="${DIST_CONTAINER_DIR}/${SceneJS._NAME}.zip" basedir="${DIST_CONTAINER_DIR}/extracted"/>
 
     </target>
 
-    <target name="assemble-lib" depends="create-dist-directories">
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._JS_NAME}">
-            <path refid="sourcefiles"/>
-        </concat>
-    </target>
+   <!-- Create compressed javascript lib -->
 
-    <target name="package-index">
-        <echo file="resources/version.txt" append="false">V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
-        </echo>
-        <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/examples/index.html">
-            <filelist dir="."
-                      files="${basedir}/resources/example-index-p1.html, ${basedir}/resources/version.txt, ${basedir}/resources/example-index-p2.html"/>
-        </concat>
+   <!--<target name="package" depends="assemble-lib, package-index, package-examples, package-docs">-->
 
-    </target>
+   <target name="package"
+           depends="package-lib, package-lib-utils, package-lib-plugins, package-index, package-examples, package-docs">
+   </target>
 
-    <target name="package-examples" depends="package-lib, package-index">
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
-        <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
-            <fileset dir="${basedir}/resources/web"/>
-        </copy>
+   <target name="package-lib"
+           depends="assemble-lib, package-lib-utils, package-lib-plugins">
 
-        <copy todir="${EXTRACTED_DIST_DIR}/examples">
-            <fileset dir="${SRC_DIR}/examples"/>
-        </copy>
-    </target>
+       <!-- Compress JS file list -->
 
-    <target name="package-docs" depends="docs">
-        <copy todir="${EXTRACTED_DIST_DIR}/api-docs">
-            <fileset dir="${basedir}/docs/"/>
-        </copy>
-    </target>
+       <taskdef name="yuicompress" classname="com.yahoo.platform.yui.compressor.YUICompressTask">
+           <classpath>
+               <path refid="yuicompressor.classpath"/>
+           </classpath>
+       </taskdef>
+       <yuicompress linebreak="300" warn="false" munge="no" preserveallsemicolons="true"
+                    outputfolder="${EXTRACTED_DIST_DIR}">
+           <fileset dir="${EXTRACTED_DIST_DIR}/lib/">
+               <include name="**/*.js"/>
+           </fileset>
+       </yuicompress>
 
-    <target name="package-lib-utils" depends="create-dist-directories">
-        <!--<target name="package-lib-utils">-->
-        <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
-            <fileset dir="${basedir}/src/utils"/>
-        </copy>
-    </target>
+       <!-- Move compressed lib into temp file in lib dir -->
 
-    <target name="package-lib-plugins" depends="create-dist-directories">
-        <!--<target name="package-lib-plugins">-->
-        <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
-            <fileset dir="${basedir}/src/plugins"/>
-        </copy>
-    </target>
+       <move file="${EXTRACTED_DIST_DIR}/${SceneJS._JS_NAME}"
+             tofile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}-temp"/>
+
+       <!-- Concat temp file to license yeilding final compressed lib file -->
+
+       <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._MIN_JS_NAME}">
+           <path id="sourcefiles">
+               <fileset dir="${basedir}" includes="resources/license_intro.txt"/>
+               <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="${SceneJS._MIN_JS_NAME}-temp"/>
+           </path>
+       </concat>
+
+       <!-- Delete temp file -->
+
+       <delete>
+           <fileset dir="${EXTRACTED_DIST_DIR}/lib/" includes="*-temp" defaultexcludes="false"/>
+       </delete>
+
+   </target>
+
+   <target name="assemble-lib" depends="create-dist-directories">
+       <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/lib/${SceneJS._JS_NAME}">
+           <path refid="sourcefiles"/>
+       </concat>
+   </target>
+
+   <target name="package-index">
+       <echo file="resources/version.txt" append="false">V${BUILD_MAJOR}.${BUILD_MINOR}.${BUILD_ID}.${PATCH_ID}
+       </echo>
+       <concat fixlastline="yes" destfile="${EXTRACTED_DIST_DIR}/examples/index.html">
+           <filelist dir="."
+                     files="${basedir}/resources/example-index-p1.html, ${basedir}/resources/version.txt, ${basedir}/resources/example-index-p2.html"/>
+       </concat>
+
+   </target>
+
+   <target name="package-examples" depends="package-lib, package-index">
+       <mkdir dir="${EXTRACTED_DIST_DIR}/examples/web"/>
+       <copy todir="${EXTRACTED_DIST_DIR}/examples/web">
+           <fileset dir="${basedir}/resources/web"/>
+       </copy>
+
+       <copy todir="${EXTRACTED_DIST_DIR}/examples">
+           <fileset dir="${SRC_DIR}/examples"/>
+       </copy>
+   </target>
+
+   <target name="package-docs" depends="docs">
+       <copy todir="${EXTRACTED_DIST_DIR}/api-docs">
+           <fileset dir="${basedir}/docs/"/>
+       </copy>
+   </target>
+
+   <target name="package-lib-utils" depends="create-dist-directories">
+       <!--<target name="package-lib-utils">-->
+       <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
+           <fileset dir="${basedir}/src/utils"/>
+       </copy>
+   </target>
+
+   <target name="package-lib-plugins" depends="create-dist-directories">
+       <!--<target name="package-lib-plugins">-->
+       <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
+           <fileset dir="${basedir}/src/plugins"/>
+       </copy>
+   </target>
 
 
-    <target name="clean-dist-directory" if="CLEAN_DIST">
-        <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
-        <delete includeemptydirs="true">
-            <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
-        </delete>
-    </target>
+   <target name="clean-dist-directory" if="CLEAN_DIST">
+       <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
+       <delete includeemptydirs="true">
+           <fileset dir="${DIST_CONTAINER_DIR}" includes="**" defaultexcludes="false"/>
+       </delete>
+   </target>
 
-    <target name="create-dist-directories">
-        <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
-        <antcall target="clean-dist-directory"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib/plugins"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/api-docs"/>
-    </target>
+   <target name="create-dist-directories">
+       <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
+       <antcall target="clean-dist-directory"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/lib/plugins"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
+       <mkdir dir="${EXTRACTED_DIST_DIR}/api-docs"/>
+   </target>
 
 </project>
-   
+
