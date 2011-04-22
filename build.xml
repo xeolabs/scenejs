@@ -65,7 +65,7 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/node/layerModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/layers/layerModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/memory/memoryModule.js"/>
 

@@ -44,19 +44,6 @@ SceneJS._renderModule = new (function() {
     var VIEW_TRANSFORM = 15;
     var PICK_LISTENERS = 16;
     var RENDER_LISTENERS = 17;
-    var SPRITE_TRANSFORM = 18;
-
-
-    /*----------------------------------------------------------------------
-     * State synch masks - TODO: expand on this
-     *--------------------------------------------------------------------*/
-
-    var STATE_MASKS = [];
-    STATE_MASKS[VIEW_TRANSFORM] = 0x01;
-
-    var DEPENDENTS = [];
-    DEPENDENTS[VIEW_TRANSFORM] = [SPRITE_TRANSFORM];
-    DEPENDENTS[MODEL_TRANSFORM] = [DEFORM, MORPH, LIGHTS, CLIPS];
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -95,7 +82,8 @@ SceneJS._renderModule = new (function() {
         enabled : true,         // Node not culled from traversal
         visible : true,         // Node visible - when false, everything happens except geometry draw
         transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
-        backfaces: true
+        backfaces: true,        // Show backfaces
+        frontface: "ccw"        // Default vertex winding for front face         
     };
 
     var DEFAULT_FOG = {
@@ -1811,7 +1799,7 @@ SceneJS._renderModule = new (function() {
 
         /* Render display list in pick mode
          */
-        states.nodeRenderer.init(true);
+        states.nodeRenderer.init(true);  // TODO: Only re-render when nodes are known to have moved 
 
         renderBin(states.bin, true);
 

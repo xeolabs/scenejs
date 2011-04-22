@@ -25,7 +25,8 @@ SceneJS._flagsModule = new (function() {
         enabled : true,         // Node not culled from traversal
         visible : true,         // Node visible - when false, everything happens except geometry draw
         transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
-        backfaces: true
+        backfaces: true,        // Show backfaces
+        frontface: "ccw"        // Default vertex winding for front face
     };
 
     this.flags = {}; // Flags at top of flag stack

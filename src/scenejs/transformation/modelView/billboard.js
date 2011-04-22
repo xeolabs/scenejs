@@ -28,9 +28,7 @@ SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
     // 0. The base variable
     var superViewXForm = SceneJS._viewTransformModule.getTransform();
     var lookAt = superViewXForm.lookAt;
-//    var eye = superViewXForm.lookAt.eye;
-//    var look = superViewXForm.lookAt.look;
-//    var up = superViewXForm.lookAt.up;
+
     var superModelXForm = SceneJS._modelTransformModule.getTransform();
     var matrix = superModelXForm.matrix.slice(0);
 

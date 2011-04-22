@@ -180,6 +180,14 @@ var SceneJS_NodeRenderer = function(cfg) {
                 }
             }
 
+            if (!oldFlags || newFlags.frontface != oldFlags.frontface) {
+                if (newFlags.frontface == "cw") {
+                    gl.frontFace(gl.CW);
+                } else {
+                    gl.frontFace(gl.CCW);
+                }
+            }
+
             if (!oldFlags || newFlags.blendFunc != oldFlags.blendFunc) {
                 if (newFlags.blendFunc) {
                     gl.blendFunc(glEnum(gl, newFlags.blendFunc.sfactor || "one"), glEnum(gl, newFlags.blendFunc.dfactor || "zero"));
