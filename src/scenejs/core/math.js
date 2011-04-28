@@ -536,7 +536,7 @@ SceneJS._math_normalizeVec4 = function(v, dest) {
 /** @private */
 SceneJS._math_normalizeVec3 = function(v, dest) {
     var f = 1.0 / SceneJS._math_lenVec3(v);
-    return SceneJS._math_mulVec3Scalar(v, f);
+    return SceneJS._math_mulVec3Scalar(v, f, dest);
 };
 
 // @private

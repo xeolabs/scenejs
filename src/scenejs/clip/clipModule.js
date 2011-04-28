@@ -42,11 +42,22 @@ SceneJS._clipModule = new (function() {
             });
 
     this.pushClip = function(id, clip) {
-        var modelMat = SceneJS._modelTransformModule.getTransform().matrix;
+        var modelMat = SceneJS._modelTransformModule.getTransform().matrix;       
 
-        clip.worldA = SceneJS._math_transformPoint3(modelMat, clip.a);
-        clip.worldB = SceneJS._math_transformPoint3(modelMat, clip.b);
-        clip.worldC = SceneJS._math_transformPoint3(modelMat, clip.c);
+        var worldA = SceneJS._math_transformPoint3(modelMat, clip.a);
+        var worldB = SceneJS._math_transformPoint3(modelMat, clip.b);
+        var worldC = SceneJS._math_transformPoint3(modelMat, clip.c);
+
+        var normal = SceneJS._math_normalizeVec3(
+                SceneJS._math_cross3Vec4(
+                        SceneJS._math_normalizeVec3(
+                                SceneJS._math_subVec3(worldB, worldA, [0,0,0]), [0,0,0]),
+                        SceneJS._math_normalizeVec3(
+                                SceneJS._math_subVec3(worldB, worldC, [0,0,0]), [0,0,0])));
+
+        var dist = SceneJS._math_dotVector3(normal, worldA);
+
+        clip.normalAndDist = [normal[0], normal[1], normal[2], dist];
 
         clipStack[stackLen] = clip;
         idStack[stackLen] = id;
@@ -54,10 +65,7 @@ SceneJS._clipModule = new (function() {
         dirty = true;
     };
 
-//    this.popClip = function() {
-//        stackLen--;
-//        dirty = true;
-//    };
+    // No pop because clip planes apply to successor nodes 
 
 })();
 

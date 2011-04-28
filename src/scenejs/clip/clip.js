@@ -175,9 +175,9 @@ SceneJS.Clip.prototype.getAttributes = function() {
 
 // @private
 SceneJS.Clip.prototype._compile = function(traversalContext) {
-    this._preCompile(traversalContext);
+    //this._preCompile(traversalContext);
+    SceneJS._clipModule.pushClip(this._attr.id, this._attr);
     this._compileNodes(traversalContext);
-    this._postCompile(traversalContext);
 };
 
 // @private

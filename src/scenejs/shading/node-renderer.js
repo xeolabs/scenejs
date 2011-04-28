@@ -399,9 +399,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                     program.setUniform("uClipMode" + k, 0);
                 }
 
-                program.setUniform("uClipA" + k, clip.worldA);
-                program.setUniform("uClipB" + k, clip.worldB);
-                program.setUniform("uClipC" + k, clip.worldC);
+                program.setUniform("uClipNormalAndDist" + k, clip.normalAndDist);
             }
             this._lastClipStateId = node.clipState._stateId;
         }

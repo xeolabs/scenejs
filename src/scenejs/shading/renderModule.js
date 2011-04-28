@@ -986,9 +986,6 @@ SceneJS._renderModule = new (function() {
     }
 
     function composePickingVertexShader() {
-
-        var clipping = clipState && clipState.clips.length > 0;
-
         var src = [
             "#ifdef GL_ES",
             "   precision highp float;",
@@ -998,58 +995,18 @@ SceneJS._renderModule = new (function() {
             "uniform mat4 uVMatrix;",
             "uniform mat4 uPMatrix;"];
 
-        /*-----------------------------------------------------------------------------------
-         * Variables - Clipping
-         *----------------------------------------------------------------------------------*/
-
-        if (clipping) {
-
-            for (var i = 0; i < clipState.clips.length; i++) {
-
-                /* INPUT: Clip planes
-                 */
-                src.push("uniform float uClipMode" + i + ";");
-                src.push("uniform vec4  uClipA" + i + ";");
-                src.push("uniform vec4  uClipB" + i + ";");
-                src.push("uniform vec4  uClipC" + i + ";");
-
-                /* OUTPUT: view-space normal and distance from origin
-                 */
-                src.push("varying vec4  vClipNormalAndDist" + i + ";");
-            }
-        }
-
+        src.push("varying vec4 vWorldVertex;");
         src.push("varying vec4 vViewVertex;");
+        
         src.push("void main(void) {");
-        src.push("  vec4 tmpVertex = uVMatrix * (uMMatrix * vec4(aVertex, 1.0)); ");
+
+        src.push("  vec4 tmpVertex = uMMatrix * vec4(aVertex, 1.0); ");
+        src.push("  vWorldVertex = tmpVertex; ");
+
+        src.push("  tmpVertex = uVMatrix * tmpVertex; ");
         src.push("  vViewVertex = tmpVertex;");
 
-        /*-----------------------------------------------------------------------------------
-         * Logic - Clipping
-         *----------------------------------------------------------------------------------*/
-
-        if (clipping) {
-            src.push("  vec4    tempA;");
-            src.push("  vec4    tempB;");
-            src.push("  vec4    tempC;");
-            src.push("  vec3    tempNormal;");
-
-            for (var i = 0; i < clipState.clips.length; i++) {
-
-                src.push("    if (uClipMode" + i + " != 0.0) {");
-
-                src.push("        tempA = uVMatrix * uClipA" + i + ";");
-                src.push("        tempB = uVMatrix * uClipB" + i + ";");
-                src.push("        tempC = uVMatrix * uClipC" + i + ";");
-
-                src.push("        tempNormal = normalize(cross(normalize(tempB.xyz - tempA.xyz), normalize(tempB.xyz - tempC.xyz)));");
-
-                src.push("        vClipNormalAndDist" + i + " = vec4(tempNormal.xyz, dot(tempNormal, tempA.xyz));");
-                src.push("    }");
-            }
-        }
-
-        src.push("  gl_Position = uPMatrix * vViewVertex;");
+        src.push("  gl_Position = uPMatrix * tmpVertex;");
         src.push("}");
 
         if (debugCfg.logScripts == true) {
@@ -1070,6 +1027,7 @@ SceneJS._renderModule = new (function() {
             "   precision highp float;",
             "#endif"];
 
+        src.push("varying vec4 vWorldVertex;");
         src.push("varying vec4 vViewVertex;");
         src.push("uniform vec3 uPickColor;");
 
@@ -1080,7 +1038,7 @@ SceneJS._renderModule = new (function() {
         if (clipping) {
             for (var i = 0; i < clipState.clips.length; i++) {
                 src.push("uniform float uClipMode" + i + ";");
-                src.push("varying vec4  vClipNormalAndDist" + i + ";");
+                src.push("uniform vec4  uClipNormalAndDist" + i + ";");
             }
         }
 
@@ -1094,7 +1052,7 @@ SceneJS._renderModule = new (function() {
             src.push("  float   dist;");
             for (var i = 0; i < clipState.clips.length; i++) {
                 src.push("    if (uClipMode" + i + " != 0.0) {");
-                src.push("        dist = dot(vViewVertex.xyz, vClipNormalAndDist" + i + ".xyz) - vClipNormalAndDist" + i + ".w;");
+                src.push("        dist = dot(vWorldVertex.xyz, uClipNormalAndDist" + i + ".xyz) - uClipNormalAndDist" + i + ".w;");
                 src.push("        if (uClipMode" + i + " == 1.0) {");
                 src.push("            if (dist < 0.0) { discard; }");
                 src.push("        }");
@@ -1212,6 +1170,7 @@ SceneJS._renderModule = new (function() {
         src.push("uniform mat4 uVMatrix;");                // View matrix
         src.push("uniform mat4 uPMatrix;");                 // Projection matrix
 
+        src.push("varying vec4 vWorldVertex;");
         src.push("varying vec4 vViewVertex;");
 
         if (texturing) {
@@ -1246,27 +1205,6 @@ SceneJS._renderModule = new (function() {
                 src.push("uniform float uDeformMode" + i + ";");
                 src.push("uniform vec3  uDeformVertex" + i + ";");
                 src.push("uniform float uDeformWeight" + i + ";");
-            }
-        }
-
-        /*-----------------------------------------------------------------------------------
-         * Variables - Clipping
-         *----------------------------------------------------------------------------------*/
-
-        if (clipping) {
-
-            for (var i = 0; i < clipState.clips.length; i++) {
-
-                /* INPUT: Clip planes
-                 */
-                src.push("uniform float uClipMode" + i + ";");
-                src.push("uniform vec4  uClipA" + i + ";");
-                src.push("uniform vec4  uClipB" + i + ";");
-                src.push("uniform vec4  uClipC" + i + ";");
-
-                /* OUTPUT: view-space normal and distance from origin
-                 */
-                src.push("varying vec4  vClipNormalAndDist" + i + ";");
             }
         }
 
@@ -1332,6 +1270,7 @@ SceneJS._renderModule = new (function() {
             src.push("  vNormal = normalize(worldNormal.xyz);");
         }
 
+        src.push("  vWorldVertex = worldVertex;");
         src.push("  vViewVertex = viewVertex;");
         src.push("  gl_Position = uPMatrix * vViewVertex;");
 
@@ -1356,33 +1295,6 @@ SceneJS._renderModule = new (function() {
                 if (light.mode == "spot") {
 
                 }
-            }
-        }
-
-        /*-----------------------------------------------------------------------------------
-         * Logic - Clipping
-         *
-         *
-         *----------------------------------------------------------------------------------*/
-
-        if (clipping) {
-            src.push("  vec4    tempA;");
-            src.push("  vec4    tempB;");
-            src.push("  vec4    tempC;");
-            src.push("  vec3    tempNormal;");
-
-            for (var i = 0; i < clipState.clips.length; i++) {
-
-                src.push("    if (uClipMode" + i + " != 0.0) {");
-
-                src.push("        tempA = uVMatrix * uClipA" + i + ";");
-                src.push("        tempB = uVMatrix * uClipB" + i + ";");
-                src.push("        tempC = uVMatrix * uClipC" + i + ";");
-
-                src.push("        tempNormal = normalize(cross(normalize(tempB.xyz - tempA.xyz), normalize(tempB.xyz - tempC.xyz)));");
-
-                src.push("        vClipNormalAndDist" + i + " = vec4(tempNormal.xyz, dot(tempNormal, tempA.xyz));");
-                src.push("    }");
             }
         }
 
@@ -1429,6 +1341,7 @@ SceneJS._renderModule = new (function() {
         src.push("   precision highp float;");
         src.push("#endif");
 
+        src.push("varying vec4 vWorldVertex;");             // World-space vertex
         src.push("varying vec4 vViewVertex;");              // View-space vertex
 
         /*-----------------------------------------------------------------------------------
@@ -1438,7 +1351,7 @@ SceneJS._renderModule = new (function() {
         if (clipping) {
             for (var i = 0; i < clipState.clips.length; i++) {
                 src.push("uniform float uClipMode" + i + ";");
-                src.push("varying vec4  vClipNormalAndDist" + i + ";");
+                src.push("uniform vec4  uClipNormalAndDist" + i + ";");
             }
         }
 
@@ -1538,7 +1451,7 @@ SceneJS._renderModule = new (function() {
             src.push("  float   dist;");
             for (var i = 0; i < clipState.clips.length; i++) {
                 src.push("    if (uClipMode" + i + " != 0.0) {");
-                src.push("        dist = dot(vViewVertex.xyz, vClipNormalAndDist" + i + ".xyz) - vClipNormalAndDist" + i + ".w;");
+                src.push("        dist = dot(vWorldVertex.xyz, uClipNormalAndDist" + i + ".xyz) - uClipNormalAndDist" + i + ".w;");
                 src.push("        if (uClipMode" + i + " == 1.0) {");
                 src.push("            if (dist < 0.0) { discard; }");
                 src.push("        }");
@@ -1935,45 +1848,4 @@ SceneJS._renderModule = new (function() {
         var context = states.canvas.context;
         context.bindFramebuffer(context.FRAMEBUFFER, null);
     }
-
-
-    function composeBBoxVertexShader() {
-        var src = [
-            "#ifdef GL_ES",
-            "   precision highp float;",
-            "#endif",
-
-            /* Axis-aligned bounding box
-             */
-            "attribute vec3 aBBoxMin;",
-            "attribute vec3 aBBoxMax;",
-
-            /* Transform matrices
-             */
-            "uniform mat4 uMMatrix;",
-            "uniform mat4 uVMatrix;",
-            "uniform mat4 uPMatrix;"];
-
-        src.push("varying vec3 vViewVertex;");
-
-        src.push("void main(void) {");
-        src.push("  vec4 tmpMin = uVMatrix * (uMMatrix * vec4(aBBoxMin, 1.0)); ");
-        src.push("  vec4 tmpMax = uVMatrix * (uMMatrix * vec4(aBBoxMax, 1.0)); ");
-        src.push("  vViewVertex = tmpVertex;");
-        src.push("  gl_Position = uPMatrix * vViewVertex;");
-        src.push("}");
-        return src.join("\n");
-    }
-
-    function composeBBoxFragmentShader() {
-        var src = [
-            "#ifdef GL_ES",
-            "   precision highp float;",
-            "#endif"];
-        src.push("void main(void) {");
-        src.push("    gl_FragColor = vec4(uPickColor.rgb, 1.0);  ");
-        src.push("}");
-        return src.join("\n");
-    }
-
 })();
