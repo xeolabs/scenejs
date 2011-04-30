@@ -61,75 +61,94 @@ SceneJS.createNode({
 
                             nodes: [
 
-                                //----------------------------------------------------------------------------------
-                                // Our Selector node selects three of its four sub-graphs to display three Teapots.
-                                // Try changing the indices in its "selection" property to change its selection.
-                                //----------------------------------------------------------------------------------
-
                                 {
-                                    type: "selector",
-                                    selection: [0, 1, 3],
+                                    type: "rotate",
+                                    id: "pitch",
+                                    angle: -30.0,
+                                    x : 1.0,
 
                                     nodes: [
                                         {
-                                            type:"translate",
-                                            y : 15,
+                                            type: "rotate",
+                                            id: "yaw",
+                                            angle: -30.0,
+                                            y : 1.0,
+
                                             nodes: [
+                                                //----------------------------------------------------------------------------------
+                                                // Our Selector node selects three of its four sub-graphs to display three Teapots.
+                                                // Try changing the indices in its "selection" property to change its selection.
+                                                //----------------------------------------------------------------------------------
+
                                                 {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 0",
+                                                    type: "selector",
+                                                    selection: [0, 1, 3],
+
                                                     nodes: [
                                                         {
-                                                            type: "teapot"
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            y : 5,
-                                            nodes: [
-                                                {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 1",
-                                                    nodes: [
+                                                            type:"translate",
+                                                            y : 15,
+                                                            nodes: [
+                                                                {
+                                                                    type: "text",
+                                                                    size: 80,
+                                                                    text: "     Selector selection contains 0",
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "teapot"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
                                                         {
-                                                            type: "teapot"
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            y : -5,
-                                            nodes: [
-                                                {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 2",
-                                                    nodes: [
+                                                            type: "translate",
+                                                            y : 5,
+                                                            nodes: [
+                                                                {
+                                                                    type: "text",
+                                                                    size: 80,
+                                                                    text: "     Selector selection contains 1",
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "teapot"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
                                                         {
-                                                            type: "teapot"
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            type: "translate",
-                                            y : -15,
-                                            nodes: [
-                                                {
-                                                    type: "text",
-                                                    size: 80,
-                                                    text: "     Selector selection contains 3",
-                                                    nodes: [
+                                                            type: "translate",
+                                                            y : -5,
+                                                            nodes: [
+                                                                {
+                                                                    type: "text",
+                                                                    size: 80,
+                                                                    text: "     Selector selection contains 2",
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "teapot"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
                                                         {
-                                                            type: "teapot"
+                                                            type: "translate",
+                                                            y : -15,
+                                                            nodes: [
+                                                                {
+                                                                    type: "text",
+                                                                    size: 80,
+                                                                    doubleSided: true,
+                                                                    text: "     Selector selection contains 3",
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "teapot"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -161,11 +180,62 @@ SceneJS.createNode({
 SceneJS.setDebugConfigs({
     compilation : {
         enabled : true
+    },
+     shading : {
+        whitewash : false
     }
 });
 
 
-/* Throw the switch, Igor!
+/*----------------------------------------------------------------------
+ * Scene rendering loop and mouse handler stuff
+ *---------------------------------------------------------------------*/
 
+var yaw = -30;
+var pitch = -30;
+var lastX;
+var lastY;
+var dragging = false;
+
+var texAngle = 0.0;
+var texScale = 1.0;
+
+/* For texture animation
  */
+var timeLast = (new Date()).getTime();
+
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+function mouseMove(event) {
+    if (dragging) {
+        yaw += (event.clientX - lastX) * 0.5;
+        pitch += (event.clientY - lastY) * -0.5;
+        lastX = event.clientX;
+        lastY = event.clientY;
+
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
+    }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+
 SceneJS.withNode("theScene").start();
+
+
+SceneJS.bind("error", function() {
+    window.clearInterval(pInterval);
+});
+

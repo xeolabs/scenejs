@@ -229,6 +229,7 @@ SceneJS._textureModule = new (function() {
             };
             image.src = cfg.uri;  // Starts image load
         } else if (cfg.image) {
+
             var textureId = allocateTexture(_canvas, _context, cfg.image, cfg);
             onSuccess(textures[textureId]);
         } else {

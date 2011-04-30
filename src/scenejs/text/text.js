@@ -5,39 +5,13 @@ SceneJS.Text.prototype._init = function(params) {
     var mode = params.mode || "bitmap";
     if (mode != "vector" && mode != "bitmap") {
         throw SceneJS._errorModule.fatalError(
-                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "SceneJS.Text unsupported mode - should be 'vector' or 'bitmap'");
     }
     this._mode = mode;
     if (this._mode == "bitmap") {
         var text = SceneJS._bitmapTextModule.createText("Helvetica", params.size || 1, params.text || "");
-        this._layer = {
-            creationParams: {
-                image: text.image,
-                minFilter: "linear",
-                magFilter: "linear",
-                isDepth: false,
-                depthMode:"luminance",
-                depthCompareMode: "compareRToTexture",
-                depthCompareFunc: "lequal",
-                flipY: false,
-                width: 1,
-                height: 1,
-                internalFormat:"lequal",
-                sourceFormat:"alpha",
-                sourceType: "unsignedByte",
-                applyTo:"baseColor",
-                blendMode:"add"
-            },
-            texture: null,
-            applyFrom: "uv",
-            applyTo: "baseColor",
-            blendMode: "add",
-            scale : null,
-            translate : null,
-            rotate : null,
-            rebuildMatrix : true
-        };
+
         var w = text.width / 16;
         var h = text.height / 16;
 
@@ -55,20 +29,47 @@ SceneJS.Text.prototype._init = function(params) {
         }
 
         this.addNode({
-            type: "material",
-            emit: 0,
-            baseColor:      { r: 0.0, g: 0.0, b: 0.0 },
-            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-            specular:       0.9,
-            shine:          100.0,
+            type: "texture",
+            layers: [
+                {
+                    image: text.image,
+                    minFilter: "linear",
+                    magFilter: "linear",
+                    wrapS: "repeat",
+                    wrapT: "repeat",
+                    isDepth: false,
+                    depthMode:"luminance",
+                    depthCompareMode: "compareRToTexture",
+                    depthCompareFunc: "lequal",
+                    flipY: false,
+                    width: 1,
+                    height: 1,
+                    internalFormat:"lequal",
+                    sourceFormat:"alpha",
+                    sourceType: "unsignedByte",
+                    applyTo:"baseColor",
+                    blendMode:"add"
+                }
+            ],
+
             nodes: [
                 {
-                    type: "geometry",
-                    primitive: "triangles",
-                    positions : positions,
-                    normals : normals,
-                    uv : uv,
-                    indices : indices
+                    type: "material",
+                    emit: 1,
+                    baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
+                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                    specular:       0.9,
+                    shine:          100.0,
+                    nodes: [
+                        {
+                            type: "geometry",
+                            primitive: "triangles",
+                            positions : positions,
+                            normals : normals,
+                            uv : uv,
+                            indices : indices
+                        }
+                    ]
                 }
             ]
         });
@@ -93,41 +94,6 @@ SceneJS.Text.prototype._init = function(params) {
 
 SceneJS.Text.prototype._compile = function(traversalContext) {
     if (this._mode == "bitmap") {
-        if (!this._layer.texture && !this._error) {
-            var self = this;
-            (function() {
-
-                SceneJS._textureModule.createTexture(
-                        self._layer.creationParams,
-                        function(texture) { // Success
-                            self._layer.texture = texture;
-
-                            /**
-                             * Need re-compile so that this texture layer
-                             * can create and apply the texture
-                             */
-                            SceneJS._compileModule.nodeUpdated(self, "loadedImage");
-                        },
-                        function() { // General error
-                            self._error = true;
-                            var message = "SceneJS.text texture creation failed";
-                            SceneJS._loggingModule.warn(message);
-                        },
-                        function() { // Aborted
-                            self._error = true;
-                            var message = "SceneJS.text texture creation failed";
-                            SceneJS._loggingModule.warn(message);
-                        });
-            })();
-        }
-
-
-        if (this._layer) {
-            SceneJS._textureModule.pushTexture(this._attr.id, [this._layer]);
-            this._compileNodes(traversalContext);
-            SceneJS._textureModule.popTexture();
-        }
-    } else {
         this._compileNodes(traversalContext);
     }
 };

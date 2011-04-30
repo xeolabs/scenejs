@@ -32,7 +32,6 @@
  * <table>
  * <tr><td>type</td><td>Class</td></tr>
  * <tr><td>----</td><td>-----</td></tr>
- * <tr><td>bounding-box</td><td>{@link SceneJS.BoundingBox}</td></tr>
  * <tr><td>camera</td><td>{@link SceneJS.Camera}</td></tr>
  * <tr><td>cube</td><td>{@link SceneJS.Cube}</td></tr>
  * <tr><td>fog</td><td>{@link SceneJS.Fog}</td></tr>
