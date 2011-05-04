@@ -153,10 +153,10 @@ SceneJS.Texture.prototype._init = function(params) {
 
     for (var i = 0; i < params.layers.length; i++) {
         var layerParam = params.layers[i];
-        if (!layerParam.uri && !layerParam.imageBuf && !layerParam.image) {
+        if (!layerParam.uri && !layerParam.imageBuf && !layerParam.image && !layerParam.canvasId) {
             throw SceneJS._errorModule.fatalError(
                     SceneJS.errors.NODE_CONFIG_EXPECTED,
-                    "SceneJS.Texture.layers[" + i + "] has no uri or imageBuf specified");
+                    "SceneJS.Texture.layers[" + i + "] has no uri, imageBuf or canvasId specified");
         }
         if (layerParam.applyFrom) {
             if (layerParam.applyFrom != "uv" &&
@@ -283,7 +283,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
 
                 layer.state = SceneJS.TextureLayer.STATE_LOADING;
 
-                if (layer.creationParams.uri || layer.creationParams.image) {
+                if (layer.creationParams.uri || layer.creationParams.image || layer.creationParams.canvasId) {
                     var self = this;
                     (function(l) { // Closure allows this layer to receive results
                         SceneJS._textureModule.createTexture(

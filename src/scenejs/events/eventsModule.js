@@ -53,13 +53,12 @@ SceneJS._eventModule = new (function() {
     this.PROCESS_TIMED_OUT = 37;
     this.LOGGING_ELEMENT_ACTIVATED = 38;
     this.PICK_COLOR_EXPORTED = 39;
-    this.BOUNDARY_EXPORTED = 40;
-    this.NODE_CREATED = 41;
-    this.NODE_UPDATED = 42;
-    this.NODE_DESTROYED = 43;
-    this.IMAGEBUFFER_EXPORTED = 44;
-    this.CLIP_EXPORTED = 45;
-    this.FLAGS_EXPORTED = 46;
+    this.NODE_CREATED = 40;
+    this.NODE_UPDATED = 41;
+    this.NODE_DESTROYED = 42;
+    this.IMAGEBUFFER_EXPORTED = 43;
+    this.CLIP_EXPORTED = 44;
+    this.FLAGS_EXPORTED = 45;
 
     /* Priority queue for each type of event
      */

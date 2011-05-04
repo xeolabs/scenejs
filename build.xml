@@ -131,12 +131,6 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundaryModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
-
         <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
@@ -260,12 +254,6 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/highlight/highlight.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewFrustumModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/viewLocalityModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundingBox.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/boundaryModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/boundary/locality.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/texture/textureLayer.js"/>

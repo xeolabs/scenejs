@@ -21,7 +21,7 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -55 },
+            eye : { x: 0.0, y: 10.0, z: 55 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -40,26 +40,18 @@ SceneJS.createNode({
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.5, g: 0.5, b: 0.5 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.7, g: 0.7, b: 0.7 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            dir:                    { x: 0.0, y: -1.0, z: -1.0 }
                         },
                         {
                             type: "rotate",
@@ -139,34 +131,7 @@ SceneJS.Message.sendMessage({
                     layers: [
                         {
                             uri:"images/BrickWall.jpg" ,
-                            minFilter: "linear",
-                            magFilter: "linear",
-                            wrapS: "repeat",
-                            wrapT: "repeat",
-                            isDepth: false,
-                            depthMode:"luminance",
-                            depthCompareMode: "compareRToTexture",
-                            depthCompareFunc: "lequal",
-                            flipY: false,
-                            width: 1,
-                            height: 1,
-                            internalFormat:"lequal",
-                            sourceFormat:"alpha",
-                            sourceType: "unsignedByte",
-                            applyTo:"baseColor",
-                            blendMode:"add",
-
-                            /* Texture rotation angle in degrees
-                             */
-                            rotate: 0.0,
-
-                            /* Texture translation offset
-                             */
-                            translate : {
-                                x: 0,
-                                y: 0
-                            },
-
+                            blendMode: "multiply",
                             /* Texture scale factors
                              */
                             scale : {
@@ -213,7 +178,7 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
+        pitch += (event.clientY - lastY) * 0.5;
 
         SceneJS.withNode("pitch").set("angle", pitch);
         SceneJS.withNode("yaw").set("angle", yaw);

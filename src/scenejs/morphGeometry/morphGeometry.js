@@ -26,6 +26,7 @@ SceneJS.MorphGeometry.prototype._init = function(params) {
     }
 
     this._attr.factor = params.factor || 0;
+    this._attr.clamp = (params.clamp === false) ? false : true;
 };
 
 SceneJS.MorphGeometry.prototype._setMorph = function(params) {
@@ -175,6 +176,10 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
     if (!this._handle) {
 
+        var options = {
+            clamp: this._attr.clamp
+        };
+
         /* Morph VBOs not created yet
          */
         if (this._create) {
@@ -187,7 +192,8 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 
             this._handle = SceneJS._morphGeometryModule.createMorphGeometry(
                     this._resource,
-                    this._attr);
+                    this._attr,
+                    options);
 
             this._changeState(SceneJS.MorphGeometry.STATE_LOADED);
 
@@ -203,6 +209,8 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
             SceneJS._morphGeometryModule.createMorphGeometry(
                     this._resource,
                     this._stream,
+                    options,
+
                     function(handle) {
 
                         self._handle = handle;
@@ -219,7 +227,8 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 
             this._handle = SceneJS._morphGeometryModule.createMorphGeometry(
                     this._resource,
-                    this._attr);
+                    this._attr,
+                    options);
 
             this._changeState(SceneJS.MorphGeometry.STATE_LOADED);
         }

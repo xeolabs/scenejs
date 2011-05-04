@@ -44,7 +44,7 @@ SceneJS.createNode({
 				{
 					type: "rotate",
 					x: 1,
-					angle: 90,
+					angle: -90,
 					nodes: [
 						{
 							type: "quad",
@@ -67,7 +67,7 @@ SceneJS.createNode({
 		{
 			type: "lookAt",
 			id: "myLookAt",
-			eye : { x: 0, y: 0, z: -25 },
+			eye : { x: 0, y: 0, z: 25 },
 			look : { x: 0, y: 0, z: 0 },
 			up : { y: 1.0 },
 
@@ -86,17 +86,17 @@ SceneJS.createNode({
 							type: "light",
 							mode: "dir",
 							color: { r: 1, g: 1, b: 1 },
-							dir: {x:0, y:4, z:0},
+							dir: {x:0, y:-1, z:0},
 							diffuse: true,
-							specular: false,
+							specular: false
 						},
 						{
 							type: "light",
 							mode: "dir",
 							color: { r: 1, g: 1, b: 1 },
-							dir: {x:0, y:-4, z:0},
+							dir: {x:0, y:-1, z:-1},
 							diffuse: true,
-							specular: false,
+							specular: false
 						},
 						{
 							type: "translate",

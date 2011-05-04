@@ -41,7 +41,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.5, y: -0.5, z: -0.5 }
+                            dir:                    { x: 0.5, y: -0.5, z: -0.75 }
                         },
                         {
                             type: "rotate",
@@ -70,7 +70,9 @@ SceneJS.createNode({
                                                             y: 2,
                                                             z: 2,
 
-                                                            flags: { enabled: true },
+                                                            flags: {
+                                                                enabled: true
+                                                            },
                                                             layer: "surface-layer",
 
                                                             nodes: [
@@ -259,30 +261,13 @@ SceneJS.createNode({
 });
 
 
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
 var yaw = 0;
 var pitch = 0;
 var lastX;
 var lastY;
 var dragging = false;
 
-var posZ = -10;
+var posZ = 10;
 
 var earthRotate = 0;
 var cloudsRotate = 0;
@@ -304,8 +289,8 @@ function mouseUp() {
  */
 function mouseMove(event) {
     if (dragging) {
-        yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
+        yaw += (event.clientX - lastX) * 0.3;
+        pitch += (event.clientY - lastY) * 0.3;
 
         lastX = event.clientX;
         lastY = event.clientY;

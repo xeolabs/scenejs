@@ -25,10 +25,14 @@ SceneJS.createNode({
     canvasId: "theCanvas",
     loggingElementId: "theLoggingDiv",
 
+    flags: {
+        backfaces: false
+    },
+
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -55 },
+            eye : { x: 0.0, y: 10.0, z: 55 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -47,18 +51,14 @@ SceneJS.createNode({
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                            dir:                    { x: 1.0, y: -0.5, z: -1.0 }
                         },
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.7, g: 0.7, b: 0.7 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 1.0, y: 0.0, z: -1.0 }
+                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
                         /* Next, modelling transforms to orient our geometry
@@ -79,7 +79,7 @@ SceneJS.createNode({
 
                                     nodes: [
                                         {
-                                            type: "material",
+                                            type: "node",
                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                             specular:       0.2,
@@ -91,34 +91,7 @@ SceneJS.createNode({
                                                     layers: [
                                                         {
                                                             uri:"images/BrickWall.jpg" ,
-                                                            minFilter: "linear",
-                                                            magFilter: "linear",
-                                                            wrapS: "repeat",
-                                                            wrapT: "repeat",
-                                                            isDepth: false,
-                                                            depthMode:"luminance",
-                                                            depthCompareMode: "compareRToTexture",
-                                                            depthCompareFunc: "lequal",
-                                                            flipY: false,
-                                                            width: 1,
-                                                            height: 1,
-                                                            internalFormat:"lequal",
-                                                            sourceFormat:"alpha",
-                                                            sourceType: "unsignedByte",
-                                                            applyTo:"baseColor",
-                                                            blendMode:"multiply",
-
-                                                            /* Texture rotation angle in degrees
-                                                             */
-                                                            rotate: 0.0,
-
-                                                            /* Texture translation offset
-                                                             */
-                                                            translate : {
-                                                                x: 0,
-                                                                y: 0
-                                                            },
-
+                                                          
                                                             /* Texture scale factors
                                                              */
                                                             scale : {
@@ -217,45 +190,45 @@ SceneJS.createNode({
 
                                                                 /* v0-v1-v2-v3 front
                                                                  */
-                                                                0, 0, -1,
-                                                                0, 0, -1,
-                                                                0, 0, -1,
-                                                                0, 0, -1,
+                                                                0, 0, 1,
+                                                                0, 0, 1,
+                                                                0, 0, 1,
+                                                                0, 0, 1,
 
                                                                 /* v0-v3-v4-v5 right
                                                                  */
-                                                                -1, 0, 0,
-                                                                -1, 0, 0,
-                                                                -1, 0, 0,
-                                                                -1, 0, 0,
+                                                                1, 0, 0,
+                                                                1, 0, 0,
+                                                                1, 0, 0,
+                                                                1, 0, 0,
 
                                                                 /* v0-v5-v6-v1 top
                                                                  */
-                                                                0, -1, 0,
-                                                                0, -1, 0,
-                                                                0, -1, 0,
-                                                                0, -1, 0,
+                                                                0, 1, 0,
+                                                                0, 1, 0,
+                                                                0, 1, 0,
+                                                                0, 1, 0,
 
                                                                 /* v1-v6-v7-v2 left
                                                                  */
-                                                                1, 0, 0,
-                                                                1, 0, 0,
-                                                                1, 0, 0,
-                                                                1, 0, 0,
+                                                                -1, 0, 0,
+                                                                -1, 0, 0,
+                                                                -1, 0, 0,
+                                                                -1, 0, 0,
 
                                                                 /* v7-v4-v3-v2 bottom
                                                                  */
-                                                                0,1, 0,
-                                                                0,1, 0,
-                                                                0,1, 0,
-                                                                0,1, 0,
+                                                                0,-1, 0,
+                                                                0,-1, 0,
+                                                                0,-1, 0,
+                                                                0,-1, 0,
 
                                                                 /* v4-v7-v6-v5 back
                                                                  */
-                                                                0, 0,1,
-                                                                0, 0,1,
-                                                                0, 0,1,
-                                                                0, 0,1
+                                                                0, 0,-1,
+                                                                0, 0,-1,
+                                                                0, 0,-1,
+                                                                0, 0,-1
                                                             ],
 
                                                             /* 2D texture coordinates corresponding to the
@@ -323,36 +296,24 @@ SceneJS.createNode({
                                                              * the default "ccw".
                                                              */
                                                             indices : [
-
-                                                                /* Front
-                                                                 */
                                                                 0, 1, 2,
                                                                 0, 2, 3,
-
-                                                                /* Right
-                                                                 */
+                                                                // front
                                                                 4, 5, 6,
                                                                 4, 6, 7,
-
-                                                                /* Top
-                                                                 */
+                                                                // right
                                                                 8, 9,10,
                                                                 8,10,11,
-
-                                                                /* Left
-                                                                 */
+                                                                // top
                                                                 12,13,14,
                                                                 12,14,15,
-
-                                                                /* Bottom
-                                                                 */
+                                                                // left
                                                                 16,17,18,
                                                                 16,18,19,
-
-                                                                /* Back
-                                                                 */
+                                                                // bottom
                                                                 20,21,22,
                                                                 20,22,23
+                                                               
                                                             ]
                                                         }
                                                     ]
@@ -413,7 +374,7 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
+        pitch += (event.clientY - lastY) * 0.5;
 
         lastX = event.clientX;
         lastY = event.clientY;

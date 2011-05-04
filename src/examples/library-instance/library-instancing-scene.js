@@ -120,7 +120,7 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -25 },
+            eye : { x: 0.0, y: 10.0, z: 25 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -139,31 +139,23 @@ SceneJS.createNode({
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.5, g: 0.5, b: 0.5 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.7, g: 0.7, b: 0.7 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type: "light",
-                            mode:                   "dir",
                             color:                  { r: 0.8, g: 0.8, b: 0.8 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
+                        },
+                        {
+                            type: "light",
+                            mode:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                            diffuse:                true,
+                            specular:               true,
+                            dir:                    { x: 0.0, y: -1.0, z: -1.0 }
                         },
                         {
                             type: "rotate",
                             id: "pitch",
-                            angle: -30.0,
+                            angle: 30.0,
                             x : 1.0,
 
                             nodes: [
@@ -224,29 +216,12 @@ SceneJS.createNode({
 });
 
 
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
 /*---------------------------------------------------------------------------
  * Scene rendering and mouse input stuff
  *--------------------------------------------------------------------------*/
 
 var yaw = 30;
-var pitch = -30;
+var pitch = 30;
 var lastX;
 var lastY;
 var dragging = false;
@@ -266,7 +241,7 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
+        pitch += (event.clientY - lastY) * 0.5;
 
         SceneJS.withNode("pitch").set("angle", pitch);
         SceneJS.withNode("yaw").set("angle", yaw);

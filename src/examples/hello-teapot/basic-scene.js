@@ -37,7 +37,7 @@ SceneJS.createNode({
          */
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -15 },
+            eye : { x: 0.0, y: 10.0, z: 15 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -69,7 +69,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 0.5, z: -1.0 }
+                            dir:                    { x: 1.0, y: -0.5, z: -1.0 }
                         },
 
                         {
@@ -78,7 +78,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 1.0, b: 0.8 },
                             diffuse:                true,
                             specular:               false,
-                            dir:                    { x: 0.0, y: 0.5, z: -1.0 }
+                            dir:                    { x: 0.0, y: -0.5, z: -1.0 }
                         },
 
                         /* Next, modelling transforms to orient our teapot. See how these have IDs,
@@ -147,24 +147,6 @@ SceneJS.createNode({
     ]
 });
 
-
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
@@ -174,12 +156,6 @@ var lastX;
 var lastY;
 var dragging = false;
 
-//SceneJS.setDebugConfigs({
-//
-//    shading : {
-//        whitewash : true
-//    }
-//});
 
 SceneJS.withNode("theScene").render();
 

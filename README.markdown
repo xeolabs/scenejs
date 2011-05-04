@@ -6,18 +6,22 @@ for model and data visualisation systems.
 Some key features:
 
  * flexible JSON API for scene graph create/update/query
- * messaging system for peer-to-peer commands to the JSON API
- * automatic GLSL generation - fully encapsulated
+ * message system
+ * automatic internal GLSL generation
  * IoC container
  * GL state sorting
- * bounding boxes
- * LOD
- * flexible data flows
  * interpolated animation
+ * morphing
  * branching
  * instancing
+ * text
  * animated textures
+ * rendering to textures
+ * color, specular, glow, transparency and bump mapping
+ * arbitrarily-aligned clipping planes
  * multimaterials
+ * material atlasses
+ * render order layers
  * debugging modes
  * and more..
 

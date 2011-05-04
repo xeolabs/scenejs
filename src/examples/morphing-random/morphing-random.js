@@ -19,7 +19,7 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -15 },
+            eye : { x: 0.0, y: 10.0, z: 15 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -41,7 +41,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
                         {
@@ -50,7 +50,7 @@ SceneJS.createNode({
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 0.0, y: -1.0, z: -1.0 }
                         },
 
                         {
@@ -113,23 +113,6 @@ SceneJS.createNode({
     ]
 });
 
-
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
 
 /*----------------------------------------------------------------------
  * When the teapot has been rendered, get its positions, multiply them

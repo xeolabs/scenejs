@@ -179,11 +179,11 @@ SceneJS.createNode({
 
             /* Specify facet culling mode, accepted values are: front, back, front_and_back
              */
-            cullFace: "back",
+            cullFace: "front",
 
             /* Specify front/back-facing mode. Accepted values are cw or ccw
              */
-            frontFace: "cw",
+            frontFace: "ccw",
 
             nodes: [
 

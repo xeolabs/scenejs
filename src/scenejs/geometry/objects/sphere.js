@@ -81,9 +81,9 @@ SceneJS.Sphere.prototype._init = function(params) {
                 var u = 1 - (ringNum / rings);
                 var v = sliceNum / slices;
 
-                normals.push(-x);
-                normals.push(-y);
-                normals.push(-z);
+                normals.push(x);
+                normals.push(y);
+                normals.push(z);
                 uv.push(u);
                 uv.push(v);
                 positions.push(radius * x);

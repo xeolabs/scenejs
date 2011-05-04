@@ -39,14 +39,7 @@ SceneJS._bitmapTextModule = new (function() {
         var x = 0;
         var y = (size / 2);
         cx.fillText(text, x, y);
-
-       // document.body.appendChild(canvas);
-
-
-        //cx.fillText(text, 0, size);
-
-        //                canvas.width = 400;
-        //        canvas.height = 400;
+     
         return {
             image: canvas,
             width: canvas.width,

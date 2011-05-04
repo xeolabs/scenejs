@@ -10,14 +10,14 @@
 
  This renders separate scenegraphs containing a teapot object from different perspectives 
  into four separate canvases.
- 
+
  This scene is interactive; to rotate the view, it takes two variables, "yaw" and "pitch", which are
  updated on rotate nodes from mouse input.
 
  Dragging in the pitch and yaw axes in any one canvas will affect the orientation of the teapot 
  object in the other three canvases. Each of the rotatable Newell Teapots are illuminated by three 
  light sources from the same direction.
- 
+
  */
 SceneJS.createNode({
 
@@ -42,7 +42,7 @@ SceneJS.createNode({
          */
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -15 },
+            eye : { x: 0.0, y: 10.0, z: 15 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -73,7 +73,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
                         {
@@ -82,16 +82,7 @@ SceneJS.createNode({
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            dir:                    { x: 0.0, y: -1.0, z: -1.0 }
                         },
 
                         /* Next, modelling transforms to orient our teapot. See how these have IDs,
@@ -125,7 +116,7 @@ SceneJS.createNode({
                                                 {
                                                     type: "material",
                                                     emit: 0,
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    baseColor:      { r: 0.6, g: 0.6, b: 1.0 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                     specular:       0.9,
                                                     shine:          100.0,
@@ -133,14 +124,16 @@ SceneJS.createNode({
                                                     nodes: [
 
                                                         {
-                                                            type: "translate", // Example translation
+                                                            type: "translate",
+                                                            // Example translation
                                                             x:0.0,
                                                             y:0.0,
                                                             z:0.0,
 
                                                             nodes : [
                                                                 {
-                                                                    type: "scale",  // Example scaling
+                                                                    type: "scale",
+                                                                    // Example scaling
                                                                     x:1.0,
                                                                     y:1.0,
                                                                     z:1.0,
@@ -281,7 +274,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
                         {
@@ -290,16 +283,7 @@ SceneJS.createNode({
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            dir:                    { x: 0.0, y: -1.0, z: -1.0 }
                         },
 
                         /* Next, modelling transforms to orient our teapot. See how these have IDs,
@@ -333,7 +317,7 @@ SceneJS.createNode({
                                                 {
                                                     type: "material",
                                                     emit: 0,
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    baseColor:      { r: 0.6, g: 0.6, b: 1.0 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                     specular:       0.9,
                                                     shine:          100.0,
@@ -341,14 +325,16 @@ SceneJS.createNode({
                                                     nodes: [
 
                                                         {
-                                                            type: "translate", // Example translation
+                                                            type: "translate",
+                                                            // Example translation
                                                             x:0.0,
                                                             y:0.0,
                                                             z:0.0,
 
                                                             nodes : [
                                                                 {
-                                                                    type: "scale",  // Example scaling
+                                                                    type: "scale",
+                                                                    // Example scaling
                                                                     x:1.0,
                                                                     y:1.0,
                                                                     z:1.0,
@@ -490,7 +476,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
                         {
@@ -499,17 +485,9 @@ SceneJS.createNode({
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 0.0, y: -1.0, z: -1.0 }
                         },
 
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                        },
 
                         /* Next, modelling transforms to orient our teapot. See how these have IDs,
                          * so we can access them to set their angle attributes.
@@ -542,7 +520,7 @@ SceneJS.createNode({
                                                 {
                                                     type: "material",
                                                     emit: 0,
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    baseColor:      { r: 0.6, g: 0.6, b: 1.0 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                     specular:       0.9,
                                                     shine:          100.0,
@@ -550,14 +528,16 @@ SceneJS.createNode({
                                                     nodes: [
 
                                                         {
-                                                            type: "translate", // Example translation
+                                                            type: "translate",
+                                                            // Example translation
                                                             x:0.0,
                                                             y:0.0,
                                                             z:0.0,
 
                                                             nodes : [
                                                                 {
-                                                                    type: "scale",  // Example scaling
+                                                                    type: "scale",
+                                                                    // Example scaling
                                                                     x:1.0,
                                                                     y:1.0,
                                                                     z:1.0,
@@ -698,7 +678,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 0.5, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
                         {
@@ -707,17 +687,9 @@ SceneJS.createNode({
                             color:                  { r: 0.5, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 0.0, y: -1.0, z: -1.0 }
                         },
 
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
-                        },
 
                         /* Next, modelling transforms to orient our teapot. See how these have IDs,
                          * so we can access them to set their angle attributes.
@@ -750,7 +722,7 @@ SceneJS.createNode({
                                                 {
                                                     type: "material",
                                                     emit: 0,
-                                                    baseColor:      { r: 0.3, g: 0.3, b: 0.9 },
+                                                    baseColor:      { r: 0.6, g: 0.6, b: 1.0 },
                                                     specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                                     specular:       0.9,
                                                     shine:          100.0,
@@ -758,14 +730,16 @@ SceneJS.createNode({
                                                     nodes: [
 
                                                         {
-                                                            type: "translate", // Example translation
+                                                            type: "translate",
+                                                            // Example translation
                                                             x:0.0,
                                                             y:0.0,
                                                             z:0.0,
 
                                                             nodes : [
                                                                 {
-                                                                    type: "scale",  // Example scaling
+                                                                    type: "scale",
+                                                                    // Example scaling
                                                                     x:1.0,
                                                                     y:1.0,
                                                                     z:1.0,

@@ -395,6 +395,17 @@ SceneJS._WithNode.prototype.stop = function () {
 };
 
 /**
+ * Stops the selected scene node, which must be a scene.
+ */
+SceneJS._WithNode.prototype.pause = function (doPause) {
+    if (this._targetNode.getType() != "scene") {
+        throw "pause attempted on node that is not a \"scene\" '" + this._targetNode.getID() + "'";
+    }
+    this._targetNode.pause(doPause);
+    return this;
+};
+
+/**
  * Destroys the selected scene node, which must be a scene.
  */
 SceneJS._WithNode.prototype.destroy = function() {

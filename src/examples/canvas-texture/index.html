@@ -5,15 +5,17 @@
     <title></title>
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
     <link href="../web/style.css" rel="stylesheet" type="text/css"/>
-
 </head>
+<body>
+
 <div id="container">
     <div id="header">
         <div id="header-nav">
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Transparency
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Canvas
+                Texture Demo
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -31,17 +33,19 @@
                 <a href="http://www.w3.org/html/wg/html5/">HTML5</a>
                 &lt;canvas&gt; feature.</p>
         </canvas>
+        <canvas id="the-2d-canvas" width="200" height="200">
+        </canvas>
         <div id="info">
-            <h2>Transparency</h2>
+            <h2>Kneel before Zod!</h2>
 
-            <p>More info on transparency here</p>
-
-
+            <p>This example demonstrates all texture configurations, including scaling, translation and rotation of the
+                texture.</p>
 
             <br/>
             <ul>
-                <li><a target="_other" href="transparency.js">Scene source code</a></li>
-              
+                <li><a target="_other" href="canvas-texture.js">Scene source code</a></li>
+                <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.Texture">Wiki page on
+                    SceneJS.Texture</a></li>
             </ul>
         </div>
         <div id="log">
@@ -51,6 +55,8 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="transparency.js"></script>
+
+
+<script type="text/javascript" src="canvas-texture.js"></script>
 </body>
 </html>

@@ -85,7 +85,7 @@ SceneJS.Material.prototype.setBaseColor = function(color) {
         r: color.r != undefined && color.r != null ? color.r : 0.0,
         g: color.g != undefined && color.g != null ? color.g : 0.0,
         b: color.b != undefined && color.b != null ? color.b : 0.0
-    } : null;
+    } : undefined;
 };
 
 /**
@@ -98,7 +98,7 @@ SceneJS.Material.prototype.getBaseColor = function() {
         r: this._attr.baseColor.r,
         g: this._attr.baseColor.g,
         b: this._attr.baseColor.b
-    } : null;
+    } : undefined;
 };
 
 /**
@@ -111,7 +111,7 @@ SceneJS.Material.prototype.setHighlightBaseColor = function(color) {
         r: color.r != undefined && color.r != null ? color.r : 0.0,
         g: color.g != undefined && color.g != null ? color.g : 0.0,
         b: color.b != undefined && color.b != null ? color.b : 0.0
-    } : null;
+    } : undefined;
 };
 
 /**
@@ -124,7 +124,7 @@ SceneJS.Material.prototype.getHighlightBaseColor = function() {
         r: this._attr.highlightBaseColor.r,
         g: this._attr.highlightBaseColor.g,
         b: this._attr.highlightBaseColor.b
-    } : null;
+    } : undefined;
 };
 
 /**
@@ -137,7 +137,7 @@ SceneJS.Material.prototype.setSpecularColor = function(color) {
         r: color.r != undefined && color.r != null ? color.r : 0.0,
         g: color.g != undefined && color.g != null ? color.g : 0.0,
         b: color.b != undefined && color.b != null ? color.b : 0.0
-    } : null;
+    } : undefined;
 };
 
 
@@ -151,7 +151,7 @@ SceneJS.Material.prototype.getBaseColor = function() {
         r: this._attr.baseColor.r,
         g: this._attr.baseColor.g,
         b: this._attr.baseColor.b
-    } : null;
+    } : undefined;
 };
 
 
@@ -165,7 +165,7 @@ SceneJS.Material.prototype.getSpecularColor = function() {
         r: this._attr.specularColor.r,
         g: this._attr.specularColor.g,
         b: this._attr.specularColor.b
-    } : null;
+    } : undefined;
 };
 
 /**

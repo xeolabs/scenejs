@@ -18,7 +18,7 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -35 },
+            eye : { x: 0.0, y: 10.0, z: 35 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -84,7 +84,7 @@ SceneJS.createNode({
                                  * -------------------------------------------------------*/
                                 {
                                     type: "translate",
-                                    z: -10 ,
+                                    z: 10 ,
                                     nodes: [
                                         {
                                             type: "material",
@@ -211,7 +211,7 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         roty = (event.clientX - lastX);
-        rotx = (event.clientY - lastY) * -1;
+        rotx = (event.clientY - lastY);
 
         if (Math.abs(roty) > Math.abs(rotx)) {
 

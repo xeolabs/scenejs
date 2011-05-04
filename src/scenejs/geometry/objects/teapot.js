@@ -5796,7 +5796,7 @@ SceneJS.Teapot = function() {
                     y += nvecs[i][j][1];
                     z += nvecs[i][j][2];
                 }
-                normals[i] = [x / count, y / count, z / count];
+                normals[i] = [-(x / count), -(y / count), -(z / count)];
             }
             return normals;
         };

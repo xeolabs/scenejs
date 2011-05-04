@@ -390,6 +390,7 @@ SceneJS._webgl_Texture2D = function(context, cfg) {
     this.magFilter = cfg.magFilter;
     this.wrapS = cfg.wrapS;
     this.wrapT = cfg.wrapT;
+    this.update = cfg.update;  // For dynamically-sourcing textures (ie movies etc)
 
     context.bindTexture(this.target, this.handle);
 
@@ -498,7 +499,9 @@ SceneJS._webgl_Texture2D = function(context, cfg) {
     this.bind = function(unit) {
         context.activeTexture(context["TEXTURE" + unit]);
         context.bindTexture(this.target, this.handle);
-
+        if (this.update) {
+            this.update(context);
+        }
     };
 
     /** @private */

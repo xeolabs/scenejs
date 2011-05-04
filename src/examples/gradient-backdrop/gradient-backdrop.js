@@ -10,7 +10,7 @@ SceneJS.createNode({
 
             id: "the-lookat",
             
-            eye : { x: 0.0, y: 2.0, z: -55 },
+            eye : { x: 0.0, y: 2.0, z: 55 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -90,7 +90,7 @@ SceneJS.createNode({
                                                     type: "material",
                                                     baseColor: { r: .95, g: .95, b: .95 },
                                                     specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
-                                                    emit:           0.01,
+                                                    emit:           0.2,
                                                     specular:       0.9,
                                                     shine:          3.0,
 
@@ -138,7 +138,7 @@ SceneJS.createNode({
                                                                             /* Normal per vertex
                                                                              */
                                                                             normals : [
-                                                                                0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
+                                                                                0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1
                                                                             ],
 
                                                                             /* Vertex UV coordinates
@@ -210,25 +210,6 @@ SceneJS.createNode({
             ]
         }
     ]
-});
-
-
-
-/*----------------------------------------------------------------------
- * Disable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : false
-    }
 });
 
 

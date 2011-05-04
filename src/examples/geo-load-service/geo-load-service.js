@@ -25,8 +25,8 @@ function MyGeoLoader() {
             callback({
                 primitive   : "triangles",
                 positions   : new Float32Array([  5, 5, 5,-5, 5, 5,-5,-5, 5,5,-5, 5,5, 5, 5,5,-5, 5,5,-5,-5,5, 5,-5,5, 5, 5,5, 5,-5,-5, 5,-5,-5, 5, 5, -5, 5, 5,-5, 5,-5,-5,-5,-5,-5,-5, 5,-5,-5,-5,5,-5,-5,5,-5, 5,-5,-5, 5,5,-5,-5,-5,-5,-5,-5, 5,-5, 5, 5,-5]),
-                normals     : new Float32Array([ 0, 0, -1,0, 0, -1, 0, 0, -1, 0, 0, -1,-1, 0, 0,-1, 0, 0,-1, 0, 0,-1, 0, 0, 0, -1, 0,0, -1, 0,0, -1, 0,0, -1, 0,1, 0, 0,1, 0, 0,1, 0, 0,1, 0, 0,0,1, 0, 0,1, 0,0,1, 0,0,1, 0,0, 0,1,0, 0,1,0, 0,1,0, 0,1]),
-                uv          : new Float32Array([5, 5,0, 5,0, 0, 5, 0,  0, 5,0, 0,5, 0,5, 5,5,0,5, 5,0, 5,0, 0,5,5,0, 5,0, 0,5, 0,0, 0,5,0,5,5,0,5,0,0,5,0,5,5,0,5]),
+                normals     : new Float32Array([  0, 0, 1, 0, 0, 1,  0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0,-1, 0, 0, -1, 0, 0,  0,-1, 0, 0,-1, 0,  0,-1, 0, 0,-1, 0, 0, 0,-1, 0, 0,-1, 0, 0,-1, 0, 0,-1]),
+                uv          : new Float32Array([  5, 5,0, 5,0, 0, 5, 0,  0, 5,0, 0,5, 0,5, 5,5,0,5, 5,0, 5,0, 0,5,5,0, 5,0, 0,5, 0,0, 0,5,0,5,5,0,5,0,0,5,0,5,5,0,5]),
                 uv2         : null,
                 indices     : new Int32Array([ 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9,10, 8,10,11,12,13,14, 12,14,15,16,17,18,16,18,19,20,21,22,20,22,23])
             });
@@ -52,7 +52,7 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -55 },
+            eye : { x: 0.0, y: 10.0, z: 55 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -66,31 +66,23 @@ SceneJS.createNode({
                         near : 0.10,
                         far : 300.0
                     },
-
+                    
                     nodes: [
-                        {
+                          {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.5, g: 0.5, b: 0.5 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            specular:               false,
+                            dir:                    { x: 1.0, y: -0.5, z: -1.0 }
                         },
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.7, g: 0.7, b: 0.7 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            specular:               false,
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
                         /* Next, modelling transforms to orient our geometry
@@ -122,37 +114,7 @@ SceneJS.createNode({
                                                     type: "texture",
                                                     layers: [
                                                         {
-                                                            uri:"images/BrickWall.jpg" ,
-                                                            minFilter: "linear",
-                                                            magFilter: "linear",
-                                                            wrapS: "repeat",
-                                                            wrapT: "repeat",
-                                                            isDepth: false,
-                                                            depthMode:"luminance",
-                                                            depthCompareMode: "compareRToTexture",
-                                                            depthCompareFunc: "lequal",
-                                                            flipY: false,
-                                                            width: 1,
-                                                            height: 1,
-                                                            internalFormat:"lequal",
-                                                            sourceFormat:"alpha",
-                                                            sourceType: "unsignedByte",
-                                                            applyTo:"baseColor",
-                                                            blendMode:"multiply",
-
-                                                            /* Texture rotation angle in degrees
-                                                             */
-                                                            rotate: 0.0,
-
-                                                            /* Texture translation offset
-                                                             */
-                                                            translate : {
-                                                                x: 0,
-                                                                y: 0
-                                                            },
-
-                                                            /* Texture scale factors
-                                                             */
+                                                            uri:"images/BrickWall.jpg",
                                                             scale : {
                                                                 x: .1,
                                                                 y: .05
@@ -183,24 +145,6 @@ SceneJS.createNode({
             ]
         }
     ]
-});
-
-
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
 });
 
 

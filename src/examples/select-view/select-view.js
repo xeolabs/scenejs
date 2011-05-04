@@ -53,7 +53,7 @@ SceneJS.createNode({
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: 1.0 }
+                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
                         },
 
                         {
@@ -133,23 +133,6 @@ SceneJS.createNode({
             ]
         }
     ]
-});
-
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
 });
 
 //------------------------------------------------------------------------------------------------------------------

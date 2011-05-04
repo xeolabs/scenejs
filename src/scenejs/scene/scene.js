@@ -176,14 +176,14 @@ SceneJS.Scene.prototype.getCanvasId = function() {
     return this._canvasId;
 };
 
-/** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to. 
+/** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to.
  */
 SceneJS.Scene.prototype.getZBufferDepth = function() {
     var context;
     if (this._sceneId) {
         context = SceneJS._sceneModule.getSceneContext(this._sceneId);
         return context.getParameter(context.DEPTH_BITS)
-    }    
+    }
     return context;
 };
 
@@ -204,6 +204,17 @@ SceneJS.Scene.prototype.setLayers = function(layers) {
 SceneJS.Scene.prototype.getLayers = function() {
     return this._layers;
 };
+
+ window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       ||
+              window.webkitRequestAnimationFrame ||
+              window.mozRequestAnimationFrame    ||
+              window.oRequestAnimationFrame      ||
+              window.msRequestAnimationFrame     ||
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
 
 /**
  * Starts the scene rendering repeatedly in a loop. After this {@link #isRunning} will return true, and you can then stop it again
@@ -279,9 +290,12 @@ SceneJS.Scene.prototype.start = function(cfg) {
         });
     }
 
-    if (!this._running) {
+    if (!this._running || this._paused) {
         cfg = cfg || {};
+
         this._running = true;
+        this._paused = false;
+
         var self = this;
         var fnName = "__scenejs_compileScene" + this._sceneId;
 
@@ -293,7 +307,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
 
         window[fnName] = function() {
 
-            if (self._running) { // idleFunc may have stopped render loop
+            if (self._running && !self._paused) { // idleFunc may have stopped render loop
 
                 if (cfg.idleFunc) {
                     cfg.idleFunc();
@@ -313,10 +327,27 @@ SceneJS.Scene.prototype.start = function(cfg) {
                 }
             }
         };
+
+//        (function animloop(){
+//    window[fnName]();
+//      requestAnimFrame(animloop);
+//    })();
+
         this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 60));
+
+        /* Push one frame immediately        
+         */
+        window[fnName]();
     }
 };
 
+/** Pauses/unpauses current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
+ */
+SceneJS.Scene.prototype.pause = function(doPause) {
+    if (this._running && this._sceneId) {
+        this._paused = doPause;
+    }
+};
 
 /** Returns true if the scene is currently rendering repeatedly in a loop after being started with {@link #start}.
  */

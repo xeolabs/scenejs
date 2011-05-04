@@ -13,7 +13,7 @@ SceneJS.createNode({
 		{
 			type: "lookAt",
 			id: "myLookAt",
-			eye : { x: 0, y: 120, z: -30 },
+			eye : { x: 0, y: 120, z: 30 },
 			look : { x: 0, y: 0, z: 0 },
 			up : { y: 1.0 },
 
@@ -32,9 +32,9 @@ SceneJS.createNode({
 							type: "light",
 							mode: "dir",
 							color: { r: 1, g: 1, b: 1 },
-							dir: {x:0, y:4, z:-1},
+							dir: {x:0, y:-1, z:-1},
 							diffuse: true,
-							specular: false,
+							specular: false
 						},
 						{
 							type: "material",
@@ -55,7 +55,7 @@ SceneJS.createNode({
 											x: 0, y: 0, z: 10,
 											nodes: [
 												{
-													type: "sphere",
+													type: "sphere"
 												},
 												{
 													type: "sound",

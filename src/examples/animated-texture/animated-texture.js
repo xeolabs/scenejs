@@ -1,5 +1,5 @@
 /**
- * Animated texture example
+ * Texture sampled from 2D canvas
  *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
@@ -7,9 +7,6 @@
  *
  */
 
-/*----------------------------------------------------------------------
- * Scene graph definition
- *---------------------------------------------------------------------*/
 
 SceneJS.createNode({
     type: "scene",
@@ -19,7 +16,7 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 0.0, z: -10},
+            eye : { x: 0.0, y: 0.0, z: 10},
             look : { x : 0.0, y : 0.0, z : 0 },
             up : { x: 0.0, y: 1.0, z: 0.0 },
 
@@ -32,32 +29,24 @@ SceneJS.createNode({
                         aspect : 1.47,
                         near : 0.10,
                         far : 300.0
-                    },
+                    },                   
 
                     nodes: [
                         {
                             type: "light",
-                            mode:                 "dir",
-                            color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                            mode:                   "dir",
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -0.5, z: -1.0 }
                         },
                         {
                             type: "light",
-                            mode:                 "dir",
-                            color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                            mode:                   "dir",
+                            color:                  { r: 0.7, g: 0.7, b: 0.7 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type: "light",
-                            mode:                 "dir",
-                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: 0.5, z: -1.0 }
                         },
                         {
                             type: "material",
@@ -67,22 +56,11 @@ SceneJS.createNode({
                             shine:          10.0,
 
                             nodes: [
-
-
-                                /** Textures images are loaded asynchronously and won't render
-                                 * immediately. On first traversal, they start loading their image,
-                                 * which they collect on a subsequent traversal.
-                                 */
                                 {
                                     type: "texture",
 
                                     id: "theTexture",
 
-                                    /* A texture can have multiple layers, each applying an
-                                     * image to a different material reflection component.
-                                     * This layer applies the Zod image to the diffuse
-                                     * component, with animated scaling.
-                                     */
                                     layers: [
                                         {
                                             uri:"general-zod.jpg",
@@ -157,23 +135,6 @@ SceneJS.createNode({
 });
 
 /*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
-/*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff
  *---------------------------------------------------------------------*/
 
@@ -205,7 +166,7 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
+        pitch += (event.clientY - lastY) * 0.5;
         lastX = event.clientX;
         lastY = event.clientY;
 

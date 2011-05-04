@@ -102,12 +102,11 @@ SceneJS._renderModule = new (function() {
 
     var DEFAULT_MATERIAL = {
         material: {
-            baseColor :  [ 0.0, 0.0, 0.0 ],
-            highlightBaseColor :  [ 0.0, 0.0, 0.0 ],
-            specularColor :  [ 0.5,  0.5,  0.5 ],
-            specular : 2,
-            shine :  0.5,
-            reflect :  0,
+            baseColor :  [ 1.0, 1.0, 1.0 ],
+            specularColor :  [ 1.0,  1.0,  1.0 ],
+            specular : 1.0,
+            shine :  10.0,
+            reflect :  0.8,
             alpha :  1.0,
             emit :  0.0
         }
@@ -562,10 +561,10 @@ SceneJS._renderModule = new (function() {
         materialState.material = {
             baseColor : material.baseColor || [ 0.0, 0.0, 0.0 ],
             highlightBaseColor : material.highlightBaseColor || material.baseColor || [ 0.0, 0.0, 0.0 ],
-            specularColor : material.specularColor || [ 0.5,  0.5,  0.5 ],
-            specular : material.specular != undefined ? material.specular : 2,
-            shine : material.shine != undefined ? material.shine : 0.5,
-            reflect : material.reflect != undefined ? material.reflect : 0,
+            specularColor : material.specularColor || [ 0.0,  0.0,  0.0 ],
+            specular : material.specular != undefined ? material.specular : 1.0,
+            shine : material.shine != undefined ? material.shine : 10.0,
+            reflect : material.reflect != undefined ? material.reflect : 0.8,
             alpha : material.alpha != undefined ? material.alpha : 1.0,
             emit : material.emit != undefined ? material.emit : 0.0
         };
@@ -877,7 +876,7 @@ SceneJS._renderModule = new (function() {
         //  var sceneBVH = SceneJS._bvhModule.sceneBVH[states.sceneId];
 
         /* Render opaque nodes while buffering transparent nodes.
-        * Layer order is preserved independently within opaque and transparent bins.
+         * Layer order is preserved independently within opaque and transparent bins.
          */
         for (i = 0; i < len; i++) {
             node = bin[i];
@@ -997,7 +996,7 @@ SceneJS._renderModule = new (function() {
 
         src.push("varying vec4 vWorldVertex;");
         src.push("varying vec4 vViewVertex;");
-        
+
         src.push("void main(void) {");
 
         src.push("  vec4 tmpVertex = uMMatrix * vec4(aVertex, 1.0); ");
@@ -1267,7 +1266,11 @@ SceneJS._renderModule = new (function() {
         src.push("  vec4 viewVertex  = uVMatrix * worldVertex; ");
 
         if (lighting) {
-            src.push("  vNormal = normalize(worldNormal.xyz);");
+//            if (debugCfg.invertNormals) {
+//                src.push("  vNormal = normalize(worldNormal.xyz);");
+//            } else {
+                src.push("  vNormal = normalize(worldNormal.xyz);");
+            //}
         }
 
         src.push("  vWorldVertex = worldVertex;");
@@ -1289,7 +1292,7 @@ SceneJS._renderModule = new (function() {
                     src.push("vLightVecAndDist" + i + " = vec4(-normalize(uLightDir" + i + "), 0.0);");
                 }
                 if (light.mode == "point") {
-                    src.push("tmpVec3 = -(uLightPos" + i + ".xyz - worldVertex.xyz);");
+                    src.push("tmpVec3 = (uLightPos" + i + ".xyz - worldVertex.xyz);");
                     src.push("vLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
                 }
                 if (light.mode == "spot") {
@@ -1299,7 +1302,7 @@ SceneJS._renderModule = new (function() {
         }
 
         if (lighting) {
-            src.push("vEyeVec = -normalize(aEye - worldVertex.xyz);");
+            src.push("vEyeVec = normalize(aEye - worldVertex.xyz);");
         }
 
         if (texturing) {
@@ -1560,7 +1563,7 @@ SceneJS._renderModule = new (function() {
 
                 if (layer.applyTo == "normals") {
                     src.push("vec3 bump = normalize(texture2D(uSampler" + i + ", textureCoord).xyz * 2.0 - 1.0);");
-                    src.push("normalVec *= bump;");
+                    src.push("normalVec *= -bump;");
                 }
             }
         }

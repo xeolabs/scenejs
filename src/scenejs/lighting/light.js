@@ -143,7 +143,7 @@ SceneJS.Light.prototype.getDiffuse = function() {
  * @return {SceneJS.Light} this
  */
 SceneJS.Light.prototype.setSpecular = function (specular) {
-    this._light.specular = specular || false;
+    this._light.specular = specular || true;
     return this;
 };
 

@@ -160,7 +160,7 @@ SceneJS._textureModule = new (function() {
         var glName = SceneJS._webgl_enumMap[value];
         if (glName == undefined) {
             throw SceneJS._errorModule.fatalError(
-                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Unrecognised value for SceneJS.texture node property '" + name + "' value: '" + value + "'");
         }
         var glValue = context[glName];
@@ -190,10 +190,12 @@ SceneJS._textureModule = new (function() {
     /** Asynchronously creates a texture, either from image URL or image object
      */
     this.createTexture = function(cfg, onSuccess, onError, onAbort) {
-        var image = new Image();
+
         var _canvas = canvas;
         var _context = canvas.context;
         if (cfg.uri) {
+
+            var image = new Image();
 
             /* Start a SceneJS process for the texture load and creation
              */
@@ -228,13 +230,36 @@ SceneJS._textureModule = new (function() {
                 onAbort();
             };
             image.src = cfg.uri;  // Starts image load
-        } else if (cfg.image) {
 
-            var textureId = allocateTexture(_canvas, _context, cfg.image, cfg);
-            onSuccess(textures[textureId]);
-        } else {
-            throw "Failed to create texture: neither cfg.image nor cfg.uri supplied";
-        }
+        } else
+
+        /*--------------------------------------------------------------------
+         * Image texture
+         *-------------------------------------------------------------------*/
+
+            if (cfg.image) {
+                var textureId = allocateTexture(_canvas, _context, cfg.image, cfg);
+                onSuccess(textures[textureId]);
+
+            } else
+
+            /*--------------------------------------------------------------------
+             * Canvas texture
+             *-------------------------------------------------------------------*/
+
+                if (cfg.canvasId) {
+
+                    var srcCanvas = document.getElementById(cfg.canvasId);
+                    if (!srcCanvas) {
+                        throw SceneJS._errorModule.fatalError(
+                                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                                "Could not find canvas for texture node '" + cfg.canvasId + "'");
+                    }
+                    var textureId = allocateTexture(_canvas, _context, srcCanvas, cfg);
+                    onSuccess(textures[textureId]);
+                } else {
+                    throw "Failed to create texture: neither cfg.image nor cfg.uri supplied";
+                }
     };
 
     function allocateTexture(canvas, context, image, cfg) {
@@ -244,6 +269,20 @@ SceneJS._textureModule = new (function() {
                 "texture '" + textureId + "'",
                 function() {
                     try {
+                        if (cfg.autoUpdate) {
+                            var update = function() {
+                                //TODO: fix this when minefield is upto spec
+                                try {
+                                    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+                                }
+                                catch(e) {
+                                    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image, null);
+                                }
+                                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+                                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+                              //  context.generateMipmap(context.TEXTURE_2D);
+                            };
+                        }
                         textures[textureId] = new SceneJS._webgl_Texture2D(context, {
                             textureId : textureId,
                             canvas: canvas,
@@ -263,7 +302,8 @@ SceneJS._textureModule = new (function() {
                             internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
                             sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
                             sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
-                            logging: SceneJS._loggingModule
+                            logging: SceneJS._loggingModule ,
+                            update: update
                         });
                     } catch (e) {
                         throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);

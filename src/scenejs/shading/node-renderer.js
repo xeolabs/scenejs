@@ -661,6 +661,7 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         ///////////////////////////////////////////
         this._context.finish();
+        //this._context.flush();
         ///////////////////////////////////////////
 
 

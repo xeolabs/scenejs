@@ -14,8 +14,8 @@ SceneJS.createNode({
     nodes: [
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -35 },
-            look : { y:1.0 },
+            eye : { x: 0.0, y: 0.0, z: 35 },
+            look : { y:0.0 },
             up : { y: 1.0 },
 
             nodes: [
@@ -44,8 +44,9 @@ SceneJS.createNode({
                             nodes: [
                                 {
                                     type: "translate",
-                                    x: 10,
-                                    z: -10,
+                                    x: -10,
+                                    y: 0.0,
+                                    z: 10,
 
                                     nodes: [
                                         {
@@ -115,7 +116,7 @@ SceneJS.createNode({
 
                         {
                             type: "rotate",
-                            angle: -20,
+                            angle: 20,
                             x : 1.0,
                             nodes: [
 
@@ -160,23 +161,6 @@ SceneJS.createNode({
     ]
 });
 
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
 /*---------------------------------------------------------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff
  *--------------------------------------------------------------------------------------------------------------------*/
@@ -207,7 +191,7 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         roty = (event.clientX - lastX);
-        rotx = (event.clientY - lastY) * -1;
+        rotx = (event.clientY - lastY);
 
         if (Math.abs(roty) > Math.abs(rotx)) {
 

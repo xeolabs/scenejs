@@ -185,7 +185,7 @@ SceneJS._morphGeometryModule = new (function() {
      * @param callback Callback that returns handle to morph once created
      *
      */
-    this.createMorphGeometry = function(resource, source, callback) {
+    this.createMorphGeometry = function(resource, source, options, callback) {
 
         if (!resource) {
             resource = SceneJS._createKeyForMap(currentMorphMap, "m");
@@ -203,18 +203,18 @@ SceneJS._morphGeometryModule = new (function() {
              */
             geoService.loadMorphGeometry(source,
                     function(data) {
-                        callback(self._createMorph(resource, data));
+                        callback(self._createMorph(resource, data, options));
                     });
 
         } else {
 
             /* Targets specified
              */
-            return this._createMorph(resource, source);
+            return this._createMorph(resource, source, options);
         }
     };
 
-    this._createMorph = function(resource, data) {
+    this._createMorph = function(resource, data, options) {
 
         var context = canvas.context;
 

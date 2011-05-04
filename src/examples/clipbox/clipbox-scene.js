@@ -40,7 +40,7 @@ SceneJS.createNode({
          */
         {
             type: "lookAt",
-            eye : { x: 0.0, y: 10.0, z: -15 },
+            eye : { x: 0.0, y: 10.0, z: 15 },
             look : { y:1.0 },
             up : { y: 1.0 },
 
@@ -60,33 +60,21 @@ SceneJS.createNode({
 
                     nodes: [
 
-                        /* A lights node inserts  point lights into the world-space.
-                         * You can have many of these, nested within modelling transforms
-                         * if you want to move them around.
-                         */
                         {
-                            type:                   "light",
+                            type: "light",
                             mode:                   "dir",
-                            color:                  { r: 1.0, g: 0.5, b: 0.5 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 1.0, y: 1.0, z: -1.0 }
+                            dir:                    { x: -1.0, y: -0.5, z: -1.0 }
                         },
                         {
-                            type:                   "light",
+                            type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.5, g: 1.0, b: 0.5 },
+                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: 0.0, y: 1.0, z: -1.0 }
-                        },
-                        {
-                            type:                   "light",
-                            mode:                   "dir",
-                            color:                  { r: 0.2, g: 0.2, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: -1.0, y: 0.0, z: -1.0 }
+                            dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
 
 
