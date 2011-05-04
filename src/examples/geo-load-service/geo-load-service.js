@@ -115,6 +115,7 @@ SceneJS.createNode({
                                                     layers: [
                                                         {
                                                             uri:"images/BrickWall.jpg",
+                                                            blendMode: "multiply",
                                                             scale : {
                                                                 x: .1,
                                                                 y: .05
