@@ -1,10 +1,12 @@
 /*
- This example shows how to define and use a GeoStreamService to customize how geometry is loaded. We'll just
- implement a stub of the service in this example, which should give you enough clues for define your own implementation.
+ This example shows how to define and use a GeoStreamService to customize how geometry is loaded, along with a
+ MorphGeoService to customize how morph targets are loaded for its animation. We'll just implement a stub of the
+ services in this example, which should give you enough clues for define your own implementation.
 
- Wiki article:
+ Wiki articles:
 
  http://scenejs.wikispaces.com/GeoLoaderService
+ http://scenejs.wikispaces.com/MorphGeoLoaderService
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
@@ -18,14 +20,15 @@
  * is available. We'll reference the stream with a geometry node within our scene graph, further below.
  */
 
+var FIRST_MORPH_KEY = 0;
+var LAST_MORPH_KEY = 6;
+
 function MyGeoLoader() {
 
     this.loadGeometry = function(id, callback) {
         if (id == "my-geo-stream") {
             callback({
                 primitive   : "triangles",
-                positions   : new Float32Array([  5, 5, 5,-5, 5, 5,-5,-5, 5,5,-5, 5,5, 5, 5,5,-5, 5,5,-5,-5,5, 5,-5,5, 5, 5,5, 5,-5,-5, 5,-5,-5, 5, 5, -5, 5, 5,-5, 5,-5,-5,-5,-5,-5,-5, 5,-5,-5,-5,5,-5,-5,5,-5, 5,-5,-5, 5,5,-5,-5,-5,-5,-5,-5, 5,-5, 5, 5,-5]),
-                normals     : new Float32Array([  0, 0, 1, 0, 0, 1,  0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0,-1, 0, 0, -1, 0, 0,  0,-1, 0, 0,-1, 0,  0,-1, 0, 0,-1, 0, 0, 0,-1, 0, 0,-1, 0, 0,-1, 0, 0,-1]),
                 uv          : new Float32Array([  5, 5,0, 5,0, 0, 5, 0,  0, 5,0, 0,5, 0,5, 5,5,0,5, 5,0, 5,0, 0,5,5,0, 5,0, 0,5, 0,0, 0,5,0,5,5,0,5,0,0,5,0,5,5,0,5]),
                 uv2         : null,
                 indices     : new Int32Array([ 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9,10, 8,10,11,12,13,14, 12,14,15,16,17,18,16,18,19,20,21,22,20,22,23])
@@ -39,6 +42,52 @@ function MyGeoLoader() {
 /* Register the service implementation
  */
 SceneJS.Services.addService(SceneJS.Services.GEO_LOADER_SERVICE_ID, new MyGeoLoader());
+
+/* Define a stub morphGeometry stream service that just provides a mock stream through which a simple morph
+ * targets data is available. We'll reference the stream with a morphGeometry node within our scene graph, further below.
+ */
+function MyMorphGeoLoader() {
+
+    this.loadMorphGeometry = function(id, callback) {
+        if (id == "my-morph-geo-stream") {
+            callback({
+
+                keys: [ FIRST_MORPH_KEY, 3, LAST_MORPH_KEY ], // One for each target
+
+                targets: [
+
+                    /* You can have as many targets as GPU memory will allow
+                     */
+                    {
+                        positions   : new Float32Array(randomize([  5, 5, 5,-5, 5, 5,-5,-5, 5,5,-5, 5,5, 5, 5,5,-5, 5,5,-5,-5,5, 5,-5,5, 5, 5,5, 5,-5,-5, 5,-5,-5, 5, 5, -5, 5, 5,-5, 5,-5,-5,-5,-5,-5,-5, 5,-5,-5,-5,5,-5,-5,5,-5, 5,-5,-5, 5,5,-5,-5,-5,-5,-5,-5, 5,-5, 5, 5,-5])),
+                        normals     : new Float32Array([ 0, 0, 1, 0, 0, 1,  0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0,-1, 0, 0, -1, 0, 0,  0,-1, 0, 0,-1, 0,  0,-1, 0, 0,-1, 0, 0, 0,-1, 0, 0,-1, 0, 0,-1, 0, 0,-1])
+                    },
+                    {
+                        positions   : new Float32Array(randomize([  15, 5, 5,-5, 5, 5,-5,-5, 15,5,-5, 5,5, 5, 5,5,-5, 5,5,-5,-5,5, 5,-5,5, 5, 5,5, 5,-5,-5, 5,-5,-5, 5, 5, -5, 5, 5,-5, 5,-5,-5,-5,-5,-5,-5, 5,-5,-5,-5,5,-5,-5,5,-5, 5,-5,-5, 5,5,-5,-5,-5,-5,-5,-5, 5,-5, 5, 5,-5])),
+                        normals     : new Float32Array([  0, 0, 1, 0, 0, 1,  0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0,-1, 0, 0, -1, 0, 0,  0,-1, 0, 0,-1, 0,  0,-1, 0, 0,-1, 0, 0, 0,-1, 0, 0,-1, 0, 0,-1, 0, 0,-1])
+                    },
+                    {
+                        positions   : new Float32Array(randomize([  25, 5, 5,-5, 5, 5,-5,-5, 15,5,-5, 5,5, 5, 5,5,-5, 5,5,-5,-5,5, 5,-5,5, 5, 5,5, 5,-5,-5, 5,-5,-5, 5, 5, -5, 5, 5,-5, 5,-5,-5,-5,-5,-5,-5, 5,-5,-5,-5,5,-5,-5,5,-5, 5,-5,-5, 5,5,-5,-5,-5,-5,-5,-5, 5,-5, 5, 5,-5])),
+                        normals     : new Float32Array([  0, 0, 1, 0, 0, 1,  0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, -1, 0, 0, -1, 0, 0,-1, 0, 0, -1, 0, 0,  0,-1, 0, 0,-1, 0,  0,-1, 0, 0,-1, 0, 0, 0,-1, 0, 0,-1, 0, 0,-1, 0, 0,-1])
+                    }
+                ]
+            });
+        } else {
+            throw "Can't find morphGeometry stream: '" + id + "'";
+        }
+    };
+}
+
+function randomize(arry) {
+    for (var i = 0, len = arry.length; i < len; i++) {
+        arry[i] += (Math.random() * 4.0) - 2;
+    }
+    return arry;
+}
+
+/* Register the service implementation
+ */
+SceneJS.Services.addService(SceneJS.Services.MORPH_GEO_LOADER_SERVICE_ID, new MyMorphGeoLoader());
 
 
 /* Scene graph containing geometry that pulls in the stream
@@ -105,10 +154,7 @@ SceneJS.createNode({
                                         {
                                             type: "material",
                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                            specular:       0.9,
-                                            shine:          6.0,
-
+                                            
                                             nodes: [
                                                 {
                                                     type: "texture",
@@ -124,14 +170,25 @@ SceneJS.createNode({
                                                     ],
 
                                                     nodes: [
-
                                                         {
-                                                            type: "geometry",
+                                                            type: "morphGeometry",
+                                                            id: "my-morph-geometry",
 
-                                                            /* Our GeoLoaderService implementation resolves this to the
+                                                            /* Our MorphGeoLoaderService resolves this to the
                                                              * available stream
                                                              */
-                                                            stream: "my-geo-stream"
+                                                            stream: "my-morph-geo-stream",
+
+                                                            nodes: [
+                                                                {
+                                                                    type: "geometry",
+
+                                                                    /* Our GeoLoaderService resolves this to the
+                                                                     * available stream
+                                                                     */
+                                                                    stream: "my-geo-stream"
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -177,6 +234,24 @@ function mouseMove(event) {
 
         lastX = event.clientX;
         lastY = event.clientY;
+    }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+
+
+/* On a mouse drag, we'll re-render the scene, passing in
+ * incremented angles in each time.
+ */
+function mouseMove(event) {
+    if (dragging) {
+        yaw += (event.clientX - lastX) * 0.5;
+        pitch += (event.clientY - lastY) * -0.5;
+
+        lastX = event.clientX;
+        lastY = event.clientY;
 
         SceneJS.withNode("pitch").set("angle", pitch);
         SceneJS.withNode("yaw").set("angle", yaw);
@@ -187,7 +262,22 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("the-scene").start();
+
+/* Run the scene, cycling the morphGeometry through it's keys:
+ */
+var factor = FIRST_MORPH_KEY;
+
+SceneJS.withNode("the-scene").start({
+    idleFunc: function() {
+        if (SceneJS.nodeExists("my-morph-geometry")) {
+            SceneJS.withNode("my-morph-geometry").set("factor", factor);
+            factor += 0.1;
+            if (factor > LAST_MORPH_KEY) {
+                factor = FIRST_MORPH_KEY;
+            }
+        }
+    }
+});
 
 
 

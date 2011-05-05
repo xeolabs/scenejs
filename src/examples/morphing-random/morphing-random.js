@@ -145,7 +145,7 @@ SceneJS.withNode("theScene").bind("rendered",
                 teapot.parent().insert({
                     node: {
                         type: "morphGeometry",
-                        id: "my-morphGeometry",
+                        id: "my-morph-geometry",
 
                         keys: [
                             0, // Target 1
@@ -189,8 +189,8 @@ var factor = 0;
 
 SceneJS.withNode("theScene").start({
     idleFunc: function() {
-        if (SceneJS.nodeExists("my-morphGeometry")) {
-            SceneJS.withNode("my-morphGeometry").set("factor", 1.0 + (Math.sin(factor) * 2.0));
+        if (SceneJS.nodeExists("my-morph-geometry")) {
+            SceneJS.withNode("my-morph-geometry").set("factor", 1.0 + (Math.sin(factor) * 2.0));
             factor += 0.1;
         }
     }

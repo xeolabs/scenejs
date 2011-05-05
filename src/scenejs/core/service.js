@@ -6,9 +6,9 @@ SceneJS.Services = new (function() {
 
     this.NODE_LOADER_SERVICE_ID = "node-loader";
 
-    this.GEO_LOADER_SERVICE_ID = "geo-stream";
+    this.GEO_LOADER_SERVICE_ID = "geo-loader";
 
-    this.MORPH_GEO_LOADER_SERVICE_ID = "geo-stream";
+    this.MORPH_GEO_LOADER_SERVICE_ID = "morph-geo-loader";
 
     this.COMMAND_SERVICE_ID = "command";
 
