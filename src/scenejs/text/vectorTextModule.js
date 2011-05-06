@@ -393,7 +393,7 @@ SceneJS._vectorTextModule = new (function() {
             [6,1],
             [5,2]
         ] },
-        ',': { width: 10, points: [
+        ';': { width: 10, points: [
             [5,14],
             [4,13],
             [5,12],

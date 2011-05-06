@@ -118,7 +118,7 @@ SceneJS.Services.addService(
                         };
                     }
                     if (handlers.error) {
-                        sockets.socket.onerror = function() {
+                        sockets.socket.onerror = function(e) {
                             sockets[socketId] = null;
                             var msg = "WebSocket error (URI: '" + socket.uri + "') : " + e;
                             handlers.error({socketId: socketId, error: msg });

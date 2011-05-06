@@ -334,7 +334,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
       if (tracing) {
           var prefix = '';
           // Should we remember the result for later?
-          objectNamer = constructorDict[functionName];
+          var objectNamer = constructorDict[functionName];
           if (objectNamer != undefined) {
               resultName = objectNamer();
               prefix = 'var ' + resultName + ' = ';

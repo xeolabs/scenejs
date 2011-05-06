@@ -79,7 +79,7 @@ SceneJS._loggingModule = new (function() {
 
     function logScript(src) {
         for (var i = 0; i < src.length; i++) {
-            logToConsole(src[i]);
+            _logToConsole(src[i]);
         }
     }
 

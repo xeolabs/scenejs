@@ -1516,7 +1516,7 @@ SceneJS._math_Box3 = function(min, max) {
     this.fromPoints = function(points) {
         var pointsLength = points.length;
 
-        for (i = 0; i < pointsLength; ++i) {
+        for (var i = 0; i < pointsLength; ++i) {
             var points_i3 = points[i][3];
             var pDiv0 = points[i][0] / points_i3;
             var pDiv1 = points[i][1] / points_i3;
