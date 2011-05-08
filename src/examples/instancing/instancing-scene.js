@@ -9,101 +9,6 @@
 
  */
 
-
-/*----------------------------------------------------------------------------
- * A box geometry
- *---------------------------------------------------------------------------*/
-
-SceneJS.createNode({
-    type: "scale",
-
-    id: "my-box",
-
-    x: 4.0,
-    y: 4.0,
-    z: 4.0,
-
-    nodes: [
-        {
-            type: "box"
-        }
-    ]
-});
-
-
-/*----------------------------------------------------------------------------
- * A material and texture containing an instance of the box
- *---------------------------------------------------------------------------*/
-
-SceneJS.createNode({
-
-    type: "material",
-
-    id: "my-material",
-
-    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-    specular:       0.2,
-    shine:          6.0,
-
-    nodes: [
-        {
-            type: "texture",
-            layers: [
-                {
-                    uri:"images/BrickWall.jpg" ,
-                    minFilter: "linear",
-                    magFilter: "linear",
-                    wrapS: "repeat",
-                    wrapT: "repeat",
-                    isDepth: false,
-                    depthMode:"luminance",
-                    depthCompareMode: "compareRToTexture",
-                    depthCompareFunc: "lequal",
-                    flipY: false,
-                    width: 1,
-                    height: 1,
-                    internalFormat:"lequal",
-                    sourceFormat:"alpha",
-                    sourceType: "unsignedByte",
-                    applyTo:"baseColor",
-                    blendMode:"multiply",
-
-                    /* Texture rotation angle in degrees
-                     */
-                    rotate: 0.0,
-
-                    /* Texture translation offset
-                     */
-                    translate : {
-                        x: 0,
-                        y: 0
-                    },
-
-                    /* Texture scale factors
-                     */
-                    scale : {
-                        x: 1,
-                        y: .5
-                    }
-                }
-            ],
-
-            nodes:[
-                {
-                    type: "instance",
-                    target:"my-box"
-                }
-            ]
-        }
-    ]
-});
-
-/*---------------------------------------------------------------------------
- * A scene containing an instance of the material, which contains an
- * instance of the box
- *--------------------------------------------------------------------------*/
-
 SceneJS.createNode({
     type: "scene",
     id: "the-scene",
@@ -111,6 +16,109 @@ SceneJS.createNode({
     loggingElementId: "theLoggingDiv",
 
     nodes: [
+
+        /*----------------------------------------------------------------------------
+         * The library node marks its subgraph as an explicit library section, causing
+         * traversal to bypass it. These are useful when we want certain nodes within
+         * our scene graph to only be traversed into via instance node that target them.
+         *---------------------------------------------------------------------------*/
+
+        {
+            type : "library",
+            nodes: [
+
+                /*----------------------------------------------------------------------------
+                 * A box geometry
+                 *---------------------------------------------------------------------------*/
+
+                {
+                    type: "scale",
+
+                    id: "my-box",
+
+                    x: 4.0,
+                    y: 4.0,
+                    z: 4.0,
+
+                    nodes: [
+                        {
+                            type: "box"
+                        }
+                    ]
+                },
+
+
+                /*----------------------------------------------------------------------------
+                 * A material and texture, wrapping an instance of the box
+                 *---------------------------------------------------------------------------*/
+
+                {
+
+                    type: "material",
+
+                    id: "my-brick-box",
+
+                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                    specular:       0.2,
+                    shine:          6.0,
+
+                    nodes: [
+                        {
+                            type: "texture",
+                            layers: [
+                                {
+                                    uri:"images/BrickWall.jpg" ,
+                                    minFilter: "linear",
+                                    magFilter: "linear",
+                                    wrapS: "repeat",
+                                    wrapT: "repeat",
+                                    isDepth: false,
+                                    depthMode:"luminance",
+                                    depthCompareMode: "compareRToTexture",
+                                    depthCompareFunc: "lequal",
+                                    flipY: false,
+                                    width: 1,
+                                    height: 1,
+                                    internalFormat:"lequal",
+                                    sourceFormat:"alpha",
+                                    sourceType: "unsignedByte",
+                                    applyTo:"baseColor",
+                                    blendMode:"multiply",
+
+                                    /* Texture rotation angle in degrees
+                                     */
+                                    rotate: 0.0,
+
+                                    /* Texture translation offset
+                                     */
+                                    translate : {
+                                        x: 0,
+                                        y: 0
+                                    },
+
+                                    /* Texture scale factors
+                                     */
+                                    scale : {
+                                        x: 1,
+                                        y: .5
+                                    }
+                                }
+                            ],
+
+                            nodes:[
+                                {
+                                    type: "instance",
+                                    target:"my-box"
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+            ]
+        },
+
         {
             type: "lookAt",
             eye : { x: 0.0, y: 10.0, z: 55 },
@@ -169,7 +177,7 @@ SceneJS.createNode({
                                     nodes: [
                                         {
                                             type: "instance",
-                                            target: "my-material"
+                                            target: "my-brick-box"
                                         }
                                     ]
                                 }

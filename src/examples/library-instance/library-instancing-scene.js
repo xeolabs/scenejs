@@ -14,98 +14,6 @@
 
  */
 
-
-
-/*----------------------------------------------------------------------------
- * Create a materials library containing two materials.
- *
- * Note that we could have put this within the main scene graph if we wanted,
- * in which case we would want to wrap it with a library node so that its
- * material nodes are instead only traversed via the instances that target them.
- *
- *---------------------------------------------------------------------------*/
-
-SceneJS.createNode({
-
-    type: "node",
-
-    nodes: [
-
-        /* Material #1: Red surface with not texture
-         */
-        {
-            type: "material",
-
-            id: "my-red-material",
-
-            baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
-            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-            specular:       0.2,
-            shine:          6.0
-        },
-
-
-        /* Material #2: Brick textured surface
-         */
-        {
-            type: "material",
-
-            id: "my-brick-material",
-
-            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-            specular:       0.2,
-            shine:          6.0,
-
-            nodes: [
-                {
-                    type: "texture",
-                    layers: [
-                        {
-                            uri:"images/BrickWall.jpg" ,
-                            minFilter: "linear",
-                            magFilter: "linear",
-                            wrapS: "repeat",
-                            wrapT: "repeat",
-                            isDepth: false,
-                            depthMode:"luminance",
-                            depthCompareMode: "compareRToTexture",
-                            depthCompareFunc: "lequal",
-                            flipY: false,
-                            width: 1,
-                            height: 1,
-                            internalFormat:"lequal",
-                            sourceFormat:"alpha",
-                            sourceType: "unsignedByte",
-                            applyTo:"baseColor",
-                            blendMode:"multiply",
-
-                            /* Texture rotation angle in degrees
-                             */
-                            rotate: 0.0,
-
-                            /* Texture translation offset
-                             */
-                            translate : {
-                                x: 0,
-                                y: 0
-                            },
-
-                            /* Texture scale factors
-                             */
-                            scale : {
-                                x: 1,
-                                y: .5
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-});
-
-
 /*---------------------------------------------------------------------------
  * A basic scene graph containing two boxes wrapped with instances of
  * materials from the material library we just defined.
@@ -118,6 +26,97 @@ SceneJS.createNode({
     loggingElementId: "theLoggingDiv",
 
     nodes: [
+
+        /*----------------------------------------------------------------------------
+         * A materials library containing two materials.
+         *
+         * The library node marks its subgraph as an explicit library section, causing
+         * traversal to bypass it. These are useful when we want certain nodes within
+         * our scene graph to only be traversed into via instance node that target them.
+         *---------------------------------------------------------------------------*/
+
+        {
+            type: "library",
+            nodes: [
+
+                /* Material #1: Red surface with not texture
+                 */
+                {
+                    type: "material",
+
+                    id: "my-red-material",
+
+                    baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
+                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                    specular:       0.2,
+                    shine:          6.0
+                },
+
+                /* Material #2: Brick textured surface
+                 */
+                {
+                    type: "material",
+
+                    id: "my-brick-material",
+
+                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                    specular:       0.2,
+                    shine:          6.0,
+
+                    nodes: [
+                        {
+                            type: "texture",
+                            layers: [
+                                {
+                                    uri:"images/BrickWall.jpg" ,
+                                    minFilter: "linear",
+                                    magFilter: "linear",
+                                    wrapS: "repeat",
+                                    wrapT: "repeat",
+                                    isDepth: false,
+                                    depthMode:"luminance",
+                                    depthCompareMode: "compareRToTexture",
+                                    depthCompareFunc: "lequal",
+                                    flipY: false,
+                                    width: 1,
+                                    height: 1,
+                                    internalFormat:"lequal",
+                                    sourceFormat:"alpha",
+                                    sourceType: "unsignedByte",
+                                    applyTo:"baseColor",
+                                    blendMode:"multiply",
+
+                                    /* Texture rotation angle in degrees
+                                     */
+                                    rotate: 0.0,
+
+                                    /* Texture translation offset
+                                     */
+                                    translate : {
+                                        x: 0,
+                                        y: 0
+                                    },
+
+                                    /* Texture scale factors
+                                     */
+                                    scale : {
+                                        x: 1,
+                                        y: .5
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+
+        /*----------------------------------------------------------------------------
+         * Viewing transform, camera, lights, modelling transforms, and a couple of
+         * boxes wrapped by instances of our library materials
+         *---------------------------------------------------------------------------*/
+
         {
             type: "lookAt",
             eye : { x: 0.0, y: 10.0, z: 25 },

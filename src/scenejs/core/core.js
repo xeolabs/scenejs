@@ -63,23 +63,52 @@ var SceneJS = {
         if (!json) {
             throw "createNode param 'json' is null or undefined";
         }
-        var newNode = this._parseNodeJSON(json);
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
-        return SceneJS.withNode(newNode);
+        if (json.parent) {
+            if (json.type == "scene") {
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "createNode 'parent' not expected for 'scene' node");
+            }
+            if (json.parent == json.id) {
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.NODE_NOT_FOUND,
+                        "createNode 'parent' cannot equal 'id'");
+            }
+            var parent = SceneJS._nodeIDMap[json.parent];
+            if (!parent) {
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.NODE_NOT_FOUND,
+                        "createNode 'parent' not resolved");
+            }
+            var newNode = this._parseNodeJSON(json, parent._scene);
+            SceneJS.withNode(parent).add("node", newNode); // Fires events and compilation triggering
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : newNode.getId(), json: json });
+            return SceneJS.withNode(newNode);
+        } else {
+            if (json.type != "scene") {
+                throw SceneJS._errorModule.fatalError(
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "createNode 'parent' is expected for all node types except 'scene'");
+            }
+            var newNode = this._parseNodeJSON(json);
+            SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
+            return SceneJS.withNode(newNode);
+        }
     },
 
     /**
      * Parses JSON into a subgraph of nodes using iterative depth-first search
      */
-    _parseNodeJSON : function(v) {
+    _parseNodeJSON : function(v, scene) {
         v.__visited = true;
-        v.__node = this._createNode(v);
+        v.__node = this._createNode(v, scene);
+        scene = scene || v.__node;
         var s = [];
         var i, len;
         if (v.nodes) {
             for (i = 0,len = v.nodes.length; i < len; i++) {
                 var child = v.nodes[i];
-                child.__node = this._createNode(child);
+                child.__node = this._createNode(child, scene);
                 child.__parent = v;
                 s.push(child);
             }
@@ -94,7 +123,7 @@ var SceneJS = {
                 for (i = 0,len = w.nodes.length; i < len; i++) {
                     u = w.nodes[i];
                     if (!u.__parent) {
-                        u.__node = this._createNode(u);
+                        u.__node = this._createNode(u, scene);
                         u.__parent = w;
                         s.push(u);
                     }
@@ -104,13 +133,15 @@ var SceneJS = {
         return v.__node;
     },
 
-    _createNode : function(json) {
+    _createNode : function(json, scene) {
         json.type = json.type || "node";
         var nodeType = this._nodeTypes[json.type];
         if (!nodeType) {
             throw "Failed to parse JSON node definition - unknown node type: '" + json.type + "'";
         }
-        return new nodeType.nodeClass(this._copyCfg(json));   // Faster to instantiate class directly
+        var node = new nodeType.nodeClass(this._copyCfg(json));   // Faster to instantiate class directly
+        node._scene = scene || node;
+        return node;
     },
 
     /** Returns true if the {@link SceneJS.Node} with the given ID exists
@@ -160,13 +191,15 @@ var SceneJS = {
      * @private
      */
     _actionNodeDestroys : function() {
-        var node;
-        for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
-            node = this._destroyedNodes[i];
-            node._doDestroy();
-            SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : node.getID() });
+        if (this._destroyedNodes.length > 0) {
+            var node;
+            for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
+                node = this._destroyedNodes[i];
+                node._doDestroy();
+                SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_DESTROYED, { nodeId : node.getID() });
+            }
+            this._destroyedNodes = [];
         }
-        this._destroyedNodes = [];
     },
 
     /**

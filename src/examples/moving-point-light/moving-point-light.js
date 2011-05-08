@@ -171,8 +171,6 @@ var lastX;
 var lastY;
 var dragging = false;
 
-SceneJS.withNode("theScene").render();
-
 var canvas = document.getElementById("theCanvas");
 
 function mouseDown(event) {
@@ -226,7 +224,7 @@ SceneJS.bind("error", function(e) {
     alert(e.exception.message);
 });
 
-
+SceneJS.withNode("theScene").start();
 
 
 

@@ -49,6 +49,12 @@ SceneJS._WithNode.prototype.node = function(node) {
     return new SceneJS._WithNode(nodeGot);
 };
 
+/** Returns the scene to which the node belongs
+ */
+SceneJS._WithNode.prototype.scene = function() {
+    return new SceneJS._WithNode(this._targetNode.getScene());
+};
+
 /** Returns true if a child node matching given ID or index existis on the selected node
  * @param {Number|String} node Child node index or ID
  */

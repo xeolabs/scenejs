@@ -177,12 +177,10 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
+        pitch += (event.clientY - lastY) * 0.5;
 
         SceneJS.withNode("yaw").set("angle", yaw);
         SceneJS.withNode("pitch").set("angle", pitch);
-
-        SceneJS.withNode("theScene").render();
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -194,4 +192,5 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 
+SceneJS.withNode("theScene").start();
 

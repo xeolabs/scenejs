@@ -182,19 +182,6 @@ var dragging = false;
 
 var factor = 0;
 
-/*----------------------------------------------------------------------
- * In our rendering loop, as soon as the morphGeometry exists, we'll
- * increment its factor to move the morph between its two targets
- *---------------------------------------------------------------------*/
-
-SceneJS.withNode("theScene").start({
-    idleFunc: function() {
-        if (SceneJS.nodeExists("my-morph-geometry")) {
-            SceneJS.withNode("my-morph-geometry").set("factor", 1.0 + (Math.sin(factor) * 2.0));
-            factor += 0.1;
-        }
-    }
-});
 
 var canvas = document.getElementById("theCanvas");
 
@@ -231,4 +218,17 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 
+/*----------------------------------------------------------------------
+ * In our rendering loop, as soon as the morphGeometry exists, we'll
+ * increment its factor to move the morph between its two targets
+ *---------------------------------------------------------------------*/
+
+SceneJS.withNode("theScene").start({
+    idleFunc: function() {
+        if (SceneJS.nodeExists("my-morph-geometry")) {
+            SceneJS.withNode("my-morph-geometry").set("factor", 1.0 + (Math.sin(factor) * 2.0));
+            factor += 0.1;
+        }
+    }
+});
 

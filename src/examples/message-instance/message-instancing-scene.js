@@ -84,21 +84,26 @@ SceneJS.createNode({
 
 
 /*----------------------------------------------------------------------------
- * A scaled box geometry
+ * Add a library to our scene
  *---------------------------------------------------------------------------*/
 
 SceneJS.createNode({
-    type: "scale",
-
-    id: "my-box",
-
-    x: 4.0,
-    y: 4.0,
-    z: 4.0,
+    type: "library",
+    parent: "the-scene",  // Parent node is mandatory from V0.8
 
     nodes: [
         {
-            type: "box"
+            type: "scale",
+            id: "my-box",
+            x: 4.0,
+            y: 4.0,
+            z: 4.0,
+
+            nodes: [
+                {
+                    type: "box"
+                }
+            ]
         }
     ]
 });

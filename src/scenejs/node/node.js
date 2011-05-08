@@ -587,6 +587,14 @@ SceneJS.Node.prototype.getInfo = function() {
     return this._attr.NODEINFO || "";
 };
 
+/** Returns the SceneJS.Scene to which this node belongs.
+ * Returns node if this is a SceneJS.Scene.
+ * @returns {SceneJS.Scene} Scene node
+ */
+SceneJS.Node.prototype.getScene = function() {
+    return this._scene;
+};
+
 /**
  * Sets the node's optional information string. The string will be empty if never set.
  * @param {string} info Node info string
@@ -761,7 +769,7 @@ SceneJS.Node.prototype.addNode = function(node) {
             }
             node = gotNode;
         } else {
-            node = SceneJS._parseNodeJSON(node);
+            node = SceneJS._parseNodeJSON(node, this._scene);
         }
     }
     if (!node._compile) {
@@ -781,18 +789,6 @@ SceneJS.Node.prototype.addNode = function(node) {
     return node;
 };
 
-
-/** @private
- */
-SceneJS.Node.prototype.findNodeIndex = function(sid) {
-    for (var i = 0; i < this._children.length; i++) {
-        if (this._children[i].getSID() == sid) {
-            return i;
-        }
-    }
-    return -1;
-};
-
 /** Inserts a subgraph into child nodes
  * @param {SceneJS.Node} node Child node
  * @param {int} i Index for new child node
@@ -805,7 +801,7 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
                 "SceneJS.Node#insertNode - node argument is undefined");
     }
     if (!node._compile) {
-        node = SceneJS._parseNodeJSON(node);
+        node = SceneJS._parseNodeJSON(node, this._scene);
     }
     if (!node._compile) {
         throw SceneJS._errorModule.fatalError(

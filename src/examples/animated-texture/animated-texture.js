@@ -1,5 +1,5 @@
 /**
- * Texture sampled from 2D canvas
+ * Animated texture example
  *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
@@ -29,7 +29,7 @@ SceneJS.createNode({
                         aspect : 1.47,
                         near : 0.10,
                         far : 300.0
-                    },                   
+                    },
 
                     nodes: [
                         {
@@ -179,24 +179,18 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("theScene").start();
-
-window.updateAnimations = function() {
-    SceneJS.withNode("theTexture").set("layers", {
-        "0":{
-            scale: {
-                x: texScale,
-                y: texScale
-            },
-            rotate: texAngle
-        }
-    });
-    texAngle += 0.4;
-    texScale = (texScale + 0.01) % 10.0;
-};
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
+SceneJS.withNode("theScene").start({
+    idleFunc: function() {
+        SceneJS.withNode("theTexture").set("layers", {
+            "0":{
+                scale: {
+                    x: texScale,
+                    y: texScale
+                },
+                rotate: texAngle
+            }
+        });
+        texAngle += 0.4;
+        texScale = (texScale + 0.01) % 10.0;
+    }
 });
-
-var pInterval = setInterval("window.updateAnimations()", 10);

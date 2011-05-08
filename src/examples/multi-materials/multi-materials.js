@@ -467,28 +467,14 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
-    SceneJS.withNode("yaw").set({angle: yaw});
-    SceneJS.withNode("pitch").set({angle: pitch});
-    SceneJS.withNode("theScene").render();
 
-};
-
-/* Render loop until error or reset
- * (which IDE does whenever you hit that run again button)
- */
-var pInterval;
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
+SceneJS.withNode("theScene").start({
+    idleFunc: function() {
+        SceneJS.withNode("yaw").set({angle: yaw});
+        SceneJS.withNode("pitch").set({angle: pitch});
+        SceneJS.withNode("theScene").render();
+    }
 });
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-pInterval = window.setInterval("window.render()", 10);
-
 
 
 

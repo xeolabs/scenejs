@@ -1,5 +1,5 @@
 /*
- Custom Command Demo - clip.clipbox<
+ Custom Command Demo - clip.clipbox
 
  The SceneJS API has an extensible messaging system which allows us to drive the JSON Scene Graph API via commands.
 
@@ -202,23 +202,6 @@ SceneJS.createNode({
 });
 
 /*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
-/*----------------------------------------------------------------------
  * Insert the clipbox, then tweak it a bit
  *---------------------------------------------------------------------*/
 
@@ -293,9 +276,6 @@ function mouseUp() {
     dragging = false;
 }
 
-/* On a mouse drag, we'll re-render the scene, passing in
- * incremented angles in each time.
- */
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
@@ -313,41 +293,26 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-
-/* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
- */
-SceneJS.withNode("theScene").start({
-    fpd: 60,
-    idleFunc: function() {
-        // ...
-    }
-});
-
 var factor = 0.0;
 
-window.updateAnimations = function() {
+SceneJS.withNode("theScene").start({
+    idleFunc: function() {
 
-    /* We'll periodically issue the "clip.clipbox.update" command to tweak the
-     * boundary of the clipbox, to extend its extents on X,Y,Z axis:
-     */
-    var extent = 1.0 + Math.sin(factor) * 1.0;
-    factor += 0.008;
+        /* We'll periodically issue the "clip.clipbox.update" command to tweak the
+         * boundary of the clipbox, to extend its extents on X,Y,Z axis:
+         */
+        var extent = 1.0 + Math.sin(factor) * 1.0;
+        factor += 0.008;
 
-    SceneJS.Message.sendMessage({
+        SceneJS.Message.sendMessage({
 
-        command:"clip.clipbox.update",
+            command:"clip.clipbox.update",
 
-        target: "insert-clipbox-here",
+            target: "insert-clipbox-here",
 
-        ymax: extent
-    });
-
-};
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
+            ymax: extent
+        });
+    }
 });
-
-var pInterval = setInterval("window.updateAnimations()", 10);
 
 

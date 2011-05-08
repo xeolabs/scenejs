@@ -1,16 +1,10 @@
 /*
- This example demonstrates how to define geometry, in this case a simple cube
- object that supports texturing.
+ This example demonstrates how to define a color at each vertex of a geometry
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
 
- This example assumes that you have looked at a few of the other examples
- and now have an understanding of concepts such as basic SceneJS syntax,
- lighting, material, data flow etc.
-
- Scroll down to the SceneJS.geometry node about one third of the way down
- this file and I'll guide you from there.
+ http://scenejs.wikispaces.com/geometry#x-Vertex Colors
 
  */
 
@@ -43,7 +37,7 @@ SceneJS.createNode({
                         far : 300.0
                     },
 
-                    nodes: [                     
+                    nodes: [
                         {
                             type: "light",
                             mode:                   "dir",
@@ -410,24 +404,6 @@ SceneJS.createNode({
 });
 
 
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
-
 var yaw = 30;
 var pitch = -30;
 var lastX;
@@ -463,27 +439,14 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
-
-    SceneJS.withNode("pitch").set("angle", pitch);
-    SceneJS.withNode("yaw").set("angle", yaw);
-    SceneJS.withNode("the-scene").render();
-};
-
-/* Render loop until error or reset
- * (which IDE does whenever you hit that run again button)
- */
-var pInterval;
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
+SceneJS.withNode("the-scene").start({
+    idleFunc:  function() {
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
+        SceneJS.withNode("the-scene").render();
+    }
 });
 
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-pInterval = window.setInterval("window.render()", 10);
 
 
 

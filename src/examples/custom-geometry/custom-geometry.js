@@ -67,14 +67,14 @@ SceneJS.createNode({
                         {
                             type: "rotate",
                             id: "pitch",
-                            angle: 0.0,
+                            angle: -30.0,
                             x : 1.0,
 
                             nodes: [
                                 {
                                     type: "rotate",
                                     id: "yaw",
-                                    angle: 0.0,
+                                    angle: 30.0,
                                     y : 1.0,
 
                                     nodes: [
@@ -91,7 +91,7 @@ SceneJS.createNode({
                                                     layers: [
                                                         {
                                                             uri:"images/BrickWall.jpg" ,
-                                                          
+
                                                             /* Texture scale factors
                                                              */
                                                             scale : {
@@ -313,7 +313,7 @@ SceneJS.createNode({
                                                                 // bottom
                                                                 20,21,22,
                                                                 20,22,23
-                                                               
+
                                                             ]
                                                         }
                                                     ]
@@ -330,25 +330,6 @@ SceneJS.createNode({
         }
     ]
 });
-
-
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
 
 var yaw = 30;
 var pitch = -30;
@@ -378,6 +359,8 @@ function mouseMove(event) {
 
         lastX = event.clientX;
         lastY = event.clientY;
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
     }
 }
 
@@ -385,30 +368,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
-
-    SceneJS.withNode("pitch").set("angle", pitch);
-    SceneJS.withNode("yaw").set("angle", yaw);
-    SceneJS.withNode("the-scene").render();
-};
-
-/* Render loop until error or reset
- * (which IDE does whenever you hit that run again button)
- */
-var pInterval;
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
-});
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-pInterval = window.setInterval("window.render()", 10);
-
-
-
+SceneJS.withNode("the-scene").start();
 
 
 

@@ -70,16 +70,10 @@ SceneJS.createNode({
 
                                     nodes: [
 
-                                        /* Instance our airplane model, defined in seymour-plane-model.js,
-                                         * which was loaded via a <script> tag in index.html. The script
-                                         * immediately created the airplane node, assigning it an ID
-                                         * we'll refer to it by.
+                                        /* Integrate our airplane model, defined in seymour-plane-model.js,
+                                         * which was loaded via a <script> tag in index.html.
                                          */
-                                        {
-                                            type: "instance",
-                                            id: "my-airplane",
-                                            target: "org.scenejs.examples.collada.seymourplane.scene"
-                                        }
+                                        planeJSON
                                     ]
                                 }
                             ]

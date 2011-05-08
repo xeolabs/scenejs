@@ -23,11 +23,11 @@ SceneJS.createNode({
 
             nodes: [
 
-            {
-                type: "rotate",
-                id: "all-rotate",
-                angle: 0,
-                y: 1.0,
+                {
+                    type: "rotate",
+                    id: "all-rotate",
+                    angle: 0,
+                    y: 1.0,
 
                     nodes: [
                         {
@@ -421,11 +421,11 @@ SceneJS.createNode({
                                                                             nodes: [
 
                                                                                 {
-                                                                                     type: "disk",
-                                                                                     id: "disk1",
-                                                                                     radius: 5,
-                                                                                     height: 2,
-                                                                                     rings: 24
+                                                                                    type: "disk",
+                                                                                    id: "disk1",
+                                                                                    radius: 5,
+                                                                                    height: 2,
+                                                                                    rings: 24
                                                                                 },
 
                                                                             ]
@@ -471,14 +471,19 @@ SceneJS.createNode({
                                                                             nodes: [
 
                                                                                 {
-                                                                                     type: "disk",
-                                                                                     id: "disk2",
-                                                                                     radius: 6,           // Optional radius (1 is default)
-                                                                                     innerRadius: 4,      // Optional innerRadius results in ring (default is 0)
-                                                                                     semiMajorAxis: 1.5,  // Optional semiMajorAxis results in ellipse (default of 1 creates circle)
-                                                                                     height: 2,           // Optional height (1 is default)
-                                                                                     rings: 48,           // Optional number of longitudinal rings (30 is default)
-                                                                                     sweep: 0.75          // Optional rotational extrusion (1 is default)
+                                                                                    type: "disk",
+                                                                                    id: "disk2",
+                                                                                    radius: 6,
+                                                                                    // Optional radius (1 is default)
+                                                                                    innerRadius: 4,
+                                                                                    // Optional innerRadius results in ring (default is 0)
+                                                                                    semiMajorAxis: 1.5,
+                                                                                    // Optional semiMajorAxis results in ellipse (default of 1 creates circle)
+                                                                                    height: 2,
+                                                                                    // Optional height (1 is default)
+                                                                                    rings: 48,
+                                                                                    // Optional number of longitudinal rings (30 is default)
+                                                                                    sweep: 0.75          // Optional rotational extrusion (1 is default)
                                                                                 },
 
                                                                             ]
@@ -525,14 +530,19 @@ SceneJS.createNode({
                                                                             nodes: [
 
                                                                                 {
-                                                                                     type: "disk",
-                                                                                     id: "disk-triangle",
-                                                                                     radius: 5,           // Optional radius (1 is default)
-                                                                                     innerRadius: 4,      // Optional innerRadius results in ring (default is 0)
-                                                                                     semiMajorAxis: 1.0,  // Optional semiMajorAxis results in ellipse (default of 1 creates circle)
-                                                                                     height: 2,           // Optional height (1 is default)
-                                                                                     rings: 3,            // Optional number of longitudinal rings (30 is default)
-                                                                                     sweep: 1.0           // Optional rotational extrusion (1 is default)
+                                                                                    type: "disk",
+                                                                                    id: "disk-triangle",
+                                                                                    radius: 5,
+                                                                                    // Optional radius (1 is default)
+                                                                                    innerRadius: 4,
+                                                                                    // Optional innerRadius results in ring (default is 0)
+                                                                                    semiMajorAxis: 1.0,
+                                                                                    // Optional semiMajorAxis results in ellipse (default of 1 creates circle)
+                                                                                    height: 2,
+                                                                                    // Optional height (1 is default)
+                                                                                    rings: 3,
+                                                                                    // Optional number of longitudinal rings (30 is default)
+                                                                                    sweep: 1.0           // Optional rotational extrusion (1 is default)
                                                                                 }
                                                                             ]
                                                                         }
@@ -548,32 +558,32 @@ SceneJS.createNode({
                                 },
 
                                 {
-                                     type: "renderer",
+                                    type: "renderer",
 
-                                     flags: {
+                                    flags: {
                                         wireframe: true
-                                     },
+                                    },
 
-                                     lineWidth: 1,
+                                    lineWidth: 1,
 
-                                     nodes: [
+                                    nodes: [
 
-                                         {
-                                             type: "scale",
-                                             x: 1.2,
-                                             y: 1.2,
-                                             z: 1.2,
+                                        {
+                                            type: "scale",
+                                            x: 1.2,
+                                            y: 1.2,
+                                            z: 1.2,
 
-                                             nodes: [
+                                            nodes: [
 
-                                                 {
-                                                     type: "material",
-                                                     baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                                     specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                                     specular:       0.2,
-                                                     shine:          6.0,
+                                                {
+                                                    type: "material",
+                                                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                                    specular:       0.2,
+                                                    shine:          6.0,
 
-                                                     nodes: [
+                                                    nodes: [
 
                                                         {
 
@@ -612,9 +622,9 @@ SceneJS.createNode({
                                                                 // Spheres
 
                                                                 {
-                                                                        type: "node",
+                                                                    type: "node",
 
-                                                                        nodes: [
+                                                                    nodes: [
 
                                                                         {
                                                                             type: "translate",
@@ -766,9 +776,9 @@ SceneJS.createNode({
                                                                 // Disks
 
                                                                 {
-                                                                        type: "node",
+                                                                    type: "node",
 
-                                                                        nodes: [
+                                                                    nodes: [
                                                                         {
                                                                             type: "translate",
                                                                             x: -3.75,
@@ -906,15 +916,15 @@ var light2 = SceneJS.withNode("light2");
 var light3 = SceneJS.withNode("light3");
 
 function specularLightChange() {
-  if (specular_light.checked) {
-      light1.set({ specular: true });
-      light2.set({ specular: true });
-      light3.set({ specular: true });
-  } else {
-      light1.set({ specular: false });
-      light2.set({ specular: false });
-      light3.set({ specular: false });
-  }
+    if (specular_light.checked) {
+        light1.set({ specular: true });
+        light2.set({ specular: true });
+        light3.set({ specular: true });
+    } else {
+        light1.set({ specular: false });
+        light2.set({ specular: false });
+        light3.set({ specular: false });
+    }
 }
 
 specular_light.onchange = specularLightChange;
@@ -927,26 +937,26 @@ var wireframe_objects_selector = SceneJS.withNode("wireframeObjectsSelector");
 var choose_object_type = document.getElementById("choose-object-type");
 var object_type_selection;
 
-for(var i = 0; i < choose_object_type.elements.length; i++)
+for (var i = 0; i < choose_object_type.elements.length; i++)
     if (choose_object_type.elements[i].checked) object_type_selection = choose_object_type.elements[i].value;
 
 function chooseObjectType() {
-  for(var i = 0; i < this.elements.length; i++)
-      if (this.elements[i].checked) object_type_selection = this.elements[i].value;
-  switch(object_type_selection) {
-     case "boxes":
-        filled_objects_selector.set("selection", [0]);
-        wireframe_objects_selector.set("selection", [0]);
-        break;
-     case 'spheres':
-        filled_objects_selector.set("selection", [1]);
-        wireframe_objects_selector.set("selection", [1]);
-        break;
-     case "disks":
-        filled_objects_selector.set("selection", [2]);
-        wireframe_objects_selector.set("selection", [2]);
-        break;
-  }
+    for (var i = 0; i < this.elements.length; i++)
+        if (this.elements[i].checked) object_type_selection = this.elements[i].value;
+    switch (object_type_selection) {
+        case "boxes":
+            filled_objects_selector.set("selection", [0]);
+            wireframe_objects_selector.set("selection", [0]);
+            break;
+        case 'spheres':
+            filled_objects_selector.set("selection", [1]);
+            wireframe_objects_selector.set("selection", [1]);
+            break;
+        case "disks":
+            filled_objects_selector.set("selection", [2]);
+            wireframe_objects_selector.set("selection", [2]);
+            break;
+    }
 }
 
 choose_object_type.onchange = chooseObjectType;
@@ -1012,43 +1022,35 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
-    if (rotation.checked) {
-        var angle = disk1_rotate.get("angle") + 0.3;
-        disk1_rotate.set("angle", angle);
-        disk2_rotate.set("angle", angle);
-        disk_triangle_rotate.set("angle", angle);
-        wireframe_disk1_rotate.set("angle", angle);
-        wireframe_disk2_rotate.set("angle", angle);
-        wireframe_disk_triangle_rotate.set("angle", angle);
+SceneJS.withNode("theScene").start({
+    idleFunc:function() {
+        if (rotation.checked) {
+            var angle = disk1_rotate.get("angle") + 0.3;
+            disk1_rotate.set("angle", angle);
+            disk2_rotate.set("angle", angle);
+            disk_triangle_rotate.set("angle", angle);
+            wireframe_disk1_rotate.set("angle", angle);
+            wireframe_disk2_rotate.set("angle", angle);
+            wireframe_disk_triangle_rotate.set("angle", angle);
 
-        sphere1_rotate.set("angle", angle);
-        sphere2_rotate.set("angle", angle);
-        sphere3_rotate.set("angle", angle);
-        sphere4_rotate.set("angle", angle);
-        sphere5_rotate.set("angle", angle);
-        wireframe_sphere1_rotate.set("angle", angle);
-        wireframe_sphere2_rotate.set("angle", angle);
-        wireframe_sphere3_rotate.set("angle", angle);
-        wireframe_sphere4_rotate.set("angle", angle);
-        wireframe_sphere5_rotate.set("angle", angle);
+            sphere1_rotate.set("angle", angle);
+            sphere2_rotate.set("angle", angle);
+            sphere3_rotate.set("angle", angle);
+            sphere4_rotate.set("angle", angle);
+            sphere5_rotate.set("angle", angle);
+            wireframe_sphere1_rotate.set("angle", angle);
+            wireframe_sphere2_rotate.set("angle", angle);
+            wireframe_sphere3_rotate.set("angle", angle);
+            wireframe_sphere4_rotate.set("angle", angle);
+            wireframe_sphere5_rotate.set("angle", angle);
 
-        box_rotate.set("angle", angle);
-        wireframe_box_rotate.set("angle", angle);
+            box_rotate.set("angle", angle);
+            wireframe_box_rotate.set("angle", angle);
 
-        yaw = all_rotate.get("angle");
-        yaw +=  + 0.1;
-        all_rotate.set("angle", yaw);
+            yaw = all_rotate.get("angle");
+            yaw += + 0.1;
+            all_rotate.set("angle", yaw);
+        }
+
     }
-    SceneJS.withNode("theScene").render();
-};
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
 });
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-var pInterval = setInterval("window.render()", 30);

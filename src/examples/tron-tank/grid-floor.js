@@ -1,4 +1,4 @@
-SceneJS.createNode({
+var gridFloorJSON = {
     id: "grid-floor",
     type: "material",
     baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
@@ -45,4 +45,4 @@ SceneJS.createNode({
             ]
         }
     ]
-});
+};

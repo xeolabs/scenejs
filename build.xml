@@ -58,7 +58,9 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
 
+        <fileset dir="${SRC_DIR}" includes="scenejs/compile/compileCfg.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/compile/compileModule.js"/>
+        
         <fileset dir="${SRC_DIR}" includes="scenejs/logging/loggingModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>

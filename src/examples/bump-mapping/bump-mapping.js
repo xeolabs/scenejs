@@ -214,9 +214,4 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 /* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
  */
-SceneJS.withNode("the-scene").start({
-    fpd: 60,
-    idleFunc: function() {
-        // ...
-    }
-});
+SceneJS.withNode("the-scene").start();

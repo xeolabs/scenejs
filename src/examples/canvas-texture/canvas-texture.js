@@ -436,13 +436,5 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-//SceneJS.withNode("theScene").render();
-//SceneJS.withNode("theScene").render();
-
 SceneJS.withNode("theScene").start();
 
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
-});
-
-var pInterval = setInterval("window.updateAnimations()", 10);

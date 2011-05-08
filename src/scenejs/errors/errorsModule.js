@@ -19,7 +19,7 @@ SceneJS._errorModule = new (function() {
             exception: message,
             fatal: true
         });
-        return new SceneJS.errors.Exception(code, message);
+        return message;
     };
 
     this.error = function(code, message) {

@@ -242,8 +242,3 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 SceneJS.withNode("theScene").start();
-
-
-SceneJS.bind("error", function() {
-    window.clearInterval(pInterval);
-});

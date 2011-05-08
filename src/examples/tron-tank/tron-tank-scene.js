@@ -75,18 +75,12 @@ SceneJS.createNode({
                          * allowing us to locate them and set their properties, in order to move the tank
                          * around, rotate its cannon etc.
                          */
-                        {
-                            type: "instance",
-                            target: "tron-tank"
-                        },
+                        tankJSON,
 
                         /* Integrate our grid floor, which is defined in grid-floor.js
                          * and loaded via a <script> tag in index.html.
                          */
-                        {
-                            type: "instance",
-                            target: "grid-floor"
-                        },
+                        gridFloorJSON,
 
                         /* Canyon walls, a bunch of cubes
                          */
@@ -249,29 +243,12 @@ SceneJS.createNode({
     ]
 });
 
-/*----------------------------------------------------------------------
- * Disable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-
-});
-
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
+var needFrame = true;
 var speed = 0;
 var tankPos = { x: 0, y: 0, z: -100 };
 var eyeDir = 0;
@@ -353,112 +330,90 @@ canvas.addEventListener('mouseup', mouseUp, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
-/** Feeds current rotations, positions etc into the scene graph
- *
- */
-function updateSceneState() {
-
-
-    pitch += pitchInc;
-
-    if (pitch < 1) {
-        pitch = 1;
-    }
-
-    if (pitch > 80) {
-        pitch = 80;
-    }
-
-    tankYaw += tankYawInc;
-    var tankYawMat = Matrix.Rotation(tankYaw * 0.0174532925, $V([0,1,0]));
-
-    var moveVec = [0,0,1];
-
-    moveVec = tankYawMat.multiply($V(moveVec)).elements;
-
-    var trailVec = [0,0, -1 - (pitch * 0.02)];
-
-    var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1,0,0]));
-    var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0,1,0]));
-
-    trailVec = trailPitchMat.multiply($V(trailVec)).elements;
-    trailVec = trailYawMat.multiply($V(trailVec)).elements;
-
-    if (speed) {
-        tankPos.x += moveVec[0] * speed;
-        tankPos.y += moveVec[1] * speed;
-        tankPos.z += moveVec[2] * speed;
-    }
-
-    if (eye.y > 100.0) {
-        eye.y = 100.0;
-    }
-
-    if (eye.y < 20.0) {
-        eye.y = 20.0;
-    }
-
-    eye.x = tankPos.x + (trailVec[0] * 35);
-    eye.y = tankPos.y + (trailVec[1] * 35);
-    eye.z = tankPos.z + (trailVec[2] * 35);
-
-    SceneJS.withNode("theLookAt").set({
-        eye: eye,
-        look: {
-            x: tankPos.x,
-            y: tankPos.y,
-            z : tankPos.z
-        }
-    });
-
-    SceneJS.withNode("tankPos").set({
-        x: tankPos.x,
-        z: tankPos.z
-    });
-
-    SceneJS.withNode("tankRotate").set({
-        angle: tankYaw + 180 || 180
-    });
-
-    SceneJS.withNode("tankGunRotate").set({
-        angle: -tankYaw
-    });
-
-    if (trailYaw > tankYaw) {
-        trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
-    } else if (trailYaw < tankYaw) {
-        trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
-    }
-}
-;
-
-/* Render loop until error or reset
- */
-var pInterval;
-
 SceneJS.bind("error", function(e) {
     alert(e.exception.message);
-    window.clearInterval(pInterval);
 });
-
-SceneJS.bind("reset", function() {
-    window.clearInterval(pInterval);
-});
-
-pInterval = window.setInterval(function() {
-    if (pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0) {
-        return;
-    }
-    updateSceneState();
-}, 10);
-
-
-/* Call once to begin with to set tank transforms etc. to initial states
- */
-updateSceneState();
 
 SceneJS.withNode("theScene").start({
-    fps: 60
+
+    idleFunc: function() {
+
+        if (!needFrame && ( pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0)) {
+            return;
+        }
+        needFrame = false;
+        
+        pitch += pitchInc;
+
+        if (pitch < 1) {
+            pitch = 1;
+        }
+
+        if (pitch > 80) {
+            pitch = 80;
+        }
+
+        tankYaw += tankYawInc;
+        var tankYawMat = Matrix.Rotation(tankYaw * 0.0174532925, $V([0,1,0]));
+
+        var moveVec = [0,0,1];
+
+        moveVec = tankYawMat.multiply($V(moveVec)).elements;
+
+        var trailVec = [0,0, -1 - (pitch * 0.02)];
+
+        var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1,0,0]));
+        var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0,1,0]));
+
+        trailVec = trailPitchMat.multiply($V(trailVec)).elements;
+        trailVec = trailYawMat.multiply($V(trailVec)).elements;
+
+        if (speed) {
+            tankPos.x += moveVec[0] * speed;
+            tankPos.y += moveVec[1] * speed;
+            tankPos.z += moveVec[2] * speed;
+        }
+
+        if (eye.y > 100.0) {
+            eye.y = 100.0;
+        }
+
+        if (eye.y < 20.0) {
+            eye.y = 20.0;
+        }
+
+        eye.x = tankPos.x + (trailVec[0] * 35);
+        eye.y = tankPos.y + (trailVec[1] * 35);
+        eye.z = tankPos.z + (trailVec[2] * 35);
+
+        SceneJS.withNode("theLookAt").set({
+            eye: eye,
+            look: {
+                x: tankPos.x,
+                y: tankPos.y,
+                z : tankPos.z
+            }
+        });
+
+        SceneJS.withNode("tankPos").set({
+            x: tankPos.x,
+            z: tankPos.z
+        });
+
+        SceneJS.withNode("tankRotate").set({
+            angle: tankYaw + 180 || 180
+        });
+
+        SceneJS.withNode("tankGunRotate").set({
+            angle: -tankYaw
+        });
+
+        if (trailYaw > tankYaw) {
+            trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
+        } else if (trailYaw < tankYaw) {
+            trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
+        }
+    }
 });
 
 

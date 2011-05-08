@@ -2,12 +2,11 @@
  This example demonstrates how to define billboards, in this case a simple quad sprite
  object that supports texturing.
 
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
-
  This example assumes that you have looked at a few of the other examples
  and now have an understanding of concepts such as basic SceneJS syntax,
  lighting, material, data flow etc.
+
+ Cheers to Salomon Brys for this example - salomon.brys@gmail.com
 
  */
 
@@ -16,35 +15,38 @@
  *---------------------------------------------------------------------*/
 
 SceneJS.createNode({
-    id: "SalomonSprite",
-    type: "billboard",
-    nodes: [
-        {
-            type: "texture",
-            layers: [
-                {
-                    uri: "images/avatar.png"
-                }
-            ],
-            nodes: [
-                {
-                    type: "quad",
-                    xSize: 1.2,
-                    ySize: 1.2
-                }
-            ]
-        }
-    ]
-});
-
-
-SceneJS.createNode({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
     loggingElementId: "theLoggingDiv",
 
     nodes: [
+        {
+            type: "library",    // Child nodes of a library may only be instanced
+            nodes: [
+                {
+                    id: "SalomonSprite",
+                    type: "billboard",
+                    nodes: [
+                        {
+                            type: "texture",
+                            layers: [
+                                {
+                                    uri: "images/avatar.png"
+                                }
+                            ],
+                            nodes: [
+                                {
+                                    type: "quad",
+                                    xSize: 1.2,
+                                    ySize: 1.2
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
         {
             type: "lookAt",
             eye : { x: 0, y: 1, z: 25 },
@@ -189,9 +191,4 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 /* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
  */
-SceneJS.withNode("the-scene").start({
-    fpd: 60,
-    idleFunc: function() {
-        // ...
-    }
-});
+SceneJS.withNode("the-scene").start();

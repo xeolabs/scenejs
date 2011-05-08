@@ -128,6 +128,10 @@ SceneJS.Message.sendMessage({
     ]
 });
 
+SceneJS.withNode("my-scene").start();
+
+// ------------ [ 1 ] ------------------------
+
 SceneJS.Message.sendMessage({
     command: "update",
     target: "my-mount-node",
@@ -135,8 +139,6 @@ SceneJS.Message.sendMessage({
         node: "my-subgraph"
     }
 });
-
-SceneJS.withNode("my-scene").render();
 
 // ------------ [ 2 ] ------------------------
 
@@ -149,8 +151,6 @@ SceneJS.Message.sendMessage({
         angle: 45
     }
 });
-
-SceneJS.withNode("my-scene").render();
 
 // ------------ [ 3 ] ------------------------
 
@@ -179,10 +179,6 @@ SceneJS.Message.sendMessage({
     }
 });
 
-SceneJS.withNode("my-scene").render();
-
-
-
 // ------------ [ 4 ] ------------------------
 
 alert("Remove first subgraph..");
@@ -194,6 +190,3 @@ SceneJS.Message.sendMessage({
         node: "my-subgraph2"
     }
 });
-
-SceneJS.withNode("my-scene").render();
-

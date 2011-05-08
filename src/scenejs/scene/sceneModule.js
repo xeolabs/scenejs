@@ -145,7 +145,7 @@ SceneJS._sceneModule = new (function() {
         }
         var canvas = findCanvas(params.canvasId); // canvasId can be null
         var loggingElement = findLoggingElement(params.loggingElementId); // loggingElementId can be null
-        var sceneId = SceneJS._createKeyForMap(scenes, "s");
+        var sceneId = params.sceneId;
         scenes[sceneId] = {
             sceneId: sceneId,
             scene:scene,
@@ -156,7 +156,6 @@ SceneJS._sceneModule = new (function() {
         SceneJS._eventModule.fireEvent(SceneJS._eventModule.SCENE_CREATED, { sceneId : sceneId, canvas: canvas });
         SceneJS._loggingModule.info("Scene defined: " + sceneId);
         SceneJS._compileModule.nodeUpdated(scene, "created");
-        return sceneId;
     };
 
     /** Deregisters scene

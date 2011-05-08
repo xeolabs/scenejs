@@ -142,14 +142,11 @@ SceneJS.createNode({
 var activeView = 0;
 var canvas = document.getElementById("theCanvas");
 
-SceneJS.withNode("theScene").render();
+SceneJS.withNode("theScene").start();
 
 function mouseClick() {
     activeView = (activeView + 1) % 3;
-
     SceneJS.withNode("mySelector").set("selection", [activeView]);
-
-    SceneJS.withNode("theScene").render();
 }
 
 canvas.addEventListener('click', mouseClick, true);

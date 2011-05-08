@@ -1,5 +1,5 @@
 /**
- * SceneJS Example - Basic picking
+ * SceneJS Example - Basic picking example
  *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
@@ -13,7 +13,6 @@
  *---------------------------------------------------------------------*/
 
 SceneJS.createNode({
-
     type: "scene",
     id: "theScene",
     canvasId: 'theCanvas',
@@ -263,7 +262,6 @@ SceneJS.withNode("left-green-sphere").bind("picked",
         function(event) {
             alert("Picked: 'left-green-sphere'");
         });
-
 
 SceneJS.withNode("theScene").start();
 

@@ -200,25 +200,6 @@ SceneJS.createNode({
 
 });
 
-
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
-
 /*-------------------------------------------------------------------------------------------
  * Cause the inner cube to render first, then the middle cube in the default layer,
  * then the outer cube. This ensures that when SceneJS blends the cubes with
@@ -263,7 +244,7 @@ function mouseUp() {
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
+        pitch += (event.clientY - lastY) * 0.5;
         lastX = event.clientX;
         lastY = event.clientY;
 

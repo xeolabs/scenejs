@@ -586,33 +586,9 @@ SceneJS.withNode("teapot8").bind("picked",
             });
         });
 
-
-var pInterval;
-
-var x = 0;
-window.render = function() {
-    SceneJS.withNode("my-scene").render();
-};
-
-SceneJS.bind("error", function(e) {
-    window.clearInterval(pInterval);
-    alert(e.exception.message ? e.exception.message : e.exception);
-});
-
-pInterval = setInterval("window.render()", 10);
-
 var canvas = document.getElementById("theCanvas");
 
-
-/* On mouse down, we render the scene in picking mode, passing in the
- * mouse canvas coordinates. This will cause a scene render traversal in which
- * all the "picked" listeners will fire on nodes situated above whatever
- * geometry node was picked, as those nodes are visited.
- *
- */
-
 canvas.addEventListener('mousedown', mouseDown, false);
-
 
 function mouseDown(event) {
     var coords = clickCoordsWithinElement(event);
@@ -641,3 +617,5 @@ function clickCoordsWithinElement(event) {
     }
     return coords;
 }
+
+SceneJS.withNode("my-scene").start();

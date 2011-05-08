@@ -159,6 +159,7 @@ SceneJS.Scene.prototype._init = function(params) {
     this._loggingElementId = params.loggingElementId;
     this.setLayers(params.layers);
     this._destroyed = false;
+    this._scene = this;
 };
 
 /** ID of canvas SceneJS looks for when {@link SceneJS.Scene} node does not supply one
@@ -180,8 +181,8 @@ SceneJS.Scene.prototype.getCanvasId = function() {
  */
 SceneJS.Scene.prototype.getZBufferDepth = function() {
     var context;
-    if (this._sceneId) {
-        context = SceneJS._sceneModule.getSceneContext(this._sceneId);
+    if (this._created) {
+        context = SceneJS._sceneModule.getSceneContext(this._attr.id);
         return context.getParameter(context.DEPTH_BITS)
     }
     return context;
@@ -283,11 +284,13 @@ SceneJS.Scene.prototype.start = function(cfg) {
     /*
      * Lazy scene creation
      */
-    if (!this._sceneId) {
-        this._sceneId = SceneJS._sceneModule.createScene(this, {
+    if (!this._created) {
+        SceneJS._sceneModule.createScene(this, {
             canvasId: this._canvasId,
-            loggingElementId: this._loggingElementId
+            loggingElementId: this._loggingElementId,
+            sceneId: this._attr.id
         });
+        this._created = true;
     }
 
     if (!this._running || this._paused) {
@@ -297,7 +300,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
         this._paused = false;
 
         var self = this;
-        var fnName = "__scenejs_compileScene" + this._sceneId;
+        var fnName = "__scenejs_compileScene" + this._attr.id;
 
         /* Render loop
          */
@@ -313,7 +316,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
                     cfg.idleFunc();
                 }
 
-                if (SceneJS._compileModule.triggerCompile) {
+                if (SceneJS._compileModule.scheduleCompilations(self._attr.id)) {
 
                     self._compileWithEvents();
 
@@ -344,7 +347,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
 /** Pauses/unpauses current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
  */
 SceneJS.Scene.prototype.pause = function(doPause) {
-    if (this._running && this._sceneId) {
+    if (this._running && this._created) {
         this._paused = doPause;
     }
 };
@@ -369,11 +372,13 @@ SceneJS.Scene.prototype.render = function() {
     /*
      * Lazy scene creation
      */
-    if (!this._sceneId) {
-        this._sceneId = SceneJS._sceneModule.createScene(this, {
+    if (!this._created) {
+        SceneJS._sceneModule.createScene(this, {
             canvasId: this._canvasId,
-            loggingElementId: this._loggingElementId
+            loggingElementId: this._loggingElementId,
+            sceneId: this._attr.id
         });
+        this._created = true;
     }
 
     if (!this._running) {
@@ -400,14 +405,14 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
                 SceneJS.errors.NODE_ILLEGAL_STATE,
                 "Attempted pick on Scene that has been destroyed");
     }
-    if (!this._sceneId) {
+    if (!this._created) {
         throw SceneJS._errorModule.fatalError(
                 SceneJS.errors.NODE_ILLEGAL_STATE,
                 "Attempted pick on Scene that has not been rendered");
     }
 
     if (!SceneJS._renderModule.pick({
-        sceneId: this._sceneId,
+        sceneId: this._attr.id,
         canvasX : canvasX,
         canvasY : canvasY }, options)) {
 
@@ -416,8 +421,7 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
 };
 
 SceneJS.Scene.prototype._compile = function() {
-    SceneJS._actionNodeDestroys();
-    SceneJS._sceneModule.activateScene(this._sceneId);
+    SceneJS._sceneModule.activateScene(this._attr.id);
     if (SceneJS._compileModule.preVisitNode(this)) {
         SceneJS._layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
         var traversalContext = {};
@@ -543,7 +547,7 @@ SceneJS.Scene.prototype._compile = function() {
  * a race condition.
  */
 SceneJS.Scene.prototype.getNumProcesses = function() {
-    return (this._sceneId) ? SceneJS._processModule.getNumProcesses(this._sceneId) : 0;
+    return this._created ? SceneJS._processModule.getNumProcesses(this._attr.id) : 0;
 };
 
 /**
@@ -551,10 +555,10 @@ SceneJS.Scene.prototype.getNumProcesses = function() {
  * @private
  */
 SceneJS.Scene.prototype._destroy = function() {
-    if (this._sceneId) {
+    if (this._created) {
         this.stop();
-        SceneJS._sceneModule.destroyScene(this._sceneId); // Last one fires RESET command
-        this._sceneId = null;
+        SceneJS._sceneModule.destroyScene(this._attr.id); // Last one fires RESET command
+        this._created = false;
         this._destroyed = true;
     }
 };
@@ -563,15 +567,15 @@ SceneJS.Scene.prototype._destroy = function() {
  * when you render it.
  */
 SceneJS.Scene.prototype.isActive = function() {
-    return (this._sceneId != null);
+    return this._created;
 };
 
 /** Stops current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
  */
 SceneJS.Scene.prototype.stop = function() {
-    if (this._running && this._sceneId) {
+    if (this._running && this._created) {
         this._running = false;
-        window["__scenejs_compileScene" + this._sceneId] = null;
+        window["__scenejs_compileScene" + this._attr.id] = null;
         window.clearInterval(this._pInterval);
     }
 };

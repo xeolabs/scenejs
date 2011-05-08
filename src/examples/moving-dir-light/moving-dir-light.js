@@ -164,23 +164,6 @@ SceneJS.createNode({
     ]
 });
 
-/*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
 /*---------------------------------------------------------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff
  *--------------------------------------------------------------------------------------------------------------------*/
@@ -190,8 +173,6 @@ var roty = 0;
 var lastX;
 var lastY;
 var dragging = false;
-
-SceneJS.withNode("theScene").render();
 
 var canvas = document.getElementById("theCanvas");
 
@@ -246,4 +227,4 @@ SceneJS.bind("error", function(e) {
     alert(e.exception.message);
 });
 
-
+SceneJS.withNode("theScene").start();
