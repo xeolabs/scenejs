@@ -42,7 +42,7 @@ SceneJS.createNode({
 							nodes: [
 								{
 									type: "box",
-									ySize: 2,
+									ySize: 2
 								},
 								{
 									type: "rotate",

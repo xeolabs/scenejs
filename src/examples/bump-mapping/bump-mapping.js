@@ -51,7 +51,7 @@ SceneJS.createNode({
                             specular:               true,
                             dir:                    { x: 1.0, y: -1.0, z: -1.0 }
                         },
-                            
+
                         /* Material properties
                          */
                         {
@@ -69,13 +69,9 @@ SceneJS.createNode({
                                      * image to a different material or geometry component.
                                      */
 
-                                    /* Our first layer texture is the bump map, and is applied within
-                                     * the fragment shader to our geometry node's normal vectors.
-                                     */
                                     layers: [
 
-                                        /* Our second texture layer is applied within the fragment
-                                         * shader to the baseColor of our material.
+                                        /* Our first texture layer is applied to the baseColor of our material.
                                          */
                                         {
                                             uri:"pattern.jpg",
@@ -96,6 +92,10 @@ SceneJS.createNode({
                                             applyTo:"baseColor",
                                             blendMode: "multiply"
                                         },
+
+                                        /* Our second layer texture is the bump map, and is applied to
+                                         * our geometry node's normal vectors.
+                                         */
                                         {
                                             uri:"normal_map.jpg",
                                             minFilter: "linear",
@@ -152,23 +152,6 @@ SceneJS.createNode({
 });
 
 /*----------------------------------------------------------------------
- * Enable scene graph compilation (disabled by default in V0.8).
- *
- * This feature is alpha status and may break some scene graphs.
- *
- * It can speed your scene graph up by an order of magnitude - we'll
- * do it here just to show how it's done.
- *
- * http://scenejs.wikispaces.com/V0.8+Branch
- *---------------------------------------------------------------------*/
-
-SceneJS.setDebugConfigs({
-    compilation : {
-        enabled : true
-    }
-});
-
-/*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
@@ -204,7 +187,6 @@ function mouseMove(event) {
         lastY = event.clientY;
     }
 }
-
 
 var canvas = document.getElementById("theCanvas");
 

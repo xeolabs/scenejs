@@ -21,6 +21,8 @@ SceneJS.createNode({
          * The library node marks its subgraph as an explicit library section, causing
          * traversal to bypass it. These are useful when we want certain nodes within
          * our scene graph to only be traversed into via instance node that target them.
+         *
+         * We can define these anywhere in our scene.
          *---------------------------------------------------------------------------*/
 
         {

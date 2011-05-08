@@ -24,8 +24,6 @@ SceneJS.createNode({
     loggingElementId: "theLoggingDiv",
 
     nodes: [
-
-
         {
             type: "lookAt",
             eye : { x: 0.0, y: 0.0, z: 35.0},

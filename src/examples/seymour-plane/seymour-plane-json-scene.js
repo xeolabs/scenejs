@@ -127,6 +127,10 @@ function mouseMove(event) {
         pitch += (event.clientY - lastY) * 0.5;
         lastX = event.clientX;
         lastY = event.clientY;
+
+        SceneJS.withNode("pitch").set("angle", pitch);
+        SceneJS.withNode("yaw").set("angle", yaw);
+
     }
 }
 
@@ -134,18 +138,4 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-window.render = function() {
-    SceneJS.withNode("pitch").set("angle", pitch);
-    SceneJS.withNode("yaw").set("angle", yaw);
-    SceneJS.withNode("myScene").render();
-};
-
-pInterval = setInterval("window.render()", 10);
-
-
-SceneJS.bind("error", // Listen for errors on SceneJS
-        function(event) {
-            alert(event.exception.message);
-            window.clearInterval(pInterval);
-        });
-
+SceneJS.withNode("myScene").start();
