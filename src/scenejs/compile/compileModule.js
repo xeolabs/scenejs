@@ -395,12 +395,13 @@ var SceneJS_compileModule = new (function() {
         while (node) {
             id = node._attr.id;
 
-            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
-                return;
-            }
-            if (compileScene.dirtyNodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
-                return;
-            }
+            // TODO: why do these two lines break compilation within instanced subtrees?
+//            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
+//                return;
+//            }
+//            if (compileScene.dirtyNodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
+//                return;
+//            }
 
             /* Ensure that instance allows compilation of the entire subgraph of its symbol
              * because the updated node will be a temporary child of the symbol subgraph's
