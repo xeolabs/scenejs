@@ -206,16 +206,16 @@ SceneJS.Scene.prototype.getLayers = function() {
     return this._layers;
 };
 
- window.requestAnimFrame = (function(){
-      return  window.requestAnimationFrame       ||
-              window.webkitRequestAnimationFrame ||
-              window.mozRequestAnimationFrame    ||
-              window.oRequestAnimationFrame      ||
-              window.msRequestAnimationFrame     ||
-              function(/* function */ callback, /* DOMElement */ element){
+window.requestAnimFrame = (function() {
+    return  window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            function(/* function */ callback, /* DOMElement */ element) {
                 window.setTimeout(callback, 1000 / 60);
-              };
-    })();
+            };
+})();
 
 /**
  * Starts the scene rendering repeatedly in a loop. After this {@link #isRunning} will return true, and you can then stop it again
@@ -331,12 +331,18 @@ SceneJS.Scene.prototype.start = function(cfg) {
             }
         };
 
-//        (function animloop(){
-//    window[fnName]();
-//      requestAnimFrame(animloop);
-//    })();
+        if (cfg.requestAnimationFrame === true) {
+            (function animloop() {
+                if (window[fnName]) {
+                    window[fnName]();
+                    requestAnimFrame(animloop);
+                }
+            })();
+        } else {
+            this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 60));
+        }
 
-        this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 60));
+        this._startCfg = cfg;
 
         /* Push one frame immediately        
          */
@@ -576,7 +582,9 @@ SceneJS.Scene.prototype.stop = function() {
     if (this._running && this._created) {
         this._running = false;
         window["__scenejs_compileScene" + this._attr.id] = null;
-        window.clearInterval(this._pInterval);
+        if (!this._startCfg.requestAnimFrame) {
+            window.clearInterval(this._pInterval);
+        }
     }
 };
 
