@@ -18,12 +18,12 @@
  *
  *  @private
  */
-SceneJS._viewTransformModule = new (function() {
+var SceneJS_viewTransformModule = new (function() {
     var DEFAULT_TRANSFORM = {
-        matrix : SceneJS._math_identityMat4(),
+        matrix : SceneJS_math_identityMat4(),
         fixed: true,
         identity : true,
-        lookAt:SceneJS._math_LOOKAT
+        lookAt:SceneJS_math_LOOKAT
     };
 
     var idStack = new Array(255);
@@ -35,27 +35,27 @@ SceneJS._viewTransformModule = new (function() {
 
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 nodeId = null;
                 transform = {
-                    matrix : SceneJS._math_identityMat4(),
+                    matrix : SceneJS_math_identityMat4(),
                     fixed: true,
                     identity : true
                 };
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 loadTransform();
             });
@@ -70,16 +70,16 @@ SceneJS._viewTransformModule = new (function() {
             }
             if (!transform.normalMatrixAsArray) {
                 transform.normalMatrixAsArray = new Float32Array(
-                        SceneJS._math_transposeMat4(
-                                SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
+                        SceneJS_math_transposeMat4(
+                                SceneJS_math_inverseMat4(transform.matrix, SceneJS_math_mat4())));
             }
-            SceneJS._renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray, transform.lookAt);
+            SceneJS_renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray, transform.lookAt);
             dirty = false;
         }
     }
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -91,7 +91,7 @@ SceneJS._viewTransformModule = new (function() {
         nodeId = id;
         transform = t;
         dirty = true;
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEW_TRANSFORM_UPDATED, transform);
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEW_TRANSFORM_UPDATED, transform);
        loadTransform();
     };
 
@@ -108,7 +108,7 @@ SceneJS._viewTransformModule = new (function() {
             nodeId = null;
             transform = DEFAULT_TRANSFORM;
         }
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEW_TRANSFORM_UPDATED, transform);
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEW_TRANSFORM_UPDATED, transform);
         loadTransform();
         dirty = true;
     };

@@ -76,8 +76,8 @@
 
                 /* Receive time update
                  */
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.TIME_UPDATED,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.TIME_UPDATED,
                         function(t) {
                             time = t;
                         });
@@ -85,27 +85,27 @@
                 /* When SceneJS initialised, get the command service and
                  * execute commands for this trigger
                  */
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.INIT,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.INIT,
                         function() {
                             commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
                             runBindings("init");
                         });
 
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.RESET,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.RESET,
                         function() {
                             runBindings("reset");
                         });
 
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.ERROR,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.ERROR,
                         function(params) {
                             runBindings("error");
                         });
 
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.SCENE_COMPILING,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.SCENE_COMPILING,
                         function(params) {
                             runIntervalBindings();
                             runBindings("scene-rendering", {
@@ -114,32 +114,32 @@
                             });
                         });
 
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.SCENE_COMPILED,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.SCENE_COMPILED,
                         function(params) {
                             runBindings("scene-rendered", {
                                 nodeId: params.nodeId
                             });
                         });
 
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.NODE_CREATED,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.NODE_CREATED,
                         function(params) {
                             runBindings("node-created", {
                                 nodeId: params.nodeId
                             });
                         });
 
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.NODE_UPDATED,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.NODE_UPDATED,
                         function(params) {
                             runBindings("node-updated", {
                                 nodeId: params.nodeId
                             });
                         });
 
-                SceneJS._eventModule.addListener(
-                        SceneJS._eventModule.NODE_DESTROYED,
+                SceneJS_eventModule.addListener(
+                        SceneJS_eventModule.NODE_DESTROYED,
                         function(params) {
                             runBindings("node-destroyed", {
                                 nodeId: params.nodeId

@@ -33,11 +33,11 @@ SceneJS.Inverse.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
         this._memoLevel = 1; // For consistency with other transform nodes
     }
-    var superXform = SceneJS._modelViewTransformModule.getTransform();
+    var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {
-        var instancing = SceneJS._instancingModule.instancing();
-        var tempMat = SceneJS._math_mat4();
-        SceneJS._math_inverseMat4(superXform.matrix, this._mat, tempMat);
+        var instancing = SceneJS_instancingModule.instancing();
+        var tempMat = SceneJS_math_mat4();
+        SceneJS_math_inverseMat4(superXform.matrix, this._mat, tempMat);
 
         this._xform = {
             localMatrix: this._mat,
@@ -49,10 +49,10 @@ SceneJS.Inverse.prototype._preCompile = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(this._attr.id, this._xform);
 };
 
 // @private
 SceneJS.Inverse.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelViewTransformModule.popTransform();
+    SceneJS_modelViewTransformModule.popTransform();
 };

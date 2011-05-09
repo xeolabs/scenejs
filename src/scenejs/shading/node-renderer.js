@@ -63,7 +63,7 @@ var SceneJS_NodeRenderer = function(cfg) {
         getCameraPos : function(offset) {
             if (!this._mem.camPos || offset) {
                 this.getProjPos(offset);
-                this._mem.camPos = SceneJS._math_normalizeVec3(this._mem.pc, [0,0,0]);
+                this._mem.camPos = SceneJS_math_normalizeVec3(this._mem.pc, [0,0,0]);
             }
             return { x: this._mem.camPos[0], y: this._mem.camPos[1], z: this._mem.camPos[2] };
         },
@@ -71,7 +71,7 @@ var SceneJS_NodeRenderer = function(cfg) {
         getProjPos : function(offset) {
             if (!this._mem.pc || offset) {
                 this.getViewPos(offset);
-                this._mem.pc = SceneJS._math_transformPoint3(this._node.projXFormState.mat, this._mem.vc);
+                this._mem.pc = SceneJS_math_transformPoint3(this._node.projXFormState.mat, this._mem.vc);
             }
             return { x: this._mem.pc[0], y: this._mem.pc[1], z: this._mem.pc[2],  w: this._mem.pc[3] };
         },
@@ -79,14 +79,14 @@ var SceneJS_NodeRenderer = function(cfg) {
         getViewPos : function(offset) {
             if (!this._mem.vc || offset) {
                 this.getWorldPos(offset);
-                this._mem.vc = SceneJS._math_transformPoint3(this._node.viewXFormState.mat, this._mem.wc);
+                this._mem.vc = SceneJS_math_transformPoint3(this._node.viewXFormState.mat, this._mem.wc);
             }
             return { x: this._mem.vc[0], y: this._mem.vc[1], z: this._mem.vc[2],  w: this._mem.vc[3] };
         },
 
         getWorldPos : function(offset) {
             if (!this._mem.wc || offset) {
-                this._mem.wc = SceneJS._math_transformPoint3(this._node.modelXFormState.mat, offset || [0,0,0]);
+                this._mem.wc = SceneJS_math_transformPoint3(this._node.modelXFormState.mat, offset || [0,0,0]);
             }
             return { x: this._mem.wc[0], y: this._mem.wc[1], z: this._mem.wc[2],  w: this._mem.wc[3] };
         }
@@ -142,7 +142,6 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastColortransStateId = -1;
             this._lastLightStateId = -1;
             this._lastClipStateId = -1;
-            this._lastDeformStateId = -1;
             this._lastMorphStateId = -1;
             this._lastTexStateId = -1;
             this._lastMaterialStateId = -1;
@@ -386,7 +385,7 @@ var SceneJS_NodeRenderer = function(cfg) {
              node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable clip
 
             var clip;
-            for (var k = 0; k < node.clipState.clips.length; k++) {
+            for (var k = 0, len = node.clipState.clips.length; k < len; k++) {
                 clip = node.clipState.clips[k];
 
                 if (node.flagsState.flags.clipping === false) { // Flags disable/enable clipping
@@ -403,27 +402,6 @@ var SceneJS_NodeRenderer = function(cfg) {
             }
             this._lastClipStateId = node.clipState._stateId;
         }
-
-        /*----------------------------------------------------------------------------------------------------------
-         * deform
-         *--------------------------------------------------------------------------------------------------------*/
-
-        if (node.deformState && node.deformState.deform && node.deformState._stateId != this._lastDeformStateId) {
-            var verts = node.deformState.deform.verts;
-            var vert;
-            for (var k = 0, len = verts.length; k < len; k++) {
-                vert = verts[k];
-                program.setUniform("uDeformVertex" + k, vert.worldPos);
-                program.setUniform("uDeformWeight" + k, vert.weight);
-                if (vert.mode == "linear") {
-                    program.setUniform("uDeformMode" + k, 0.0);
-                } else if (vert.mode == "exp") {
-                    program.setUniform("uDeformMode" + k, 1.0);
-                }
-            }
-            this._lastDeformStateId = node.deformState._stateId;
-        }
-
 
         if (!this._picking) {
 
@@ -528,7 +506,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             if (node.lightState && node.lightState._stateId != this._lastLightStateId) {
                 var ambient;
                 var light;
-                for (var k = 0; k < node.lightState.lights.length; k++) {
+                for (var k = 0, len = node.lightState.lights.length; k < len; k++) {
                     light = node.lightState.lights[k];
                     program.setUniform("uLightColor" + k, light.color);
                     program.setUniform("uLightDiffuse" + k, light.diffuse);
@@ -633,7 +611,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Null SceneJS.renderer node config: \"" + name + "\"");
         }
-        var result = SceneJS._webgl_enumMap[name];
+        var result = SceneJS_webgl_enumMap[name];
         if (!result) {
             throw SceneJS._errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,

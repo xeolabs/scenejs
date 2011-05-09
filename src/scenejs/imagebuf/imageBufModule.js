@@ -1,7 +1,7 @@
 /*
  *  @private
  */
-SceneJS._imageBufModule = new (function() {
+var SceneJS_imageBufModule = new (function() {
 
     var sceneBufs = {};
     var currentSceneBufs = null;
@@ -13,15 +13,15 @@ SceneJS._imageBufModule = new (function() {
     var canvas;
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.INIT,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.INIT,
             function() {
                 sceneBufs = {};
                 currentSceneBufs = null;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function(e) {
                 canvas = e.canvas;
                 currentSceneBufs = sceneBufs[e.sceneId];
@@ -32,27 +32,27 @@ SceneJS._imageBufModule = new (function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setImagebuf(idStack[stackLen - 1], bufStack[stackLen - 1]);
+                        SceneJS_renderModule.setImagebuf(idStack[stackLen - 1], bufStack[stackLen - 1]);
                     } else {
-                        SceneJS._renderModule.setImagebuf(); // No imageBuf
+                        SceneJS_renderModule.setImagebuf(); // No imageBuf
                     }
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -204,8 +204,8 @@ SceneJS._imageBufModule = new (function() {
         dirty = true;
     };
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_DESTROYED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_DESTROYED,
             function() {
 
             });

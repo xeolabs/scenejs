@@ -266,7 +266,7 @@ SceneJS.Light.prototype._compile = function(traversalContext) {
 
 // @private
 SceneJS.Light.prototype._preCompile = function(traversalContext) {
-    SceneJS._lightingModule.pushLight(this._attr.id, this._light);
+    SceneJS_lightingModule.pushLight(this._attr.id, this._light);
 };
 
 // @private

@@ -256,14 +256,14 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
              * not dissappeared.
              */
             if (layer.creationParams.uri) {
-                if (!SceneJS._textureModule.textureExists(layer.texture)) {
+                if (!SceneJS_textureModule.textureExists(layer.texture)) {
 
                     /* Image texture evicted from cache
                      */
                     layer.state = SceneJS.TextureLayer.STATE_INITIAL;
                 }
             } else if (layer.creationParams.imageBuf) {
-                if (!SceneJS._imageBufModule.getImageBuffer(layer.creationParams.imageBuf)) {
+                if (!SceneJS_imageBufModule.getImageBuffer(layer.creationParams.imageBuf)) {
 
                     /* Target imageBuf node was destroyed
                      */
@@ -286,7 +286,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
                 if (layer.creationParams.uri || layer.creationParams.image || layer.creationParams.canvasId) {
                     var self = this;
                     (function(l) { // Closure allows this layer to receive results
-                        SceneJS._textureModule.createTexture(
+                        SceneJS_textureModule.createTexture(
                                 l.creationParams,
 
                                 function(texture) { // Success
@@ -297,13 +297,13 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
                                      * Need re-compile so that this texture layer
                                      * can create and apply the texture
                                      */
-                                    SceneJS._compileModule.nodeUpdated(self, "loadedImage");
+                                    SceneJS_compileModule.nodeUpdated(self, "loadedImage");
                                 },
 
                                 function() { // General error, probably 404
                                     l.state = SceneJS.TextureLayer.STATE_ERROR;
                                     var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
-                                    SceneJS._loggingModule.warn(message);
+                                    SceneJS_loggingModule.warn(message);
 
                                     if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
                                         self._changeState(SceneJS.Texture.STATE_ERROR, {
@@ -313,7 +313,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
                                 },
 
                                 function() { // Load aborted - user probably refreshed/stopped page
-                                    SceneJS._loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
+                                    SceneJS_loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
                                     l.state = SceneJS.TextureLayer.STATE_ERROR;
 
                                     if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
@@ -329,9 +329,9 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
             case SceneJS.TextureLayer.STATE_LOADING: // Layer still loading
 
                 if (layer.creationParams.imageBuf) {
-                    var imageBuf = SceneJS._imageBufModule.getImageBuffer(layer.creationParams.imageBuf);
+                    var imageBuf = SceneJS_imageBufModule.getImageBuffer(layer.creationParams.imageBuf);
                     if (imageBuf && imageBuf.isRendered()) {
-                        var texture = SceneJS._imageBufModule.getTexture(layer.creationParams.imageBuf);
+                        var texture = SceneJS_imageBufModule.getTexture(layer.creationParams.imageBuf);
                         if (texture) {
 
                             // TODO: Waiting for target node is OK, but exception should be thrown when target is not an 'imageBuf'
@@ -344,7 +344,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
                              * Need re-compile so that this texture layer
                              * can create and apply the texture
                              */
-                            SceneJS._compileModule.nodeUpdated(this, "loadedImagebuf");
+                            SceneJS_compileModule.nodeUpdated(this, "loadedImagebuf");
                         }
                     }
                 }
@@ -359,13 +359,13 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
     /* Fastest strategy is to allow the complete set of layers to load
      * before applying any of them. There would be a huge performance penalty
      * if we were to apply the incomplete set as layers are still loading -
-     * SceneJS._renderModule would then have to generate a new shader for each new
+     * SceneJS_renderModule would then have to generate a new shader for each new
      * layer loaded, which would become redundant as soon as the next layer is loaded.
      */
 
     if (this._countLayersReady == this._layers.length) {  // All layers loaded
 
-        SceneJS._textureModule.pushTexture(this._attr.id, this._layers);
+        SceneJS_textureModule.pushTexture(this._attr.id, this._layers);
 
         if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
             this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
@@ -378,7 +378,7 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
 
         /* Record this node as loaded for "loading-status" events
          */
-        SceneJS._loadStatusModule.status.numNodesLoaded++;
+        SceneJS_loadStatusModule.status.numNodesLoaded++;
 
     } else {
 
@@ -394,13 +394,13 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
 
         /* Record this node as loaded for "loading-status" events
          */
-        SceneJS._loadStatusModule.status.numNodesLoading++;
+        SceneJS_loadStatusModule.status.numNodesLoading++;
     }
 
     /* Post-compile
      */
     if (this._countLayersReady == this._layers.length) {  // All layers loaded
-        SceneJS._textureModule.popTexture();
+        SceneJS_textureModule.popTexture();
     }
 };
 
@@ -421,15 +421,15 @@ SceneJS.Texture.prototype._rebuildTextureMatrix = function(layer) {
 SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
     var matrix = null;
     if (translate) {
-        matrix = SceneJS._math_translationMat4v([ translate.x || 0, translate.y || 0, 0]);
+        matrix = SceneJS_math_translationMat4v([ translate.x || 0, translate.y || 0, 0]);
     }
     if (scale) {
-        var t = SceneJS._math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
-        matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
+        var t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
+        matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
     }
     if (rotate) {
-        var t = SceneJS._math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
-        matrix = matrix ? SceneJS._math_mulMat4(matrix, t) : t;
+        var t = SceneJS_math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
+        matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
     }
     return matrix;
 };

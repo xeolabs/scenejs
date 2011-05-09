@@ -5,7 +5,7 @@
  * traversal by the other modules, then when traversal is finished, sort them into a sequence of
  * that would involve minimal WebGL state changes, then apply the sequence to WebGL.
  */
-SceneJS._renderModule = new (function() {
+var SceneJS_renderModule = new (function() {
 
     this.MAX_PICK_LISTENERS = 50000;
     this.MAX_NODE_DEPTH = 500;
@@ -26,24 +26,23 @@ SceneJS._renderModule = new (function() {
      * ID for each state type
      *--------------------------------------------------------------------*/
 
-    var GEO = 0;
-    var CLIPS = 1;
-    var COLORTRANS = 2;
-    var DEFORM = 3;
-    var FLAGS = 4;
-    var FOG = 5;
-    var IMAGEBUF = 6;
-    var LIGHTS = 7;
-    var MATERIAL = 8;
-    var MORPH = 9;
-    var PICKCOLOR = 10;
-    var TEXTURE = 11;
-    var RENDERER = 12;
-    var MODEL_TRANSFORM = 13;
-    var PROJ_TRANSFORM = 14;
-    var VIEW_TRANSFORM = 15;
-    var PICK_LISTENERS = 16;
-    var RENDER_LISTENERS = 17;
+    this._GEO = 0;
+    this._CLIPS = 1;
+    this._COLORTRANS = 2;
+    this._FLAGS = 3;
+    this._FOG = 4;
+    this._IMAGEBUF = 5;
+    this._LIGHTS = 6;
+    this._MATERIAL = 7;
+    this._MORPH = 8;
+    this._PICKCOLOR = 9;
+    this._TEXTURE = 10;
+    this._RENDERER = 11;
+    this._MODEL_TRANSFORM = 12;
+    this._PROJ_TRANSFORM = 13;
+    this._VIEW_TRANSFORM = 14;
+    this._PICK_LISTENERS = 15;
+    this._RENDER_LISTENERS = 16;
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -51,13 +50,13 @@ SceneJS._renderModule = new (function() {
 
     /* Default transform matrices
      */
-    var DEFAULT_MAT = new Float32Array(SceneJS._math_identityMat4());
+    var DEFAULT_MAT = new Float32Array(SceneJS_math_identityMat4());
 
     var DEFAULT_NORMAL_MAT = new Float32Array(
-            SceneJS._math_transposeMat4(
-                    SceneJS._math_inverseMat4(
-                            SceneJS._math_identityMat4(),
-                            SceneJS._math_mat4())));
+            SceneJS_math_transposeMat4(
+                    SceneJS_math_inverseMat4(
+                            SceneJS_math_identityMat4(),
+                            SceneJS_math_mat4())));
 
     var DEFAULT_CLIPS = {
         clips: [],
@@ -67,11 +66,6 @@ SceneJS._renderModule = new (function() {
     var DEFAULT_COLOR_TRANS = {
         trans : null,
         hash :"f"
-    };
-
-    var DEFAULT_DEFORM = {
-        deform : null,
-        hash : ""
     };
 
     var DEFAULT_FLAGS = {
@@ -199,7 +193,6 @@ SceneJS._renderModule = new (function() {
     var pickState;
     var imageBufState;
     var clipState;
-    var deformState;
     var morphState;
     var pickListenersState;
     var renderListenersState;
@@ -221,7 +214,7 @@ SceneJS._renderModule = new (function() {
     /* Volunteer this module with the VRAM memory management module
      * to deallocate programs when memory module needs VRAM.
      */
-    SceneJS._memoryModule.registerEvictor(
+    SceneJS_memoryModule.registerEvictor(
             function() {
                 var earliest = time;
                 var programToEvict;
@@ -235,7 +228,7 @@ SceneJS._renderModule = new (function() {
                     }
                 }
                 if (programToEvict) { // Delete LRU program's shaders and deregister program
-                    //  SceneJS._loggingModule.info("Evicting shader: " + hash);
+                    //  SceneJS_loggingModule.info("Evicting shader: " + hash);
                     programToEvict.destroy();
                     programs[programToEvict.hash] = null;
                     return true;
@@ -243,24 +236,24 @@ SceneJS._renderModule = new (function() {
                 return false;   // Couldnt find suitable program to delete
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.INIT,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.INIT,
             function() {
-                debugCfg = SceneJS._debugModule.getConfigs("shading");
+                debugCfg = SceneJS_debugModule.getConfigs("shading");
             });
 
     /* Track the scene graph time so we can timestamp the last time
      * we use each shader programs in case we need to evict the
      * least-recently-used program for the memor-management module.
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.TIME_UPDATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.RESET,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.RESET,
             function() {
                 for (var programId in programs) {  // Just free allocated programs
                     programs[programId].destroy();
@@ -269,8 +262,8 @@ SceneJS._renderModule = new (function() {
                 nextProgramId = 0;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_CREATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_CREATED,
             function(params) {
                 var sceneId = params.sceneId;
 
@@ -297,8 +290,8 @@ SceneJS._renderModule = new (function() {
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_DESTROYED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_DESTROYED,
             function(params) {
 
             });
@@ -336,7 +329,7 @@ SceneJS._renderModule = new (function() {
 
         idPrefix = null;
 
-        if (options.compileMode == SceneJS._renderModule.COMPILE_SCENE) {        // Rebuild display list for entire scene
+        if (options.compileMode == SceneJS_renderModule.COMPILE_SCENE) {        // Rebuild display list for entire scene
 
             /* Going to rebuild the state graph as we recompile
              * the entire scene graph. We'll set the state soup to
@@ -345,7 +338,6 @@ SceneJS._renderModule = new (function() {
 
             clipState = DEFAULT_CLIPS;
             colortransState = DEFAULT_COLOR_TRANS;
-            deformState = DEFAULT_DEFORM;
             flagsState = DEFAULT_FLAGS;
             fogState = DEFAULT_FOG;
             imageBufState = DEFAULT_IMAGEBUF;
@@ -374,7 +366,7 @@ SceneJS._renderModule = new (function() {
             setNeedBinSort();
             // states.needSort = true;
 
-        } else if (options.compileMode == SceneJS._renderModule.COMPILE_NODES) {   // Rebuild display list for subtree
+        } else if (options.compileMode == SceneJS_renderModule.COMPILE_NODES) {   // Rebuild display list for subtree
 
             /* Going to overwrite selected state graph nodes
              * as we partially recompile portions of the scene graph.
@@ -405,7 +397,7 @@ SceneJS._renderModule = new (function() {
     };
 
     this.marshallStates = function() {
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.SHADER_RENDERING);
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SHADER_RENDERING);
     };
 
     /*-----------------------------------------------------------------------------------------------------------------
@@ -421,7 +413,7 @@ SceneJS._renderModule = new (function() {
     };
 
     /** Find or create a new state of the given state type and node ID
-     * @param stateType ID of the type of state, eg. DEFORM, TEXTURE etc
+     * @param stateType ID of the type of state, eg.  this._TEXTURE etc
      * @param id ID of scene graph node that is setting this state
      */
     function getState(stateType, id) {
@@ -433,7 +425,7 @@ SceneJS._renderModule = new (function() {
         if (!typeMap) {
             typeMap = stateMap[stateType] = {};
         }
-        if (compileMode != SceneJS._renderModule.COMPILE_SCENE) {
+        if (compileMode != SceneJS_renderModule.COMPILE_SCENE) {
             state = typeMap[id];
             if (!state) {
                 state = {
@@ -468,7 +460,7 @@ SceneJS._renderModule = new (function() {
      * Set the current world-space clipping planes
      */
     this.setClips = function(id, clips) {
-        clipState = getState(CLIPS, id || "___DEFAULT_CLIPS");
+        clipState = getState(this._CLIPS, id || "___DEFAULT_CLIPS");
         clips = clips || [];
         if (clips.length > 0) {
             var hash = [];
@@ -488,19 +480,9 @@ SceneJS._renderModule = new (function() {
      * Set the current color transform
      */
     this.setColortrans = function(id, trans) {
-        colortransState = getState(COLORTRANS, id || "___DEFAULT_COLOR_TRANS");
+        colortransState = getState(this._COLORTRANS, id || "___DEFAULT_COLOR_TRANS");
         colortransState.trans = trans;
         colortransState.hash = trans ? "t" : "f";
-        stateHash = null;
-    };
-
-    /**
-     * Set the current world-space deformation points
-     */
-    this.setDeform = function(id, deform) {
-        deformState = getState(DEFORM, id || "___DEFAULT_DEFORM");
-        deformState.deform = deform;
-        deformState.hash = deform ? "d" + deform.verts.length : "";
         stateHash = null;
     };
 
@@ -508,7 +490,7 @@ SceneJS._renderModule = new (function() {
      * Set the current flags
      */
     this.setFlags = function(id, flags) {
-        flagsState = getState(FLAGS, id || "___DEFAULT_FLAGS");
+        flagsState = getState(this._FLAGS, id || "___DEFAULT_FLAGS");
         flagsState.flags = flags || DEFAULT_FLAGS;
     };
 
@@ -516,7 +498,7 @@ SceneJS._renderModule = new (function() {
      * Set the current fog
      */
     this.setFog = function(id, fog) {
-        fogState = getState(FOG, id || "___DEFAULT_FOG");
+        fogState = getState(this._FOG, id || "___DEFAULT_FOG");
         fogState.fog = fog;
         fogState.hash = fog ? fog.mode : "";
         stateHash = null;
@@ -526,7 +508,7 @@ SceneJS._renderModule = new (function() {
      * Set the current image buffer
      */
     this.setImagebuf = function(id, imageBuf) {
-        imageBufState = getState(IMAGEBUF, id || "___DEFAULT_IMAGEBUF");
+        imageBufState = getState(this._IMAGEBUF, id || "___DEFAULT_IMAGEBUF");
         imageBufState.imageBuf = imageBuf;
     };
 
@@ -546,7 +528,7 @@ SceneJS._renderModule = new (function() {
                 hash.push("d");
             }
         }
-        lightState = getState(LIGHTS, id || "___DEFAULT_LIGHTS");
+        lightState = getState(this._LIGHTS, id || "___DEFAULT_LIGHTS");
         lightState.lights = lights;
         lightState.hash = hash.join("");
         stateHash = null;
@@ -556,7 +538,7 @@ SceneJS._renderModule = new (function() {
      * Set the current surface material
      */
     this.setMaterial = function(id, material) {
-        materialState = getState(MATERIAL, id || "___DEFAULT_MATERIAL");
+        materialState = getState(this._MATERIAL, id || "___DEFAULT_MATERIAL");
         material = material || {};
         materialState.material = {
             baseColor : material.baseColor || [ 0.0, 0.0, 0.0 ],
@@ -574,7 +556,7 @@ SceneJS._renderModule = new (function() {
      * Set model-space morph targets
      */
     this.setMorph = function(id, morph) {
-        morphState = getState(MORPH, id || "___DEFAULT_MORPH");
+        morphState = getState(this._MORPH, id || "___DEFAULT_MORPH");
         var hash;
         if (morph) {
             hash = [];
@@ -596,7 +578,7 @@ SceneJS._renderModule = new (function() {
      * Pick color is only expected to be set within a pick traversal
      */
     this.setPickColor = function(id, pickColor) {
-        pickState = getState(PICKCOLOR, id || "___DEFAULT_PICK");
+        pickState = getState(this._PICKCOLOR, id || "___DEFAULT_PICK");
         pickState.pickColor = pickColor;
         stateHash = null;
     };
@@ -605,7 +587,7 @@ SceneJS._renderModule = new (function() {
      * Set the current textures
      */
     this.setTexture = function(id, texlayers) {
-        texState = getState(TEXTURE, id || "___DEFAULT_TEXTURE");
+        texState = getState(this._TEXTURE, id || "___DEFAULT_TEXTURE");
 
         texlayers = texlayers || [];
 
@@ -639,7 +621,7 @@ SceneJS._renderModule = new (function() {
      * Set the current renderer configs
      */
     this.setRenderer = function(id, props) {
-        rendererState = getState(RENDERER, id || "___DEFAULT_RENDERER");
+        rendererState = getState(this._RENDERER, id || "___DEFAULT_RENDERER");
         rendererState.props = props;
         stateHash = null;
     };
@@ -648,7 +630,7 @@ SceneJS._renderModule = new (function() {
      * Set the current model matrix and model normal matrix
      */
     this.setModelTransform = function(id, mat, normalMat) {
-        modelXFormState = getState(MODEL_TRANSFORM, id || "___DEFAULT_MODEL_TRANSFORM");
+        modelXFormState = getState(this._MODEL_TRANSFORM, id || "___DEFAULT_MODEL_TRANSFORM");
         modelXFormState.mat = mat || DEFAULT_MAT;
         modelXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
     };
@@ -657,7 +639,7 @@ SceneJS._renderModule = new (function() {
      * Set the current projection matrix
      */
     this.setProjectionTransform = function(id, mat) {
-        projXFormState = getState(PROJ_TRANSFORM, id || "___DEFAULT_PROJ_TRANSFORM");
+        projXFormState = getState(this._PROJ_TRANSFORM, id || "___DEFAULT_PROJ_TRANSFORM");
         projXFormState.mat = mat || DEFAULT_MAT;
     };
 
@@ -665,17 +647,17 @@ SceneJS._renderModule = new (function() {
      * Set the current view matrix and view normal matrix
      */
     this.setViewTransform = function(id, mat, normalMat, lookAt) {
-        viewXFormState = getState(VIEW_TRANSFORM, id || "___DEFAULT_VIEW_TRANSFORM");
+        viewXFormState = getState(this._VIEW_TRANSFORM, id || "___DEFAULT_VIEW_TRANSFORM");
         viewXFormState.mat = mat || DEFAULT_MAT;
         viewXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
-        viewXFormState.lookAt = lookAt || SceneJS._math_LOOKAT;
+        viewXFormState.lookAt = lookAt || SceneJS_math_LOOKAT;
     };
 
     /**
      * Set the current pick listeners
      */
     this.setPickListeners = function(id, listeners) {
-        pickListenersState = getState(PICK_LISTENERS, id || "___DEFAULT_PICK_LISTENERS");
+        pickListenersState = getState(this._PICK_LISTENERS, id || "___DEFAULT_PICK_LISTENERS");
         pickListenersState.listeners = listeners || [];
     };
 
@@ -683,7 +665,7 @@ SceneJS._renderModule = new (function() {
      * Set the current node render listeners
      */
     this.setRenderListeners = function(id, listeners) {
-        renderListenersState = getState(RENDER_LISTENERS, id || "___DEFAULT_RENDER_LISTENERS");
+        renderListenersState = getState(this._RENDER_LISTENERS, id || "___DEFAULT_RENDER_LISTENERS");
         renderListenersState.listeners = listeners || [];
     };
 
@@ -731,7 +713,7 @@ SceneJS._renderModule = new (function() {
 
         /* If not rebuilding then ensure that the node's shader is updated for state updates
          */
-        if (compileMode != SceneJS._renderModule.COMPILE_SCENE) {
+        if (compileMode != SceneJS_renderModule.COMPILE_SCENE) {
             return;
         }
 
@@ -740,7 +722,7 @@ SceneJS._renderModule = new (function() {
 
         /*
          */
-        geoState = getState(GEO, id);
+        geoState = getState(this._GEO, id);
         geoState.geo = geo;
         geoState.hash = ([                           // Safe to build geometry hash here - geometry is immutable
             geo.normalBuf ? "t" : "f",
@@ -759,8 +741,8 @@ SceneJS._renderModule = new (function() {
 
         var layerPriority;
 
-        var layerName = SceneJS._layerModule.getLayer();
-        layerPriority = layerName ? SceneJS._layerModule.getLayerPriority(layerName) : 0;
+        var layerName = SceneJS_layerModule.getLayer();
+        layerPriority = layerName ? SceneJS_layerModule.getLayerPriority(layerName) : 0;
 
         /* Create state graph node, with program and
          * pointers to current state soup elements
@@ -797,7 +779,6 @@ SceneJS._renderModule = new (function() {
             pickState :             pickState,        // Will be DEFAULT_PICK because we are compiling whole scene here
             imageBufState :         imageBufState,
             clipState :             clipState,
-            deformState :           deformState,
             morphState :            morphState,
             pickListenersState:     pickListenersState,
             renderListenersState:   renderListenersState,
@@ -816,8 +797,8 @@ SceneJS._renderModule = new (function() {
 
     /* When the canvas deactivates, we'll render the node bins.
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 if (states.needSort) {
                     preSortBins();
@@ -866,7 +847,7 @@ SceneJS._renderModule = new (function() {
 
     function renderBin(bin, picking) {
 
-        var enabledLayers = SceneJS._layerModule.getEnabledLayers();
+        var enabledLayers = SceneJS_layerModule.getEnabledLayers();
         var context = states.canvas.context;
         var nTransparent = 0;
         var node;
@@ -931,7 +912,6 @@ SceneJS._renderModule = new (function() {
             lightState.hash,
             texState.hash,
             clipState.hash,
-            deformState.hash,
             morphState.hash,
             geoState.hash
         ]).join(";");
@@ -940,7 +920,7 @@ SceneJS._renderModule = new (function() {
     function getProgram(stateHash) {
         if (!programs[stateHash]) {
             if (debugCfg.logScripts === true) {
-                SceneJS._loggingModule.info("Creating render and pick shaders: '" + stateHash + "'");
+                SceneJS_loggingModule.info("Creating render and pick shaders: '" + stateHash + "'");
             }
 
             programs[stateHash] = {
@@ -956,24 +936,24 @@ SceneJS._renderModule = new (function() {
 
     function createShader(vertexShaderSrc, fragmentShaderSrc) {
         var p;
-        SceneJS._memoryModule.allocate(
+        SceneJS_memoryModule.allocate(
                 states.canvas.context,
                 "shader",
                 function() {
                     try {
-                        p = new SceneJS._webgl_Program(
+                        p = new SceneJS_webgl_Program(
                                 stateHash,
                                 time,
                                 states.canvas.context,
                                 [vertexShaderSrc],
                                 [fragmentShaderSrc],
-                                SceneJS._loggingModule);
+                                SceneJS_loggingModule);
 
                     } catch (e) {
-                        SceneJS._loggingModule.debug("Vertex shader:");
-                        SceneJS._loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
-                        SceneJS._loggingModule.debug("Fragment shader:");
-                        SceneJS._loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
+                        SceneJS_loggingModule.debug("Vertex shader:");
+                        SceneJS_loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
+                        SceneJS_loggingModule.debug("Fragment shader:");
+                        SceneJS_loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
                         throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create shader: " + e.message || e);
                     }
                 });
@@ -1009,7 +989,7 @@ SceneJS._renderModule = new (function() {
         src.push("}");
 
         if (debugCfg.logScripts == true) {
-            SceneJS._loggingModule.info(src);
+            SceneJS_loggingModule.info(src);
         }
         return src.join("\n");
     }
@@ -1066,7 +1046,7 @@ SceneJS._renderModule = new (function() {
         src.push("}");
 
         if (debugCfg.logScripts == true) {
-            SceneJS._loggingModule.info(src);
+            SceneJS_loggingModule.info(src);
         }
         return src.join("\n");
     }
@@ -1107,7 +1087,6 @@ SceneJS._renderModule = new (function() {
         var texturing = isTexturing();
         var lighting = isLighting();
         var clipping = clipState.clips.length > 0;
-        var deforming = deformState.deform && true;
         var morphing = morphState.morph && true;
 
         var src = [
@@ -1196,17 +1175,7 @@ SceneJS._renderModule = new (function() {
                 }
             }
         }
-
-        /* Deformation - declare uniforms for control points
-         */
-        if (deforming) {
-            for (var i = 0, len = deformState.deform.verts.length; i < len; i++) {
-                src.push("uniform float uDeformMode" + i + ";");
-                src.push("uniform vec3  uDeformVertex" + i + ";");
-                src.push("uniform float uDeformWeight" + i + ";");
-            }
-        }
-
+    
         src.push("void main(void) {");
 
         src.push("  vec4 modelVertex = vec4(aVertex, 1.0); ");
@@ -1239,28 +1208,6 @@ SceneJS._renderModule = new (function() {
             /* Transform normal from model to view space
              */
             src.push("  vec4 worldNormal = uMNMatrix * modelNormal; ");
-        }
-
-        /*
-         * Deformation - apply world-space deform points to world-space vertex
-         */
-        if (deforming) {
-            src.push("  vec3 deformVec;");
-            src.push("  float deformLen;");
-            src.push("  vec3 deformVecSum = vec3(0.0, 0.0, 0.0);");
-            src.push("  float deformScalar;");
-            for (var i = 0, len = deformState.deform.verts.length; i < len; i++) {
-                src.push("deformVec = vec4(uDeformVertex" + i + ".xyz, 1.0).xyz - worldVertex.xyz;");
-                src.push("deformLen = length(deformVec);");
-                src.push("if (uDeformMode" + i + " == 0.0) {");
-                src.push("    deformScalar = deformLen;");
-                src.push("} else {");
-                src.push("    deformScalar = deformLen * deformLen;");
-                src.push("}");
-                src.push("deformVecSum += (deformVec * -uDeformWeight" + i + " * (1.0 / deformScalar));"); // TODO: weight
-            }
-
-            src.push("worldVertex = vec4(deformVecSum.xyz + worldVertex.xyz, 1.0);");
         }
 
         src.push("  vec4 viewVertex  = uVMatrix * worldVertex; ");
@@ -1322,7 +1269,7 @@ SceneJS._renderModule = new (function() {
 
         src.push("}");
         if (debugCfg.logScripts === true) {
-            SceneJS._loggingModule.info(src);
+            SceneJS_loggingModule.info(src);
         }
         return src.join("\n");
     }
@@ -1495,7 +1442,7 @@ SceneJS._renderModule = new (function() {
                     if (geoState.geo.normalBuf) {
                         src.push("texturePos=vec4(normalVec.xyz, 1.0);");
                     } else {
-                        SceneJS._loggingModule.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
+                        SceneJS_loggingModule.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
                         continue;
                     }
                 }
@@ -1503,7 +1450,7 @@ SceneJS._renderModule = new (function() {
                     if (geoState.geo.uvBuf) {
                         src.push("texturePos = vec4(vUVCoord.s, vUVCoord.t, 1.0, 1.0);");
                     } else {
-                        SceneJS._loggingModule.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
+                        SceneJS_loggingModule.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
                         continue;
                     }
                 }
@@ -1511,7 +1458,7 @@ SceneJS._renderModule = new (function() {
                     if (geoState.geo.uvBuf2) {
                         src.push("texturePos = vec4(vUVCoord2.s, vUVCoord2.t, 1.0, 1.0);");
                     } else {
-                        SceneJS._loggingModule.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
+                        SceneJS_loggingModule.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
                         continue;
                     }
                 }
@@ -1701,7 +1648,7 @@ SceneJS._renderModule = new (function() {
 
         src.push("}");
         if (debugCfg.logScripts == true) {
-            SceneJS._loggingModule.info(src);
+            SceneJS_loggingModule.info(src);
         }
         return src.join("\n");
     }

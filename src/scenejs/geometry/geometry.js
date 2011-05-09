@@ -265,12 +265,12 @@ SceneJS.Geometry.prototype.getBoundary = function() {
     var positions = this._getArrays().positions;
 
     this._boundary = {
-        xmin : SceneJS._math_MAX_DOUBLE,
-        ymin : SceneJS._math_MAX_DOUBLE,
-        zmin : SceneJS._math_MAX_DOUBLE,
-        xmax : SceneJS._math_MIN_DOUBLE,
-        ymax : SceneJS._math_MIN_DOUBLE,
-        zmax : SceneJS._math_MIN_DOUBLE
+        xmin : SceneJS_math_MAX_DOUBLE,
+        ymin : SceneJS_math_MAX_DOUBLE,
+        zmin : SceneJS_math_MAX_DOUBLE,
+        xmax : SceneJS_math_MIN_DOUBLE,
+        ymax : SceneJS_math_MIN_DOUBLE,
+        zmax : SceneJS_math_MIN_DOUBLE
     };
 
     var x, y, z;
@@ -327,7 +327,7 @@ SceneJS.Geometry.prototype._preCompile = function(traversalContext) {
             this._attr.uv2 = attr.uv2;
             this._attr.primitive = attr.primitive;
 
-            this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._attr);
+            this._handle = SceneJS_geometryModule.createGeometry(this._resource, this._attr);
 
             this._changeState(SceneJS.Geometry.STATE_LOADED);
 
@@ -337,7 +337,7 @@ SceneJS.Geometry.prototype._preCompile = function(traversalContext) {
 
             var self = this;
 
-            SceneJS._geometryModule.createGeometry(
+            SceneJS_geometryModule.createGeometry(
                     this._resource,
                     this._stream,
                     function(handle) {
@@ -349,12 +349,12 @@ SceneJS.Geometry.prototype._preCompile = function(traversalContext) {
                         /**
                          * Need another compilation to apply freshly-loaded geometry
                          */
-                        SceneJS._compileModule.nodeUpdated(self, "loaded");
+                        SceneJS_compileModule.nodeUpdated(self, "loaded");
                     });
 
         } else { // Arrays
 
-            this._handle = SceneJS._geometryModule.createGeometry(this._resource, this._attr);
+            this._handle = SceneJS_geometryModule.createGeometry(this._resource, this._attr);
 
             this._changeState(SceneJS.Geometry.STATE_LOADED);
         }
@@ -363,14 +363,14 @@ SceneJS.Geometry.prototype._preCompile = function(traversalContext) {
 
         /* Apply geometry
          */
-        SceneJS._geometryModule.pushGeometry(this._attr.id, this._handle.resource);
+        SceneJS_geometryModule.pushGeometry(this._attr.id, this._handle.resource);
     }
 };
 
 // @private
 SceneJS.Geometry.prototype._postCompile = function(traversalContext) {
     if (this._handle) {
-        SceneJS._geometryModule.popGeometry();
+        SceneJS_geometryModule.popGeometry();
     }
 };
 

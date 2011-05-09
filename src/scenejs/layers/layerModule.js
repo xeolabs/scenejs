@@ -9,7 +9,7 @@
  *
  * @private
  */
-SceneJS._layerModule = new (function() {
+var SceneJS_layerModule = new (function() {
 
     this.DEFAULT_LAYER_NAME = "___default";
 
@@ -22,8 +22,8 @@ SceneJS._layerModule = new (function() {
 
     var self = this;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 self.setActiveLayers(null);
                 stackLen = 0;

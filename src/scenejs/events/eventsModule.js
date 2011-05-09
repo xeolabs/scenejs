@@ -11,7 +11,7 @@
  *
  * @private
  */
-SceneJS._eventModule = new (function() {
+var SceneJS_eventModule = new (function() {
 
     this.ERROR = 0;
     this.INIT = 1;                           // SceneJS framework initialised
@@ -76,7 +76,7 @@ SceneJS._eventModule = new (function() {
      * (priority >= n)      - command will be the last called
      * (0 < priority < n)   - command will be called at the order given by the priority
      * @private
-     * @param type Event type - one of the values in SceneJS._eventModule
+     * @param type Event type - one of the values in SceneJS_eventModule
      * @param command - Handler function that will accept whatever parameter object accompanies the event
      * @param priority - Optional priority number (see above)
      */
@@ -240,8 +240,8 @@ SceneJS.bind = function(name, func) {
          * widget that is using this Store as a Record cache should refresh its view.
          * @param {Store} this
          */
-        case "error" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.ERROR,
+        case "error" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.ERROR,
                 function(params) {
                     func({
                         code: params.code,
@@ -252,15 +252,15 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "reset" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.RESET,
+        case "reset" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.RESET,
                 function() {
                     func();
                 });
             break;
 
-        case "scene-created" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.SCENE_CREATED,
+        case "scene-created" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.SCENE_CREATED,
                 function(params) {
                     func({
                         sceneId : params.sceneId
@@ -268,8 +268,8 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "node-created" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.NODE_CREATED,
+        case "node-created" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.NODE_CREATED,
                 function(params) {
                     func({
                         nodeId : params.nodeId,
@@ -278,8 +278,8 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "node-updated" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.NODE_UPDATED,
+        case "node-updated" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.NODE_UPDATED,
                 function(params) {
                     func({
                         nodeId : params.nodeId
@@ -287,8 +287,8 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "node-destroyed" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.NODE_DESTROYED,
+        case "node-destroyed" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.NODE_DESTROYED,
                 function(params) {
                     func({
                         nodeId : params.nodeId
@@ -296,8 +296,8 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "scene-rendering" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.SCENE_COMPILING,
+        case "scene-rendering" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.SCENE_COMPILING,
                 function(params) {
                     func({
                         sceneId : params.sceneId
@@ -305,8 +305,8 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "canvas-activated" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.CANVAS_ACTIVATED,
+        case "canvas-activated" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.CANVAS_ACTIVATED,
                 function(params) {
                     func({
                         canvas: params.canvas
@@ -314,29 +314,29 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "process-created" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.PROCESS_CREATED,
+        case "process-created" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.PROCESS_CREATED,
                 function(params) {
                     func(params);
                 });
             break;
 
-        case "process-timed-out" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.PROCESS_TIMED_OUT,
+        case "process-timed-out" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.PROCESS_TIMED_OUT,
                 function(params) {
                     func(params);
                 });
             break;
 
-        case "process-killed" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.PROCESS_KILLED,
+        case "process-killed" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.PROCESS_KILLED,
                 function(params) {
                     func(params);
                 });
             break;
 
-        case "scene-rendered" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.SCENE_COMPILED,
+        case "scene-rendered" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.SCENE_COMPILED,
                 function(params) {
                     func({
                         sceneId : params.sceneId
@@ -344,8 +344,8 @@ SceneJS.bind = function(name, func) {
                 });
             break;
 
-        case "scene-destroyed" : SceneJS._eventModule.addListener(
-                SceneJS._eventModule.SCENE_DESTROYED,
+        case "scene-destroyed" : SceneJS_eventModule.addListener(
+                SceneJS_eventModule.SCENE_DESTROYED,
                 function(params) {
                     func({
                         sceneId : params.sceneId

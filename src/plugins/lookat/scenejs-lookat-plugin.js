@@ -12,28 +12,28 @@
 		look = [look.x, look.y, look.z];
 		
 		var dir = [];
-		SceneJS._math_subVec3(look, eye, dir);
+		SceneJS_math_subVec3(look, eye, dir);
 		dir = [
 			(params.ignoreX ? 0 : dir[0]),
 			(params.ignoreY ? 0 : dir[1]),
 			(params.ignoreZ ? 0 : dir[2]),
 		];
-		ret.dirLen = SceneJS._math_lenVec3(dir);
+		ret.dirLen = SceneJS_math_lenVec3(dir);
 
 		var up = params.up || node.get('up');
 		up = [up.x, up.y, up.z];
-		SceneJS._math_subVec3(up, dir, up);
+		SceneJS_math_subVec3(up, dir, up);
 		
 		var ZZ = dir;
-		SceneJS._math_normalizeVec3(ZZ);
+		SceneJS_math_normalizeVec3(ZZ);
 
 		var XX = [];
-		SceneJS._math_cross3Vec3(up, ZZ, XX);
-		SceneJS._math_normalizeVec3(XX);
+		SceneJS_math_cross3Vec3(up, ZZ, XX);
+		SceneJS_math_normalizeVec3(XX);
 
 		var YY = [];
-		SceneJS._math_cross3Vec3(ZZ, XX, YY);
-		SceneJS._math_normalizeVec3(YY);
+		SceneJS_math_cross3Vec3(ZZ, XX, YY);
+		SceneJS_math_normalizeVec3(YY);
 
 		ret.mat = [
 			XX[0], XX[1], XX[2], 0,
@@ -80,17 +80,17 @@
 					
 				var addVector = [0, 0, 0];
 				if (params.x)
-					SceneJS._math_addVec3(addVector, SceneJS._math_mulVec3Scalar(infos.mat.slice(0, 3), params.x));
+					SceneJS_math_addVec3(addVector, SceneJS_math_mulVec3Scalar(infos.mat.slice(0, 3), params.x));
 				if (params.y)
-					SceneJS._math_addVec3(addVector, SceneJS._math_mulVec3Scalar(infos.mat.slice(4, 7), params.y));
+					SceneJS_math_addVec3(addVector, SceneJS_math_mulVec3Scalar(infos.mat.slice(4, 7), params.y));
 				if (params.z)
-					SceneJS._math_addVec3(addVector, SceneJS._math_mulVec3Scalar(infos.mat.slice(8, 11), params.z));
+					SceneJS_math_addVec3(addVector, SceneJS_math_mulVec3Scalar(infos.mat.slice(8, 11), params.z));
 				
 				var newEye = [];
-				SceneJS._math_addVec3([params.eye.x, params.eye.y, params.eye.z], addVector, newEye);
+				SceneJS_math_addVec3([params.eye.x, params.eye.y, params.eye.z], addVector, newEye);
 
 				var newLook = [];
-				SceneJS._math_addVec3([params.look.x, params.look.y, params.look.z], addVector, newLook);
+				SceneJS_math_addVec3([params.look.x, params.look.y, params.look.z], addVector, newLook);
 
 				node.set({
 					eye: {x: newEye[0], y: newEye[1], z: newEye[2]},
@@ -126,14 +126,14 @@
 
 				var infos = _getLookatInfos(node, params);
 				
-				var rot = SceneJS._math_rotationMat4c(
+				var rot = SceneJS_math_rotationMat4c(
 					(params.angle / 180.0) * Math.PI,
 					params.x,
 					params.y,
 					params.z
 				);
 				
-				SceneJS._math_mulMat4(infos.mat, rot, infos.mat);
+				SceneJS_math_mulMat4(infos.mat, rot, infos.mat);
 				
 				var curEye = node.get('eye');
 				var newLook = {

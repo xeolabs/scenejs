@@ -1,7 +1,7 @@
 /** Backend module that creates vector geometry repreentations of text
  *  @private
  */
-SceneJS._vectorTextModule = new (function() {
+var SceneJS_vectorTextModule = new (function() {
 
     var letters = {
         ' ': { width: 16, points: [] },

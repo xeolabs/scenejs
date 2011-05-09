@@ -182,7 +182,7 @@ SceneJS.Scene.prototype.getCanvasId = function() {
 SceneJS.Scene.prototype.getZBufferDepth = function() {
     var context;
     if (this._created) {
-        context = SceneJS._sceneModule.getSceneContext(this._attr.id);
+        context = SceneJS_sceneModule.getSceneContext(this._attr.id);
         return context.getParameter(context.DEPTH_BITS)
     }
     return context;
@@ -285,7 +285,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
      * Lazy scene creation
      */
     if (!this._created) {
-        SceneJS._sceneModule.createScene(this, {
+        SceneJS_sceneModule.createScene(this, {
             canvasId: this._canvasId,
             loggingElementId: this._loggingElementId,
             sceneId: this._attr.id
@@ -306,7 +306,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
          */
         var sleeping = false;
 
-        SceneJS._compileModule.nodeUpdated(this, "start");
+        SceneJS_compileModule.nodeUpdated(this, "start");
 
         window[fnName] = function() {
 
@@ -316,7 +316,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
                     cfg.idleFunc();
                 }
 
-                if (SceneJS._compileModule.scheduleCompilations(self._attr.id)) {
+                if (SceneJS_compileModule.scheduleCompilations(self._attr.id)) {
 
                     self._compileWithEvents();
 
@@ -373,7 +373,7 @@ SceneJS.Scene.prototype.render = function() {
      * Lazy scene creation
      */
     if (!this._created) {
-        SceneJS._sceneModule.createScene(this, {
+        SceneJS_sceneModule.createScene(this, {
             canvasId: this._canvasId,
             loggingElementId: this._loggingElementId,
             sceneId: this._attr.id
@@ -411,7 +411,7 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
                 "Attempted pick on Scene that has not been rendered");
     }
 
-    if (!SceneJS._renderModule.pick({
+    if (!SceneJS_renderModule.pick({
         sceneId: this._attr.id,
         canvasX : canvasX,
         canvasY : canvasY }, options)) {
@@ -421,14 +421,14 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
 };
 
 SceneJS.Scene.prototype._compile = function() {
-    SceneJS._sceneModule.activateScene(this._attr.id);
-    if (SceneJS._compileModule.preVisitNode(this)) {
-        SceneJS._layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
+    SceneJS_sceneModule.activateScene(this._attr.id);
+    if (SceneJS_compileModule.preVisitNode(this)) {
+        SceneJS_layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
         var traversalContext = {};
         this._compileNodes(traversalContext);
     }
-    SceneJS._compileModule.postVisitNode(this);
-    SceneJS._sceneModule.deactivateScene();
+    SceneJS_compileModule.postVisitNode(this);
+    SceneJS_sceneModule.deactivateScene();
     SceneJS._actionNodeDestroys();
 };
 
@@ -460,11 +460,11 @@ SceneJS.Scene.prototype._compile = function() {
                  * Pre-visit
                  *--------------------------------------------------------------*/
 
-                SceneJS._pickingModule.preVisitNode(p.node);
+                SceneJS_pickingModule.preVisitNode(p.node);
 
-                if (SceneJS._compileModule.preVisitNode(p.node)) {
+                if (SceneJS_compileModule.preVisitNode(p.node)) {
 
-                    if (SceneJS._flagsModule.preVisitNode(p.node)) {
+                    if (SceneJS_flagsModule.preVisitNode(p.node)) {
 
                         if (p.node._listeners["pre-rendered"]) {
                             p.node._fireEvent("pre-rendered", { });
@@ -530,9 +530,9 @@ SceneJS.Scene.prototype._compile = function() {
                     p.node._postCompile({});
                 }
 
-                SceneJS._flagsModule.postVisitNode(p.node); // Must postVisit even if preVisit returned false
-                SceneJS._compileModule.postVisitNode(p.node);
-                SceneJS._pickingModule.postVisitNode(p.node);
+                SceneJS_flagsModule.postVisitNode(p.node); // Must postVisit even if preVisit returned false
+                SceneJS_compileModule.postVisitNode(p.node);
+                SceneJS_pickingModule.postVisitNode(p.node);
             }
         }
     };
@@ -547,7 +547,7 @@ SceneJS.Scene.prototype._compile = function() {
  * a race condition.
  */
 SceneJS.Scene.prototype.getNumProcesses = function() {
-    return this._created ? SceneJS._processModule.getNumProcesses(this._attr.id) : 0;
+    return this._created ? SceneJS_processModule.getNumProcesses(this._attr.id) : 0;
 };
 
 /**
@@ -557,7 +557,7 @@ SceneJS.Scene.prototype.getNumProcesses = function() {
 SceneJS.Scene.prototype._destroy = function() {
     if (this._created) {
         this.stop();
-        SceneJS._sceneModule.destroyScene(this._attr.id); // Last one fires RESET command
+        SceneJS_sceneModule.destroyScene(this._attr.id); // Last one fires RESET command
         this._created = false;
         this._destroyed = true;
     }
@@ -583,7 +583,7 @@ SceneJS.Scene.prototype.stop = function() {
 /** Total SceneJS reset - destroys all scenes and cached resources.
  */
 SceneJS.reset = function() {
-    var scenes = SceneJS._sceneModule.getAllScenes();
+    var scenes = SceneJS_sceneModule.getAllScenes();
     var temp = [];
     for (var i = 0; i < scenes.length; i++) {
         temp.push(scenes[i]);

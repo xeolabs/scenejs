@@ -14,14 +14,14 @@ SceneJS.ImageBuf.prototype._compile = function(traversalContext) {
 // @private
 SceneJS.ImageBuf.prototype._preCompile = function(traversalContext) {
     if (!this._bufId) {
-        this._bufId = SceneJS._imageBufModule.createImageBuffer(this._attr.id);
+        this._bufId = SceneJS_imageBufModule.createImageBuffer(this._attr.id);
     }
-    SceneJS._imageBufModule.pushImageBuffer(this._attr.id, this._bufId);
+    SceneJS_imageBufModule.pushImageBuffer(this._attr.id, this._bufId);
 };
 
 // @private
 SceneJS.ImageBuf.prototype._postCompile = function(traversalContext) {
-    SceneJS._imageBufModule.popImageBuffer();
+    SceneJS_imageBufModule.popImageBuffer();
 };
 
 /**
@@ -30,7 +30,7 @@ SceneJS.ImageBuf.prototype._postCompile = function(traversalContext) {
  */
 SceneJS.ImageBuf.prototype._destroy = function() {
     if (this._bufId) {
-        SceneJS._imageBufModule.destroyImageBuffer(this._bufId);
+        SceneJS_imageBufModule.destroyImageBuffer(this._bufId);
         this._bufId = null;
     }
 };

@@ -9,7 +9,7 @@
  *
  * @private
  */
-SceneJS._loadStatusModule = new (function() {
+var SceneJS_loadStatusModule = new (function() {
 
     this.status = {
         numNodesLoading : 0,
@@ -19,8 +19,8 @@ SceneJS._loadStatusModule = new (function() {
     /* Make fresh status counts for new render pass
      */
     var self = this;
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 self.status = {
                     numNodesLoading : 0,

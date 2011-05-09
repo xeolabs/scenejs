@@ -24,20 +24,20 @@ SceneJS.Sound.prototype._compile = function(traversalContext) {
     if (this._loaded)
     {
         var listener = this._position;
-        var matrix = SceneJS._math_identityMat4();
+        var matrix = SceneJS_math_identityMat4();
         if (!listener) {
-            var lookAt = SceneJS._viewTransformModule.getTransform().lookAt;
+            var lookAt = SceneJS_viewTransformModule.getTransform().lookAt;
             listener = lookAt.eye;
             lookAt = new SceneJS.LookAt({eye: lookAt.eye, look: lookAt.look, up: lookAt.up});
-            matrix = SceneJS._math_negateMat4(lookAt.getMatrix());
+            matrix = SceneJS_math_negateMat4(lookAt.getMatrix());
         }
 
         if (this._matrix)
             matrix = this._matrix;
 
-        var pos = SceneJS._math_transformPoint3(SceneJS._modelTransformModule.getTransform().matrix, [0, 0, 0]);
-        var v = SceneJS._math_subVec3(pos, [listener.x, listener.y, listener.z]);
-        var dist = SceneJS._math_lenVec3(v);
+        var pos = SceneJS_math_transformPoint3(SceneJS_modelTransformModule.getTransform().matrix, [0, 0, 0]);
+        var v = SceneJS_math_subVec3(pos, [listener.x, listener.y, listener.z]);
+        var dist = SceneJS_math_lenVec3(v);
 
         if (dist < 0.001)
         {
@@ -47,17 +47,17 @@ SceneJS.Sound.prototype._compile = function(traversalContext) {
         else
         {
             var ov = [0, 0, 0];
-            SceneJS._math_addVec3(ov, SceneJS._math_mulVec3Scalar(matrix.slice(0, 3), v[0]));
-            SceneJS._math_addVec3(ov, SceneJS._math_mulVec3Scalar(matrix.slice(4, 7), v[1]));
-            SceneJS._math_addVec3(ov, SceneJS._math_mulVec3Scalar(matrix.slice(8, 11), v[2]));
+            SceneJS_math_addVec3(ov, SceneJS_math_mulVec3Scalar(matrix.slice(0, 3), v[0]));
+            SceneJS_math_addVec3(ov, SceneJS_math_mulVec3Scalar(matrix.slice(4, 7), v[1]));
+            SceneJS_math_addVec3(ov, SceneJS_math_mulVec3Scalar(matrix.slice(8, 11), v[2]));
 
-            SceneJS._math_normalizeVec3(ov);
+            SceneJS_math_normalizeVec3(ov);
 
-            var pan = SceneJS._math_dotVector3([ov[0], 0, ov[2]], [1, 0, 0]);
+            var pan = SceneJS_math_dotVector3([ov[0], 0, ov[2]], [1, 0, 0]);
             pan = pan * -99.9;
             this._sound.setPan(pan);
 
-            var rearAtt = SceneJS._math_dotVector3([ov[0], 0, ov[2]], [0, 0, -1]);
+            var rearAtt = SceneJS_math_dotVector3([ov[0], 0, ov[2]], [0, 0, -1]);
             rearAtt = rearAtt * this._rearAtt;
             if (rearAtt < 0)
                 rearAtt = 0;
@@ -69,7 +69,7 @@ SceneJS.Sound.prototype._compile = function(traversalContext) {
     }
     else
     {
-        SceneJS._compileModule.nodeUpdated(this);
+        SceneJS_compileModule.nodeUpdated(this);
     }
 
     this._compileNodes(traversalContext);

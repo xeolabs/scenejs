@@ -6,7 +6,7 @@
  *
  *--------------------------------------------------------------------------------------------------------------*/
 
-SceneJS._compileModule = new (function() {
+var SceneJS_compileModule = new (function() {
 
     var debugCfg;
 
@@ -98,16 +98,16 @@ SceneJS._compileModule = new (function() {
     };
 
     var self = this;
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.INIT,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.INIT,
             function() {
-                debugCfg = SceneJS._debugModule.getConfigs("compilation");
+                debugCfg = SceneJS_debugModule.getConfigs("compilation");
                 self._enableCompiler = (debugCfg.enabled === false) ? false : true;
             });
 
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_CREATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_CREATED,
             function(params) {
                 self._scenes[params.sceneId] = {
                     flagSceneCompile: false,
@@ -126,15 +126,15 @@ SceneJS._compileModule = new (function() {
                 };
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_DESTROYED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_DESTROYED,
             function(params) {
                 self._scenes[params.sceneId] = null;
             });
 
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function(params) {
 
                 var compileScene = self._scene = self._scenes[params.sceneId];
@@ -152,14 +152,14 @@ SceneJS._compileModule = new (function() {
                 /* Initiate (re)compilation
                  */
                 var compileMode = (compileScene.flagSceneCompile || !self._enableCompiler)
-                        ? SceneJS._renderModule.COMPILE_SCENE
-                        : SceneJS._renderModule.COMPILE_NODES;
+                        ? SceneJS_renderModule.COMPILE_SCENE
+                        : SceneJS_renderModule.COMPILE_NODES;
 
-                SceneJS._renderModule.bindScene({ sceneId: params.sceneId }, { compileMode: compileMode });
+                SceneJS_renderModule.bindScene({ sceneId: params.sceneId }, { compileMode: compileMode });
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILED,
             function() {
                 var scene = self._scene;
                 scene.flagSceneCompile = false;
@@ -324,9 +324,9 @@ SceneJS._compileModule = new (function() {
         };
 
         if (debugCfg.logTrace) {
-            SceneJS._loggingModule.info("-------------------------------------------------------------------");
-            SceneJS._loggingModule.info("COMPILING ...");
-            SceneJS._loggingModule.info("");
+            SceneJS_loggingModule.info("-------------------------------------------------------------------");
+            SceneJS_loggingModule.info("COMPILING ...");
+            SceneJS_loggingModule.info("");
         }
 
         while (compilationQueue.size() > 0) {
@@ -342,7 +342,7 @@ SceneJS._compileModule = new (function() {
                 var minLevel = logLevels.min || SceneJS_compileCfg.COMPILE_SCENE;
                 var maxLevel = (logLevels.max == undefined || logLevels.max == null) ? SceneJS_compileCfg.COMPILE_NODE : logLevels.max;
                 if (minLevel <= level && level <= maxLevel) {
-                    SceneJS._loggingModule.info("Compiling - level: "
+                    SceneJS_loggingModule.info("Compiling - level: "
                             + SceneJS_compileCfg.levelNameStrings[compilation.level] + ", node: "
                             + compilation.node._attr.nodeType + ", node ID: " + compilation.node._attr.id + ", op: "
                             + compilation.op + ", attr: "
@@ -377,7 +377,7 @@ SceneJS._compileModule = new (function() {
         }
 
         if (debugCfg.logTrace) {
-            SceneJS._loggingModule.info("-------------------------------------------------------------------");
+            SceneJS_loggingModule.info("-------------------------------------------------------------------");
         }
 
         this._nodeCompilationLevels = {};

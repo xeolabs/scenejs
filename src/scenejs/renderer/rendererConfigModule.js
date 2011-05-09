@@ -2,7 +2,7 @@
  * Manages a stack of WebGL state frames that may be pushed and popped by SceneJS.renderer nodes.
  *  @private
  */
-SceneJS._rendererModule = new (function() {
+var SceneJS_rendererModule = new (function() {
 
     var canvas;         // Currently active canvas
     var idStack = new Array(255);
@@ -10,41 +10,41 @@ SceneJS._rendererModule = new (function() {
     var stackLen = 0;
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
+                        SceneJS_renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
                     } else {
-                        SceneJS._renderModule.setRenderer();
+                        SceneJS_renderModule.setRenderer();
                     }
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
 
     var _this = this;
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
                 stackLen = 0;
@@ -200,7 +200,7 @@ SceneJS._rendererModule = new (function() {
         stackLen++;
 
         if (props.props.viewport) {
-            SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, props.props.viewport);
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, props.props.viewport);
         }
         dirty = true;
     };
@@ -215,7 +215,7 @@ SceneJS._rendererModule = new (function() {
                      SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Null SceneJS.renderer node config: \"" + name + "\"");
         }
-        var result = SceneJS._webgl_enumMap[name];
+        var result = SceneJS_webgl_enumMap[name];
         if (!result) {
             throw SceneJS._errorModule.fatalError(
                      SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -480,7 +480,7 @@ SceneJS._rendererModule = new (function() {
                 };
             }
             context.viewport(v.x, v.y, v.width, v.height);
-            SceneJS._eventModule.fireEvent(SceneJS._eventModule.VIEWPORT_UPDATED, v);
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, v);
         },
 
         /** Sets scissor region on the given context
@@ -527,8 +527,8 @@ SceneJS._rendererModule = new (function() {
         stackLen--;
         var newProps = propStack[stackLen - 1];
         if (oldProps.props.viewport) {
-            SceneJS._eventModule.fireEvent(
-                    SceneJS._eventModule.VIEWPORT_UPDATED,
+            SceneJS_eventModule.fireEvent(
+                    SceneJS_eventModule.VIEWPORT_UPDATED,
                     newProps.props.viewport);
         }
         dirty = true;

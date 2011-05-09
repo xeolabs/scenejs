@@ -19,7 +19,7 @@
  *  @private
  *
  */
-SceneJS._loggingModule = new (function() {
+var SceneJS_loggingModule = new (function() {
 
     var activeSceneId;
     var funcs = null;
@@ -99,8 +99,8 @@ SceneJS._loggingModule = new (function() {
         }
     }
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.LOGGING_ELEMENT_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED,
             function(params) {
                 var element = params.loggingElement;
                 if (element) {
@@ -123,20 +123,20 @@ SceneJS._loggingModule = new (function() {
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING, // Set default logging for scene root
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING, // Set default logging for scene root
             function(params) {
                 activeSceneId = params.sceneId;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILED, // Set default logging for scene root
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILED, // Set default logging for scene root
             function() {
                 activeSceneId = null;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.RESET,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.RESET,
             function() {
                 queues = {};
                 funcs = null;

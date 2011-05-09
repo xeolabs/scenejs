@@ -18,41 +18,41 @@
  *
  *  @private
  */
-SceneJS._materialModule = new (function() {
+var SceneJS_materialModule = new (function() {
 
     var idStack = new Array(255);
     var materialStack = new Array(255);
     var stackLen = 0;
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setMaterial(idStack[stackLen - 1], materialStack[stackLen - 1]);
+                        SceneJS_renderModule.setMaterial(idStack[stackLen - 1], materialStack[stackLen - 1]);
                     } else {
-                        SceneJS._renderModule.setMaterial();
+                        SceneJS_renderModule.setMaterial();
                     }
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });

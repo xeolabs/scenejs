@@ -176,7 +176,7 @@ SceneJS.Clip.prototype.getAttributes = function() {
 // @private
 SceneJS.Clip.prototype._compile = function(traversalContext) {
     //this._preCompile(traversalContext);
-    SceneJS._clipModule.pushClip(this._attr.id, this._attr);
+    SceneJS_clipModule.pushClip(this._attr.id, this._attr);
     this._compileNodes(traversalContext);
 };
 
@@ -185,25 +185,25 @@ SceneJS.Clip.prototype._preCompile = function() {
     //    if (this._memoLevel == 0) {
     //        this._makeClip();
     //    }
-    SceneJS._clipModule.pushClip(this._attr.id, this._attr);
+    SceneJS_clipModule.pushClip(this._attr.id, this._attr);
 };
 
 // @private
 SceneJS.Clip.prototype._postCompile = function() {
-    //SceneJS._clipModule.popClip();
+    //SceneJS_clipModule.popClip();
 };
 
 /** Create succinct plane representation from points A, B & C
  *
  */
 //SceneJS.Clip.prototype._makeClip = function() {
-//    var modelMat = SceneJS._modelTransformModule.getTransform().matrix;
+//    var modelMat = SceneJS_modelTransformModule.getTransform().matrix;
 //
 //    this._clip = {
 //        mode: this._attr.mode,
-//        a : SceneJS._math_transformPoint3(modelMat, this._attr.a),
-//        b : SceneJS._math_transformPoint3(modelMat, this._attr.b),
-//        c : SceneJS._math_transformPoint3(modelMat, this._attr.c)
+//        a : SceneJS_math_transformPoint3(modelMat, this._attr.a),
+//        b : SceneJS_math_transformPoint3(modelMat, this._attr.b),
+//        c : SceneJS_math_transformPoint3(modelMat, this._attr.c)
 //    };
 //};
 

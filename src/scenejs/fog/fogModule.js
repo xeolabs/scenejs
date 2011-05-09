@@ -46,34 +46,34 @@ SceneJS._fogModule = new (function() {
         }
     }
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setFog(idStack[stackLen-1], fogStack[stackLen - 1]);
+                        SceneJS_renderModule.setFog(idStack[stackLen-1], fogStack[stackLen - 1]);
                     } else {
-                        SceneJS._renderModule.setFog();
+                        SceneJS_renderModule.setFog();
                     }
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });

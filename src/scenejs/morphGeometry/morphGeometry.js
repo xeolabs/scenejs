@@ -166,11 +166,11 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 
     if (!this._handle) { // Not created yet
 
-        this._handle = SceneJS._morphGeometryModule.createMorphGeometry(this._resource, this._attr);
+        this._handle = SceneJS_morphGeometryModule.createMorphGeometry(this._resource, this._attr);
 
         this._changeState(SceneJS.MorphGeometry.STATE_LOADED);
     }
-    SceneJS._morphGeometryModule.pushMorphGeometry(this._attr.id, this._handle, this._attr.factor);
+    SceneJS_morphGeometryModule.pushMorphGeometry(this._attr.id, this._handle, this._attr.factor);
 };
 
 SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
@@ -190,7 +190,7 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 
             this._setMorph(params);
 
-            this._handle = SceneJS._morphGeometryModule.createMorphGeometry(
+            this._handle = SceneJS_morphGeometryModule.createMorphGeometry(
                     this._resource,
                     this._attr,
                     options);
@@ -206,7 +206,7 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 
             var self = this;
 
-            SceneJS._morphGeometryModule.createMorphGeometry(
+            SceneJS_morphGeometryModule.createMorphGeometry(
                     this._resource,
                     this._stream,
                     options,
@@ -220,12 +220,12 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
                         /**
                          * Need another compilation to apply freshly-loaded morphGeometry
                          */
-                        SceneJS._compileModule.nodeUpdated(self, "loaded");
+                        SceneJS_compileModule.nodeUpdated(self, "loaded");
                     });
 
         } else { // Arrays
 
-            this._handle = SceneJS._morphGeometryModule.createMorphGeometry(
+            this._handle = SceneJS_morphGeometryModule.createMorphGeometry(
                     this._resource,
                     this._attr,
                     options);
@@ -238,7 +238,7 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 
         /* Apply morphGeometry
          */
-        SceneJS._morphGeometryModule.pushMorphGeometry(
+        SceneJS_morphGeometryModule.pushMorphGeometry(
                 this._attr.id,
                 this._handle.resource,
                 this._attr.factor);
@@ -248,6 +248,6 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
 // @private
 SceneJS.MorphGeometry.prototype._postCompile = function(traversalContext) {
     if (this._handle) {
-        SceneJS._morphGeometryModule.popMorphGeometry();
+        SceneJS_morphGeometryModule.popMorphGeometry();
     }
 };

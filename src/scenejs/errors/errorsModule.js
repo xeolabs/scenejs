@@ -5,15 +5,15 @@
  */
 SceneJS._errorModule = new (function() {
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 var time = (new Date()).getTime();
-                SceneJS._eventModule.fireEvent(SceneJS._eventModule.TIME_UPDATED, time);
+                SceneJS_eventModule.fireEvent(SceneJS_eventModule.TIME_UPDATED, time);
             });
 
     this.fatalError = function(code, message) {
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
             errorName: SceneJS.errors._getErrorName(code) || "ERROR",
             code: code,
             exception: message,
@@ -23,7 +23,7 @@ SceneJS._errorModule = new (function() {
     };
 
     this.error = function(code, message) {
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.ERROR, {
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.ERROR, {
             errorName: SceneJS.errors._getErrorName(code) || "ERROR",
             code: code,
             exception: message,

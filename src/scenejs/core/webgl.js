@@ -6,7 +6,7 @@
 /** Maps SceneJS node parameter names to WebGL enum names
  * @private
  */
-SceneJS._webgl_enumMap = {
+var SceneJS_webgl_enumMap = {
     funcAdd: "FUNC_ADD",
     funcSubtract: "FUNC_SUBTRACT",
     funcReverseSubtract: "FUNC_REVERSE_SUBTRACT",
@@ -60,14 +60,14 @@ SceneJS._webgl_enumMap = {
 
 /** @private
  */
-SceneJS._webgl_fogModes = {
+var SceneJS_webgl_fogModes = {
     EXP: 0,
     EXP2: 1,
     LINEAR: 2
 };
 
 /** @private */
-SceneJS._webgl_ProgramUniform = function(context, program, name, type, size, location, logging) {
+var SceneJS_webgl_ProgramUniform = function(context, program, name, type, size, location, logging) {
 
     var func = null;
     if (type == context.BOOL) {
@@ -150,7 +150,7 @@ SceneJS._webgl_ProgramUniform = function(context, program, name, type, size, loc
 }
 
 /** @private */
-SceneJS._webgl_ProgramSampler = function(context, program, name, type, size, location, logging) {
+var SceneJS_webgl_ProgramSampler = function(context, program, name, type, size, location, logging) {
     //  logging.debug("Program sampler found in shader: " + name);
     this.bindTexture = function(texture, unit) {
         texture.bind(unit);
@@ -161,7 +161,7 @@ SceneJS._webgl_ProgramSampler = function(context, program, name, type, size, loc
 /** An attribute within a shader
  * @private
  */
-SceneJS._webgl_ProgramAttribute = function(context, program, name, type, size, location, logging) {
+var SceneJS_webgl_ProgramAttribute = function(context, program, name, type, size, location, logging) {
     // logging.debug("Program attribute found in shader: " + name);
     this.bindFloatArrayBuffer = function(buffer) {
         buffer.bind();
@@ -181,7 +181,7 @@ SceneJS._webgl_ProgramAttribute = function(context, program, name, type, size, l
  * @param source Source code for shader
  * @param logging Shader will write logging's debug channel as it compiles
  */
-SceneJS._webgl_Shader = function(context, type, source, logging) {
+var SceneJS_webgl_Shader = function(context, type, source, logging) {
     this.handle = context.createShader(type);
 
     //  logging.debug("Creating " + ((type == context.VERTEX_SHADER) ? "vertex" : "fragment") + " shader");
@@ -215,7 +215,7 @@ SceneJS._webgl_Shader = function(context, type, source, logging) {
  * @param fragmentSources Source codes for fragment shaders
  * @param logging Program and shaders will write to logging's debug channel as they compile and link
  */
-SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragmentSources, logging) {
+var SceneJS_webgl_Program = function(hash, lastUsed, context, vertexSources, fragmentSources, logging) {
     this.hash = hash;
     this.lastUsed = lastUsed;
 
@@ -223,10 +223,10 @@ SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragme
      */
     var shaders = [];
     for (var i = 0; i < vertexSources.length; i++) {
-        shaders.push(new SceneJS._webgl_Shader(context, context.VERTEX_SHADER, vertexSources[i], logging));
+        shaders.push(new SceneJS_webgl_Shader(context, context.VERTEX_SHADER, vertexSources[i], logging));
     }
     for (var i = 0; i < fragmentSources.length; i++) {
-        shaders.push(new SceneJS._webgl_Shader(context, context.FRAGMENT_SHADER, fragmentSources[i], logging));
+        shaders.push(new SceneJS_webgl_Shader(context, context.FRAGMENT_SHADER, fragmentSources[i], logging));
     }
 
     /* Create program, attach shaders, link and validate program
@@ -280,7 +280,7 @@ SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragme
             var location = context.getUniformLocation(handle, u_name);
             if ((u.type == context.SAMPLER_2D) || (u.type == context.SAMPLER_CUBE) || (u.type == 35682)) {
 
-                samplers[u_name] = new SceneJS._webgl_ProgramSampler(
+                samplers[u_name] = new SceneJS_webgl_ProgramSampler(
                         context,
                         handle,
                         u_name,
@@ -289,7 +289,7 @@ SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragme
                         location,
                         logging);
             } else {
-                uniforms[u_name] = new SceneJS._webgl_ProgramUniform(
+                uniforms[u_name] = new SceneJS_webgl_ProgramUniform(
                         context,
                         handle,
                         u_name,
@@ -310,7 +310,7 @@ SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragme
         var a = context.getActiveAttrib(handle, i);
         if (a) {
             var location = context.getAttribLocation(handle, a.name);
-            attributes[a.name] = new SceneJS._webgl_ProgramAttribute(
+            attributes[a.name] = new SceneJS_webgl_ProgramAttribute(
                     context,
                     handle,
                     a.name,
@@ -380,7 +380,7 @@ SceneJS._webgl_Program = function(hash, lastUsed, context, vertexSources, fragme
 }
 
 /** @private */
-SceneJS._webgl_Texture2D = function(context, cfg) {
+var SceneJS_webgl_Texture2D = function(context, cfg) {
     //  cfg.logging.debug("Creating texture: '" + cfg.textureId + "'");
     this.canvas = cfg.canvas;
     this.textureId = cfg.textureId;
@@ -535,7 +535,7 @@ SceneJS._webgl_Texture2D = function(context, cfg) {
  * @param itemSize Size of each item
  * @param usage    Eg. STATIC_DRAW
  */
-SceneJS._webgl_ArrayBuffer = function(context, type, values, numItems, itemSize, usage) {
+var SceneJS_webgl_ArrayBuffer = function(context, type, values, numItems, itemSize, usage) {
     this.handle = context.createBuffer();
     context.bindBuffer(type, this.handle);
     context.bufferData(type, values, usage);

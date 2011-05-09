@@ -10,7 +10,7 @@ SceneJS.Text.prototype._init = function(params) {
     }
     this._mode = mode;
     if (this._mode == "bitmap") {
-        var text = SceneJS._bitmapTextModule.createText("Helvetica", params.size || 1, params.text || "");
+        var text = SceneJS_bitmapTextModule.createText("Helvetica", params.size || 1, params.text || "");
 
         var w = text.width / 16;
         var h = text.height / 16;
@@ -77,7 +77,7 @@ SceneJS.Text.prototype._init = function(params) {
         this.addNode({
             type: "geometry",
             create: function() {
-                var geo = SceneJS._vectorTextModule.getGeometry(3, 0, 0, params.text); // Unit size
+                var geo = SceneJS_vectorTextModule.getGeometry(3, 0, 0, params.text); // Unit size
                 return {
                     resource: this._attr.id, // Assuming text geometry varies a lot - don't try to share VBOs
                     primitive : "lines",

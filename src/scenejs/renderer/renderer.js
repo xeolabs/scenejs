@@ -329,14 +329,14 @@ SceneJS.Renderer.prototype._compile = function(traversalContext) {
 // @private
 SceneJS.Renderer.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
-        this._props = SceneJS._rendererModule.createProps(this._attr);
+        this._props = SceneJS_rendererModule.createProps(this._attr);
         this._memoLevel = 1;
     }
-    SceneJS._rendererModule.pushProps(this._attr.id, this._props);
+    SceneJS_rendererModule.pushProps(this._attr.id, this._props);
 };
 
 
 // @private
 SceneJS.Renderer.prototype._postCompile = function(traversalContext) {
-    SceneJS._rendererModule.popProps();
+    SceneJS_rendererModule.popProps();
 };

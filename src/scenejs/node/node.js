@@ -331,9 +331,9 @@ SceneJS.Node.prototype._compile = function(traversalContext) {
  */
 SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildren) { // Selected children - useful for Selector node
 
-    SceneJS._pickingModule.preVisitNode(this);
+    SceneJS_pickingModule.preVisitNode(this);
 
-    SceneJS._nodeEventsModule.preVisitNode(this);
+    SceneJS_nodeEventsModule.preVisitNode(this);
 
     /* Fire "pre-rendered" event if observed
      */
@@ -356,9 +356,9 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
 
             /* Compile module culls child traversal when child compilation not required.
              */
-            if (SceneJS._compileModule.preVisitNode(child)) {
+            if (SceneJS_compileModule.preVisitNode(child)) {
 
-                SceneJS._flagsModule.preVisitNode(child);
+                SceneJS_flagsModule.preVisitNode(child);
 
                 childTraversalContext = {
 
@@ -372,10 +372,10 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
                 };
                 child._compileWithEvents.call(child, childTraversalContext);
 
-                SceneJS._flagsModule.postVisitNode(child);
+                SceneJS_flagsModule.postVisitNode(child);
 
             }
-            SceneJS._compileModule.postVisitNode(child);
+            SceneJS_compileModule.postVisitNode(child);
         }
     }
 
@@ -387,9 +387,9 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
         }
     }
 
-    SceneJS._pickingModule.postVisitNode(this);
+    SceneJS_pickingModule.postVisitNode(this);
 
-    SceneJS._nodeEventsModule.postVisitNode(this);
+    SceneJS_nodeEventsModule.postVisitNode(this);
 
     if (this._listeners["post-rendering"]) {
         this._fireEvent("post-rendering", { });
@@ -409,11 +409,11 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
 
         /* Only render layers that are enabled
          */
-        if (!SceneJS._layerModule.layerEnabled(this._attr.layer)) {
+        if (!SceneJS_layerModule.layerEnabled(this._attr.layer)) {
             return;
         }
 
-        SceneJS._layerModule.pushLayer(this._attr.layer);
+        SceneJS_layerModule.pushLayer(this._attr.layer);
     }
 
     /* Flag this node as rendering - while this is true, it is legal
@@ -434,7 +434,7 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
         this._fireEvent("pre-rendering", { });
     }
 
-    /* As scene is traversed, SceneJS._loadStatusModule will track the counts
+    /* As scene is traversed, SceneJS_loadStatusModule will track the counts
      * of nodes that are still initialising (ie. texture, instance nodes).
      *
      * If we are listening to "loading-status" events on this node, then we'll
@@ -443,7 +443,7 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
      */
     var loadStatusSnapshot;
     if (this._listeners["loading-status"]) {
-        loadStatusSnapshot = SceneJS._loadStatusModule.getStatusSnapshot();
+        loadStatusSnapshot = SceneJS_loadStatusModule.getStatusSnapshot();
     }
 
     this._compile(traversalContext);
@@ -453,7 +453,7 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
         /* Report diff of loading stats that occurred while rending this node
          * and its sub-nodes
          */
-        this._fireEvent("loading-status", SceneJS._loadStatusModule.diffStatus(loadStatusSnapshot));
+        this._fireEvent("loading-status", SceneJS_loadStatusModule.diffStatus(loadStatusSnapshot));
     }
 
 
@@ -466,7 +466,7 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
     this._rendering = false;
 
     if (this._attr.layer) {
-        SceneJS._layerModule.popLayer();
+        SceneJS_layerModule.popLayer();
     }
 };
 

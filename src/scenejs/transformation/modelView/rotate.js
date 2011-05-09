@@ -162,7 +162,7 @@ SceneJS.Rotate.prototype.incAngle = function(angle) {
 SceneJS.Rotate.prototype.getMatrix = function() {
     return (this._memoLevel > 0)
             ? this._mat.slice(0)
-            : SceneJS._math_rotationMat4v(this._attr.angle * Math.PI / 180.0, [this._attr.x, this._attr.y, this._attr.z]);
+            : SceneJS_math_rotationMat4v(this._attr.angle * Math.PI / 180.0, [this._attr.x, this._attr.y, this._attr.z]);
 };
 
 /**
@@ -195,19 +195,19 @@ SceneJS.Rotate.prototype._preCompile = function(traversalContext) {
             /* When building a view transform, apply the negated rotation angle
              * to correctly transform the SceneJS.Camera
              */
-            var angle = SceneJS._modelViewTransformModule.isBuildingViewTransform()
+            var angle = SceneJS_modelViewTransformModule.isBuildingViewTransform()
                     ? -this._attr.angle
                     : this._attr.angle;
-            this._mat = SceneJS._math_rotationMat4v(angle * Math.PI / 180.0, [this._attr.x, this._attr.y, this._attr.z]);
+            this._mat = SceneJS_math_rotationMat4v(angle * Math.PI / 180.0, [this._attr.x, this._attr.y, this._attr.z]);
         } else {
-            this._mat = SceneJS._math_identityMat4();
+            this._mat = SceneJS_math_identityMat4();
         }
     }
-    var superXForm = SceneJS._modelViewTransformModule.getTransform();
+    var superXForm = SceneJS_modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXForm.fixed)) {
-        var instancing = SceneJS._instancingModule.instancing();
-        var tempMat = SceneJS._math_mat4();
-        SceneJS._math_mulMat4(superXForm.matrix, this._mat, tempMat);
+        var instancing = SceneJS_instancingModule.instancing();
+        var tempMat = SceneJS_math_mat4();
+        SceneJS_math_mulMat4(superXForm.matrix, this._mat, tempMat);
 
         this._xform = {
             localMatrix: this._mat,
@@ -219,12 +219,12 @@ SceneJS.Rotate.prototype._preCompile = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(this._attr.id, this._xform);
 };
 
 // @private
 SceneJS.Rotate.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelViewTransformModule.popTransform();
+    SceneJS_modelViewTransformModule.popTransform();
 };
 
 

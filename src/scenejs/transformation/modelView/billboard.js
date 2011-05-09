@@ -26,10 +26,10 @@ SceneJS.Billboard.prototype._compile = function(traversalContext) {
 // @private
 SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
     // 0. The base variable
-    var superViewXForm = SceneJS._viewTransformModule.getTransform();
+    var superViewXForm = SceneJS_viewTransformModule.getTransform();
     var lookAt = superViewXForm.lookAt;
 
-    var superModelXForm = SceneJS._modelTransformModule.getTransform();
+    var superModelXForm = SceneJS_modelTransformModule.getTransform();
     var matrix = superModelXForm.matrix.slice(0);
 
     // 1. Invert the model rotation matrix, which will reset the subnodes rotation
@@ -39,26 +39,26 @@ SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
         matrix[8], matrix[9], matrix[10], 0,
         0,         0,         0,          1
     ];
-    SceneJS._math_inverseMat4(rotMatrix);
-    SceneJS._math_mulMat4(matrix, rotMatrix, matrix);
+    SceneJS_math_inverseMat4(rotMatrix);
+    SceneJS_math_mulMat4(matrix, rotMatrix, matrix);
 
     // 2. Get the billboard Z vector
     var ZZ = [];
-    SceneJS._math_subVec3(lookAt.eye, lookAt.look, ZZ);
-    SceneJS._math_normalizeVec3(ZZ);
+    SceneJS_math_subVec3(lookAt.eye, lookAt.look, ZZ);
+    SceneJS_math_normalizeVec3(ZZ);
 
     // 3. Get the billboard X vector
     var XX = [];
-    SceneJS._math_cross3Vec3(lookAt.up, ZZ, XX);
-    SceneJS._math_normalizeVec3(XX);
+    SceneJS_math_cross3Vec3(lookAt.up, ZZ, XX);
+    SceneJS_math_normalizeVec3(XX);
 
     // 4. Get the billboard Y vector
     var YY = [];
-    SceneJS._math_cross3Vec3(ZZ, XX, YY);
-    SceneJS._math_normalizeVec3(YY);
+    SceneJS_math_cross3Vec3(ZZ, XX, YY);
+    SceneJS_math_normalizeVec3(YY);
 
     // 5. Multiply those billboard vector to the matrix
-    SceneJS._math_mulMat4(matrix, [
+    SceneJS_math_mulMat4(matrix, [
         XX[0], XX[1], XX[2], 0,
         YY[0], YY[1], YY[2], 0,
         ZZ[0], ZZ[1], ZZ[2], 0,
@@ -66,10 +66,10 @@ SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
     ], matrix);
 
     // 6. Render
-    SceneJS._modelTransformModule.pushTransform(this._attr.id,  { matrix: matrix }); // TODO : memoize!
+    SceneJS_modelTransformModule.pushTransform(this._attr.id,  { matrix: matrix }); // TODO : memoize!
 };
 
 // @private
 SceneJS.Billboard.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelTransformModule.popTransform();
+    SceneJS_modelTransformModule.popTransform();
 };

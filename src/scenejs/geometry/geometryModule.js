@@ -25,7 +25,7 @@
  *
  *  @private
  */
-SceneJS._geometryModule = new (function() {
+var SceneJS_geometryModule = new (function() {
 
     var canvas;
     var geoMaps = {};                   // Geometry map for each canvas
@@ -38,16 +38,16 @@ SceneJS._geometryModule = new (function() {
 
     //var geoStack = [];
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 canvas = null;
                 currentGeoMap = null;
                 stackLen = 0;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 if (!geoMaps[c.canvasId]) {      // Lazy-create geometry map for canvas
                     geoMaps[c.canvasId] = {};
@@ -56,25 +56,25 @@ SceneJS._geometryModule = new (function() {
                 currentGeoMap = geoMaps[c.canvasId];
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
                 currentGeoMap = null;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.RESET,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.RESET,
             function() {
                 for (var canvasId in geoMaps) {    // Destroy geometries on all canvases
                     if (geoMaps.hasOwnProperty(canvasId)) {
@@ -98,7 +98,7 @@ SceneJS._geometryModule = new (function() {
      * @private
      */
     function destroyGeometry(geo) {
-        //  SceneJS._loggingModule.debug("Destroying geometry : '" + geo.resource + "'");
+        //  SceneJS_loggingModule.debug("Destroying geometry : '" + geo.resource + "'");
         if (document.getElementById(geo.canvas.canvasId)) { // Context won't exist if canvas has disappeared
             if (geo.vertexBuf) {
                 geo.vertexBuf.destroy();
@@ -216,35 +216,35 @@ SceneJS._geometryModule = new (function() {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             if (data.positions && data.positions.length > 0) {
-                vertexBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.positions, data.positions.length, 3, usage);
+                vertexBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.positions, data.positions.length, 3, usage);
             }
 
             if (data.normals && data.normals.length > 0) {
-                normalBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.normals, data.normals.length, 3, usage);
+                normalBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.normals, data.normals.length, 3, usage);
             }
 
             if (data.uv && data.uv.length > 0) {
                 if (data.uv) {
-                    uvBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.uv, data.uv.length, 2, usage);
+                    uvBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.uv, data.uv.length, 2, usage);
                 }
             }
 
             if (data.uv2 && data.uv2.length > 0) {
                 if (data.uv2) {
-                    uvBuf2 = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.uv2, data.uv2.length, 2, usage);
+                    uvBuf2 = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.uv2, data.uv2.length, 2, usage);
                 }
             }
 
             if (data.colors && data.colors.length > 0) {
                 if (data.colors) {
-                    colorBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.colors, data.colors.length, 4, usage);
+                    colorBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER, data.colors, data.colors.length, 4, usage);
                 }
             }
 
             var primitive;
             if (data.indices && data.indices.length > 0) {
                 primitive = getPrimitiveType(context, data.primitive);
-                indexBuf = new SceneJS._webgl_ArrayBuffer(context, context.ELEMENT_ARRAY_BUFFER,
+                indexBuf = new SceneJS_webgl_ArrayBuffer(context, context.ELEMENT_ARRAY_BUFFER,
                         new Uint16Array(data.indices), data.indices.length, 3, usage);
             }
 
@@ -318,7 +318,7 @@ SceneJS._geometryModule = new (function() {
             /* We don't render Geometry's that have no index buffer - they merely define
              * vertex/uv buffers that are indexed by sub-Geometry's in a composite geometry  
              */
-            SceneJS._renderModule.setGeometry(id, geo);
+            SceneJS_renderModule.setGeometry(id, geo);
         }
 
         geoStack[stackLen++] = geo;
@@ -326,12 +326,12 @@ SceneJS._geometryModule = new (function() {
 
     function getBoundary(positions) {
         var boundary = {
-            xmin : SceneJS._math_MAX_DOUBLE,
-            ymin : SceneJS._math_MAX_DOUBLE,
-            zmin : SceneJS._math_MAX_DOUBLE,
-            xmax : SceneJS._math_MIN_DOUBLE,
-            ymax : SceneJS._math_MIN_DOUBLE,
-            zmax : SceneJS._math_MIN_DOUBLE
+            xmin : SceneJS_math_MAX_DOUBLE,
+            ymin : SceneJS_math_MAX_DOUBLE,
+            zmin : SceneJS_math_MAX_DOUBLE,
+            xmax : SceneJS_math_MIN_DOUBLE,
+            ymax : SceneJS_math_MIN_DOUBLE,
+            zmax : SceneJS_math_MIN_DOUBLE
         };
         var x, y, z;
         for (var i = 0, len = positions.length - 2; i < len; i += 3) {

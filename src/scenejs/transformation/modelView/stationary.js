@@ -31,26 +31,26 @@ SceneJS.Stationary.prototype._compile = function(traversalContext) {
 
     var origMemoLevel = this._memoLevel;
 
-    var superXform = SceneJS._viewTransformModule.getTransform();
+    var superXform = SceneJS_viewTransformModule.getTransform();
     var lookAt = superXform.lookAt;
     if (lookAt) {
         if (this._memoLevel == 0 || (!superXform.fixed)) {
-            var tempMat = SceneJS._math_mat4();
-            SceneJS._math_mulMat4(superXform.matrix,
-                    SceneJS._math_translationMat4v(lookAt.eye), tempMat);
+            var tempMat = SceneJS_math_mat4();
+            SceneJS_math_mulMat4(superXform.matrix,
+                    SceneJS_math_translationMat4v(lookAt.eye), tempMat);
             this._xform = {
                 matrix: tempMat,
                 lookAt: lookAt,
                 fixed: origMemoLevel == 1
             };
 
-            if (superXform.fixed && !SceneJS._instancingModule.instancing()) {
+            if (superXform.fixed && !SceneJS_instancingModule.instancing()) {
                 this._memoLevel = 1;
             }
         }
-        SceneJS._viewTransformModule.pushTransform(this._attr.id, this._xform);
+        SceneJS_viewTransformModule.pushTransform(this._attr.id, this._xform);
         this._compileNodes(traversalContext);
-        SceneJS._viewTransformModule.popTransform();
+        SceneJS_viewTransformModule.popTransform();
     } else {
         this._compileNodes(traversalContext);        
     }

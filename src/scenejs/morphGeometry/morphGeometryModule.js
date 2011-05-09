@@ -3,7 +3,7 @@
  *
  *  @private
  */
-SceneJS._morphGeometryModule = new (function() {
+var SceneJS_morphGeometryModule = new (function() {
 
     var canvas;
     var morphMaps = {};                   // morph map for each canvas
@@ -14,15 +14,15 @@ SceneJS._morphGeometryModule = new (function() {
     var stackLen = 0;
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 canvas = null;
                 currentMorphMap = null;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 if (!morphMaps[c.canvasId]) {      // Lazy-create morph map for canvas
                     morphMaps[c.canvasId] = {};
@@ -32,21 +32,21 @@ SceneJS._morphGeometryModule = new (function() {
                 stackLen = 0;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
                 currentMorphMap = null;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
 
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -101,7 +101,7 @@ SceneJS._morphGeometryModule = new (function() {
 
                         /* Set factor and target frame on shader module
                          */
-                        SceneJS._renderModule.setMorph(idStack[stackLen - 1], {
+                        SceneJS_renderModule.setMorph(idStack[stackLen - 1], {
                             factor: normalizedFactor,
                             target1: morph.targets[key1],
                             target2: morph.targets[key2]
@@ -111,19 +111,19 @@ SceneJS._morphGeometryModule = new (function() {
 
                         /* Set null morph
                          */
-                        SceneJS._renderModule.setMorph();
+                        SceneJS_renderModule.setMorph();
                     }
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.RESET,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.RESET,
             function() {
                 for (var canvasId in morphMaps) {    // Destroy geometries on all canvases
                     if (morphMaps.hasOwnProperty(canvasId)) {
@@ -241,19 +241,19 @@ SceneJS._morphGeometryModule = new (function() {
                 typedArrays = createTypedArrays(target);
 
                 if (target.positions && target.positions.length > 0) {
-                     newTarget.vertexBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
+                     newTarget.vertexBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
                             new Float32Array(target.positions), target.positions.length, 3, usage);
                 }
                 if (target.normals && target.normals.length > 0) {
-                    newTarget.normalBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
+                    newTarget.normalBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
                             new Float32Array(target.normals), target.normals.length, 3, usage);
                 }
                 if (target.uv && target.uv.length > 0) {
-                    newTarget.uvBuf = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
+                    newTarget.uvBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
                             new Float32Array(target.uv), target.uv.length, 2, usage);
                 }
                 if (target.uv2 && target.uv2.length > 0) {
-                    newTarget.uvBuf2 = new SceneJS._webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
+                    newTarget.uvBuf2 = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
                             new Float32Array(target.uv2), target.uv2.length, 2, usage);
                 }
             }

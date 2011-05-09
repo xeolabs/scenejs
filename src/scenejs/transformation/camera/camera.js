@@ -199,12 +199,12 @@ SceneJS.Camera.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
         this._rebuild();
     }
-    SceneJS._projectionModule.pushTransform(this._attr.id, this._transform);
+    SceneJS_projectionModule.pushTransform(this._attr.id, this._transform);
 };
 
 // Override
 SceneJS.Camera.prototype._postCompile = function(traversalContext) {
-    SceneJS._projectionModule.popTransform();
+    SceneJS_projectionModule.popTransform();
 };
 
 /** @private
@@ -223,7 +223,7 @@ SceneJS.Camera.prototype._rebuild = function () {
                     near: optics.near,
                     far : optics.far
                 },
-                matrix:SceneJS._math_orthoMat4c(
+                matrix:SceneJS_math_orthoMat4c(
                         optics.left,
                         optics.right,
                         optics.bottom,
@@ -242,7 +242,7 @@ SceneJS.Camera.prototype._rebuild = function () {
                     near: optics.near,
                     far : optics.far
                 },
-                matrix: SceneJS._math_frustumMatrix4(
+                matrix: SceneJS_math_frustumMatrix4(
                         optics.left,
                         optics.right,
                         optics.bottom,
@@ -259,7 +259,7 @@ SceneJS.Camera.prototype._rebuild = function () {
                     near: optics.near,
                     far: optics.far
                 },
-                matrix:SceneJS._math_perspectiveMatrix4(
+                matrix:SceneJS_math_perspectiveMatrix4(
                         optics.fovy * Math.PI / 180.0,
                         optics.aspect,
                         optics.near,

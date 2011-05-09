@@ -2,15 +2,15 @@
  * Backend module that provides the current system time, updating it every time a scene is rendered
  *  @private
  */
-SceneJS._timeModule = new (function() {
+var SceneJS_timeModule = new (function() {
 
     var time = (new Date()).getTime();
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 time = (new Date()).getTime();
-                SceneJS._eventModule.fireEvent(SceneJS._eventModule.TIME_UPDATED, time);
+                SceneJS_eventModule.fireEvent(SceneJS_eventModule.TIME_UPDATED, time);
             });
 
     this.getTime = function() {

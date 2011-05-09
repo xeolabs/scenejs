@@ -82,7 +82,7 @@ var SceneJS = {
             }
             var newNode = this._parseNodeJSON(json, parent._scene);
             SceneJS.withNode(parent).add("node", newNode); // Fires events and compilation triggering
-            SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : newNode.getId(), json: json });
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getId(), json: json });
             return SceneJS.withNode(newNode);
         } else {
             if (json.type != "scene") {
@@ -91,7 +91,7 @@ var SceneJS = {
                         "createNode 'parent' is expected for all node types except 'scene'");
             }
             var newNode = this._parseNodeJSON(json);
-            SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
             return SceneJS.withNode(newNode);
         }
     },
@@ -196,7 +196,7 @@ var SceneJS = {
             for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
                 node = this._destroyedNodes[i];
                 node._doDestroy();
-                SceneJS._eventModule.fireEvent(SceneJS._eventModule.NODE_DESTROYED, { nodeId : node.getID() });
+                SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_DESTROYED, { nodeId : node.getID() });
             }
             this._destroyedNodes = [];
         }

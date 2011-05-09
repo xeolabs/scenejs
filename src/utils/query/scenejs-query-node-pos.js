@@ -284,7 +284,7 @@ SceneJS.utils.query.QueryNodePos.prototype._transformPoint3 = function(mat, p) {
 
 // @private
 SceneJS.utils.query.QueryNodePos.prototype._normalizeVec2 = function(v) {
-    var f = 1.0 / SceneJS._math_lenVec2(v);
+    var f = 1.0 / SceneJS_math_lenVec2(v);
     return this._mulVec2Scalar(v, f);
 };
 

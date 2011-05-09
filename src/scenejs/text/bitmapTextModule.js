@@ -1,11 +1,11 @@
 /** Backend module that creates bitmapp text textures
  *  @private
  */
-SceneJS._bitmapTextModule = new (function() {
+var SceneJS_bitmapTextModule = new (function() {
 
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.INIT,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.INIT,
             function() {
 
             });

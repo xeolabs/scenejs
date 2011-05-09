@@ -276,11 +276,11 @@ SceneJS.Transform.prototype._compile = function(traversalContext) {
 SceneJS.Transform.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
-        var buildingViewXForm = SceneJS._modelViewTransformModule.isBuildingViewTransform();
+        var buildingViewXForm = SceneJS_modelViewTransformModule.isBuildingViewTransform();
 
         /* Scale
          */
-        this._mat = SceneJS._math_scalingMat4v([-this._scale.x, -this._scale.y, -this._scale.z]);
+        this._mat = SceneJS_math_scalingMat4v([-this._scale.x, -this._scale.y, -this._scale.z]);
 
         /* Rotation
          */
@@ -290,13 +290,13 @@ SceneJS.Transform.prototype._preCompile = function(traversalContext) {
              * to correctly transform the SceneJS.Camera
              */
 
-            var mat1 = SceneJS._math_rotationMat4v(buildingViewXForm ? -this._rotate.x : this._rotate.x * Math.PI / 180.0, [1, 0, 0]);
-            var mat2 = SceneJS._math_rotationMat4v(buildingViewXForm ? -this._rotate.y : this._rotate.y * Math.PI / 180.0, [0, 1, 0]);
-            var mat3 = SceneJS._math_rotationMat4v(buildingViewXForm ? -this._rotate.z : this._rotate.z * Math.PI / 180.0, [0, 0, 1]);
+            var mat1 = SceneJS_math_rotationMat4v(buildingViewXForm ? -this._rotate.x : this._rotate.x * Math.PI / 180.0, [1, 0, 0]);
+            var mat2 = SceneJS_math_rotationMat4v(buildingViewXForm ? -this._rotate.y : this._rotate.y * Math.PI / 180.0, [0, 1, 0]);
+            var mat3 = SceneJS_math_rotationMat4v(buildingViewXForm ? -this._rotate.z : this._rotate.z * Math.PI / 180.0, [0, 0, 1]);
 
-            SceneJS._math_mulMat4(mat3, SceneJS._math_mulMat4(mat2, SceneJS._math_mulMat4(mat1, this._mat)), this._mat);
+            SceneJS_math_mulMat4(mat3, SceneJS_math_mulMat4(mat2, SceneJS_math_mulMat4(mat1, this._mat)), this._mat);
         } else {
-            this._mat = SceneJS._math_identityMat4();
+            this._mat = SceneJS_math_identityMat4();
         }
 
         /* Translation
@@ -308,20 +308,20 @@ SceneJS.Transform.prototype._preCompile = function(traversalContext) {
                 /* When building a view transform, apply the negated translation vector
                  * to correctly transform the SceneJS.Camera
                  */
-                SceneJS._math_mulMat4(this._mat, SceneJS._math_translationMat4v([-this._translate.x, -this._translate.y, -this._translate.z]));
+                SceneJS_math_mulMat4(this._mat, SceneJS_math_translationMat4v([-this._translate.x, -this._translate.y, -this._translate.z]));
             } else {
-                SceneJS._math_mulMat4(this._mat, SceneJS._math_translationMat4v([ this._translate.x,  this._translate.y,  this._translate.z]));
+                SceneJS_math_mulMat4(this._mat, SceneJS_math_translationMat4v([ this._translate.x,  this._translate.y,  this._translate.z]));
             }
         }
 
         this._memoLevel = 1;
     }
-    var superXForm = SceneJS._modelViewTransformModule.getTransform();
+    var superXForm = SceneJS_modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXForm.fixed)) {
-        var instancing = SceneJS._instancingModule.instancing();
+        var instancing = SceneJS_instancingModule.instancing();
 
-        var tempMat = SceneJS._math_mat4();
-        SceneJS._math_mulMat4(superXForm.matrix, this._mat, tempMat);
+        var tempMat = SceneJS_math_mat4();
+        SceneJS_math_mulMat4(superXForm.matrix, this._mat, tempMat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
@@ -332,10 +332,10 @@ SceneJS.Transform.prototype._preCompile = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.pushTransform(thia._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(thia._attr.id, this._xform);
 };
 
 // @private
 SceneJS.Transform.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelViewTransformModule.popTransform();
+    SceneJS_modelViewTransformModule.popTransform();
 };

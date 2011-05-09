@@ -285,10 +285,10 @@ SceneJS.Material.prototype._compile = function(traversalContext) {
 
 // @private
 SceneJS.Material.prototype._preCompile = function(traversalContext) {
-    SceneJS._materialModule.pushMaterial(this._attr.id, this._attr);
+    SceneJS_materialModule.pushMaterial(this._attr.id, this._attr);
 };
 
 // @private
 SceneJS.Material.prototype._postCompile = function(traversalContext) {
-    SceneJS._materialModule.popMaterial();
+    SceneJS_materialModule.popMaterial();
 };

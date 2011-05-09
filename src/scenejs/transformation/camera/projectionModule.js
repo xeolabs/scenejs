@@ -17,10 +17,10 @@
  *
  *  @private
  */
-SceneJS._projectionModule = new (function() {
+var SceneJS_projectionModule = new (function() {
 
     var DEFAULT_TRANSFORM = {
-        matrix : SceneJS._math_identityMat4(),
+        matrix : SceneJS_math_identityMat4(),
         fixed: true,
         isDefault : true
     };
@@ -34,27 +34,27 @@ SceneJS._projectionModule = new (function() {
 
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 nodeId = null;
                 transform = {
-                    matrix : SceneJS._math_identityMat4(),
+                    matrix : SceneJS_math_identityMat4(),
                     fixed: true,
                     isDefault : true
                 };
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
 
@@ -64,14 +64,14 @@ SceneJS._projectionModule = new (function() {
                         transform.matrixAsArray = new Float32Array(transform.matrix);
                     }
 
-                    SceneJS._renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
+                    SceneJS_renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
 
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -83,7 +83,7 @@ SceneJS._projectionModule = new (function() {
         nodeId = id;
         transform = t;
         dirty = true;
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED, transform);
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED, transform);
     };
 
     this.getTransform = function() {
@@ -98,12 +98,12 @@ SceneJS._projectionModule = new (function() {
         } else {
             nodeId = null;
             transform = {
-                matrix : SceneJS._math_identityMat4(),
+                matrix : SceneJS_math_identityMat4(),
                 fixed: true,
                 isDefault : true
             };
         }
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.PROJECTION_TRANSFORM_UPDATED, transform);
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.PROJECTION_TRANSFORM_UPDATED, transform);
         dirty = true;
     };
 })();

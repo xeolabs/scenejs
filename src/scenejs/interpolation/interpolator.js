@@ -177,9 +177,9 @@ SceneJS.Interpolator.prototype._preCompile = function(traversalContext) {
     /* Generate next value
      */
     if (!this._timeStarted) {
-        this._timeStarted = SceneJS._timeModule.getTime();
+        this._timeStarted = SceneJS_timeModule.getTime();
     }
-    this._update((SceneJS._timeModule.getTime() - this._timeStarted) * 0.001);
+    this._update((SceneJS_timeModule.getTime() - this._timeStarted) * 0.001);
 
     if (this._outputValue != null // Null when interpolation outside of time range
             && SceneJS.nodeExists(this._attr.target)) {
@@ -223,7 +223,7 @@ SceneJS.Interpolator.prototype._update = function(key) {
 
             /* Need at least one more scene render to find first key
              */
-            SceneJS._compileModule.nodeUpdated(this, "before");
+            SceneJS_compileModule.nodeUpdated(this, "before");
             break;  // Time delay before interpolation begins
 
         case this.STATE_AFTER:
@@ -249,7 +249,7 @@ SceneJS.Interpolator.prototype._update = function(key) {
             /* Flag recompile for this interpolator. Recompile will be flagged
              * for target as that is updated.
              */
-            SceneJS._compileModule.nodeUpdated(this, "running");
+            SceneJS_compileModule.nodeUpdated(this, "running");
             break;
         default:
             break;
@@ -346,7 +346,7 @@ SceneJS.Interpolator.prototype._cubicInterpolate = function(k) {
 SceneJS.Interpolator.prototype._slerp = function(k) {
     var u = this._attr.keys[this._key2] - this._attr.keys[this._key1];
     var v = k - this._attr.keys[this._key1];
-    return SceneJS._math_slerp((v / u), this._attr.values[this._key1], this._attr.values[this._key2]);
+    return SceneJS_math_slerp((v / u), this._attr.values[this._key1], this._attr.values[this._key2]);
 };
 
 

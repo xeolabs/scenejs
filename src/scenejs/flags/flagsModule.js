@@ -6,7 +6,7 @@
  *
  * @private
  */
-SceneJS._flagsModule = new (function() {
+var SceneJS_flagsModule = new (function() {
 
     var idStack = new Array(255);
     var flagStack = new Array(255);
@@ -63,7 +63,7 @@ SceneJS._flagsModule = new (function() {
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Null SceneJS.renderer node config: \"" + name + "\"");
         }
-        var result = SceneJS._webgl_enumMap[name];
+        var result = SceneJS_webgl_enumMap[name];
         if (!result) {
             throw SceneJS._errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -82,8 +82,8 @@ SceneJS._flagsModule = new (function() {
      * to enable/disable various things for subgraph
      */
     var self = this;
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 self.flags = DEFAULT_FLAGS;
                 stackLen = 0;
@@ -92,14 +92,14 @@ SceneJS._flagsModule = new (function() {
 
     /* Export flags when renderer needs them - only when current set not exported (dirty)
      */
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setFlags(idStack[stackLen - 1], self.flags);
+                        SceneJS_renderModule.setFlags(idStack[stackLen - 1], self.flags);
                     } else {
-                        SceneJS._renderModule.setFlags();
+                        SceneJS_renderModule.setFlags();
                     }
                     dirty = false;
                 }

@@ -18,10 +18,10 @@
  *
  *  @private
  */
-SceneJS._modelTransformModule = new (function() {
+var SceneJS_modelTransformModule = new (function() {
 
     var DEFAULT_TRANSFORM = {
-        matrix : SceneJS._math_identityMat4(),
+        matrix : SceneJS_math_identityMat4(),
         fixed: true,
         identity : true
     };
@@ -35,26 +35,26 @@ SceneJS._modelTransformModule = new (function() {
 
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 nodeId = null;
                 transform = {
-                    matrix : SceneJS._math_identityMat4(),
+                    matrix : SceneJS_math_identityMat4(),
                     fixed: true,
                     identity : true
                 };
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(SceneJS._eventModule.SHADER_RENDERING, exportTransform);
+    SceneJS_eventModule.addListener(SceneJS_eventModule.SHADER_RENDERING, exportTransform);
 
     function exportTransform() {
         if (dirty) {
@@ -66,16 +66,16 @@ SceneJS._modelTransformModule = new (function() {
             }
             if (!transform.normalMatrixAsArray) {
                 transform.normalMatrixAsArray = new Float32Array(
-                        SceneJS._math_transposeMat4(
-                                SceneJS._math_inverseMat4(transform.matrix, SceneJS._math_mat4())));
+                        SceneJS_math_transposeMat4(
+                                SceneJS_math_inverseMat4(transform.matrix, SceneJS_math_mat4())));
             }
-            SceneJS._renderModule.setModelTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
+            SceneJS_renderModule.setModelTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
             dirty = false;
         }
     }
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -87,7 +87,7 @@ SceneJS._modelTransformModule = new (function() {
         nodeId = id;
         transform = t;
         dirty = true;
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.MODEL_TRANSFORM_UPDATED, transform);
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.MODEL_TRANSFORM_UPDATED, transform);
     };
 
     this.getTransform = function() {
@@ -104,7 +104,7 @@ SceneJS._modelTransformModule = new (function() {
             transform = DEFAULT_TRANSFORM;
         }
         dirty = true;
-        SceneJS._eventModule.fireEvent(SceneJS._eventModule.MODEL_TRANSFORM_UPDATED, transform);        
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.MODEL_TRANSFORM_UPDATED, transform);
     };
 
 })();

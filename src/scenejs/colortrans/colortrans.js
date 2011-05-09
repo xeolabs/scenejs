@@ -188,11 +188,11 @@ SceneJS.Colortrans.prototype._compile = function(traversalContext) {
 
 // @private
 SceneJS.Colortrans.prototype._preCompile = function(traversalContext) {
-    SceneJS._colortransModule.pushColortrans(this._attr.id, this._attr);
+    SceneJS_colortransModule.pushColortrans(this._attr.id, this._attr);
 };
 
 // @private
 SceneJS.Colortrans.prototype._postCompile = function(traversalContext) {
-    SceneJS._colortransModule.popColortrans();
+    SceneJS_colortransModule.popColortrans();
 };
 

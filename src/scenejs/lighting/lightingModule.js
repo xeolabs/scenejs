@@ -20,46 +20,46 @@
  *
  *  @private
  */
-SceneJS._lightingModule = new (function() {
+var SceneJS_lightingModule = new (function() {
     var idStack = new Array(255);
     var lightStack = new Array(255);
     var stackLen = 0;
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
-                    SceneJS._renderModule.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
+                    SceneJS_renderModule.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
 
     this.pushLight = function(id, light) {  // TODO: what to do with ID?
-        var modelMat = SceneJS._modelTransformModule.getTransform().matrix;        
+        var modelMat = SceneJS_modelTransformModule.getTransform().matrix;
         if (light.mode == "point") {
-            light.worldPos = SceneJS._math_transformPoint3(modelMat, light.pos);
+            light.worldPos = SceneJS_math_transformPoint3(modelMat, light.pos);
         } else if (light.mode == "dir") {
-            light.worldDir = SceneJS._math_transformVector3(modelMat, light.dir);
+            light.worldDir = SceneJS_math_transformVector3(modelMat, light.dir);
         }
         idStack[stackLen] = id;
         lightStack[stackLen] = light;

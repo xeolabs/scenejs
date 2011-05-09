@@ -136,7 +136,7 @@ SceneJS.Scale.prototype.incZ = function(z) {
  * @returns {Number[16]} The matrix elements
  */
 SceneJS.Scale.prototype.getMatrix = function() {
-    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_scalingMat4v([this._attr.x, this._attr.y, this._attr.z]);
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS_math_scalingMat4v([this._attr.x, this._attr.y, this._attr.z]);
 };
 
 /**
@@ -163,14 +163,14 @@ SceneJS.Scale.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
         this._memoLevel = 1;
-        this._mat = SceneJS._math_scalingMat4v([this._attr.x, this._attr.y, this._attr.z]);
+        this._mat = SceneJS_math_scalingMat4v([this._attr.x, this._attr.y, this._attr.z]);
     }
-    var superXform = SceneJS._modelViewTransformModule.getTransform();
+    var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {
-        var instancing = SceneJS._instancingModule.instancing();
+        var instancing = SceneJS_instancingModule.instancing();
 
-        var tempMat = SceneJS._math_mat4();
-        SceneJS._math_mulMat4(superXform.matrix, this._mat, tempMat);
+        var tempMat = SceneJS_math_mat4();
+        SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
         this._xform = {
             localMatrix: this._mat,
             matrix: tempMat,
@@ -181,10 +181,10 @@ SceneJS.Scale.prototype._preCompile = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(this._attr.id, this._xform);
 };
 
 // @private
 SceneJS.Scale.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelViewTransformModule.popTransform();
+    SceneJS_modelViewTransformModule.popTransform();
 };

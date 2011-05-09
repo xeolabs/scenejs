@@ -263,7 +263,7 @@ SceneJS.LookAt.prototype.incUp = function(up) {
 SceneJS.LookAt.prototype.getMatrix = function() {
     return (this._memoLevel > 0)
             ? this._mat.slice(0)
-            : SceneJS._math_lookAtMat4c(
+            : SceneJS_math_lookAtMat4c(
             this._eyeX, this._eyeY, this._eyeZ,
             this._lookX, this._lookY, this._lookZ,
             this._upX, this._upY, this._upZ);
@@ -304,16 +304,16 @@ SceneJS.LookAt.prototype._compile = function(traversalContext) {
 SceneJS.LookAt.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
-        this._mat = SceneJS._math_lookAtMat4c(
+        this._mat = SceneJS_math_lookAtMat4c(
                 this._eyeX, this._eyeY, this._eyeZ,
                 this._lookX, this._lookY, this._lookZ,
                 this._upX, this._upY, this._upZ);
         this._memoLevel = 1;
     }
-    var superXform = SceneJS._modelViewTransformModule.getTransform();
+    var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (this._memoLevel < 2 || (!superXform.fixed)) {
-        var tempMat = SceneJS._math_mat4();
-        SceneJS._math_mulMat4(superXform.matrix, this._mat, tempMat);
+        var tempMat = SceneJS_math_mat4();
+        SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
         this._xform = {
             type: "lookat",
             matrix: tempMat,
@@ -324,14 +324,14 @@ SceneJS.LookAt.prototype._preCompile = function(traversalContext) {
             },
             fixed: origMemoLevel == 2
         };
-        if (this._memoLevel == 1 && superXform.fixed && !SceneJS._instancingModule.instancing()) {   // Bump up memoization level if space fixed
+        if (this._memoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if space fixed
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(this._attr.id, this._xform);
 };
 
 // @private
 SceneJS.LookAt.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelViewTransformModule.popTransform();
+    SceneJS_modelViewTransformModule.popTransform();
 };

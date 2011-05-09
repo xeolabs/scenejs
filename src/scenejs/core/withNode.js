@@ -295,7 +295,7 @@ SceneJS._WithNode.prototype.bind = function(name, handler) {
         throw "bind param 'handler' should be a function";
     } else {
         this._targetNode.addListener(name, handler, { scope: this });
-        SceneJS._compileModule.nodeUpdated(this._targetNode);
+        SceneJS_compileModule.nodeUpdated(this._targetNode);
     }
     //else {
     //        var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
@@ -330,7 +330,7 @@ SceneJS._WithNode.prototype.unbind = function(name, handler) {
         throw "bind param 'handler' should be a function";
     } else {
         this._targetNode.removeListener(name, handler);
-        SceneJS._compileModule.nodeUpdated(this._targetNode);
+        SceneJS_compileModule.nodeUpdated(this._targetNode);
     }
     return this;
 };
@@ -500,7 +500,7 @@ SceneJS._WithNode.prototype._callNodeMethod = function(prefix, attr, value, targ
 
     /* Notify of node update
      */
-    SceneJS._compileModule.nodeUpdated(targetNode, prefix, attr, value);
+    SceneJS_compileModule.nodeUpdated(targetNode, prefix, attr, value);
 
     /* TODO: event should be queued and consumed to avoid many of these events accumulating
      */
@@ -521,7 +521,7 @@ SceneJS._WithNode.prototype._callNodeMethods = function(prefix, attr, targetNode
 
             /* Notify of node update
              */
-            SceneJS._compileModule.nodeUpdated(targetNode, prefix, key, attr[key]);
+            SceneJS_compileModule.nodeUpdated(targetNode, prefix, key, attr[key]);
         }
     }
 

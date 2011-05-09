@@ -22,7 +22,7 @@
  *
  *  @private
  */
-SceneJS._textureModule = new (function() {
+var SceneJS_textureModule = new (function() {
 
     var time = (new Date()).getTime();      // Current system time for LRU caching
     var canvas;
@@ -34,54 +34,54 @@ SceneJS._textureModule = new (function() {
 
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.TIME_UPDATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.TIME_UPDATED,
             function(t) {
                 time = t;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 canvas = c;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.CANVAS_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setTexture(idStack[stackLen - 1], textureStack[stackLen - 1]);
+                        SceneJS_renderModule.setTexture(idStack[stackLen - 1], textureStack[stackLen - 1]);
                     } else {
-                        SceneJS._renderModule.setTexture();
+                        SceneJS_renderModule.setTexture();
                     }
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -111,8 +111,8 @@ SceneJS._textureModule = new (function() {
         dirty = true;
     }
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.RESET, // Framework reset - delete textures
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.RESET, // Framework reset - delete textures
             function() {
                 deleteTextures();
             });
@@ -125,7 +125,7 @@ SceneJS._textureModule = new (function() {
      * system time. Since system time is updated just before scene traversal, this ensures that
      * textures previously or currently active during this traversal are not suddenly evicted.
      */
-    SceneJS._memoryModule.registerEvictor(
+    SceneJS_memoryModule.registerEvictor(
             function() {
                 var earliest = time; // Doesn't evict textures that are current in layers
                 var evictee;
@@ -139,7 +139,7 @@ SceneJS._textureModule = new (function() {
                     }
                 }
                 if (evictee) { // Delete LRU texture
-                    SceneJS._loggingModule.info("Evicting texture: " + id);
+                    SceneJS_loggingModule.info("Evicting texture: " + id);
                     deleteTexture(evictee);
                     return true;
                 }
@@ -157,7 +157,7 @@ SceneJS._textureModule = new (function() {
         if (value == undefined) {
             return defaultVal;
         }
-        var glName = SceneJS._webgl_enumMap[value];
+        var glName = SceneJS_webgl_enumMap[value];
         if (glName == undefined) {
             throw SceneJS._errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -199,7 +199,7 @@ SceneJS._textureModule = new (function() {
 
             /* Start a SceneJS process for the texture load and creation
              */
-            var process = SceneJS._processModule.createProcess({
+            var process = SceneJS_processModule.createProcess({
                 description:"creating texture: uri = " + cfg.uri,
                 type: "create-texture",
                 info: {
@@ -212,21 +212,21 @@ SceneJS._textureModule = new (function() {
              */
             image.onload = function() {
                 var textureId = allocateTexture(_canvas, _context, image, cfg);
-                SceneJS._processModule.killProcess(process);
+                SceneJS_processModule.killProcess(process);
                 onSuccess(textures[textureId]);
             };
 
             /* Kill process on error
              */
             image.onerror = function() {
-                SceneJS._processModule.killProcess(process);
+                SceneJS_processModule.killProcess(process);
                 onError();
             };
 
             /* Kill process on abort
              */
             image.onabort = function() {
-                SceneJS._processModule.killProcess(process);
+                SceneJS_processModule.killProcess(process);
                 onAbort();
             };
             image.src = cfg.uri;  // Starts image load
@@ -264,7 +264,7 @@ SceneJS._textureModule = new (function() {
 
     function allocateTexture(canvas, context, image, cfg) {
         var textureId = SceneJS._createKeyForMap(textures, "t");
-        SceneJS._memoryModule.allocate(
+        SceneJS_memoryModule.allocate(
                 context,
                 "texture '" + textureId + "'",
                 function() {
@@ -283,7 +283,7 @@ SceneJS._textureModule = new (function() {
                               //  context.generateMipmap(context.TEXTURE_2D);
                             };
                         }
-                        textures[textureId] = new SceneJS._webgl_Texture2D(context, {
+                        textures[textureId] = new SceneJS_webgl_Texture2D(context, {
                             textureId : textureId,
                             canvas: canvas,
                             image : ensureImageSizePowerOfTwo(image),
@@ -302,7 +302,7 @@ SceneJS._textureModule = new (function() {
                             internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
                             sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
                             sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
-                            logging: SceneJS._loggingModule ,
+                            logging: SceneJS_loggingModule ,
                             update: update
                         });
                     } catch (e) {

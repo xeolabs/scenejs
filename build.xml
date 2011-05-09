@@ -120,7 +120,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/inverse.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/projectionModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/querySupport.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/lightingModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
@@ -142,9 +141,6 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometryModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
@@ -265,10 +261,7 @@
             <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
 
             <fileset dir="${SRC_DIR}" includes="scenejs/clip/clipModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
-
-            <fileset dir="${SRC_DIR}" includes="scenejs/deform/deformModule.js"/>
-            <fileset dir="${SRC_DIR}" includes="scenejs/deform/deform.js"/>
+            <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>           
 
             <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometryModule.js"/>
             <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>

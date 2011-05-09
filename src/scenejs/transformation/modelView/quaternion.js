@@ -47,7 +47,7 @@ SceneJS.Quaternion = SceneJS.createNodeType("quaternion");
 SceneJS.Quaternion.prototype._init = function(params) {
     this._mat = null;
     this._xform = null;
-    this._q = SceneJS._math_identityQuaternion();
+    this._q = SceneJS_math_identityQuaternion();
 
     if (params.x || params.y || params.x || params.angle || params.w) {
         this.setRotation(params);
@@ -99,7 +99,7 @@ SceneJS.Quaternion.prototype._init = function(params) {
 // * @returns {SceneJS.Quaternion} this
 // */
 //SceneJS.Quaternion.prototype.multiply = function(q) {
-//    this._q = SceneJS._math_mulQuaternions(SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
+//    this._q = SceneJS_math_mulQuaternions(SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
 //    this._setDirty();
 //    return this;
 //};
@@ -117,7 +117,7 @@ SceneJS.Quaternion.prototype._init = function(params) {
  */
 SceneJS.Quaternion.prototype.setRotation = function(q) {
     q = q || {};
-    this._q = SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
+    this._q = SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
     this._setDirty();
     return this;
 };
@@ -127,7 +127,7 @@ SceneJS.Quaternion.prototype.setRotation = function(q) {
  * @returns {{ x: float, y: float, z: float, angle: float }} Quaternion properties as rotation axis and angle
  */
 SceneJS.Quaternion.prototype.getRotation = function() {
-    return SceneJS._math_angleAxisFromQuaternion(this._q);
+    return SceneJS_math_angleAxisFromQuaternion(this._q);
 };
 
 /**
@@ -142,7 +142,7 @@ SceneJS.Quaternion.prototype.getRotation = function() {
  * @returns {SceneJS.Quaternion} this
  */
 SceneJS.Quaternion.prototype.addRotation = function(q) {
-    this._q = SceneJS._math_mulQuaternions(SceneJS._math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
+    this._q = SceneJS_math_mulQuaternions(SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
     this._setDirty();
     return this;
 };
@@ -152,7 +152,7 @@ SceneJS.Quaternion.prototype.addRotation = function(q) {
  *
  */
 SceneJS.Quaternion.prototype.getMatrix = function() {
-    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS._math_newMat4FromQuaternion(this._q);
+    return (this._memoLevel > 0) ? this._mat.slice(0) : SceneJS_math_newMat4FromQuaternion(this._q);
 };
 
 
@@ -161,7 +161,7 @@ SceneJS.Quaternion.prototype.getMatrix = function() {
  * @returns {SceneJS.Quaternion} this
  */
 SceneJS.Quaternion.prototype.normalize = function() {
-    this._q = SceneJS._math_normalizeQuaternion(this._q);
+    this._q = SceneJS_math_normalizeQuaternion(this._q);
     this._setDirty();
     return this;
 };
@@ -190,14 +190,14 @@ SceneJS.Quaternion.prototype._compile = function(traversalContext) {
 SceneJS.Quaternion.prototype._preCompile = function(traversalContext) {
     var origMemoLevel = this._memoLevel;
     if (this._memoLevel == 0) {
-        this._mat = SceneJS._math_newMat4FromQuaternion(this._q);
+        this._mat = SceneJS_math_newMat4FromQuaternion(this._q);
         this._memoLevel = 1;
     }
-    var superXform = SceneJS._modelViewTransformModule.getTransform();
+    var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {
-        var instancing = SceneJS._instancingModule.instancing();
-        var tempMat = SceneJS._math_mat4();
-        SceneJS._math_mulMat4(superXform.matrix, this._mat, tempMat);
+        var instancing = SceneJS_instancingModule.instancing();
+        var tempMat = SceneJS_math_mat4();
+        SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
 
         this._xform = {
             localMatrix: this._mat,
@@ -209,10 +209,10 @@ SceneJS.Quaternion.prototype._preCompile = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(this._attr.id, this._xform);
 };
 
 // @private
 SceneJS.Quaternion.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelViewTransformModule.popTransform();
+    SceneJS_modelViewTransformModule.popTransform();
 };

@@ -3,40 +3,40 @@
  *
  *  @private
  */
-SceneJS._pickingModule = new (function() {
+var SceneJS_pickingModule = new (function() {
     var idStack = new Array(255);
     var listenerStack = new Array(255);
     var stackLen = 0;
     var dirty;
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SCENE_COMPILING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_ACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_ACTIVATED,
             function() {
                 dirty = true;
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_RENDERING,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS._renderModule.setPickListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
+                        SceneJS_renderModule.setPickListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
                     } else {
-                        SceneJS._renderModule.setPickListeners();
+                        SceneJS_renderModule.setPickListeners();
                     }
                     dirty = false;
                 }
             });
 
-    SceneJS._eventModule.addListener(
-            SceneJS._eventModule.SHADER_DEACTIVATED,
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SHADER_DEACTIVATED,
             function() {
                 dirty = true;
             });
@@ -44,11 +44,13 @@ SceneJS._pickingModule = new (function() {
     this.preVisitNode = function(node) {
         var listeners = node._listeners["picked"];
         if (listeners) {
-            idStack[stackLen] = node._attr.id;            
-            listenerStack[stackLen] = function (params, options) {
-                node._fireEvent("picked", params, options);
-            };
-
+            idStack[stackLen] = node._attr.id;
+            if (!node.__pickingModule_picked) {
+                node.__pickingModule_picked = function (params, options) {
+                    node._fireEvent("picked", params, options);
+                };
+            }
+            listenerStack[stackLen] = node.__pickingModule_picked;
             stackLen++;
             dirty = true;
         }

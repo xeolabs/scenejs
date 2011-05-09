@@ -22,7 +22,7 @@ SceneJS.Matrix = SceneJS.createNodeType("matrix");
 
 SceneJS.Matrix.prototype._init = function(params) {
     this._xform = null;
-    this._mat = SceneJS._math_identityMat4();
+    this._mat = SceneJS_math_identityMat4();
     this.setElements(params.elements);
 };
 
@@ -32,7 +32,7 @@ SceneJS.Matrix.prototype._init = function(params) {
  * @returns {SceneJS.Matrix} this
  */
 SceneJS.Matrix.prototype.setElements = function(elements) {
-    elements = elements || SceneJS._math_identityMat4();
+    elements = elements || SceneJS_math_identityMat4();
     if (!elements) {
         throw SceneJS._errorModule.fatalError(
                  SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -85,20 +85,20 @@ SceneJS.Matrix.prototype._preCompile = function(traversalContext) {
     if (this._memoLevel == 0) {
             this._memoLevel = 1;
     }
-    var superXform = SceneJS._modelViewTransformModule.getTransform();
+    var superXform = SceneJS_modelViewTransformModule.getTransform();
     if (origMemoLevel < 2 || (!superXform.fixed)) {
-        var instancing = SceneJS._instancingModule.instancing();
+        var instancing = SceneJS_instancingModule.instancing();
 
         /* When building a view transform, apply the inverse of the matrix
          * to correctly transform the SceneJS.Camera
          */
-        var mat = SceneJS._math_mat4();
-        mat = SceneJS._modelViewTransformModule.isBuildingViewTransform()
-                ? SceneJS._math_inverseMat4(this._mat, mat)
+        var mat = SceneJS_math_mat4();
+        mat = SceneJS_modelViewTransformModule.isBuildingViewTransform()
+                ? SceneJS_math_inverseMat4(this._mat, mat)
                 : this._mat;
 
-        var tempMat = SceneJS._math_mat4();
-        SceneJS._math_mulMat4(superXform.matrix, mat, tempMat);
+        var tempMat = SceneJS_math_mat4();
+        SceneJS_math_mulMat4(superXform.matrix, mat, tempMat);
 
         this._xform = {
             localMatrix: this._mat,
@@ -110,10 +110,10 @@ SceneJS.Matrix.prototype._preCompile = function(traversalContext) {
             this._memoLevel = 2;
         }
     }
-    SceneJS._modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(this._attr.id, this._xform);
 };
 
 // @private
 SceneJS.Matrix.prototype._postCompile = function(traversalContext) {
-    SceneJS._modelViewTransformModule.popTransform();
+    SceneJS_modelViewTransformModule.popTransform();
 };
