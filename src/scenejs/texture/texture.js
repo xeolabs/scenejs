@@ -179,7 +179,7 @@ SceneJS.Texture.prototype._init = function(params) {
                 throw SceneJS._errorModule.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
                         "SceneJS.Texture.layers[" + i + "].applyTo value is unsupported - " +
-                                "should be either 'baseColor', 'specular' or 'normals'");
+                        "should be either 'baseColor', 'specular' or 'normals'");
             }
         }
         this._layers.push({
@@ -195,7 +195,7 @@ SceneJS.Texture.prototype._init = function(params) {
             translate : layerParam.translate,
             rotate : layerParam.rotate,
             rebuildMatrix : true
-        });       
+        });
     }
 };
 
@@ -372,13 +372,13 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
             this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
         }
 
-        /* Render child nodes
-         */
-        this._compileNodes(traversalContext);
-
         /* Record this node as loaded for "loading-status" events
          */
         SceneJS_loadStatusModule.status.numNodesLoaded++;
+
+        /* Render child nodes
+         */
+        this._compileNodes(traversalContext);
 
     } else {
 
@@ -388,13 +388,13 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
             }
         }
 
-        if (!this._waitForLoad) {
-            this._compileNodes(traversalContext);
-        }
-
         /* Record this node as loaded for "loading-status" events
          */
         SceneJS_loadStatusModule.status.numNodesLoading++;
+
+        if (!this._waitForLoad) {
+            this._compileNodes(traversalContext);
+        }
     }
 
     /* Post-compile
@@ -442,12 +442,12 @@ SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
 SceneJS.Texture.prototype.setLayer = function(cfg) {
     if (cfg.index == undefined || cfg.index == null) {
         throw SceneJS._errorModule.fatalError(
-                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "Invalid SceneJS.Texture#setLayerConfig argument: index null or undefined");
     }
     if (cfg.index < 0 || cfg.index >= this._layers.length) {
         throw SceneJS._errorModule.fatalError(
-                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)");
     }
     var layer = this._layers[cfg.index];
@@ -476,7 +476,7 @@ SceneJS.Texture.prototype.setLayers = function(layers) {
 
                 if (index < 0 || index >= this._layers.length) {
                     throw SceneJS._errorModule.fatalError(
-                             SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
                             "Invalid SceneJS.Texture#setLayer argument: index out of range (" + this._layers.length + " layers defined)");
                 }
                 var cfg = layers[index] || {};

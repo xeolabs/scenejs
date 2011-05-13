@@ -59,10 +59,10 @@ SceneJS.createNode({
                         {
                             type: "light",
                             mode:                   "dir",
-                            color:                  { r: 0.8, g: 0.8, b: 0.8 },
+                            color:                  { r: 1.0, g: 1.0, b: 0.5 },
                             diffuse:                true,
                             specular:               true,
-                            dir:                    { x: -2.0, y: -1.0, z: 0.0 }
+                            dir:                    { x: -1.0, y: 0.0, z: -0.7 }
                         },
 
                         {

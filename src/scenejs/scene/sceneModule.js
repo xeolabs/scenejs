@@ -122,8 +122,9 @@ var SceneJS_sceneModule = new (function() {
                             + canvasId
                             + '\' failed to provide a supported WebGL context');
         }
+     
         context.clearColor(0.0, 0.0, 0.0, 1.0);
-        context.clearDepth(1.0);
+        context.clearDepth(1.0);             
         context.enable(context.DEPTH_TEST);
         context.disable(context.CULL_FACE);
         context.depthRange(0, 1);

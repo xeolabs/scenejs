@@ -153,12 +153,12 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastFogStateId = -1;
             this._lastPickListenersStateId = -1;
             this._lastRenderListenersStateId = -1;
-
             this._lastProgramId = node.program.id;
         }
 
         var program = this._program;
         var gl = this._context;
+
 
         /*----------------------------------------------------------------------------------------------------------
          * flags
@@ -170,6 +170,22 @@ var SceneJS_NodeRenderer = function(cfg) {
              */
             var newFlags = node.flagsState.flags;
             var oldFlags = this._lastFlagsState ? this._lastFlagsState.flags : null;
+
+//            var clear = newFlags.clear;
+//            if (!oldFlags || (clear && (clear.depth != oldFlags.depth || clear.stencil != oldFlags.stencil))) {
+//                var clear = newFlags.clear || {};
+//                var mask = 0;
+//                if (clear.depth) {
+//                    mask |= gl.DEPTH_BUFFER_BIT;
+//                }
+//                if (clear.stencil) {
+//                    mask |= gl.STENCIL_BUFFER_BIT;
+//                }
+//                if (mask != 0) { alert("clear");
+//                    gl.clear(mask);
+//                }
+//            }
+
 
             if (!oldFlags || newFlags.backfaces != oldFlags.backfaces) {
                 if (newFlags.backfaces) {
@@ -194,6 +210,19 @@ var SceneJS_NodeRenderer = function(cfg) {
                     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Not redundant, because of inequality test above
                 }
             }
+
+//            var mask = newFlags.colorMask;
+//
+//            if (!oldFlags || (mask && (mask.r != oldFlags.r || mask.g != oldFlags.g || mask.b != oldFlags.b || mask.a != oldFlags.a))) {
+//
+//                if (mask) {
+//
+//                    gl.colorMask(mask.r, mask.g, mask.b, mask.a);
+//
+//                } else {
+//                    gl.colorMask(true, true, true, true);
+//                }
+//            }
 
             this._lastFlagsState = node.flagsState;
         }
@@ -362,9 +391,10 @@ var SceneJS_NodeRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         if (node.modelXFormState._stateId != this._lastModelXFormStateId) {
-            program.setUniform("uMMatrix", node.modelXFormState.mat);
-            program.setUniform("uMNMatrix", node.modelXFormState.normalMat);
-            this._lastModelXFormStateId = node.modelXFormState._stateId;
+            var m = node.modelXFormState;
+            program.setUniform("uMMatrix", m.mat);
+            program.setUniform("uMNMatrix", m.normalMat);
+            this._lastModelXFormStateId = m._stateId;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -372,8 +402,9 @@ var SceneJS_NodeRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         if (node.projXFormState._stateId != this._lastProjXFormStateId) {
-            program.setUniform("uPMatrix", node.projXFormState.mat);
-            this._lastProjXFormStateId = node.projXFormState._stateId;
+            var p = node.projXFormState;
+            program.setUniform("uPMatrix", p.mat);
+            this._lastProjXFormStateId = p._stateId;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -383,11 +414,10 @@ var SceneJS_NodeRenderer = function(cfg) {
         if (node.clipState &&
             (node.clipState._stateId != this._lastClipStateId ||
              node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable clip
-
+            var clips = node.clipState.clips;
             var clip;
-            for (var k = 0, len = node.clipState.clips.length; k < len; k++) {
-                clip = node.clipState.clips[k];
-
+            for (var k = 0, len = clips.length; k < len; k++) {
+                clip = clips[k];
                 if (node.flagsState.flags.clipping === false) { // Flags disable/enable clipping
                     program.setUniform("uClipMode" + k, 0);
                 } else if (clip.mode == "inside") {
@@ -397,7 +427,6 @@ var SceneJS_NodeRenderer = function(cfg) {
                 } else { // disabled
                     program.setUniform("uClipMode" + k, 0);
                 }
-
                 program.setUniform("uClipNormalAndDist" + k, clip.normalAndDist);
             }
             this._lastClipStateId = node.clipState._stateId;
@@ -505,9 +534,10 @@ var SceneJS_NodeRenderer = function(cfg) {
 
             if (node.lightState && node.lightState._stateId != this._lastLightStateId) {
                 var ambient;
+                var lights = node.lightState.lights;
                 var light;
-                for (var k = 0, len = node.lightState.lights.length; k < len; k++) {
-                    light = node.lightState.lights[k];
+                for (var k = 0, len = lights.length; k < len; k++) {
+                    light = lights[k];
                     program.setUniform("uLightColor" + k, light.color);
                     program.setUniform("uLightDiffuse" + k, light.diffuse);
                     if (light.mode == "dir") {
@@ -545,20 +575,15 @@ var SceneJS_NodeRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         if (this._picking) {
-
             if (! this._lastPickListenersState || node.pickListenersState._stateId != this._lastPickListenersState._stateId) {
-
                 if (node.pickListenersState.listeners.length > 0) {
-
                     this._pickListeners[this._pickIndex++] = node.pickListenersState;
-
                     var b = this._pickIndex >> 16 & 0xFF;
                     var g = this._pickIndex >> 8 & 0xFF;
                     var r = this._pickIndex & 0xFF;
                     g = g / 255;
                     r = r / 255;
                     b = b / 255;
-
                     program.setUniform("uPickColor", [r,g,b]);
                 }
                 this._lastPickListenersState = node.pickListenersState;
@@ -593,7 +618,6 @@ var SceneJS_NodeRenderer = function(cfg) {
             if (primitive == gl.TRIANGLES ||
                 primitive == gl.TRIANGLE_STRIP ||
                 primitive == gl.TRIANGLE_FAN) {
-
                 primitive = gl.LINES;
             }
         }
@@ -663,7 +687,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._program.unbind();
             this._program = null;
         }
+//        this._context.colorMask(true, true, true, true);
         return this._pickListeners;
     };
-}
-        ;
+};

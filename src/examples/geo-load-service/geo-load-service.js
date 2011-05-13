@@ -1,5 +1,5 @@
 /*
- This example shows how to define and use a GeoStreamService to customize how geometry is loaded. We'll just
+ This example shows how to define and use a GeoLoaderService to customize how geometry is loaded. We'll just
  implement a stub of the service in this example, which should give you enough clues for define your own implementation.
 
  Wiki article:
