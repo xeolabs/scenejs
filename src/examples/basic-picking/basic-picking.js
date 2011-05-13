@@ -83,7 +83,7 @@ SceneJS.createNode({
                                                             nodes: [
                                                                 {
                                                                     type: "node",
-                                                                    id: "right-blue-sphere",
+                                                                    id: "left-blue-sphere",
 
                                                                     nodes: [
                                                                         {
@@ -93,7 +93,7 @@ SceneJS.createNode({
                                                                 },
                                                                 {
                                                                     type: "node",
-                                                                    id: "left-blue-sphere",
+                                                                    id: "right-blue-sphere",
 
                                                                     nodes: [
 
@@ -137,7 +137,7 @@ SceneJS.createNode({
                                                             nodes: [
                                                                 {
                                                                     type: "node",
-                                                                    id: "right-green-sphere",
+                                                                    id: "left-green-sphere",
                                                                     nodes: [
                                                                         {
                                                                             type: "translate",
@@ -152,7 +152,7 @@ SceneJS.createNode({
                                                                 },
                                                                 {
                                                                     type: "node",
-                                                                    id: "left-green-sphere",
+                                                                    id: "right-green-sphere",
 
                                                                     nodes: [
                                                                         {
