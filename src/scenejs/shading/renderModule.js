@@ -255,9 +255,6 @@ var SceneJS_renderModule = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
-                for (var programId in programs) {  // Just free allocated programs
-                    programs[programId].destroy();
-                }
                 programs = {};
                 nextProgramId = 0;
             });
