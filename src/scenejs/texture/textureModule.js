@@ -118,35 +118,6 @@ var SceneJS_textureModule = new (function() {
             });
 
     /**
-     * Registers this backend module with the memory management module as willing
-     * to attempt to destroy a texture when asked, in order to free up memory. Eviction
-     * is done on a least-recently-used basis, where a texture may be evicted if the
-     * time that it was last used is the earliest among all textures, and after the current
-     * system time. Since system time is updated just before scene traversal, this ensures that
-     * textures previously or currently active during this traversal are not suddenly evicted.
-     */
-    SceneJS_memoryModule.registerEvictor(
-            function() {
-                var earliest = time; // Doesn't evict textures that are current in layers
-                var evictee;
-                for (var id in textures) {
-                    if (id) {
-                        var texture = textures[id];
-                        if (texture.lastUsed < earliest) {
-                            evictee = texture;
-                            earliest = texture.lastUsed;
-                        }
-                    }
-                }
-                if (evictee) { // Delete LRU texture
-                    SceneJS_loggingModule.info("Evicting texture: " + id);
-                    deleteTexture(evictee);
-                    return true;
-                }
-                return false;   // Couldnt find suitable evictee
-            });
-
-    /**
      * Translates a SceneJS param value to a WebGL enum value,
      * or to default if undefined. Throws exception when defined
      * but not mapped to an enum.
@@ -178,11 +149,6 @@ var SceneJS_textureModule = new (function() {
         return (value == undefined) ? defaultVal : value;
     }
 
-
-    /** Verifies that texture still cached - it may have been evicted after lack of recent use,
-     * in which case client texture node will have to recreate it.
-     * @private
-     */
     this.textureExists = function(texture) {
         return textures[texture.textureId];
     };
@@ -263,52 +229,47 @@ var SceneJS_textureModule = new (function() {
     };
 
     function allocateTexture(canvas, context, image, cfg) {
-        var textureId = SceneJS._createKeyForMap(textures, "t");
-        SceneJS_memoryModule.allocate(
-                context,
-                "texture '" + textureId + "'",
-                function() {
+        var textureId = SceneJS._createUUID();
+        try {
+            if (cfg.autoUpdate) {
+                var update = function() {
+                    //TODO: fix this when minefield is upto spec
                     try {
-                        if (cfg.autoUpdate) {
-                            var update = function() {
-                                //TODO: fix this when minefield is upto spec
-                                try {
-                                    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
-                                }
-                                catch(e) {
-                                    context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image, null);
-                                }
-                                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
-                                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
-                              //  context.generateMipmap(context.TEXTURE_2D);
-                            };
-                        }
-                        textures[textureId] = new SceneJS_webgl_Texture2D(context, {
-                            textureId : textureId,
-                            canvas: canvas,
-                            image : ensureImageSizePowerOfTwo(image),
-                            texels :cfg.texels,
-                            minFilter : getGLOption("minFilter", context, cfg, context.LINEAR),
-                            magFilter :  getGLOption("magFilter", context, cfg, context.LINEAR),
-                            wrapS : getGLOption("wrapS", context, cfg, context.CLAMP_TO_EDGE),
-                            wrapT :   getGLOption("wrapT", context, cfg, context.CLAMP_TO_EDGE),
-                            isDepth :  getOption(cfg.isDepth, false),
-                            depthMode : getGLOption("depthMode", context, cfg, context.LUMINANCE),
-                            depthCompareMode : getGLOption("depthCompareMode", context, cfg, context.COMPARE_R_TO_TEXTURE),
-                            depthCompareFunc : getGLOption("depthCompareFunc", context, cfg, context.LEQUAL),
-                            flipY : getOption(cfg.flipY, true),
-                            width: getOption(cfg.width, 1),
-                            height: getOption(cfg.height, 1),
-                            internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
-                            sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
-                            sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
-                            logging: SceneJS_loggingModule ,
-                            update: update
-                        });
-                    } catch (e) {
-                        throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
+                        context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
                     }
-                });
+                    catch(e) {
+                        context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image, null);
+                    }
+                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+                    context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+                    //  context.generateMipmap(context.TEXTURE_2D);
+                };
+            }
+            textures[textureId] = new SceneJS_webgl_Texture2D(context, {
+                textureId : textureId,
+                canvas: canvas,
+                image : ensureImageSizePowerOfTwo(image),
+                texels :cfg.texels,
+                minFilter : getGLOption("minFilter", context, cfg, context.LINEAR),
+                magFilter :  getGLOption("magFilter", context, cfg, context.LINEAR),
+                wrapS : getGLOption("wrapS", context, cfg, context.CLAMP_TO_EDGE),
+                wrapT :   getGLOption("wrapT", context, cfg, context.CLAMP_TO_EDGE),
+                isDepth :  getOption(cfg.isDepth, false),
+                depthMode : getGLOption("depthMode", context, cfg, context.LUMINANCE),
+                depthCompareMode : getGLOption("depthCompareMode", context, cfg, context.COMPARE_R_TO_TEXTURE),
+                depthCompareFunc : getGLOption("depthCompareFunc", context, cfg, context.LEQUAL),
+                flipY : getOption(cfg.flipY, true),
+                width: getOption(cfg.width, 1),
+                height: getOption(cfg.height, 1),
+                internalFormat : getGLOption("internalFormat", context, cfg, context.LEQUAL),
+                sourceFormat : getGLOption("sourceType", context, cfg, context.ALPHA),
+                sourceType : getGLOption("sourceType", context, cfg, context.UNSIGNED_BYTE),
+                logging: SceneJS_loggingModule ,
+                update: update
+            });
+        } catch (e) {
+            throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
+        }
         return textureId;
     }
 
@@ -338,11 +299,15 @@ var SceneJS_textureModule = new (function() {
         return x + 1;
     }
 
+    this.destroyTexture = function(texture) {
+        texture.destroy(); // Idempotent
+        delete textures[texture.textureId];
+    };
+
     this.pushTexture = function(id, layers) {
         idStack[stackLen] = id;
         textureStack[stackLen] = layers;
         stackLen++;
-
         dirty = true;
     };
 

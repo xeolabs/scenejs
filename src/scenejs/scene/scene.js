@@ -427,6 +427,7 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
 };
 
 SceneJS.Scene.prototype._compile = function() {
+    SceneJS._actionNodeDestroys();                          // Do first to avoid clobbering allocations by node compiles                     
     SceneJS_sceneModule.activateScene(this._attr.id);
     if (SceneJS_compileModule.preVisitNode(this)) {
         SceneJS_layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
@@ -435,7 +436,6 @@ SceneJS.Scene.prototype._compile = function() {
     }
     SceneJS_compileModule.postVisitNode(this);
     SceneJS_sceneModule.deactivateScene();
-    SceneJS._actionNodeDestroys();
 };
 
 

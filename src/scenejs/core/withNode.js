@@ -415,9 +415,6 @@ SceneJS._WithNode.prototype.pause = function (doPause) {
  * Destroys the selected scene node, which must be a scene.
  */
 SceneJS._WithNode.prototype.destroy = function() {
-    if (this._targetNode.getType() != "scene") {
-        throw "destroy attempted on node that is not a \"scene\" type: '" + this._targetNode.getID() + "'";
-    }
     this._targetNode.destroy();
     return this;
 };

@@ -217,6 +217,10 @@ SceneJS.Texture.STATE_LOADED = "loaded";
  */
 SceneJS.Texture.STATE_ERROR = "error";
 
+/** Node destroyed.
+ */
+SceneJS.Texture.STATE_DESTROYED = "destroyed";
+
 /**
  * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
  * {@link #STATE_LOADING}, {@link #STATE_LOADED} and {@link #STATE_ERROR}.
@@ -250,9 +254,8 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
 
         if (layer.state == SceneJS.TextureLayer.STATE_LOADED) {
 
-            /* Texture node has loaded texture, now check that the texture
-             * has not been deallocated by SceneJS after lack of recent use,
-             * or in the case if a target imageBuf node, that the target has
+            /* Texture node has loaded texture, now check that texture
+             * still exists, or in the case if a target imageBuf node, that the target has
              * not dissappeared.
              */
             if (layer.creationParams.uri) {
@@ -290,6 +293,12 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
                                 l.creationParams,
 
                                 function(texture) { // Success
+
+                                    if (self._destroyed) { // Destroy again when texture destroyed
+                                        SceneJS_textureModule.destroyTexture(texture);
+                                        return;
+                                    }
+
                                     l.texture = texture;
                                     l.state = SceneJS.TextureLayer.STATE_LOADED;
 
@@ -301,6 +310,11 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
                                 },
 
                                 function() { // General error, probably 404
+
+                                    if (self._destroyed) { // Dont care when texture destroyed
+                                        return;
+                                    }
+
                                     l.state = SceneJS.TextureLayer.STATE_ERROR;
                                     var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
                                     SceneJS_loggingModule.warn(message);
@@ -313,6 +327,11 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
                                 },
 
                                 function() { // Load aborted - user probably refreshed/stopped page
+
+                                    if (self._destroyed) { // Dont care when texture destroyed
+                                        return;
+                                    }
+
                                     SceneJS_loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
                                     l.state = SceneJS.TextureLayer.STATE_ERROR;
 
@@ -561,4 +580,19 @@ SceneJS.Texture.prototype._changeState = function(newState, params) {
  */
 SceneJS.Texture.prototype.queryState = function() {
     return this._state;
+};
+
+// @private
+SceneJS.Texture.prototype._destroy = function() {
+    if (this._destroyed) { // Not created yet
+        return;
+    }
+    this._destroyed = true; // Pending layer creations will destroy again as they are created
+    var layer;
+    for (var i = 0, len = this._layers.length; i < len; i++) {
+        layer = this._layers[i];
+        if (layer.texture) {
+            SceneJS_textureModule.destroyTexture(layer.texture);
+        }
+    }
 };

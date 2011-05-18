@@ -211,31 +211,6 @@ var SceneJS_renderModule = new (function() {
      *
      *--------------------------------------------------------------------*/
 
-    /* Volunteer this module with the VRAM memory management module
-     * to deallocate programs when memory module needs VRAM.
-     */
-    SceneJS_memoryModule.registerEvictor(
-            function() {
-                var earliest = time;
-                var programToEvict;
-                for (var hash in programs) {
-                    if (hash) {
-                        var program = programs[hash];
-                        if (program.lastUsed < earliest) {
-                            programToEvict = program;
-                            earliest = programToEvict.lastUsed;
-                        }
-                    }
-                }
-                if (programToEvict) { // Delete LRU program's shaders and deregister program
-                    //  SceneJS_loggingModule.info("Evicting shader: " + hash);
-                    programToEvict.destroy();
-                    programs[programToEvict.hash] = null;
-                    return true;
-                }
-                return false;   // Couldnt find suitable program to delete
-            });
-
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.INIT,
             function() {
@@ -935,29 +910,21 @@ var SceneJS_renderModule = new (function() {
     }
 
     function createShader(vertexShaderSrc, fragmentShaderSrc) {
-        var p;
-        SceneJS_memoryModule.allocate(
-                states.canvas.context,
-                "shader",
-                function() {
-                    try {
-                        p = new SceneJS_webgl_Program(
-                                stateHash,
-                                time,
-                                states.canvas.context,
-                                [vertexShaderSrc],
-                                [fragmentShaderSrc],
-                                SceneJS_loggingModule);
-
-                    } catch (e) {
-                        SceneJS_loggingModule.debug("Vertex shader:");
-                        SceneJS_loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
-                        SceneJS_loggingModule.debug("Fragment shader:");
-                        SceneJS_loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-                        throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create shader: " + e.message || e);
-                    }
-                });
-        return p;
+        try {
+            return new SceneJS_webgl_Program(
+                    stateHash,
+                    time,
+                    states.canvas.context,
+                    [vertexShaderSrc],
+                    [fragmentShaderSrc],
+                    SceneJS_loggingModule);
+        } catch (e) {
+            SceneJS_loggingModule.debug("Vertex shader:");
+            SceneJS_loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
+            SceneJS_loggingModule.debug("Fragment shader:");
+            SceneJS_loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
+            throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create shader: " + e.message || e);
+        }
     }
 
     function getShaderLoggingSource(src) {
@@ -1175,7 +1142,7 @@ var SceneJS_renderModule = new (function() {
                 }
             }
         }
-    
+
         src.push("void main(void) {");
 
         src.push("  vec4 modelVertex = vec4(aVertex, 1.0); ");
@@ -1213,10 +1180,10 @@ var SceneJS_renderModule = new (function() {
         src.push("  vec4 viewVertex  = uVMatrix * worldVertex; ");
 
         if (lighting) {
-//            if (debugCfg.invertNormals) {
-//                src.push("  vNormal = normalize(worldNormal.xyz);");
-//            } else {
-                src.push("  vNormal = normalize(worldNormal.xyz);");
+            //            if (debugCfg.invertNormals) {
+            //                src.push("  vNormal = normalize(worldNormal.xyz);");
+            //            } else {
+            src.push("  vNormal = normalize(worldNormal.xyz);");
             //}
         }
 

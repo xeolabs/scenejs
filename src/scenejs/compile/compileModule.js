@@ -437,8 +437,6 @@ var SceneJS_compileModule = new (function() {
      */
     this.preVisitNode = function(node) {
 
-        var nodeId;
-
         /* Compile indiscriminately if scheduler disabled
          */
         if (!this._enableCompiler) {
@@ -446,8 +444,8 @@ var SceneJS_compileModule = new (function() {
         }
 
         var compileScene = this._scene;
-
         var config = SceneJS_compileCfg.config[node._attr.nodeType];
+        var nodeId = node._attr.id;
 
         /* When doing complete indescriminate scene compile, take this opportunity
          * to flag paths to nodes that must always be compiled
@@ -462,8 +460,6 @@ var SceneJS_compileModule = new (function() {
         /* Track compilation path into scene graph
          */
         nodeStack[stackLen++] = node;
-
-        nodeId = node._attr.id;
 
         /* Track nodes within instances
          */

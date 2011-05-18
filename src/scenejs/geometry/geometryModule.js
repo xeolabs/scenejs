@@ -28,11 +28,8 @@
 var SceneJS_geometryModule = new (function() {
 
     var canvas;
-    var geoMaps = {};                   // Geometry map for each canvas
-    var currentGeoMap = null;
-
-    var globalGeoMap = {};
-
+    var canvasGeos = {};                   // Geometry map for each canvas
+    var currentGeos = null;
     var geoStack = new Array(255);
     var stackLen = 0;
 
@@ -42,25 +39,25 @@ var SceneJS_geometryModule = new (function() {
             SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 canvas = null;
-                currentGeoMap = null;
+                currentGeos = null;
                 stackLen = 0;
             });
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
-                if (!geoMaps[c.canvasId]) {      // Lazy-create geometry map for canvas
-                    geoMaps[c.canvasId] = {};
+                if (!canvasGeos[c.canvasId]) {      // Lazy-create geometry map for canvas
+                    canvasGeos[c.canvasId] = {};
                 }
                 canvas = c;
-                currentGeoMap = geoMaps[c.canvasId];
+                currentGeos = canvasGeos[c.canvasId];
             });
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.CANVAS_DEACTIVATED,
             function() {
                 canvas = null;
-                currentGeoMap = null;
+                currentGeos = null;
             });
 
     SceneJS_eventModule.addListener(
@@ -76,9 +73,9 @@ var SceneJS_geometryModule = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
-                for (var canvasId in geoMaps) {    // Destroy geometries on all canvases
-                    if (geoMaps.hasOwnProperty(canvasId)) {
-                        var geoMap = geoMaps[canvasId];
+                for (var canvasId in canvasGeos) {    // Destroy geometries on all canvases
+                    if (canvasGeos.hasOwnProperty(canvasId)) {
+                        var geoMap = canvasGeos[canvasId];
                         for (var resource in geoMap) {
                             if (geoMap.hasOwnProperty(resource)) {
                                 var geometry = geoMap[resource];
@@ -88,8 +85,8 @@ var SceneJS_geometryModule = new (function() {
                     }
                 }
                 canvas = null;
-                geoMaps = {};
-                currentGeoMap = null;
+                canvasGeos = {};
+                currentGeos = null;
             });
 
     /**
@@ -119,7 +116,7 @@ var SceneJS_geometryModule = new (function() {
                 geo.colorBuf.destroy();
             }
         }
-        var geoMap = geoMaps[geo.canvas.canvasId];
+        var geoMap = canvasGeos[geo.canvas.canvasId];
         if (geoMap) {
             geoMap[geo.resource] = null;
         }
@@ -158,7 +155,7 @@ var SceneJS_geometryModule = new (function() {
     this.createGeometry = function(resource, source, callback) {
 
         if (!resource) {
-            resource = SceneJS._createKeyForMap(currentGeoMap, "t");
+            resource = SceneJS._createKeyForMap(currentGeos, "t");
         }
 
         if (typeof source == "string") {
@@ -267,9 +264,9 @@ var SceneJS_geometryModule = new (function() {
                 // geo.boundary = getBoundary(data.positions);
             }
 
-            currentGeoMap[resource] = geo;
+            currentGeos[resource] = geo;
 
-            return { resource: resource, arrays: geo.arrays };
+            return { canvasId: canvas.canvasId, resource: resource, arrays: geo.arrays };
 
         } catch (e) { // Allocation failure - delete whatever buffers got allocated
 
@@ -295,8 +292,23 @@ var SceneJS_geometryModule = new (function() {
         }
     };
 
-    this.pushGeometry = function(id, resource) {
-        var geo = currentGeoMap[resource];
+      /**
+     * Destroys exisitng geometry
+     */
+    this.destroyGeometry = function(handle) {
+        var geos = canvasGeos[handle.canvasId];
+        if (!geos) {  // Canvas must have been destroyed - that's OK, will have destroyed geometry as well
+            return;
+        }
+        var geo = geos[handle.resource];
+        if (!geo) {
+            throw "geometry not found: '" + handle.resource + "'";
+        }
+        destroyGeometry(geo);
+    };
+
+    this.pushGeometry = function(id, handle) {
+        var geo = currentGeos[handle.resource];
 
         if (!geo.vertexBuf) {
 

@@ -363,7 +363,7 @@ SceneJS.Geometry.prototype._preCompile = function(traversalContext) {
 
         /* Apply geometry
          */
-        SceneJS_geometryModule.pushGeometry(this._attr.id, this._handle.resource);
+        SceneJS_geometryModule.pushGeometry(this._attr.id, this._handle);
     }
 };
 
@@ -372,5 +372,13 @@ SceneJS.Geometry.prototype._postCompile = function(traversalContext) {
     if (this._handle) {
         SceneJS_geometryModule.popGeometry();
     }
+};
+
+// @private
+SceneJS.Geometry.prototype._destroy = function() {
+    if (this._handle) { // Not created yet
+        SceneJS_geometryModule.destroyGeometry(this._handle);
+    }
+    this._handle= null;
 };
 

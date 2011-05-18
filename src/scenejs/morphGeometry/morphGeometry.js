@@ -240,7 +240,7 @@ SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
          */
         SceneJS_morphGeometryModule.pushMorphGeometry(
                 this._attr.id,
-                this._handle.resource,
+                this._handle,
                 this._attr.factor);
     }
 };
@@ -250,4 +250,12 @@ SceneJS.MorphGeometry.prototype._postCompile = function(traversalContext) {
     if (this._handle) {
         SceneJS_morphGeometryModule.popMorphGeometry();
     }
+};
+
+// @private
+SceneJS.MorphGeometry.prototype._destroy = function() {
+    if (this._handle) { // Not created yet
+        SceneJS_morphGeometryModule.destroyMorphGeometry(this._handle);
+    }
+    this._handle= null;
 };

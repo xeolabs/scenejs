@@ -291,6 +291,30 @@ var SceneJS = {
         }
     },
 
+    /** Stolen from GLGE:https://github.com/supereggbert/GLGE/blob/master/glge-compiled.js#L1656
+      */
+    _createUUID:function() {
+        var data = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+        var data2 = ["8","9","A","B"];
+        var uuid = "";
+        for (var i = 0; i < 38; i++) {
+            switch (i) {
+                case 8:uuid = uuid + "-";
+                    break;
+                case 13:uuid = uuid + "-";
+                    break;
+                case 18:uuid = uuid + "-";
+                    break;
+                case 14:uuid = uuid + "4";
+                    break;
+                case 19:uuid = uuid + data2[Math.round(Math.random() * 3)];
+                    break;
+                default:uuid = uuid + data[Math.round(Math.random() * 15)];
+                    break;
+            }
+        }
+        return uuid;
+    },
 
     _getBaseURL : function(url) {
         var i = url.lastIndexOf("/");
