@@ -145,7 +145,7 @@ var SceneJS_webgl_ProgramUniform = function(context, program, name, type, size, 
     };
 
     this.getLocation = function() {
-      return location;
+        return location;
     };
 }
 
@@ -379,150 +379,126 @@ var SceneJS_webgl_Program = function(hash, lastUsed, context, vertexSources, fra
     };
 }
 
-/** @private */
-var SceneJS_webgl_Texture2D = function(context, cfg) {
-    //  cfg.logging.debug("Creating texture: '" + cfg.textureId + "'");
-    this.canvas = cfg.canvas;
-    this.textureId = cfg.textureId;
-    this.handle = context.createTexture();
-    this.target = context.TEXTURE_2D;
-    this.minFilter = cfg.minFilter;
-    this.magFilter = cfg.magFilter;
-    this.wrapS = cfg.wrapS;
-    this.wrapT = cfg.wrapT;
-    this.update = cfg.update;  // For dynamically-sourcing textures (ie movies etc)
 
-    context.bindTexture(this.target, this.handle);
+var SceneJS_webgl_Texture2D = function(context, cfg, onComplete) {
 
-    if (cfg.image) {
-
-        /* Texture from image
-         *
-         * HACK - see https://xeolabs.lighthouseapp.com/projects/50643-scenejs/tickets/149-hack-to-fall-back-on-old-createtexture-api
-         */
+    this._init = function(image) {
+        image = SceneJS_webgl_ensureImageSizePowerOfTwo(image);
+        this.canvas = cfg.canvas;
+        this.textureId = cfg.textureId;
+        this.handle = context.createTexture();
+        this.target = context.TEXTURE_2D;
+        this.minFilter = cfg.minFilter;
+        this.magFilter = cfg.magFilter;
+        this.wrapS = cfg.wrapS;
+        this.wrapT = cfg.wrapT;
+        this.update = cfg.update;  // For dynamically-sourcing textures (ie movies etc)
+        context.bindTexture(this.target, this.handle);
         try {
-
-            /* New API change
-             */
-            context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, cfg.image);
+            context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image); // New API change
         } catch (e) {
-
-            /* Fall back for old browser
-             */
-            context.texImage2D(context.TEXTURE_2D, 0, cfg.image, cfg.flipY);
+            context.texImage2D(context.TEXTURE_2D, 0, image, cfg.flipY); // Fallback for old browser
         }
-
         this.format = context.RGBA;
-        this.width = cfg.image.width;
-        this.height = cfg.image.height;
+        this.width = image.width;
+        this.height = image.height;
         this.isDepth = false;
         this.depthMode = 0;
         this.depthCompareMode = 0;
         this.depthCompareFunc = 0;
-
-    } else {
-
-        /* Texture from data
-         */
-        if (!cfg.texels) {
-            if (cfg.sourceType == context.FLOAT) {
-                cfg.texels = new Float32Array(cfg.width * cfg.height * 4);
-            }
-            else {
-                cfg.texels = new WebGLUnsignedByteArray(cfg.width * cfg.height * 4);
-            }
+        if (cfg.minFilter) {
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, cfg.minFilter);
         }
-
-        context.texImage2D(context.TEXTURE_2D, 0, cfg.internalFormat, cfg.width, cfg.height, 0, cfg.sourceFormat, cfg.sourceType, cfg.texels);
-
-        if (cfg.isDepth) {
-            if (cfg.depthMode) {
-                context.texParameteri(context.TEXTURE_2D, context.DEPTH_TEXTURE_MODE, cfg.depthMode);
-            }
-            if (cfg.depthCompareMode) {
-                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_MODE, cfg.depthCompareMode);
-            }
-            if (cfg.depthCompareFunc) {
-                context.texParameteri(context.TEXTURE_2D, context.TEXTURE_COMPARE_FUNC, cfg.depthCompareFunc);
-            }
+        if (cfg.magFilter) {
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, cfg.magFilter);
         }
-
-        this.format = cfg.internalFormat;
-        this.width = cfg.width;
-        this.height = cfg.height;
-        this.isDepth = cfg.isDepth;
-        this.depthMode = cfg.depthMode;
-        this.depthCompareMode = cfg.depthCompareMode;
-        this.depthCompareFunc = cfg.depthCompareFunc;
-    }
-
-    if (cfg.minFilter) {
-        context.texParameteri(// Filtered technique when scaling texture down
-                context.TEXTURE_2D,
-                context.TEXTURE_MIN_FILTER,
-                cfg.minFilter);
-    }
-
-    if (cfg.magFilter) {
-        context.texParameteri(// Filtering technique when scaling texture up
-                context.TEXTURE_2D,
-                context.TEXTURE_MAG_FILTER,
-                cfg.magFilter);
-    }
-    if (cfg.wrapS) {
-        context.texParameteri(
-                context.TEXTURE_2D,
-                context.TEXTURE_WRAP_S,
-                cfg.wrapS);
-    }
-
-    if (cfg.wrapT) {
-        context.texParameteri(
-                context.TEXTURE_2D,
-                context.TEXTURE_WRAP_T,
-                cfg.wrapT);
-    }
-
-    /* Generate MIP map if required
-     */
-    if (cfg.minFilter == context.NEAREST_MIPMAP_NEAREST ||
-        cfg.minFilter == context.LINEAR_MIPMAP_NEAREST ||
-        cfg.minFilter == context.NEAREST_MIPMAP_LINEAR ||
-        cfg.minFilter == context.LINEAR_MIPMAP_LINEAR) {
-
-        context.generateMipmap(context.TEXTURE_2D);
-    }
-
-    context.bindTexture(this.target, null);
-
-    /** @private */
-    this.bind = function(unit) {
-        context.activeTexture(context["TEXTURE" + unit]);
-        context.bindTexture(this.target, this.handle);
-        if (this.update) {
-            this.update(context);
+        if (cfg.wrapS) {
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, cfg.wrapS);
         }
-    };
-
-    /** @private */
-    this.unbind = function(unit) {
-        context.activeTexture(context["TEXTURE" + unit]);
+        if (cfg.wrapT) {
+            context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, cfg.wrapT);
+        }
+        if (cfg.minFilter == context.NEAREST_MIPMAP_NEAREST ||
+            cfg.minFilter == context.LINEAR_MIPMAP_NEAREST ||
+            cfg.minFilter == context.NEAREST_MIPMAP_LINEAR ||
+            cfg.minFilter == context.LINEAR_MIPMAP_LINEAR) {
+            context.generateMipmap(context.TEXTURE_2D);
+        }
         context.bindTexture(this.target, null);
+        if (onComplete) {
+            onComplete(this);
+        }
     };
 
-    /** @private */
+    if (cfg.image) {
+        this._init(cfg.image);
+    } else {
+        if (!cfg.url) {
+            throw "texture 'image' or 'url' expected";
+        }
+        var self = this;
+        var img = new Image();
+        img.onload = function() {
+            self._init(img);
+        };
+        img.src = cfg.url;
+    }
+
+    this.bind = function(unit) {
+        if (this.handle) {
+            context.activeTexture(context["TEXTURE" + unit]);
+            context.bindTexture(this.target, this.handle);
+            if (this.update) {
+                this.update(context);
+            }
+        }
+    };
+
+    this.unbind = function(unit) {
+        if (this.handle) {
+            context.activeTexture(context["TEXTURE" + unit]);
+            context.bindTexture(this.target, null);
+        }
+    };
+
     this.generateMipmap = function() {
-        context.generateMipmap(context.TEXTURE_2D);
+        if (this.handle) {
+            context.generateMipmap(context.TEXTURE_2D);
+        }
     };
 
-    /** @private */
     this.destroy = function() {
         if (this.handle) {
-            // cfg.logging.debug("Destroying texture");
             context.deleteTexture(this.handle);
             this.handle = null;
         }
     };
+};
+
+function SceneJS_webgl_ensureImageSizePowerOfTwo(image) {
+    if (!SceneJS_webgl_isPowerOfTwo(image.width) || !SceneJS_webgl_isPowerOfTwo(image.height)) {
+        var canvas = document.createElement("canvas");
+        canvas.width = SceneJS_webgl_nextHighestPowerOfTwo(image.width);
+        canvas.height = SceneJS_webgl_nextHighestPowerOfTwo(image.height);
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(image,
+                0, 0, image.width, image.height,
+                0, 0, canvas.width, canvas.height);
+        image = canvas;
+    }
+    return image;
+}
+
+function SceneJS_webgl_isPowerOfTwo(x) {
+    return (x & (x - 1)) == 0;
+}
+
+function SceneJS_webgl_nextHighestPowerOfTwo(x) {
+    --x;
+    for (var i = 1; i < 32; i <<= 1) {
+        x = x | x >> i;
+    }
+    return x + 1;
 }
 
 /** Buffer for vertices and indices

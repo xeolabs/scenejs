@@ -1,139 +1,11 @@
 /**
  * @class A scene node that defines one or more layers of texture to apply to all those geometries within its subgraph
  * that have UV coordinates.
- * @extends SceneJS.Node
- * <p>Texture layers are applied to specified material reflection cooficients, and may be transformed.</p>
-
- * <p>A cube wrapped with a material which specifies its base (diffuse) color coefficient, and a texture with
- * one layer which applies a texture image to that particular coefficient. The texture is also translated, scaled and
- * rotated, in that order. All the texture properties are specified here to show what they are. </p>
- *  <pre><code>
- * var subGraph =
- *       new SceneJS.Material({
- *           baseColor: { r: 1.0, g: 1.0, b: 1.0 }
- *       },
- *               new SceneJS.Texture({
- *                   layers: [
- *                       {
- *                           // Only the image URI is mandatory:
- *
- *                           uri:"http://scenejs.org/library/textures/misc/general-zod.jpg",
- *
- *                          // Optional params:
- *
- *                           minFilter: "linear",                   // Options are ”nearest”, “linear” (default), “nearestMipMapNearest”,
- *                                                                  //        ”nearestMipMapLinear” or “linearMipMapLinear”
- *                           magFilter: "linear",                   // Options are “nearest” or “linear” (default)
- *                           wrapS: "repeat",                       // Options are “clampToEdge” (default) or “repeat”
- *                           wrapT: "repeat",                       // Options are "clampToEdge” (default) or “repeat”
- *                           isDepth: false,                        // Options are false (default) or true
- *                           depthMode:"luminance"                  // (default)
- *                           depthCompareMode: "compareRToTexture", // (default)
- *                           depthCompareFunc: "lequal",            // (default)
- *                           flipY: false,                          // Options are true (default) or false
- *                           width: 1,
- *                           height: 1,
- *                           internalFormat:"lequal",               // (default)
- *                           sourceFormat:"alpha",                  // (default)
- *                           sourceType: "unsignedByte",            // (default)
- *                           applyTo: "baseColor",                   // Options so far are “baseColor” (default), “diffuseColor” and "normals" for bump mapping
- *                           blendMode: "multiply",                 // Options are "add" or "multiply" (default)
- *
- *                           // Optional transforms
- *
- *                           rotate: {      // Currently textures are 2-D, so only rotation about Z makes sense
- *                               z: 45.0
- *                           },
- *
- *                           translate : {
- *                               x: 10,
- *                               y: 0,
- *                               z: 0
- *                           },
- *
- *                           scale : {
- *                               x: 1,
- *                               y: 2,
- *                               z: 1
- *                           }
- *                       }
- *                   ],
- *
- *                   // You can observe the state of the Texture node:
- *
- *                   listeners: {
- *                       "state-changed":
- *                           function(event) {
- *                               switch (event.params.newState) {
- *                                   case SceneJS.Texture.STATE_INITIAL:
- *                                       alert("SceneJS.Texture.STATE_INITIAL");
- *                                       break;
- *
- *                                   case SceneJS.Texture.STATE_LOADING:
- *
- *                                       // At least one layer still loading
- *
- *                                       alert("SceneJS.Texture.STATE_LOADING");
- *                                       break;
- *
- *                                   case SceneJS.Texture.STATE_LOADED:
- *
- *                                       // All layers loaded
- *
- *                                       alert("SceneJS.Texture.STATE_LOADED");
- *                                       break;
- *
- *                                   case SceneJS.Texture.STATE_ERROR:
- *
- *                                       // One or more layers failed to load - Layer
- *                                       // will limp on, remaining in this state
- *
- *                                       alert("SceneJS.Texture.STATE_ERROR: " + params.exception.message || params.exception);
- *                                       break;
- *                                  }
- *                              }
- *                          }
- *                     }
- *               },
- *
- *               new SceneJS.Cube()
- *           )
- *     );
- *  </code></pre>
- *
- * <p><b>Example 2</b></p>
- * <p>You can animate texture transformations - this example shows how the rotate, scale and translate properties
- * can be functions to take their values from the data scope, in this case created by a higher WithData node:</p>
- *  <pre><code>
- * var subGraph =
- *       new SceneJS.WithData({
- *           angle: 45.0   // Vary this value to rotate the texture
- *       },
- *               new SceneJS.Texture({
- *                   layers: [
- *                       {
- *                           uri:"http://scenejs.org/library/textures/misc/general-zod.jpg",
- *
- *                           rotate: function(data) {
- *                               return { z: data.get("angle") }
- *                           }
- *                       }
- *                   ]
- *               },
- *               new SceneJS.Cube()
- *         )
- *   );
- *  </code></pre>
- * @constructor
- * Create a new SceneJS.texture
- * @param {Object} The config object or function, followed by zero or more child nodes
  */
 SceneJS.Texture = SceneJS.createNodeType("texture");
 
-// @private
 SceneJS.Texture.prototype._init = function(params) {
     this._layers = [];
-    this._state = SceneJS.Texture.STATE_INITIAL;
 
     /* When set, texture waits for layers to load before compiling children - default is true
      */
@@ -183,8 +55,6 @@ SceneJS.Texture.prototype._init = function(params) {
             }
         }
         this._layers.push({
-            state : SceneJS.TextureLayer.STATE_INITIAL,
-            process: null,                      // Image load process handle
             image : null,                       // Initialised when state == IMAGE_LOADED
             creationParams: layerParam,         // Create texture using this
             texture: null,                      // Initialised when state == TEXTURE_LOADED
@@ -200,27 +70,6 @@ SceneJS.Texture.prototype._init = function(params) {
 };
 
 
-/** Ready to create texture layers
- */
-SceneJS.Texture.STATE_INITIAL = "init";
-
-/** At least one texture layer image load (or target imageBuf search) in progress. The Texture node can temporarily revert to this
- * after {@link STATE_LOADED} if any layer has been evicted from VRAM (after lack of use) while the Texture node re-creates it.
- */
-SceneJS.Texture.STATE_LOADING = "loading";
-
-/** All texture layer image loads completed
- */
-SceneJS.Texture.STATE_LOADED = "loaded";
-
-/** At least one texture layer creation or image load failed. The Texture node limps on in this state.
- */
-SceneJS.Texture.STATE_ERROR = "error";
-
-/** Node destroyed.
- */
-SceneJS.Texture.STATE_DESTROYED = "destroyed";
-
 /**
  * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
  * {@link #STATE_LOADING}, {@link #STATE_LOADED} and {@link #STATE_ERROR}.
@@ -230,202 +79,47 @@ SceneJS.Texture.prototype.getState = function() {
     return this._state;
 };
 
-
-// @private
-//SceneJS.Texture.prototype._compile = function(traversalContext) {
-//    this._preCompile(traversalContext);
-//    this._compileNodes(traversalContext);
-//    this._postCompile(traversalContext);
-//};
-
-// @private
 SceneJS.Texture.prototype._compile = function(traversalContext) {
-
-    this._countLayersReady = 0;
-
-    /*-----------------------------------------------------
-     * On each render, update state of each texture layer
-     * and count how many are ready to apply
-     *-----------------------------------------------------*/
-
     var layer;
     for (var i = 0; i < this._layers.length; i++) {
         layer = this._layers[i];
+        if (!layer.texture) {
+            if (layer.creationParams.imageBuf) {
+                var imageBuf = SceneJS_imageBufModule.getImageBuffer(layer.creationParams.imageBuf);
+                if (imageBuf && imageBuf.isRendered()) {
+                    var texture = SceneJS_imageBufModule.getTexture(layer.creationParams.imageBuf);
+                    if (texture) {
 
-        if (layer.state == SceneJS.TextureLayer.STATE_LOADED) {
+                        // TODO: Waiting for target node is OK, but exception should be thrown when target is not an 'imageBuf'
+                        // TODO: Re-acquire texture dynamically
 
-            /* Texture node has loaded texture, now check that texture
-             * still exists, or in the case if a target imageBuf node, that the target has
-             * not dissappeared.
-             */
-            if (layer.creationParams.uri) {
-                if (!SceneJS_textureModule.textureExists(layer.texture)) {
-
-                    /* Image texture evicted from cache
-                     */
-                    layer.state = SceneJS.TextureLayer.STATE_INITIAL;
-                }
-            } else if (layer.creationParams.imageBuf) {
-                if (!SceneJS_imageBufModule.getImageBuffer(layer.creationParams.imageBuf)) {
-
-                    /* Target imageBuf node was destroyed
-                     */
-                    layer.state = SceneJS.TextureLayer.STATE_INITIAL;
-                }
-            }
-        }
-
-        switch (layer.state) {
-
-            case SceneJS.TextureLayer.STATE_LOADED: // Layer ready to apply
-                this._countLayersReady++;
-                this._rebuildTextureMatrix(layer);
-                break;
-
-            case SceneJS.TextureLayer.STATE_INITIAL: // Layer load to start
-
-                layer.state = SceneJS.TextureLayer.STATE_LOADING;
-
-                if (layer.creationParams.uri || layer.creationParams.image || layer.creationParams.canvasId) {
-                    var self = this;
-                    (function(l) { // Closure allows this layer to receive results
-                        SceneJS_textureModule.createTexture(
-                                l.creationParams,
-
-                                function(texture) { // Success
-
-                                    if (self._destroyed) { // Destroy again when texture destroyed
-                                        SceneJS_textureModule.destroyTexture(texture);
-                                        return;
-                                    }
-
-                                    l.texture = texture;
-                                    l.state = SceneJS.TextureLayer.STATE_LOADED;
-
-                                    /**
-                                     * Need re-compile so that this texture layer
-                                     * can create and apply the texture
-                                     */
-                                    SceneJS_compileModule.nodeUpdated(self, "loadedImage");
-                                },
-
-                                function() { // General error, probably 404
-
-                                    if (self._destroyed) { // Dont care when texture destroyed
-                                        return;
-                                    }
-
-                                    l.state = SceneJS.TextureLayer.STATE_ERROR;
-                                    var message = "SceneJS.texture image load failed: " + l.creationParams.uri;
-                                    SceneJS_loggingModule.warn(message);
-
-                                    if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
-                                        self._changeState(SceneJS.Texture.STATE_ERROR, {
-                                            exception: new SceneJS.errors.Exception(SceneJS.errors.ERROR, "SceneJS.Exception - " + message)
-                                        });
-                                    }
-                                },
-
-                                function() { // Load aborted - user probably refreshed/stopped page
-
-                                    if (self._destroyed) { // Dont care when texture destroyed
-                                        return;
-                                    }
-
-                                    SceneJS_loggingModule.warn("SceneJS.texture image load aborted: " + l.creationParams.uri);
-                                    l.state = SceneJS.TextureLayer.STATE_ERROR;
-
-                                    if (self._state != SceneJS.Texture.STATE_ERROR) { // Don't keep re-entering STATE_ERROR
-                                        self._changeState(SceneJS.Texture.STATE_ERROR, {
-                                            exception: new SceneJS.errors.Exception(SceneJS.errors.ERROR, "SceneJS.Exception - texture image load stopped - user aborted it?")
-                                        });
-                                    }
-                                });
-                    }).call(this, layer);
-                }
-                break;
-
-            case SceneJS.TextureLayer.STATE_LOADING: // Layer still loading
-
-                if (layer.creationParams.imageBuf) {
-                    var imageBuf = SceneJS_imageBufModule.getImageBuffer(layer.creationParams.imageBuf);
-                    if (imageBuf && imageBuf.isRendered()) {
-                        var texture = SceneJS_imageBufModule.getTexture(layer.creationParams.imageBuf);
-                        if (texture) {
-
-                            // TODO: Waiting for target node is OK, but exception should be thrown when target is not an 'imageBuf'
-                            // TODO: Re-acquire texture dynamically
-
-                            layer.texture = texture;
-                            layer.state = SceneJS.TextureLayer.STATE_LOADED;
-
-                            /**
-                             * Need re-compile so that this texture layer
-                             * can create and apply the texture
-                             */
-                            SceneJS_compileModule.nodeUpdated(this, "loadedImagebuf");
-                        }
+                        layer.texture = texture;
+                        layer.state = SceneJS.TextureLayer.STATE_LOADED;
                     }
+                } else {
+                    SceneJS_compileModule.nodeUpdated(this, "waitingForImagebuf");
                 }
-                break;
-
-            case SceneJS.TextureLayer.STATE_ERROR: // Layer disabled
-                break;
-        }
-    }
-
-
-    /* Fastest strategy is to allow the complete set of layers to load
-     * before applying any of them. There would be a huge performance penalty
-     * if we were to apply the incomplete set as layers are still loading -
-     * SceneJS_renderModule would then have to generate a new shader for each new
-     * layer loaded, which would become redundant as soon as the next layer is loaded.
-     */
-
-    if (this._countLayersReady == this._layers.length) {  // All layers loaded
-
-        SceneJS_textureModule.pushTexture(this._attr.id, this._layers);
-
-        if (this._state != SceneJS.Texture.STATE_ERROR && // Not stuck in STATE_ERROR
-            this._state != SceneJS.Texture.STATE_LOADED) {    // Waiting for layers to load
-            this._changeState(SceneJS.Texture.STATE_LOADED);  // All layers now loaded
-        }
-
-        /* Record this node as loaded for "loading-status" events
-         */
-        SceneJS_loadStatusModule.status.numNodesLoaded++;
-
-        /* Render child nodes
-         */
-        this._compileNodes(traversalContext);
-
-    } else {
-
-        if (this._state != SceneJS.Texture.STATE_ERROR) { // Not stuck in STATE_ERROR
-            if (this._state != SceneJS.Texture.STATE_LOADING) {   // Waiting in STATE_INITIAL
-                this._changeState(SceneJS.Texture.STATE_LOADING); // Now loading some layers
+            } else {
+                var self = this;
+                layer.texture = SceneJS_textureModule.createTexture(
+                        layer.creationParams,
+                        function() {
+                            SceneJS_compileModule.nodeUpdated(self, "loadedImage");
+                        });
             }
+            SceneJS_loadStatusModule.status.numNodesLoading++;
+        } else {
+            SceneJS_loadStatusModule.status.numNodesLoaded++;
         }
-
-        /* Record this node as loaded for "loading-status" events
-         */
-        SceneJS_loadStatusModule.status.numNodesLoading++;
-
-        if (!this._waitForLoad) {
-            this._compileNodes(traversalContext);
+        if (layer.rebuildMatrix) {
+            this._rebuildTextureMatrix(layer);
         }
     }
-
-    /* Post-compile
-     */
-    if (this._countLayersReady == this._layers.length) {  // All layers loaded
-        SceneJS_textureModule.popTexture();
-    }
+    SceneJS_textureModule.pushTexture(this._attr.id, this._layers);
+    this._compileNodes(traversalContext);
+    SceneJS_textureModule.popTexture();
 };
 
-
-/* Returns texture transform matrix
- */
 SceneJS.Texture.prototype._rebuildTextureMatrix = function(layer) {
     if (layer.rebuildMatrix) {
         if (layer.translate || layer.rotate || layer.scale) {
@@ -436,7 +130,6 @@ SceneJS.Texture.prototype._rebuildTextureMatrix = function(layer) {
     }
 };
 
-// @private
 SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
     var matrix = null;
     if (translate) {
@@ -455,8 +148,6 @@ SceneJS.Texture.prototype._getMatrix = function(translate, rotate, scale) {
 
 /**
  *
- * </code></pre>
- * @param cfg
  */
 SceneJS.Texture.prototype.setLayer = function(cfg) {
     if (cfg.index == undefined || cfg.index == null) {
@@ -485,8 +176,6 @@ SceneJS.Texture.prototype.setLayer = function(cfg) {
 
 /**
  *
- * </code></pre>
- * @param cfg
  */
 SceneJS.Texture.prototype.setLayers = function(layers) {
     for (var index in layers) {
@@ -556,30 +245,6 @@ SceneJS.Texture.prototype.setRotate = function(layer, angle) {
     }
     layer.rotate = angle;
     layer.rebuildMatrix = true;
-};
-
-// @private
-SceneJS.Texture.prototype._changeState = function(newState, params) {
-    params = params || {};
-    params.oldState = this._state;
-    params.newState = newState;
-    this._state = newState;
-    if (this._listeners["state-changed"]) {
-        this._fireEvent("state-changed", params);
-    }
-};
-
-/*---------------------------------------------------------------------
- * Query methods - calls to these only legal while node is rendering
- *-------------------------------------------------------------------*/
-
-/**
- * Queries the Texture's current render-time state.
- * This will update after each "state-changed" event.
- * @returns {String} The state
- */
-SceneJS.Texture.prototype.queryState = function() {
-    return this._state;
 };
 
 // @private

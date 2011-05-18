@@ -110,16 +110,26 @@
  * @param {Object} [cfg] Static configuration object
  * @param {SceneJS.node, ...} arguments Zero or more child nodes
  */
-SceneJS.Node = function() {
+SceneJS.Node = function(cfg, scene) {
 
     /* Public properties are stored on the _attr map
      */
     this._attr = {};
     this._attr.nodeType = "node";
-    this._attr.NODEINFO = null;  // Big and bold, to stand out in debugger object graph inspectors
     this._attr.sid = null;
     this._attr.flags = null;     // Fast to detect that we have no flags and then bypass processing them
     this._attr.data = {};
+
+    if (cfg) {
+        this._attr.id = cfg.id;
+        this._attr.layer = cfg.layer;
+        this._attr.data = cfg.data;
+        this._attr.flags = cfg.flags;
+        this._attr.enabled = cfg.enabled === false ? false : true;
+        this._attr.sid = cfg.sid;
+        this._attr.info = cfg.info;
+        this._scene = scene || this;
+    }
 
     /* Rendering flag - set while this node is rendering - while it is true, it is legal
      * to make render-time queries on the node using SceneJS.withNode(xx).query(xx).
@@ -151,8 +161,6 @@ SceneJS.Node = function() {
         SceneJS._nodeIDMap[this._attr.id] = undefined;
     }
 
-    SceneJS.Node._ArgParser.parseArgs(arguments, this);
-
     /* Register again by whatever ID we now have
      */
     if (!this._attr.id) {
@@ -160,138 +168,12 @@ SceneJS.Node = function() {
     }
     SceneJS._nodeIDMap[this._attr.id] = this;
 
-    if (this._init) {
-        this._init(this._getParams());
+    if (cfg && this._init) {
+        this._init(cfg);
     }
 };
 
 SceneJS.Node.prototype.constructor = SceneJS.Node;
-
-/**
- * A simple recursive descent parser to parse SceneJS's flexible node
- * arguments.
- *
- * @private
- */
-SceneJS.Node._ArgParser = new (function() {
-
-    /**
-     * Entry point - parse first argument in variable argument list
-     */
-    this.parseArgs = function(args, node) {
-        node._getParams = function() {
-            return {};
-        };
-        node._params = {};
-        if (args.length > 0) {
-            var arg = args[0];
-            if (!arg) {
-                throw SceneJS._errorModule.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "First element in node config is null or undefined");
-            }
-            if (arg._compile) {   // Determines arg to be a node
-                this._parseChild(arg, args, 1, node);
-            } else {
-                this._parseConfigObject(arg, args, 1, node);
-            }
-        }
-    };
-
-
-    /**
-     * Parse argument that is a configuration object, then parse the next
-     * argument (if any) at the given index, which is expected to be either a
-     * configuration callback or a child node.
-     * @private
-     */
-    this._parseConfigObject = function(arg, args, i, node) {
-
-        var cfg = arg;
-
-        /* Seperate out basic node configs from other configs - set those
-         * directly on the node and set the rest on an intermediate config object.
-         */
-        var param;
-        for (var key in cfg) {
-            if (cfg.hasOwnProperty(key)) {
-                param = cfg[key];
-                if (param != null) {
-                    if (key == "id") {
-                        //                        if (SceneJS._nodeIDMap[param]) {
-                        //                            throw SceneJS._errorModule.fatalError(new SceneJS.errors.InvalidNodeConfigException
-                        //                                    ("Node with this ID already defined: '" + param + "'"));
-                        //                        }
-                        node._attr.id = param;
-                    } else if (key == "sid") {        //  TODO: Deprecate
-                        node._attr.sid = param;
-                    } else if (key == "info") {       //  TODO: Deprecate
-                        node._attr.NODEINFO = param;
-                    } else if (key == "data") {       // User-attached data map
-                        node._attr.data = param;
-                    } else if (key == "flags") {       // 
-                        node._attr.flags = param;
-                    } else if (key == "enabled") {    // Traversal enabled/disabled
-                        node._attr.enabled = param;
-                    } else if (key == "layer") {     // Rendering layers
-                        node._attr.layer = param;
-                    } else {
-                        node._params[key] = param;
-                    }
-                }
-            }
-        }
-
-        node._getParams = (function() {
-            var _config = node._params;
-            node._params = {};
-            return function() {
-                return _config;
-            };
-        })();
-
-        /* Wind on to next argument if any, expected be a child node
-         */
-        if (i < args.length) {
-            arg = args[i];
-            if (arg._compile) { // Determines arg to be a node
-                this._parseChild(arg, args, i + 1, node);
-            } else {
-                throw SceneJS._errorModule.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "Unexpected type for node argument " + i + " - expected a child node");
-            }
-        }
-    };
-
-    /**
-     * Parse argument that is a child node, then parse the next
-     * argument (if any) at the given index, which is expected to
-     * be a child node.
-     * @private
-     */
-    this._parseChild = function(arg, args, i, node) {
-        node._children.push(arg);
-        arg._parent = node;
-        arg._resetMemoLevel(); // In case child is a pruned and grafted subgraph
-        if (i < args.length) {
-            arg = args[i];
-            if (!arg) {
-                throw SceneJS._errorModule.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "Node argument " + i + " is null or undefined");
-            }
-            if (arg._attr) {
-                this._parseChild(arg, args, i + 1, node);
-            } else {
-                throw SceneJS._errorModule.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "Unexpected type for node argument " + i + " - expected a child node");
-            }
-        }
-    };
-})();
-
 
 /**
  * Flags state change on this node.
@@ -379,7 +261,7 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
         }
     }
 
-    if (numChildren == 0) {                
+    if (numChildren == 0) {
         if (! traversalContext.insideRightFringe) { // Last node in the subtree
             if (traversalContext.callback) { // Within subtree of instanced
                 traversalContext.callback(traversalContext); // Visit instance's children as temp children of last node
@@ -578,30 +460,12 @@ SceneJS.Node.prototype.getSID = function() {
     return this._attr.sid;
 };
 
-/**
- * Returns the node's optional information string. The string will be empty if never set.
- * @returns {string} Node info string
- * @deprecated
- */
-SceneJS.Node.prototype.getInfo = function() {
-    return this._attr.NODEINFO || "";
-};
-
 /** Returns the SceneJS.Scene to which this node belongs.
  * Returns node if this is a SceneJS.Scene.
  * @returns {SceneJS.Scene} Scene node
  */
 SceneJS.Node.prototype.getScene = function() {
     return this._scene;
-};
-
-/**
- * Sets the node's optional information string. The string will be empty if never set.
- * @param {string} info Node info string
- * @deprecated
- */
-SceneJS.Node.prototype.setInfo = function(info) {
-    this._attr.NODEINFO = info; // Doesnt require re-render
 };
 
 /**

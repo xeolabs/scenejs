@@ -90,7 +90,7 @@ var SceneJS = {
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "createNode 'parent' is expected for all node types except 'scene'");
             }
-            var newNode = this._parseNodeJSON(json);
+            var newNode = this._parseNodeJSON(json, undefined); // Scene references itself as the owner scene
             SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
             return SceneJS.withNode(newNode);
         }
@@ -139,9 +139,7 @@ var SceneJS = {
         if (!nodeType) {
             throw "Failed to parse JSON node definition - unknown node type: '" + json.type + "'";
         }
-        var node = new nodeType.nodeClass(this._copyCfg(json));   // Faster to instantiate class directly
-        node._scene = scene || node;
-        return node;
+        return new nodeType.nodeClass(json, scene);   // Faster to instantiate class directly
     },
 
     /** Returns true if the {@link SceneJS.Node} with the given ID exists

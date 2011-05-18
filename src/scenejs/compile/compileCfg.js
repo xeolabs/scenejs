@@ -8,7 +8,8 @@ var SceneJS_compileCfg = new (function() {
     /* Compilation levels - these are also the priorities in which the
      * compilations are queued (when queuing is applicable).
      */
-    this.COMPILE_NOTHING = -1;  // Compile nothing
+    this.COMPILE_NOTHING = -2;  // Do nothing
+    this.REDRAW = -1;           // Compile nothing and redraw the display list
     this.COMPILE_SCENE = 0;     // Compile entire scene graph
     this.COMPILE_BRANCH = 1;    // Compile node, plus path to root, plus subnodes
     this.COMPILE_SUBTREE = 2;   // Compile node plus subnodes
@@ -267,10 +268,10 @@ var SceneJS_compileCfg = new (function() {
         "texture": {
 
             "loadedImage": {
-                level: this.COMPILE_SCENE
+                level: this.REDRAW
             },
 
-            "loadedImagebuf": {
+            "waitingForImagebuf": {
                 level: this.COMPILE_SCENE   // TODO: got to be a tighter rule - maybe compile imagebuf's subtree then texture's branch?
             },
 
