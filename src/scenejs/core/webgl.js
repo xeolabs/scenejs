@@ -198,7 +198,7 @@ var SceneJS_webgl_Shader = function(context, type, source, logging) {
         logging.error("Shader compile failed:" + context.getShaderInfoLog(this.handle));
     }
     if (!this.valid) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.SHADER_COMPILATION_FAILURE, "Shader program failed to compile");
     }
 }
@@ -255,7 +255,7 @@ var SceneJS_webgl_Program = function(hash, lastUsed, context, vertexSources, fra
     }
 
     if (!this.valid) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.SHADER_LINK_FAILURE, "Shader program failed to link");
     }
 
@@ -511,32 +511,39 @@ function SceneJS_webgl_nextHighestPowerOfTwo(x) {
  * @param itemSize Size of each item
  * @param usage    Eg. STATIC_DRAW
  */
-var SceneJS_webgl_ArrayBuffer = function(context, type, values, numItems, itemSize, usage) {
-    this.handle = context.createBuffer();
-    context.bindBuffer(type, this.handle);
-    context.bufferData(type, values, usage);
-    this.handle.numItems = numItems;
-    this.handle.itemSize = itemSize;
-    context.bindBuffer(type, null);
 
-    this.type = type;
-    this.numItems = numItems;
-    this.itemSize = itemSize;
-
-
-    /** @private */
-    this.bind = function() {
+var SceneJS_webgl_ArrayBuffer;
+(function() {
+    var bufMap = new SceneJS_Map();
+    SceneJS_webgl_ArrayBuffer = function(context, type, values, numItems, itemSize, usage) {
+        this.handle = context.createBuffer();
+        this.id = bufMap.addItem(this);
         context.bindBuffer(type, this.handle);
-    };
-
-    /** @private */
-    this.unbind = function() {
+        context.bufferData(type, values, usage);
+        this.handle.numItems = numItems;
+        this.handle.itemSize = itemSize;
         context.bindBuffer(type, null);
-    };
 
-    /** @private */
-    this.destroy = function() {
-        context.deleteBuffer(this.handle);
+        this.type = type;
+        this.numItems = numItems;
+        this.itemSize = itemSize;
+
+
+        /** @private */
+        this.bind = function() {
+            context.bindBuffer(type, this.handle);
+        };
+
+        /** @private */
+        this.unbind = function() {
+            context.bindBuffer(type, null);
+        };
+
+        /** @private */
+        this.destroy = function() {
+            context.deleteBuffer(this.handle);
+            bufMap.removeItem(this.id);
+        };
     };
-}
+})();
 

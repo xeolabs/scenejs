@@ -1,3 +1,39 @@
+/** Generic map of IDs to items - can generate own IDs or accept given IDs.
+ * Given IDs should be strings in order to not clash with internally generated IDs, which are numbers.
+ */
+var SceneJS_Map = function() {
+    this.items = [];
+    this.lastUniqueId = 0;
+
+    this.addItem = function() {
+        var item;
+        if (arguments.length == 2) {
+            var id = arguments[0];          
+            item = arguments[1];
+            if (this.items[id]) { // Won't happen if given ID is string
+                throw SceneJS_errorModule.fatalError(SceneJS.errors.ID_CLASH, "ID clash: '" + id + "'");
+            }
+            this.items[id] = item;
+            return id;
+        } else {
+            while (true) {
+                item = arguments[0];
+                var findId = this.lastUniqueId++ ;
+                if (!this.items[findId]) {
+                    this.items[findId] = item;
+                    return findId;
+                }
+            }
+        }
+    };
+
+    this.removeItem = function(id) {
+        this.items[id] = null;
+    };
+};
+
+var SceneJS_nodeMap = new SceneJS_Map();
+
 /**
  * @class SceneJS
  * SceneJS name space
@@ -65,18 +101,18 @@ var SceneJS = {
         }
         if (json.parent) {
             if (json.type == "scene") {
-                throw SceneJS._errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "createNode 'parent' not expected for 'scene' node");
             }
             if (json.parent == json.id) {
-                throw SceneJS._errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.NODE_NOT_FOUND,
                         "createNode 'parent' cannot equal 'id'");
             }
-            var parent = SceneJS._nodeIDMap[json.parent];
+            var parent = SceneJS_nodeMap.items[json.parent];
             if (!parent) {
-                throw SceneJS._errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.NODE_NOT_FOUND,
                         "createNode 'parent' not resolved");
             }
@@ -86,7 +122,7 @@ var SceneJS = {
             return SceneJS.withNode(newNode);
         } else {
             if (json.type != "scene") {
-                throw SceneJS._errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "createNode 'parent' is expected for all node types except 'scene'");
             }
@@ -154,7 +190,7 @@ var SceneJS = {
         if (typeof id != "string") {
             throw "nodeExists param 'id' not a string";
         }
-        var node = SceneJS._nodeIDMap[id];
+        var node = SceneJS_nodeMap.items[id];
         return (node != undefined && node != null);
     },
 
@@ -205,13 +241,6 @@ var SceneJS = {
      * @private
      */
     _nodeTypes: {},
-
-    /**
-     * ID map of all existing nodes.
-     * Referenced by {@link SceneJS.Node}.
-     * @private
-     */
-    _nodeIDMap : {},
 
     /**
      * Links each node that is an instance target back to
@@ -282,7 +311,7 @@ var SceneJS = {
     _last_unique_id: 0,
     _createKeyForMap : function(keyMap, prefix) {
         while (true) {
-            var key = prefix + SceneJS._last_unique_id++;
+            var key = prefix ? prefix + SceneJS._last_unique_id++ : SceneJS._last_unique_id++;
             if (!keyMap[key]) {
                 return key;
             }
@@ -290,7 +319,7 @@ var SceneJS = {
     },
 
     /** Stolen from GLGE:https://github.com/supereggbert/GLGE/blob/master/glge-compiled.js#L1656
-      */
+     */
     _createUUID:function() {
         var data = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
         var data2 = ["8","9","A","B"];

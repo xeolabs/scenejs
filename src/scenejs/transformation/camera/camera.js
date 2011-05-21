@@ -147,12 +147,12 @@ SceneJS.Camera.prototype.setOptics = function(optics) {
                 far : optics.far || 5000.0
             };
         } else if (!optics.type) {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                      SceneJS.errors.ILLEGAL_NODE_CONFIG,
                             "SceneJS.Camera configuration invalid: optics type not specified - " +
                             "supported types are 'perspective', 'frustum' and 'ortho'");
         } else {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                      SceneJS.errors.ILLEGAL_NODE_CONFIG,
                             "SceneJS.Camera configuration invalid: optics type not supported - " +
                             "supported types are 'perspective', 'frustum' and 'ortho'");

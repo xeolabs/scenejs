@@ -193,7 +193,7 @@ SceneJS.LookAt.prototype.setUp = function(up) {
     var y = (up.y != undefined && up.y != null) ? up.y : 0;
     var z = (up.z != undefined && up.z != null) ? up.z : 0;
     if (x + y + z == 0) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                  SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "SceneJS.lookAt up vector is zero length - at least one of its x,y and z components must be non-zero");
     }

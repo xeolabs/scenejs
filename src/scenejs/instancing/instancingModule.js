@@ -34,12 +34,12 @@ var SceneJS_instancingModule = new function() {
      */
     this.acquireInstance = function(id, nodeID) {
         if (instances[nodeID]) {
-            SceneJS._errorModule.error(
+            SceneJS_errorModule.error(
                     SceneJS.errors.INSTANCE_CYCLE,
                     "SceneJS.Instance attempted to create cyclic instantiation: " + nodeID);
             return null;
         }
-        var node = SceneJS._nodeIDMap[nodeID];
+        var node = SceneJS_nodeMap.items[nodeID];
         if (!node) {
             var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_LOADER_SERVICE_ID);
             if (nodeStore) {

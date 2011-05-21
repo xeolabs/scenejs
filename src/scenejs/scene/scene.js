@@ -276,7 +276,7 @@ window.requestAnimFrame = (function() {
  */
 SceneJS.Scene.prototype.start = function(cfg) {
     if (this._destroyed) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.NODE_ILLEGAL_STATE,
                 "Attempted start on Scene that has been destroyed");
     }
@@ -370,7 +370,7 @@ SceneJS.Scene.prototype.isRunning = function() {
  */
 SceneJS.Scene.prototype.render = function() {
     if (this._destroyed) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.NODE_ILLEGAL_STATE,
                 "Attempted render on Scene that has been destroyed");
     }
@@ -407,12 +407,12 @@ SceneJS.Scene.prototype.render = function() {
  */
 SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
     if (this._destroyed) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.NODE_ILLEGAL_STATE,
                 "Attempted pick on Scene that has been destroyed");
     }
     if (!this._created) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.NODE_ILLEGAL_STATE,
                 "Attempted pick on Scene that has not been rendered");
     }

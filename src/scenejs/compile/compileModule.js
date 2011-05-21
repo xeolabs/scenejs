@@ -417,7 +417,7 @@ var SceneJS_compileModule = new (function() {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
                         compileScene.dirtyNodesWithinBranches[instanceNodeId] = true;
-                        this._flagCompilePath(compileScene, SceneJS._nodeIDMap[instanceNodeId]);
+                        this._flagCompilePath(compileScene, SceneJS_nodeMap.items[instanceNodeId]);
                     }
                 }
             }
@@ -519,7 +519,7 @@ var SceneJS_compileModule = new (function() {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
                         this._nodeAlwaysCompile[instanceNodeId] = true;
-                        this._alwaysCompilePath(SceneJS._nodeIDMap[instanceNodeId]);
+                        this._alwaysCompilePath(SceneJS_nodeMap.items[instanceNodeId]);
                     }
                 }
             }

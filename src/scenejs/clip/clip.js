@@ -21,7 +21,7 @@ SceneJS.Clip.prototype._init = function(params) {
 SceneJS.Clip.prototype.setMode = function(mode) {
     mode = mode || "outside";
     if (mode != "disabled" && mode != "inside" && mode != "outside") {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "SceneJS.clip has a mode of unsupported type: '" + mode + " - should be 'disabled', 'inside' or 'outside'");
     }

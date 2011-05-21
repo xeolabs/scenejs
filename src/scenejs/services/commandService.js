@@ -84,7 +84,7 @@ SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID).addCommand("cre
                 }
             }
 
-            SceneJS._nodeIDMap[params.target]._fireEvent("updated", { }); // TODO: only if listener exists; and buffer events
+            SceneJS_nodeMap.items[params.target]._fireEvent("updated", { }); // TODO: only if listener exists; and buffer events
 
             /* Further messages
              */

@@ -34,12 +34,12 @@ SceneJS.Matrix.prototype._init = function(params) {
 SceneJS.Matrix.prototype.setElements = function(elements) {
     elements = elements || SceneJS_math_identityMat4();
     if (!elements) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                  SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "Matrix elements undefined");
     }
     if (elements.length != 16) {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                  SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "Matrix elements should number 16");
     }

@@ -164,7 +164,7 @@ SceneJS.Instance.prototype._compile = function(traversalContext) {
              */
             var exception;
             if (this._attr.mustExist) {
-                throw SceneJS._errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         exception = SceneJS.errors.INSTANCE_TARGET_NOT_FOUND,
                                 "SceneJS.Instance could not find target node: '" + this._attr.target + "'");
             }

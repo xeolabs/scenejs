@@ -62,7 +62,7 @@ var SceneJS_sceneModule = new (function() {
             canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
             canvas = document.getElementById(canvasId);
             if (!canvas) {
-                throw SceneJS._errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.CANVAS_NOT_FOUND,
                         "SceneJS.Scene failed to find default canvas with ID '"
                                 + SceneJS.Scene.DEFAULT_CANVAS_ID + "'");
@@ -75,7 +75,7 @@ var SceneJS_sceneModule = new (function() {
                 canvasId = SceneJS.Scene.DEFAULT_CANVAS_ID;
                 canvas = document.getElementById(canvasId);
                 if (!canvas) {
-                    throw SceneJS._errorModule.fatalError(SceneJS.errors.CANVAS_NOT_FOUND,
+                    throw SceneJS_errorModule.fatalError(SceneJS.errors.CANVAS_NOT_FOUND,
                             "SceneJS.Scene config 'canvasId' does not match any elements in the page and no " +
                              "default canvas found with ID '" + SceneJS.Scene.DEFAULT_CANVAS_ID + "'");
                 }
@@ -116,7 +116,7 @@ var SceneJS_sceneModule = new (function() {
             }
         }
         if (!context) {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.WEBGL_NOT_SUPPORTED,
                     'Canvas document element with ID \''
                             + canvasId
@@ -183,7 +183,7 @@ var SceneJS_sceneModule = new (function() {
     this.activateScene = function(sceneId) {
         var scene = scenes[sceneId];
         if (!scene) {
-            throw SceneJS._errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }
         activeSceneId = sceneId;
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
@@ -199,7 +199,7 @@ var SceneJS_sceneModule = new (function() {
     this.redrawScene = function(sceneId) {
         var scene = scenes[sceneId];
         if (!scene) {
-            throw SceneJS._errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_ACTIVATED, scene.canvas);
         SceneJS_renderModule.redraw();
@@ -212,7 +212,7 @@ var SceneJS_sceneModule = new (function() {
     this.getSceneCanvas = function(sceneId) {
         var scene = scenes[sceneId];
         if (!scene) {
-            throw SceneJS._errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }
         return scene.canvas.canvas;
     };
@@ -223,7 +223,7 @@ var SceneJS_sceneModule = new (function() {
     this.getSceneContext = function(sceneId) {
         var scene = scenes[sceneId];
         if (!scene) {
-            throw SceneJS._errorModule.fatalError("Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
         return scene.canvas.context;
     };
@@ -260,7 +260,7 @@ var SceneJS_sceneModule = new (function() {
         activeSceneId = null;
         var scene = scenes[sceneId];
         if (!scene) {
-            throw SceneJS._errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_DEACTIVATED, scene.canvas);
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_COMPILED, {sceneId : sceneId });

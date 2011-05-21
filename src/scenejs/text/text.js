@@ -4,7 +4,7 @@ SceneJS.Text = SceneJS.createNodeType("text");
 SceneJS.Text.prototype._init = function(params) {
     var mode = params.mode || "bitmap";
     if (mode != "vector" && mode != "bitmap") {
-        throw SceneJS._errorModule.fatalError(
+        throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "SceneJS.Text unsupported mode - should be 'vector' or 'bitmap'");
     }

@@ -13,6 +13,7 @@ SceneJS.errors.INSTANCE_TARGET_NOT_FOUND = 9;
 SceneJS.errors.INSTANCE_CYCLE = 10;
 SceneJS.errors.NODE_NOT_FOUND = 11;
 SceneJS.errors.NODE_ILLEGAL_STATE = 12;
+SceneJS.errors.ID_CLASH = 13;
 
 /**
  *

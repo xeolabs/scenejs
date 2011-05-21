@@ -631,19 +631,19 @@ var SceneJS_NodeRenderer = function(cfg) {
 
     var glEnum = function(context, name) {
         if (!name) {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Null SceneJS.renderer node config: \"" + name + "\"");
         }
         var result = SceneJS_webgl_enumMap[name];
         if (!result) {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
         }
         var value = context[result];
         if (!value) {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.WEBGL_UNSUPPORTED_NODE_CONFIG,
                     "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
         }

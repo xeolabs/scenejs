@@ -3,7 +3,7 @@
  *
  * @private
  */
-SceneJS._errorModule = new (function() {
+SceneJS_errorModule = new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,

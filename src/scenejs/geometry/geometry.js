@@ -244,7 +244,7 @@ SceneJS.Geometry.prototype._getArrays = function() {
         return this._attr;
     } else {
         if (!this._handle) {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.NODE_ILLEGAL_STATE,
                     "Invalid node state exception: geometry stream not loaded yet - can't query geometry data yet");
         }

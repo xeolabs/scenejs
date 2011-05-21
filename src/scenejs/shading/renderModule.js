@@ -923,7 +923,7 @@ var SceneJS_renderModule = new (function() {
             SceneJS_loggingModule.debug(getShaderLoggingSource(vertexShaderSrc.split(";")));
             SceneJS_loggingModule.debug("Fragment shader:");
             SceneJS_loggingModule.debug(getShaderLoggingSource(fragmentShaderSrc.split(";")));
-            throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create shader: " + e.message || e);
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create shader: " + e.message || e);
         }
     }
 

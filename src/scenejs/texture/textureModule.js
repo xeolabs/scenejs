@@ -150,7 +150,7 @@ var SceneJS_textureModule = new (function() {
                 update: update
             }, onComplete);
         } catch (e) {
-            throw SceneJS._errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
         }
     };
 
@@ -161,7 +161,7 @@ var SceneJS_textureModule = new (function() {
         }
         var glName = SceneJS_webgl_enumMap[value];
         if (glName == undefined) {
-            throw SceneJS._errorModule.fatalError(
+            throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
         }

@@ -26,7 +26,6 @@
  *  @private
  */
 var SceneJS_geometryModule = new (function() {
-
     var canvas;
     var canvasGeos = {};                   // Geometry map for each canvas
     var currentGeos = null;
@@ -47,7 +46,7 @@ var SceneJS_geometryModule = new (function() {
             SceneJS_eventModule.CANVAS_ACTIVATED,
             function(c) {
                 if (!canvasGeos[c.canvasId]) {      // Lazy-create geometry map for canvas
-                    canvasGeos[c.canvasId] = {};
+                    canvasGeos[c.canvasId] = new SceneJS_Map();
                 }
                 canvas = c;
                 currentGeos = canvasGeos[c.canvasId];
@@ -75,7 +74,7 @@ var SceneJS_geometryModule = new (function() {
             function() {
                 for (var canvasId in canvasGeos) {    // Destroy geometries on all canvases
                     if (canvasGeos.hasOwnProperty(canvasId)) {
-                        var geoMap = canvasGeos[canvasId];
+                        var geoMap = canvasGeos[canvasId].items;
                         for (var resource in geoMap) {
                             if (geoMap.hasOwnProperty(resource)) {
                                 var geometry = geoMap[resource];
@@ -95,7 +94,6 @@ var SceneJS_geometryModule = new (function() {
      * @private
      */
     function destroyGeometry(geo) {
-        //  SceneJS_loggingModule.debug("Destroying geometry : '" + geo.resource + "'");
         if (document.getElementById(geo.canvas.canvasId)) { // Context won't exist if canvas has disappeared
             if (geo.vertexBuf) {
                 geo.vertexBuf.destroy();
@@ -118,7 +116,7 @@ var SceneJS_geometryModule = new (function() {
         }
         var geoMap = canvasGeos[geo.canvas.canvasId];
         if (geoMap) {
-            geoMap[geo.resource] = null;
+            geoMap.removeItem(geo.resource);
         }
     }
 
@@ -143,7 +141,7 @@ var SceneJS_geometryModule = new (function() {
             case "triangle-fan":
                 return context.TRIANGLE_FAN;
             default:
-                throw SceneJS._errorModule.fatalError(
+                throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "SceneJS.geometry primitive unsupported: '" +
                         primitive +
@@ -153,11 +151,6 @@ var SceneJS_geometryModule = new (function() {
     }
 
     this.createGeometry = function(resource, source, callback) {
-
-        if (!resource) {
-            resource = SceneJS._createKeyForMap(currentGeos, "t");
-        }
-
         if (typeof source == "string") {
 
             /* Load from stream
@@ -172,6 +165,14 @@ var SceneJS_geometryModule = new (function() {
                         callback(self._createGeometry(resource, data));
                     });
         } else {
+
+            if (resource) {  // Attempt to reuse a geo resource
+                var geo = currentGeos.items[resource];
+                if (geo) {
+                    geo._resourceCount++;
+                    return { canvasId: canvas.canvasId, resource: geo.resource, arrays: geo.arrays };
+                }
+            }
 
             /* Arrays specified
              */
@@ -195,8 +196,8 @@ var SceneJS_geometryModule = new (function() {
     this._createGeometry = function(resource, data) {
 
         if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
-            throw SceneJS._errorModule.fatalError(
-                    SceneJS.errors.NODE_CONFIG_EXPECTED, 
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.NODE_CONFIG_EXPECTED,
                     "SceneJS.geometry node property expected : primitive");
         }
         var context = canvas.context;
@@ -248,7 +249,6 @@ var SceneJS_geometryModule = new (function() {
             var geo = {
                 fixed : true, // TODO: support dynamic geometry
                 primitive: primitive,
-                resource: resource,
                 canvas : canvas,
                 context : context,
                 vertexBuf : vertexBuf,
@@ -257,16 +257,17 @@ var SceneJS_geometryModule = new (function() {
                 uvBuf: uvBuf,
                 uvBuf2: uvBuf2,
                 colorBuf: colorBuf,
-                arrays: data          // Retain the arrays for geometric ops
+                arrays: data,          // Retain the arrays for geometric ops
+                _resourceCount : 1     // One user of this geo resource so far
             };
 
             if (data.positions) {
                 // geo.boundary = getBoundary(data.positions);
             }
 
-            currentGeos[resource] = geo;
+            geo.resource = resource ? currentGeos.addItem(resource, geo) : currentGeos.addItem(geo);
 
-            return { canvasId: canvas.canvasId, resource: resource, arrays: geo.arrays };
+            return { canvasId: canvas.canvasId, resource: geo.resource, arrays: geo.arrays };
 
         } catch (e) { // Allocation failure - delete whatever buffers got allocated
 
@@ -292,7 +293,7 @@ var SceneJS_geometryModule = new (function() {
         }
     };
 
-      /**
+    /**
      * Destroys exisitng geometry
      */
     this.destroyGeometry = function(handle) {
@@ -300,15 +301,17 @@ var SceneJS_geometryModule = new (function() {
         if (!geos) {  // Canvas must have been destroyed - that's OK, will have destroyed geometry as well
             return;
         }
-        var geo = geos[handle.resource];
+        var geo = geos.items[handle.resource];
         if (!geo) {
             throw "geometry not found: '" + handle.resource + "'";
         }
-        destroyGeometry(geo);
+        if (--geo._resourceCount == 0) {
+            destroyGeometry(geo);
+        }
     };
 
     this.pushGeometry = function(id, handle) {
-        var geo = currentGeos[handle.resource];
+        var geo = currentGeos.items[handle.resource];
 
         if (!geo.vertexBuf) {
 
