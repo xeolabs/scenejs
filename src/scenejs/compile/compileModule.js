@@ -296,6 +296,8 @@ var SceneJS_compileModule = new (function() {
             return true;
         }
 
+        this._nodeCompilationLevels = {};
+
         var compileScene = this._scenes[sceneId];
         if (!compileScene) {
             throw "scene not found";
@@ -380,8 +382,6 @@ var SceneJS_compileModule = new (function() {
             SceneJS_loggingModule.info("-------------------------------------------------------------------");
         }
 
-        this._nodeCompilationLevels = {};
-
         return true;
     };
 
@@ -417,7 +417,7 @@ var SceneJS_compileModule = new (function() {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
                         compileScene.dirtyNodesWithinBranches[instanceNodeId] = true;
-                        this._flagCompilePath(compileScene, SceneJS_nodeMap.items[instanceNodeId]);
+                        this._flagCompilePath(compileScene, SceneJS_sceneNodeMaps.items[instanceNodeId]);
                     }
                 }
             }
@@ -519,7 +519,7 @@ var SceneJS_compileModule = new (function() {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
                         this._nodeAlwaysCompile[instanceNodeId] = true;
-                        this._alwaysCompilePath(SceneJS_nodeMap.items[instanceNodeId]);
+                        this._alwaysCompilePath(SceneJS_sceneNodeMaps.items[instanceNodeId]);
                     }
                 }
             }
