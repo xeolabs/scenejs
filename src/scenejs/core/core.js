@@ -278,7 +278,7 @@ var SceneJS = {
             if (!command) {
                 throw "Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?";
             }
-            command.execute({}, message);
+            command.execute(message);
         };
     })(),
 

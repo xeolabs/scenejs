@@ -57,7 +57,10 @@
 
         /* First of all, ensure nodes for clipbox are inserted
          */
-        if (!rootData._clipbox) {   // No clipbox inserted on target yet
+        if (!(rootData && rootData._clipbox)) {   // No clipbox inserted on target yet
+
+            rootData = rootData || {};
+
             var parentId = node.parent().get("id");
             var id = node.get("id");
 
@@ -227,7 +230,7 @@
             var xmax = ((params.xmax != undefined) ? params.xmax : 1) + (translate.x || 0);
             var ymin = ((params.ymin != undefined) ? params.ymin : -1) + (translate.y || 0);
             var ymax = ((params.ymax != undefined) ? params.ymax : 1) + (translate.y || 0);
-            
+
             var rotate = params.rotate || {};
             var xrot = rotate.x || 0;
             var yrot = rotate.y || 0;

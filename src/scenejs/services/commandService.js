@@ -22,7 +22,7 @@ SceneJS.Services.addService(
                     return commands[commandId];
                 },
 
-                executeCommand : function (ctx, params) {
+                executeCommand : function (params, ctx) {
                     if (!params) {
                         throw "sendMessage param 'message' null or undefined";
                     }
@@ -63,7 +63,7 @@ SceneJS.Services.addService(
             })());
 
     commandService.addCommand("update", {
-        execute: function(ctx, params) {
+        execute: function(params, ctx) {
             var scenes = ctx.scenes || SceneJS_sceneModule.scenes;
             var target = params.target;
             for (var i = 0, len = scenes.length; i < len; i++) {
@@ -105,7 +105,7 @@ SceneJS.Services.addService(
     });
 
     commandService.addCommand("selectScenes", {
-        execute: function(ctx, params) {
+        execute: function(params, ctx) {
             var scenes = params.scenes;
             if (scenes) {
 
@@ -128,7 +128,7 @@ SceneJS.Services.addService(
             var messages = params.messages;
             if (messages) {
                 for (var i = 0; i < messages.length; i++) {
-                    commandService.executeCommand(ctx, messages[i]);
+                    commandService.executeCommand(messages[i], ctx);
                 }
             }
         }
