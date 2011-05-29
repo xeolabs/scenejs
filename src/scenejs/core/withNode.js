@@ -10,7 +10,7 @@ SceneJS._WithNode = function(node) {
     if (!node) {
         throw "withNode param 'node' is null or undefined";
     }
-    this._targetNode = node._compile ? node : SceneJS_nodeMap.items[node];
+    this._targetNode = node._compile ? node : SceneJS_sceneNodeMaps.items[node];
     if (!this._targetNode) {
         throw "withNode node not found: '" + node + "'";
     }

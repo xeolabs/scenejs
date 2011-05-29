@@ -1,114 +1,5 @@
 /**
- * @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs.
- *
- * <h1>Flexible Constructor Signature</h1>
- * <p>Node constructors generally take a static configuration object followed by zero or more child nodes.</p>
- *
- * <p>For many nodes you only need to specify properties where you want to override the node's defaults. Note the
- * optional <b>sid</b> property, which is an optional subidentifier which must be unique within the scope of the
- * parent {@link SceneJS.Node}, and the optional <b>id</b> which must be unique among all nodes:</p>
- * <pre><code>
- * var n1 = new SceneJS.Scale({
- *     id:   "foo",                    // Optional global ID, unique among all nodes
- *     sid:  "bar",                    // Optional subidentifier, unique within scope of parent node
- *     x:    100.0 },                  // Falls back on node's defaults of 1.0 for y and z
- *
- *         new SceneJS.Geometry( ... ) // Child nodes, zero or more
- * );
- * </code></pre>
- *
- * <h2>No configuration</h2>
- * <p>For many node types you can omit configuration altogether. This node falls back on defaults for all configs:</p>
- * <pre><code>
- * var n4 = new SceneJS.Scale(         // Scales by defaults of 1.0 on X, Y and Z axis
- *     new SceneJS.Geometry( ... )     // Here's a child node
- *             );
- * </code></pre>
- *
- * <h1>Node Type ID</h1>
- * <p>Every node type, (ie. subtypes of {@link SceneJS.Node}, has a SceneJS type ID, which may be got with {@link #getType}.
- * This is the list of all valid xtypes:</p>
- *
- * <table>
- * <tr><td>type</td><td>Class</td></tr>
- * <tr><td>----</td><td>-----</td></tr>
- * <tr><td>camera</td><td>{@link SceneJS.Camera}</td></tr>
- * <tr><td>cube</td><td>{@link SceneJS.Cube}</td></tr>
- * <tr><td>fog</td><td>{@link SceneJS.Fog}</td></tr>
- * <tr><td>geometry</td><td>{@link SceneJS.Geometry}</td></tr>
- * <tr><td>instance</td><td>{@link SceneJS.Instance}</td></tr>
- * <tr><td>library</td><td>{@link SceneJS.Library}</td></tr>
- * <tr><td>lights</td><td>{@link SceneJS.Lights}</td></tr>
- * <tr><td>locality</td><td>{@link SceneJS.Locality}</td></tr>
- * <tr><td>lookat</td><td>{@link SceneJS.LookAt}</td></tr>
- * <tr><td>material</td><td>{@link SceneJS.Material}</td></tr>
- * <tr><td>matrix</td><td>{@link SceneJS.Matrix}</td></tr>
- * <tr><td>node</td><td>{@link SceneJS.Node}</td></tr>
- * <tr><td>perspective</td><td>{@link SceneJS.Perspective}</td></tr>
- * <tr><td>renderer</td><td>{@link SceneJS.Renderer}</td></tr>
- * <tr><td>rotate</td><td>{@link SceneJS.Rotate}</td></tr>
- * <tr><td>scale</td><td>{@link SceneJS.Scale}</td></tr>
- * <tr><td>scene</td><td>{@link SceneJS.Scene}</td></tr>
- * <tr><td>interpolator</td><td>{@link SceneJS.Interpolator}</td></tr>
- * <tr><td>selector</td><td>{@link SceneJS.Selector}</td></tr>
- * <tr><td>sphere</td><td>{@link SceneJS.Sphere}</td></tr>
- * <tr><td>stationary</td><td>{@link SceneJS.Stationary}</td></tr>
- * <tr><td>symbol</td><td>{@link SceneJS.Symbol}</td></tr>
- * <tr><td>teapot</td><td>{@link SceneJS.Teapot}</td></tr>
- * <tr><td>text</td><td>{@link SceneJS.Text}</td></tr>
- * <tr><td>texture</td><td>{@link SceneJS.Texture}</td></tr>
- * <tr><td>translate</td><td>{@link SceneJS.Translate}</td></tr>
- * <tr><td>socket</td><td>{@link SceneJS.Socket}</td></tr>
- * </table>
- *
- * <h2>Events</h2>
- * <p>You can register listeners to handle events fired by each node type. They can be registered either through the
- * constructor on a static config object, or at any time on a node instance through its {@link #addListener} method.</p>
- * <p><b>Registering listeners on configuration</b></p>
- * <p>The example below creates a {@link SceneJS.Instance} node, with a "state-changed" listener registered through its constructor.
- * To specify event-handling options, specify an object containing the handler function and your selected options. When no options
- * are required, just specify the function.
- * <pre><code>
- * var myLoad = new SceneJS.Instance({
- *
- *                  target: "foo",               // Node to instantiate
- *
- *                  listeners: {
- *                        "state-changed" : {
- *                                fn: function(event) {
- *                                       alert("Node " + this.getType() + " has changed state to " + event.params.newState);
- *                                    },
- *                                options: {
- *                                     // Whatever event-handling options are supported (none yet as of V0.7.7)
- *                                }
- *                         },
- *
- *                         // You can specify just the listener's function
- *                         // when there are no options to specify
- *
- *                         "rendering" : function(event) {
- *                                       alert("Node " + this.getType() + " is rendering");
- *                                    }
- *                  }
- *             }
- *        );
- * </code></pre>
- * <p><b>Registering and de-registering listeners on node instances</b></p>
- * <p>This example registers a "state-changed" listener on an existing instance of the node, then removes it again:</p>
- * <pre><code>
- * var handler = function(params) {
- *                  alert("Node " + this.getType() + " has changed state to " + this.getState());
- *              };
- *
- * myLoad.addListener("state-changed", handler);
- *
- * myLoad.removeListener("state-changed", handler);
- * </code></pre>
- *
- * @constructor
- * Create a new SceneJS.Node
- * @param {Object} [cfg] Static configuration object
- * @param {SceneJS.node, ...} arguments Zero or more child nodes
+ * @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs
  */
 SceneJS.Node = function(cfg, scene) {
 
@@ -158,15 +49,15 @@ SceneJS.Node = function(cfg, scene) {
     /* Deregister default ID
      */
     if (this._attr.id) {
-     //   SceneJS_nodeMap.removeItem(this._attr.id);
+        //   SceneJS_sceneNodeMaps.removeItem(this._attr.id);
     }
 
     /* Register again by whatever ID we now have
      */
-    if (this._attr.id){
-        SceneJS_nodeMap.addItem(this._attr.id,this);
-    } else{
-        this._attr.id = SceneJS_nodeMap.addItem(this);
+    if (this._attr.id) {
+        SceneJS_sceneNodeMaps.addItem(this._attr.id, this);
+    } else {
+        this._attr.id = SceneJS_sceneNodeMaps.addItem(this);
     }
 
     if (cfg && this._init) {
@@ -310,11 +201,11 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
      * scene nodes during the picking pass
      *-----------------------------------------------------------------------*/
 
-    if (this._listeners["rendering"]) {         // DEPRECATED
-        this._fireEvent("rendering", { });
+    if (this._listeners["compiling"]) {         // DEPRECATED
+        this._fireEvent("compiling", { });
     }
-    if (this._listeners["pre-rendering"]) {
-        this._fireEvent("pre-rendering", { });
+    if (this._listeners["pre-compiling"]) {
+        this._fireEvent("pre-compiling", { });
     }
 
     /* As scene is traversed, SceneJS_loadStatusModule will track the counts
@@ -339,9 +230,8 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
         this._fireEvent("loading-status", SceneJS_loadStatusModule.diffStatus(loadStatusSnapshot));
     }
 
-
-    if (this._listeners["post-rendered"]) {
-        this._fireEvent("post-rendered", { });
+    if (this._listeners["post-compiled"]) {
+        this._fireEvent("post-compiled", { });
     }
 
     /* Flag this node as no longer rendering - render-time queries are now illegal on this node
@@ -561,7 +451,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
     }
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = SceneJS_nodeMap.items[node];
+            var gotNode = SceneJS_sceneNodeMaps.items[node];
             if (!gotNode) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.NODE_NOT_FOUND,
@@ -626,7 +516,7 @@ SceneJS.Node.prototype.addNode = function(node) {
     }
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = SceneJS_nodeMap.items[node];
+            var gotNode = SceneJS_sceneNodeMaps.items[node];
             if (!gotNode) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -802,24 +692,33 @@ SceneJS.Node.prototype.getEnabled = function() {
 SceneJS.Node.prototype.destroy = function() {
     if (!this._destroyed) {
         this._destroyed = true;
-        SceneJS._scheduleNodeDestroy(this);
+        this._scheduleNodeDestroy(this);
     }
     return this;
 };
 
-SceneJS.Node.prototype._doDestroy = function() {
-    if (this._destroy) {
-        this._destroy();
-    }
+/** Schedule the destruction of this node
+ */
+SceneJS.Node.prototype._scheduleNodeDestroy = function(node) {
     if (this._parent) {
         this._parent.removeNode(this);
     }
-    SceneJS_nodeMap.removeItem(this._attr.id);
+    SceneJS_sceneNodeMaps.removeItem(this._attr.id);
     if (this._children.length > 0) {
         var children = this._children.slice(0);      // destruction will modify this._children
         for (var i = 0; i < children.length; i++) {
-            children[i]._doDestroy();
+            children[i]._scheduleNodeDestroy();
         }
+    }
+    SceneJS._destroyedNodes.push(this);
+};
+
+/**
+ * Performs the actual destruction of this node, calling the node's optional template destroy method
+ */
+SceneJS.Node.prototype._doDestroy = function() {
+    if (this._destroy) {
+        this._destroy();
     }
     return this;
 };

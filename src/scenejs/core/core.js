@@ -8,7 +8,7 @@ var SceneJS_Map = function() {
     this.addItem = function() {
         var item;
         if (arguments.length == 2) {
-            var id = arguments[0];          
+            var id = arguments[0];
             item = arguments[1];
             if (this.items[id]) { // Won't happen if given ID is string
                 throw SceneJS_errorModule.fatalError(SceneJS.errors.ID_CLASH, "ID clash: '" + id + "'");
@@ -32,7 +32,7 @@ var SceneJS_Map = function() {
     };
 };
 
-var SceneJS_nodeMap = new SceneJS_Map();
+var SceneJS_sceneNodeMaps = new SceneJS_Map();
 
 /**
  * @class SceneJS
@@ -90,6 +90,16 @@ var SceneJS = {
         };
     },
 
+    createScene : function(json) {
+        if (!json) {
+            throw "createScene param 'json' is null or undefined";
+        }
+        json.type = "scene";
+        var newNode = this._parseNodeJSON(json, undefined); // Scene references itself as the owner scene
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
+        return SceneJS.withNode(newNode);
+    },
+
     /**
      * Factory function to create a scene (sub)graph from JSON
      * @param json
@@ -110,7 +120,7 @@ var SceneJS = {
                         SceneJS.errors.NODE_NOT_FOUND,
                         "createNode 'parent' cannot equal 'id'");
             }
-            var parent = SceneJS_nodeMap.items[json.parent];
+            var parent = SceneJS_sceneNodeMaps.items[json.parent];
             if (!parent) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.NODE_NOT_FOUND,
@@ -190,7 +200,7 @@ var SceneJS = {
         if (typeof id != "string") {
             throw "nodeExists param 'id' not a string";
         }
-        var node = SceneJS_nodeMap.items[id];
+        var node = SceneJS_sceneNodeMaps.items[id];
         return (node != undefined && node != null);
     },
 
@@ -206,13 +216,6 @@ var SceneJS = {
             }
         }
         return cfg2;
-    },
-
-    /** Schedule the destruction of a node
-     * @private
-     */
-    _scheduleNodeDestroy : function(node) {
-        this._destroyedNodes.push(node);
     },
 
     /** Nodes that are scheduled to be destroyed. When a node is destroyed it is added here, then at the end of each
@@ -275,7 +278,7 @@ var SceneJS = {
             if (!command) {
                 throw "Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?";
             }
-            command.execute(message);
+            command.execute({}, message);
         };
     })(),
 

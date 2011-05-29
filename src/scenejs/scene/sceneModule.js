@@ -5,16 +5,16 @@
 var SceneJS_sceneModule = new (function() {
 
     var initialised = false; // True as soon as first scene registered
-    var scenes = {};
-    var nScenes = 0;
-    var activeSceneId;
+    this.scenes = {};
+    this.nScenes = 0;
+    this.activeSceneId = null;
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
-                scenes = {};
-                nScenes = 0;
-                activeSceneId = null;
+                this.scenes = {};
+                this.nScenes = 0;
+                this.activeSceneId = null;
             });
 
     /** Locates element in DOM to write logging to
@@ -122,7 +122,6 @@ var SceneJS_sceneModule = new (function() {
                             + canvasId
                             + '\' failed to provide a supported WebGL context');
         }
-     
         context.clearColor(0.0, 0.0, 0.0, 1.0);
         context.clearDepth(1.0);             
         context.enable(context.DEPTH_TEST);
@@ -136,9 +135,6 @@ var SceneJS_sceneModule = new (function() {
         };
     }
 
-    /** Registers a scene, finds it's canvas, and returns the ID under which the scene is registered
-     * @private
-     */
     this.createScene = function(scene, params) {
         if (!initialised) {
             SceneJS_loggingModule.info("SceneJS V" + SceneJS.VERSION + " initialised");
@@ -147,30 +143,30 @@ var SceneJS_sceneModule = new (function() {
         var canvas = findCanvas(params.canvasId); // canvasId can be null
         var loggingElement = findLoggingElement(params.loggingElementId); // loggingElementId can be null
         var sceneId = params.sceneId;
-        scenes[sceneId] = {
+        var nodeMap = new SceneJS_Map();
+        this.scenes[sceneId] = {
             sceneId: sceneId,
             scene:scene,
             canvas: canvas,
-            loggingElement: loggingElement
+            loggingElement: loggingElement,
+            nodeMap: nodeMap
         };
-        nScenes++;
+        nodeMap.addItem(sceneId, scene.scene);
+        this.nScenes++;
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_CREATED, { sceneId : sceneId, canvas: canvas });
         SceneJS_loggingModule.info("Scene defined: " + sceneId);
         SceneJS_compileModule.nodeUpdated(scene, "created");
     };
 
-    /** Deregisters scene
-     * @private
-     */
     this.destroyScene = function(sceneId) {
-        scenes[sceneId] = null;
-        nScenes--;
+        this.scenes[sceneId] = null;
+        this.nScenes--;
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DESTROYED, {sceneId : sceneId });
-        if (activeSceneId == sceneId) {
-            activeSceneId = null;
+        if (this.activeSceneId == sceneId) {
+            this.activeSceneId = null;
         }
         SceneJS_loggingModule.info("Scene destroyed: " + sceneId);
-        if (nScenes == 0) {
+        if (this.nScenes == 0) {
             SceneJS_loggingModule.info("SceneJS reset");
             SceneJS_eventModule.fireEvent(SceneJS_eventModule.RESET);
 
@@ -181,11 +177,11 @@ var SceneJS_sceneModule = new (function() {
      * @private
      */
     this.activateScene = function(sceneId) {
-        var scene = scenes[sceneId];
+        var scene = this.scenes[sceneId];
         if (!scene) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }
-        activeSceneId = sceneId;
+        this.activeSceneId = sceneId;
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_COMPILING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.CANVAS_ACTIVATED, scene.canvas);
@@ -197,7 +193,7 @@ var SceneJS_sceneModule = new (function() {
      * @param sceneId
      */
     this.redrawScene = function(sceneId) {
-        var scene = scenes[sceneId];
+        var scene = this.scenes[sceneId];
         if (!scene) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }
@@ -210,7 +206,7 @@ var SceneJS_sceneModule = new (function() {
      * @private
      */
     this.getSceneCanvas = function(sceneId) {
-        var scene = scenes[sceneId];
+        var scene = this.scenes[sceneId];
         if (!scene) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }
@@ -221,7 +217,7 @@ var SceneJS_sceneModule = new (function() {
      * @private
      */
     this.getSceneContext = function(sceneId) {
-        var scene = scenes[sceneId];
+        var scene = this.scenes[sceneId];
         if (!scene) {
             throw SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
         }
@@ -233,8 +229,8 @@ var SceneJS_sceneModule = new (function() {
      */
     this.getAllScenes = function() {
         var list = [];
-        for (var id in scenes) {
-            var scene = scenes[id];
+        for (var id in this.scenes) {
+            var scene = this.scenes[id];
             if (scene) {
                 list.push(scene.scene);
             }
@@ -246,19 +242,19 @@ var SceneJS_sceneModule = new (function() {
      * @private
      */
     this.getScene = function(sceneId) {
-        return scenes[sceneId].scene;
+        return this.scenes[sceneId].scene;
     };
 
     /** Deactivates the currently active scene and reaps destroyed and timed out processes
      * @private
      */
     this.deactivateScene = function() {
-        if (!activeSceneId) {
+        if (!this.activeSceneId) {
             throw "Internal error: no scene active";
         }
-        var sceneId = activeSceneId;
-        activeSceneId = null;
-        var scene = scenes[sceneId];
+        var sceneId = this.activeSceneId;
+        this.activeSceneId = null;
+        var scene = this.scenes[sceneId];
         if (!scene) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
         }

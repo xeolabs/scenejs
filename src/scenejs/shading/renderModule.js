@@ -1,3 +1,4 @@
+
 /**
  * This module encapsulates the rendering backend behind an event API.
  *

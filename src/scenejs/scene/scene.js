@@ -1,151 +1,6 @@
 /**
  *@class Root node of a SceneJS scene graph.
- *
- * <p>This is entry and exit point for traversal of a scene graph, providing the means to inject configs, pick
- * {@link SceneJS.Geometry} and render frames either singularly or in a continuous loop.</p>
- * <p><b>Binding to a canvas</b></p>
- * <p>The Scene node can be configured with a <b>canvasId</b> property to specify the ID of a WebGL compatible Canvas
- * element for the scene to render to. When that is omitted, the node will look for one with the default ID of
- * "_scenejs-default-canvas".</p>
- * <p><b>Usage Example:</b></p><p>Below is a minimal scene graph. To render the scene, SceneJS will traverse its nodes
- * in depth-first order. Each node will set some scene state on entry, then un-set it again before exit. In this graph,
- * the {@link SceneJS.Scene} node binds to a WebGL Canvas element, a {@link SceneJS.LookAt} defines the viewoint,
- * a {@link SceneJS.Camera} defines the projection, a {@link SceneJS.Lights} defines a light source,
- * a {@link SceneJS.Material} defines the current material properties, {@link SceneJS.Rotate} nodes orient the modeling
- * coordinate space, then a {@link SceneJS.Cube} defines our cube.</p>
- * <pre><code>
- *
- * var myScene = new SceneJS.Scene({
- *     canvasId: 'theCanvas'
- *   },
- *
- *   new SceneJS.LookAt({
- *       eye  : { x: -1.0, y: 0.0, z: 15 },
- *       look : { x: -1.0, y: 0, z: 0 },
- *       up   : { y: 1.0 }
- *     },
- *
- *     new SceneJS.Camera({
- *         optics: {
- *           type: "perspective",
- *           fovy   : 55.0,
- *           aspect : 1.0,
- *           near   : 0.10,
- *           far    : 1000.0
- *         }
- *       },
- *
- *       new SceneJS.Light({
- *               type:  "dir",
- *               color: { r: 1.0, g: 1.0, b: 1.0 },
- *               dir:   { x: 1.0, y: -1.0, z: 1.0 }
- *             }),
- *
- *       new SceneJS.Light({
- *               type:  "dir",
- *               color: { r: 1.0, g: 1.0, b: 1.0 },
- *               dir:   { x: -1.0, y: -1.0, z: -3.0 }
- *             }),
- *
- *       new SceneJS.Material({
- *               baseColor:      { r: 0.9, g: 0.2, b: 0.2 },
- *               specularColor:  { r: 0.9, g: 0.9, b: 0.2 },
- *               emit:           0.0,
- *               specular:       0.9,
- *               shine:          6.0
- *            },
- *
- *            // We're going to demonstrate two techniques for updating
- *            // the angles of these rotate nodes. One technique requires
- *            // that they have scoped identifiers (SID)s, while the other
- *            // requires them to have globally-unique IDs.
- *
- *            new SceneJS.Rotate({
- *                     id:   "foo-id",                // Optional global ID
- *                     sid:  "foo-sid",               // Optional scoped identifier
- *                     angle: 0.0, y : 1.0
- *                 },
- *
- *                 new SceneJS.Rotate({
- *                          id:  "bar-id",            // Optional global ID
- *                         sid: "bar-sid",           // Optional scoped identifier
- *                          angle: 0.0, x : 1.0
- *                     },
- *
- *                     new SceneJS.Cube()
- *                   )
- *                )
- *              )
- *           )
- *        )
- *     );
- * </pre></code>
- *
- * <b><p>Injecting Data into the Scene</p></b>
- * <p>Now, to inject some data into those rotate nodes, we can pass a configuration map into the scene graph,
- *  which as traversal descends into the scene, locates our rotate node by their SIDs and stuffs some angles into
- * their appropriate setter methods:</p>
- * <code><pre>
- *   myScene.setConfigs({
- *           "foo-sid": {
- *               angle: 315,       // Maps to SceneJS.Rotate#setAngle
- *               "#bar-sid": {
- *                   angle:20
- *               }
- *           });
- *
- *   myScene.render();
- * </pre></code>
- *
- * <p>Since gave those rotate nodes <b>ID</b>s, then we could instead find them directly and set their angles:
- * <pre><code>
- * SceneJS.getNode("foo-id").setAngle(315);
- * SceneJS.getNode("bar-id").setAngle(20);
- *
- * myScene.render();
- * </pre></code>
- *
- * <p>We can also pass config objects directly to nodes:
- * <pre><code>
- * SceneJS.getNode("foo-id").configure({ angle: 315 });
- * </pre></code>
- *
- * <p>..or pass them in "configure" events:
- * <pre><code>
- * SceneJS.fireEvent("configure", "foo-id", { angle: 315 });
- * </pre></code>
- *
- *
- * <h2>Rendering in a Loop</h2>
- * <p>If you wanted to animate the rotation within the scene example above, then instead of rendering just a single frame
- * you could start a rendering loop on the scene, as shown below:</p>
- * <pre><code>
- *    var yaw = 0.0;
- *    var pitch = 20.0
- *
- *    myScene.start({
- *
- *        // Idle function called before each render traversal
- *
- *        idleFunc: function(scene) {
- *             scene.setConfigs({
- *                 "foo-sid": {
- *                     angle: yaw,
- *                     "#bar-sid": {
- *                         angle: pitch
- *                     }
- *                 });
- *
- *             yaw += 2.0;
- *             if (yaw == 360) {
- *                 scene.stop();
- *             }
- *        },
- *
- *        fps: 20
- * });
- * </code></pre>
- * @extends SceneJS.Node
+ *@extends SceneJS.Node
  */
 SceneJS.Scene = SceneJS.createNodeType("scene");
 
@@ -189,18 +44,14 @@ SceneJS.Scene.prototype.getZBufferDepth = function() {
 };
 
 /**
- Sets which layers are included in the next render of this scene, along with their priorities (default priority is 0)
- @param {{String:Number}} layers - render priority for each layer defined in scene
- @since Version 0.7.9
+ Sets which layers are included in the each render of the scene, along with their priorities (default priority is 0)
  */
 SceneJS.Scene.prototype.setLayers = function(layers) {
     this._layers = layers || {};
 };
 
 /**
- Gets which layers are included in the next render of this scene, along with their priorities (default priority is 0)
- @returns {{String:Number}} layers - render priority for each layer defined in scene
- @since Version 0.7.9
+ Gets which layers are included in the each render of this scene, along with their priorities (default priority is 0)
  */
 SceneJS.Scene.prototype.getLayers = function() {
     return this._layers;
@@ -218,61 +69,7 @@ window.requestAnimFrame = (function() {
 })();
 
 /**
- * Starts the scene rendering repeatedly in a loop. After this {@link #isRunning} will return true, and you can then stop it again
- * with {@link #stop}. You can specify an idleFunc that will be called within each iteration before the scene graph is
- * traversed for the next frame. You can also specify the desired number of frames per second to render, which SceneJS
- * will attempt to achieve.
- *
- * To render just one frame at a time, use {@link #render}.
- *
- * <p><b>Usage Example: Basic Loop</b></p><p>Here we are rendering a scene in a loop, at each frame feeding some data into it
- * (see main {@link SceneJS.Scene} comment for more info on that), then stopping the loop after ten frames are rendered:</p>
- *
- * <pre><code>
- * var n = 0;
- * myScene.start({
- *     idleFunc: function(scene) {
- *
- *         scene.setData({ someData: 5, moreData: 10 };
- *
- *         n++;
- *         if (n == 100) {
- *             scene.stop();
- *         }
- *     },
- *     fps: 20
- * });
- * </code></pre>
- *
- *
- * <p><b>Usage Example: Picking</b></p><p>The snippet below shows how to do picking via the idle function, where we
- * retain the mouse click event in some variables which are collected when the idleFunc is next called. The idleFunc
- * then puts the scene into picking mode for the next traversal. Then any {@link SceneJS.Geometry} intersecting the
- * canvas-space coordinates during that traversal will fire a "picked" event to be observed by "picked" listeners at
- * higher nodes (see examples, wiki etc. for the finer details of picking). After the traversal, the scene will be back
- * "rendering" mode again.</p>
- *
- * <pre><code>
- * var clicked = false;
- * var clickX, clickY;
- *
- * canvas.addEventListener('mousedown',
- *     function (event) {
- *         clicked = true;
- *         clickX = event.clientX;
- *         clickY = event.clientY;
- * }, false);
- *
- * myScene.start({
- *     idleFunc: function(scene) {
- *         if (clicked) {
- *             scene.pick(clickX, clickY);
- *             clicked = false;
- *         }
- *     }
- * });
- * </code></pre>
- * @param cfg
+ * Starts the scene rendering repeatedly in a loop.
  */
 SceneJS.Scene.prototype.start = function(cfg) {
     if (this._destroyed) {
@@ -394,16 +191,7 @@ SceneJS.Scene.prototype.render = function() {
 
 
 /**
- * Picks whatever {@link SceneJS.Geometry} will be rendered at the given canvas coordinates.
- *
- * When a node is picked (hit), then all nodes on the traversal path to that node that have "picked" listeners will
- * receive a "picked" event as they are rendered (see examples and wiki for more info).
- *
- * You can attach "notpicked" listeners to the {@link SceneJS.Scene} node to catch when
- * nothing is picked.
- *
- * @param canvasX Canvas X-coordinate
- * @param canvasY Canvas Y-coordinate
+ * Picks whatever geometry will be rendered at the given canvas coordinates.
  */
 SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
     if (this._destroyed) {
@@ -438,119 +226,8 @@ SceneJS.Scene.prototype._compile = function() {
     SceneJS_sceneModule.deactivateScene();
 };
 
-
 /**
- *
- */
-(function() {
-    SceneJS.Scene.prototype.__queue = new Array();
-    SceneJS.Scene.prototype.__callbackStack = [];
-
-    SceneJS.Scene.prototype._compileBranch = function(root, last, instanceChildren) {
-
-        this.__queue.push({
-            node: root,
-            last: last,
-            fringe: last
-        });
-
-        this.__callbackStack = [];
-
-        while (this.__queue.length > 0) {
-
-            var p = this.__queue.pop();
-
-            if (!p.preCompiled) {  // Node not preCompiled
-
-                /*----------------------------------------------------------------
-                 * Pre-visit
-                 *--------------------------------------------------------------*/
-
-                SceneJS_pickingModule.preVisitNode(p.node);
-
-                if (SceneJS_compileModule.preVisitNode(p.node)) {
-
-                    if (SceneJS_flagsModule.preVisitNode(p.node)) {
-
-                        if (p.node._listeners["pre-rendered"]) {
-                            p.node._fireEvent("pre-rendered", { });
-                        }
-
-                        var result;
-
-                        if (p.node._preCompile) {
-                            result = p.node._preCompile({});
-                        } else {
-                            result = null;
-                        }
-
-                        p.preCompiled = true;
-
-                        this.__queue.push(p);
-
-                        if (result && result.target) {
-
-                            this.__queue.push({
-                                node: result.target,
-                                fringe: true,
-                                last: true
-                            });
-
-                            result = null;
-
-                            this.__callbackStack.push(p.node._children);
-
-                        } else {
-
-                            var i, children = p.node._children;
-
-                            if (children.length == 0 && p.fringe) {
-                                if (this.__callbackStack.length > 0) {
-                                    children = this.__callbackStack.pop();
-                                }
-                            }
-
-                            for (i = children.length - 1; i >= 0; i--) {
-                                last = (i == children.length - 1);
-                                this.__queue.push({
-                                    node: children[i],
-                                    fringe: p.last && last,
-                                    last: last
-                                });
-                            }
-                        }
-                    }
-                }
-
-            } else {                        // Node was preCompiled
-
-                /*----------------------------------------------------------------
-                 * Post-visit
-                 *--------------------------------------------------------------*/
-
-                if (p.node._listeners["post-rendering"]) {
-                    p.node._fireEvent("post-rendering", { });
-                }
-
-                if (p.node._postCompile) {
-                    p.node._postCompile({});
-                }
-
-                SceneJS_flagsModule.postVisitNode(p.node); // Must postVisit even if preVisit returned false
-                SceneJS_compileModule.postVisitNode(p.node);
-                SceneJS_pickingModule.postVisitNode(p.node);
-            }
-        }
-    };
-
-})();
-
-/**
- * Returns count of active processes. A non-zero count indicates that the scene should be rendered
- * at least one more time to allow asynchronous processes to complete - since processes are
- * queried like this between renders (ie. in the idle period), to avoid confusion processes are killed
- * during renders, not between, in order to ensure that this count doesnt change unexpectedly and create
- * a race condition.
+ * Returns count of active processes.
  */
 SceneJS.Scene.prototype.getNumProcesses = function() {
     return this._created ? SceneJS_processModule.getNumProcesses(this._attr.id) : 0;
@@ -586,6 +263,32 @@ SceneJS.Scene.prototype.stop = function() {
             window.clearInterval(this._pInterval);
         }
     }
+};
+
+/** Determines if node exists in this scene
+ */
+SceneJS.Scene.prototype.containsNode = function(nodeId) {
+    if (!this._created) {
+        return null;
+    }
+    var scene = SceneJS_sceneModule.scenes[this._attr.id];
+    if (!scene) {
+        return false;
+    }
+    var node = scene.nodeMap.items[nodeId]
+    return node != null && node != undefined;
+};
+
+/** Finds a node within this scene
+ */
+SceneJS.Scene.prototype.findNode = function(nodeId) {
+    if (!this._created) {
+        throw SceneJS_errorModule.fatalError(
+                SceneJS.errors.NODE_ILLEGAL_STATE,
+                "Scene has been destroyed");
+    }
+    var scene = SceneJS_sceneModule.scenes[this._attr.id];
+    return scene.nodeMap.items[nodeId];
 };
 
 /** Total SceneJS reset - destroys all scenes and cached resources.

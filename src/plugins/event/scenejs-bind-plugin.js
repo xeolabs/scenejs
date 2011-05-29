@@ -196,7 +196,7 @@
                                     nodeId: params.nodeId
                                 };
                             }
-                            commandService.executeCommand(binding.message);
+                            commandService.executeCommand({}, binding.message);
                             //                            if (binding.trigger.once) {
                             //                                nodeBindings[params.nodeId] = undefined;
                             //                                bindings[binding.bindId] = undefined;
