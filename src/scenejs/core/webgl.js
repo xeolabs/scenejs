@@ -528,22 +528,45 @@ var SceneJS_webgl_ArrayBuffer;
         this.numItems = numItems;
         this.itemSize = itemSize;
 
-
-        /** @private */
         this.bind = function() {
             context.bindBuffer(type, this.handle);
         };
 
-        /** @private */
         this.unbind = function() {
             context.bindBuffer(type, null);
         };
 
-        /** @private */
         this.destroy = function() {
             context.deleteBuffer(this.handle);
             bufMap.removeItem(this.id);
         };
     };
 })();
+
+
+var SceneJS_webgl_VertexBuffer;
+(function() {
+    var bufMap = new SceneJS_Map();
+    SceneJS_webgl_VertexBuffer = function(context, values) {
+        this.handle = context.createBuffer();
+        this.id = bufMap.addItem(this);
+        context.bindBuffer(context.ARRAY_BUFFER, this.handle);
+        context.bufferData(context.ARRAY_BUFFER, new Float32Array(values), context.STATIC_DRAW);        
+        context.bindBuffer(context.ARRAY_BUFFER, null);
+
+        this.bind = function() {
+            context.bindBuffer(context.ARRAY_BUFFER, this.handle);
+        };
+
+        this.unbind = function() {
+            context.bindBuffer(context.ARRAY_BUFFER, null);
+        };
+
+        this.destroy = function() {
+            context.deleteBuffer(this.handle);
+            bufMap.removeItem(this.id);
+        };
+    };
+})();
+
 

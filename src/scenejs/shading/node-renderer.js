@@ -259,10 +259,10 @@ var SceneJS_NodeRenderer = function(cfg) {
                 gl.disableVertexAttribArray(k);
             }
 
-            var vertexBufBound = false;
-            var normalBufBound = false;
-            var uvBufBound = false;
-            var uvBuf2Bound = false;
+            var morphVertexBufBound = false;
+            var morphNormalBufBound = false;
+            var morphUVBufBound = false;
+            var morphUV2BufBound = false;
 
             var morph;
             var target1, target2;
@@ -282,25 +282,25 @@ var SceneJS_NodeRenderer = function(cfg) {
                 if (target1.vertexBuf) {
                     program.bindFloatArrayBuffer("aVertex", target1.vertexBuf);
                     program.bindFloatArrayBuffer("aMorphVertex", target2.vertexBuf);
-                    vertexBufBound = true;
+                    morphVertexBufBound = true;
                 }
 
                 if (target1.normalBuf) {
                     program.bindFloatArrayBuffer("aNormal", target1.normalBuf);
                     program.bindFloatArrayBuffer("aMorphNormal", target2.normalBuf);
-                    normalBufBound = true;
+                    morphNormalBufBound = true;
                 }
 
                 if (target1.uvBuf) {
                     program.bindFloatArrayBuffer("aUVCoord", target1.uvBuf);
                     program.bindFloatArrayBuffer("aMorphUVCoord", target2.uvBuf);
-                    uvBufBound = true;
+                    morphUVBufBound = true;
                 }
 
                 if (target1.uvBuf2) {
                     program.bindFloatArrayBuffer("aUVCoord2", target1.uvBuf);
                     program.bindFloatArrayBuffer("aMorphUVCoord2", target2.uvBuf);
-                    uvBuf2Bound = true;
+                    morphUV2BufBound = true;
                 }
 
                 program.setUniform("uMorphFactor", morph.factor);
@@ -313,11 +313,11 @@ var SceneJS_NodeRenderer = function(cfg) {
 
             this._lastGeoStateId = node.geoState._stateId;
 
-            if (!vertexBufBound && geo.vertexBuf) {
+            if (!morphVertexBufBound && geo.vertexBuf) {
                 program.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
             }
 
-            if (!normalBufBound && geo.normalBuf) {
+            if (!morphNormalBufBound && geo.normalBuf) {
                 program.bindFloatArrayBuffer("aNormal", geo.normalBuf);
             }
             // TODO

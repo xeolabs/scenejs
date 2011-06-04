@@ -211,9 +211,32 @@ var SceneJS_morphGeometryModule = new (function() {
 
             /* Targets specified
              */
-            return this._createMorph(resource, source, options);
+
+            var data = createTypedMorph(source);
+            return this._createMorph(resource, data, options);
         }
     };
+
+    function createTypedMorph(data) {
+        var typedMorph = {
+            keys: data.keys,
+            targets: []
+        };
+        for (var i = 0, len = data.targets.length; i < len; i++) {
+            typedMorph.targets.push(createTypedArrays(data.targets[i]));
+        }
+        return typedMorph;
+    }
+
+    function createTypedArrays(data) {
+        return {
+            positions: data.positions ? new Float32Array(data.positions) : undefined,
+            normals: data.normals ? new Float32Array(data.normals) : undefined,
+            uv: data.uv ? new Float32Array(data.uv) : undefined,
+            uv2: data.uv2 ? new Float32Array(data.uv2) : undefined
+        };
+    }
+
 
     this._createMorph = function(resource, data, options) {
 
@@ -231,32 +254,27 @@ var SceneJS_morphGeometryModule = new (function() {
             var usage = context.STATIC_DRAW;
 
             var target;
-            var typedArrays;
             var newTarget;
 
             for (var i = 0, len = data.targets.length; i < len; i++) {
                 target = data.targets[i];
-
                 newTarget = {};
                 morph.targets.push(newTarget);  // We'll iterate this to destroy targets when we recover from error
-
-                typedArrays = createTypedArrays(target);
-
                 if (target.positions && target.positions.length > 0) {
                     newTarget.vertexBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
-                            new Float32Array(target.positions), target.positions.length, 3, usage);
+                            target.positions, target.positions.length, 3, usage);
                 }
                 if (target.normals && target.normals.length > 0) {
                     newTarget.normalBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
-                            new Float32Array(target.normals), target.normals.length, 3, usage);
+                            target.normals, target.normals.length, 3, usage);
                 }
                 if (target.uv && target.uv.length > 0) {
                     newTarget.uvBuf = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
-                            new Float32Array(target.uv), target.uv.length, 2, usage);
+                            target.uv, target.uv.length, 2, usage);
                 }
                 if (target.uv2 && target.uv2.length > 0) {
                     newTarget.uvBuf2 = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
-                            new Float32Array(target.uv2), target.uv2.length, 2, usage);
+                           target.uv2, target.uv2.length, 2, usage);
                 }
             }
 
@@ -287,14 +305,6 @@ var SceneJS_morphGeometryModule = new (function() {
         }
     };
 
-    function createTypedArrays(data) {
-        return {
-            positions: data.positions ? new Float32Array(data.positions) : undefined,
-            normals: data.normals ? new Float32Array(data.normals) : undefined,
-            uv: data.uv ? new Float32Array(data.uv) : undefined,
-            uv2: data.uv2 ? new Float32Array(data.uv2) : undefined
-        };
-    }
 
     /**
      * Destroys exisitng morph

@@ -1592,18 +1592,11 @@ var SceneJS_renderModule = new (function() {
         /* Color transformations
          */
         if (colortrans) {
-
             src.push("    if (uColortransMode != 0.0) {");     // Not disabled
-
-            /* Desaturate
-             */
             src.push("        if (uColortransSaturation < 0.0) {");
             src.push("            float intensity = 0.3 * fragColor.r + 0.59 * fragColor.g + 0.11 * fragColor.b;");
             src.push("            fragColor = vec4((intensity * -uColortransSaturation) + fragColor.rgb * (1.0 + uColortransSaturation), 1.0);");
             src.push("        }");
-
-            /* Scale/add
-             */
             src.push("        fragColor = (fragColor * uColortransScale) + uColortransAdd;");
             src.push("    }");
         }
