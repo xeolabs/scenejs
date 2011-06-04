@@ -126,6 +126,10 @@ SceneJS.Scene.prototype.start = function(cfg) {
                     sleeping = true;
                 }
             }
+
+            if (!cfg.requestAnimationFrame) {
+               window.setTimeout(window[fnName], 1000 / 60);
+            }
         };
 
         if (cfg.requestAnimationFrame === true) {
@@ -136,7 +140,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
                 }
             })();
         } else {
-            this._pInterval = setInterval("window['" + fnName + "']()", 1000.0 / (cfg.fps || 60));
+            window[fnName]();
         }
 
         this._startCfg = cfg;
