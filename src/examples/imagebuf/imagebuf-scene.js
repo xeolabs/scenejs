@@ -7,7 +7,7 @@
 
 
  */
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -262,6 +262,8 @@ function mouseUp() {
     dragging = false;
 }
 
+var scene = SceneJS.scene("theScene");
+
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
@@ -270,8 +272,8 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * -0.5;
 
-        SceneJS.withNode("cube-yaw").set("angle", yaw);
-        SceneJS.withNode("cube-pitch").set("angle", pitch);
+        scene.findNode("cube-yaw").set("angle", yaw);
+        scene.findNode("cube-pitch").set("angle", pitch);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -286,13 +288,14 @@ canvas.addEventListener('mouseup', mouseUp, true);
 /* Start rendering the scene graph. On each frame, increment the rotation
  * of the teapot.
  */
-SceneJS.withNode("theScene").start({
-    idleFunc: function() {
-        SceneJS.withNode("teapot-yaw").inc("angle", 1);
-        SceneJS.withNode("teapot-pitch").inc("angle", .3);
 
-        SceneJS.withNode("cube-yaw").inc("angle", .1);
-        SceneJS.withNode("cube-pitch").inc("angle", .2);
+scene.start({
+    idleFunc: function() {
+        scene.findNode("teapot-yaw").inc("angle", 1);
+        scene.findNode("teapot-pitch").inc("angle", .3);
+
+        scene.findNode("cube-yaw").inc("angle", .1);
+        scene.findNode("cube-pitch").inc("angle", .2);
     }
 });
 

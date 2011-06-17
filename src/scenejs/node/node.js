@@ -13,6 +13,7 @@ SceneJS.Node = function(cfg, scene) {
 
     if (cfg) {
         this._attr.id = cfg.id;
+        this._attr.nodeType = cfg.type || "node";
         this._attr.layer = cfg.layer;
         this._attr.data = cfg.data;
         this._attr.flags = cfg.flags;
@@ -54,10 +55,12 @@ SceneJS.Node = function(cfg, scene) {
 
     /* Register again by whatever ID we now have
      */
-    if (this._attr.id) {
-        SceneJS_sceneNodeMaps.addItem(this._attr.id, this);
-    } else {
-        this._attr.id = SceneJS_sceneNodeMaps.addItem(this);
+    if (this._scene && this._scene._nodeMap) {
+        if (this._attr.id) {
+            this._scene._nodeMap.addItem(this._attr.id, this);
+        } else {
+            this._attr.id = this._scene._nodeMap.addItem(this);
+        }
     }
 
     if (cfg && this._init) {
@@ -451,7 +454,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
     }
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = SceneJS_sceneNodeMaps.items[node];
+            var gotNode = this._scene._nodeMap.items[node];
             if (!gotNode) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.NODE_NOT_FOUND,
@@ -516,7 +519,7 @@ SceneJS.Node.prototype.addNode = function(node) {
     }
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = SceneJS_sceneNodeMaps.items[node];
+            var gotNode = this._scene._nodeMap.items[node];
             if (!gotNode) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -703,7 +706,7 @@ SceneJS.Node.prototype._scheduleNodeDestroy = function(node) {
     if (this._parent) {
         this._parent.removeNode(this);
     }
-    SceneJS_sceneNodeMaps.removeItem(this._attr.id);
+    this._scene._nodeMap.removeItem(this._attr.id);
     if (this._children.length > 0) {
         var children = this._children.slice(0);      // destruction will modify this._children
         for (var i = 0; i < children.length; i++) {

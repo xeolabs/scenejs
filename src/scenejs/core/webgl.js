@@ -333,7 +333,7 @@ var SceneJS_webgl_Program = function(hash, lastUsed, context, vertexSources, fra
         if (u) {
             u.setValue(value);
         } else {
-            //    logging.warn("Shader uniform load failed - uniform not found in shader : " + name);
+      //      SceneJS_loggingModule.warn("Shader uniform load failed - uniform not found in shader : " + name);
         }
     };
 
@@ -551,7 +551,7 @@ var SceneJS_webgl_VertexBuffer;
         this.handle = context.createBuffer();
         this.id = bufMap.addItem(this);
         context.bindBuffer(context.ARRAY_BUFFER, this.handle);
-        context.bufferData(context.ARRAY_BUFFER, new Float32Array(values), context.STATIC_DRAW);        
+        context.bufferData(context.ARRAY_BUFFER, new Float32Array(values), context.STATIC_DRAW);
         context.bindBuffer(context.ARRAY_BUFFER, null);
 
         this.bind = function() {

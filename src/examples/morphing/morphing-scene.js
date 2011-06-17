@@ -10,7 +10,7 @@
 
  */
 
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -229,10 +229,11 @@ var factor = 0;
  * morph factory on our morphGeometry node
  *--------------------------------------------------------------------*/
 
-SceneJS.withNode("theScene").start({
-    idleFunc: function() {
+var scene = SceneJS.scene("theScene");
 
-        SceneJS.withNode("my-morph").set("factor", factor);
+scene.start({
+    idleFunc: function() {
+        this.findNode("my-morph").set("factor", factor);
         factor += 0.01;
         if (factor > 1) {
             factor = 0;
@@ -260,10 +261,8 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * -0.5;
 
-        SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("pitch").set("angle", pitch);
-
-        SceneJS.withNode("theScene").render();
+        scene.findNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
 
         lastX = event.clientX;
         lastY = event.clientY;

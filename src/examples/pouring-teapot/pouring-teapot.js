@@ -14,7 +14,7 @@
  *
  */
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
@@ -155,6 +155,6 @@ SceneJS.createNode({
 });
 
 
-SceneJS.withNode("the-scene").start();
+SceneJS.scene("the-scene").start();
 
 

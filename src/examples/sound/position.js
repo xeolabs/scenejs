@@ -5,7 +5,7 @@ soundManager.debugMode = false;
 soundManager.flashVersion = 9;
 soundManager.url = 'SoundManager2/';
 
-SceneJS.createNode({
+SceneJS.createScene({
 	type: "scene",
 	id: "theScene",
 	canvasId: "theCanvas",

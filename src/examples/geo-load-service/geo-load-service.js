@@ -43,7 +43,7 @@ SceneJS.Services.addService(SceneJS.Services.GEO_LOADER_SERVICE_ID, new MyGeoLoa
 
 /* Scene graph containing geometry that pulls in the stream
  */
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
@@ -167,6 +167,8 @@ function mouseUp() {
     dragging = false;
 }
 
+var scene = SceneJS.scene("the-scene");
+
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
@@ -178,8 +180,8 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
     }
 }
 
@@ -187,7 +189,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("the-scene").start();
+SceneJS.scene("the-scene").start();
 
 
 

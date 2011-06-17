@@ -149,7 +149,8 @@ var SceneJS_sceneModule = new (function() {
             scene:scene,
             canvas: canvas,
             loggingElement: loggingElement,
-            nodeMap: nodeMap
+            nodeMap: nodeMap,
+            instanceMap: {} 
         };
         nodeMap.addItem(sceneId, scene.scene);
         this.nScenes++;

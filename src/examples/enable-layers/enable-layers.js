@@ -19,7 +19,7 @@
  * Scene graph definition
  *---------------------------------------------------------------------*/
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "theScene",
     canvasId: "theCanvas",
@@ -169,8 +169,9 @@ SceneJS.createNode({
  *
  * Try commenting/uncommenting some of these layers to see the teapots appear/disappear.
  *-------------------------------------------------------------------------------------------*/
+var scene = SceneJS.scene("theScene");
 
-SceneJS.withNode("theScene").set("layers", {
+scene.set("layers", {
     "example-layer-1": 0,
     //  "example-layer-2": 0,
     "example-layer-3": 0,
@@ -178,4 +179,4 @@ SceneJS.withNode("theScene").set("layers", {
 
 });
 
-SceneJS.withNode("theScene").start();
+scene.start();

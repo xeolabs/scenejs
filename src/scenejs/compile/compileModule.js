@@ -27,27 +27,6 @@ var SceneJS_compileModule = new (function() {
     var nodeStack = new Array(1000);
     var stackLen = 0;
 
-    /* Flag for each node indicating if it is within subtree or target of an instance node.
-     * Updated when node is traversed.
-     * When compiler notified of node update, bumps COMPILE_NODE and COMPILE_SUBTREE up to COMPILE_BRANCH.
-     * Cleared when scene compiled.
-     * Synchronised for node relocation, which causes COMPILE_SCENE, which then overrides all notifications.
-     */
-    this._nodeInstanced = {};
-
-    /* Flag for each node indicating if it must always be recompiled
-     */
-    this._nodeAlwaysCompile = {};
-
-    /**
-     * Tracks highest compilation level selected for each node that compiler receives update notification on.
-     * Is emptied after compilation. A notification that would result in lower compilation level than already stored
-     * for each node are ignored.
-     * Array eleared on exit from scheduleCompilations
-     */
-    this._nodeCompilationLevels = {};
-
-
     /*-----------------------------------------------------------------------------------------------------------------
      * Priority queue of compilations. Each element is a directive to (re)compile a portion of the scene
      * graph relative to a given node. They is ordered by decreasing generality of compilation to avoid overlap,
@@ -122,7 +101,27 @@ var SceneJS_compileModule = new (function() {
                      * entire subtree compilation, decremented on return
                      */
                     countTraversedSubtreesToCompile : 0,
-                    compilationQueue : new CompilationQueue()
+                    compilationQueue : new CompilationQueue(),
+
+                    /* Flag for each node indicating if it is within subtree or target of an instance node.
+                     * Updated when node is traversed.
+                     * When compiler notified of node update, bumps COMPILE_NODE and COMPILE_SUBTREE up to COMPILE_BRANCH.
+                     * Cleared when scene compiled.
+                     * Synchronised for node relocation, which causes COMPILE_SCENE, which then overrides all notifications.
+                     */
+                    nodeInstanced : {},
+
+                    /**
+                     * Tracks highest compilation level selected for each node that compiler receives update notification on.
+                     * Is emptied after compilation. A notification that would result in lower compilation level than already stored
+                     * for each node are ignored.
+                     * Array eleared on exit from scheduleCompilations
+                     */
+                    nodeCompilationLevels : {},
+
+                    /* Flag for each node indicating if it must always be recompiled
+                     */
+                    nodeAlwaysCompile : {}
                 };
             });
 
@@ -205,9 +204,13 @@ var SceneJS_compileModule = new (function() {
             throw "Updated node without a compiler scene";
         }
 
-        /* Further updates redundant when entire scene flagged for compile
-         */
-        if (compileScene.flagSceneCompile) {
+        //        /* Further updates redundant when entire scene flagged for compile
+        //         */
+        //        if (compileScene.flagSceneCompile) {
+        //            return;
+        //        }
+
+        if (compileScene.compilingScene) {
             return;
         }
 
@@ -238,7 +241,7 @@ var SceneJS_compileModule = new (function() {
         /* Compilation queue redundant when entire scene needs compilation
          */
         if (level == SceneJS_compileCfg.COMPILE_SCENE) {
-            compileScene.flagSceneCompile = true;
+            compileScene.compilingScene = true;
             compileScene.compilationQueue.clear();
             return;
         }
@@ -249,7 +252,7 @@ var SceneJS_compileModule = new (function() {
          * instance node defines child nodes, then they become surrogate children
          * of the target sub-graph's right-most node.
          */
-        if (this._nodeInstanced[nodeId]) {
+        if (compileScene.nodeInstanced[nodeId]) {
             if (level == SceneJS_compileCfg.COMPILE_SUBTREE || level == SceneJS_compileCfg.COMPILE_NODE) {
                 level = SceneJS_compileCfg.COMPILE_BRANCH;
             }
@@ -265,10 +268,10 @@ var SceneJS_compileModule = new (function() {
 
         /* Only reschedule compilation for node if new level is more general.
          */
-        if (this._nodeCompilationLevels[nodeId] <= level) {
+        if (compileScene.nodeCompilationLevels[nodeId] <= level) {
             return;
         }
-        this._nodeCompilationLevels[nodeId] = level;
+        compileScene.nodeCompilationLevels[nodeId] = level;
 
         var priority = level;
 
@@ -296,14 +299,16 @@ var SceneJS_compileModule = new (function() {
             return true;
         }
 
-        this._nodeCompilationLevels = {};
-
         var compileScene = this._scenes[sceneId];
         if (!compileScene) {
             throw "scene not found";
         }
 
-        if (compileScene.flagSceneCompile) {
+        compileScene.nodeCompilationLevels = {};
+
+        if (compileScene.compilingScene) {
+            compileScene.flagSceneCompile = true;
+            compileScene.compilingScene = false;
             return true;
         }
 
@@ -396,12 +401,12 @@ var SceneJS_compileModule = new (function() {
             id = node._attr.id;
 
             // TODO: why do these two lines break compilation within instanced subtrees?
-//            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
-//                return;
-//            }
-//            if (compileScene.dirtyNodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
-//                return;
-//            }
+            //            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
+            //                return;
+            //            }
+            //            if (compileScene.dirtyNodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
+            //                return;
+            //            }
 
             /* Ensure that instance allows compilation of the entire subgraph of its symbol
              * because the updated node will be a temporary child of the symbol subgraph's
@@ -412,12 +417,12 @@ var SceneJS_compileModule = new (function() {
                 compileScene.dirtyNodesWithinBranches[id] = true;
             }
             dirtyNodes[id] = true;
-            nodeInstances = SceneJS._nodeInstanceMap[id];
+            nodeInstances = node._scene._instanceMap[id];
             if (nodeInstances) {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
                         compileScene.dirtyNodesWithinBranches[instanceNodeId] = true;
-                        this._flagCompilePath(compileScene, SceneJS_sceneNodeMaps.items[instanceNodeId]);
+                        this._flagCompilePath(compileScene, node._scene._nodeMap.items[instanceNodeId]);
                     }
                 }
             }
@@ -451,9 +456,9 @@ var SceneJS_compileModule = new (function() {
          * to flag paths to nodes that must always be compiled
          */
         if (compileScene.flagSceneCompile) {
-            this._nodeAlwaysCompile[nodeId] = false;
+            compileScene.nodeAlwaysCompile[nodeId] = false;
             if (config && config.alwaysCompile) {
-                this._alwaysCompilePath(node);
+                this._alwaysCompilePath(compileScene, node);
             }
         }
 
@@ -463,9 +468,9 @@ var SceneJS_compileModule = new (function() {
 
         /* Track nodes within instances
          */
-        this._nodeInstanced[nodeId] = (this._scene.countTraversedInstanceLinks > 0);
+        compileScene.nodeInstanced[nodeId] = (this._scene.countTraversedInstanceLinks > 0);
 
-        /* Track number of nodes compiling within subtrees of instances 
+        /* Track number of nodes compiling within subtrees of instances
          */
         if (node._attr.nodeType == "instance") {
             compileScene.countTraversedInstanceLinks++;
@@ -487,7 +492,7 @@ var SceneJS_compileModule = new (function() {
 
         /* Compile every node flagged for indiscriminate compilation
          */
-        if (this._nodeAlwaysCompile[nodeId]) {
+        if (compileScene.nodeAlwaysCompile[nodeId]) {
             return true;
         }
 
@@ -504,8 +509,8 @@ var SceneJS_compileModule = new (function() {
         return false;
     };
 
-    this._alwaysCompilePath = function(targetNode) {
-        if (this._nodeAlwaysCompile[id]) {
+    this._alwaysCompilePath = function(compileScene, targetNode) {
+        if (compileScene.nodeAlwaysCompile[id]) {
             return;
         }
         var nodeInstances;
@@ -513,13 +518,13 @@ var SceneJS_compileModule = new (function() {
         var node = targetNode;
         while (node) {
             id = node._attr.id;
-            this._nodeAlwaysCompile[id] = true;
-            nodeInstances = SceneJS._nodeInstanceMap[id];
+            compileScene.nodeAlwaysCompile[id] = true;
+            nodeInstances = targetNode._scene._instanceMap[id];
             if (nodeInstances) {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
-                        this._nodeAlwaysCompile[instanceNodeId] = true;
-                        this._alwaysCompilePath(SceneJS_sceneNodeMaps.items[instanceNodeId]);
+                        compileScene.nodeAlwaysCompile[instanceNodeId] = true;
+                        this._alwaysCompilePath(compileScene, targetNode._scene._nodeMap.items[instanceNodeId]);
                     }
                 }
             }

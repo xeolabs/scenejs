@@ -5,7 +5,7 @@
  lindsay.kay@xeolabs.com
 
  */
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
@@ -328,19 +328,21 @@ canvas.addEventListener('mousewheel', mouseWheel, true);
 canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
 
-SceneJS.withNode("the-scene").set("layers", [
+var scene = SceneJS.scene("the-scene");
+
+scene.set("layers", [
     "surface-layer",
     "cloud-layer"
 ]);
 
-SceneJS.withNode("the-scene").start({
+scene.start({
     idleFunc: function() {
-        SceneJS.withNode("earth-rotate").set("angle", earthRotate);
-        SceneJS.withNode("clouds-rotate").set("angle", cloudsRotate);
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("the-lookat").set({ eye: { x: 0, y: 0, z: posZ } });
+        scene.findNode("earth-rotate").set("angle", earthRotate);
+        scene.findNode("clouds-rotate").set("angle", cloudsRotate);
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
+        scene.findNode("yaw").set("angle", yaw);
+        scene.findNode("the-lookat").set({ eye: { x: 0, y: 0, z: posZ } });
 
         //   earthRotate -= 0.4;
         cloudsRotate -= 0.06;
@@ -370,7 +372,7 @@ var $dialog = $('<div></div>')
 
 var dialogOpen = false;
 
-SceneJS.withNode("the-scene").bind("loading-status",
+scene.bind("loading-status",
 
         function(event) {
             var params = event.params;

@@ -1,19 +1,9 @@
-SceneJS.withNode = function(node) {
-    return new SceneJS._WithNode(node);
-};
-
 /** Selects a scene graph node by its ID and provides a set of methods to modify and observe it.
  * @returns {Object} Handle to node
  */
 
 SceneJS._WithNode = function(node) {
-    if (!node) {
-        throw "withNode param 'node' is null or undefined";
-    }
-    this._targetNode = node._compile ? node : SceneJS_sceneNodeMaps.items[node];
-    if (!this._targetNode) {
-        throw "withNode node not found: '" + node + "'";
-    }
+    this._targetNode = node;
 };
 
 
@@ -49,10 +39,17 @@ SceneJS._WithNode.prototype.node = function(node) {
     return new SceneJS._WithNode(nodeGot);
 };
 
+SceneJS._WithNode.prototype.findNode = function (nodeId) {
+    if (this._targetNode.getType() != "scene") {
+        throw "findNode attempted on node that is not a \"scene\" type: '" + this._targetNode.getID() + "'";
+    }
+    return this._targetNode.findNode(nodeId);        
+};
+
 /** Returns the scene to which the node belongs
  */
 SceneJS._WithNode.prototype.scene = function() {
-    return new SceneJS._WithNode(this._targetNode.getScene());
+    return new SceneJS._WithNode(this._targetNode._scene);
 };
 
 /** Returns true if a child node matching given ID or index existis on the selected node
@@ -155,14 +152,14 @@ SceneJS._WithNode.prototype.eachInstance = function(fn) {
     if (typeof fn != "function") {
         throw "eachInstance param 'fn' should be a function";
     }
-    var nodeInstances = SceneJS._nodeInstanceMap[this._targetNode._attr.id];
+    var nodeInstances = this._targetNode._scene._instanceMap[this._targetNode._attr.id];
     if (nodeInstances) {
         var instances = nodeInstances.instances;
         var count = 0;
         var selector;
         for (var instanceNodeId in instances) {
             if (instances.hasOwnProperty(instanceNodeId)) {
-                selector = new SceneJS._WithNode(instanceNodeId);
+                selector = new SceneJS._WithNode(this._targetNode._scene._nodeMap[instanceNodeId]);
                 if (fn.call(selector, count++) === true) {
                     return selector;
                 }
@@ -173,7 +170,7 @@ SceneJS._WithNode.prototype.eachInstance = function(fn) {
 };
 
 SceneJS._WithNode.prototype.numInstances = function() {
-    var instances = SceneJS._nodeInstanceMap[this._targetNode._attr.id];
+    var instances = this._targetNode._scene._instanceMap[this._targetNode._attr.id];
     return instances ? instances.numInstances : 0;
 };
 
@@ -257,21 +254,6 @@ SceneJS._WithNode.prototype.get = function(attr) {
     var func = this._targetNode[funcName];
     if (!func) {
         throw "Attribute '" + attr + "' not found on node '" + this._targetNode.getID() + "'";
-    }
-    return func.call(this._targetNode);
-};
-
-/** Queries some render-time state on the selected node. This is only valid when
- * the node is currently rendering, ie. between "rendering" and "rendered" events.
- */
-SceneJS._WithNode.prototype.query = function(attr) {
-    if (!this._targetNode._rendering) {
-        throw "Node is not rendering - cannot do render-time query for '" + attr + "' on node '" + this._targetNode.getID() + "'";
-    }
-    var funcName = "query" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
-    var func = this._targetNode[funcName];
-    if (!func) {
-        throw "Render-time query for '" + attr + "' not available on node '" + this._targetNode.getID() + "'";
     }
     return func.call(this._targetNode);
 };
@@ -379,10 +361,17 @@ SceneJS._WithNode.prototype.start = function (cfg) {
         throw "start attempted on node that is not a \"scene\" type: '" + this._targetNode.getID() + "'";
     }
     cfg = cfg || {};
+    var self = this;
     if (cfg.idleFunc) {    // Wrap idleFunc to call on selector as scope
-        var fn = cfg.idleFunc;
+        var idleFunc = cfg.idleFunc;
         cfg.idleFunc = function() {
-            fn(this);
+            idleFunc.call(self);
+        };
+    }
+    if (cfg.sleepFunc) {    // Wrap idleFunc to call on selector as scope
+        var sleepFunc = cfg.sleepFunc;
+        cfg.sleepFunc = function() {
+            sleepFunc.call(self);
         };
     }
     this._targetNode.start(cfg);

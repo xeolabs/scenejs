@@ -182,7 +182,7 @@ SceneJS.Interpolator.prototype._preCompile = function(traversalContext) {
     this._update((SceneJS_timeModule.getTime() - this._timeStarted) * 0.001);
 
     if (this._outputValue != null // Null when interpolation outside of time range
-            && SceneJS.nodeExists(this._attr.target)) {
+            && this._scene._nodeMap.items[this._attr.target]) {
 
         this._setTargetValue();
     }
@@ -192,7 +192,7 @@ SceneJS.Interpolator.prototype._setTargetValue = function() {
     var propName = this._attr.targetProperty;
     var d = propName.split(".");
     if (d.length == 1) {
-        SceneJS.withNode(this._attr.target).set(propName, this._outputValue);
+        SceneJS.scene(this._scene._attr.id).findNode(this._attr.target).set(propName, this._outputValue);
 
     } else {
         var root = {};
@@ -205,7 +205,7 @@ SceneJS.Interpolator.prototype._setTargetValue = function() {
                 o[d[j]] = this._outputValue;
             }
         }
-        SceneJS.withNode(this._attr.target).set(root);
+        SceneJS.scene(this._scene._attr.id).findNode(this._attr.target).set(root);
     }
 };
 

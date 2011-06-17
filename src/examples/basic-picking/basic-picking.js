@@ -12,7 +12,7 @@
  * Scene graph definition
  *---------------------------------------------------------------------*/
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "theScene",
     canvasId: 'theCanvas',
@@ -226,44 +226,45 @@ SceneJS.createNode({
 });
 
 
+var scene = SceneJS.scene("theScene");
+
 /* We can observe when nothing is picked with a "notpicked"
  * listener attached to the scene node:
   */
-SceneJS.withNode("theScene").bind("notpicked",
+scene.bind("notpicked",
         function(event) {
             alert("Nothing picked");
         });
 
-
 /* We'll listen for picking on each of the teapots:
  */
 
-SceneJS.withNode("right-blue-sphere").bind("picked",
+scene.findNode("right-blue-sphere").bind("picked",
         function(event) {
             alert("Picked: 'right-blue-sphere'");
         });
 
-SceneJS.withNode("left-blue-sphere").bind("picked",
+scene.findNode("left-blue-sphere").bind("picked",
         function(event) {
             alert("Picked: 'left-blue-sphere'");
         });
 
-SceneJS.withNode("red-group-sphere").bind("picked",
+scene.findNode("red-group-sphere").bind("picked",
         function(event) {
             alert("Picked: 'red-group-sphere'");
         });
 
-SceneJS.withNode("right-green-sphere").bind("picked",
+scene.findNode("right-green-sphere").bind("picked",
         function(event) {
             alert("Picked: 'right-green-sphere'");
         });
 
-SceneJS.withNode("left-green-sphere").bind("picked",
+scene.findNode("left-green-sphere").bind("picked",
         function(event) {
             alert("Picked: 'left-green-sphere'");
         });
 
-SceneJS.withNode("theScene").start();
+scene.start();
 
 var canvas = document.getElementById("theCanvas");
 
@@ -275,7 +276,7 @@ var canvas = document.getElementById("theCanvas");
  */
 function mouseDown(event) {
     var coords = clickCoordsWithinElement(event);
-    SceneJS.withNode("theScene").pick(coords.x, coords.y);
+    scene.pick(coords.x, coords.y);
 }
 
 canvas.addEventListener('mousedown', mouseDown, false);

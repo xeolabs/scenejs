@@ -1,4 +1,4 @@
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
@@ -252,7 +252,9 @@ canvas.addEventListener('mousewheel', function(event) {
     event.returnValue = false;
 }, true);
 
-SceneJS.withNode("the-scene").start({
+var scene = SceneJS.scene("the-scene");
+
+scene.start({
     fps: 60,
     idleFunc: function() {
         if (speed && speed.y)

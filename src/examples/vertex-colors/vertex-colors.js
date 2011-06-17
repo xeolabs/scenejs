@@ -13,7 +13,7 @@
  * Scene graph definition
  *---------------------------------------------------------------------*/
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
@@ -439,11 +439,12 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("the-scene").start({
+var scene = SceneJS.scene("the-scene");
+
+scene.start({
     idleFunc:  function() {
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("the-scene").render();
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);        
     }
 });
 

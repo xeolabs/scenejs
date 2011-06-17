@@ -17,7 +17,7 @@
  lindsay.kay@xeolabs.com
 
  */
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "theScene",
     canvasId: "theCanvas",
@@ -205,7 +205,7 @@ SceneJS.createNode({
  * in the order neccessary for a correct transparency effect.
  *-------------------------------------------------------------------------------------------*/
 
-SceneJS.withNode("theScene").set("layers", {
+SceneJS.scene("theScene").set("layers", {
     "inner-layer": -1, // Higher priority than default layer's 0 priority
     "outer-layer":  1  // Lower priority than default layer's 0 priority
 });
@@ -246,8 +246,9 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        var scene = SceneJS.scene("theScene");
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
     }
 }
 
@@ -255,5 +256,5 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("theScene").start();
+SceneJS.scene("theScene").start();
 

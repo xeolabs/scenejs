@@ -10,7 +10,7 @@
  * lindsay.kay@xeolabs.com
  */
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "theScene",
     canvasId: 'theCanvas',
@@ -334,7 +334,7 @@ SceneJS.bind("error", function(e) {
     alert(e.exception.message);
 });
 
-SceneJS.withNode("theScene").start({
+SceneJS.scene("theScene").start({
 
     idleFunc: function() {
 
@@ -386,7 +386,10 @@ SceneJS.withNode("theScene").start({
         eye.y = tankPos.y + (trailVec[1] * 35);
         eye.z = tankPos.z + (trailVec[2] * 35);
 
-        SceneJS.withNode("theLookAt").set({
+        /* "this" is the scene
+         */
+
+        this.findNode("theLookAt").set({   // Find node somewhere within the scene 
             eye: eye,
             look: {
                 x: tankPos.x,
@@ -395,16 +398,16 @@ SceneJS.withNode("theScene").start({
             }
         });
 
-        SceneJS.withNode("tankPos").set({
+        this.findNode("tankPos").set({
             x: tankPos.x,
             z: tankPos.z
         });
 
-        SceneJS.withNode("tankRotate").set({
+        this.findNode("tankRotate").set({
             angle: tankYaw + 180 || 180
         });
 
-        SceneJS.withNode("tankGunRotate").set({
+        this.findNode("tankGunRotate").set({
             angle: -tankYaw
         });
 

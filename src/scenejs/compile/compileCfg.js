@@ -252,6 +252,9 @@ var SceneJS_compileCfg = new (function() {
         "morphGeometry": {
             set: {
                 level: this.COMPILE_BRANCH
+            },
+            "loaded": {
+                level: this.COMPILE_SCENE
             }
         },
 
@@ -268,7 +271,7 @@ var SceneJS_compileCfg = new (function() {
         "texture": {
 
             "loadedImage": {
-                level: this.REDRAW
+                level: this.COMPILE_BRANCH
             },
 
             "waitingForImagebuf": {
@@ -289,7 +292,7 @@ var SceneJS_compileCfg = new (function() {
         "geometry": {
 
             "loaded": {
-                level: this.COMPILE_BRANCH
+                level: this.COMPILE_SCENE
             }
         },
 
@@ -308,10 +311,22 @@ var SceneJS_compileCfg = new (function() {
          */
         "interpolator": {
             "before": {
-                level: this.COMPILE_NODE
+                level: this.COMPILE_PATH
             },
             "running": {
-                level: this.COMPILE_NODE
+                level: this.COMPILE_PATH
+            }
+        },
+
+        /* Custom shader
+         */
+        "shader": {
+            set: {
+                attr: {
+                    vars: {
+                        level: this.COMPILE_PATH
+                    }
+                }
             }
         }
     };

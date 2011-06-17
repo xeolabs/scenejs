@@ -6,7 +6,7 @@
  * March 2010
  *
  */
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
     id: "theScene",
@@ -52,7 +52,7 @@ SceneJS.createNode({
                                 },
                                 {
                                     type: "light",
-                                    id: "light1",
+                                    id: "light2",
                                     mode:                 "dir",
                                     color:                  { r: 1.0, g: 1.0, b: 1.0 },
                                     diffuse:                true,
@@ -61,7 +61,7 @@ SceneJS.createNode({
                                 },
                                 {
                                     type: "light",
-                                    id: "light2",
+                                    id: "light3",
                                     mode:                 "dir",
                                     color:                  {r: 1.0, g: 1.0, b: 1.0},
                                     diffuse:                true,
@@ -70,7 +70,7 @@ SceneJS.createNode({
                                 },
                                 {
                                     type: "light",
-                                    id: "light3",
+                                    id: "light4",
                                     mode:                 "dir",
                                     color:                  {r: 1.0, g: 1.0, b: 1.0},
                                     diffuse:                true,
@@ -904,16 +904,16 @@ SceneJS.createNode({
     ]
 });
 
-SceneJS.withNode("theScene").render();
+var scene = SceneJS.scene("theScene");
 
 var rotation = document.getElementById("rotation");
 
 // Specular light
 
 var specular_light = document.getElementById("specular-light");
-var light1 = SceneJS.withNode("light1");
-var light2 = SceneJS.withNode("light2");
-var light3 = SceneJS.withNode("light3");
+var light1 = scene.findNode("light1");
+var light2 = scene.findNode("light2");
+var light3 = scene.findNode("light3");
 
 function specularLightChange() {
     if (specular_light.checked) {
@@ -930,8 +930,8 @@ function specularLightChange() {
 specular_light.onchange = specularLightChange;
 specular_light.onchange();
 
-var filled_objects_selector = SceneJS.withNode("filledObjectsSelector");
-var wireframe_objects_selector = SceneJS.withNode("wireframeObjectsSelector");
+var filled_objects_selector = scene.findNode("filledObjectsSelector");
+var wireframe_objects_selector = scene.findNode("wireframeObjectsSelector");
 
 
 var choose_object_type = document.getElementById("choose-object-type");
@@ -962,28 +962,28 @@ function chooseObjectType() {
 choose_object_type.onchange = chooseObjectType;
 choose_object_type.onchange();
 
-var all_rotate = SceneJS.withNode("all-rotate");
+var all_rotate = scene.findNode("all-rotate");
 
-var disk1_rotate = SceneJS.withNode("disk1-rotate");
-var disk2_rotate = SceneJS.withNode("disk2-rotate");
-var disk_triangle_rotate = SceneJS.withNode("disk-triangle-rotate");
-var wireframe_disk1_rotate = SceneJS.withNode("wireframe-disk1-rotate");
-var wireframe_disk2_rotate = SceneJS.withNode("wireframe-disk2-rotate");
-var wireframe_disk_triangle_rotate = SceneJS.withNode("wireframe-disk-triangle-rotate");
+var disk1_rotate = scene.findNode("disk1-rotate");
+var disk2_rotate = scene.findNode("disk2-rotate");
+var disk_triangle_rotate = scene.findNode("disk-triangle-rotate");
+var wireframe_disk1_rotate = scene.findNode("wireframe-disk1-rotate");
+var wireframe_disk2_rotate = scene.findNode("wireframe-disk2-rotate");
+var wireframe_disk_triangle_rotate = scene.findNode("wireframe-disk-triangle-rotate");
 
-var sphere1_rotate = SceneJS.withNode("sphere1-rotate");
-var sphere2_rotate = SceneJS.withNode("sphere2-rotate");
-var sphere3_rotate = SceneJS.withNode("sphere3-rotate");
-var sphere4_rotate = SceneJS.withNode("sphere4-rotate");
-var sphere5_rotate = SceneJS.withNode("sphere5-rotate");
-var wireframe_sphere1_rotate = SceneJS.withNode("wireframe-sphere1-rotate");
-var wireframe_sphere2_rotate = SceneJS.withNode("wireframe-sphere2-rotate");
-var wireframe_sphere3_rotate = SceneJS.withNode("wireframe-sphere3-rotate");
-var wireframe_sphere4_rotate = SceneJS.withNode("wireframe-sphere4-rotate");
-var wireframe_sphere5_rotate = SceneJS.withNode("wireframe-sphere5-rotate");
+var sphere1_rotate = scene.findNode("sphere1-rotate");
+var sphere2_rotate = scene.findNode("sphere2-rotate");
+var sphere3_rotate = scene.findNode("sphere3-rotate");
+var sphere4_rotate = scene.findNode("sphere4-rotate");
+var sphere5_rotate = scene.findNode("sphere5-rotate");
+var wireframe_sphere1_rotate = scene.findNode("wireframe-sphere1-rotate");
+var wireframe_sphere2_rotate = scene.findNode("wireframe-sphere2-rotate");
+var wireframe_sphere3_rotate = scene.findNode("wireframe-sphere3-rotate");
+var wireframe_sphere4_rotate = scene.findNode("wireframe-sphere4-rotate");
+var wireframe_sphere5_rotate = scene.findNode("wireframe-sphere5-rotate");
 
-var box_rotate = SceneJS.withNode("box-rotate");
-var wireframe_box_rotate = SceneJS.withNode("wireframe-box-rotate");
+var box_rotate = scene.findNode("box-rotate");
+var wireframe_box_rotate = scene.findNode("wireframe-box-rotate");
 
 var yaw = all_rotate.get("angle");
 
@@ -1010,8 +1010,7 @@ function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * -0.5;
 
-        all_rotate.set("angle", yaw);
-        // SceneJS.withNode("theScene").render();
+        all_rotate.set("angle", yaw);        
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -1022,7 +1021,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("theScene").start({
+scene.start({
     idleFunc:function() {
         if (rotation.checked) {
             var angle = disk1_rotate.get("angle") + 0.3;

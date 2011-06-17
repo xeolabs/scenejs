@@ -48,14 +48,31 @@ SceneJS.Services.addService(
     commandService.addCommand("create",
             (function() {
                 return {
-                    execute: function(params) {
+                    execute: function(params, ctx) {
                         var nodes = params.nodes;
+                        var target = params.target;
+                        var targetNode;
                         if (nodes) {
-                            for (var i = 0; i < nodes.length; i++) {
-                                if (!nodes[i].id) {
-                                    throw "Message 'create' must have ID for new node";
+                            var scenes = ctx.scenes || SceneJS_sceneModule.scenes;
+                            var scene;
+                            var node;
+                            for (var i = 0, len = scenes.length; i < len; i++) {
+                                scene = SceneJS.scene(scenes[i].sceneId);
+                                for (var j = 0; j < nodes.length; j++) {
+                                    node = nodes[j];
+                                    if (!node.id) {
+                                        throw "Message 'create' must have ID for new node";
+                                    }
+                                    if (target) {
+                                        targetNode = scene.findNode(target);
+                                        if (!target) {
+                                            continue;
+                                        }
+                                        target.add("node", nodes[i]);
+                                    } else {
+                                        scene.addNode(nodes[i]);
+                                    }
                                 }
-                                SceneJS.createNode(nodes[i]);
                             }
                         }
                     }
@@ -66,11 +83,17 @@ SceneJS.Services.addService(
         execute: function(params, ctx) {
             var scenes = ctx.scenes || SceneJS_sceneModule.scenes;
             var target = params.target;
+            var scene;
+            var targetNode;
             for (var i = 0, len = scenes.length; i < len; i++) {
-                if (!SceneJS.nodeExists(target)) {
+                scene = SceneJS.scene(scenes[i].sceneId);
+                if (scene) { // Scene might have been blown away by some other command
                     continue;
                 }
-                var targetNode = SceneJS.withNode(target);
+                targetNode = scene.findNode(target);
+                if (!targetNode) { // Node might have been blown away by some other command
+                    continue;
+                }
                 var sett = params["set"];
                 if (sett) {
                     callNodeMethods("set", sett, targetNode);
@@ -90,7 +113,7 @@ SceneJS.Services.addService(
                 if (params.remove) {
                     callNodeMethods("remove", params.remove, targetNode);
                 }
-                SceneJS_sceneNodeMaps.items[params.target]._fireEvent("updated", { }); // TODO: only if listener exists; and buffer events
+                targetNode._scene._nodeMap.items[params.target]._fireEvent("updated", { }); // TODO: only if listener exists; and buffer events
             }
 
             /* Further messages
@@ -116,7 +139,7 @@ SceneJS.Services.addService(
                 for (var i = 0, len = scenes.length; i < len; i++) {
                     scene = SceneJS_sceneModule.scenes[scenes[i]];
                     if (scene) {
-                        existingScenes.push(scene);
+                        existingScenes.push(scene.sceneId);
                     }
                 }
                 ctx = SceneJS._shallowClone(ctx);   // Feed scenes into command context for sub-messages

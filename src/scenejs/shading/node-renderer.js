@@ -137,6 +137,15 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._program = this._picking ? node.program.pick : node.program.render;
             this._program.bind();
 
+            if (node.shaderState.shader && node.shaderState.shader.vars) { // Custom shader - set any vars we have
+                var vars = node.shaderState.shader.vars;
+                for (var name in vars) {
+                    if (vars.hasOwnProperty(name)) {
+                        this._program.setUniform(name, vars[name]);
+                    }
+                }
+            }
+
             this._lastGeoStateId = -1;
             this._lastFlagsStateId = -1;
             this._lastColortransStateId = -1;
@@ -159,73 +168,6 @@ var SceneJS_NodeRenderer = function(cfg) {
         var program = this._program;
         var gl = this._context;
 
-
-        /*----------------------------------------------------------------------------------------------------------
-         * flags
-         *--------------------------------------------------------------------------------------------------------*/
-
-        if (! this._lastFlagsState || node.flagsState._stateId != this._lastFlagsState._stateId) {
-
-            /*
-             */
-            var newFlags = node.flagsState.flags;
-            var oldFlags = this._lastFlagsState ? this._lastFlagsState.flags : null;
-
-//            var clear = newFlags.clear;
-//            if (!oldFlags || (clear && (clear.depth != oldFlags.depth || clear.stencil != oldFlags.stencil))) {
-//                var clear = newFlags.clear || {};
-//                var mask = 0;
-//                if (clear.depth) {
-//                    mask |= gl.DEPTH_BUFFER_BIT;
-//                }
-//                if (clear.stencil) {
-//                    mask |= gl.STENCIL_BUFFER_BIT;
-//                }
-//                if (mask != 0) { alert("clear");
-//                    gl.clear(mask);
-//                }
-//            }
-
-
-            if (!oldFlags || newFlags.backfaces != oldFlags.backfaces) {
-                if (newFlags.backfaces) {
-                    gl.disable(gl.CULL_FACE);
-                } else {
-                    gl.enable(gl.CULL_FACE);
-                }
-            }
-
-            if (!oldFlags || newFlags.frontface != oldFlags.frontface) {
-                if (newFlags.frontface == "cw") {
-                    gl.frontFace(gl.CW);
-                } else {
-                    gl.frontFace(gl.CCW);
-                }
-            }
-
-            if (!oldFlags || newFlags.blendFunc != oldFlags.blendFunc) {
-                if (newFlags.blendFunc) {
-                    gl.blendFunc(glEnum(gl, newFlags.blendFunc.sfactor || "one"), glEnum(gl, newFlags.blendFunc.dfactor || "zero"));
-                } else {
-                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Not redundant, because of inequality test above
-                }
-            }
-
-//            var mask = newFlags.colorMask;
-//
-//            if (!oldFlags || (mask && (mask.r != oldFlags.r || mask.g != oldFlags.g || mask.b != oldFlags.b || mask.a != oldFlags.a))) {
-//
-//                if (mask) {
-//
-//                    gl.colorMask(mask.r, mask.g, mask.b, mask.a);
-//
-//                } else {
-//                    gl.colorMask(true, true, true, true);
-//                }
-//            }
-
-            this._lastFlagsState = node.flagsState;
-        }
 
         /*----------------------------------------------------------------------------------------------------------
          * imagebuf
@@ -280,61 +222,56 @@ var SceneJS_NodeRenderer = function(cfg) {
                 target2 = morph.target2;
 
                 if (target1.vertexBuf) {
-                    program.bindFloatArrayBuffer("aVertex", target1.vertexBuf);
-                    program.bindFloatArrayBuffer("aMorphVertex", target2.vertexBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aVertex", target1.vertexBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aMorphVertex", target2.vertexBuf);
                     morphVertexBufBound = true;
                 }
 
                 if (target1.normalBuf) {
-                    program.bindFloatArrayBuffer("aNormal", target1.normalBuf);
-                    program.bindFloatArrayBuffer("aMorphNormal", target2.normalBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aNormal", target1.normalBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aMorphNormal", target2.normalBuf);
                     morphNormalBufBound = true;
                 }
 
                 if (target1.uvBuf) {
-                    program.bindFloatArrayBuffer("aUVCoord", target1.uvBuf);
-                    program.bindFloatArrayBuffer("aMorphUVCoord", target2.uvBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aUVCoord", target1.uvBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aMorphUVCoord", target2.uvBuf);
                     morphUVBufBound = true;
                 }
 
                 if (target1.uvBuf2) {
-                    program.bindFloatArrayBuffer("aUVCoord2", target1.uvBuf);
-                    program.bindFloatArrayBuffer("aMorphUVCoord2", target2.uvBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aUVCoord2", target1.uvBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aMorphUVCoord2", target2.uvBuf);
                     morphUV2BufBound = true;
                 }
 
-                program.setUniform("uMorphFactor", morph.factor);
+                program.setUniform("SCENEJS_uMorphFactor", morph.factor);
                 this._lastMorphStateId = node.morphState._stateId;
             }
 
-            /* Bind geometry VBOs - do that in any case, since we'll always have a geometry
-             * within a morphGeometry
+            /* Bind geometry
              */
-
-            this._lastGeoStateId = node.geoState._stateId;
-
             if (!morphVertexBufBound && geo.vertexBuf) {
-                program.bindFloatArrayBuffer("aVertex", geo.vertexBuf);
+                program.bindFloatArrayBuffer("SCENEJS_aVertex", geo.vertexBuf);
             }
 
             if (!morphNormalBufBound && geo.normalBuf) {
-                program.bindFloatArrayBuffer("aNormal", geo.normalBuf);
+                program.bindFloatArrayBuffer("SCENEJS_aNormal", geo.normalBuf);
             }
             // TODO
             if (node.texState && node.texState.layers.length > 0) {
                 if (geo.uvBuf) {
-                    program.bindFloatArrayBuffer("aUVCoord", geo.uvBuf);
+                    program.bindFloatArrayBuffer("SCENEJS_aUVCoord", geo.uvBuf);
                 }
                 if (geo.uvBuf2) {
-                    program.bindFloatArrayBuffer("aUVCoord2", geo.uvBuf2);
+                    program.bindFloatArrayBuffer("SCENEJS_aUVCoord2", geo.uvBuf2);
                 }
             }
-
             if (geo.colorBuf) {
-                program.bindFloatArrayBuffer("aVertexColor", geo.colorBuf);
+                program.bindFloatArrayBuffer("SCENEJS_aVertexColor", geo.colorBuf);
             }
-
             geo.indexBuf.bind();
+            this._lastGeoStateId = node.geoState._stateId;
         }
 
         /* Set GL props
@@ -356,7 +293,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             if (node.rendererState.props) {
                 clearColor = node.rendererState.props.props.clearColor;
             }
-            program.setUniform("uAmbient", clearColor ? [clearColor.r, clearColor.g, clearColor.b] : [0, 0, 0]);
+            program.setUniform("SCENEJS_uAmbient", clearColor ? [clearColor.r, clearColor.g, clearColor.b] : [0, 0, 0]);
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -367,10 +304,12 @@ var SceneJS_NodeRenderer = function(cfg) {
             var layer;
             for (var j = 0, len = node.texState.layers.length; j < len; j++) {
                 layer = node.texState.layers[j];
-                program.bindTexture("uSampler" + j, layer.texture, j);
-                if (layer.matrixAsArray) {
-                    program.setUniform("uLayer" + j + "Matrix", layer.matrixAsArray);
-                }
+                if (layer.texture) {
+                    program.bindTexture("SCENEJS_uSampler" + j, layer.texture, j);
+                    if (layer.matrixAsArray) {
+                        program.setUniform("SCENEJS_uLayer" + j + "Matrix", layer.matrixAsArray);
+                    }
+               }
             }
             this._lastTexStateId = node.texState._stateId;
         }
@@ -380,9 +319,9 @@ var SceneJS_NodeRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         if (node.viewXFormState._stateId != this._lastViewXFormStateId) {
-            program.setUniform("uVMatrix", node.viewXFormState.mat);
-            program.setUniform("uVNMatrix", node.viewXFormState.normalMat);
-            program.setUniform("uEye", node.viewXFormState.lookAt.eye);
+            program.setUniform("SCENEJS_uVMatrix", node.viewXFormState.mat);
+            //            program.setUniform("SCENEJS_uVNMatrix", node.viewXFormState.normalMat);
+            //            program.setUniform("SCENEJS_uEye", node.viewXFormState.lookAt.eye);
             this._lastViewXFormStateId = node.viewXFormState._stateId;
         }
 
@@ -392,8 +331,8 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (node.modelXFormState._stateId != this._lastModelXFormStateId) {
             var m = node.modelXFormState;
-            program.setUniform("uMMatrix", m.mat);
-            program.setUniform("uMNMatrix", m.normalMat);
+            program.setUniform("SCENEJS_uMMatrix", m.mat);
+            program.setUniform("SCENEJS_uMNMatrix", m.normalMat);
             this._lastModelXFormStateId = m._stateId;
         }
 
@@ -403,7 +342,7 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (node.projXFormState._stateId != this._lastProjXFormStateId) {
             var p = node.projXFormState;
-            program.setUniform("uPMatrix", p.mat);
+            program.setUniform("SCENEJS_uPMatrix", p.mat);
             this._lastProjXFormStateId = p._stateId;
         }
 
@@ -419,15 +358,15 @@ var SceneJS_NodeRenderer = function(cfg) {
             for (var k = 0, len = clips.length; k < len; k++) {
                 clip = clips[k];
                 if (node.flagsState.flags.clipping === false) { // Flags disable/enable clipping
-                    program.setUniform("uClipMode" + k, 0);
+                    program.setUniform("SCENEJS_uClipMode" + k, 0);
                 } else if (clip.mode == "inside") {
-                    program.setUniform("uClipMode" + k, 2);
+                    program.setUniform("SCENEJS_uClipMode" + k, 2);
                 } else if (clip.mode == "outside") {
-                    program.setUniform("uClipMode" + k, 1);
+                    program.setUniform("SCENEJS_uClipMode" + k, 1);
                 } else { // disabled
-                    program.setUniform("uClipMode" + k, 0);
+                    program.setUniform("SCENEJS_uClipMode" + k, 0);
                 }
-                program.setUniform("uClipNormalAndDist" + k, clip.normalAndDist);
+                program.setUniform("SCENEJS_uClipNormalAndDist" + k, clip.normalAndDist);
             }
             this._lastClipStateId = node.clipState._stateId;
         }
@@ -449,27 +388,27 @@ var SceneJS_NodeRenderer = function(cfg) {
                     // When fog is disabled, don't bother loading any of its parameters
                     // because they will be ignored by the shader
 
-                    program.setUniform("uFogMode", 0.0);
+                    program.setUniform("SCENEJS_uFogMode", 0.0);
                 } else {
 
                     if (fog.mode == "constant") {
-                        program.setUniform("uFogMode", 4.0);
-                        program.setUniform("uFogColor", fog.color);
-                        program.setUniform("uFogDensity", fog.density);
+                        program.setUniform("SCENEJS_uFogMode", 4.0);
+                        program.setUniform("SCENEJS_uFogColor", fog.color);
+                        program.setUniform("SCENEJS_uFogDensity", fog.density);
 
                     } else {
 
                         if (fog.mode == "linear") {
-                            program.setUniform("uFogMode", 1.0);
+                            program.setUniform("SCENEJS_uFogMode", 1.0);
                         } else if (fog.mode == "exp") {
-                            program.setUniform("uFogMode", 2.0);
+                            program.setUniform("SCENEJS_uFogMode", 2.0);
                         } else if (fog.mode == "exp2") {
-                            program.setUniform("uFogMode", 3.0); // mode is "exp2"
+                            program.setUniform("SCENEJS_uFogMode", 3.0); // mode is "exp2"
                         }
-                        program.setUniform("uFogColor", fog.color);
-                        program.setUniform("uFogDensity", fog.density);
-                        program.setUniform("uFogStart", fog.start);
-                        program.setUniform("uFogEnd", fog.end);
+                        program.setUniform("SCENEJS_uFogColor", fog.color);
+                        program.setUniform("SCENEJS_uFogDensity", fog.density);
+                        program.setUniform("SCENEJS_uFogStart", fog.start);
+                        program.setUniform("SCENEJS_uFogEnd", fog.end);
                     }
                 }
                 this._lastFogStateId = node.fogState._stateId;
@@ -486,15 +425,15 @@ var SceneJS_NodeRenderer = function(cfg) {
                 /* Bind colortrans
                  */
                 if (node.flagsState.flags.colortrans === false) {
-                    program.setUniform("uColortransMode", 0);  // Disable
+                    program.setUniform("SCENEJS_uColorTransMode", 0);  // Disable
                 } else {
                     var trans = node.colortransState.trans;
                     var scale = trans.scale;
                     var add = trans.add;
-                    program.setUniform("uColortransMode", 1);  // Enable
-                    program.setUniform("uColortransScale", [scale.r, scale.g, scale.b, scale.a]);  // Scale
-                    program.setUniform("uColortransAdd", [add.r, add.g, add.b, add.a]);  // Scale
-                    program.setUniform("uColortransSaturation", trans.saturation);  // Saturation
+                    program.setUniform("SCENEJS_uColorTransMode", 1);  // Enable
+                    program.setUniform("SCENEJS_uColorTransScale", [scale.r, scale.g, scale.b, scale.a]);  // Scale
+                    program.setUniform("SCENEJS_uColorTransAdd", [add.r, add.g, add.b, add.a]);  // Scale
+                    program.setUniform("SCENEJS_uColorTransSaturation", trans.saturation);  // Saturation
                     this._lastColortransStateId = node.colortransState._stateId;
                 }
             }
@@ -509,12 +448,12 @@ var SceneJS_NodeRenderer = function(cfg) {
                 /* Bind Material
                  */
                 var material = node.materialState.material;
-                program.setUniform("uMaterialBaseColor", material.baseColor);
-                program.setUniform("uMaterialSpecularColor", material.specularColor);
-                program.setUniform("uMaterialSpecular", node.flagsState.flags.specular != false ? material.specular : 0.0);
-                program.setUniform("uMaterialShine", material.shine);
-                program.setUniform("uMaterialEmit", material.emit);
-                program.setUniform("uMaterialAlpha", material.alpha);
+                program.setUniform("SCENEJS_uMaterialBaseColor", material.baseColor);
+                program.setUniform("SCENEJS_uMaterialSpecularColor", material.specularColor);
+                program.setUniform("SCENEJS_uMaterialSpecular", node.flagsState.flags.specular != false ? material.specular : 0.0);
+                program.setUniform("SCENEJS_uMaterialShine", material.shine);
+                program.setUniform("SCENEJS_uMaterialEmit", material.emit);
+                program.setUniform("SCENEJS_uMaterialAlpha", material.alpha);
 
                 this._lastMaterialStateId = node.materialState._stateId;
 
@@ -523,7 +462,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                  * may linger in the shader uniform if there is no material state change for the next node.
                  */
                 if (node.flagsState && node.flagsState.flags.highlight) {
-                    program.setUniform("uMaterialBaseColor", material.highlightBaseColor);
+                    program.setUniform("SCENEJS_uMaterialBaseColor", material.highlightBaseColor);
                     this._lastMaterialStateId = null;
                 }
             }
@@ -538,10 +477,9 @@ var SceneJS_NodeRenderer = function(cfg) {
                 var light;
                 for (var k = 0, len = lights.length; k < len; k++) {
                     light = lights[k];
-                    program.setUniform("uLightColor" + k, light.color);
-                    program.setUniform("uLightDiffuse" + k, light.diffuse);
+                    program.setUniform("SCENEJS_uLightColor" + k, light.color);
                     if (light.mode == "dir") {
-                        program.setUniform("uLightDir" + k, light.worldDir);
+                        program.setUniform("SCENEJS_uLightDir" + k, light.worldDir);
                     } else if (light.mode == "ambient") {
                         ambient = ambient ? [
                             ambient[0] + light.color[0],
@@ -550,15 +488,15 @@ var SceneJS_NodeRenderer = function(cfg) {
                         ] : light.color;
                     } else {
                         if (light.mode == "point") {
-                            program.setUniform("uLightPos" + k, light.worldPos);
+                            program.setUniform("SCENEJS_uLightPos" + k, light.worldPos);
                         }
                         if (light.mode == "spot") {
-                            program.setUniform("uLightPos" + k, light.worldPos);
-                            program.setUniform("uLightDir" + k, light.worldDir);
-                            program.setUniform("uLightSpotCosCutOff" + k, light.spotCosCutOff);
-                            program.setUniform("uLightSpotExp" + k, light.spotExponent);
+                            program.setUniform("SCENEJS_uLightPos" + k, light.worldPos);
+                            program.setUniform("SCENEJS_uLightDir" + k, light.worldDir);
+                            program.setUniform("SCENEJS_uLightCutOff" + k, light.spotCosCutOff);
+                            program.setUniform("SCENEJS_uLightSpotExp" + k, light.spotExponent);
                         }
-                        program.setUniform("uLightAttenuation" + k,
+                        program.setUniform("SCENEJS_uLightAttenuation" + k,
                                 [
                                     light.constantAttenuation,
                                     light.linearAttenuation,
@@ -576,16 +514,11 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (this._picking) {
             if (! this._lastPickListenersState || node.pickListenersState._stateId != this._lastPickListenersState._stateId) {
-                if (node.pickListenersState.listeners.length > 0) {
-                    this._pickListeners[this._pickIndex++] = node.pickListenersState;
-                    var b = this._pickIndex >> 16 & 0xFF;
-                    var g = this._pickIndex >> 8 & 0xFF;
-                    var r = this._pickIndex & 0xFF;
-                    g = g / 255;
-                    r = r / 255;
-                    b = b / 255;
-                    program.setUniform("uPickColor", [r,g,b]);
-                }
+                this._pickListeners[this._pickIndex++] = node.pickListenersState;
+                var b = this._pickIndex >> 16 & 0xFF;
+                var g = this._pickIndex >> 8 & 0xFF;
+                var r = this._pickIndex & 0xFF;
+                program.setUniform("SCENEJS_uPickColor", [r/255,g/255,b/255]);
                 this._lastPickListenersState = node.pickListenersState;
             }
         }
@@ -605,6 +538,75 @@ var SceneJS_NodeRenderer = function(cfg) {
                     this._lastRenderListenersState = node.renderListenersState;
                 }
             }
+        }
+
+        /*----------------------------------------------------------------------------------------------------------
+         * flags
+         *
+         * Set these last because we change certain other states when we determine that flags will change
+         *--------------------------------------------------------------------------------------------------------*/
+
+        if (! this._lastFlagsState || node.flagsState._stateId != this._lastFlagsState._stateId) {
+
+            /*
+             */
+            var newFlags = node.flagsState.flags;
+            var oldFlags = this._lastFlagsState ? this._lastFlagsState.flags : null;
+
+            //            var clear = newFlags.clear;
+            //            if (!oldFlags || (clear && (clear.depth != oldFlags.depth || clear.stencil != oldFlags.stencil))) {
+            //                var clear = newFlags.clear || {};
+            //                var mask = 0;
+            //                if (clear.depth) {
+            //                    mask |= gl.DEPTH_BUFFER_BIT;
+            //                }
+            //                if (clear.stencil) {
+            //                    mask |= gl.STENCIL_BUFFER_BIT;
+            //                }
+            //                if (mask != 0) { alert("clear");
+            //                    gl.clear(mask);
+            //                }
+            //            }
+
+
+            if (!oldFlags || newFlags.backfaces != oldFlags.backfaces) {
+                if (newFlags.backfaces) {
+                    gl.disable(gl.CULL_FACE);
+                } else {
+                    gl.enable(gl.CULL_FACE);
+                }
+            }
+
+            if (!oldFlags || newFlags.frontface != oldFlags.frontface) {
+                if (newFlags.frontface == "cw") {
+                    gl.frontFace(gl.CW);
+                } else {
+                    gl.frontFace(gl.CCW);
+                }
+            }
+
+            if (!oldFlags || newFlags.blendFunc != oldFlags.blendFunc) {
+                if (newFlags.blendFunc) {
+                    gl.blendFunc(glEnum(gl, newFlags.blendFunc.sfactor || "one"), glEnum(gl, newFlags.blendFunc.dfactor || "zero"));
+                } else {
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Not redundant, because of inequality test above
+                }
+            }
+
+            //            var mask = newFlags.colorMask;
+            //
+            //            if (!oldFlags || (mask && (mask.r != oldFlags.r || mask.g != oldFlags.g || mask.b != oldFlags.b || mask.a != oldFlags.a))) {
+            //
+            //                if (mask) {
+            //
+            //                    gl.colorMask(mask.r, mask.g, mask.b, mask.a);
+            //
+            //                } else {
+            //                    gl.colorMask(true, true, true, true);
+            //                }
+            //            }
+
+            this._lastFlagsState = node.flagsState;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -687,7 +689,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._program.unbind();
             this._program = null;
         }
-//        this._context.colorMask(true, true, true, true);
+        //        this._context.colorMask(true, true, true, true);
         return this._pickListeners;
     };
 };

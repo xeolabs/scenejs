@@ -15,6 +15,7 @@ SceneJS.errors.NODE_NOT_FOUND = 11;
 SceneJS.errors.NODE_ILLEGAL_STATE = 12;
 SceneJS.errors.ID_CLASH = 13;
 SceneJS.errors.ILLEGAL_MESSAGE = 14;
+SceneJS.errors.SCENE_ILLEGAL_UPDATE = 15;
 
 /**
  *

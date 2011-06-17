@@ -161,17 +161,6 @@ SceneJS.MorphGeometry.prototype._compile = function(traversalContext) {
     this._postCompile(traversalContext);
 };
 
-// @private
-SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
-
-    if (!this._handle) { // Not created yet
-
-        this._handle = SceneJS_morphGeometryModule.createMorphGeometry(this._resource, this._attr);
-
-        this._changeState(SceneJS.MorphGeometry.STATE_LOADED);
-    }
-    SceneJS_morphGeometryModule.pushMorphGeometry(this._attr.id, this._handle, this._attr.factor);
-};
 
 SceneJS.MorphGeometry.prototype._preCompile = function(traversalContext) {
     if (!this._handle) {

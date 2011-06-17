@@ -9,7 +9,7 @@
  lindsay.kay@xeolabs.com
 
  */
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
     id: "theScene",
@@ -90,15 +90,6 @@ SceneJS.createNode({
                                                 {
                                                     type : "teapot",
                                                     id: "the-teapot"
-
-
-                                                },
-                                                {
-                                                    type: "translate",
-                                                    id: "translate2",
-                                                    x:0.0,
-                                                    y:0.0,
-                                                    z:0.0
                                                 }
                                             ]
                                         }
@@ -125,53 +116,58 @@ SceneJS.createNode({
 
 var morphCreated = false;
 
-SceneJS.withNode("theScene").bind("rendered",
-        function() {
+var scene = SceneJS.scene("theScene");
 
-            var teapot = SceneJS.withNode("the-teapot");
+var teapot = scene.findNode("the-teapot");
 
-            if (!morphCreated) {
+function addMorph() {
 
-                var positions = teapot.get("positions");
-                var positions2 = [];
-                for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
-                    positions2.push(positions[i] * (1 + (Math.sin(i * 0.003) * 0.1)));
-                }
-                var positions3 = [];
-                for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
-                    positions3.push(positions[i] * (1 + (Math.sin(i * 0.015) * 0.1)));
-                }
+    if (!morphCreated) {
 
-                teapot.parent().insert({
-                    node: {
-                        type: "morphGeometry",
-                        id: "my-morph-geometry",
+        var positions = teapot.get("positions");
+        if (positions.length == 0) {
+            return;
+        }
 
-                        keys: [
-                            0, // Target 1
-                            1, // Target 2
-                            3  // target 3
-                        ],
+        var positions2 = [];
+        for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
+            positions2.push(positions[i] * (1 + (Math.sin(i * 0.003) * 0.1)));
+        }
+        var positions3 = [];
+        for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
+            positions3.push(positions[i] * (1 + (Math.sin(i * 0.015) * 0.1)));
+        }
 
-                        targets: [
-                            {
-                                positions: positions   // Target 1
-                            },
-                            {
-                                positions: positions2  // Target 2
-                            },
-                            {
-                                positions: positions3  // Target 3
-                            }
-                        ],
+        teapot.parent().insert({
+            node: {
+                type: "morphGeometry",
+                id: "my-morph-geometry",
 
-                        factor: 0.0  // Start at first target
+                keys: [
+                    0, // Target 1
+                    1, // Target 2
+                    3  // target 3
+                ],
+
+                targets: [
+                    {
+                        positions: positions   // Target 1
+                    },
+                    {
+                        positions: positions2  // Target 2
+                    },
+                    {
+                        positions: positions3  // Target 3
                     }
-                });
-            }
+                ],
 
-            morphCreated = true;
+                factor: 0.0
+            }
         });
+    }
+
+    morphCreated = true;
+}
 
 
 var yaw = 0;
@@ -195,6 +191,7 @@ function mouseUp() {
     dragging = false;
 }
 
+
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
@@ -203,10 +200,8 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * -0.5;
 
-        SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("pitch").set("angle", pitch);
-
-        SceneJS.withNode("theScene").render();
+        scene.findNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -223,12 +218,13 @@ canvas.addEventListener('mouseup', mouseUp, true);
  * increment its factor to move the morph between its two targets
  *---------------------------------------------------------------------*/
 
-SceneJS.withNode("theScene").start({
+scene.start({
     idleFunc: function() {
-        if (SceneJS.nodeExists("my-morph-geometry")) {
-            SceneJS.withNode("my-morph-geometry").set("factor", 1.0 + (Math.sin(factor) * 2.0));
+        addMorph();
+        var morphGeometry = this.findNode("my-morph-geometry");   // Wont exist until created
+        if (morphGeometry) {
+            morphGeometry.set("factor", 1.0 + (Math.sin(factor) * 2.0));
             factor += 0.1;
         }
     }
 });
-

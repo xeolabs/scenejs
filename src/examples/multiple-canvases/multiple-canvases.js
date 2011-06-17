@@ -19,7 +19,7 @@
  light sources from the same direction.
 
  */
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -161,10 +161,8 @@ SceneJS.createNode({
     ]
 });
 
-SceneJS.withNode("theScene1").start();
 
-
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -307,10 +305,7 @@ SceneJS.createNode({
 });
 
 
-SceneJS.withNode("theScene2").start();
-
-
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -453,11 +448,8 @@ SceneJS.createNode({
     ]
 });
 
-SceneJS.withNode("theScene3").start();
 
-
-
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -600,10 +592,6 @@ SceneJS.createNode({
     ]
 });
 
-SceneJS.withNode("theScene4").start();
-
-
-
 
 /*----------------------------------------------------------------------
  *
@@ -627,6 +615,11 @@ function mouseUp1() {
     dragging1 = false;
 }
 
+var scene1 = SceneJS.scene("theScene1");
+var scene2 = SceneJS.scene("theScene2");
+var scene3 = SceneJS.scene("theScene3");
+var scene4 = SceneJS.scene("theScene4");
+
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
@@ -635,20 +628,20 @@ function mouseMove1(event) {
         yaw1 += (event.clientX - lastX1) * 0.2;
         pitch1 += (event.clientY - lastY1) * -0.2;
 
-        SceneJS.withNode("yaw1").set("angle", yaw1);
-        SceneJS.withNode("pitch1").set("angle", pitch1);
+        scene1.findNode("yaw1").set("angle", yaw1);
+        scene1.findNode("pitch1").set("angle", pitch1);
 
         lastX1 = event.clientX;
         lastY1 = event.clientY;
 
-        SceneJS.withNode("yaw2").set("angle", yaw1);
-        SceneJS.withNode("roll2").set("angle", pitch1);
+        scene2.findNode("yaw2").set("angle", yaw1);
+        scene2.findNode("roll2").set("angle", pitch1);
 
-        SceneJS.withNode("roll3").set("angle", yaw1);
-        SceneJS.withNode("pitch3").set("angle", pitch1);
+        scene3.findNode("roll3").set("angle", yaw1);
+        scene3.findNode("pitch3").set("angle", pitch1);
 
-        SceneJS.withNode("yaw4").set("angle", yaw1);
-        SceneJS.withNode("roll4").set("angle", pitch1);
+        scene4.findNode("yaw4").set("angle", yaw1);
+        scene4.findNode("roll4").set("angle", pitch1);
     }
 }
 

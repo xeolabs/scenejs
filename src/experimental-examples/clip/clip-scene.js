@@ -5,7 +5,7 @@
  lindsay.kay@xeolabs.com
 
  */
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 

@@ -13,7 +13,7 @@
  */
 
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "myScene",
     canvasId: "theCanvas" , // Bind to canvas
@@ -128,8 +128,9 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        var scene = SceneJS.scene("myScene");
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
 
     }
 }
@@ -138,4 +139,4 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("myScene").start();
+SceneJS.scene("myScene").start();

@@ -32,7 +32,6 @@ var SceneJS_Map = function() {
     };
 };
 
-var SceneJS_sceneNodeMaps = new SceneJS_Map();
 
 /**
  * @class SceneJS
@@ -48,6 +47,10 @@ var SceneJS = {
     /** Names of supported WebGL canvas contexts
      */
     SUPPORTED_WEBGL_CONTEXT_NAMES:["webgl", "experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"],
+
+    /** Map of existing scenes
+     */
+    _scenes: {},
 
     /** Extension point to create a new node type.
      *
@@ -79,7 +82,6 @@ var SceneJS = {
             return n;
         };
         this._registerNode(type, nodeType, nodeFunc);
-        SceneJS[type] = nodeFunc;
         return nodeType;
     },
 
@@ -90,56 +92,46 @@ var SceneJS = {
         };
     },
 
-    createScene : function(json) {
-        if (!json) {
-            throw "createScene param 'json' is null or undefined";
-        }
-        json.type = "scene";
-        var newNode = this._parseNodeJSON(json, undefined); // Scene references itself as the owner scene
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
-        return SceneJS.withNode(newNode);
-    },
-
     /**
-     * Factory function to create a scene (sub)graph from JSON
-     * @param json
-     * @return {SceneJS.Node} Root of (sub)graph
+     * Factory function to create a "scene" node
      */
-    createNode : function(json) {
+    createScene : function(json) {
         if (!json) {
             throw "createNode param 'json' is null or undefined";
         }
-        if (json.parent) {
-            if (json.type == "scene") {
-                throw SceneJS_errorModule.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "createNode 'parent' not expected for 'scene' node");
-            }
-            if (json.parent == json.id) {
-                throw SceneJS_errorModule.fatalError(
-                        SceneJS.errors.NODE_NOT_FOUND,
-                        "createNode 'parent' cannot equal 'id'");
-            }
-            var parent = SceneJS_sceneNodeMaps.items[json.parent];
-            if (!parent) {
-                throw SceneJS_errorModule.fatalError(
-                        SceneJS.errors.NODE_NOT_FOUND,
-                        "createNode 'parent' not resolved");
-            }
-            var newNode = this._parseNodeJSON(json, parent._scene);
-            SceneJS.withNode(parent).add("node", newNode); // Fires events and compilation triggering
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getId(), json: json });
-            return SceneJS.withNode(newNode);
-        } else {
-            if (json.type != "scene") {
-                throw SceneJS_errorModule.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "createNode 'parent' is expected for all node types except 'scene'");
-            }
-            var newNode = this._parseNodeJSON(json, undefined); // Scene references itself as the owner scene
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
-            return SceneJS.withNode(newNode);
+        json.type = "scene";
+        if (!json.id) {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "createNode 'id' is mandatory for 'scene' node");
         }
+        if (this._scenes[json.id]) {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "createNode 'id' already taken by another 'scene' node");
+        }
+        var newNode = this._parseNodeJSON(json, undefined); // Scene references itself as the owner scene
+        this._scenes[json.id] = newNode;
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
+        return new SceneJS._WithNode(newNode);        
+    },
+
+    /** Returns true if the "scene" node with the given ID exists
+     */
+    sceneExists : function(sceneId) {
+        return this._scenes[sceneId] ? true : false;
+    },
+
+    /** Select a "scene" node
+     */
+    scene : function(sceneId) {
+        var scene = this._scenes[sceneId];
+        if (!scene) {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "withScene scene not found: '" + sceneId + "'");
+        }
+        return new SceneJS._WithNode(scene);
     },
 
     /**
@@ -188,22 +180,6 @@ var SceneJS = {
         return new nodeType.nodeClass(json, scene);   // Faster to instantiate class directly
     },
 
-    /** Returns true if the {@link SceneJS.Node} with the given ID exists
-     *
-     * @param id ID of {@link SceneJS.Node} to find
-     * @returns {Boolean} True if node exists else false
-     */
-    nodeExists : function(id) {
-        if (!id) {
-            throw "nodeExists param 'id' null or undefined";
-        }
-        if (typeof id != "string") {
-            throw "nodeExists param 'id' not a string";
-        }
-        var node = SceneJS_sceneNodeMaps.items[id];
-        return (node != undefined && node != null);
-    },
-
     /**
      * Shallow copy of JSON node configs, filters out JSON-specific properties like "nodes"
      * @private
@@ -243,14 +219,7 @@ var SceneJS = {
      * Node factory funcs mapped to type
      * @private
      */
-    _nodeTypes: {},
-
-    /**
-     * Links each node that is an instance target back to
-     * it's instance- for each target node a map of the
-     * {@link SceneJS.Instance} nodes pointing to it
-     */
-    _nodeInstanceMap : {},
+    _nodeTypes: {},  
 
     /*----------------------------------------------------------------------------------------------------------------
      * Messaging System

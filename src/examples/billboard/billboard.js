@@ -14,9 +14,9 @@
  * Scene graph definition
  *---------------------------------------------------------------------*/
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
-    id: "the-scene",
+    id: "theScene",
     canvasId: "theCanvas",
     loggingElementId: "theLoggingDiv",
 
@@ -47,7 +47,8 @@ SceneJS.createNode({
                             type: "texture",
                             layers: [
                                 {
-                                    uri: "images/avatar.png"
+                                    uri: "images/avatar.png" ,
+                                    blendMode: "add"
                                 }
                             ],
                             nodes: [
@@ -166,6 +167,8 @@ SceneJS.createNode({
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
+var scene = SceneJS.scene("theScene");
+
 var yaw = 0;
 var pitch = 0;
 var lastX;
@@ -190,8 +193,8 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * -0.5;
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -206,4 +209,4 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 /* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
  */
-SceneJS.withNode("the-scene").start();
+scene.start();

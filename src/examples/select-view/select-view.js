@@ -11,7 +11,7 @@
  * lindsay.kay@xeolabs.com
  * January 2010
  */
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
     id: "theScene",
@@ -142,11 +142,11 @@ SceneJS.createNode({
 var activeView = 0;
 var canvas = document.getElementById("theCanvas");
 
-SceneJS.withNode("theScene").start();
+SceneJS.scene("theScene").start();
 
 function mouseClick() {
     activeView = (activeView + 1) % 3;
-    SceneJS.withNode("mySelector").set("selection", [activeView]);
+    SceneJS.scene("theScene").findNode("mySelector").set("selection", [activeView]);
 }
 
 canvas.addEventListener('click', mouseClick, true);

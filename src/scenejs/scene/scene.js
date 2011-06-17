@@ -15,6 +15,8 @@ SceneJS.Scene.prototype._init = function(params) {
     this.setLayers(params.layers);
     this._destroyed = false;
     this._scene = this;
+    this._nodeMap = new SceneJS_Map(); // Can auto-generate IDs when not supplied
+    this._instanceMap = {}; // Map for each node ID of instances that target it - targets don't have to exist yet 
 };
 
 /** ID of canvas SceneJS looks for when {@link SceneJS.Scene} node does not supply one
@@ -128,7 +130,7 @@ SceneJS.Scene.prototype.start = function(cfg) {
             }
 
             if (!cfg.requestAnimationFrame) {
-               window.setTimeout(window[fnName], 1000 / 60);
+                window.setTimeout(window[fnName], 1000 / (cfg.fps || 60));
             }
         };
 
@@ -275,25 +277,25 @@ SceneJS.Scene.prototype.containsNode = function(nodeId) {
     if (!this._created) {
         return null;
     }
-    var scene = SceneJS_sceneModule.scenes[this._attr.id];
-    if (!scene) {
-        return false;
-    }
-    var node = scene.nodeMap.items[nodeId]
-    return node != null && node != undefined;
+    var node = this._nodeMap.items[nodeId];
+    return (node) ? true : false;
 };
 
-/** Finds a node within this scene
- */
 SceneJS.Scene.prototype.findNode = function(nodeId) {
-    if (!this._created) {
-        throw SceneJS_errorModule.fatalError(
-                SceneJS.errors.NODE_ILLEGAL_STATE,
-                "Scene has been destroyed");
-    }
-    var scene = SceneJS_sceneModule.scenes[this._attr.id];
-    return scene.nodeMap.items[nodeId];
+//    if (!this._created) {
+//        throw SceneJS_errorModule.fatalError(
+//                SceneJS.errors.NODE_ILLEGAL_STATE,
+//                "Scene has been destroyed");
+//    }
+    var node = this._nodeMap.items[nodeId];
+//    if (!node) {
+//        throw SceneJS_errorModule.fatalError(
+//                SceneJS.errors.NODE_ILLEGAL_STATE,
+//                "Node '" + nodeId + "' not found in scene '" + this._attr.id + "'");
+//    }
+    return node ? new SceneJS._WithNode(node) : null;
 };
+
 
 /** Total SceneJS reset - destroys all scenes and cached resources.
  */

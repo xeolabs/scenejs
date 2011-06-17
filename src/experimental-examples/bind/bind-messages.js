@@ -10,7 +10,7 @@
  * lindsay.kay@xeolabs.com
  * November 2010
  */
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "my-scene",
     canvasId: 'theCanvas',

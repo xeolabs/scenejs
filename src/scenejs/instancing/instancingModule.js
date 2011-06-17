@@ -10,6 +10,7 @@
  *  @private
  */
 var SceneJS_instancingModule = new function() {
+    var sceneId;
     var idStack = [];
     var countInstances = 0;
     var instances = {}; // Maps ID of each current node instance
@@ -24,7 +25,8 @@ var SceneJS_instancingModule = new function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function() {
+            function(params) {
+                sceneId = params.sceneId;
                 idStack = [];
                 countInstances = 0;
                 instances = {};
@@ -32,22 +34,22 @@ var SceneJS_instancingModule = new function() {
 
     /** Acquire instance of a node
      */
-    this.acquireInstance = function(id, nodeID) {
-        if (instances[nodeID]) {
-            SceneJS_errorModule.error(
-                    SceneJS.errors.INSTANCE_CYCLE,
-                    "SceneJS.Instance attempted to create cyclic instantiation: " + nodeID);
-            return null;
-        }
-        var node = SceneJS_sceneNodeMaps.items[nodeID];
-        if (!node) {
-            var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_LOADER_SERVICE_ID);
-            if (nodeStore) {
-                node = nodeStore.loadNode(nodeID);
-            }
-        }
-        if (node) {
-            instances[nodeID] = nodeID;
+    this.acquireInstance = function(id, node) {
+//        if (instances[nodeID]) {
+//            SceneJS_errorModule.error(
+//                    SceneJS.errors.INSTANCE_CYCLE,
+//                    "SceneJS.Instance attempted to create cyclic instantiation: " + nodeID);
+//            return null;
+//        }
+//        var node = SceneJS_sceneModule.scenes[sceneId].scene._nodeMap.items[nodeID];
+//        if (!node) {
+//            var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_LOADER_SERVICE_ID);
+//            if (nodeStore) {
+//                node = nodeStore.loadNode(nodeID);
+//            }
+//        }
+//        if (node) {
+//            instances[nodeID] = nodeID;
             idStack.push(id);
             countInstances++;
 
@@ -55,8 +57,8 @@ var SceneJS_instancingModule = new function() {
              * internally form state IDs prefixed by the instance
              */
             SceneJS_renderModule.setIDPrefix(idStack.join(""));
-        }
-        return node;
+//        }
+//        return node;
     };
 
     /**
@@ -72,7 +74,7 @@ var SceneJS_instancingModule = new function() {
      * previously acquired
      */
     this.releaseInstance = function(nodeID) {
-        instances[nodeID] = undefined;
+        instances[nodeID] = null;
         idStack.pop();
         countInstances--;
         SceneJS_renderModule.setIDPrefix((countInstances > 0) ? idStack[countInstances - 1] : null);

@@ -15,7 +15,7 @@
  *
  */
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "my-scene",
     canvasId: "theCanvas",
@@ -172,10 +172,12 @@ SceneJS.createNode({
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
+var scene = SceneJS.scene("my-scene");
+
 var yaw = -0;
 var pitch = -40;
 
-SceneJS.withNode("teapot1").bind(
+scene.findNode("teapot1").bind(
         "rendered",
         function (event) {
             var params = event.params;
@@ -189,7 +191,7 @@ SceneJS.withNode("teapot1").bind(
                     params.getWorldPos());
         });
 
-SceneJS.withNode("teapot2").bind(
+scene.findNode("teapot2").bind(
         "rendered",
         function (event) {
             var params = event.params;
@@ -202,7 +204,7 @@ SceneJS.withNode("teapot2").bind(
                     params.getWorldPos());
         });
 
-SceneJS.withNode("teapot3").bind(
+scene.findNode("teapot3").bind(
         "rendered",
         function (event) {
             var params = event.params;
@@ -215,13 +217,12 @@ SceneJS.withNode("teapot3").bind(
                     params.getWorldPos());
         });
 
-SceneJS.withNode("my-scene").start({
+scene.start({
 
     idleFunc: function() {
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-
-        SceneJS.withNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
 
         yaw += 0.1;
         pitch += 0.1;

@@ -17,7 +17,7 @@
  * Scene graph definition
  *---------------------------------------------------------------------*/
 
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -210,16 +210,24 @@ SceneJS.createNode({
  */
 SceneJS.Message.sendMessage({
 
-    command:"clip.clipbox.create",
+    command: "selectScenes",
 
-    target: "insert-clipbox-here",
+    scenes: ["theScene"],
 
-    xmin: -1.2,
-    ymin: -1.2,
-    zmin: -1.2,
-    xmax: 1.2,
-    ymax: 1.2,
-    zmax: 1.2
+    commands: [
+        {
+            command:"clip.clipbox.create",
+
+            target: "insert-clipbox-here",
+
+            xmin: -1.2,
+            ymin: -1.2,
+            zmin: -1.2,
+            xmax: 1.2,
+            ymax: 1.2,
+            zmax: 1.2
+        }
+    ]
 });
 
 /* Now we'll issue the "clip.clipbox.update" command to tweak the
@@ -227,13 +235,22 @@ SceneJS.Message.sendMessage({
  */
 SceneJS.Message.sendMessage({
 
-    command:"clip.clipbox.update",
+    command: "selectScenes",
 
-    target: "insert-clipbox-here",
+    scenes: ["theScene"],
 
-    ymin: -2.0,
-    xmax: 2.0,
-    zmax: 2.0
+    commands: [
+        {
+
+            command:"clip.clipbox.update",
+
+            target: "insert-clipbox-here",
+
+            ymin: -2.0,
+            xmax: 2.0,
+            zmax: 2.0
+        }
+    ]
 });
 
 
@@ -261,8 +278,6 @@ var pitch = 0;
 var lastX;
 var lastY;
 var dragging = false;
-
-SceneJS.withNode("theScene").render();
 
 var canvas = document.getElementById("theCanvas");
 
@@ -295,7 +310,7 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 var factor = 0.0;
 
-SceneJS.withNode("theScene").start({
+SceneJS.scene("theScene").start({
     idleFunc: function() {
 
         /* We'll periodically issue the "clip.clipbox.update" command to tweak the
@@ -306,11 +321,20 @@ SceneJS.withNode("theScene").start({
 
         SceneJS.Message.sendMessage({
 
-            command:"clip.clipbox.update",
+            command: "selectScenes",
 
-            target: "insert-clipbox-here",
+            scenes: ["theScene"],
 
-            ymax: extent
+            commands: [
+                {
+
+                    command:"clip.clipbox.update",
+
+                    target: "insert-clipbox-here",
+
+                    ymax: extent
+                }
+            ]
         });
     }
 });

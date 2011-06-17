@@ -81,6 +81,7 @@ SceneJS.Texture.prototype.getState = function() {
 
 SceneJS.Texture.prototype._compile = function(traversalContext) {
     var layer;
+    var countLoaded = 0;
     for (var i = 0; i < this._layers.length; i++) {
         layer = this._layers[i];
         if (!layer.texture) {
@@ -110,14 +111,17 @@ SceneJS.Texture.prototype._compile = function(traversalContext) {
             SceneJS_loadStatusModule.status.numNodesLoading++;
         } else {
             SceneJS_loadStatusModule.status.numNodesLoaded++;
+            countLoaded++;
         }
         if (layer.rebuildMatrix) {
             this._rebuildTextureMatrix(layer);
         }
     }
-    SceneJS_textureModule.pushTexture(this._attr.id, this._layers);
-    this._compileNodes(traversalContext);
-    SceneJS_textureModule.popTexture();
+   // if (countLoaded == this._layers.length) {
+        SceneJS_textureModule.pushTexture(this._attr.id, this._layers);
+        this._compileNodes(traversalContext);
+        SceneJS_textureModule.popTexture();
+ //   }
 };
 
 SceneJS.Texture.prototype._rebuildTextureMatrix = function(layer) {

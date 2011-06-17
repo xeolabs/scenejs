@@ -6,7 +6,7 @@ soundManager.flashVersion = 9;
 soundManager.url = 'SoundManager2/';
 
 // The tiled floor
-SceneJS.createNode({
+SceneJS.createScene({
 	type: "material",
 	
 	id: "tiled-floor",
@@ -59,7 +59,7 @@ SceneJS.createNode({
 });
 
 // The Scene
-SceneJS.createNode({
+SceneJS.createScene({
 	type: "scene",
 	id: "theScene",
 	canvasId: "theCanvas",

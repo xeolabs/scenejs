@@ -119,24 +119,25 @@ SceneJS.Instance.prototype.setTarget = function(target) {
      */
     var map;
     if (this._attr.target) {
-        map = SceneJS._nodeInstanceMap[this._attr.target];
+        map = this._scene._instanceMap[this._attr.target];
         if (!map) {
-            map = SceneJS._nodeInstanceMap[this._attr.target] = {
+            map = this._scene._instanceMap[this._attr.target] = {
                 numInstances: 0,
                 instances: {}
             };
+        } else {
+            delete map.instances[this._attr.id];
+            map.numInstances--;
         }
-        map.numInstances--;
-        map.instances[this._attr.id] = undefined;
     }
     this._attr.target = target;
 
     /* Register new link
      */
     if (target) {
-        map = SceneJS._nodeInstanceMap[target];
+        map = this._scene._instanceMap[target];
         if (!map) {
-            map = SceneJS._nodeInstanceMap[this._attr.target] = {
+            map = this._scene._instanceMap[this._attr.target] = {
                 numInstances: 0,
                 instances: {}
             };
@@ -156,7 +157,9 @@ SceneJS.Instance.prototype._compile = function(traversalContext) {
     if (this._attr.target) {
         var nodeId = this._attr.target; // Make safe to set #uri while instantiating
 
-        this._symbol = SceneJS_instancingModule.acquireInstance(this._attr.id, nodeId);
+        this._symbol = this._scene._nodeMap.items[nodeId];
+
+        //this._symbol = SceneJS_instancingModule.acquireInstance(this._attr.id, nodeId);
 
         if (!this._symbol) {
 
@@ -188,6 +191,8 @@ SceneJS.Instance.prototype._compile = function(traversalContext) {
             }
 
         } else {
+
+            SceneJS_instancingModule.acquireInstance(this._attr.id, nodeId);
 
             /* Record this node as loaded
              */
@@ -267,14 +272,13 @@ SceneJS.Instance.prototype._createTargetTraversalContext = function(traversalCon
  */
 SceneJS.Instance.prototype._destroy = function() {
     if (this._attr.target) {
-        var map = SceneJS._nodeInstanceMap[this._attr.target];
+        var map = this._scene._instanceMap[this._attr.target];
         if (map) {
             map.numInstances--;
-            map.instances[this._attr.id] = undefined;
+            delete map.instances[this._attr.id];
         }
     }
 };
-
 
 /*---------------------------------------------------------------------
  * Query methods - calls to these only legal while node is rendering

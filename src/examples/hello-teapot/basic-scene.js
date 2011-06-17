@@ -14,7 +14,7 @@
 
  */
 
-SceneJS.createNode({
+SceneJS.createScene({
 
     type: "scene",
 
@@ -147,6 +147,13 @@ SceneJS.createNode({
     ]
 });
 
+SceneJS.setDebugConfigs({
+ shading : {
+        logScripts : true
+    }
+});
+
+
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
@@ -156,8 +163,6 @@ var lastX;
 var lastY;
 var dragging = false;
 
-
-SceneJS.withNode("theScene").render();
 
 var canvas = document.getElementById("theCanvas");
 
@@ -179,8 +184,10 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
 
-        SceneJS.withNode("yaw").set("angle", yaw);
-        SceneJS.withNode("pitch").set("angle", pitch);
+        var scene = SceneJS.scene("theScene");
+        
+        scene.findNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -191,6 +198,5 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-
-SceneJS.withNode("theScene").start();
+SceneJS.scene("theScene").start();
 

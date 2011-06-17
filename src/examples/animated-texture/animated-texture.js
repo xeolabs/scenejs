@@ -8,7 +8,7 @@
  */
 
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "theScene",
     canvasId: "theCanvas",
@@ -134,9 +134,12 @@ SceneJS.createNode({
     ]
 });
 
+
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff
  *---------------------------------------------------------------------*/
+
+var scene = SceneJS.scene("theScene");
 
 var yaw = -30;
 var pitch = -30;
@@ -170,8 +173,8 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
     }
 }
 
@@ -179,9 +182,12 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("theScene").start({
+scene.start({
     idleFunc: function() {
-        SceneJS.withNode("theTexture").set("layers", {
+
+        /* "this" is the scene        
+         */
+        scene.findNode("theTexture").set("layers", {
             "0":{
                 scale: {
                     x: texScale,

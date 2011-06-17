@@ -92,7 +92,7 @@ SceneJS.Services.addService(SceneJS.Services.MORPH_GEO_LOADER_SERVICE_ID, new My
 
 /* Scene graph containing geometry that pulls in the stream
  */
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
@@ -154,7 +154,7 @@ SceneJS.createNode({
                                         {
                                             type: "material",
                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                            
+
                                             nodes: [
                                                 {
                                                     type: "texture",
@@ -241,6 +241,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
+var scene = SceneJS.scene("the-scene");
 
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
@@ -253,8 +254,8 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
     }
 }
 
@@ -267,10 +268,11 @@ canvas.addEventListener('mouseup', mouseUp, true);
  */
 var factor = FIRST_MORPH_KEY;
 
-SceneJS.withNode("the-scene").start({
+scene.start({
     idleFunc: function() {
-        if (SceneJS.nodeExists("my-morph-geometry")) {
-            SceneJS.withNode("my-morph-geometry").set("factor", factor);
+        var morphGeometry = scene.findNode("my-morph-geometry");
+        if (morphGeometry) { // May not be loaded yet
+            morphGeometry.set("factor", factor);
             factor += 0.1;
             if (factor > LAST_MORPH_KEY) {
                 factor = FIRST_MORPH_KEY;

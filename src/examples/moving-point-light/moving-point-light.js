@@ -5,7 +5,7 @@
  lindsay.kay@xeolabs.com
 
  */
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id:"theScene",
     canvasId: "theCanvas",
@@ -183,6 +183,8 @@ function mouseUp() {
     dragging = false;
 }
 
+var scene = SceneJS.scene("theScene");
+
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
@@ -193,23 +195,21 @@ function mouseMove(event) {
 
         if (Math.abs(roty) > Math.abs(rotx)) {
 
-            SceneJS.withNode("myQuaternion").add({
+            scene.findNode("myQuaternion").add({
                 rotation:{
                     y: 1,
                     angle: roty
                 }
             });
-            SceneJS.withNode("theScene").render();
 
         } else {
 
-            SceneJS.withNode("myQuaternion").add({
+            scene.findNode("myQuaternion").add({
                 rotation:{
                     x: 1,
                     angle: rotx
                 }
             });
-            SceneJS.withNode("theScene").render();
         }
         lastX = event.clientX;
         lastY = event.clientY;
@@ -224,7 +224,7 @@ SceneJS.bind("error", function(e) {
     alert(e.exception.message);
 });
 
-SceneJS.withNode("theScene").start();
+scene.start();
 
 
 

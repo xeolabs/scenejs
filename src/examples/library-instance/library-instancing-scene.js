@@ -19,7 +19,7 @@
  * materials from the material library we just defined.
  *--------------------------------------------------------------------------*/
 
-SceneJS.createNode({
+SceneJS.createScene({
     type: "scene",
     id: "the-scene",
     canvasId: "theCanvas",
@@ -237,13 +237,15 @@ function mouseUp() {
     dragging = false;
 }
 
+var scene = SceneJS.scene("the-scene");
+
 function mouseMove(event) {
     if (dragging) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
 
-        SceneJS.withNode("pitch").set("angle", pitch);
-        SceneJS.withNode("yaw").set("angle", yaw);
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -254,7 +256,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.withNode("the-scene").start();
+scene.start();
 
 
 
