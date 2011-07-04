@@ -40,7 +40,7 @@ SceneJS.Services.addService(
                                         socket.onmessage(messageObj);
                                     }
                                 } catch (e) {
-                                    throw "WebSocket error reading message (from server at URI: '" + socket.uri + "') : ";
+                                    throw  SceneJS_errorModule.fatalError("WebSocket error reading message (from server at URI: '" + socket.uri + "') : ");
                                 }
                             }
                         }
@@ -50,18 +50,18 @@ SceneJS.Services.addService(
 
             this.open = function(params, handlers) {
                 if (!("WebSocket" in window)) {
-                    throw "WebSocket cannot be used - WebSockets are not supported by this browser";
+                    throw  SceneJS_errorModule.fatalError("WebSocket cannot be used - WebSockets are not supported by this browser");
                 }
                 params = params || {};
                 if (!params.url) {
-                    throw "WebSocket param expected: url";
+                    throw  SceneJS_errorModule.fatalError("WebSocket param expected: url");
                 }
                 var socketId = nextSocketId();
                 var webSocket;
                 try {
                     webSocket = new WebSocket(params.uri);  // W3C WebSocket
                 } catch (e) {
-                    throw "WebSocket error (URI: '" + params.uri + "') : " + e.message || e;
+                    throw  SceneJS_errorModule.fatalError("WebSocket error (URI: '" + params.uri + "') : " + e.message || e);
                 }
                 var socket = {
                     id : socketId,
@@ -94,13 +94,13 @@ SceneJS.Services.addService(
             this.send = function(socketId, message) {
                 var socket = getSocket(socketId);
                 if (socket.socket.readyState != 1) {
-                    throw "Socket not open: " + socketId;
+                    throw  SceneJS_errorModule.fatalError("Socket not open: " + socketId);
                 }
                 var messageStr = JSON.stringify(message);
                 try {
                     socket.socket.send(messageStr);
                 } catch (e) {
-                    throw "WebSocket error sending message to server at URI: '" + socket.uri + "' : " + e;
+                    throw  SceneJS_errorModule.fatalError("WebSocket error sending message to server at URI: '" + socket.uri + "' : " + e);
                 }
             };
 
@@ -173,7 +173,7 @@ SceneJS.Services.addService(
             function getSocket(socketId) {
                 var socket = sockets[socketId];
                 if (!socket) {
-                    throw "Socket not found: " + socketId;
+                    throw  SceneJS_errorModule.fatalError("Socket not found: " + socketId);
                 }
                 return socket;
             }

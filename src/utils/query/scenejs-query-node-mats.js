@@ -98,7 +98,7 @@ SceneJS.utils.query.QueryNodeMats.prototype.setConfigs = function(cfg) {
         cfg = {};
     }
     if (!cfg.model && !cfg.proj && !cfg.view) {
-        throw "SceneJS.utils.query.QueryNodeMats misconfigured - need one or more of model, view and proj";
+        throw  SceneJS_errorModule.fatalError("SceneJS.utils.query.QueryNodeMats misconfigured - need one or more of model, view and proj");
     }
     this._cfg = {
         model : cfg.model,
@@ -117,7 +117,7 @@ SceneJS.utils.query.QueryNodeMats.prototype.setConfigs = function(cfg) {
  */
 SceneJS.utils.query.QueryNodeMats.prototype.execute = function(params, completed) {
     if (!params.nodeId) {
-        throw "SceneJS.utils.query.QueryNodeMats.execute expects params.nodeId";
+        throw  SceneJS_errorModule.fatalError("SceneJS.utils.query.QueryNodeMats.execute expects params.nodeId");
     }
     var node = SceneJS.withNode(params.nodeId);
     this._queryResult = this._walkUpBranch(node, null);

@@ -16,37 +16,17 @@ var SceneJS_morphGeometryModule = new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function() {
-                canvas = null;
-                currentMorphs = null;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
-            function(c) {
-                if (!canvasMorphs[c.canvasId]) {      // Lazy-create morph map for canvas
-                    canvasMorphs[c.canvasId] = {};
+            function(params) {
+                canvas = params.canvas;
+                if (!canvasMorphs[canvas.canvasId]) {      // Lazy-create morph map for canvas
+                    canvasMorphs[canvas.canvasId] = {};
                 }
-                canvas = c;
-                currentMorphs = canvasMorphs[c.canvasId];
+                currentMorphs = canvasMorphs[canvas.canvasId];
                 stackLen = 0;
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_DEACTIVATED,
-            function() {
-                canvas = null;
-                currentMorphs = null;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -115,11 +95,6 @@ var SceneJS_morphGeometryModule = new (function() {
                     }
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
             });
 
     SceneJS_eventModule.addListener(
@@ -274,7 +249,7 @@ var SceneJS_morphGeometryModule = new (function() {
                 }
                 if (target.uv2 && target.uv2.length > 0) {
                     newTarget.uvBuf2 = new SceneJS_webgl_ArrayBuffer(context, context.ARRAY_BUFFER,
-                           target.uv2, target.uv2.length, 2, usage);
+                            target.uv2, target.uv2.length, 2, usage);
                 }
             }
 
@@ -316,7 +291,7 @@ var SceneJS_morphGeometryModule = new (function() {
         }
         var morph = morphs[handle.resource];
         if (!morph) {
-            throw "morph not found: '" + handle.resource + "'";
+            throw  SceneJS_errorModule.fatalError("morph not found: '" + handle.resource + "'");
         }
         destroyMorph(morph);
     };

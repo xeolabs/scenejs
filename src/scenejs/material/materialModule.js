@@ -3,7 +3,7 @@
  *
  * Services the SceneJS.material scene node, providing it with methods to set and get the current material.
  *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a
  * MATERIAL_EXPORTED to pass the material properties to the shading backend.
  *
  * Avoids redundant export of the material properties with a dirty flag; they are only exported when that is set, which
@@ -33,13 +33,7 @@ var SceneJS_materialModule = new (function() {
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -49,12 +43,6 @@ var SceneJS_materialModule = new (function() {
                     }
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
             });
 
     this.pushMaterial = function(id, m) {

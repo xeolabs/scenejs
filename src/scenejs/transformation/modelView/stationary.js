@@ -1,59 +1,34 @@
-/**
- * @class A Scene node that defines a region within a {@link SceneJS.LookAt} in which the translations specified by that node have no effect.
- * @extends SceneJS.Node
- *
- * <p> As the parameters of the {@link SceneJS.LookAt} are modified, the content in the subgraph
- * of this node will rotate about the eye position, but will not translate as the eye position moves. You could therefore
- * define a skybox within the subgraph of this node, that will always stay in the distance.</p>
- *
- * <p><b>Example:</b></p><p>A box that the eye position never appears to move outside of</b></p><pre><code>
- * var l = new SceneJS.LookAt({
- *     eye  : { x: 0.0, y: 10.0, z: -15 },
- *     look : { y:1.0 },
- *     up   : { y: 1.0 },
- *
- *      new SceneJS.Stationary(
- *          new SceneJS.Scale({ x: 100.0, y: 100.0, z: 100.0 },
- *              new SceneJS.Cube()
- *          )
- *      )
- *  )
- *
- * </pre></code>
- *
- *  @constructor
- * Create a new SceneJS.Stationary
- * @param {args} args Zero or more child nodes
- */
-SceneJS.Stationary = SceneJS.createNodeType("stationary");
+(function () {
 
-SceneJS.Stationary.prototype._compile = function(traversalContext) {
+    var Stationary = SceneJS.createNodeType("stationary");
 
-    var origMemoLevel = this._memoLevel;
+    Stationary.prototype._compile = function(traversalContext) {
 
-    var superXform = SceneJS_viewTransformModule.getTransform();
-    var lookAt = superXform.lookAt;
-    if (lookAt) {
-        if (this._memoLevel == 0 || (!superXform.fixed)) {
-            var tempMat = SceneJS_math_mat4();
-            SceneJS_math_mulMat4(superXform.matrix,
-                    SceneJS_math_translationMat4v(lookAt.eye), tempMat);
-            this._xform = {
-                matrix: tempMat,
-                lookAt: lookAt,
-                fixed: origMemoLevel == 1
-            };
+        var origMemoLevel = this._compileMemoLevel;
 
-            if (superXform.fixed && !SceneJS_instancingModule.instancing()) {
-                this._memoLevel = 1;
-            }
+        var superXform = SceneJS_viewTransformModule.getTransform();
+        var lookAt = superXform.lookAt;
+        if (lookAt) {
+            if (this._compileMemoLevel == 0 || (!superXform.fixed)) {
+                var tempMat = SceneJS_math_mat4();
+                SceneJS_math_mulMat4(superXform.matrix,
+                        SceneJS_math_translationMat4v(lookAt.eye), tempMat);
+                this._xform = {
+                    matrix: tempMat,
+                    lookAt: lookAt,
+                    fixed: origMemoLevel == 1
+                };
+
+                if (superXform.fixed && !SceneJS_instancingModule.instancing()) {
+                    this._compileMemoLevel = 1;
+                }
+           }
+            SceneJS_viewTransformModule.pushTransform(this.attr.id, this._xform);
+            this._compileNodes(traversalContext);
+            SceneJS_viewTransformModule.popTransform();
+        } else {
+            this._compileNodes(traversalContext);
         }
-        SceneJS_viewTransformModule.pushTransform(this._attr.id, this._xform);
-        this._compileNodes(traversalContext);
-        SceneJS_viewTransformModule.popTransform();
-    } else {
-        this._compileNodes(traversalContext);        
-    }
-};
+    };
 
-
+})();

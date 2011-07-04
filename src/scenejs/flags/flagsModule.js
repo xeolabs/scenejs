@@ -8,8 +8,8 @@
  */
 var SceneJS_flagsModule = new (function() {
 
-    var idStack = new Array(255);
-    var flagStack = new Array(255);
+    var idStack = [];
+    var flagStack = [];
     var stackLen = 0;
     var dirty;
 
@@ -93,12 +93,12 @@ var SceneJS_flagsModule = new (function() {
     /* Export flags when renderer needs them - only when current set not exported (dirty)
      */
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
-            function() {
+            SceneJS_eventModule.SCENE_RENDERING,
+            function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setFlags(idStack[stackLen - 1], self.flags);
-                    } else {
+                    } else   {
                         SceneJS_renderModule.setFlags();
                     }
                     dirty = false;
@@ -106,22 +106,27 @@ var SceneJS_flagsModule = new (function() {
             });
 
     this.preVisitNode = function(node) {
-        var attr = node._attr;
-        if (attr.flags) {
-            this.flags = createFlags(attr.flags);
-            idStack[stackLen] = attr.id;
-            flagStack[stackLen] = this.flags;
-            stackLen++;
-            dirty = true;
+        var attr = node.attr;
+        var flags = attr.flags;
+        if (flags) {
+            flags = createFlags(flags);
+        } else {
+            flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
         }
+        idStack[stackLen] = attr.id;
+        flagStack[stackLen] = flags;
+        stackLen++;
+        dirty = true;
+        this.flags = flags;
     };
 
     this.postVisitNode = function(node) {
-        if (stackLen > 0 && idStack[stackLen - 1] === node._attr.id) {
+        if (stackLen > 0 && idStack[stackLen - 1] === node.attr.id) {
             stackLen--;
             this.flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
             dirty = true;
         }
     };
+
 })();
 

@@ -1,65 +1,54 @@
 /**
- * @class The basic scene node type, providing the ability to connect nodes into parent-child relationships to form scene graphs
+ * @class The basic scene node type
  */
-SceneJS.Node = function(cfg, scene) {
+SceneJS._Node = function(cfg, scene) {
 
     /* Public properties are stored on the _attr map
      */
-    this._attr = {};
-    this._attr.nodeType = "node";
-    this._attr.sid = null;
-    this._attr.flags = null;     // Fast to detect that we have no flags and then bypass processing them
-    this._attr.data = {};
+    this.attr = {};
+    this.attr.type = "node";
+    this.attr.sid = null;
+    this.attr.flags = null;     // Fast to detect that we have no flags and then bypass processing them
+    this.attr.data = {};
 
     if (cfg) {
-        this._attr.id = cfg.id;
-        this._attr.nodeType = cfg.type || "node";
-        this._attr.layer = cfg.layer;
-        this._attr.data = cfg.data;
-        this._attr.flags = cfg.flags;
-        this._attr.enabled = cfg.enabled === false ? false : true;
-        this._attr.sid = cfg.sid;
-        this._attr.info = cfg.info;
-        this._scene = scene || this;
+        this.attr.id = cfg.id;
+        this.attr.type = cfg.type || "node";
+        this.attr.layer = cfg.layer;
+        this.attr.data = cfg.data;
+        this.attr.flags = cfg.flags;
+        this.attr.enabled = cfg.enabled === false ? false : true;
+        this.attr.sid = cfg.sid;
+        this.attr.info = cfg.info;
+        this.scene = scene || this;
     }
-
-    /* Rendering flag - set while this node is rendering - while it is true, it is legal
-     * to make render-time queries on the node using SceneJS.withNode(xx).query(xx).
-     */
-    this._rendering = false;
 
     /* Child nodes
      */
-    this._children = [];
-    this._parent = null;
-    this._listeners = {};
-    this._numListeners = 0; // Useful for quick check whether node observes any events
+    this.children = [];
+    this.parent = null;
+    this.listeners = {};
+    this.numListeners = 0; // Useful for quick check whether node observes any events
 
-    /* Used by many node types to track the level at which they can
-     * memoise internal state. When rendered, a node increments
-     * this each time it discovers that it can cache more state, so that
-     * it knows not to recompute that state when next rendered.
-     * Since internal state is usually dependent on the states of higher
-     * nodes, this is reset whenever the node is attached to a new
-     * parent.
-     *
-     * private
+    /* When compiled, a node increments this each time it discovers that it can cache more state, so that it
+     * knows not to recompute that state when next compiled. Since internal state is usually dependent on the
+     * states of higher nodes, this is reset whenever the node is attached to a new parent.
      */
-    this._setDirty();
+    this._compileMemoLevel = 0
 
     /* Deregister default ID
      */
-    if (this._attr.id) {
-        //   SceneJS_sceneNodeMaps.removeItem(this._attr.id);
+    if (this.attr.id) {
+        //   SceneJS_sceneNodeMaps.removeItem(this.attr.id);
     }
 
     /* Register again by whatever ID we now have
      */
-    if (this._scene && this._scene._nodeMap) {
-        if (this._attr.id) {
-            this._scene._nodeMap.addItem(this._attr.id, this);
+    if (this.scene && this.scene.nodeMap) {
+        if (this.attr.id) {
+            this.scene.nodeMap.addItem(this.attr.id, this);
         } else {
-            this._attr.id = this._scene._nodeMap.addItem(this);
+            this.attr.id = this.scene.nodeMap.addItem(this);
         }
     }
 
@@ -68,30 +57,27 @@ SceneJS.Node = function(cfg, scene) {
     }
 };
 
-SceneJS.Node.prototype.constructor = SceneJS.Node;
+SceneJS._Node.prototype.constructor = Node;
 
 /**
- * Flags state change on this node.
- * Resets memoisation level and schedules another scene render pass.
- * @private
+ * Dumps anything that was memoized on this node to reduce recompilation work
  */
-SceneJS.Node.prototype._setDirty = function() {
-    this._memoLevel = 0;   // TODO: schedule another scene render pass
+SceneJS._Node.prototype._resetCompilationMemos = function() {
+    this._compileMemoLevel = 0;
 };
 
 /**
- * Resets memoization level to zero - called when moving nodes around in graph or calling their setters
- * @private
+ * Same as _resetCompilationMemos, also called on sub-nodes
  */
-SceneJS.Node.prototype._resetMemoLevel = function() {
-    this._setDirty();
-    for (var i = 0; i < this._children.length; i++) {
-        this._children[i]._resetMemoLevel();
+SceneJS._Node.prototype._resetTreeCompilationMemos = function() {
+    this._resetCompilationMemos();
+    for (var i = 0; i < this.children.length; i++) {
+        this.children[i]._resetTreeCompilationMemos();
     }
 };
 
 /** @private */
-SceneJS.Node.prototype._compile = function(traversalContext) {
+SceneJS._Node.prototype._compile = function(traversalContext) {
     this._compileNodes(traversalContext);
 };
 
@@ -106,19 +92,17 @@ SceneJS.Node.prototype._compile = function(traversalContext) {
  * by the Instance node that is intiating it. The callback is then called to render the
  * Instance's child nodes as if they were children of the last node.
  */
-SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildren) { // Selected children - useful for Selector node
+SceneJS._Node.prototype._compileNodes = function(traversalContext, selectedChildren) { // Selected children - useful for Selector node
 
-    SceneJS_pickingModule.preVisitNode(this);
-
-    SceneJS_nodeEventsModule.preVisitNode(this);
-
-    /* Fire "pre-rendered" event if observed
-     */
-    if (this._listeners["pre-rendered"]) {
-        this._fireEvent("pre-rendered", { });
+    if (this.listeners["picked"]) {
+        SceneJS_pickingModule.preVisitNode(this);
     }
 
-    var children = selectedChildren || this._children;  // Set of child nodes we'll be rendering
+    if (this.listeners["rendered"]) {
+        SceneJS_nodeEventsModule.preVisitNode(this);
+    }
+
+    var children = selectedChildren || this.children;  // Set of child nodes we'll be rendering
     var numChildren = children.length;
     var child;
     var childId;
@@ -128,7 +112,7 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
         var childTraversalContext;
         for (i = 0; i < numChildren; i++) {
             child = children[i];
-            childId = child._attr.id;
+            childId = child.attr.id;
 
 
             /* Compile module culls child traversal when child compilation not required.
@@ -164,12 +148,12 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
         }
     }
 
-    SceneJS_pickingModule.postVisitNode(this);
+    if (this.listeners["picked"]) {
+        SceneJS_pickingModule.postVisitNode(this);
+    }
 
-    SceneJS_nodeEventsModule.postVisitNode(this);
-
-    if (this._listeners["post-rendering"]) {
-        this._fireEvent("post-rendering", { });
+    if (this.listeners["rendered"]) {
+        SceneJS_nodeEventsModule.postVisitNode(this);
     }
 };
 
@@ -177,38 +161,9 @@ SceneJS.Node.prototype._compileNodes = function(traversalContext, selectedChildr
 /**
  * Wraps _compile to fire built-in events either side of rendering.
  * @private */
-SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
-
-    /* Track any user-defined explicit node layer attribute as we traverse the
-     * the graph. This is used by state sorting to organise geometries into layers.
-     */
-    if (this._attr.layer) {
-
-        /* Only render layers that are enabled
-         */
-        if (!SceneJS_layerModule.layerEnabled(this._attr.layer)) {
-            return;
-        }
-
-        SceneJS_layerModule.pushLayer(this._attr.layer);
-    }
-
-    /* Flag this node as rendering - while this is true, it is legal
-     * to make render-time queries on the node using SceneJS.withNode(xx).query(xx).
-     */
-    this._rendering = true;
-
-    /*------------------------------------------------------------------------
-     * Note we still fire events in a picking pass because scene may be
-     * dependent on application code processing those and setting things on
-     * scene nodes during the picking pass
-     *-----------------------------------------------------------------------*/
-
-    if (this._listeners["compiling"]) {         // DEPRECATED
-        this._fireEvent("compiling", { });
-    }
-    if (this._listeners["pre-compiling"]) {
-        this._fireEvent("pre-compiling", { });
+SceneJS._Node.prototype._compileWithEvents = function(traversalContext) {
+    if (this.attr.layer) {
+        SceneJS_layerModule.pushLayer(this.attr.layer);
     }
 
     /* As scene is traversed, SceneJS_loadStatusModule will track the counts
@@ -219,38 +174,23 @@ SceneJS.Node.prototype._compileWithEvents = function(traversalContext) {
      * via the event once we have rendered this node.
      */
     var loadStatusSnapshot;
-    if (this._listeners["loading-status"]) {
+    if (this.listeners["loading-status"]) {
         loadStatusSnapshot = SceneJS_loadStatusModule.getStatusSnapshot();
     }
-
     this._compile(traversalContext);
-
-    if (this._listeners["loading-status"]) {
-
-        /* Report diff of loading stats that occurred while rending this node
-         * and its sub-nodes
-         */
+    if (this.listeners["loading-status"]) { // Report diff of loading stats that occurred while rending this tree
         this._fireEvent("loading-status", SceneJS_loadStatusModule.diffStatus(loadStatusSnapshot));
     }
-
-    if (this._listeners["post-compiled"]) {
-        this._fireEvent("post-compiled", { });
-    }
-
-    /* Flag this node as no longer rendering - render-time queries are now illegal on this node
-     */
-    this._rendering = false;
-
-    if (this._attr.layer) {
+    if (this.attr.layer) {
         SceneJS_layerModule.popLayer();
     }
 };
 
 
 /** @private */
-SceneJS.Node.prototype._compileNodeAtIndex = function(index, traversalContext) {
-    if (index >= 0 && index < this._children.length) {
-        var child = this._children[index];
+SceneJS._Node.prototype._compileNodeAtIndex = function(index, traversalContext) {
+    if (index >= 0 && index < this.children.length) {
+        var child = this.children[index];
         child._compileWithEvents.call(child, traversalContext);
     }
 };
@@ -259,23 +199,23 @@ SceneJS.Node.prototype._compileNodeAtIndex = function(index, traversalContext) {
  * Returns the SceneJS-assigned ID of the node.
  * @returns {string} Node's ID
  */
-SceneJS.Node.prototype.getID = function() {
-    return this._attr.id;
+SceneJS._Node.prototype.getID = function() {
+    return this.attr.id;
 };
 
 /**
  * Alias for {@link #getID()} to assist resolution of the ID by JSON query API
  * @returns {string} Node's ID
  */
-SceneJS.Node.prototype.getId = SceneJS.Node.prototype.getID;
+SceneJS._Node.prototype.getId = SceneJS._Node.prototype.getID;
 
 /**
- * Returns the type ID of the node. For the SceneJS.Node base class, it is "node",
+ * Returns the type ID of the node. For the Node base class, it is "node",
  * which is overriden in sub-classes.
  * @returns {string} Type ID
  */
-SceneJS.Node.prototype.getType = function() {
-    return this._attr.nodeType;
+SceneJS._Node.prototype.getType = function() {
+    return this.attr.type;
 };
 
 /**
@@ -283,8 +223,8 @@ SceneJS.Node.prototype.getType = function() {
  @param {{String:Boolean}} flags Map of flag booleans
  @since Version 0.8
  */
-SceneJS.Node.prototype.setFlags = function(flags) {
-    this._attr.flags = SceneJS._shallowClone(flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
+SceneJS._Node.prototype.setFlags = function(flags) {
+    this.attr.flags = SceneJS._shallowClone(flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
 };
 
 /**
@@ -292,11 +232,11 @@ SceneJS.Node.prototype.setFlags = function(flags) {
  @param {{String:Boolean}} flags Map of flag booleans
  @since Version 0.8
  */
-SceneJS.Node.prototype.addFlags = function(flags) {
-    if (this._attr.flags) {
-        SceneJS._apply(flags, this._attr.flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
+SceneJS._Node.prototype.addFlags = function(flags) {
+    if (this.attr.flags) {
+        SceneJS._apply(flags, this.attr.flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
     } else {
-        this._attr.flags = SceneJS._shallowClone(flags);
+        this.attr.flags = SceneJS._shallowClone(flags);
     }
 };
 
@@ -305,24 +245,24 @@ SceneJS.Node.prototype.addFlags = function(flags) {
  @param {{String:Boolean}} Map of flag booleans
  @since Version 0.8
  */
-SceneJS.Node.prototype.getFlags = function() {
-    return SceneJS._shallowClone(this._attr.flags || {});  // Flags map is null when none exist
+SceneJS._Node.prototype.getFlags = function() {
+    return SceneJS._shallowClone(this.attr.flags || {});  // Flags map is null when none exist
 };
 
 /**
  * Returns the data object attached to this node.
  * @returns {Object} data object
  */
-SceneJS.Node.prototype.getData = function() {
-    return this._attr.data;
+SceneJS._Node.prototype.getData = function() {
+    return this.attr.data;
 };
 
 /**
  * Sets a data object on this node.
  * @param {Object} data Data object
  */
-SceneJS.Node.prototype.setData = function(data) {
-    this._attr.data = data;
+SceneJS._Node.prototype.setData = function(data) {
+    this.attr.data = data;
     return this;
 };
 
@@ -331,8 +271,8 @@ SceneJS.Node.prototype.setData = function(data) {
  * http://scenejs.wikispaces.com/Layers
  * @param {string} layer The layer name
  */
-SceneJS.Node.prototype.setLayer = function(layer) {
-    this._attr.layer = layer;
+SceneJS._Node.prototype.setLayer = function(layer) {
+    this.attr.layer = layer;
 };
 
 /**
@@ -340,8 +280,8 @@ SceneJS.Node.prototype.setLayer = function(layer) {
  * http://scenejs.wikispaces.com/Layers
  * @return {string} layer The layer name
  */
-SceneJS.Node.prototype.getLayer = function() {
-    return this._attr.layer;
+SceneJS._Node.prototype.getLayer = function() {
+    return this.attr.layer;
 };
 
 /**
@@ -350,78 +290,78 @@ SceneJS.Node.prototype.getLayer = function() {
  * @returns {string} Node SID
  *  @deprecated
  */
-SceneJS.Node.prototype.getSID = function() {
-    return this._attr.sid;
+SceneJS._Node.prototype.getSID = function() {
+    return this.attr.sid;
 };
 
 /** Returns the SceneJS.Scene to which this node belongs.
- * Returns node if this is a SceneJS.Scene.
+ * Returns node if this is a SceneJS_scene.
  * @returns {SceneJS.Scene} Scene node
  */
-SceneJS.Node.prototype.getScene = function() {
-    return this._scene;
+SceneJS._Node.prototype.getScene = function() {
+    return this.scene;
 };
 
 /**
  * Returns the number of child nodes
  * @returns {int} Number of child nodes
  */
-SceneJS.Node.prototype.getNumNodes = function() {
-    return this._children.length;
+SceneJS._Node.prototype.getNumNodes = function() {
+    return this.children.length;
 };
 
 /** Returns child nodes
  * @returns {Array} Child nodes
  */
-SceneJS.Node.prototype.getNodes = function() {
-    var list = new Array(this._children.length);
-    var len = this._children.length;
+SceneJS._Node.prototype.getNodes = function() {
+    var list = new Array(this.children.length);
+    var len = this.children.length;
     for (var i = 0; i < len; i++) {
-        list[i] = this._children[i];
+        list[i] = this.children[i];
     }
     return list;
 };
 
 /** Returns child node at given index. Returns null if no node at that index.
  * @param {Number} index The child index
- * @returns {SceneJS.Node} Child node, or null if not found
+ * @returns {Node} Child node, or null if not found
  */
-SceneJS.Node.prototype.getNodeAt = function(index) {
-    if (index < 0 || index >= this._children.length) {
+SceneJS._Node.prototype.getNodeAt = function(index) {
+    if (index < 0 || index >= this.children.length) {
         return null;
     }
-    return this._children[index];
+    return this.children[index];
 };
 
 /** Returns first child node. Returns null if no child nodes.
- * @returns {SceneJS.Node} First child node, or null if not found
+ * @returns {Node} First child node, or null if not found
  */
-SceneJS.Node.prototype.getFirstNode = function() {
-    if (this._children.length == 0) {
+SceneJS._Node.prototype.getFirstNode = function() {
+    if (this.children.length == 0) {
         return null;
     }
-    return this._children[0];
+    return this.children[0];
 };
 
 /** Returns last child node. Returns null if no child nodes.
- * @returns {SceneJS.Node} Last child node, or null if not found
+ * @returns {Node} Last child node, or null if not found
  */
-SceneJS.Node.prototype.getLastNode = function() {
-    if (this._children.length == 0) {
+SceneJS._Node.prototype.getLastNode = function() {
+    if (this.children.length == 0) {
         return null;
     }
-    return this._children[this._children.length - 1];
+    return this.children[this.children.length - 1];
 };
 
 /** Returns child node with the given ID.
  * Returns null if no such child node found.
  * @param {String} sid The child's SID
- * @returns {SceneJS.Node} Child node, or null if not found
+ * @returns {Node} Child node, or null if not found
  */
-SceneJS.Node.prototype.getNode = function(id) {
-    for (var i = 0; i < this._children.length; i++) {
-        if (this._children[i].getID() == id) {
-            return this._children[i];
+SceneJS._Node.prototype.getNode = function(id) {
+    for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].attr.id == id) {
+            return this.children[i];
         }
     }
     return null;
@@ -429,13 +369,13 @@ SceneJS.Node.prototype.getNode = function(id) {
 
 /** Removes the child node at the given index
  * @param {int} index Child node index
- * @returns {SceneJS.Node} The removed child node if located, else null
+ * @returns {Node} The removed child node if located, else null
  */
-SceneJS.Node.prototype.removeNodeAt = function(index) {
-    var r = this._children.splice(index, 1);
-    this._setDirty();
+SceneJS._Node.prototype.removeNodeAt = function(index) {
+    var r = this.children.splice(index, 1);
+    this._resetCompilationMemos();
     if (r.length > 0) {
-        r[0]._parent = null;
+        r[0].parent = null;
         return r[0];
     } else {
         return null;
@@ -443,133 +383,132 @@ SceneJS.Node.prototype.removeNodeAt = function(index) {
 };
 
 /** Removes the child node, given as either a node object or an ID string.
- * @param {String | SceneJS.Node} id The target child node, or its ID
- * @returns {SceneJS.Node} The removed child node if located
+ * @param {String | Node} id The target child node, or its ID
+ * @returns {Node} The removed child node if located
  */
-SceneJS.Node.prototype.removeNode = function(node) {
+SceneJS._Node.prototype.removeNode = function(node) {
     if (!node) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#removeNode - node argument undefined");
+                "Node#removeNode - node argument undefined");
     }
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = this._scene._nodeMap.items[node];
+            var gotNode = this.scene.nodeMap.items[node];
             if (!gotNode) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.NODE_NOT_FOUND,
-                        "SceneJS.Node#removeNode - node not found anywhere: '" + node + "'");
+                        "Node#removeNode - node not found anywhere: '" + node + "'");
             }
             node = gotNode;
         }
     }
     if (node._compile) { //  instance of node
-        for (var i = 0; i < this._children.length; i++) {
-            if (this._children[i]._attr.id == node._attr.id) {
-                this._setDirty();
+        for (var i = 0; i < this.children.length; i++) {
+            if (this.children[i].attr.id == node.attr.id) {
+                this._resetCompilationMemos();
                 return this.removeNodeAt(i);
             }
         }
     }
     throw SceneJS_errorModule.fatalError(
             SceneJS.errors.NODE_NOT_FOUND,
-            "SceneJS.Node#removeNode - child node not found: " + (node._compile ? ": " + node._attr.id : node));
+            "Node#removeNode - child node not found: " + (node._compile ? ": " + node.attr.id : node));
 };
 
 /** Removes all child nodes and returns them in an array.
- * @returns {Array[SceneJS.Node]} The removed child nodes
+ * @returns {Array[Node]} The removed child nodes
  */
-SceneJS.Node.prototype.removeNodes = function() {
-    for (var i = 0; i < this._children.length; i++) {  // Unlink children from this
-        if (this._children[i]._parent = null) {
+SceneJS._Node.prototype.removeNodes = function() {
+    for (var i = 0; i < this.children.length; i++) {  // Unlink children from this
+        if (this.children[i].parent = null) {
         }
     }
-    var children = this._children;
-    this._children = [];
-    this._setDirty();
+    var children = this.children;
+    this.children = [];
+    this._resetCompilationMemos();
     return children;
 };
 
 /** Appends multiple child nodes
- * @param {Array[SceneJS.Node]} nodes Array of nodes
- * @return {SceneJS.Node} This node
+ * @param {Array[Node]} nodes Array of nodes
+ * @return {Node} This node
  */
-SceneJS.Node.prototype.addNodes = function(nodes) {
+SceneJS._Node.prototype.addNodes = function(nodes) {
     if (!nodes) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#addNodes - nodes argument is undefined");
+                "Node#addNodes - nodes argument is undefined");
     }
     for (var i = nodes.length - 1; i >= 0; i--) {
         this.addNode(nodes[i]);
     }
-    this._setDirty();
+    this._resetCompilationMemos();
     return this;
 };
 
 /** Appends a child node
- * @param {SceneJS.Node} node Child node
- * @return {SceneJS.Node} The child node
+ * @param {Node} node Child node
+ * @return {Node} The child node
  */
-SceneJS.Node.prototype.addNode = function(node) {
+SceneJS._Node.prototype.addNode = function(node) {
     if (!node) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#addNode - node argument is undefined");
+                "Node#addNode - node argument is undefined");
     }
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = this._scene._nodeMap.items[node];
+            var gotNode = this.scene.nodeMap.items[node];
             if (!gotNode) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "SceneJS.Node#addNode - node not found: '" + node + "'");
+                        "Node#addNode - node not found: '" + node + "'");
             }
             node = gotNode;
         } else {
-            node = SceneJS._parseNodeJSON(node, this._scene);
+            node = SceneJS._parseNodeJSON(node, this.scene);
         }
     }
     if (!node._compile) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#addNode - node argument is not a SceneJS.Node or subclass!");
+                "Node#addNode - node argument is not a Node or subclass!");
     }
-    if (node._parent != null) {
+    if (node.parent != null) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#addNode - node argument is still attached to another parent!");
+                "Node#addNode - node argument is still attached to another parent!");
     }
-    this._children.push(node);
-    node._parent = this;
-    node._resetMemoLevel();
-    this._setDirty();
+    this.children.push(node);
+    node.parent = this;
+    node._resetTreeCompilationMemos();
     return node;
 };
 
 /** Inserts a subgraph into child nodes
- * @param {SceneJS.Node} node Child node
+ * @param {Node} node Child node
  * @param {int} i Index for new child node
- * @return {SceneJS.Node} The child node
+ * @return {Node} The child node
  */
-SceneJS.Node.prototype.insertNode = function(node, i) {
+SceneJS._Node.prototype.insertNode = function(node, i) {
     if (!node) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#insertNode - node argument is undefined");
+                "Node#insertNode - node argument is undefined");
     }
     if (!node._compile) {
-        node = SceneJS._parseNodeJSON(node, this._scene);
+        node = SceneJS._parseNodeJSON(node, this.scene);
     }
     if (!node._compile) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#insertNode - node argument is not a SceneJS.Node or subclass!");
+                "Node#insertNode - node argument is not a Node or subclass!");
     }
-    if (node._parent != null) {
+    if (node.parent != null) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#insertNode - node argument is still attached to another parent!");
+                "Node#insertNode - node argument is still attached to another parent!");
     }
 
     if (i == undefined || i == null) {
@@ -590,32 +529,31 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
     } else if (i < 0) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "SceneJS.Node#insertNode - node index out of range: -1");
+                "Node#insertNode - node index out of range: -1");
 
-    } else if (i >= this._children.length) {
-        this._children.push(node);
+    } else if (i >= this.children.length) {
+        this.children.push(node);
 
     } else {
-        this._children.splice(i, 0, node);
+        this.children.splice(i, 0, node);
     }
-    node._parent = this;
-    node._resetMemoLevel();
-    this._setDirty();
+    node.parent = this;
+    node._resetTreeCompilationMemos();
     return node;
 };
 
 /** Calls the given function on each node in the subgraph rooted by this node, including this node.
  * The callback takes each node as it's sole argument and traversal stops as soon as the function returns
  * true and returns the node.
- * @param {function(SceneJS.Node)} func The function
+ * @param {function(Node)} func The function
  */
-SceneJS.Node.prototype.mapNodes = function(func) {
+SceneJS._Node.prototype.mapNodes = function(func) {
     if (func(this)) {
         return this;
     }
     var result;
-    for (var i = 0; i < this._children.length; i++) {
-        result = this._children[i].mapNodes(func);
+    for (var i = 0; i < this.children.length; i++) {
+        result = this.children[i].mapNodes(func);
         if (result) {
             return result;
         }
@@ -628,7 +566,7 @@ SceneJS.Node.prototype.mapNodes = function(func) {
  * is not supported by this node type, then the listener will never be called.
  * <p><b>Example:</b>
  * <pre><code>
- * var node = new SceneJS.Node();
+ * var node = new Node();
  *
  * node.addListener(
  *
@@ -649,21 +587,21 @@ SceneJS.Node.prototype.mapNodes = function(func) {
  * @param {String} eventName One of the event types supported by this node
  * @param {Function} fn - Handler function that be called as specified
  * @param options - Optional options for the handler as specified
- * @return {SceneJS.Node} this
+ * @return {Node} this
  */
-SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
-    var list = this._listeners[eventName];
+SceneJS._Node.prototype.addListener = function(eventName, fn, options) {
+    var list = this.listeners[eventName];
     if (!list) {
         list = [];
-        this._listeners[eventName] = list;
+        this.listeners[eventName] = list;
     }
     list.push({
         eventName : eventName,
         fn: fn,
         options : options || {}
     });
-    this._numListeners++;
-    this._setDirty();  // Need re-render - potentially more state changes
+    this.numListeners++;
+    this._resetCompilationMemos();  // Need re-render - potentially more state changes
     return this;
 };
 
@@ -673,26 +611,26 @@ SceneJS.Node.prototype.addListener = function(eventName, fn, options) {
  * @param {Boolean} enabled Will only be rendered when true
  * @deprecated - Use setFlags instead
  */
-SceneJS.Node.prototype.setEnabled = function(enabled) {
-    throw "node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead";
+SceneJS._Node.prototype.setEnabled = function(enabled) {
+    throw SceneJS_errorModule.fatalError("node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead");
 };
 
 /**
  * Returns whether or not this node and its subtree will be rendered when next visited during traversal, as earlier
- * specified with {@link SceneJS.Node#setEnabled}.
+ * specified with {@link Node#setEnabled}.
  * @return {boolean} Whether or not this subtree is rendered
  * @deprecated - Use getFlags instead
  */
-SceneJS.Node.prototype.getEnabled = function() {
-    throw "node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead";
+SceneJS._Node.prototype.getEnabled = function() {
+    throw SceneJS_errorModule.fatalError("node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead");
 };
 
 /**
  * Destroys this node. It is marked for destruction; when the next scene traversal begins (or the current one ends)
  * it will be destroyed and removed from it's parent.
- * @return {SceneJS.Node} this
+ * @return {Node} this
  */
-SceneJS.Node.prototype.destroy = function() {
+SceneJS._Node.prototype.destroy = function() {
     if (!this._destroyed) {
         this._destroyed = true;
         this._scheduleNodeDestroy(this);
@@ -702,13 +640,13 @@ SceneJS.Node.prototype.destroy = function() {
 
 /** Schedule the destruction of this node
  */
-SceneJS.Node.prototype._scheduleNodeDestroy = function(node) {
-    if (this._parent) {
-        this._parent.removeNode(this);
+SceneJS._Node.prototype._scheduleNodeDestroy = function(node) {
+    if (this.parent) {
+        this.parent.removeNode(this);
     }
-    this._scene._nodeMap.removeItem(this._attr.id);
-    if (this._children.length > 0) {
-        var children = this._children.slice(0);      // destruction will modify this._children
+    this.scene.nodeMap.removeItem(this.attr.id);
+    if (this.children.length > 0) {
+        var children = this.children.slice(0);      // destruction will modify this.children
         for (var i = 0; i < children.length; i++) {
             children[i]._scheduleNodeDestroy();
         }
@@ -719,7 +657,7 @@ SceneJS.Node.prototype._scheduleNodeDestroy = function(node) {
 /**
  * Performs the actual destruction of this node, calling the node's optional template destroy method
  */
-SceneJS.Node.prototype._doDestroy = function() {
+SceneJS._Node.prototype._doDestroy = function() {
     if (this._destroy) {
         this._destroy();
     }
@@ -732,8 +670,8 @@ SceneJS.Node.prototype._doDestroy = function() {
  * @param {Object} params Event parameters
  * @param {Object} options Event options
  */
-SceneJS.Node.prototype._fireEvent = function(eventName, params, options) {
-    var list = this._listeners[eventName];
+SceneJS._Node.prototype._fireEvent = function(eventName, params, options) {
+    var list = this.listeners[eventName];
     if (list) {
         if (!params) {
             params = {};
@@ -763,8 +701,8 @@ SceneJS.Node.prototype._fireEvent = function(eventName, params, options) {
  * @param {function} fn - Handler function that is registered for the event
  * @return {function} The handler, or null if not registered
  */
-SceneJS.Node.prototype.removeListener = function(eventName, fn) {
-    var list = this._listeners[eventName];
+SceneJS._Node.prototype.removeListener = function(eventName, fn) {
+    var list = this.listeners[eventName];
     if (!list) {
         return null;
     }
@@ -774,7 +712,7 @@ SceneJS.Node.prototype.removeListener = function(eventName, fn) {
             return fn;
         }
     }
-    this._numListeners--;
+    this.numListeners--;
     return null;
 };
 
@@ -784,8 +722,8 @@ SceneJS.Node.prototype.removeListener = function(eventName, fn) {
  * @param {String} eventName Event type
  * @return {boolean} True if listener present
  */
-SceneJS.Node.prototype.hasListener = function(eventName) {
-    return this._listeners[eventName];
+SceneJS._Node.prototype.hasListener = function(eventName) {
+    return this.listeners[eventName];
 };
 
 /**
@@ -793,24 +731,24 @@ SceneJS.Node.prototype.hasListener = function(eventName) {
  *
  * @return {boolean} True if any listener present
  */
-SceneJS.Node.prototype.hasListeners = function() {
-    return (this._numListeners > 0);
+SceneJS._Node.prototype.hasListeners = function() {
+    return (this.numListeners > 0);
 };
 
 /** Removes all listeners registered on this node.
- * @return {SceneJS.Node} this
+ * @return {Node} this
  */
-SceneJS.Node.prototype.removeListeners = function() {
-    this._listeners = {};
-    this._numListeners = 0;
+SceneJS._Node.prototype.removeListeners = function() {
+    this.listeners = {};
+    this.numListeners = 0;
     return this;
 };
 
 /** Returns the parent node
- * @return {SceneJS.Node} The parent node
+ * @return {Node} The parent node
  */
-SceneJS.Node.prototype.getParent = function() {
-    return this._parent;
+SceneJS._Node.prototype.getParent = function() {
+    return this.parent;
 };
 
 /** Returns either all child or all sub-nodes of the given type, depending on whether search is recursive or not.
@@ -818,47 +756,31 @@ SceneJS.Node.prototype.getParent = function() {
  * @param {boolean} [recursive=false] When true, will return all matching nodes in subgraph, otherwise returns just children (default)
  * @return {SceneJS.node[]} Array of matching nodes
  */
-SceneJS.Node.prototype.findNodesByType = function(type, recursive) {
+SceneJS._Node.prototype.findNodesByType = function(type, recursive) {
     return this._findNodesByType(type, [], recursive);
 };
 
 /** @private */
-SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
-    for (var i = 0; i < this._children; i++) {
-        var node = this._children[i];
-        if (node.nodeType == type) {
+SceneJS._Node.prototype._findNodesByType = function(type, list, recursive) {
+    for (var i = 0; i < this.children; i++) {
+        var node = this.children[i];
+        if (node.type == type) {
             list.add(node);
         }
     }
     if (recursive) {
-        for (var i = 0; i < this._children; i++) {
-            this._children[i]._findNodesByType(type, list, recursive);
+        for (var i = 0; i < this.children; i++) {
+            this.children[i]._findNodesByType(type, list, recursive);
         }
     }
     return list;
 };
-
 
 /**
  * Returns an object containing the attributes that were given when creating the node. Obviously, the map will have
  * the current values, plus any attributes that were later added through set/add methods on the node
  *
  */
-SceneJS.Node.prototype.getJSON = function() {
-    return this._attr;
+SceneJS._Node.prototype.getJSON = function() {
+    return this.attr;
 };
-
-/** Factory function that returns a new {@link SceneJS.Node} instance
- * @param {Object} [cfg] Static configuration object
- * @param {SceneJS.node, ...} arguments Zero or more child nodes
- * @returns {SceneJS.Node}
- */
-SceneJS.node = function() {
-    var n = new SceneJS.Node();
-    SceneJS.Node.prototype.constructor.apply(n, arguments);
-    return n;
-};
-
-SceneJS._registerNode("node", SceneJS.Node, SceneJS.node);
-
-

@@ -6,7 +6,7 @@ var SceneJS_NodeRenderer = function(cfg) {
     this._canvas = cfg.canvas;
     this._context = cfg.context;
 
-    this._pickListeners = new Array(100000);
+    this.pickListeners = [];
 
     /** Facade to support node state queries while node rendering
      */
@@ -98,13 +98,21 @@ var SceneJS_NodeRenderer = function(cfg) {
      * Forgets any program that was used for the last node rendered, which causes it
      * to forget all states for that node.
      */
-    this.init = function(picking) {
-        this._picking = picking;
+    this.init = function(params) {
+        params = params || {};
+        this._picking = params.picking;
         this._program = null;
         this._lastRendererState = null;
         this._lastImageBufState = null;
         this._pickIndex = 0;
+        this.profile = params.doProfile ? {
+            program: 0,
+            uniform: 0,
+            varying: 0,
+            texture: 0
+        } : null;
     };
+
 
     /**
      * Renders a state node. Makes state changes only where the node's states have different IDs
@@ -135,6 +143,11 @@ var SceneJS_NodeRenderer = function(cfg) {
             //                }
 
             this._program = this._picking ? node.program.pick : node.program.render;
+
+            if (this.profile) {
+                this._program.setProfile(this.profile);
+            }
+
             this._program.bind();
 
             if (node.shaderState.shader && node.shaderState.shader.vars) { // Custom shader - set any vars we have
@@ -182,6 +195,35 @@ var SceneJS_NodeRenderer = function(cfg) {
                 node.imageBufState.imageBuf.bind();
             }
             this._lastImageBufState = node.imageBufState;
+        }
+
+        /*----------------------------------------------------------------------------------------------------------
+         * texture
+         *
+         * Handle texture here so we can efficiently abort this node if configured to wait for textures
+         *--------------------------------------------------------------------------------------------------------*/
+
+        if (node.texState._stateId != this._lastTexStateId) {
+            var numLayers = node.texState.layers.length;
+            var layer;
+            var countBound = 0;
+            for (var j = 0; j < numLayers; j++) {
+                layer = node.texState.layers[j];
+                if (layer.texture) {
+                    if (program.bindTexture("SCENEJS_uSampler" + j, layer.texture, j)) {
+                        countBound++;
+                    }
+                    if (layer.matrixAsArray) { // Must bind matrix in any case
+                        program.setUniform("SCENEJS_uLayer" + j + "Matrix", layer.matrixAsArray);
+                    }
+                }
+            }
+            if (numLayers != countBound) {
+                if (node.texState.params.waitForLoad) { // Abort if waiting for missing textures                    
+                    return;
+                }
+            }
+            this._lastTexStateId = node.texState._stateId;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -297,31 +339,13 @@ var SceneJS_NodeRenderer = function(cfg) {
         }
 
         /*----------------------------------------------------------------------------------------------------------
-         * texture
-         *--------------------------------------------------------------------------------------------------------*/
-
-        if (node.texState._stateId != this._lastTexStateId) {
-            var layer;
-            for (var j = 0, len = node.texState.layers.length; j < len; j++) {
-                layer = node.texState.layers[j];
-                if (layer.texture) {
-                    program.bindTexture("SCENEJS_uSampler" + j, layer.texture, j);
-                    if (layer.matrixAsArray) {
-                        program.setUniform("SCENEJS_uLayer" + j + "Matrix", layer.matrixAsArray);
-                    }
-               }
-            }
-            this._lastTexStateId = node.texState._stateId;
-        }
-
-        /*----------------------------------------------------------------------------------------------------------
          * view matrix and eye position
          *--------------------------------------------------------------------------------------------------------*/
 
         if (node.viewXFormState._stateId != this._lastViewXFormStateId) {
             program.setUniform("SCENEJS_uVMatrix", node.viewXFormState.mat);
-            //            program.setUniform("SCENEJS_uVNMatrix", node.viewXFormState.normalMat);
-            //            program.setUniform("SCENEJS_uEye", node.viewXFormState.lookAt.eye);
+            //  program.setUniform("SCENEJS_uVNMatrix", node.viewXFormState.normalMat);
+            program.setUniform("SCENEJS_uEye", node.viewXFormState.lookAt.eye);
             this._lastViewXFormStateId = node.viewXFormState._stateId;
         }
 
@@ -514,11 +538,11 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (this._picking) {
             if (! this._lastPickListenersState || node.pickListenersState._stateId != this._lastPickListenersState._stateId) {
-                this._pickListeners[this._pickIndex++] = node.pickListenersState;
+                this.pickListeners[this._pickIndex++] = node.pickListenersState;
                 var b = this._pickIndex >> 16 & 0xFF;
                 var g = this._pickIndex >> 8 & 0xFF;
                 var r = this._pickIndex & 0xFF;
-                program.setUniform("SCENEJS_uPickColor", [r/255,g/255,b/255]);
+                program.setUniform("SCENEJS_uPickColor", [r / 255,g / 255,b / 255]);
                 this._lastPickListenersState = node.pickListenersState;
             }
         }
@@ -652,33 +676,17 @@ var SceneJS_NodeRenderer = function(cfg) {
         return value;
     };
 
-
     /**
      * Called after all nodes rendered for the current frame
      */
     this.cleanup = function() {
 
-
-        //            if (node._pickListenersState) {     // Post-call last listeners
-        //
-        //            }
-
-        ///////////////////////////////////////////
         this._context.finish();
         //this._context.flush();
-        ///////////////////////////////////////////
-
 
         //            if (this._lastRendererState) {
         //                this._lastRendererState.props.restoreProps(canvas.context);
         //            }
-        //            if (this._program) {
-        //                this._program.unbind();
-        //            }
-
-        /*----------------------------------------------------------------------------------------------------------
-         * If an image buffer is active, flush and deactivate it
-         *--------------------------------------------------------------------------------------------------------*/
 
         if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
             this._lastImageBufState.imageBuf.unbind();
@@ -690,6 +698,6 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._program = null;
         }
         //        this._context.colorMask(true, true, true, true);
-        return this._pickListeners;
+        return this.pickListeners;
     };
 };

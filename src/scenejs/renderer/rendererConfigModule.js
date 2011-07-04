@@ -10,43 +10,14 @@ var SceneJS_rendererModule = new (function() {
     var stackLen = 0;
     var dirty;
 
+    var _this = this;
+
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function() {
+            function(params) {
                 stackLen = 0;
                 dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
-            function() {
-                if (dirty) {
-                    if (stackLen > 0) {
-                        SceneJS_renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
-                    } else {
-                        SceneJS_renderModule.setRenderer();
-                    }
-                    dirty = false;
-                }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    var _this = this;
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
-            function(c) {
-                canvas = c;
+                canvas = params.canvas;
                 stackLen = 0;
                 var props = _this.createProps({  // Dont set props - just define for restoring to on props pop
                     clear: {
@@ -68,7 +39,7 @@ var SceneJS_rendererModule = new (function() {
                     viewport:{
                         x : 1,
                         y : 1,
-                        width: c.canvas.width,
+                        width: canvas.canvas.width,
                         height: canvas.canvas.height
                     },
                     wireframe: false,
@@ -86,6 +57,19 @@ var SceneJS_rendererModule = new (function() {
                 setProperties(canvas.context, props);
 
                 _this.pushProps("__scenejs_default_props", props);
+            });
+
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
+            function() {
+                if (dirty) {
+                    if (stackLen > 0) {
+                        SceneJS_renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
+                    } else {
+                        SceneJS_renderModule.setRenderer();
+                    }
+                    dirty = false;
+                }
             });
 
     this.createProps = function(props) {
@@ -212,19 +196,19 @@ var SceneJS_rendererModule = new (function() {
     var glEnum = function(context, name) {
         if (!name) {
             throw SceneJS_errorModule.fatalError(
-                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Null SceneJS.renderer node config: \"" + name + "\"");
         }
         var result = SceneJS_webgl_enumMap[name];
         if (!result) {
             throw SceneJS_errorModule.fatalError(
-                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
         }
         var value = context[result];
         if (!value) {
             throw SceneJS_errorModule.fatalError(
-                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
         }
         return value;

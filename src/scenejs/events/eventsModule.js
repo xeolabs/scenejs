@@ -23,7 +23,7 @@ var SceneJS_eventModule = new (function() {
     this.SCENE_DESTROYED = 7;                // Scene just been destroyed
     this.RENDERER_UPDATED = 8;                // Current WebGL context has been updated to the given state
     this.RENDERER_EXPORTED = 9;               // Export of the current WebGL context state
-    this.CANVAS_ACTIVATED = 10;
+//    this.CANVAS_ACTIVATED = 10;
     this.CANVAS_DEACTIVATED = 11;
     this.VIEWPORT_UPDATED = 12;
     this.GEOMETRY_UPDATED = 13;
@@ -42,23 +42,19 @@ var SceneJS_eventModule = new (function() {
     this.TEXTURES_EXPORTED = 26;
     this.SHADER_ACTIVATE = 27;
     this.SHADER_ACTIVATED = 28;
-    this.SHADER_RENDERING = 29;
+    this.SCENE_RENDERING = 29;
     this.SHADER_NEEDS_BOUNDARIES = 30;
-    this.SHADER_DEACTIVATED = 31;
-    this.FOG_UPDATED = 32;
-    this.FOG_EXPORTED = 33;
-    this.NAME_UPDATED = 34;
-    this.PROCESS_CREATED = 35;
-    this.PROCESS_KILLED = 36;
-    this.PROCESS_TIMED_OUT = 37;
-    this.LOGGING_ELEMENT_ACTIVATED = 38;
-    this.PICK_COLOR_EXPORTED = 39;
-    this.NODE_CREATED = 40;
-    this.NODE_UPDATED = 41;
-    this.NODE_DESTROYED = 42;
-    this.IMAGEBUFFER_EXPORTED = 43;
-    this.CLIP_EXPORTED = 44;
-    this.FLAGS_EXPORTED = 45;
+    this.FOG_UPDATED = 31;
+    this.FOG_EXPORTED = 32;
+
+    this.LOGGING_ELEMENT_ACTIVATED = 37;
+    this.PICK_COLOR_EXPORTED = 38;
+    this.NODE_CREATED = 39;
+    this.NODE_UPDATED = 40;
+    this.NODE_DESTROYED = 41;
+    this.IMAGEBUFFER_EXPORTED = 42;
+    this.CLIP_EXPORTED = 43;
+    this.FLAGS_EXPORTED = 44;
 
     /* Priority queue for each type of event
      */
@@ -167,50 +163,6 @@ var SceneJS_eventModule = new (function() {
  *      });
  * </pre></code>
  *
- * <p><b><em>process-created</em></b></p><p>An asynchronous process has started somewhere among the nodes wtihin a
- * {@link SceneJS.Scene}. Processes track the progress of tasks such as the loading of remotely-stored content by
- * {@link SceneJS.Instance} nodes. This event is particularly useful to monitor for content loading. </p>
- * <p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "process-created",
- *      function(e) {
- *          var sceneId = e.sceneId;
- *          var processId = e.process.id;
- *          var timeStarted = e.process.timeStarted;
- *          var description = e.process.description;
- *          var timeoutSecs = e.process.timeoutSecs;
- *
- *          // ...
- *      });
- * </pre></code>
- *
- * <p><b><em>process-timed-out</em></b></p><p>An asynchronous process has timed out. This will be followed by
- * a "process-killed" event.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "process-timed-out",
- *      function(e) {
- *          var sceneId = e.sceneId;
- *          var processId = e.process.id;
- *          var timeStarted = e.process.timeStarted;
- *          var description = e.process.description;
- *          var timeoutSecs = e.process.timeoutSecs;
- *
- *          // ...
- *      });
- * </pre></code>
- *
- * <p><b><em>process-killed</em></b></p><p>An asynchronous process has finished.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "process-killed",
- *      function(e) {
- *          var sceneId = e.sceneId;
- *          var processId = e.process.id;
- *          var timeStarted = e.process.timeStarted;
- *          var description = e.process.description;
- *          var timeoutSecs = e.process.timeoutSecs;
- *
- *          // ...
- *      });
  * </pre></code>
  *
  * <p><b><em>scene-rendered</em></b></p><p>A render of a {@link SceneJS.Scene} has completed.</p><p>Example:</p><pre><code>
@@ -303,37 +255,7 @@ SceneJS.bind = function(name, func) {
                         sceneId : params.sceneId
                     });
                 });
-            break;
-
-        case "canvas-activated" : SceneJS_eventModule.addListener(
-                SceneJS_eventModule.CANVAS_ACTIVATED,
-                function(params) {
-                    func({
-                        canvas: params.canvas
-                    });
-                });
-            break;
-
-        case "process-created" : SceneJS_eventModule.addListener(
-                SceneJS_eventModule.PROCESS_CREATED,
-                function(params) {
-                    func(params);
-                });
-            break;
-
-        case "process-timed-out" : SceneJS_eventModule.addListener(
-                SceneJS_eventModule.PROCESS_TIMED_OUT,
-                function(params) {
-                    func(params);
-                });
-            break;
-
-        case "process-killed" : SceneJS_eventModule.addListener(
-                SceneJS_eventModule.PROCESS_KILLED,
-                function(params) {
-                    func(params);
-                });
-            break;
+            break;       
 
         case "scene-rendered" : SceneJS_eventModule.addListener(
                 SceneJS_eventModule.SCENE_COMPILED,
@@ -354,7 +276,7 @@ SceneJS.bind = function(name, func) {
             break;
 
         default:
-            throw "SceneJS.bind - this event type not supported: '" + name + "'";
+            throw SceneJS_errorModule.fatalError("SceneJS.bind - this event type not supported: '" + name + "'");
     }
 };
 

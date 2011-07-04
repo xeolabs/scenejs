@@ -113,15 +113,7 @@
                                 canvas: params.canvas
                             });
                         });
-
-                SceneJS_eventModule.addListener(
-                        SceneJS_eventModule.SCENE_COMPILED,
-                        function(params) {
-                            runBindings("scene-rendered", {
-                                nodeId: params.nodeId
-                            });
-                        });
-
+              
                 SceneJS_eventModule.addListener(
                         SceneJS_eventModule.NODE_CREATED,
                         function(params) {

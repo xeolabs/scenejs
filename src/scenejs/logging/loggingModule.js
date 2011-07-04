@@ -130,12 +130,6 @@ var SceneJS_loggingModule = new (function() {
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_COMPILED, // Set default logging for scene root
-            function() {
-                activeSceneId = null;
-            });
-
-    SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
                 queues = {};

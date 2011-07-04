@@ -24,7 +24,7 @@ SceneJS.Services.addService(
 
             this.sample = function(params) {
                 if (!params.target) {
-                    throw "ImageService sample param missing: " + params.target;
+                    throw  SceneJS_errorModule.fatalError("ImageService sample param missing: " + params.target);
                 }
 
             };

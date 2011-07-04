@@ -11,7 +11,7 @@ SceneJS.createScene({
     canvasId: "theCanvas",
     loggingElementId: "theLoggingDiv",
 
-  
+
 
     nodes: [
         {
@@ -33,8 +33,7 @@ SceneJS.createScene({
                     },
                     nodes: [
 
-                      
-                            
+
                         {
                             type: "light",
                             mode:                   "dir",

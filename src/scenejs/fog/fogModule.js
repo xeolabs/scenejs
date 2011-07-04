@@ -54,13 +54,7 @@ SceneJS._fogModule = new (function() {
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -70,12 +64,6 @@ SceneJS._fogModule = new (function() {
                     }
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
             });
 
     this.pushFog = function(id, fog) {

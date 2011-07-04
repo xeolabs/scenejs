@@ -28,52 +28,52 @@ var SceneJS_compileModule = new (function() {
     var stackLen = 0;
 
     /*-----------------------------------------------------------------------------------------------------------------
-     * Priority queue of compilations. Each element is a directive to (re)compile a portion of the scene
-     * graph relative to a given node. They is ordered by decreasing generality of compilation to avoid overlap,
-     * and are processed and cleared before each scene traversal to set combinations of the traversal flags
-     * defined above.
+     * Priority queue of compilations, optimised for minimal garbage collection and implicit sort. Each entry has 
+     * a scene graph node and a compilation level. Entries are ordered in descending order of compilation level.
      *---------------------------------------------------------------------------------------------------------------*/
 
     var CompilationQueue = function() {
-        var contents = [];
-        var sorted = false;
+        var bins = [];
+        this.size = 0;
 
-        var prioritySortLow = function(a, b) {
-            return b.priority - a.priority;
-        };
-
-        var sort = function() {
-            contents.sort(prioritySortLow);
-            sorted = true;
-        };
-
-        this.push = function(element) {
-            contents.push(element);
-            sorted = false;
-            return element;
-        };
-
-        this.pop = function() {
-            if (!sorted) {
-                sort();
+        this.insert = function(level, node) {
+            var bin = bins[level];
+            if (!bin) {
+                bin = bins[level] = [];
+                bin.numNodes = 0;
             }
-            var element = contents.pop();
-            if (element) {
-                return element;
-            } else {
-                return undefined;
+            var compilation = bin[bin.numNodes];
+            if (!compilation) {
+                compilation = bin[bin.numNodes] = {};
             }
+            compilation.node = node;
+            compilation.level = level;
+            bin.numNodes++;
+            this.size++;
         };
 
-        this.size = function() {
-            return contents.length;
+        this.remove = function() {
+            var bin;
+            for (var level = SceneJS_compileCfg.COMPILE_NOTHING; level <= SceneJS_compileCfg.RESORT; level++) {
+                bin = bins[level];
+                if (bin && bin.numNodes > 0) {
+                    this.size--;
+                    return bin[--bin.numNodes];
+                }
+            }
+            return null;
         };
 
         this.clear = function() {
-            contents = [];
+            var bin;
+            for (var level = SceneJS_compileCfg.COMPILE_NOTHING; level <= SceneJS_compileCfg.RESORT; level++) {
+                bin = bins[level];
+                if (bin) {
+                    bins[level].numNodes = 0;
+                }
+            }
+            this.size = 0;
         };
-
-        this.sort = sort;
     };
 
     var self = this;
@@ -81,7 +81,7 @@ var SceneJS_compileModule = new (function() {
             SceneJS_eventModule.INIT,
             function() {
                 debugCfg = SceneJS_debugModule.getConfigs("compilation");
-                self._enableCompiler = (debugCfg.enabled === false) ? false : true;
+                self._enableCompiler = !!debugCfg.enabled;
             });
 
 
@@ -121,7 +121,11 @@ var SceneJS_compileModule = new (function() {
 
                     /* Flag for each node indicating if it must always be recompiled
                      */
-                    nodeAlwaysCompile : {}
+                    nodeAlwaysCompile : {},
+
+                    stats: {
+                        nodes: 0
+                    }
                 };
             });
 
@@ -130,47 +134,6 @@ var SceneJS_compileModule = new (function() {
             function(params) {
                 self._scenes[params.sceneId] = null;
             });
-
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_COMPILING,
-            function(params) {
-
-                var compileScene = self._scene = self._scenes[params.sceneId];
-
-                /* Ready to note nodes that are within
-                 * instanced subtrees in _nodeInstanced
-                 */
-                stackLen = 0;
-                compileScene.countTraversedInstanceLinks = 0;
-
-                /*
-                 */
-                compileScene.countTraversedSubtreesToCompile = 0;
-
-                /* Initiate (re)compilation
-                 */
-                var compileMode = (compileScene.flagSceneCompile || !self._enableCompiler)
-                        ? SceneJS_renderModule.COMPILE_SCENE
-                        : SceneJS_renderModule.COMPILE_NODES;
-
-                SceneJS_renderModule.bindScene({ sceneId: params.sceneId }, { compileMode: compileMode });
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_COMPILED,
-            function() {
-                var scene = self._scene;
-                scene.flagSceneCompile = false;
-                scene.dirtyNodes = {};
-                scene.dirtyNodesWithinBranches = {};
-            });
-
-
-    this._preCompile = function(node) {
-
-    };
-
 
     /*-----------------------------------------------------------------------------------------------------------------
      * NOTIFICATION
@@ -195,27 +158,21 @@ var SceneJS_compileModule = new (function() {
             return;
         }
 
-        var nodeScene = node._scene;
+        var nodeScene = node.scene;
         if (!nodeScene) {
-            throw "Updated node without a scene";
+            throw SceneJS_errorModule.fatalError("Internal error - Updated node without a scene");
         }
-        var compileScene = this._scenes[nodeScene._attr.id];
+        var compileScene = this._scenes[nodeScene.attr.id];
         if (!compileScene) {
-            throw "Updated node without a compiler scene";
+            throw SceneJS_errorModule.fatalError("Internal error - Updated node without a compiler scene");
         }
-
-        //        /* Further updates redundant when entire scene flagged for compile
-        //         */
-        //        if (compileScene.flagSceneCompile) {
-        //            return;
-        //        }
 
         if (compileScene.compilingScene) {
             return;
         }
 
-        var nodeType = node._attr.nodeType;
-        var nodeId = node._attr.id;
+        var nodeType = node.attr.type;
+        var nodeId = node.attr.id;
         var level;
 
         /* Compilation configs for base node type overrides configs for subtypes
@@ -231,6 +188,7 @@ var SceneJS_compileModule = new (function() {
         }
 
         if (level == SceneJS_compileCfg.COMPILE_NOTHING) {
+
             return;
         }
 
@@ -275,13 +233,14 @@ var SceneJS_compileModule = new (function() {
 
         var priority = level;
 
-        compileScene.compilationQueue.push({
-            node: node,
-            op: op,
-            attrName: attrName,
-            level: level,
-            priority: priority
-        });
+        compileScene.compilationQueue.insert(level, node);
+        //        compileScene.compilationQueue.push({
+        //            node: node,
+        //            op: op,
+        //            attrName: attrName,
+        //            level: level,
+        //            priority: priority
+        //        });
     };
 
 
@@ -290,18 +249,33 @@ var SceneJS_compileModule = new (function() {
      *
      *----------------------------------------------------------------------------------------------------------------*/
 
+    this.COMPILE_NOTHING = 0;       // No recompilations
+    this.REDRAW = 1;                // Redraw display list, resolves render-time node dependencies like texture->imageBuf
+    this.COMPILE_PARTIAL = 2;       // Recompile some nodes back into display list
+    this.COMPILE_EVERYTHING = 3;    // Recompile all nodes, rebuilding the entire display list
+
     /**
      * Flush compilation queue to set all the flags that will direct the next compilation traversal
      */
-    this.scheduleCompilations = function(sceneId) {
-
-        if (!this._enableCompiler) {
-            return true;
-        }
+    this.beginSceneCompile = function(sceneId) {
 
         var compileScene = this._scenes[sceneId];
         if (!compileScene) {
-            throw "scene not found";
+            throw SceneJS_errorModule.fatalError("Internal error - scene not found");
+        }
+
+        this._scene = compileScene;
+
+        /* Ready to note nodes that are within
+         * instanced subtrees in _nodeInstanced
+         */
+        stackLen = 0;
+        compileScene.countTraversedInstanceLinks = 0;
+        compileScene.countTraversedSubtreesToCompile = 0;
+
+
+        if (!this._enableCompiler) {
+            return { level: this.COMPILE_EVERYTHING };
         }
 
         compileScene.nodeCompilationLevels = {};
@@ -309,12 +283,13 @@ var SceneJS_compileModule = new (function() {
         if (compileScene.compilingScene) {
             compileScene.flagSceneCompile = true;
             compileScene.compilingScene = false;
-            return true;
+            //compileScene.compilingSceneFor = null;
+            return { level: this.COMPILE_EVERYTHING };
         }
 
         var compilationQueue = compileScene.compilationQueue;
-        if (compilationQueue.size() == 0) {
-            return false;
+        if (compilationQueue.size == 0) {
+            return { level: this.COMPILE_NOTHING };
         }
 
         var compilation;
@@ -322,13 +297,14 @@ var SceneJS_compileModule = new (function() {
         var nodeId;
         var level;
 
-        var stats = {
+        compileScene.stats = {
             scene: 0,
             branch: 0,
             path: 0,
             subtree: 0,
-            node: 0
+            nodes: 0
         };
+        var stats = compileScene.stats;
 
         if (debugCfg.logTrace) {
             SceneJS_loggingModule.info("-------------------------------------------------------------------");
@@ -336,50 +312,60 @@ var SceneJS_compileModule = new (function() {
             SceneJS_loggingModule.info("");
         }
 
-        while (compilationQueue.size() > 0) {
+        var result = {
+            level: this.REDRAW,     // Just flag display redraw until we know we need any node recompilations
+            resort: false           // Don't know if we'll need to sort display list yet
+        };
 
-            compilation = compilationQueue.pop();
+        while (compilationQueue.size > 0) {
+
+            compilation = compilationQueue.remove();
 
             level = compilation.level;
             node = compilation.node;
-            nodeId = node._attr.id;
+            nodeId = node.attr.id;
 
-            if (debugCfg.logTrace) {
-                var logLevels = debugCfg.logTrace.levels || {};
-                var minLevel = logLevels.min || SceneJS_compileCfg.COMPILE_SCENE;
-                var maxLevel = (logLevels.max == undefined || logLevels.max == null) ? SceneJS_compileCfg.COMPILE_NODE : logLevels.max;
-                if (minLevel <= level && level <= maxLevel) {
-                    SceneJS_loggingModule.info("Compiling - level: "
-                            + SceneJS_compileCfg.levelNameStrings[compilation.level] + ", node: "
-                            + compilation.node._attr.nodeType + ", node ID: " + compilation.node._attr.id + ", op: "
-                            + compilation.op + ", attr: "
-                            + compilation.attrName);
-                }
-            }
+//            if (debugCfg.logTrace) {
+//                var logLevels = debugCfg.logTrace.levels || {};
+//                var minLevel = logLevels.min || SceneJS_compileCfg.COMPILE_SCENE;
+//                var maxLevel = (logLevels.max == undefined || logLevels.max == null) ? SceneJS_compileCfg.COMPILE_NODE : logLevels.max;
+//                if (minLevel <= level && level <= maxLevel) {
+//                    SceneJS_loggingModule.info("Compiling - level: "
+//                            + SceneJS_compileCfg.levelNameStrings[compilation.level] + ", node: "
+//                            + compilation.node.attr.type + ", node ID: " + compilation.node.attr.id + ", op: "
+//                            + compilation.op + ", attr: "
+//                            + compilation.attrName);
+//                }
+//            }
 
             if (level == SceneJS_compileCfg.COMPILE_SCENE) {
-                throw "SceneJS_compileCfg.COMPILE_SCENE should not be queued";
+                throw SceneJS_errorModule.fatalError("Internal error - SceneJS_compileCfg.COMPILE_SCENE should not be queued");
 
             } else if (level == SceneJS_compileCfg.COMPILE_BRANCH) {          // Compile node, nodes on path to root and nodes in subtree
                 this._flagCompilePath(compileScene, node);                      // Compile nodes on path
                 compileScene.dirtyNodesWithinBranches[nodeId] = true;        // Ensures that traversal descends into subnodes
-                stats.branch++;
+                //    stats.branch++;
+                result.level = this.COMPILE_PARTIAL;
 
             } else if (level == SceneJS_compileCfg.COMPILE_PATH) {            // Compile node plus nodes on path to root
                 this._flagCompilePath(compileScene, node);                      // Traversal will not descend below the node
-                stats.path++;
+                // stats.path++;
+                result.level = this.COMPILE_PARTIAL;
 
             } else if (level == SceneJS_compileCfg.COMPILE_SUBTREE) {         // Compile node plus nodes in subtree
                 if (!compileScene.dirtyNodesWithinBranches[nodeId]) {        // No need if already compiled as part of a COMPILE_BRANCH
                     compileScene.dirtyNodesWithinBranches[nodeId] = true;    // Ensures that traversal descends into subnodes
-                    stats.subtree++;
+                    //   stats.subtree++;
+                    result.level = this.COMPILE_PARTIAL;
                 }
 
             } else if (level == SceneJS_compileCfg.COMPILE_NODE) {            // Compile just the node
                 if (!compileScene.dirtyNodes[nodeId]) {                 // No need if already compiled
-                    this.needCompileNodes = true;
-                    stats.node++;
+                    //  stats.node++;
+                    result.level = this.COMPILE_PARTIAL;
                 }
+            } else if (level == SceneJS_compileCfg.RESORT) {
+                result.resort = true;
             }
         }
 
@@ -387,7 +373,7 @@ var SceneJS_compileModule = new (function() {
             SceneJS_loggingModule.info("-------------------------------------------------------------------");
         }
 
-        return true;
+        return result;
     };
 
     /** Flags node and all nodes on path to root for recompilation
@@ -398,7 +384,7 @@ var SceneJS_compileModule = new (function() {
         var id;
         var node = targetNode;
         while (node) {
-            id = node._attr.id;
+            id = node.attr.id;
 
             // TODO: why do these two lines break compilation within instanced subtrees?
             //            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
@@ -413,20 +399,20 @@ var SceneJS_compileModule = new (function() {
              * rightmost leaf - otherwise the symbol subgraph will cull compilation of the
              * updated node if the subgraph is not flagged for compilation.
              */
-            if (node._attr.nodeType == "instance") {
+            if (node.attr.type == "instance") {
                 compileScene.dirtyNodesWithinBranches[id] = true;
             }
             dirtyNodes[id] = true;
-            nodeInstances = node._scene._instanceMap[id];
+            nodeInstances = node.scene.instanceMap[id];
             if (nodeInstances) {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
                         compileScene.dirtyNodesWithinBranches[instanceNodeId] = true;
-                        this._flagCompilePath(compileScene, node._scene._nodeMap.items[instanceNodeId]);
+                        this._flagCompilePath(compileScene, node.scene.nodeMap.items[instanceNodeId]);
                     }
                 }
             }
-            node = node._parent;
+            node = node.parent;
         }
     };
 
@@ -449,8 +435,10 @@ var SceneJS_compileModule = new (function() {
         }
 
         var compileScene = this._scene;
-        var config = SceneJS_compileCfg.config[node._attr.nodeType];
-        var nodeId = node._attr.id;
+        var config = SceneJS_compileCfg.config[node.attr.type];
+        var nodeId = node.attr.id;
+
+        compileScene.stats.nodes++;
 
         /* When doing complete indescriminate scene compile, take this opportunity
          * to flag paths to nodes that must always be compiled
@@ -472,7 +460,7 @@ var SceneJS_compileModule = new (function() {
 
         /* Track number of nodes compiling within subtrees of instances
          */
-        if (node._attr.nodeType == "instance") {
+        if (node.attr.type == "instance") {
             compileScene.countTraversedInstanceLinks++;
         }
 
@@ -506,6 +494,8 @@ var SceneJS_compileModule = new (function() {
             return true;
         }
 
+        compileScene.stats.nodes--;
+
         return false;
     };
 
@@ -517,37 +507,44 @@ var SceneJS_compileModule = new (function() {
         var id;
         var node = targetNode;
         while (node) {
-            id = node._attr.id;
+            id = node.attr.id;
             compileScene.nodeAlwaysCompile[id] = true;
-            nodeInstances = targetNode._scene._instanceMap[id];
+            nodeInstances = targetNode.scene.instanceMap[id];
             if (nodeInstances) {
                 for (var instanceNodeId in nodeInstances.instances) {
                     if (nodeInstances.instances.hasOwnProperty(instanceNodeId)) {
                         compileScene.nodeAlwaysCompile[instanceNodeId] = true;
-                        this._alwaysCompilePath(compileScene, targetNode._scene._nodeMap.items[instanceNodeId]);
+                        this._alwaysCompilePath(compileScene, targetNode.scene.nodeMap.items[instanceNodeId]);
                     }
                 }
             }
-            node = node._parent;
+            node = node.parent;
         }
     };
 
     this.postVisitNode = function(node) {
         if (stackLen > 0) {
             var compileScene = this._scene;
-            var nodeId = node._attr.id;
+            var nodeId = node.attr.id;
             var peekNode = nodeStack[stackLen - 1];
-            if (peekNode._attr.id == nodeId) {
+            if (peekNode.attr.id == nodeId) {
                 stackLen--;
-                if (node._attr.nodeType == "instance") {
+                if (node.attr.type == "instance") {
                     compileScene.countTraversedInstanceLinks--;
                 }
-                var config = SceneJS_compileCfg.config[node._attr.nodeType];
+                var config = SceneJS_compileCfg.config[node.attr.type];
                 if (compileScene.dirtyNodesWithinBranches[nodeId] === true || (config && config.alwaysCompile)) {
                     compileScene.countTraversedSubtreesToCompile--;
                 }
             }
+            compileScene.dirtyNodes[nodeId] = false;
+            compileScene.dirtyNodesWithinBranches[nodeId] = false;
         }
+    };
+
+    this.finishSceneCompile = function() {
+        var scene = this._scene;
+        scene.flagSceneCompile = false;
     };
 
 })();

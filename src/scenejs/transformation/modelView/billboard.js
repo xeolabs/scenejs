@@ -1,75 +1,59 @@
-/**
- * @class A scene node that applies a model-space billboard transform to the nodes within its subgraph.
- * @extends SceneJS.Node
- * <p><b>Example</b></p><p>A billboard to orient a flattened cube towards the lookat:</b></p><pre><code>
- * var billboard = new SceneJS.Billboard(
- *     new SceneJS.Scale({
- *       x: 5.0,
- *       y: 5.0,
- *       z: 0.1
- *   },
- *      new SceneJS.Cube()))
- * </pre></code>
- * @constructor
- * Create a new SceneJS.Billboard
- * @param {Object} config  Config object followed by zero or more child nodes
- */
-SceneJS.Billboard = SceneJS.createNodeType("billboard");
+(function () {
 
-// @private
-SceneJS.Billboard.prototype._compile = function(traversalContext) {
-    this._preCompile();
-    this._compileNodes(traversalContext);
-    this._postCompile();
-};
+    var Billboard = SceneJS.createNodeType("billboard");
 
-// @private
-SceneJS.Billboard.prototype._preCompile = function(traversalContext) {
-    // 0. The base variable
-    var superViewXForm = SceneJS_viewTransformModule.getTransform();
-    var lookAt = superViewXForm.lookAt;
+    Billboard.prototype._compile = function(traversalContext) {
+        this._preCompile();
+        this._compileNodes(traversalContext);
+        this._postCompile();
+    };
 
-    var superModelXForm = SceneJS_modelTransformModule.getTransform();
-    var matrix = superModelXForm.matrix.slice(0);
+    Billboard.prototype._preCompile = function(traversalContext) {
+        // 0. The base variable
+        var superViewXForm = SceneJS_viewTransformModule.getTransform();
+        var lookAt = superViewXForm.lookAt;
 
-    // 1. Invert the model rotation matrix, which will reset the subnodes rotation
-    var rotMatrix = [
-        matrix[0], matrix[1], matrix[2],  0,
-        matrix[4], matrix[5], matrix[6],  0,
-        matrix[8], matrix[9], matrix[10], 0,
-        0,         0,         0,          1
-    ];
-    SceneJS_math_inverseMat4(rotMatrix);
-    SceneJS_math_mulMat4(matrix, rotMatrix, matrix);
+        var superModelXForm = SceneJS_modelTransformModule.getTransform();
+        var matrix = superModelXForm.matrix.slice(0);
 
-    // 2. Get the billboard Z vector
-    var ZZ = [];
-    SceneJS_math_subVec3(lookAt.eye, lookAt.look, ZZ);
-    SceneJS_math_normalizeVec3(ZZ);
+        // 1. Invert the model rotation matrix, which will reset the subnodes rotation
+        var rotMatrix = [
+            matrix[0], matrix[1], matrix[2],  0,
+            matrix[4], matrix[5], matrix[6],  0,
+            matrix[8], matrix[9], matrix[10], 0,
+            0,         0,         0,          1
+        ];
+        SceneJS_math_inverseMat4(rotMatrix);
+        SceneJS_math_mulMat4(matrix, rotMatrix, matrix);
 
-    // 3. Get the billboard X vector
-    var XX = [];
-    SceneJS_math_cross3Vec3(lookAt.up, ZZ, XX);
-    SceneJS_math_normalizeVec3(XX);
+        // 2. Get the billboard Z vector
+        var ZZ = [];
+        SceneJS_math_subVec3(lookAt.eye, lookAt.look, ZZ);
+        SceneJS_math_normalizeVec3(ZZ);
 
-    // 4. Get the billboard Y vector
-    var YY = [];
-    SceneJS_math_cross3Vec3(ZZ, XX, YY);
-    SceneJS_math_normalizeVec3(YY);
+        // 3. Get the billboard X vector
+        var XX = [];
+        SceneJS_math_cross3Vec3(lookAt.up, ZZ, XX);
+        SceneJS_math_normalizeVec3(XX);
 
-    // 5. Multiply those billboard vector to the matrix
-    SceneJS_math_mulMat4(matrix, [
-        XX[0], XX[1], XX[2], 0,
-        YY[0], YY[1], YY[2], 0,
-        ZZ[0], ZZ[1], ZZ[2], 0,
-        0,     0,     0,     1
-    ], matrix);
+        // 4. Get the billboard Y vector
+        var YY = [];
+        SceneJS_math_cross3Vec3(ZZ, XX, YY);
+        SceneJS_math_normalizeVec3(YY);
 
-    // 6. Render
-    SceneJS_modelTransformModule.pushTransform(this._attr.id,  { matrix: matrix }); // TODO : memoize!
-};
+        // 5. Multiply those billboard vector to the matrix
+        SceneJS_math_mulMat4(matrix, [
+            XX[0], XX[1], XX[2], 0,
+            YY[0], YY[1], YY[2], 0,
+            ZZ[0], ZZ[1], ZZ[2], 0,
+            0,     0,     0,     1
+        ], matrix);
 
-// @private
-SceneJS.Billboard.prototype._postCompile = function(traversalContext) {
-    SceneJS_modelTransformModule.popTransform();
-};
+        // 6. Render
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, { matrix: matrix }); // TODO : memoize!
+    };
+
+    Billboard.prototype._postCompile = function(traversalContext) {
+        SceneJS_modelTransformModule.popTransform();
+    };
+})();

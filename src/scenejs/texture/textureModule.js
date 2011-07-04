@@ -10,7 +10,7 @@
  *
  * Holds the layers on a stack and provides the SceneJS.texture node with methods to push and pop them.
  *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a
  * TEXTURES_EXPORTED to pass the entire layer stack to the shading backend.
  *
  * Avoids redundant export of the layers with a dirty flag; they are only exported when that is set, which occurs
@@ -31,33 +31,14 @@ var SceneJS_textureModule = new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function() {
+            function(params) {
+                canvas = params.canvas;
                 stackLen = 0;
                 dirty = true;
-            });
+            });  
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
-            function(c) {
-                canvas = c;
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_DEACTIVATED,
-            function() {
-                canvas = null;
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -69,44 +50,7 @@ var SceneJS_textureModule = new (function() {
                 }
             });
 
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    //    /** Removes texture from shader (if canvas exists in DOM) and deregisters it from backend
-    //     * @private
-    //     */
-    //    function deleteTexture(texture) {
-    //        textures[texture.textureId] = undefined;
-    //        if (document.getElementById(texture.canvas.canvasId)) {
-    //            texture.destroy();
-    //        }
-    //    }
-    //
-    //    /**
-    //     * Deletes all textures from their GL contexts - does not attempt
-    //     * to delete them when their canvases no longer exist in the DOM.
-    //     * @private
-    //     */
-    //    function deleteTextures() {
-    //        for (var textureId in textures) {
-    //            var texture = textures[textureId];
-    //            deleteTexture(texture);
-    //        }
-    //        textures = {};
-    //        stackLen = 0;
-    //        dirty = true;
-    //    }
-    //
-    //    SceneJS_eventModule.addListener(
-    //            SceneJS_eventModule.RESET, // Framework reset - delete textures
-    //            function() {
-    //          //      deleteTextures();
-    //            });
-
-    /** Creates texture from either from image URL or image object
+    /** Creates texture from either image URL or image object
      */
     this.createTexture = function(cfg, onComplete) {
         var context = canvas.context;

@@ -4,7 +4,7 @@
  * Services the scene modelling transform nodes, such as SceneJS.rotate, providing them with methods to set and
  * get the current modelling transform matrices.
  *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a
  * MODEL_TRANSFORM_EXPORTED to pass the modelling matrix and inverse normal matrix as Float32Arrays to the
  * shading backend.
  *
@@ -26,8 +26,8 @@ var SceneJS_modelTransformModule = new (function() {
         identity : true
     };
 
-    var idStack = new Array(255);
-    var transformStack = new Array(255);
+    var idStack = [];
+    var transformStack = [];
     var stackLen = 0;
 
     var nodeId;
@@ -39,45 +39,30 @@ var SceneJS_modelTransformModule = new (function() {
             SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
-                nodeId = null;
-                transform = {
-                    matrix : SceneJS_math_identityMat4(),
-                    fixed: true,
-                    identity : true
-                };
+                nodeId = null;                
+                transform = DEFAULT_TRANSFORM;
                 dirty = true;
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(SceneJS_eventModule.SHADER_RENDERING, exportTransform);
-
-    function exportTransform() {
-        if (dirty) {
-
-            /* Lazy-create WebGL arrays
-             */
-            if (!transform.matrixAsArray) {
-                transform.matrixAsArray = new Float32Array(transform.matrix);
-            }
-            if (!transform.normalMatrixAsArray) {
-                transform.normalMatrixAsArray = new Float32Array(
-                        SceneJS_math_transposeMat4(
-                                SceneJS_math_inverseMat4(transform.matrix, SceneJS_math_mat4())));
-            }
-            SceneJS_renderModule.setModelTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
-            dirty = false;
-        }
-    }
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
+            SceneJS_eventModule.SCENE_RENDERING,
+            function (params) {
+                if (dirty) {
+                    if (stackLen > 0) {
+                        if (!transform.matrixAsArray) {
+                            transform.matrixAsArray = new Float32Array(transform.matrix);
+                        }
+                        if (!transform.normalMatrixAsArray) {
+                            transform.normalMatrixAsArray = new Float32Array(
+                                    SceneJS_math_transposeMat4(
+                                            SceneJS_math_inverseMat4(transform.matrix, SceneJS_math_mat4())));
+                        }
+                        SceneJS_renderModule.setModelTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
+                    } else  {
+                        SceneJS_renderModule.setModelTransform();
+                    }
+                    dirty = false;
+                }
             });
 
     this.pushTransform = function(id, t) {

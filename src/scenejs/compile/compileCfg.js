@@ -1,6 +1,6 @@
 var SceneJS_compileCfg = new (function() {
 
-      /*-----------------------------------------------------------------------------------------------------------------
+    /*-----------------------------------------------------------------------------------------------------------------
      * CONFIGURATION
      *
      *----------------------------------------------------------------------------------------------------------------*/
@@ -15,6 +15,7 @@ var SceneJS_compileCfg = new (function() {
     this.COMPILE_SUBTREE = 2;   // Compile node plus subnodes
     this.COMPILE_PATH = 3;      // Compile node plus path to root
     this.COMPILE_NODE = 4;      // Compile just node
+    this.RESORT = 5;            // Resort display list and redraw
 
     /* Level names for logging
      */
@@ -41,11 +42,6 @@ var SceneJS_compileCfg = new (function() {
         "node": {
             "set" : {
                 attr: {
-
-                    //                    "enabled": {
-                    //                        level: this.COMPILE_BRANCH
-                    //                    },
-
                     "flags": {
                         attr: {
                             transparent: {
@@ -58,6 +54,9 @@ var SceneJS_compileCfg = new (function() {
                                 level: this.COMPILE_BRANCH
                             },
                             colortrans: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            clipping: {
                                 level: this.COMPILE_BRANCH
                             }
                         },
@@ -86,6 +85,9 @@ var SceneJS_compileCfg = new (function() {
                             },
                             colortrans: {
                                 level: this.COMPILE_BRANCH
+                            },
+                            clipping: {
+                                level: this.COMPILE_BRANCH
                             }
                         },
 
@@ -107,7 +109,10 @@ var SceneJS_compileCfg = new (function() {
             "remove" : {
                 attr: {
                     "node" : {
-                        level: this.COMPILE_SCENE
+                        level: this.REDRAW
+                    },
+                    "nodes" : {
+                        level: this.REDRAW
                     }
                 },
                 level: this.COMPILE_SCENE
@@ -120,6 +125,23 @@ var SceneJS_compileCfg = new (function() {
                     }
                 },
                 level: this.COMPILE_SCENE
+            }
+            ,
+
+            "bind": {
+                attr: {
+                    "rendered": {
+                        level: this.COMPILE_BRANCH
+                    }
+                }
+            },
+
+            "unbind": {
+                attr: {
+                    "rendered": {
+                        level: this.COMPILE_BRANCH
+                    }
+                }
             }
         },
 
@@ -158,7 +180,7 @@ var SceneJS_compileCfg = new (function() {
             mul: {
                 level: this.COMPILE_BRANCH
             }
-        },       
+        },
 
         /*-----------------------------------------------------------------------------------
          * lights
@@ -174,6 +196,13 @@ var SceneJS_compileCfg = new (function() {
             },
             "start" : {
                 level: this.COMPILE_SCENE
+            },
+            "set" : {
+                attr: {
+                    "layers": {
+                        level: this.RESORT
+                    }
+                }
             }
         },
 
@@ -269,21 +298,16 @@ var SceneJS_compileCfg = new (function() {
         /* Recompile texture node once it has loaded
          */
         "texture": {
-
-            "loadedImage": {
-                level: this.COMPILE_BRANCH
-            },
-
-            "waitingForImagebuf": {
-                level: this.COMPILE_SCENE   // TODO: got to be a tighter rule - maybe compile imagebuf's subtree then texture's branch?
-            },
-
             set: {
                 attr: {
                     layers: {
                         level: this.COMPILE_BRANCH
                     }
                 }
+            },
+
+            "loaded" : {
+                level: this.REDRAW // Texture lazy-binds from with display list
             }
         },
 

@@ -50,7 +50,7 @@ SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
     } else if (arguments.length == 2) {
         SceneJS_debugModule.setConfigs(arguments[0], arguments[1]);
     } else {
-        throw "Illegal arguments given to SceneJS.setDebugs - should be either ({String}:name, {Object}:cfg) or ({Object}:cfg)";
+        throw SceneJS_errorModule.fatalError("Illegal arguments given to SceneJS.setDebugs - should be either ({String}:name, {Object}:cfg) or ({Object}:cfg)");
     }
 };
 

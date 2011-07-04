@@ -32,41 +32,15 @@ var SceneJS_geometryModule = new (function() {
     var geoStack = new Array(255);
     var stackLen = 0;
 
-    //var geoStack = [];
-
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function() {
-                canvas = null;
-                currentGeos = null;
-                stackLen = 0;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_ACTIVATED,
-            function(c) {
-                if (!canvasGeos[c.canvasId]) {      // Lazy-create geometry map for canvas
-                    canvasGeos[c.canvasId] = new SceneJS_Map();
+            function(params) {
+                canvas = params.canvas;
+                 if (!canvasGeos[canvas.canvasId]) {      // Lazy-create geometry map for canvas
+                    canvasGeos[canvas.canvasId] = new SceneJS_Map();
                 }
-                canvas = c;
-                currentGeos = canvasGeos[c.canvasId];
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.CANVAS_DEACTIVATED,
-            function() {
-                canvas = null;
-                currentGeos = null;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
+                currentGeos = canvasGeos[canvas.canvasId];
+                stackLen = 0;
             });
 
     SceneJS_eventModule.addListener(
@@ -303,7 +277,7 @@ var SceneJS_geometryModule = new (function() {
         }
         var geo = geos.items[handle.resource];
         if (!geo) {
-            throw "geometry not found: '" + handle.resource + "'";
+            throw SceneJS_errorModule.fatalError("geometry not found: '" + handle.resource + "'");
         }
         if (--geo._resourceCount == 0) {
             destroyGeometry(geo);

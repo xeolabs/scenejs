@@ -103,34 +103,34 @@ SceneJS.createScene({
 
                                     nodes: [
 
-//                                        {
-//                                            type: "material",
-//                                            emit: 0,
-//                                            baseColor:      { r: 0.4, g: 0.9, b: 0.9 },
-//                                            specularColor:  { r: 0.4, g: 0.9, b: 0.9 },
-//                                            specular:       0.7,
-//                                            shine:          10.0,
-//                                            alpha: 0.7,
-//
-//                                            flags: {
-//                                                transparent: true,
-//                                                backfaces: false
-//                                            },
-//
-//                                            nodes: [
-//                                                {
-//                                                    type: "scale",
-//                                                    x: 4,
-//                                                    y: 4,
-//                                                    z: 4,
-//                                                    nodes: [
-//                                                        {
-//                                                            type: "cube"
-//                                                        }
-//                                                    ]
-//                                                }
-//                                            ]
-//                                        },
+                                        //                                        {
+                                        //                                            type: "material",
+                                        //                                            emit: 0,
+                                        //                                            baseColor:      { r: 0.4, g: 0.9, b: 0.9 },
+                                        //                                            specularColor:  { r: 0.4, g: 0.9, b: 0.9 },
+                                        //                                            specular:       0.7,
+                                        //                                            shine:          10.0,
+                                        //                                            alpha: 0.7,
+                                        //
+                                        //                                            flags: {
+                                        //                                                transparent: true,
+                                        //                                                backfaces: false
+                                        //                                            },
+                                        //
+                                        //                                            nodes: [
+                                        //                                                {
+                                        //                                                    type: "scale",
+                                        //                                                    x: 4,
+                                        //                                                    y: 4,
+                                        //                                                    z: 4,
+                                        //                                                    nodes: [
+                                        //                                                        {
+                                        //                                                            type: "cube"
+                                        //                                                        }
+                                        //                                                    ]
+                                        //                                                }
+                                        //                                            ]
+                                        //                                        },
 
                                         /* Specify the amounts of ambient, diffuse and specular
                                          * lights our teapot reflects
@@ -176,7 +176,7 @@ SceneJS.createScene({
                                                              * from the custom shader demo for GLGE - http://www.glge.com).
                                                              */
                                                             code:  "uniform float time;\n\
-                                                                    vec4 myPosFunc(vec4 pos){\n\
+                                                                    vec4 myModelPosFunc(vec4 pos){\n\
                                                                         pos.x=pos.x+sin(pos.x*5.0+time+10.0)*0.1;\n\
                                                                         pos.y=pos.y+sin(pos.y*5.0+time+10.0)*0.1;\n\
                                                                         pos.z=pos.z+sin(pos.z*5.0+time+10.0)*0.1;\n\
@@ -186,11 +186,11 @@ SceneJS.createScene({
                                                             /* Bind our custom function to a SceneJS vertex shader hook                                                            
                                                              */
                                                             hooks: {
-                                                                modelPos: "myPosFunc"
+                                                                modelPos: "myModelPosFunc"
                                                             }
                                                         },
 
-                                                             /* Fragment shader
+                                                        /* Fragment shader
                                                          */
                                                         {
                                                             stage:  "fragment",
@@ -204,19 +204,19 @@ SceneJS.createScene({
                                                                         return (worldVertex.x < 1.0);\n\
                                                                     }\n\
                                                                     \n\
-                                                                    vec4 myPixelColorFunc(vec4 color){\n\
-                                                                        if (SCENEJS_vWorldVertex.x < 0.0) return color;\n\
+                                                                    void myPixelColorFunc(Vertex v){\n\
+                                                                        vec4 color = v.color\n\
                                                                         color.r=color.r+sin(time)*0.3;\n\
                                                                         color.g=color.g+sin(time+0.3)*0.3;\n\
                                                                         color.b=color.b+sin(time+0.6)*0.3;\n\
                                                                         color.a=color.a+sin(time);\n\
-                                                                        return color;\n\
+                                                                        v.color = color;\n\
                                                                     }\n",
 
                                                             /* Bind our custom function to a SceneJS vertex shader hook
                                                              */
                                                             hooks: {
-                                                              //  worldPosClip:"myWorldClipFunc",
+                                                                //  worldPosClip:"myWorldClipFunc",
                                                                 materialAlpha: "myMaterialAlphaFunc",
                                                                 pixelColor: "myPixelColorFunc"
                                                             }
@@ -253,7 +253,8 @@ SceneJS.createScene({
 
 SceneJS.setDebugConfigs({
     shading : {
-        logScripts : false
+        logScripts : false,
+        validate: true
     }
 });
 

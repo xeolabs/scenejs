@@ -6,9 +6,9 @@ SceneJS.Services.addService(
 
                 addCommand: function(commandId, command) {
                     if (!command.execute) {
-                        throw "SceneJS Command Service (ID '"
+                        throw  SceneJS_errorModule.fatalError("SceneJS Command Service (ID '"
                                 + SceneJS.Services.COMMAND_SERVICE_ID
-                                + ") requires an 'execute' method on your '" + commandId + " command implementation";
+                                + ") requires an 'execute' method on your '" + commandId + " command implementation");
                     }
                     commands[commandId] = command;
                 },
@@ -24,17 +24,17 @@ SceneJS.Services.addService(
 
                 executeCommand : function (params, ctx) {
                     if (!params) {
-                        throw "sendMessage param 'message' null or undefined";
+                        throw  SceneJS_errorModule.fatalError("sendMessage param 'message' null or undefined");
                     }
                     var commandId = params.command;
                     if (!commandId) {
-                        throw "Message element expected: 'command'";
+                        throw  SceneJS_errorModule.fatalError("Message element expected: 'command'");
                     }
                     var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
                     var command = commandService.getCommand(commandId);
 
                     if (!command) {
-                        throw "Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?";
+                        throw  SceneJS_errorModule.fatalError("Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?");
                     }
                     command.execute(params);
                 }
@@ -61,7 +61,7 @@ SceneJS.Services.addService(
                                 for (var j = 0; j < nodes.length; j++) {
                                     node = nodes[j];
                                     if (!node.id) {
-                                        throw "Message 'create' must have ID for new node";
+                                        throw  SceneJS_errorModule.fatalError("Message 'create' must have ID for new node");
                                     }
                                     if (target) {
                                         targetNode = scene.findNode(target);
@@ -113,7 +113,7 @@ SceneJS.Services.addService(
                 if (params.remove) {
                     callNodeMethods("remove", params.remove, targetNode);
                 }
-                targetNode._scene._nodeMap.items[params.target]._fireEvent("updated", { }); // TODO: only if listener exists; and buffer events
+                targetNode.scene.nodeMap.items[params.target]._fireEvent("updated", { }); // TODO: only if listener exists; and buffer events
             }
 
             /* Further messages

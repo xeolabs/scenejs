@@ -17,7 +17,7 @@ var SceneJS_layerModule = new (function() {
     var layerMap;
     var layerOrder;
 
-    var layerStack = new Array(500);
+    var layerStack = [];
     var stackLen = 0;
 
     var self = this;

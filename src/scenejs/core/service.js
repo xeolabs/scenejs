@@ -32,19 +32,22 @@ SceneJS.Services = new (function() {
      *---------------------------------------------------*/
 
     this.addService(this.NODE_LOADER_SERVICE_ID, {
-        loadNode: function(nodeId) {
+
+        /** Loads node and attaches to parent          
+         */
+        loadNode: function(parentId, nodeId) {
         }
     });
 
     this.addService(this.GEO_LOADER_SERVICE_ID, {
         loadGeometry: function (id, params, cb) {
-            throw "SceneJS.Services service not installed: SceneJS.Services.GEO_LOADER_SERVICE_ID";
+            throw SceneJS_errorModule.fatalError("SceneJS.Services service not installed: SceneJS.Services.GEO_LOADER_SERVICE_ID");
         }
     });
 
     this.addService(this.MORPH_GEO_LOADER_SERVICE_ID, {
         loadMorphGeometry: function (id, params, cb) {
-            throw "SceneJS.Services service not installed: SceneJS.Services.MORPH_GEO_LOADER_SERVICE_ID";
+            throw SceneJS_errorModule.fatalError("SceneJS.Services service not installed: SceneJS.Services.MORPH_GEO_LOADER_SERVICE_ID");
         }
     });
 })();

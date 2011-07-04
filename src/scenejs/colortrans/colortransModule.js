@@ -3,7 +3,7 @@
  *
  * Services the colortrans scene node, providing it with methods to set and get the current color transforms.
  *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a call to
+ * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a call to
  * setColortrans to set the material properties to the shading backend.
  *
  * Avoids redundant export of the colors transforms with a dirty flag; they are only set when that flag is set, which
@@ -24,15 +24,9 @@ var SceneJS_colortransModule = new (function() {
                 stackLen = 0;
                 dirty = true;
             });
-
+   
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -43,13 +37,6 @@ var SceneJS_colortransModule = new (function() {
                     dirty = false;
                 }
             });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
-            });
-
 
     this.pushColortrans = function(id, trans) {
         idStack[stackLen] = id;

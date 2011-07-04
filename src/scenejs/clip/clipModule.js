@@ -14,16 +14,10 @@ var SceneJS_clipModule = new (function() {
             function() {
                 stackLen = 0;
                 dirty = true;
-            });
+            });   
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -33,12 +27,6 @@ var SceneJS_clipModule = new (function() {
                     }
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
             });
 
     this.pushClip = function(id, clip) {

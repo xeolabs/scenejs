@@ -8,7 +8,7 @@
  * matrices. The stack will therefore contain sources that are instanced in view space by different modelling
  * transforms, with positions and directions that may be animated,
  *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a
  * LIGHTS_EXPORTED to pass the entire light stack to the shading backend.
  *
  * Avoids redundant export of the sources with a dirty flag; they are only exported when that is set, which occurs
@@ -34,24 +34,12 @@ var SceneJS_lightingModule = new (function() {
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     SceneJS_renderModule.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
             });
 
     this.pushLight = function(id, light) {  // TODO: what to do with ID?

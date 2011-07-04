@@ -4,7 +4,7 @@
  * Services the scene projection transform nodes, such as SceneJS.frustum, providing them with methods to set and
  * get the current projection matrix.
  *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a
  * PROJECTION_TRANSFORM_EXPORTED to pass the projection matrix as a Float32Array to the shading backend.
  *
  * The Float32Array is lazy-computed and cached on export to avoid repeatedly regenerating it.
@@ -25,8 +25,8 @@ var SceneJS_projectionModule = new (function() {
         isDefault : true
     };
 
-    var idStack = new Array(255);
-    var transformStack = new Array(255);
+    var idStack = [];
+    var transformStack = [];
     var stackLen = 0;
 
     var nodeId;
@@ -39,41 +39,24 @@ var SceneJS_projectionModule = new (function() {
             function() {
                 stackLen = 0;
                 nodeId = null;
-                transform = {
-                    matrix : SceneJS_math_identityMat4(),
-                    fixed: true,
-                    isDefault : true
-                };
+                transform = DEFAULT_TRANSFORM;
                 dirty = true;
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
-            function() {
+            SceneJS_eventModule.SCENE_RENDERING,
+            function(params) {
                 if (dirty) {
-
-                    /* Lazy-create WebGL array
-                     */
-                    if (!transform.matrixAsArray) {
-                        transform.matrixAsArray = new Float32Array(transform.matrix);
+                    if (stackLen > 0) {
+                        if (!transform.matrixAsArray) {
+                            transform.matrixAsArray = new Float32Array(transform.matrix);
+                        }
+                        SceneJS_renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
+                    } else  {
+                        SceneJS_renderModule.setProjectionTransform();
                     }
-
-                    SceneJS_renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
-
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
             });
 
     this.pushTransform = function(id, t) {

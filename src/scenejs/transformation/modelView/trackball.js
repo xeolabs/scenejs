@@ -38,7 +38,7 @@
  */
 SceneJS.Trackball = function() {
     SceneJS.Node.apply(this, arguments);
-    this._attr.nodeType = "trackball";
+    this.attr.type = "trackball";
     this._xform = null;
     this.reset();
     if (this._fixedParams) {
@@ -180,15 +180,15 @@ SceneJS.Trackball.prototype._compile = function(traversalContext, data) {
 };
 
 SceneJS.Trackball.prototype._preCompile = function(traversalContext, data) {
-    if (this._memoLevel == 0) {
+    if (this._compileMemoLevel == 0) {
         if (!this._fixedParams) {
             this._init(this._getParams(data));
         } else {
-            this._memoLevel = 1;
+            this._compileMemoLevel = 1;
         }
     }
     var superXform = SceneJS_modelViewTransformModule.getTransform();
-    if (this._memoLevel < 2) {
+    if (this._compileMemoLevel < 2) {
         var instancing = SceneJS_instancingModule.instancing();
         var tempMat = SceneJS_math_mulMat4(superXform.matrix, this._mat);
         this._xform = {
@@ -196,11 +196,11 @@ SceneJS.Trackball.prototype._preCompile = function(traversalContext, data) {
             matrix: tempMat,
             fixed: superXform.fixed && this._fixedParams && !instancing
         };
-        if (this._memoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
-            this._memoLevel = 2;
+        if (this._compileMemoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
+            this._compileMemoLevel = 2;
         }
     }
-    SceneJS_modelViewTransformModule.pushTransform(this._attr.id, this._xform);
+    SceneJS_modelViewTransformModule.pushTransform(this.attr.id, this._xform);
 };
 
 SceneJS.Trackball.prototype._postCompile = function(traversalContext, data) {

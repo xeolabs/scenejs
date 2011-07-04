@@ -4,7 +4,7 @@
  * Services the scene view transform nodes, such as SceneJS.lookAt, providing them with methods to set and
  * get the current view transform matrices.
  *
- * Interacts with the shading backend through events; on a SHADER_RENDERING event it will respond with a
+ * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a
  * VIEW_TRANSFORM_EXPORTED to pass the view matrix and normal matrix as Float32Arrays to the
  * shading backend.
  *
@@ -23,11 +23,11 @@ var SceneJS_viewTransformModule = new (function() {
         matrix : SceneJS_math_identityMat4(),
         fixed: true,
         identity : true,
-        lookAt:SceneJS_math_LOOKAT
+        lookAt:SceneJS_math_LOOKAT_ARRAYS
     };
 
-    var idStack = new Array(255);
-    var transformStack = new Array(255);
+    var idStack = [];
+    var transformStack = [];
     var stackLen = 0;
 
     var nodeId;
@@ -49,40 +49,30 @@ var SceneJS_viewTransformModule = new (function() {
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 loadTransform();
             });
 
+
     function loadTransform() {
         if (dirty) {
-
-            /* Lazy-compute WebGL matrices
-             */
-            if (!transform.matrixAsArray) {
-                transform.matrixAsArray = new Float32Array(transform.matrix);
+            if (stackLen > 0) {
+                if (!transform.matrixAsArray) {
+                    transform.matrixAsArray = new Float32Array(transform.matrix);
+                }
+                if (!transform.normalMatrixAsArray) {
+                    transform.normalMatrixAsArray = new Float32Array(
+                            SceneJS_math_transposeMat4(
+                                    SceneJS_math_inverseMat4(transform.matrix, SceneJS_math_mat4())));
+                }
+                SceneJS_renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray, transform.lookAt);
+            } else {
+                SceneJS_renderModule.setViewTransform();
             }
-            if (!transform.normalMatrixAsArray) {
-                transform.normalMatrixAsArray = new Float32Array(
-                        SceneJS_math_transposeMat4(
-                                SceneJS_math_inverseMat4(transform.matrix, SceneJS_math_mat4())));
-            }
-            SceneJS_renderModule.setViewTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray, transform.lookAt);
             dirty = false;
         }
     }
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
-            });
 
     this.pushTransform = function(id, t) {
         idStack[stackLen] = id;
@@ -92,7 +82,7 @@ var SceneJS_viewTransformModule = new (function() {
         transform = t;
         dirty = true;
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEW_TRANSFORM_UPDATED, transform);
-       loadTransform();
+           loadTransform();
     };
 
     this.getTransform = function() {
@@ -109,8 +99,15 @@ var SceneJS_viewTransformModule = new (function() {
             transform = DEFAULT_TRANSFORM;
         }
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEW_TRANSFORM_UPDATED, transform);
-        loadTransform();
         dirty = true;
+
+        /*--------------------------------------------------------------
+         * TODO: Vital to reload transform here for some reason.
+         *
+         * When removed, then there are mysterious cases when only
+         * the lights are transformed by the lookAt.
+         *------------------------------------------------------------*/
+          loadTransform();
     };
 
 })();

@@ -59,7 +59,7 @@ SceneJS.utils.query.QueryNodeBoundary.prototype.setConfigs = function(cfg) {
  */
 SceneJS.utils.query.QueryNodeBoundary.prototype.execute = function(params, completed) {
     if (!params.nodeId) {
-        throw "SceneJS.utils.query.QueryNodeBoundary.execute expects params.nodeId";
+        throw  SceneJS_errorModule.fatalError("SceneJS.utils.query.QueryNodeBoundary.execute expects params.nodeId");
     }
     var node = SceneJS.withNode(params.nodeId);
 

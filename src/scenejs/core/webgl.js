@@ -151,10 +151,12 @@ var SceneJS_webgl_ProgramUniform = function(context, program, name, type, size, 
 
 /** @private */
 var SceneJS_webgl_ProgramSampler = function(context, program, name, type, size, location, logging) {
-    //  logging.debug("Program sampler found in shader: " + name);
     this.bindTexture = function(texture, unit) {
-        texture.bind(unit);
-        context.uniform1i(location, unit);
+        if (texture.bind(unit)) {
+            context.uniform1i(location, unit);
+            return true;
+        }
+        return false;
     };
 }
 
@@ -209,15 +211,13 @@ var SceneJS_webgl_Shader = function(context, type, source, logging) {
  *
  * @private
  * @param hash SceneJS-managed ID for program
- * @param lastUsed Time program was lst activated, for LRU cache eviction
  * @param context WebGL context
  * @param vertexSources Source codes for vertex shaders
  * @param fragmentSources Source codes for fragment shaders
  * @param logging Program and shaders will write to logging's debug channel as they compile and link
  */
-var SceneJS_webgl_Program = function(hash, lastUsed, context, vertexSources, fragmentSources, logging) {
+var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSources, logging) {
     this.hash = hash;
-    this.lastUsed = lastUsed;
 
     /* Create shaders from sources
      */
@@ -240,21 +240,20 @@ var SceneJS_webgl_Program = function(hash, lastUsed, context, vertexSources, fra
         }
     }
     context.linkProgram(handle);
-    context.validateProgram(handle);
 
     this.valid = true;
-    this.valid = this.valid && (context.getProgramParameter(handle, context.LINK_STATUS) != 0);
-    this.valid = this.valid && (context.getProgramParameter(handle, context.VALIDATE_STATUS) != 0);
 
-    //     logging.debug("Creating shader program: '" + hash + "'");
-    if (this.valid) {
-        //  logging.debug("Program link succeeded: " + context.getProgramInfoLog(handle));
-    }
-    else {
-        logging.debug("Program link failed: " + context.getProgramInfoLog(handle));
+    this.valid = this.valid && (context.getProgramParameter(handle, context.LINK_STATUS) != 0);
+
+    var debugCfg = SceneJS_debugModule.getConfigs("shading");
+    if (debugCfg.validate !== false) {
+        context.validateProgram(handle);
+
+        this.valid = this.valid && (context.getProgramParameter(handle, context.VALIDATE_STATUS) != 0);
     }
 
     if (!this.valid) {
+        logging.debug("Program link failed: " + context.getProgramInfoLog(handle));
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.SHADER_LINK_FAILURE, "Shader program failed to link");
     }
@@ -321,49 +320,57 @@ var SceneJS_webgl_Program = function(hash, lastUsed, context, vertexSources, fra
         }
     }
 
-    /** @private */
-    this.bind = function() {
-        context.useProgram(handle);
+    this.setProfile = function(profile) {
+        this._profile = profile;
     };
 
+    this.bind = function() {
+        context.useProgram(handle);
+        if (this._profile) {
+            this._profile.program++;
+        }
+    };
 
-    /** @private */
     this.setUniform = function(name, value) {
         var u = uniforms[name];
         if (u) {
             u.setValue(value);
+            if (this._profile) {
+                this._profile.uniform++;
+            }
         } else {
-      //      SceneJS_loggingModule.warn("Shader uniform load failed - uniform not found in shader : " + name);
+            //      SceneJS_loggingModule.warn("Shader uniform load failed - uniform not found in shader : " + name);
         }
     };
 
-    /** @private */
     this.bindFloatArrayBuffer = function(name, buffer) {
         var attr = attributes[name];
         if (attr) {
             attr.bindFloatArrayBuffer(buffer);
+            if (this._profile) {
+                this._profile.varying++;
+            }
         } else {
             //  logging.warn("Shader attribute bind failed - attribute not found in shader : " + name);
         }
     };
 
-    /** @private */
     this.bindTexture = function(name, texture, unit) {
         var sampler = samplers[name];
         if (sampler) {
-            sampler.bindTexture(texture, unit);
+            if (this._profile) {
+                this._profile.texture++;
+            }
+            return sampler.bindTexture(texture, unit);
         } else {
-            //  logging.warn("Sampler not found: " + name);
+            return false;
         }
     };
 
-    /** @private
-     */
     this.unbind = function() {
         //     context.useProgram(0);
     };
 
-    /** @private */
     this.destroy = function() {
         if (this.valid) {
             //   logging.debug("Destroying shader program: '" + hash + "'");
@@ -397,7 +404,8 @@ var SceneJS_webgl_Texture2D = function(context, cfg, onComplete) {
         try {
             context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image); // New API change
         } catch (e) {
-            context.texImage2D(context.TEXTURE_2D, 0, image, cfg.flipY); // Fallback for old browser
+            //            context.texImage2D(context.TEXTURE_2D, 0, image, cfg.flipY); // Fallback for old browser
+            context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image, null);
         }
         this.format = context.RGBA;
         this.width = image.width;
@@ -451,7 +459,9 @@ var SceneJS_webgl_Texture2D = function(context, cfg, onComplete) {
             if (this.update) {
                 this.update(context);
             }
+            return true;
         }
+        return false;
     };
 
     this.unbind = function(unit) {

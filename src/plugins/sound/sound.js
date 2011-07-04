@@ -36,7 +36,7 @@ SceneJS.Sound.prototype._compile = function(traversalContext) {
             matrix = this._matrix;
 
         var pos = SceneJS_math_transformPoint3(SceneJS_modelTransformModule.getTransform().matrix, [0, 0, 0]);
-        var v = SceneJS_math_subVec3(pos, [listener.x, listener.y, listener.z]);
+        var v = SceneJS_math_subVec3(pos, listener);
         var dist = SceneJS_math_lenVec3(v);
 
         if (dist < 0.001)

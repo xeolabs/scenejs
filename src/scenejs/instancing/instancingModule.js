@@ -32,33 +32,31 @@ var SceneJS_instancingModule = new function() {
                 instances = {};
             });
 
-    /** Acquire instance of a node
-     */
     this.acquireInstance = function(id, node) {
-//        if (instances[nodeID]) {
-//            SceneJS_errorModule.error(
-//                    SceneJS.errors.INSTANCE_CYCLE,
-//                    "SceneJS.Instance attempted to create cyclic instantiation: " + nodeID);
-//            return null;
-//        }
-//        var node = SceneJS_sceneModule.scenes[sceneId].scene._nodeMap.items[nodeID];
-//        if (!node) {
-//            var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_LOADER_SERVICE_ID);
-//            if (nodeStore) {
-//                node = nodeStore.loadNode(nodeID);
-//            }
-//        }
-//        if (node) {
-//            instances[nodeID] = nodeID;
-            idStack.push(id);
-            countInstances++;
+        //        if (instances[nodeID]) {
+        //            SceneJS_errorModule.error(
+        //                    SceneJS.errors.INSTANCE_CYCLE,
+        //                    "SceneJS.Instance attempted to create cyclic instantiation: " + nodeID);
+        //            return null;
+        //        }
+        //        var node = SceneJS_sceneModule.scenes[sceneId].scene.nodeMap.items[nodeID];
+        //        if (!node) {
+        //            var nodeStore = SceneJS.Services.getService(SceneJS.Services.NODE_LOADER_SERVICE_ID);
+        //            if (nodeStore) {
+        //                node = nodeStore.loadNode(nodeID);
+        //            }
+        //        }
+        //        if (node) {
+        //            instances[nodeID] = nodeID;
+        idStack.push(id);
+        countInstances++;
 
-            /* We set the instance node's ID on the render module, so that it may
-             * internally form state IDs prefixed by the instance
-             */
-            SceneJS_renderModule.setIDPrefix(idStack.join(""));
-//        }
-//        return node;
+        /* We set the instance node's ID on the render module, so that it may
+         * internally form state IDs prefixed by the instance
+         */
+        SceneJS_renderModule.setIDPrefix(idStack.join(""));
+        //        }
+        //        return node;
     };
 
     /**
@@ -69,14 +67,17 @@ var SceneJS_instancingModule = new function() {
         return countInstances > 0;
     };
 
-    /**
-     * Release current Symbol instance, effectively reacquires any
-     * previously acquired
-     */
     this.releaseInstance = function(nodeID) {
         instances[nodeID] = null;
         idStack.pop();
         countInstances--;
         SceneJS_renderModule.setIDPrefix((countInstances > 0) ? idStack[countInstances - 1] : null);
     };
+
+//    SceneJS._compilationStates.setSupplier("instances", {
+//        get: function() {
+//            return countInstances > 0;
+//        }
+//    });
+
 }();

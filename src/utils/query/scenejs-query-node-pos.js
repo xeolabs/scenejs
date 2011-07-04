@@ -125,13 +125,13 @@ SceneJS.utils.query.QueryNodePos.prototype.setConfigs = function(cfg) {
  */
 SceneJS.utils.query.QueryNodePos.prototype.execute = function(params, completed) {
     if (!params.nodeId) {
-        throw "SceneJS.utils.query.QueryNodePos.execute expects params.nodeId";
+        throw  SceneJS_errorModule.fatalError("SceneJS.utils.query.QueryNodePos.execute expects params.nodeId");
     }
     if (this._cfg.canvasWidth || this._cfg.canvasHeight) {
         if (!this._cfg.canvasWidth) {
-            throw "SceneJS.utils.query.QueryNodePos misconfigured - canvasHeight given, but canvasWidth omitted";
+            throw  SceneJS_errorModule.fatalError("SceneJS.utils.query.QueryNodePos misconfigured - canvasHeight given, but canvasWidth omitted");
         } else if (!this._cfg.canvasHeight) {
-            throw "SceneJS.utils.query.QueryNodePos misconfigured - canvasWidth given, but canvasHeight omitted";
+            throw  SceneJS_errorModule.fatalError("SceneJS.utils.query.QueryNodePos misconfigured - canvasWidth given, but canvasHeight omitted");
         }
     }
     var node = SceneJS.withNode(params.nodeId);

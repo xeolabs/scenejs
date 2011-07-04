@@ -1,342 +1,834 @@
-/** @class A scene node that sets WebGL state for nodes in its subtree.
- * <p>This node basically exposes various WebGL state configurations through the SceneJS API.</p>
- * (TODO: more comments here!)
+new (function() {
 
- * @extends SceneJS.Node
- */
-SceneJS.Renderer = SceneJS.createNodeType("renderer");
+    var canvas;         // Currently active canvas
+    var idStack =[];
+    var propStack = [];
+    var stackLen = 0;
+    var dirty;
+
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
+            function(params) {
+                stackLen = 0;
+                dirty = true;
+                canvas = params.canvas;
+                stackLen = 0;
+                var props = createProps({  // Dont set props - just define for restoring to on props pop
+                    clear: {
+                        depth : true,
+                        color : true
+                    },
+                    // clearColor: {r: 0, g : 0, b : 0 },
+                    clearDepth: 1.0,
+                    enableDepthTest:true,
+                    enableCullFace: false,
+                    frontFace: "ccw",
+                    cullFace: "back",
+                    depthFunc: "less",
+                    depthRange: {
+                        zNear: 0,
+                        zFar: 1
+                    },
+                    enableScissorTest: false,
+                    viewport:{
+                        x : 1,
+                        y : 1,
+                        width: canvas.canvas.width,
+                        height: canvas.canvas.height
+                    },
+                    wireframe: false,
+                    highlight: false,
+                    enableClip: undefined,
+                    enableBlend: false,
+                    blendFunc: {
+                        sfactor: "srcAlpha",
+                        dfactor: "one"
+                    }
+                });
 
 
-// @private
-SceneJS.Renderer.prototype._init = function(params) {
-    for (var key in params) {
-        if (params.hasOwnProperty(key)){
-            this._attr[key] = params[key];
+                // Not sure if needed:
+                setProperties(canvas.context, props);
+
+                pushProps("__scenejs_default_props", props);
+            });
+
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
+            function(params) {
+                if (dirty) {
+                    if (stackLen > 0) {
+                        SceneJS_renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
+                    } else  {
+                        SceneJS_renderModule.setRenderer();
+                    }
+                    dirty = false;
+                }
+            });
+
+    function createProps(props) {
+        var restore;
+        if (stackLen > 0) {  // can't restore when no previous props set
+            restore = {};
+            for (var name in props) {
+                if (props.hasOwnProperty(name)) {
+                    if (!(props[name] == undefined)) {
+                        restore[name] = getSuperProperty(name);
+                    }
+                }
+            }
         }
+        props = processProps(props);
+
+        return {
+
+            props: props,
+
+            setProps: function(context) {
+                setProperties(context, props);
+            },
+
+            restoreProps : function(context) {
+                if (restore) {
+                    restoreProperties(context, restore);
+                }
+            }
+        };
+    };
+
+    var getSuperProperty = function(name) {
+        var props;
+        var prop;
+        for (var i = stackLen - 1; i >= 0; i--) {
+            props = propStack[i].props;
+            prop = props[name];
+            if (prop != undefined && prop != null) {
+                return props[name];
+            }
+        }
+        return null; // Cause default to be set
+    };
+
+    function processProps(props) {
+        var prop;
+        for (var name in props) {
+            if (props.hasOwnProperty(name)) {
+                prop = props[name];
+                if (prop != undefined && prop != null) {
+                    if (glModeSetters[name]) {
+                        props[name] = glModeSetters[name](null, prop);
+                    } else if (glStateSetters[name]) {
+                        props[name] = glStateSetters[name](null, prop);
+                    }
+                }
+            }
+        }
+        return props;
     }
-};
 
-SceneJS.Renderer.prototype.setViewport = function(viewport) {
-    this._attr.viewport = viewport ? {
-        x : viewport.x || 1,
-        y : viewport.y || 1,
-        width: viewport.width || 1000,
-        height: viewport.height || 1000
-    } : undefined;
-    this._memoLevel = 0;
-};
+    var setProperties = function(context, props) {
+        for (var key in props) {        // Set order-insensitive properties (modes)
+            if (props.hasOwnProperty(key)) {
+                var setter = glModeSetters[key];
+                if (setter) {
+                    setter(context, props[key]);
+                }
+            }
+        }
+        if (props.viewport) {           // Set order-sensitive properties (states)
+            glStateSetters.viewport(context, props.viewport);
+        }
+        if (props.scissor) {
+            glStateSetters.clear(context, props.scissor);
+        }
+        if (props.clear) {
+            glStateSetters.clear(context, props.clear);
+        }
+    };
 
-SceneJS.Renderer.prototype.getViewport = function() {
-    return this._attr.viewport ? {
-        x : this._attr.viewport.x,
-        y : this._attr.viewport.y,
-        width: this._attr.viewport.width,
-        height: this._attr.viewport.height
-    } : undefined;
-};
+    /**
+     * Restores previous renderer properties, except for clear - that's the reason we
+     * have a seperate set and restore semantic - we don't want to keep clearing the buffer.
+     */
+    var restoreProperties = function(context, props) {
+        var value;
+        for (var key in props) {            // Set order-insensitive properties (modes)
+            if (props.hasOwnProperty(key)) {
+                value = props[key];
+                if (value != undefined && value != null) {
+                    var setter = glModeSetters[key];
+                    if (setter) {
+                        setter(context, value);
+                    }
+                }
+            }
+        }
+        if (props.viewport) {               //  Set order-sensitive properties (states)
+            glStateSetters.viewport(context, props.viewport);
+        }
+        if (props.scissor) {
+            glStateSetters.clear(context, props.scissor);
+        }
+    };
 
-SceneJS.Renderer.prototype.setScissor = function(scissor) {
-    this._attr.scissor = scissor ? {
-        x : scissor.x || 1,
-        y : scissor.y || 1,
-        width: scissor.width || 1000,
-        height: scissor.height || 1000
-    } : undefined;
-    this._memoLevel = 0;
-};
+    function pushProps(id, props) {
+        idStack[stackLen] = id;
+        propStack[stackLen] = props;
 
-SceneJS.Renderer.prototype.getScissor = function() {
-    return this._attr.scissor ? {
-        x : this._attr.scissor.x,
-        y : this._attr.scissor.y,
-        width: this._attr.scissor.width,
-        height: this._attr.scissor.height
-    } : undefined;
-};
+        stackLen++;
 
-SceneJS.Renderer.prototype.setClear = function(clear) {
-    this._attr.clear = clear ? {
-        r : clear.r || 0,
-        g : clear.g || 0,
-        b : clear.b || 0
-    } : undefined;
-    this._memoLevel = 0;
-};
+        if (props.props.viewport) {
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, props.props.viewport);
+        }
+        dirty = true;
+    };
 
-SceneJS.Renderer.prototype.getClear = function() {
-    return this._attr.clear ? {
-        r : this._attr.clear.r,
-        g : this._attr.clear.g,
-        b : this._attr.clear.b
-    } : null;
-};
-
-SceneJS.Renderer.prototype.setEnableBlend = function(enableBlend) {
-    this._attr.enableBlend = enableBlend;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getEnableBlend = function() {
-    return this._attr.enableBlend;
-};
-
-SceneJS.Renderer.prototype.setBlendColor = function(color) {
-    this._attr.blendColor = color ? {
-        r : color.r || 0,
-        g : color.g || 0,
-        b : color.b || 0,
-        a : (color.a == undefined || color.a == null) ? 1 : color.a
-    } : undefined;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getBlendColor = function() {
-    return this._attr.blendColor ? {
-        r : this._attr.blendColor.r,
-        g : this._attr.blendColor.g,
-        b : this._attr.blendColor.b,
-        a : this._attr.blendColor.a
-    } : undefined;
-};
-
-SceneJS.Renderer.prototype.setBlendEquation = function(eqn) {
-    this._attr.blendEquation = eqn;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getBlendEquation = function() {
-    return this._attr.blendEquation;
-};
-
-SceneJS.Renderer.prototype.setBlendEquationSeparate = function(eqn) {
-    this._attr.blendEquationSeparate = eqn ? {
-        rgb : eqn.rgb || "funcAdd",
-        alpha : eqn.alpha || "funcAdd"
-    } : undefined;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getBlendEquationSeparate = function() {
-    return this._attr.blendEquationSeparate ? {
-        rgb : this._attr.rgb,
-        alpha : this._attr.alpha
-    } : undefined;
-};
-
-SceneJS.Renderer.prototype.setBlendFunc = function(funcs) {
-    this._attr.blendFunc = funcs ? {
-        sfactor : funcs.sfactor || "srcAlpha",
-        dfactor : funcs.dfactor || "one"
-    } : undefined;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getBlendFunc = function() {
-    return this._attr.blendFunc ? {
-        sfactor : this._attr.sfactor,
-        dfactor : this._attr.dfactor
-    } : undefined;
-};
-
-SceneJS.Renderer.prototype.setBlendFuncSeparate = function(eqn) {
-    this._attr.blendFuncSeparate = eqn ? {
-        srcRGB : eqn.srcRGB || "zero",
-        dstRGB : eqn.dstRGB || "zero",
-        srcAlpha : eqn.srcAlpha || "zero",
-        dstAlpha : eqn.dstAlpha || "zero"
-    } : undefined;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getBlendFuncSeparate = function() {
-    return this._attr.blendFuncSeparate ? {
-        srcRGB : this._attr.blendFuncSeparate.srcRGB,
-        dstRGB : this._attr.blendFuncSeparate.dstRGB,
-        srcAlpha : this._attr.blendFuncSeparate.srcAlpha,
-        dstAlpha : this._attr.blendFuncSeparate.dstAlpha
-    } : undefined;
-};
-
-SceneJS.Renderer.prototype.setEnableCullFace = function(enableCullFace) {
-    this._attr.enableCullFace = enableCullFace;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getEnableCullFace = function() {
-    return this._attr.enableCullFace;
-};
+    /**
+     * Maps renderer node properties to WebGL context enums
+     * @private
+     */
+    var glEnum = function(context, name) {
+        if (!name) {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Null SceneJS.renderer node config: \"" + name + "\"");
+        }
+        var result = SceneJS_webgl_enumMap[name];
+        if (!result) {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
+        }
+        var value = context[result];
+        if (!value) {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
+        }
+        return value;
+    };
 
 
-SceneJS.Renderer.prototype.setCullFace = function(cullFace) {
-    this._attr.cullFace = cullFace;
-    this._memoLevel = 0;
-};
+    /**
+     * Order-insensitive functions that set WebGL modes ie. not actually causing an
+     * immediate change.
+     *
+     * These map to renderer properties and are called in whatever order their
+     * property is found on the renderer config.
+     *
+     * Each of these wrap a state-setter function on the WebGL context. Each function
+     * also uses the glEnum map to convert its renderer node property argument to the
+     * WebGL enum constant required by its wrapped function.
+     *
+     * When called with undefined/null context, will condition and return the value given
+     * ie. set it to default if value is undefined. When called with a context, will
+     * set the value on the context using the wrapped function.
+     *
+     * @private
+     */
+    var glModeSetters = {
 
-SceneJS.Renderer.prototype.getCullFace = function() {
-    return this._attr.cullFace;
-};
+        enableBlend: function(context, flag) {
+            if (!context) {
+                if (flag == null || flag == undefined) {
+                    flag = false;
+                }
+                return flag;
+            }
+            if (flag) {
+                context.enable(context.BLEND);
+            } else {
+                context.disable(context.BLEND);
+            }
+        },
 
-SceneJS.Renderer.prototype.setEnableDepthTest = function(enableDepthTest) {
-    this._attr.enableDepthTest = enableDepthTest;
-    this._memoLevel = 0;
-};
+        blendColor: function(context, color) {
+            if (!context) {
+                color = color || {};
+                return {
+                    r: color.r || 0,
+                    g: color.g || 0,
+                    b: color.b || 0,
+                    a: (color.a == undefined || color.a == null) ? 1 : color.a
+                };
+            }
+            context.blendColor(color.r, color.g, color.b, color.a);
+        },
 
-SceneJS.Renderer.prototype.getEnableDepthTest = function() {
-    return this._attr.enableDepthTest;
-};
+        blendEquation: function(context, eqn) {
+            if (!context) {
+                return eqn || "funcAdd";
+            }
+            context.blendEquation(context, glEnum(context, eqn));
+        },
 
-SceneJS.Renderer.prototype.setDepthFunc = function(depthFunc) {
-    this._attr.depthFunc = depthFunc;
-    this._memoLevel = 0;
-};
+        /** Sets the RGB blend equation and the alpha blend equation separately
+         */
+        blendEquationSeparate: function(context, eqn) {
+            if (!context) {
+                eqn = eqn || {};
+                return {
+                    rgb : eqn.rgb || "funcAdd",
+                    alpha : eqn.alpha || "funcAdd"
+                };
+            }
+            context.blendEquation(glEnum(context, eqn.rgb), glEnum(context, eqn.alpha));
+        },
 
-SceneJS.Renderer.prototype.getDepthFunc = function() {
-    return this._attr.depthFunc;
-};
+        blendFunc: function(context, funcs) {
+            if (!context) {
+                funcs = funcs || {};
+                return  {
+                    sfactor : funcs.sfactor || "srcAlpha",
+                    dfactor : funcs.dfactor || "oneMinusSrcAlpha"
+                };
+            }
+            context.blendFunc(glEnum(context, funcs.sfactor || "srcAlpha"), glEnum(context, funcs.dfactor || "oneMinusSrcAlpha"));
+        },
 
-SceneJS.Renderer.prototype.setEnableDepthMask = function(enableDepthMask) {
-    this._attr.enableDepthMask = enableDepthMask;
-    this._memoLevel = 0;
-};
+        blendFuncSeparate: function(context, func) {
+            if (!context) {
+                func = func || {};
+                return {
+                    srcRGB : func.srcRGB || "zero",
+                    dstRGB : func.dstRGB || "zero",
+                    srcAlpha : func.srcAlpha || "zero",
+                    dstAlpha :  func.dstAlpha || "zero"
+                };
+            }
+            context.blendFuncSeparate(
+                    glEnum(context, func.srcRGB || "zero"),
+                    glEnum(context, func.dstRGB || "zero"),
+                    glEnum(context, func.srcAlpha || "zero"),
+                    glEnum(context, func.dstAlpha || "zero"));
+        },
 
-SceneJS.Renderer.prototype.getEnableDepthMask = function() {
-    return this._attr.enableDepthMask;
-};
+        clearColor: function(context, color) {
+            if (!context) {
+                color = color || {};
+                return {
+                    r : color.r || 0,
+                    g : color.g || 0,
+                    b : color.b || 0,
+                    a : (color.a == undefined || color.a == null) ? 1 : color.a
+                };
+            }
+            context.clearColor(color.r, color.g, color.b, color.a);
+        },
 
-SceneJS.Renderer.prototype.setClearDepth = function(clearDepth) {
-    this._attr.clearDepth = clearDepth;
-    this._memoLevel = 0;
-};
+        clearDepth: function(context, depth) {
+            if (!context) {
+                return (depth == null || depth == undefined) ? 1 : depth;
+            }
+            context.clearDepth(depth);
+        },
 
-SceneJS.Renderer.prototype.getClearDepth = function() {
-    return this.attr.clearDepth;
-};
+        clearStencil: function(context, clearValue) {
+            if (!context) {
+                return  clearValue || 0;
+            }
+            context.clearStencil(clearValue);
+        },
 
-SceneJS.Renderer.prototype.setDepthRange = function(range) {
-    this._attr.depthRange = range ? {
-        zNear : (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
-        zFar : (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
-    } : undefined;
-    this._memoLevel = 0;
-};
+        colorMask: function(context, color) {
+            if (!context) {
+                color = color || {};
+                return {
+                    r : color.r || 0,
+                    g : color.g || 0,
+                    b : color.b || 0,
+                    a : (color.a == undefined || color.a == null) ? 1 : color.a
+                };
 
-SceneJS.Renderer.prototype.getDepthRange = function() {
-    return this._attr.depthRange ? {
-        zNear : this._attr.depthRange.zNear,
-        zFar : this._attr.depthRange.zFar
-    } : undefined;
-};
+            }
+            context.colorMask(color.r, color.g, color.b, color.a);
+        },
 
-SceneJS.Renderer.prototype.setFrontFace = function(frontFace) {
-    this._attr.frontFace = frontFace;
-    this._memoLevel = 0;
-};
+        enableCullFace: function(context, flag) {
+            if (!context) {
+                return flag;
+            }
+            if (flag) {
+                context.enable(context.CULL_FACE);
+            } else {
+                context.disable(context.CULL_FACE);
+            }
+        },
 
-SceneJS.Renderer.prototype.getFrontFace = function() {
-    return this.attr.frontFace;
-};
+        cullFace: function(context, mode) {
+            if (!context) {
+                return mode || "back";
+            }
+            context.cullFace(glEnum(context, mode));
+        },
 
-SceneJS.Renderer.prototype.setLineWidth = function(lineWidth) {
-    this._attr.lineWidth = lineWidth;
-    this._memoLevel = 0;
-};
+        enableDepthTest: function(context, flag) {
+            if (!context) {
+                if (flag == null || flag == undefined) {
+                    flag = true;
+                }
+                return flag;
+            }
+            if (flag) {
+                context.enable(context.DEPTH_TEST);
+            } else {
+                context.disable(context.DEPTH_TEST);
+            }
+        },
 
-SceneJS.Renderer.prototype.getLineWidth = function() {
-    return this.attr.lineWidth;
-};
+        depthFunc: function(context, func) {
+            if (!context) {
+                return func || "less";
+            }
+            context.depthFunc(glEnum(context, func));
+        },
 
-SceneJS.Renderer.prototype.setEnableScissorTest = function(enableScissorTest) {
-    this._attr.enableScissorTest = enableScissorTest;
-    this._memoLevel = 0;
-};
+        enableDepthMask: function(context, flag) {
+            if (!context) {
+                if (flag == null || flag == undefined) {
+                    flag = true;
+                }
+                return flag;
+            }
+            context.depthMask(flag);
+        },
 
-SceneJS.Renderer.prototype.getEnableScissorTest = function() {
-    return this.attr.enableScissorTest;
-};
+        depthRange: function(context, range) {
+            if (!context) {
+                range = range || {};
+                return {
+                    zNear : (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
+                    zFar : (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
+                };
+            }
+            context.depthRange(range.zNear, range.zFar);
+        } ,
 
-SceneJS.Renderer.prototype.setClearStencil = function(clearStencil) {
-    this._attr.clearStencil = clearStencil;
-    this._memoLevel = 0;
-};
+        frontFace: function(context, mode) {
+            if (!context) {
+                return mode || "ccw";
+            }
+            context.frontFace(glEnum(context, mode));
+        },
 
-SceneJS.Renderer.prototype.getClearStencil = function() {
-    return this.attr.clearStencil;
-};
+        lineWidth: function(context, width) {
+            if (!context) {
+                return width || 1;
+            }
+            context.lineWidth(width);
+        },
 
-SceneJS.Renderer.prototype.setColorMask = function(color) {
-    this._attr.colorMask = color ? {
-        r : color.r || 0,
-        g : color.g || 0,
-        b : color.b || 0,
-        a : (color.a == undefined || color.a == null) ? 1 : color.a
-    } : undefined;
-    this._memoLevel = 0;
-};
+        enableScissorTest: function(context, flag) {
+            if (!context) {
+                return flag;
+            }
+            if (flag) {
+                context.enable(context.SCISSOR_TEST);
+            } else {
+                flag = false;
+                context.disable(context.SCISSOR_TEST);
+            }
+        }
+    };
 
-SceneJS.Renderer.prototype.getColorMask = function() {
-    return this._attr.colorMask ? {
-        r : this._attr.colorMask.r,
-        g : this._attr.colorMask.g,
-        b : this._attr.colorMask.b,
-        a : this._attr.colorMask.a
-    } : undefined;
-};
+    /**
+     * Order-sensitive functions that immediately effect WebGL state change.
+     *
+     * These map to renderer properties and are called in a particular order since they
+     * affect one another.
+     *
+     * Each of these wrap a state-setter function on the WebGL context. Each function
+     * also uses the glEnum map to convert its renderer node property argument to the
+     * WebGL enum constant required by its wrapped function.
+     *
+     * @private
+     */
+    var glStateSetters = {
 
-SceneJS.Renderer.prototype.setWireframe = function(wireframe) {
-    this._attr.wireframe = wireframe;
-    this._memoLevel = 0;
-};
+        /** Set viewport on the given context
+         */
+        viewport: function(context, v) {
+            if (!context) {
+                v = v || {};
+                return {
+                    x : v.x || 1,
+                    y : v.y || 1,
+                    width: v.width || canvas.canvas.width,
+                    height: v.height || canvas.canvas.height
+                };
+            }
+            context.viewport(v.x, v.y, v.width, v.height);
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, v);
+        },
 
-SceneJS.Renderer.prototype.getWireframe = function() {
-    return this.attr.wireframe;
-};
+        /** Sets scissor region on the given context
+         */
+        scissor: function(context, s) {
+            if (!context) {
+                s = s || {};
+                return {
+                    x : s.x || 0,
+                    y : s.y || 0,
+                    width: s.width || 1.0,
+                    height: s.height || 1.0
+                };
+            }
+            context.scissor(s.x, s.y, s.width, s.height);
+        },
 
-SceneJS.Renderer.prototype.setHighlight = function(highlight) {
-    this._attr.highlight = highlight;
-    this._memoLevel = 0;
-};
+        /** Clears buffers on the given context as specified in mask
+         */
+        clear:function(context, mask) {
+            if (!context) {
+                mask = mask || {};
+                return mask;
+            }
+            var m;
+            if (mask.color) {
+                m = context.COLOR_BUFFER_BIT;
+            }
+            if (mask.depth) {
+                m = m | context.DEPTH_BUFFER_BIT;
+            }
+            if (mask.stencil) {
+                m = m | context.STENCIL_BUFFER_BIT;
+            }
 
-SceneJS.Renderer.prototype.getHighlight = function() {
-    return this._attr.highlight;
-};
+            if (m) {
+                context.clear(m);
+            }
+        }
+    };
 
-SceneJS.Renderer.prototype.setEnableClip = function(enableClip) {
-    this._attr.enableClip = enableClip;
-    this._memoLevel = 0;
-};
+    function popProps() {
+        var oldProps = propStack[stackLen - 1];
+        stackLen--;
+        var newProps = propStack[stackLen - 1];
+        if (oldProps.props.viewport) {
+            SceneJS_eventModule.fireEvent(
+                    SceneJS_eventModule.VIEWPORT_UPDATED,
+                    newProps.props.viewport);
+        }
+        dirty = true;
+    };
 
-SceneJS.Renderer.prototype.getEnableClip = function() {
-    return this._attr.enableClip;
-};
+    /** @class A scene node that sets WebGL state for nodes in its subtree.
+     * <p>This node basically exposes various WebGL state configurations through the SceneJS API.</p>
+     * (TODO: more comments here!)
 
-SceneJS.Renderer.prototype.setEnableFog = function(enableFog) {
-    this._attr.enableFog = enableFog;
-    this._memoLevel = 0;
-};
-
-SceneJS.Renderer.prototype.getEnableFog = function() {
-    return this._attr.enableFog;
-};
-
-// @private
-SceneJS.Renderer.prototype._compile = function(traversalContext) {
-    this._preCompile(traversalContext);
-    this._compileNodes(traversalContext);
-    this._postCompile(traversalContext);
-};
+     * @extends SceneJS_node
+     */
+    var Renderer = SceneJS.createNodeType("renderer");
 
 
-// @private
-SceneJS.Renderer.prototype._preCompile = function(traversalContext) {
-    if (this._memoLevel == 0) {
-        this._props = SceneJS_rendererModule.createProps(this._attr);
-        this._memoLevel = 1;
-    }
-    SceneJS_rendererModule.pushProps(this._attr.id, this._props);
-};
+    // @private
+    Renderer.prototype._init = function(params) {
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                this.attr[key] = params[key];
+            }
+        }
+    };
+
+    Renderer.prototype.setViewport = function(viewport) {
+        this.attr.viewport = viewport ? {
+            x : viewport.x || 1,
+            y : viewport.y || 1,
+            width: viewport.width || 1000,
+            height: viewport.height || 1000
+        } : undefined;
+    };
+
+    Renderer.prototype.getViewport = function() {
+        return this.attr.viewport ? {
+            x : this.attr.viewport.x,
+            y : this.attr.viewport.y,
+            width: this.attr.viewport.width,
+            height: this.attr.viewport.height
+        } : undefined;
+    };
+
+    Renderer.prototype.setScissor = function(scissor) {
+        this.attr.scissor = scissor ? {
+            x : scissor.x || 1,
+            y : scissor.y || 1,
+            width: scissor.width || 1000,
+            height: scissor.height || 1000
+        } : undefined;
+    };
+
+    Renderer.prototype.getScissor = function() {
+        return this.attr.scissor ? {
+            x : this.attr.scissor.x,
+            y : this.attr.scissor.y,
+            width: this.attr.scissor.width,
+            height: this.attr.scissor.height
+        } : undefined;
+    };
+
+    Renderer.prototype.setClear = function(clear) {
+        this.attr.clear = clear ? {
+            r : clear.r || 0,
+            g : clear.g || 0,
+            b : clear.b || 0
+        } : undefined;
+    };
+
+    Renderer.prototype.getClear = function() {
+        return this.attr.clear ? {
+            r : this.attr.clear.r,
+            g : this.attr.clear.g,
+            b : this.attr.clear.b
+        } : null;
+    };
+
+    Renderer.prototype.setEnableBlend = function(enableBlend) {
+        this.attr.enableBlend = enableBlend;
+    };
+
+    Renderer.prototype.getEnableBlend = function() {
+        return this.attr.enableBlend;
+    };
+
+    Renderer.prototype.setBlendColor = function(color) {
+        this.attr.blendColor = color ? {
+            r : color.r || 0,
+            g : color.g || 0,
+            b : color.b || 0,
+            a : (color.a == undefined || color.a == null) ? 1 : color.a
+        } : undefined;
+    };
+
+    Renderer.prototype.getBlendColor = function() {
+        return this.attr.blendColor ? {
+            r : this.attr.blendColor.r,
+            g : this.attr.blendColor.g,
+            b : this.attr.blendColor.b,
+            a : this.attr.blendColor.a
+        } : undefined;
+    };
+
+    Renderer.prototype.setBlendEquation = function(eqn) {
+        this.attr.blendEquation = eqn;
+    };
+
+    Renderer.prototype.getBlendEquation = function() {
+        return this.attr.blendEquation;
+    };
+
+    Renderer.prototype.setBlendEquationSeparate = function(eqn) {
+        this.attr.blendEquationSeparate = eqn ? {
+            rgb : eqn.rgb || "funcAdd",
+            alpha : eqn.alpha || "funcAdd"
+        } : undefined;
+    };
+
+    Renderer.prototype.getBlendEquationSeparate = function() {
+        return this.attr.blendEquationSeparate ? {
+            rgb : this.attr.rgb,
+            alpha : this.attr.alpha
+        } : undefined;
+    };
+
+    Renderer.prototype.setBlendFunc = function(funcs) {
+        this.attr.blendFunc = funcs ? {
+            sfactor : funcs.sfactor || "srcAlpha",
+            dfactor : funcs.dfactor || "one"
+        } : undefined;
+    };
+
+    Renderer.prototype.getBlendFunc = function() {
+        return this.attr.blendFunc ? {
+            sfactor : this.attr.sfactor,
+            dfactor : this.attr.dfactor
+        } : undefined;
+    };
+
+    Renderer.prototype.setBlendFuncSeparate = function(eqn) {
+        this.attr.blendFuncSeparate = eqn ? {
+            srcRGB : eqn.srcRGB || "zero",
+            dstRGB : eqn.dstRGB || "zero",
+            srcAlpha : eqn.srcAlpha || "zero",
+            dstAlpha : eqn.dstAlpha || "zero"
+        } : undefined;
+    };
+
+    Renderer.prototype.getBlendFuncSeparate = function() {
+        return this.attr.blendFuncSeparate ? {
+            srcRGB : this.attr.blendFuncSeparate.srcRGB,
+            dstRGB : this.attr.blendFuncSeparate.dstRGB,
+            srcAlpha : this.attr.blendFuncSeparate.srcAlpha,
+            dstAlpha : this.attr.blendFuncSeparate.dstAlpha
+        } : undefined;
+    };
+
+    Renderer.prototype.setEnableCullFace = function(enableCullFace) {
+        this.attr.enableCullFace = enableCullFace;
+    };
+
+    Renderer.prototype.getEnableCullFace = function() {
+        return this.attr.enableCullFace;
+    };
 
 
-// @private
-SceneJS.Renderer.prototype._postCompile = function(traversalContext) {
-    SceneJS_rendererModule.popProps();
-};
+    Renderer.prototype.setCullFace = function(cullFace) {
+        this.attr.cullFace = cullFace;
+    };
+
+    Renderer.prototype.getCullFace = function() {
+        return this.attr.cullFace;
+    };
+
+    Renderer.prototype.setEnableDepthTest = function(enableDepthTest) {
+        this.attr.enableDepthTest = enableDepthTest;
+    };
+
+    Renderer.prototype.getEnableDepthTest = function() {
+        return this.attr.enableDepthTest;
+    };
+
+    Renderer.prototype.setDepthFunc = function(depthFunc) {
+        this.attr.depthFunc = depthFunc;
+    };
+
+    Renderer.prototype.getDepthFunc = function() {
+        return this.attr.depthFunc;
+    };
+
+    Renderer.prototype.setEnableDepthMask = function(enableDepthMask) {
+        this.attr.enableDepthMask = enableDepthMask;
+    };
+
+    Renderer.prototype.getEnableDepthMask = function() {
+        return this.attr.enableDepthMask;
+    };
+
+    Renderer.prototype.setClearDepth = function(clearDepth) {
+        this.attr.clearDepth = clearDepth;
+    };
+
+    Renderer.prototype.getClearDepth = function() {
+        return this.attr.clearDepth;
+    };
+
+    Renderer.prototype.setDepthRange = function(range) {
+        this.attr.depthRange = range ? {
+            zNear : (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
+            zFar : (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
+        } : undefined;
+    };
+
+    Renderer.prototype.getDepthRange = function() {
+        return this.attr.depthRange ? {
+            zNear : this.attr.depthRange.zNear,
+            zFar : this.attr.depthRange.zFar
+        } : undefined;
+    };
+
+    Renderer.prototype.setFrontFace = function(frontFace) {
+        this.attr.frontFace = frontFace;
+    };
+
+    Renderer.prototype.getFrontFace = function() {
+        return this.attr.frontFace;
+    };
+
+    Renderer.prototype.setLineWidth = function(lineWidth) {
+        this.attr.lineWidth = lineWidth;
+    };
+
+    Renderer.prototype.getLineWidth = function() {
+        return this.attr.lineWidth;
+    };
+
+    Renderer.prototype.setEnableScissorTest = function(enableScissorTest) {
+        this.attr.enableScissorTest = enableScissorTest;
+    };
+
+    Renderer.prototype.getEnableScissorTest = function() {
+        return this.attr.enableScissorTest;
+    };
+
+    Renderer.prototype.setClearStencil = function(clearStencil) {
+        this.attr.clearStencil = clearStencil;
+    };
+
+    Renderer.prototype.getClearStencil = function() {
+        return this.attr.clearStencil;
+    };
+
+    Renderer.prototype.setColorMask = function(color) {
+        this.attr.colorMask = color ? {
+            r : color.r || 0,
+            g : color.g || 0,
+            b : color.b || 0,
+            a : (color.a == undefined || color.a == null) ? 1 : color.a
+        } : undefined;
+    };
+
+    Renderer.prototype.getColorMask = function() {
+        return this.attr.colorMask ? {
+            r : this.attr.colorMask.r,
+            g : this.attr.colorMask.g,
+            b : this.attr.colorMask.b,
+            a : this.attr.colorMask.a
+        } : undefined;
+    };
+
+    Renderer.prototype.setWireframe = function(wireframe) {
+        this.attr.wireframe = wireframe;
+    };
+
+    Renderer.prototype.getWireframe = function() {
+        return this.attr.wireframe;
+    };
+
+    Renderer.prototype.setHighlight = function(highlight) {
+        this.attr.highlight = highlight;
+    };
+
+    Renderer.prototype.getHighlight = function() {
+        return this.attr.highlight;
+    };
+
+    Renderer.prototype.setEnableClip = function(enableClip) {
+        this.attr.enableClip = enableClip;
+    };
+
+    Renderer.prototype.getEnableClip = function() {
+        return this.attr.enableClip;
+    };
+
+    Renderer.prototype.setEnableFog = function(enableFog) {
+        this.attr.enableFog = enableFog;
+    };
+
+    Renderer.prototype.getEnableFog = function() {
+        return this.attr.enableFog;
+    };
+
+    // @private
+    Renderer.prototype._compile = function(traversalContext) {
+        this._preCompile(traversalContext);
+        this._compileNodes(traversalContext);
+        this._postCompile(traversalContext);
+    };
+
+
+    // @private
+    Renderer.prototype._preCompile = function(traversalContext) {
+        if (this._compileMemoLevel == 0) {
+            this._props = createProps(this.attr);
+            this._compileMemoLevel = 1;
+        }
+        pushProps(this.attr.id, this._props);
+    };
+
+
+    // @private
+    Renderer.prototype._postCompile = function(traversalContext) {
+        popProps();
+    };
+
+
+})();

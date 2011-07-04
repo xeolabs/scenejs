@@ -42,62 +42,62 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.8',
+    VERSION: '0.9',
 
     /** Names of supported WebGL canvas contexts
      */
     SUPPORTED_WEBGL_CONTEXT_NAMES:["webgl", "experimental-webgl", "webkit-3d", "moz-webgl", "moz-glweb20"],
 
-    /** Map of existing scenes
+    /**
+     * Node classes
+     * @private
+     */
+    _nodeTypes: {},
+
+    /**
+     * Map of existing scene nodes
      */
     _scenes: {},
 
     /** Extension point to create a new node type.
      *
      * @param {string} type Name of new subtype
-     * @param {string} superType Optional name of super-type - {@link SceneJS.Node} by default
+     * @param {string} superType Optional name of super-type - {@link SceneJS_node} by default
      * @return {class} New node class
      */
     createNodeType : function(type, superType) {
         if (!type) {
-            throw "createNodeType param 'type' is null or undefined";
+            throw SceneJS_errorModule.fatalError("createNodeType param 'type' is null or undefined");
         }
         if (typeof type != "string") {
-            throw "createNodeType param 'type' should be a string";
+            throw SceneJS_errorModule.fatalError("createNodeType param 'type' should be a string");
         }
-        var supa = this._nodeTypes[superType || "node"];
+        if (this._nodeTypes[type]) {
+            throw SceneJS_errorModule.fatalError("createNodeType node of param 'type' already defined: '" + superType + "'");
+        }
+        var supa = this._nodeTypes[superType];
         if (!supa) {
-            throw "undefined superType: '" + superType + "'";
+            supa = SceneJS._Node;
         }
         var nodeType = function() {                  // Create class
-            supa.nodeClass.apply(this, arguments);
-            this._attr.nodeType = type;
+            supa.apply(this, arguments);
+            this.attr.type = type;
         };
-        SceneJS._inherit(nodeType, supa.nodeClass);
-
-        var nodeFunc = function() {                // Create factory function
-            var n = new nodeType();
-            nodeType.prototype.constructor.apply(n, arguments);
-            n._attr.nodeType = type;
-            return n;
-        };
-        this._registerNode(type, nodeType, nodeFunc);
+        SceneJS._inherit(nodeType, supa);
+        this._nodeTypes[type] = nodeType;
         return nodeType;
     },
 
-    _registerNode : function(type, nodeClass, nodeFunc) {
-        this._nodeTypes[type] = {
-            nodeClass : nodeClass,
-            nodeFunc: nodeFunc
-        };
+    _registerNode : function(type, nodeClass) {
+        this._nodeTypes[type] = nodeClass;
     },
 
     /**
      * Factory function to create a "scene" node
      */
-    createScene : function(json) {
+    createScene : function(json) {       
         if (!json) {
-            throw "createNode param 'json' is null or undefined";
+            throw SceneJS_errorModule.fatalError("createScene param 'json' is null or undefined");
         }
         json.type = "scene";
         if (!json.id) {
@@ -112,8 +112,8 @@ var SceneJS = {
         }
         var newNode = this._parseNodeJSON(json, undefined); // Scene references itself as the owner scene
         this._scenes[json.id] = newNode;
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.getID(), json: json });
-        return new SceneJS._WithNode(newNode);        
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_CREATED, { nodeId : newNode.attr.id, json: json });
+        return SceneJS._selectNode(newNode);
     },
 
     /** Returns true if the "scene" node with the given ID exists
@@ -131,7 +131,7 @@ var SceneJS = {
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "withScene scene not found: '" + sceneId + "'");
         }
-        return new SceneJS._WithNode(scene);
+        return SceneJS._selectNode(scene);
     },
 
     /**
@@ -173,11 +173,8 @@ var SceneJS = {
 
     _createNode : function(json, scene) {
         json.type = json.type || "node";
-        var nodeType = this._nodeTypes[json.type];
-        if (!nodeType) {
-            throw "Failed to parse JSON node definition - unknown node type: '" + json.type + "'";
-        }
-        return new nodeType.nodeClass(json, scene);   // Faster to instantiate class directly
+        var nodeType = this._nodeTypes[json.type] || SceneJS._Node;
+        return new nodeType(json, scene);
     },
 
     /**
@@ -195,7 +192,7 @@ var SceneJS = {
     },
 
     /** Nodes that are scheduled to be destroyed. When a node is destroyed it is added here, then at the end of each
-     * render traversal, each node in here is popped and has {@link SceneJS.Node#destroy} called.
+     * render traversal, each node in here is popped and has {@link SceneJS_node#destroy} called.
      *  @private
      */
     _destroyedNodes : [],
@@ -209,17 +206,11 @@ var SceneJS = {
             for (var i = this._destroyedNodes.length - 1; i >= 0; i--) {
                 node = this._destroyedNodes[i];
                 node._doDestroy();
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_DESTROYED, { nodeId : node.getID() });
+                SceneJS_eventModule.fireEvent(SceneJS_eventModule.NODE_DESTROYED, { nodeId : node.attr.id });
             }
             this._destroyedNodes = [];
         }
     },
-
-    /**
-     * Node factory funcs mapped to type
-     * @private
-     */
-    _nodeTypes: {},  
 
     /*----------------------------------------------------------------------------------------------------------------
      * Messaging System
@@ -235,17 +226,17 @@ var SceneJS = {
          */
         this.sendMessage = function (message) {
             if (!message) {
-                throw "sendMessage param 'message' null or undefined";
+                throw SceneJS_errorModule.fatalError("sendMessage param 'message' null or undefined");
             }
             var commandId = message.command;
             if (!commandId) {
-                throw "Message element expected: 'command'";
+                throw SceneJS_errorModule.fatalError("Message element expected: 'command'");
             }
             var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
             var command = commandService.getCommand(commandId);
 
             if (!command) {
-                throw "Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?";
+                throw SceneJS_errorModule.fatalError("Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?");
             }
             command.execute(message);
         };
@@ -364,11 +355,27 @@ var SceneJS = {
             }
         }
         return o2;
-    }
+    },
+
+    /** Lazy-bound state resources published by "suppliers"
+     */
+    _compilationStates : new (function() {
+        var suppliers = {};
+        this.setSupplier = function(type, supplier) {
+            suppliers[type] = supplier;
+        };
+        this.getState = function(type, id) {
+            var s = suppliers[type];
+            if (!s) {
+                throw SceneJS_errorModule.fatalError("Internal error - Compilation state supplier not found: '" + type + "'");
+            }
+            return s.get(id);
+        };
+    })()
 };
-
-SceneJS._namespace("SceneJS");
-
-window["SceneJS"] = SceneJS;
+//
+//SceneJS._namespace("SceneJS");
+//
+//window["SceneJS"] = SceneJS;
 
 

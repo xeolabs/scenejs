@@ -33,13 +33,7 @@ var SceneJS_imageBufModule = new (function() {
             });
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_ACTIVATED,
-            function() {
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_RENDERING,
+            SceneJS_eventModule.SCENE_RENDERING,
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
@@ -49,12 +43,6 @@ var SceneJS_imageBufModule = new (function() {
                     }
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SHADER_DEACTIVATED,
-            function() {
-                dirty = true;
             });
 
     /** Creates image buffer, registers it under the given ID
@@ -97,22 +85,22 @@ var SceneJS_imageBufModule = new (function() {
          */
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuf);
         if (!gl.isFramebuffer(frameBuf)) {
-            throw("Invalid framebuffer");
+            throw  SceneJS_errorModule.fatalError("Invalid framebuffer");
         }
         var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
         switch (status) {
             case gl.FRAMEBUFFER_COMPLETE:
                 break;
             case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+                throw SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
             case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+                throw SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
             case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-                throw("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
+                throw SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
             case gl.FRAMEBUFFER_UNSUPPORTED:
-                throw("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
+                throw SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
             default:
-                throw("Incomplete framebuffer: " + status);
+                throw SceneJS_errorModule.fatalError("Incomplete framebuffer: " + status);
         }
 
         /* Create handle to image buffer
@@ -178,7 +166,7 @@ var SceneJS_imageBufModule = new (function() {
     this.pushImageBuffer = function(id, bufId) {
         var buf = currentSceneBufs[bufId];
         if (!buf) {
-            throw "Image buffer not found: " + bufId;
+            throw  SceneJS_errorModule.fatalError("Image buffer not found: " + bufId);
         }
         idStack[stackLen] = id;
         bufStack[stackLen] = buf;
@@ -189,6 +177,27 @@ var SceneJS_imageBufModule = new (function() {
     this.destroyImageBuffer = function(bufId) {
 
     };
+
+    SceneJS._compilationStates.setSupplier("imagebuf", {
+        get: function(id) {
+            var bufs = currentSceneBufs;
+            return {
+                bind: function(unit) {
+                    var buf = bufs[id];
+                    if (buf && buf.isRendered()) {
+                        buf.getTexture().bind(unit);
+                    }
+                },
+
+                unbind: function(unit) {
+                    var buf = bufs[id];
+                    if (buf && buf.isRendered()) {
+                        buf.getTexture().unbind(unit);
+                    }
+                }
+            };
+        }
+    });
 
     this.getImageBuffer = function(bufId) {
         return currentSceneBufs[bufId];
