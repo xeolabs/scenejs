@@ -81,11 +81,11 @@ new (function() {
         this._postCompile(traversalContext);
     };
 
-    Shader.prototype._preCompile = function(traversalContext) {
+    Shader.prototype._preCompile = function() {
         pushShaders(this.attr.id, { shaders: this._shaders, vars: this._vars });
     };
 
-    Shader.prototype._postCompile = function(traversalContext) {
+    Shader.prototype._postCompile = function() {
         popShaders();
     };
 })();

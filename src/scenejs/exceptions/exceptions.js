@@ -17,15 +17,6 @@ SceneJS.errors.ID_CLASH = 13;
 SceneJS.errors.ILLEGAL_MESSAGE = 14;
 SceneJS.errors.SCENE_ILLEGAL_UPDATE = 15;
 
-/**
- *
- * @class Wrapper for an exception not recognised by SceneJS.
- */
-SceneJS.errors.Exception = function(code, msg, cause) {
-    this.code = code;
-    this.message = "SceneJS.errors.Exception: " + msg;
-    this.cause = cause;
-};
 
 SceneJS.errors._getErrorName = function(code) {
     for (var key in SceneJS.errors) {

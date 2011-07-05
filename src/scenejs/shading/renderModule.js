@@ -94,8 +94,8 @@ var SceneJS_renderModule = new (function() {
 
     var DEFAULT_MATERIAL = {
         material: {
-            baseColor :  [ 1.0, 1.0, 1.0 ],
-            specularColor :  [ 1.0,  1.0,  1.0 ],
+            baseColor :  [ 0.0, 0.0, 0.0 ],
+            specularColor :  [ 0.0,  0.0,  0.0 ],
             specular : 1.0,
             shine :  10.0,
             reflect :  0.8,
@@ -549,7 +549,7 @@ var SceneJS_renderModule = new (function() {
      */
     this.setMaterial = function(id, material) {
         materialState = getState(this._MATERIAL, id || "___DEFAULT_MATERIAL");
-        materialState.material = material || DEFAULT_MATERIAL;
+        materialState.material = material || DEFAULT_MATERIAL.material;
     };
 
     /**

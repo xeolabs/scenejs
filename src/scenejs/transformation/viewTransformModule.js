@@ -1,23 +1,3 @@
-/**
- * Backend that manages the current view transform matrices (view and normal).
- *
- * Services the scene view transform nodes, such as SceneJS.lookAt, providing them with methods to set and
- * get the current view transform matrices.
- *
- * Interacts with the shading backend through events; on a SCENE_RENDERING event it will respond with a
- * VIEW_TRANSFORM_EXPORTED to pass the view matrix and normal matrix as Float32Arrays to the
- * shading backend.
- *
- * Normal matrix and Float32Arrays are lazy-computed and cached on export to avoid repeatedly regenerating them.
- *
- * Avoids redundant export of the matrices with a dirty flag; they are only exported when that is set, which occurs
- * when transform is set by scene node, or on SCENE_COMPILING, SHADER_ACTIVATED and SHADER_DEACTIVATED events.
- *
- * Whenever a scene node sets the matrix, this backend publishes it with a VIEW_TRANSFORM_UPDATED to allow other
- * dependent backends (such as "view-frustum") to synchronise their resources.
- *
- *  @private
- */
 var SceneJS_viewTransformModule = new (function() {
     var DEFAULT_TRANSFORM = {
         matrix : SceneJS_math_identityMat4(),
@@ -82,7 +62,7 @@ var SceneJS_viewTransformModule = new (function() {
         transform = t;
         dirty = true;
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEW_TRANSFORM_UPDATED, transform);
-           loadTransform();
+        loadTransform();
     };
 
     this.getTransform = function() {
@@ -107,7 +87,7 @@ var SceneJS_viewTransformModule = new (function() {
          * When removed, then there are mysterious cases when only
          * the lights are transformed by the lookAt.
          *------------------------------------------------------------*/
-          loadTransform();
+        loadTransform();
     };
 
 })();

@@ -87,16 +87,15 @@
         this._postCompile(traversalContext);
     };
 
-    Scale.prototype._preCompile = function(traversalContext) {
+    Scale.prototype._preCompile = function() {
         var origMemoLevel = this._compileMemoLevel;
         if (this._compileMemoLevel == 0) {
             this._compileMemoLevel = 1;
             this._mat = SceneJS_math_scalingMat4v([this.attr.x, this.attr.y, this.attr.z]);
         }
-        var superXform = SceneJS_modelViewTransformModule.getTransform();
+        var superXform = SceneJS_modelTransformModule.getTransform();
         if (origMemoLevel < 2 || (!superXform.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
-
             var tempMat = SceneJS_math_mat4();
             SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
             this._xform = {
@@ -104,16 +103,15 @@
                 matrix: tempMat,
                 fixed: origMemoLevel == 2
             };
-
             if (this._compileMemoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelViewTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xform);
     };
 
     Scale.prototype._postCompile = function(traversalContext) {
-        SceneJS_modelViewTransformModule.popTransform();
+        SceneJS_modelTransformModule.popTransform();
     };
 
 })();

@@ -164,8 +164,10 @@ new (function() {
         //    if (this._compileMemoLevel == 0) {
         //        this._makeClip();
         //    }
-        SceneJS_clipModule.pushClip(this.attr.id, this.attr);
+        pushClip(this.attr.id, this.attr);
     };
+
+
 
     Clip.prototype._postCompile = function() {
         //SceneJS_clipModule.popClip();

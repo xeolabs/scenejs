@@ -86,21 +86,13 @@
         this._postCompile(traversalContext);
     };
 
-    Translate.prototype._preCompile = function(traversalContext) {
+    Translate.prototype._preCompile = function() {
         var origMemoLevel = this._compileMemoLevel;
         if (this._compileMemoLevel == 0) {
-            if (SceneJS_modelViewTransformModule.isBuildingViewTransform()) {
-
-                /* When building a view transform, apply the negated translation vector
-                 * to correctly transform the SceneJS.Camera
-                 */
-                this._mat = SceneJS_math_translationMat4v([-this.attr.x, -this.attr.y, -this.attr.z]);
-            } else {
-                this._mat = SceneJS_math_translationMat4v([this.attr.x, this.attr.y, this.attr.z]);
-            }
+            this._mat = SceneJS_math_translationMat4v([this.attr.x, this.attr.y, this.attr.z]);
             this._compileMemoLevel = 1;
         }
-        var superXForm = SceneJS_modelViewTransformModule.getTransform();
+        var superXForm = SceneJS_modelTransformModule.getTransform();
         if (origMemoLevel < 2 || (!superXForm.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
 
@@ -112,15 +104,15 @@
                 fixed: origMemoLevel == 2
             };
 
-            if (this._compileMemoLevel == 1 && superXForm.fixed && !instancing) {   // Bump up memoization level if model-space fixed
+            if (this._compileMemoLevel == 1 && superXForm.fixed && !instancing) {
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelViewTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xform);
     };
 
-    Translate.prototype._postCompile = function(traversalContext) {
-        SceneJS_modelViewTransformModule.popTransform();
+    Translate.prototype._postCompile = function() {
+        SceneJS_modelTransformModule.popTransform();
     };
 
 })();

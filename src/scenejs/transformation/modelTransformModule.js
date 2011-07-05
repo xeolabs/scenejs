@@ -72,7 +72,6 @@ var SceneJS_modelTransformModule = new (function() {
         nodeId = id;
         transform = t;
         dirty = true;
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.MODEL_TRANSFORM_UPDATED, transform);
     };
 
     this.getTransform = function() {
@@ -89,7 +88,6 @@ var SceneJS_modelTransformModule = new (function() {
             transform = DEFAULT_TRANSFORM;
         }
         dirty = true;
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.MODEL_TRANSFORM_UPDATED, transform);
     };
 
 })();

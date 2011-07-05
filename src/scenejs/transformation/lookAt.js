@@ -1,5 +1,5 @@
 (function() {
-    
+
     var Lookat = SceneJS.createNodeType("lookAt");
 
     Lookat.prototype._init = function(params) {
@@ -185,12 +185,12 @@
     };
 
     Lookat.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
+        this._preCompile();
         this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
+        this._postCompile();
     };
 
-    Lookat.prototype._preCompile = function(traversalContext) {
+    Lookat.prototype._preCompile = function() {
         var origMemoLevel = this._compileMemoLevel;
         if (this._compileMemoLevel == 0) {
             this._mat = SceneJS_math_lookAtMat4c(
@@ -199,7 +199,7 @@
                     this._upX, this._upY, this._upZ);
             this._compileMemoLevel = 1;
         }
-        var superXform = SceneJS_modelViewTransformModule.getTransform();
+        var superXform = SceneJS_viewTransformModule.getTransform();
         if (this._compileMemoLevel < 2 || (!superXform.fixed)) {
             var tempMat = SceneJS_math_mat4();
             SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
@@ -217,11 +217,11 @@
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelViewTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_viewTransformModule.pushTransform(this.attr.id, this._xform);
     };
 
-    Lookat.prototype._postCompile = function(traversalContext) {
-        SceneJS_modelViewTransformModule.popTransform();
+    Lookat.prototype._postCompile = function() {
+        SceneJS_viewTransformModule.popTransform();
     };
 
 })();

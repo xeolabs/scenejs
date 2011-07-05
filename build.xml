@@ -35,7 +35,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/core/withNode.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/nodeSelector.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/services/commandService.js"/>
 
@@ -90,22 +90,19 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/text/text.js"/>
 
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelTransformModule.js"/>
-         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/modelViewTransformModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/rotate.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/translate.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/scale.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/matrix.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/quaternion.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/viewTransformModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/lookAt.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/stationary.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/billboard.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelView/inverse.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/projectionModule.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera/camera.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelTransformModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/rotate.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/translate.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/scale.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/matrix.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/quaternion.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/viewTransformModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/lookAt.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/stationary.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/billboard.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/inverse.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projectionModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
 

@@ -239,7 +239,8 @@ var SceneJS = {
             if (!command) {
                 throw SceneJS_errorModule.fatalError("Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?");
             }
-            command.execute(message);
+            var ctx = {};
+            command.execute(ctx, message);
         };
     })(),
 
@@ -287,24 +288,24 @@ var SceneJS = {
     _createUUID:function() {
         var data = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
         var data2 = ["8","9","A","B"];
-        var uuid = "";
+        var uuid = [];
         for (var i = 0; i < 38; i++) {
             switch (i) {
-                case 8:uuid = uuid + "-";
+                case 8:uuid.push("-");
                     break;
-                case 13:uuid = uuid + "-";
+                case 13:uuid.push("-");
                     break;
-                case 18:uuid = uuid + "-";
+                case 18:uuid.push("-");
                     break;
-                case 14:uuid = uuid + "4";
+                case 14:uuid.push("4");
                     break;
-                case 19:uuid = uuid + data2[Math.round(Math.random() * 3)];
+                case 19:uuid.push(data2[Math.round(Math.random() * 3)]);
                     break;
-                default:uuid = uuid + data[Math.round(Math.random() * 15)];
+                default:uuid.push(data[Math.round(Math.random() * 15)]);
                     break;
             }
         }
-        return uuid;
+        return uuid.join("");
     },
 
     _getBaseURL : function(url) {

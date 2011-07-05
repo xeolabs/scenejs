@@ -353,16 +353,6 @@ new (function() {
         return this._state;
     };
 
-    MorphGeometry.prototype._changeState = function(newState, params) {
-        params = params || {};
-        params.oldState = this._state;
-        params.newState = newState;
-        this._state = newState;
-        if (this.listeners["state-changed"]) {
-            this._fireEvent("state-changed", params);
-        }
-    };
-
     MorphGeometry.prototype.getStream = function() {
         return this._stream;
     };

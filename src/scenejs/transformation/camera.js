@@ -1,5 +1,70 @@
 (function() {
 
+     var DEFAULT_TRANSFORM = {
+        matrix : SceneJS_math_identityMat4(),
+        fixed: true,
+        isDefault : true
+    };
+
+    var idStack = [];
+    var transformStack = [];
+    var stackLen = 0;
+
+    var nodeId;
+    var transform;
+
+    var dirty;
+
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_COMPILING,
+            function() {
+                stackLen = 0;
+                nodeId = null;
+                transform = DEFAULT_TRANSFORM;
+                dirty = true;
+            });
+
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
+            function(params) {
+                if (dirty) {
+                    if (stackLen > 0) {
+                        if (!transform.matrixAsArray) {
+                            transform.matrixAsArray = new Float32Array(transform.matrix);
+                        }
+                        SceneJS_renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
+                    } else  {
+                        SceneJS_renderModule.setProjectionTransform();
+                    }
+                    dirty = false;
+                }
+            });
+
+    function pushTransform(id, t) {
+        idStack[stackLen] = id;
+        transformStack[stackLen] = t;
+        stackLen++;
+        nodeId = id;
+        transform = t;
+        dirty = true;
+    };
+
+    function popTransform() {
+        stackLen--;
+        if (stackLen > 0) {
+            nodeId = idStack[stackLen - 1];
+            transform = transformStack[stackLen - 1];
+        } else {
+            nodeId = null;
+            transform = {
+                matrix : SceneJS_math_identityMat4(),
+                fixed: true,
+                isDefault : true
+            };
+        }
+        dirty = true;
+    };
+
     var Camera = SceneJS.createNodeType("camera");
 
     Camera.prototype._init = function(params) {
@@ -83,15 +148,15 @@
         this._postCompile(traversalContext);
     };
 
-    Camera.prototype._preCompile = function(traversalContext) {
+    Camera.prototype._preCompile = function() {
         if (this._compileMemoLevel == 0) {
             this._rebuild();
         }
-        SceneJS_projectionModule.pushTransform(this.attr.id, this._transform);
+        pushTransform(this.attr.id, this._transform);
     };
 
-    Camera.prototype._postCompile = function(traversalContext) {
-        SceneJS_projectionModule.popTransform();
+    Camera.prototype._postCompile = function() {
+        popTransform();
     };
 
     Camera.prototype._rebuild = function () {

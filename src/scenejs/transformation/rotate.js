@@ -103,7 +103,7 @@
         this._postCompile(traversalContext);
     };
 
-    Rotate.prototype._preCompile = function(traversalContext) {
+    Rotate.prototype._preCompile = function() {
         var origMemoLevel = this._compileMemoLevel;
         if (this._compileMemoLevel == 0) {
             this._compileMemoLevel = 1;
@@ -112,15 +112,13 @@
                 /* When building a view transform, apply the negated rotation angle
                  * to correctly transform the SceneJS.Camera
                  */
-                var angle = SceneJS_modelViewTransformModule.isBuildingViewTransform()
-                        ? -this.attr.angle
-                        : this.attr.angle;
+                var angle =  this.attr.angle;
                 this._mat = SceneJS_math_rotationMat4v(angle * Math.PI / 180.0, [this.attr.x, this.attr.y, this.attr.z]);
             } else {
                 this._mat = SceneJS_math_identityMat4();
             }
         }
-        var superXForm = SceneJS_modelViewTransformModule.getTransform();
+        var superXForm = SceneJS_modelTransformModule.getTransform();
         if (origMemoLevel < 2 || (!superXForm.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
             var tempMat = SceneJS_math_mat4();
@@ -136,11 +134,11 @@
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelViewTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xform);
     };
 
-    Rotate.prototype._postCompile = function(traversalContext) {
-        SceneJS_modelViewTransformModule.popTransform();
+    Rotate.prototype._postCompile = function() {
+        SceneJS_modelTransformModule.popTransform();
     };
 
 })();

@@ -204,13 +204,12 @@ SceneJS.createScene({
                                                                         return (worldVertex.x < 1.0);\n\
                                                                     }\n\
                                                                     \n\
-                                                                    void myPixelColorFunc(Vertex v){\n\
-                                                                        vec4 color = v.color\n\
+                                                                    vec4 myPixelColorFunc(vec4 color){\n\
                                                                         color.r=color.r+sin(time)*0.3;\n\
                                                                         color.g=color.g+sin(time+0.3)*0.3;\n\
                                                                         color.b=color.b+sin(time+0.6)*0.3;\n\
                                                                         color.a=color.a+sin(time);\n\
-                                                                        v.color = color;\n\
+                                                                        return color;\n\
                                                                     }\n",
 
                                                             /* Bind our custom function to a SceneJS vertex shader hook

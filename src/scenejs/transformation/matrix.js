@@ -57,13 +57,13 @@
         this._postCompile(traversalContext);
     };
 
-    Matrix.prototype._preCompile = function(traversalContext) {
+    Matrix.prototype._preCompile = function() {
         var origMemoLevel = this._compileMemoLevel;
 
         if (this._compileMemoLevel == 0) {
             this._compileMemoLevel = 1;
         }
-        var superXform = SceneJS_modelViewTransformModule.getTransform();
+        var superXform = SceneJS_modelTransformModule.getTransform();
         if (origMemoLevel < 2 || (!superXform.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
 
@@ -71,13 +71,9 @@
              * to correctly transform the SceneJS.Camera
              */
             var mat = SceneJS_math_mat4();
-            mat = SceneJS_modelViewTransformModule.isBuildingViewTransform()
-                    ? SceneJS_math_inverseMat4(this._mat, mat)
-                    : this._mat;
-
+            mat = this._mat;
             var tempMat = SceneJS_math_mat4();
             SceneJS_math_mulMat4(superXform.matrix, mat, tempMat);
-
             this._xform = {
                 localMatrix: this._mat,
                 matrix: tempMat,
@@ -88,10 +84,10 @@
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelViewTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xform);
     };
 
-    Matrix.prototype._postCompile = function(traversalContext) {
-        SceneJS_modelViewTransformModule.popTransform();
+    Matrix.prototype._postCompile = function() {
+        SceneJS_modelTransformModule.popTransform();
     };
 })();

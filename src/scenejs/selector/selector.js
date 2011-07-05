@@ -37,7 +37,7 @@
         this._postCompile(traversalContext);
     };
 
-    Selector.prototype._preCompile = function(traversalContext) {
+    Selector.prototype._preCompile = function() {
         if (this.attr.selection.length > 0) {
             this._selectedChildren = [];
             for (var i = 0, len = this.attr.selection.length; i < len; i++) {
@@ -58,7 +58,7 @@
         SceneJS._Node.prototype._compileNodes.call(this, traversalContext, this._selectedChildren);
     };
 
-    Selector.prototype._postCompile = function(traversalContext) {
+    Selector.prototype._postCompile = function() {
     };
 
 })();

@@ -84,7 +84,7 @@
         this._key1 = 0;
         this._key2 = 1;
         this._timeStarted = null;
-    }
+    };
 
     Interpolator.prototype.STATE_OUTSIDE = "outside";    // Alpha outside of key sequence
 
@@ -254,7 +254,6 @@
         }
     };
 
-    // @private
     Interpolator.prototype._cosineInterpolate = function(k) {
         var mu2 = (1 - Math.cos(k * Math.PI) / 2.0);
         return (this.attr.keys[this._key1] * (1 - mu2) + this.attr.keys[this._key2] * mu2);
@@ -284,15 +283,4 @@
         var v = k - this.attr.keys[this._key1];
         return SceneJS_math_slerp((v / u), this.attr.values[this._key1], this.attr.values[this._key2]);
     };
-
-    Interpolator.prototype._changeState = function(newState, params) {
-        params = params || {};
-        params.oldState = this._state;
-        params.newState = newState;
-        this._state = newState;
-        if (this.listeners["state-changed"]) {
-            this._fireEvent("state-changed", params);
-        }
-    };
-
 })();

@@ -22,7 +22,7 @@ SceneJS.Services.addService(
                     return commands[commandId];
                 },
 
-                executeCommand : function (params, ctx) {
+                executeCommand : function (ctx, params) {
                     if (!params) {
                         throw  SceneJS_errorModule.fatalError("sendMessage param 'message' null or undefined");
                     }
@@ -36,7 +36,7 @@ SceneJS.Services.addService(
                     if (!command) {
                         throw  SceneJS_errorModule.fatalError("Message command not supported: '" + commandId + "' - perhaps this command needs to be added to the SceneJS Command Service?");
                     }
-                    command.execute(params);
+                    command.execute(ctx, params);
                 }
             };
         })());
@@ -48,29 +48,31 @@ SceneJS.Services.addService(
     commandService.addCommand("create",
             (function() {
                 return {
-                    execute: function(params, ctx) {
+                    execute: function(ctx, params) {
                         var nodes = params.nodes;
                         var target = params.target;
                         var targetNode;
                         if (nodes) {
-                            var scenes = ctx.scenes || SceneJS_sceneModule.scenes;
+                            var scenes = ctx.scenes || SceneJS._scenes;
                             var scene;
                             var node;
                             for (var i = 0, len = scenes.length; i < len; i++) {
-                                scene = SceneJS.scene(scenes[i].sceneId);
-                                for (var j = 0; j < nodes.length; j++) {
-                                    node = nodes[j];
-                                    if (!node.id) {
-                                        throw  SceneJS_errorModule.fatalError("Message 'create' must have ID for new node");
-                                    }
-                                    if (target) {
-                                        targetNode = scene.findNode(target);
-                                        if (!target) {
-                                            continue;
+                                scene = scenes[i];
+                                if (scene) {
+                                    for (var j = 0; j < nodes.length; j++) {
+                                        node = nodes[j];
+                                        if (!node.id) {
+                                            throw  SceneJS_errorModule.fatalError("Message 'create' must have ID for new node");
                                         }
-                                        target.add("node", nodes[i]);
-                                    } else {
-                                        scene.addNode(nodes[i]);
+                                        if (target) {
+                                            targetNode = scene.findNode(target);
+                                            if (!target) {
+                                                continue;
+                                            }
+                                            target.add("node", nodes[i]);
+                                        } else {
+                                            scene.addNode(nodes[i]);
+                                        }
                                     }
                                 }
                             }
@@ -80,46 +82,44 @@ SceneJS.Services.addService(
             })());
 
     commandService.addCommand("update", {
-        execute: function(params, ctx) {
-            var scenes = ctx.scenes || SceneJS_sceneModule.scenes;
+        execute: function(ctx, params) {
+            var scenes = ctx.scenes || SceneJS._scenes;
             var target = params.target;
             var scene;
             var targetNode;
             for (var i = 0, len = scenes.length; i < len; i++) {
-                scene = SceneJS.scene(scenes[i].sceneId);
+                scene = scenes[i];
                 if (scene) { // Scene might have been blown away by some other command
-                    continue;
+                    targetNode = scene.findNode(target);
+                    if (!targetNode) { // Node might have been blown away by some other command
+                        continue;
+                    }
+                    var sett = params["set"];
+                    if (sett) {
+                        callNodeMethods("set", sett, targetNode);
+                    }
+                    if (params.insert) {
+                        callNodeMethods("insert", params.insert, targetNode);
+                    }
+                    if (params.inc) {
+                        callNodeMethods("inc", params.inc, targetNode);
+                    }
+                    if (params.dec) {
+                        callNodeMethods("dec", params.dec, targetNode);
+                    }
+                    if (params.add) {
+                        callNodeMethods("add", params.add, targetNode);
+                    }
+                    if (params.remove) {
+                        callNodeMethods("remove", params.remove, targetNode);
+                    }
                 }
-                targetNode = scene.findNode(target);
-                if (!targetNode) { // Node might have been blown away by some other command
-                    continue;
-                }
-                var sett = params["set"];
-                if (sett) {
-                    callNodeMethods("set", sett, targetNode);
-                }
-                if (params.insert) {
-                    callNodeMethods("insert", params.insert, targetNode);
-                }
-                if (params.inc) {
-                    callNodeMethods("inc", params.inc, targetNode);
-                }
-                if (params.dec) {
-                    callNodeMethods("dec", params.dec, targetNode);
-                }
-                if (params.add) {
-                    callNodeMethods("add", params.add, targetNode);
-                }
-                if (params.remove) {
-                    callNodeMethods("remove", params.remove, targetNode);
-                }
-                targetNode.scene.nodeMap.items[params.target]._fireEvent("updated", { }); // TODO: only if listener exists; and buffer events
             }
 
             /* Further messages
              */
             var messages = params.messages;
-            if (messages) {
+            if (messages && messages.length > 0) {
                 for (var i = 0; i < messages.length; i++) {
                     commandService.executeCommand(ctx, messages[i]);
                 }
@@ -128,18 +128,19 @@ SceneJS.Services.addService(
     });
 
     commandService.addCommand("selectScenes", {
-        execute: function(params, ctx) {
+        execute: function(ctx, params) {
             var scenes = params.scenes;
             if (scenes) {
 
                 /* Filter out the scenes that actually exist so sub-commands don't have to check
                  */
                 var existingScenes = [];
+                var sceneId;
                 var scene;
                 for (var i = 0, len = scenes.length; i < len; i++) {
-                    scene = SceneJS_sceneModule.scenes[scenes[i]];
-                    if (scene) {
-                        existingScenes.push(scene.sceneId);
+                    sceneId = scenes[i];
+                    if (SceneJS._scenes[sceneId]) {
+                        existingScenes.push(SceneJS.scene(sceneId));
                     }
                 }
                 ctx = SceneJS._shallowClone(ctx);   // Feed scenes into command context for sub-messages
@@ -151,7 +152,7 @@ SceneJS.Services.addService(
             var messages = params.messages;
             if (messages) {
                 for (var i = 0; i < messages.length; i++) {
-                    commandService.executeCommand(messages[i], ctx);
+                    commandService.executeCommand(ctx, messages[i]);
                 }
             }
         }

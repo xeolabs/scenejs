@@ -43,18 +43,15 @@ var SceneJS_eventModule = new (function() {
     this.SHADER_ACTIVATE = 27;
     this.SHADER_ACTIVATED = 28;
     this.SCENE_RENDERING = 29;
-    this.SHADER_NEEDS_BOUNDARIES = 30;
-    this.FOG_UPDATED = 31;
-    this.FOG_EXPORTED = 32;
 
     this.LOGGING_ELEMENT_ACTIVATED = 37;
     this.PICK_COLOR_EXPORTED = 38;
     this.NODE_CREATED = 39;
     this.NODE_UPDATED = 40;
     this.NODE_DESTROYED = 41;
-    this.IMAGEBUFFER_EXPORTED = 42;
-    this.CLIP_EXPORTED = 43;
-    this.FLAGS_EXPORTED = 44;
+
+
+
 
     /* Priority queue for each type of event
      */
@@ -112,77 +109,6 @@ var SceneJS_eventModule = new (function() {
 })();
 
 
-/** <p>Adds a listener to be notified when a given event occurs within SceneJS.</p>
- * <p><b>Supported events</b></p>
- * <p><b><em>error</em></b></p><p>An error has occurred either while defining or rendering a scene. These can be either fatal,
- * or errors that SceneJS can recover from.</p><p>Example:</p><pre><code>
- * SceneJS.bind("error", function(e) {
- *     if (e.exception.message) {
- *         alert("Error: " + e.exception.message);
- *     } else {
- *         alert("Error: " + e.exception);
- *     }
- *  });
- * </pre></code>
- *
- * <p><b><em>reset</em></b></p><p>The SceneJS framework has been reset, where all {@link SceneJS.Scene} instances have
- * been destroyed and resources held for them freed.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "reset",
- *      function(e) {
- *          alert("SceneJS has been reset");
- *      });
- * </pre></code>
-
- * <p><b><em>scene-created</em></b></p><p>A {@link SceneJS.Scene} has been defined.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "scene-created",
- *      function(e) {
- *          alert("A new Scene has been created - scene ID: " + e.sceneId);
- *      });
- * </pre></code>
- *
- * <p><b><em>scene-rendering</em></b></p><p>Traversal (render) of a {@link SceneJS.Scene} has just begun.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "scene-rendering",
- *      function(e) {
- *          alert("Rendering of a new Scene has just begun - scene ID: " + e.sceneId);
- *      });
- * </pre></code>
- *
- * <p><b><em>canvas-activated</em></b></p><p>A canvas has just been activated for a {@link SceneJS.Scene}, where that
- * node is about to start rendering to it. This will come right after a "scene-rendering" event, which will indicate which
- * {@link SceneJS.Scene} is the one about to do the rendering.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "canvas-activated",
- *      function(e) {
- *          var canvas = e.canvas;
- *          var context = e.context;
- *          var canvasId = e.canvasId;
- *          alert("Canvas is about to be rendered to : " + canvasId);
- *      });
- * </pre></code>
- *
- * </pre></code>
- *
- * <p><b><em>scene-rendered</em></b></p><p>A render of a {@link SceneJS.Scene} has completed.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "scene-rendered",
- *      function(e) {
- *          alert("Traversal completed for Scene - scene ID: " + e.sceneId);
- *      });
- * </pre></code>
- *
- * <p><b><em>scene-destroyed</em></b></b></p><p>A SceneJS.Scene traversal has been destroyed.</p><p>Example:</p><pre><code>
- *  SceneJS.bind(
- *      "scene-destroyed",
- *      function(e) {
- *          alert("Scene has been destroyed - scene ID: " + e.sceneId);
- *      });
- * </pre></code>
- * @param name Event name
- * @param func Callback function
- */
 SceneJS.bind = function(name, func) {
     switch (name) {
 
@@ -280,6 +206,4 @@ SceneJS.bind = function(name, func) {
     }
 };
 
-/** @deprecated - use {@link #addListener} instead.
- */
 SceneJS.addListener = SceneJS.onEvent = SceneJS.bind;
