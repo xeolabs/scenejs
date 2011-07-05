@@ -95,7 +95,7 @@ var SceneJS = {
     /**
      * Factory function to create a "scene" node
      */
-    createScene : function(json) {       
+    createScene : function(json) {
         if (!json) {
             throw SceneJS_errorModule.fatalError("createScene param 'json' is null or undefined");
         }
@@ -108,7 +108,7 @@ var SceneJS = {
         if (this._scenes[json.id]) {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "createNode 'id' already taken by another 'scene' node");
+                    "createScene - scene id '" + json.id + "' already taken by another scene");
         }
         var newNode = this._parseNodeJSON(json, undefined); // Scene references itself as the owner scene
         this._scenes[json.id] = newNode;
@@ -138,16 +138,17 @@ var SceneJS = {
      * Parses JSON into a subgraph of nodes using iterative depth-first search
      */
     _parseNodeJSON : function(v, scene) {
-        v.__visited = true;
-        v.__node = this._createNode(v, scene);
-        scene = scene || v.__node;
+        var key = SceneJS._createUUID();  // Marking that will work for multiple stack-based iterations
+        v["__visited" + key] = true;
+        v["__node" + key] = this._createNode(v, scene);
+        scene = scene || v["__node" + key];
         var s = [];
         var i, len;
         if (v.nodes) {
             for (i = 0,len = v.nodes.length; i < len; i++) {
                 var child = v.nodes[i];
-                child.__node = this._createNode(child, scene);
-                child.__parent = v;
+                child["__node" + key] = this._createNode(child, scene);
+                child["__parent" + key] = v;
                 s.push(child);
             }
         }
@@ -155,20 +156,20 @@ var SceneJS = {
         var u;
         while (s.length > 0) {
             w = s.pop();
-            w.__parent.__node.insertNode(w.__node, 0);
+            w["__parent" + key]["__node" + key].insertNode(w["__node" + key], 0);
 
             if (w.nodes) {
                 for (i = 0,len = w.nodes.length; i < len; i++) {
                     u = w.nodes[i];
-                    if (!u.__parent) {
-                        u.__node = this._createNode(u, scene);
-                        u.__parent = w;
+                    if (!u["__parent" + key]) {
+                        u["__node" + key] = this._createNode(u, scene);
+                        u["__parent" + key] = w;
                         s.push(u);
                     }
                 }
             }
         }
-        return v.__node;
+        return v["__node" + key];
     },
 
     _createNode : function(json, scene) {
