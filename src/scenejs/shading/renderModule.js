@@ -738,11 +738,11 @@ var SceneJS_renderModule = new (function() {
                 node.renderListenersState = renderListenersState;
                 renderListenersState._refCount++;
             }
-            if (node.flagsState._stateId != flagsState._stateId) {
-                releaseState(node.flagsState);
-                node.flagsState = flagsState;
-                flagsState._refCount++;
-            }
+//            if (node.flagsState._stateId != flagsState._stateId) {
+//                releaseState(node.flagsState);
+//                node.flagsState = flagsState;
+//                flagsState._refCount++;
+//            }
             return;
         }
 
