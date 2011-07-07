@@ -39,7 +39,7 @@ var SceneJS_modelTransformModule = new (function() {
             SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
-                nodeId = null;                
+                nodeId = null;
                 transform = DEFAULT_TRANSFORM;
                 dirty = true;
             });

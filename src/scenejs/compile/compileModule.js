@@ -8,7 +8,7 @@
 
 var SceneJS_compileModule = new (function() {
 
-    var debugCfg;
+    this._debugCfg = null;
 
     /* Compile disabled by default
      */
@@ -24,8 +24,8 @@ var SceneJS_compileModule = new (function() {
      * to track which nodes are within subgraphs that are targeted by instance nodes, in order to flag
      * node compilations along traversal paths.
      */
-    var nodeStack = new Array(1000);
-    var stackLen = 0;
+    this._nodeStack = [];
+    this._stackLen = 0;
 
     /*-----------------------------------------------------------------------------------------------------------------
      * Priority queue of compilations, optimised for minimal garbage collection and implicit sort. Each entry has 
@@ -33,13 +33,13 @@ var SceneJS_compileModule = new (function() {
      *---------------------------------------------------------------------------------------------------------------*/
 
     var CompilationQueue = function() {
-        var bins = [];
+        this._bins = [];
         this.size = 0;
 
         this.insert = function(level, node) {
-            var bin = bins[level];
+            var bin = this._bins[level];
             if (!bin) {
-                bin = bins[level] = [];
+                bin = this._bins[level] = [];
                 bin.numNodes = 0;
             }
             var compilation = bin[bin.numNodes];
@@ -55,7 +55,7 @@ var SceneJS_compileModule = new (function() {
         this.remove = function() {
             var bin;
             for (var level = SceneJS_compileCfg.COMPILE_NOTHING; level <= SceneJS_compileCfg.RESORT; level++) {
-                bin = bins[level];
+                bin = this._bins[level];
                 if (bin && bin.numNodes > 0) {
                     this.size--;
                     return bin[--bin.numNodes];
@@ -67,9 +67,9 @@ var SceneJS_compileModule = new (function() {
         this.clear = function() {
             var bin;
             for (var level = SceneJS_compileCfg.COMPILE_NOTHING; level <= SceneJS_compileCfg.RESORT; level++) {
-                bin = bins[level];
+                bin = this._bins[level];
                 if (bin) {
-                    bins[level].numNodes = 0;
+                    this._bins[level].numNodes = 0;
                 }
             }
             this.size = 0;
@@ -80,10 +80,9 @@ var SceneJS_compileModule = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.INIT,
             function() {
-                debugCfg = SceneJS_debugModule.getConfigs("compilation");
-                self._enableCompiler = !!debugCfg.enabled;
+                self._debugCfg = SceneJS_debugModule.getConfigs("compilation");
+                self._enableCompiler = !!self._debugCfg.enabled;
             });
-
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_CREATED,
@@ -188,7 +187,6 @@ var SceneJS_compileModule = new (function() {
         }
 
         if (level == SceneJS_compileCfg.COMPILE_NOTHING) {
-
             return;
         }
 
@@ -231,16 +229,7 @@ var SceneJS_compileModule = new (function() {
         }
         compileScene.nodeCompilationLevels[nodeId] = level;
 
-        var priority = level;
-
         compileScene.compilationQueue.insert(level, node);
-        //        compileScene.compilationQueue.push({
-        //            node: node,
-        //            op: op,
-        //            attrName: attrName,
-        //            level: level,
-        //            priority: priority
-        //        });
     };
 
 
@@ -269,7 +258,7 @@ var SceneJS_compileModule = new (function() {
         /* Ready to note nodes that are within
          * instanced subtrees in _nodeInstanced
          */
-        stackLen = 0;
+        this._stackLen = 0;
         compileScene.countTraversedInstanceLinks = 0;
         compileScene.countTraversedSubtreesToCompile = 0;
 
@@ -306,7 +295,7 @@ var SceneJS_compileModule = new (function() {
         };
         var stats = compileScene.stats;
 
-        if (debugCfg.logTrace) {
+        if (this._debugCfg.logTrace) {
             SceneJS_loggingModule.info("-------------------------------------------------------------------");
             SceneJS_loggingModule.info("COMPILING ...");
             SceneJS_loggingModule.info("");
@@ -325,8 +314,8 @@ var SceneJS_compileModule = new (function() {
             node = compilation.node;
             nodeId = node.attr.id;
 
-//            if (debugCfg.logTrace) {
-//                var logLevels = debugCfg.logTrace.levels || {};
+//            if (this._debugCfg.logTrace) {
+//                var logLevels = this._debugCfg.logTrace.levels || {};
 //                var minLevel = logLevels.min || SceneJS_compileCfg.COMPILE_SCENE;
 //                var maxLevel = (logLevels.max == undefined || logLevels.max == null) ? SceneJS_compileCfg.COMPILE_NODE : logLevels.max;
 //                if (minLevel <= level && level <= maxLevel) {
@@ -369,7 +358,7 @@ var SceneJS_compileModule = new (function() {
             }
         }
 
-        if (debugCfg.logTrace) {
+        if (this._debugCfg.logTrace) {
             SceneJS_loggingModule.info("-------------------------------------------------------------------");
         }
 
@@ -452,7 +441,7 @@ var SceneJS_compileModule = new (function() {
 
         /* Track compilation path into scene graph
          */
-        nodeStack[stackLen++] = node;
+        this._nodeStack[this._stackLen++] = node;
 
         /* Track nodes within instances
          */
@@ -523,12 +512,12 @@ var SceneJS_compileModule = new (function() {
     };
 
     this.postVisitNode = function(node) {
-        if (stackLen > 0) {
+        if (this._stackLen > 0) {
             var compileScene = this._scene;
             var nodeId = node.attr.id;
-            var peekNode = nodeStack[stackLen - 1];
+            var peekNode = this._nodeStack[this._stackLen - 1];
             if (peekNode.attr.id == nodeId) {
-                stackLen--;
+                this._stackLen--;
                 if (node.attr.type == "instance") {
                     compileScene.countTraversedInstanceLinks--;
                 }

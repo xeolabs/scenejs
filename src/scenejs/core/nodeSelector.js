@@ -493,7 +493,8 @@
             }
             methods[attr] = func;
         }
-        func.call(targetNode, this._parseAttr(attr, value));
+        //func.call(targetNode, this._parseAttr(attr, value));
+         func.call(targetNode, value);
 
         /* TODO: optimise - dont fire unless listener exists
          */
@@ -523,7 +524,8 @@
                     }
                     methods[key] = func;
                 }
-                func.call(targetNode, this._parseAttr(key, attr[key]));
+                //func.call(targetNode, this._parseAttr(key, attr[key]));
+                func.call(targetNode, attr[key]);
                 SceneJS_compileModule.nodeUpdated(targetNode, prefix, key, attr[key]);
             }
         }

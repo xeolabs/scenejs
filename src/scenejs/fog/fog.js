@@ -54,7 +54,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setFog(idStack[stackLen - 1], fogStack[stackLen - 1]);
-                    } else  {
+                    } else  { // Full compile supplies it's own default states
                         SceneJS_renderModule.setFog();
                     }
                     dirty = false;
@@ -153,9 +153,9 @@ new (function() {
     };
 
     Fog.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
+        this._preCompile();
         this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
+        this._postCompile();
     };
 
     Fog.prototype._preCompile = function() {

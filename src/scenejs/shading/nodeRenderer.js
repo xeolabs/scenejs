@@ -538,11 +538,13 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (this._picking) {
             if (! this._lastPickListenersState || node.pickListenersState._stateId != this._lastPickListenersState._stateId) {
-                this.pickListeners[this._pickIndex++] = node.pickListenersState;
-                var b = this._pickIndex >> 16 & 0xFF;
-                var g = this._pickIndex >> 8 & 0xFF;
-                var r = this._pickIndex & 0xFF;
-                program.setUniform("SCENEJS_uPickColor", [r / 255,g / 255,b / 255]);
+                if (node.pickListenersState.listeners.length > 0) {
+                    this.pickListeners[this._pickIndex++] = node.pickListenersState;
+                    var b = this._pickIndex >> 16 & 0xFF;
+                    var g = this._pickIndex >> 8 & 0xFF;
+                    var r = this._pickIndex & 0xFF;
+                    program.setUniform("SCENEJS_uPickColor", [r / 255,g / 255,b / 255]);
+                }
                 this._lastPickListenersState = node.pickListenersState;
             }
         }

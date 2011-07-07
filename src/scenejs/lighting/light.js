@@ -18,7 +18,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
-                    } else  {
+                    } else  { // Full compile supplies it's own default states
                         SceneJS_renderModule.setLights();
                     }
                     dirty = false;

@@ -35,7 +35,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setImagebuf(idStack[stackLen - 1], bufStack[stackLen - 1]);
-                    } else  {
+                    } else  { // Full compile supplies it's own default states
                         SceneJS_renderModule.setImagebuf(); // No imageBuf
                     }
                     dirty = false;
@@ -199,7 +199,9 @@ new (function() {
     function popImageBuffer() {
         stackLen--;
         dirty = true;
-    };
+    }
+
+    ;
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_DESTROYED,
@@ -209,7 +211,8 @@ new (function() {
 
     var ImageBuf = SceneJS.createNodeType("imageBuf");
 
-    ImageBuf.prototype._init = function(params) { };
+    ImageBuf.prototype._init = function(params) {
+    };
 
     ImageBuf.prototype._compile = function(traversalContext) {
         this._preCompile(traversalContext);

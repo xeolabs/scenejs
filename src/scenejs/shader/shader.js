@@ -18,7 +18,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setShader(idStack[stackLen - 1], shaderStack[stackLen - 1]);
-                    } else  {
+                    } else { // Full compile supplies it's own default states
                         SceneJS_renderModule.setShader();
                     }
                     dirty = false;
@@ -30,12 +30,16 @@ new (function() {
         shaderStack[stackLen] = shaders;
         stackLen++;
         dirty = true;
-    };
+    }
+
+    ;
 
     function popShaders() {
         stackLen--;
         dirty = true;
-    };
+    }
+
+    ;
 
     var Shader = SceneJS.createNodeType("shader");
 

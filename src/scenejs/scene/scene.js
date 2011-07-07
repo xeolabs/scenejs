@@ -181,8 +181,6 @@ new (function() {
         return scene.canvas.context;
     }
 
-    ;
-
     function getAllScenes() {
         var list = [];
         for (var id in scenes) {
@@ -194,13 +192,10 @@ new (function() {
         return list;
     }
 
-    ;
 
     function deactivateScene() {
 
     }
-
-    ;
 
     var Scene = SceneJS.createNodeType("scene");
 

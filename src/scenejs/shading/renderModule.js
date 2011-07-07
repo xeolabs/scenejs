@@ -7,7 +7,7 @@
  */
 var SceneJS_renderModule = new (function() {
 
-    this.DEFAULT_STATE_SORT_DELAY = 10;
+    this._DEFAULT_STATE_SORT_DELAY = 10;
 
     /* Number of frames after each complete display list rebuild at which GL state is re-sorted.
      * To enable sort, is set to a positive number like 5, to prevent continuous re-sort when
@@ -17,7 +17,7 @@ var SceneJS_renderModule = new (function() {
      *
      * Set to -1 to never sort.
      */
-    var stateSortDelay = this.DEFAULT_STATE_SORT_DELAY;
+    var stateSortDelay = this._DEFAULT_STATE_SORT_DELAY;
 
     /*----------------------------------------------------------------------
      * ID for each state type
@@ -46,53 +46,66 @@ var SceneJS_renderModule = new (function() {
      * Default state values
      *--------------------------------------------------------------------*/
 
+    var createState = (function() {
+        var stateId = -1;
+        return function(data) {
+            data._id = stateId;
+            data._stateId = stateId--;
+            data._refCount = 0;
+            data._default = true;
+            return data;
+        };
+    })();
+
     /* Default transform matrices
      */
-    var DEFAULT_MAT = new Float32Array(SceneJS_math_identityMat4());
+    this._DEFAULT_MAT = new Float32Array(SceneJS_math_identityMat4());
 
-    var DEFAULT_NORMAL_MAT = new Float32Array(
+    this._DEFAULT_NORMAL_MAT = new Float32Array(
             SceneJS_math_transposeMat4(
                     SceneJS_math_inverseMat4(
                             SceneJS_math_identityMat4(),
                             SceneJS_math_mat4())));
 
-    var DEFAULT_CLIPS = {
+    this._DEFAULT_CLIP_STATE = createState({
         clips: [],
         hash: ""
-    };
+    });
 
-    var DEFAULT_COLOR_TRANS = {
+    this._DEFAULT_COLORTRANS_STATE = createState({
         trans : null,
         hash :"f"
-    };
+    });
 
-    var DEFAULT_FLAGS = {
-        fog: true,              // Fog enabled
-        colortrans : true,      // Effect of colortrans enabled
-        picking : true,         // Picking enabled
-        clipping : true,        // User-defined clipping enabled
-        enabled : true,         // Node not culled from traversal
-        visible : true,         // Node visible - when false, everything happens except geometry draw
-        transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
-        backfaces: true,        // Show backfaces
-        frontface: "ccw"        // Default vertex winding for front face
-    };
+    this._DEFAULT_FLAGS_STATE = createState({
+        flags : {
+            fog: true,              // Fog enabled
+            colortrans : true,      // Effect of colortrans enabled
+            picking : true,         // Picking enabled
+            clipping : true,        // User-defined clipping enabled
+            enabled : true,         // Node not culled from traversal
+            visible : true,         // Node visible - when false, everything happens except geometry draw
+            transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
+            backfaces: true,        // Show backfaces
+            frontface: "ccw"        // Default vertex winding for front face
+        }
+    });
 
-    var DEFAULT_FOG = {
+    this._DEFAULT_FOG_STATE = createState({
         fog: null,
         hash: ""
-    };
+    });
 
-    var DEFAULT_IMAGEBUF = {
+    this._DEFAULT_IMAGEBUF_STATE = createState({
         imageBuf: null
-    };
+    });
 
-    var DEFAULT_LIGHTS = {
+    this._DEFAULT_LIGHTS_STATE = createState({
         lights: [],
         hash: ""
-    };
+    });
 
-    var DEFAULT_MATERIAL = {
+    this._DEFAULT_MATERIAL_STATE = createState({
         material: {
             baseColor :  [ 0.0, 0.0, 0.0 ],
             specularColor :  [ 0.0,  0.0,  0.0 ],
@@ -102,48 +115,55 @@ var SceneJS_renderModule = new (function() {
             alpha :  1.0,
             emit :  0.0
         }
-    };
+    });
 
-    var DEFAULT_MORPH = {
+    this._DEFAULT_MORPH_STATE = createState({
         morph: null,
         hash: ""
-    };
+    });
 
-    var DEFAULT_PICK = {
+    this._DEFAULT_PICK_COLOR_STATE = createState({
         pickColor: null,
         hash: ""
-    };
-    var DEFAULT_TEXTURE = {
+    });
+
+    this._DEFAULT_PICK_LISTENERS_STATE = createState({
+        listeners : []
+    });
+
+    this._DEFAULT_TEXTURE_STATE = createState({
         layers: [],
         params: {},
         hash: ""
-    };
+    });
 
-    var DEFAULT_RENDERER = {
+    this._DEFAULT_RENDERER_STATE = createState({
         props: null
-    };
+    });
 
-    var DEFAULT_MODEL_TRANSFORM = {
-        mat : DEFAULT_MAT,
-        normalMat : DEFAULT_NORMAL_MAT
-    };
+    this._DEFAULT_MODEL_TRANSFORM_STATE = createState({
+        mat : this._DEFAULT_MAT,
+        normalMat : this._DEFAULT_NORMAL_MAT
+    });
 
-    var DEFAULT_PROJ_TRANSFORM = {
-        mat : DEFAULT_MAT
-    };
+    this._DEFAULT_PROJ_TRANSFORM_STATE = createState({
+        mat : this._DEFAULT_MAT
+    });
 
-    var DEFAULT_VIEW_TRANSFORM = {
-        mat : DEFAULT_MAT,
-        normalMat : DEFAULT_NORMAL_MAT
-    };
+    this._DEFAULT_VIEW_TRANSFORM_STATE = createState({
+        mat : this._DEFAULT_MAT,
+        normalMat : this._DEFAULT_NORMAL_MAT,
+        lookAt:SceneJS_math_LOOKAT_ARRAYS
+    });
 
-    var DEFAULT_LISTENERS = {
+    this._DEFAULT_RENDER_LISTENERS_STATE = createState({
         listeners : []
-    };
+    });
 
-    var DEFAULT_SHADER = {
+    this._DEFAULT_SHADER_STATE = createState({
         shader : {}
-    };
+    });
+
 
     /*----------------------------------------------------------------------
      *
@@ -151,21 +171,21 @@ var SceneJS_renderModule = new (function() {
 
     /** Shader programs currently allocated on all canvases
      */
-    var programs = {};
+    this._programs = {};
 
     var debugCfg;                       // Debugging configuration for this module
 
     /* A state set for each scene
      */
-    var sceneStates = {};
+    this._sceneStates = {};
 
     /*----------------------------------------------------------------------
      *
      *--------------------------------------------------------------------*/
 
-    var states;
-    var nodeMap;
-    var stateMap;
+    this._states = null;
+    this._nodeMap = null;
+    this._stateMap = null;
     var nextStateId;
 
     var idPrefix;
@@ -175,13 +195,13 @@ var SceneJS_renderModule = new (function() {
     this.COMPILE_SCENE = 0;     // When we set a state update, rebuilding entire scene from scratch
     this.COMPILE_NODES = 1;   //
 
-    var compileMode; // DOCS: http://scenejs.wikispaces.com/Scene+Graph+Compilation
+    this._compileMode = null; // DOCS: http://scenejs.wikispaces.com/Scene+Graph+Compilation
 
     var picking; // True when picking
 
     /* Currently exported states
      */
-    var flagsState;
+    this._flagsState = null;
     var rendererState;
     var lightState;
     var colortransState;
@@ -192,7 +212,7 @@ var SceneJS_renderModule = new (function() {
     var modelXFormState;
     var viewXFormState;
     var projXFormState;
-    var pickState;
+    var pickColorState;
     var imageBufState;
     var clipState;
     var morphState;
@@ -202,17 +222,15 @@ var SceneJS_renderModule = new (function() {
 
     /** Current scene state hash
      */
-    var stateHash;
-
-    var rebuildBins = true;
-    var rebuildShaders = true;
-
+    this._stateHash = null;
 
     var transparentBin = [];  // Temp buffer for transparent nodes, used when rendering
 
     /*----------------------------------------------------------------------
      *
      *--------------------------------------------------------------------*/
+
+    var self = this;
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.INIT,
@@ -223,10 +241,10 @@ var SceneJS_renderModule = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
-                for (var programId in programs) {  // Just free allocated programs
-                    programs[programId].destroy();
+                for (var programId in self._programs) {  // Just free allocated programs
+                    self._programs[programId].destroy();
                 }
-                programs = {};
+                self._programs = {};
                 nextProgramId = 0;
             });
 
@@ -235,9 +253,9 @@ var SceneJS_renderModule = new (function() {
             function(params) {
                 var sceneId = params.sceneId;
 
-                if (!sceneStates[sceneId]) {
+                if (!self._sceneStates[sceneId]) {
 
-                    sceneStates[sceneId] = {
+                    self._sceneStates[sceneId] = {
                         sceneId: sceneId,
 
                         canvas: params.canvas,
@@ -279,7 +297,7 @@ var SceneJS_renderModule = new (function() {
      * @param stateSortDelay
      */
     this.setStateSortDelay = function(stateSortDelay) {
-        stateSortDelay = typeof stateSortDelay == "number" ? stateSortDelay == undefined : this.DEFAULT_STATE_SORT_DELAY;
+        stateSortDelay = typeof stateSortDelay == "number" ? stateSortDelay == undefined : this._DEFAULT_STATE_SORT_DELAY;
     };
 
     /**
@@ -290,11 +308,11 @@ var SceneJS_renderModule = new (function() {
 
         /* Activate states for scene
          */
-        states = sceneStates[params.sceneId];
-        nodeMap = states.nodeMap;
-        stateMap = states.stateMap;
+        this._states = this._sceneStates[params.sceneId];
+        this._nodeMap = this._states.nodeMap;
+        this._stateMap = this._states.stateMap;
 
-        stateHash = null;
+        this._stateHash = null;
 
         idPrefix = null;
 
@@ -305,54 +323,34 @@ var SceneJS_renderModule = new (function() {
              * defaults, prepare to rebuild the node bins and shaders
              */
 
-            clipState = DEFAULT_CLIPS;
-            colortransState = DEFAULT_COLOR_TRANS;
-            flagsState = DEFAULT_FLAGS;
-            fogState = DEFAULT_FOG;
-            imageBufState = DEFAULT_IMAGEBUF;
-            lightState = DEFAULT_LIGHTS;
-            materialState = DEFAULT_MATERIAL;
-            morphState = DEFAULT_MORPH;
-            pickState = DEFAULT_PICK;
-            rendererState = DEFAULT_RENDERER;
-            texState = DEFAULT_TEXTURE;
-            modelXFormState = DEFAULT_MODEL_TRANSFORM;
-            projXFormState = DEFAULT_PROJ_TRANSFORM;
-            viewXFormState = DEFAULT_VIEW_TRANSFORM;
-            pickListenersState = DEFAULT_LISTENERS;
-            renderListenersState = DEFAULT_LISTENERS;
-            shaderState = DEFAULT_SHADER;
+            clipState = this._DEFAULT_CLIP_STATE;
+            colortransState = this._DEFAULT_COLORTRANS_STATE;
+            this._flagsState = this._DEFAULT_FLAGS_STATE;
+            fogState = this._DEFAULT_FOG_STATE;
+            imageBufState = this._DEFAULT_IMAGEBUF_STATE;
+            lightState = this._DEFAULT_LIGHTS_STATE;
+            materialState = this._DEFAULT_MATERIAL_STATE;
+            morphState = this._DEFAULT_MORPH_STATE;
+            pickColorState = this._DEFAULT_PICK_COLOR_STATE;
+            rendererState = this._DEFAULT_RENDERER_STATE;
+            texState = this._DEFAULT_TEXTURE_STATE;
+            modelXFormState = this._DEFAULT_MODEL_TRANSFORM_STATE;
+            projXFormState = this._DEFAULT_PROJ_TRANSFORM_STATE;
+            viewXFormState = this._DEFAULT_VIEW_TRANSFORM_STATE;
+            pickListenersState = this._DEFAULT_PICK_LISTENERS_STATE;
+            renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
+            shaderState = this._DEFAULT_SHADER_STATE;
 
-
-            flagsState._refCount = 0;
-            rendererState._refCount = 0;
-            lightState._refCount = 0;
-            colortransState._refCount = 0;
-            materialState._refCount = 0;
-            fogState._refCount = 0;
-            modelXFormState._refCount = 0;
-            viewXFormState._refCount = 0;
-            projXFormState._refCount = 0;
-            texState._refCount = 0;
-            pickState._refCount = 0;
-            imageBufState._refCount = 0;
-            clipState._refCount = 0;
-            morphState._refCount = 0;
-            pickListenersState._refCount = 0;
-            renderListenersState._refCount = 0;
-            shaderState._refCount = 0;
-
-            rebuildBins = true;              // Rebuild render bins
-            rebuildShaders = true;           // Rebuilding shaders - always when rebuilding state graph
+            this._states.bin = [];
 
             nextStateId = 0;                 // Ready to ID new states
 
             //  nextProgramId = 0;           // Ready to ID new programs
 
-            nodeMap = states.nodeMap = {};
-            stateMap = states.stateMap = {};
+            this._nodeMap = this._states.nodeMap = {};
+            this._stateMap = this._states.stateMap = {};
 
-            forceBinSort(true);             // Sort display list with orders re-built from layer orders
+            this._forceBinSort(true);             // Sort display list with orders re-built from layer orders
 
         } else if (options.compileMode == SceneJS_renderModule.COMPILE_NODES) {   // Rebuild display list for subtree
 
@@ -361,26 +359,22 @@ var SceneJS_renderModule = new (function() {
              *
              * We'll preserve the state graph and shaders.
              */
-
-            rebuildBins = false;             // Retain render bins
-            rebuildShaders = false;          // Might rebuild shaders, depending on level of compile
-
-            nodeMap = states.nodeMap;
-            stateMap = states.stateMap;
+            this._nodeMap = this._states.nodeMap;
+            this._stateMap = this._states.stateMap;
 
             if (options.resort) {
-                forceBinSort(true);         // Sort display list with orders re-built from layer orders
+                this._forceBinSort(true);         // Sort display list with orders re-built from layer orders
             }
         }
 
-        compileMode = options.compileMode;
+        this._compileMode = options.compileMode;
 
         picking = false;
     };
 
 
     this.marshallStates = function() {
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { fullCompile : compileMode === SceneJS_renderModule.COMPILE_SCENE });
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { fullCompile : this._compileMode === SceneJS_renderModule.COMPILE_SCENE });
     };
 
     /*-----------------------------------------------------------------------------------------------------------------
@@ -399,16 +393,16 @@ var SceneJS_renderModule = new (function() {
      * @param stateType ID of the type of state, eg.  this._TEXTURE etc
      * @param id ID of scene graph node that is setting this state
      */
-    function getState(stateType, id) {
+    this._getState = function(stateType, id) {
         if (idPrefix) {
             id = idPrefix + id;
         }
         var state;
-        var typeMap = stateMap[stateType];
+        var typeMap = this._stateMap[stateType];
         if (!typeMap) {
-            typeMap = stateMap[stateType] = {};
+            typeMap = this._stateMap[stateType] = {};
         }
-        if (compileMode != SceneJS_renderModule.COMPILE_SCENE) {
+        if (this._compileMode != SceneJS_renderModule.COMPILE_SCENE) {
             state = typeMap[id];
             if (!state) {
                 state = {
@@ -419,10 +413,7 @@ var SceneJS_renderModule = new (function() {
                 };
                 typeMap[id] = state;
             }
-        } else {
-
-            /* Recompiling entire scene graph
-             */
+        } else { // Recompiling whole scene
             state = {
                 _id: id,
                 _stateId : nextStateId,
@@ -433,38 +424,40 @@ var SceneJS_renderModule = new (function() {
                 typeMap[id] = state;
             }
         }
-
         nextStateId++;
-
-        if (rebuildBins) {
-            states.bin = [];
-            rebuildBins = false;
-        }
         return state;
-    }
+    };
 
     /**
      * Release a state after detach from display node. Destroys node if usage count is then zero.
      */
-    function releaseState(state) {
+    this._releaseState = function(state) {
+        if (state._stateType == undefined) {
+            return;
+        }
         if (state._refCount <= 0) {
             return;
         }
         if (--state._refCount == 0) {
-            var typeMap = stateMap[state._stateType];
+            var typeMap = this._stateMap[state._stateType];
             if (typeMap) {
                 delete typeMap[state.id];
             }
         }
-    }
+    };
 
     /**
      * Set the current world-space clipping planes
      */
     this.setClips = function(id, clips) {
-        clipState = getState(this._CLIPS, id || "___DEFAULT_CLIPS");
+        if (!id) {
+            clipState = this._DEFAULT_CLIP_STATE;
+            this._stateHash = null;
+            return;
+        }
+        clipState = this._getState(this._CLIPS, id);
         clips = clips || [];
-        if (compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             if (clips.length > 0) {
                 var hash = [];
                 for (var i = 0; i < clips.length; i++) {
@@ -475,7 +468,7 @@ var SceneJS_renderModule = new (function() {
             } else {
                 clipState.hash = "";
             }
-            stateHash = null;
+            this._stateHash = null;
         }
         clipState.clips = clips;
     };
@@ -484,11 +477,16 @@ var SceneJS_renderModule = new (function() {
      * Set the current color transform
      */
     this.setColortrans = function(id, trans) {
-        colortransState = getState(this._COLORTRANS, id || "___DEFAULT_COLOR_TRANS");
+        if (!id) {
+            colortransState = this._DEFAULT_COLORTRANS_STATE;
+            this._stateHash = null;
+            return;
+        }
+        colortransState = this._getState(this._COLORTRANS, id);
         colortransState.trans = trans;
-        if (compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             colortransState.hash = trans ? "t" : "f";
-            stateHash = null;
+            this._stateHash = null;
         }
     };
 
@@ -496,19 +494,28 @@ var SceneJS_renderModule = new (function() {
      * Set the current flags
      */
     this.setFlags = function(id, flags) {
-        flagsState = getState(this._FLAGS, id || "___DEFAULT_FLAGS");
-        flagsState.flags = flags || DEFAULT_FLAGS;
+        if (arguments.length == 0) {
+            this._flagsState = this._DEFAULT_FLAGS_STATE;
+            return;
+        }
+        this._flagsState = this._getState(this._FLAGS, id);
+        this._flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
     };
 
     /**
      * Set the current fog
      */
     this.setFog = function(id, fog) {
-        fogState = getState(this._FOG, id || "___DEFAULT_FOG");
+        if (arguments.length == 0) {
+            fogState = this._DEFAULT_FOG_STATE;
+            this._stateHash = null;
+            return;
+        }
+        fogState = this._getState(this._FOG, id);
         fogState.fog = fog;
-        if (compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             fogState.hash = fog ? fog.mode : "";
-            stateHash = null;
+            this._stateHash = null;
         }
     };
 
@@ -516,16 +523,26 @@ var SceneJS_renderModule = new (function() {
      * Set the current image buffer
      */
     this.setImagebuf = function(id, imageBuf) {
-        imageBufState = getState(this._IMAGEBUF, id || "___DEFAULT_IMAGEBUF");
+        if (arguments.length == 0) {
+            imageBufState = this._DEFAULT_IMAGEBUF_STATE;
+            return;
+        }
+        imageBufState = this._getState(this._IMAGEBUF, id);
         imageBufState.imageBuf = imageBuf;
     };
 
     /**
      * Set the current world-space light sources
      */
-    this.setLights = function(id, lights) { // TODO: what to do with the ID
+    this.setLights = function(id, lights) {
+        if (arguments.length == 0) {
+            lightState = this._DEFAULT_LIGHTS_STATE;
+            this._stateHash = null;
+            return;
+        }
+        lightState = this._getState(this._LIGHTS, id);
         lights = lights || [];
-        if (compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             var hash = [];
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
@@ -538,9 +555,8 @@ var SceneJS_renderModule = new (function() {
                 }
             }
             lightState.hash = hash.join("");
-            stateHash = null;
+            this._stateHash = null;
         }
-        lightState = getState(this._LIGHTS, id || "___DEFAULT_LIGHTS");
         lightState.lights = lights;
     };
 
@@ -548,16 +564,25 @@ var SceneJS_renderModule = new (function() {
      * Set the current surface material
      */
     this.setMaterial = function(id, material) {
-        materialState = getState(this._MATERIAL, id || "___DEFAULT_MATERIAL");
-        materialState.material = material || DEFAULT_MATERIAL.material;
+        if (arguments.length == 0) {
+            materialState = this._DEFAULT_MATERIAL_STATE;
+            return;
+        }
+        materialState = this._getState(this._MATERIAL, id);
+        materialState.material = material || this._DEFAULT_MATERIAL_STATE.material;
     };
 
     /**
      * Set model-space morph targets
      */
     this.setMorph = function(id, morph) {
-        morphState = getState(this._MORPH, id || "___DEFAULT_MORPH");
-        if (compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (arguments.length == 0) {
+            morphState = this._DEFAULT_MORPH_STATE;
+            this._stateHash = null;
+            return;
+        }
+        morphState = this._getState(this._MORPH, id);
+        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             if (morph) {
                 var target1 = morph.target1;
                 morphState.hash = ([
@@ -568,29 +593,33 @@ var SceneJS_renderModule = new (function() {
             } else {
                 morphState.hash = "";
             }
-            stateHash = null;
+            this._stateHash = null;
         }
         morphState.morph = morph;
     };
 
-    /**
-     * Pick color is only expected to be set within a pick traversal
-     */
     this.setPickColor = function(id, pickColor) {
-        pickState = getState(this._PICKCOLOR, id || "___DEFAULT_PICK");
-        pickState.pickColor = pickColor;
-        stateHash = null;
+        if (arguments.length == 0) {
+            pickColorState = this._DEFAULT_PICK_COLOR_STATE;
+            this._stateHash = null;
+            return;
+        }
+        pickColorState = this._getState(this._PICKCOLOR, id);
+        pickColorState.pickColor = pickColor;
+        this._stateHash = null;
     };
 
-    /**
-     * Set the current textures. Each layer can have a texture object, which
-     * can be null when that layer's texture has not yet loaded.
-     */
+
     this.setTexture = function(id, texture) {
-        texState = getState(this._TEXTURE, id || "___DEFAULT_TEXTURE");
+        if (arguments.length == 0) {
+            texState = this._DEFAULT_TEXTURE_STATE;
+            this._stateHash = null;
+            return;
+        }
+        texState = this._getState(this._TEXTURE, id);
         texture = texture || {};
         var layers = texture.layers || [];
-        if (compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             var hashStr;
             if (layers.length > 0) {
                 var hash = [];
@@ -611,7 +640,7 @@ var SceneJS_renderModule = new (function() {
                 hashStr = "__scenejs_no_tex";
             }
             texState.hash = hashStr;
-            stateHash = null;
+            this._stateHash = null;
         }
         texState.layers = layers;
         texState.params = texture.params || {};
@@ -621,35 +650,50 @@ var SceneJS_renderModule = new (function() {
      * Set the current renderer configs
      */
     this.setRenderer = function(id, props) {
-        rendererState = getState(this._RENDERER, id || "___DEFAULT_RENDERER");
+        if (arguments.length == 0) {
+            rendererState = this._DEFAULT_RENDERER_STATE;
+            return;
+        }
+        rendererState = this._getState(this._RENDERER, id);
         rendererState.props = props;
-        stateHash = null;
+        this._stateHash = null;
     };
-
     /**
      * Set the current model matrix and model normal matrix
      */
     this.setModelTransform = function(id, mat, normalMat) {
-        modelXFormState = getState(this._MODEL_TRANSFORM, id || "___DEFAULT_MODEL_TRANSFORM");
-        modelXFormState.mat = mat || DEFAULT_MAT;
-        modelXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
+        if (arguments.length == 0) {
+            modelXFormState = this._DEFAULT_MODEL_TRANSFORM_STATE;
+            return;
+        }
+        modelXFormState = this._getState(this._MODEL_TRANSFORM, id);
+        modelXFormState.mat = mat || this._DEFAULT_MAT;
+        modelXFormState.normalMat = normalMat || this._DEFAULT_NORMAL_MAT;
     };
 
     /**
      * Set the current projection matrix
      */
     this.setProjectionTransform = function(id, mat) {
-        projXFormState = getState(this._PROJ_TRANSFORM, id || "___DEFAULT_PROJ_TRANSFORM");
-        projXFormState.mat = mat || DEFAULT_MAT;
+        if (arguments.length == 0) {
+            projXFormState = this._DEFAULT_PROJ_TRANSFORM_STATE;
+            return;
+        }
+        projXFormState = this._getState(this._PROJ_TRANSFORM, id);
+        projXFormState.mat = mat || this._DEFAULT_MAT;
     };
 
     /**
      * Set the current view matrix and view normal matrix
      */
     this.setViewTransform = function(id, mat, normalMat, lookAt) {
-        viewXFormState = getState(this._VIEW_TRANSFORM, id || "___DEFAULT_VIEW_TRANSFORM");
-        viewXFormState.mat = mat || DEFAULT_MAT;
-        viewXFormState.normalMat = normalMat || DEFAULT_NORMAL_MAT;
+        if (arguments.length == 0) {
+            viewXFormState = this._DEFAULT_VIEW_TRANSFORM_STATE;
+            return;
+        }
+        viewXFormState = this._getState(this._VIEW_TRANSFORM, id);
+        viewXFormState.mat = mat || this._DEFAULT_MAT;
+        viewXFormState.normalMat = normalMat || this._DEFAULT_NORMAL_MAT;
         viewXFormState.lookAt = lookAt || SceneJS_math_LOOKAT_ARRAYS;
     };
 
@@ -657,7 +701,11 @@ var SceneJS_renderModule = new (function() {
      * Set the current pick listeners
      */
     this.setPickListeners = function(id, listeners) {
-        pickListenersState = getState(this._PICK_LISTENERS, id || "___DEFAULT_PICK_LISTENERS");
+        if (arguments.length == 0) {
+            pickListenersState = this._DEFAULT_PICK_LISTENERS_STATE;
+            return;
+        }
+        pickListenersState = this._getState(this._PICK_LISTENERS, id);
         pickListenersState.listeners = listeners || [];
     };
 
@@ -665,18 +713,26 @@ var SceneJS_renderModule = new (function() {
      * Set the current node render listeners
      */
     this.setRenderListeners = function(id, listeners) {
-        renderListenersState = getState(this._RENDER_LISTENERS, id || "___DEFAULT_RENDER_LISTENERS");
+        if (arguments.length == 0) {
+            renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
+            return;
+        }
+        renderListenersState = this._getState(this._RENDER_LISTENERS, id);
         renderListenersState.listeners = listeners || [];
     };
 
     /**
-     * Set model-space shader targets
+     * Set user-defined GLSL
      */
     this.setShader = function(id, shader) {
-        shaderState = getState(this._SHADER, id || "___DEFAULT_SHADER");
+        if (arguments.length == 0) {
+            shaderState = this._DEFAULT_SHADER_STATE;
+            return;
+        }
+        shaderState = this._getState(this._SHADER, id);
         shaderState.shader = shader || {};
         shaderState.hash = id;
-        stateHash = null;
+        this._stateHash = null;
     };
 
     /**
@@ -713,7 +769,7 @@ var SceneJS_renderModule = new (function() {
         var node;
         var id;
 
-        if (compileMode != SceneJS_renderModule.COMPILE_SCENE) {
+        if (this._compileMode != SceneJS_renderModule.COMPILE_SCENE) {
 
             /* Dynamic state reattachment for scene branch compilation.
              *
@@ -732,24 +788,33 @@ var SceneJS_renderModule = new (function() {
             if (idPrefix) {
                 id = idPrefix + geoId;
             }
-            node = nodeMap[id];
+            node = this._nodeMap[id];
             if (node.renderListenersState._stateId != renderListenersState._stateId) {
-                releaseState(node.renderListenersState);
+                this._releaseState(node.renderListenersState);
                 node.renderListenersState = renderListenersState;
                 renderListenersState._refCount++;
             }
-//            if (node.flagsState._stateId != flagsState._stateId) {
-//                releaseState(node.flagsState);
-//                node.flagsState = flagsState;
-//                flagsState._refCount++;
-//            }
+            if (node.pickListenersState._stateId != pickListenersState._stateId) {
+                this._releaseState(node.pickListenersState);
+                node.pickListenersState = pickListenersState;
+                pickListenersState._refCount++;
+            }
+
+            // This breaks BioDigital Human's green bounding box -
+            // makes it persist after fly-to:
+
+            //                        if (node.this._flagsState._stateId != this._flagsState._stateId) {
+            //                            this._releaseState(node.this._flagsState);
+            //                            node.this._flagsState = flagsState;
+            //                            this._flagsState._refCount++;
+            //                        }
             return;
         }
 
         /*
          */
 
-        geoState = getState(this._GEO, geoId);
+        geoState = this._getState(this._GEO, geoId);
         geoState.geo = geo;
         geoState.hash = ([                           // Safe to build geometry hash here - geometry is immutable
             geo.normalBuf ? "t" : "f",
@@ -759,20 +824,20 @@ var SceneJS_renderModule = new (function() {
 
         /* Identify what GLSL is required for the current state soup elements
          */
-        if (!stateHash) {
-            stateHash = getSceneHash();
+        if (!this._stateHash) {
+            this._stateHash = this._getSceneHash();
         }
 
         /* Create or re-use a program
          */
-        var program = getProgram(stateHash);    // Touches for LRU cache
+        var program = this._getProgram(this._stateHash);    // Touches for LRU cache
 
         if (idPrefix) {
             id = idPrefix + geoId;
         }
 
         geoState._refCount++;
-        flagsState._refCount++;
+        this._flagsState._refCount++;
         rendererState._refCount++;
         lightState._refCount++;
         colortransState._refCount++;
@@ -782,7 +847,7 @@ var SceneJS_renderModule = new (function() {
         viewXFormState._refCount++;
         projXFormState._refCount++;
         texState._refCount++;
-        pickState._refCount++;
+        pickColorState._refCount++;
         imageBufState._refCount++;
         clipState._refCount++;
         morphState._refCount++;
@@ -795,12 +860,12 @@ var SceneJS_renderModule = new (function() {
 
             sortId: 0,  // Lazy-create later
 
-            stateHash : stateHash,
+            stateHash : this._stateHash,
 
             program : program,
 
             geoState:               geoState,
-            flagsState:             flagsState,
+            flagsState:             this._flagsState,
             rendererState:          rendererState,
             lightState:             lightState,
             colortransState :       colortransState,
@@ -810,7 +875,7 @@ var SceneJS_renderModule = new (function() {
             viewXFormState:         viewXFormState,
             projXFormState:         projXFormState,
             texState:               texState,
-            pickState :             pickState,        // Will be DEFAULT_PICK because we are compiling whole scene here
+            pickColorState :             pickColorState,
             imageBufState :         imageBufState,
             clipState :             clipState,
             morphState :            morphState,
@@ -821,27 +886,27 @@ var SceneJS_renderModule = new (function() {
             layerName:              SceneJS_layerModule.getLayer()
         };
 
-        states.nodeMap[id] = node;
+        this._states.nodeMap[id] = node;
 
-        states.bin.push(node);
+        this._states.bin.push(node);
 
         /* Make the display list node findable by its geometry scene nodes
          */
-        var geoNodeMap = states.geoNodesMap[geoId];
+        var geoNodeMap = this._states.geoNodesMap[geoId];
         if (!geoNodeMap) {
-            geoNodeMap = states.geoNodesMap[geoId] = [];
+            geoNodeMap = this._states.geoNodesMap[geoId] = [];
         }
         geoNodeMap.push(node);
 
         /* If node has boundary, add to BVH
          */
-        //  SceneJS._bvhModule.insertNode(geo.boundary, states.sceneId, id);
+        //  SceneJS._bvhModule.insertNode(geo.boundary, this._states.sceneId, id);
     };
 
     this._attachState = function(node, stateName, soupState) {
         var state = node[stateName];
         if (state && state._stateId != soupState._stateId) {
-            releaseState(state);
+            this._releaseState(state);
         }
         node[stateName] = soupState;
         soupState._refCount++;
@@ -855,7 +920,7 @@ var SceneJS_renderModule = new (function() {
      * This may be done outside of a render pass.
      */
     this.removeGeometry = function(sceneId, geoId) {
-        var sceneState = sceneStates[sceneId];
+        var sceneState = this._sceneStates[sceneId];
         var geoNodesMap = sceneState.geoNodesMap;
         var nodes = geoNodesMap[geoId];
         if (!nodes) {
@@ -864,25 +929,25 @@ var SceneJS_renderModule = new (function() {
         for (var i = 0, len = nodes.length; i < len; i++) {
             var node = nodes[i];
             node.destroyed = true;  // Differ node destruction to bin render time, when we'll know it's bin index
-            releaseProgram(node.program);
-            releaseState(node.geoState);
-            releaseState(node.flagsState);
-            releaseState(node.rendererState);
-            releaseState(node.lightState);
-            releaseState(node.colortransState);
-            releaseState(node.materialState);
-            releaseState(node.fogState);
-            releaseState(node.modelXFormState);
-            releaseState(node.viewXFormState);
-            releaseState(node.projXFormState);
-            releaseState(node.texState)
-            releaseState(node.pickState);
-            releaseState(node.imageBufState);
-            releaseState(node.clipState);
-            releaseState(node.morphState);
-            releaseState(node.pickListenersState);
-            releaseState(node.renderListenersState);
-            releaseState(node.shaderState);
+            this._releaseProgram(node.program);
+            this._releaseState(node.geoState);
+            this._releaseState(node.flagsState);
+            this._releaseState(node.rendererState);
+            this._releaseState(node.lightState);
+            this._releaseState(node.colortransState);
+            this._releaseState(node.materialState);
+            this._releaseState(node.fogState);
+            this._releaseState(node.modelXFormState);
+            this._releaseState(node.viewXFormState);
+            this._releaseState(node.projXFormState);
+            this._releaseState(node.texState)
+            this._releaseState(node.pickColorState);
+            this._releaseState(node.imageBufState);
+            this._releaseState(node.clipState);
+            this._releaseState(node.morphState);
+            this._releaseState(node.pickListenersState);
+            this._releaseState(node.renderListenersState);
+            this._releaseState(node.shaderState);
         }
         geoNodesMap[geoId] = null;
     };
@@ -892,8 +957,8 @@ var SceneJS_renderModule = new (function() {
      * Bin pre-sorting
      *----------------------------------------------------------------------------------------------------------------*/
 
-    function createSortIDs(bin) {
-        if (states.needSortIds) {
+    this._createSortIDs = function(bin) {
+        if (this._states.needSortIds) {
             var node;
             var layerPriority;
             for (var i = 0, len = bin.length; i < len; i++) {
@@ -905,35 +970,35 @@ var SceneJS_renderModule = new (function() {
                     node.sortId = node.program.id;
                 }
             }
-            states.needSortIds = false;
+            this._states.needSortIds = false;
         }
-    }
+    };
 
     //    function hintBinSort() {
     //        states.rendersUntilSort = stateSortDelay;
     //        states.needSort = false;
     //    }
 
-    function forceBinSort(rebuildSortIDs) {
+    this._forceBinSort = function(rebuildSortIDs) {
         if (rebuildSortIDs) {
-            states.needSortIds = rebuildSortIDs;
+            this._states.needSortIds = rebuildSortIDs;
         }
-        states.rendersUntilSort = 0;
-        states.needSort = true;
-    }
+        this._states.rendersUntilSort = 0;
+        this._states.needSort = true;
+    };
 
     /**
      * Presorts bins by shader program - shader switches are most
      * pathological because they force all other state switches.
      */
-    function preSortBins() {
-        if (states.needSortIds) {
-            createSortIDs(states.bin);
+    this._preSortBins = function() {
+        if (this._states.needSortIds) {
+            this._createSortIDs(this._states.bin);
         }
-        states.bin.sort(sortNodes);
-    }
+        this._states.bin.sort(this._sortNodes);
+    };
 
-    var sortNodes = function(a, b) {
+    this._sortNodes = function(a, b) {
         return a.sortId - b.sortId;
     };
 
@@ -942,43 +1007,43 @@ var SceneJS_renderModule = new (function() {
      *----------------------------------------------------------------------------------------------------------------*/
 
     this.renderFrame = function(params) {
-        if (!states) {
+        if (!this._states) {
             throw  SceneJS_errorModule.fatalError("No scene bound");
         }
         params = params || {};
-        if (states.needSort) {
-            preSortBins();
-            states.needSort = false;
+        if (this._states.needSort) {
+            this._preSortBins();
+            this._states.needSort = false;
         } else {
             if (stateSortDelay >= 0) {
-                states.rendersUntilSort--;
-                if (states.rendersUntilSort == 0) { // Will not sort again until >= 0
-                    states.needSort = true;
+                this._states.rendersUntilSort--;
+                if (this._states.rendersUntilSort == 0) { // Will not sort again until >= 0
+                    this._states.needSort = true;
                 }
             }
         }
         var doProfile = params.profileFunc ? true : false;
-        var nodeRenderer = states.nodeRenderer;
+        var nodeRenderer = this._states.nodeRenderer;
         nodeRenderer.init({ doProfile: doProfile });
-        renderBin(states.bin, false); //Not picking
+        this._renderBin(this._states.bin, false); //Not picking
         nodeRenderer.cleanup();
-        states = null;
+        this._states = null;
         if (doProfile) {
             params.profileFunc(nodeRenderer.profile);
         }
     };
 
-    function renderBin(bin, picking) {
+    this._renderBin = function(bin, picking) {
 
         var enabledLayers = SceneJS_layerModule.getEnabledLayers();
-        var context = states.canvas.context;
+        var context = this._states.canvas.context;
         var nTransparent = 0;
         var node;
         var countDestroyed = 0;
         var i, len = bin.length;
         var flags;
 
-        //  var sceneBVH = SceneJS._bvhModule.sceneBVH[states.sceneId];
+        //  var sceneBVH = SceneJS._bvhModule.sceneBVH[this._states.sceneId];
 
         /* Render opaque nodes while buffering transparent nodes.
          * Layer order is preserved independently within opaque and transparent bins.
@@ -1017,7 +1082,7 @@ var SceneJS_renderModule = new (function() {
                 transparentBin[nTransparent++] = node;
 
             } else {
-                states.nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
+                this._states.nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
             }
         }
 
@@ -1032,7 +1097,7 @@ var SceneJS_renderModule = new (function() {
             context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);  // Default - may be overridden by flags
             for (i = 0,len = nTransparent; i < len; i++) {
                 node = transparentBin[i];
-                states.nodeRenderer.renderNode(node);
+                this._states.nodeRenderer.renderNode(node);
             }
             context.disable(context.BLEND);
         }
@@ -1042,9 +1107,9 @@ var SceneJS_renderModule = new (function() {
     //  Shader generation
     //-----------------------------------------------------------------------------------------------------------------
 
-    function getSceneHash() {
+    this._getSceneHash = function() {
         return ([                           // Same hash for both render and pick shaders
-            states.canvas.canvasId,
+            this._states.canvas.canvasId,
             rendererState.hash,
             fogState.hash,
             lightState.hash,
@@ -1055,16 +1120,16 @@ var SceneJS_renderModule = new (function() {
         ]).join(";");
     }
 
-    function getProgram(stateHash) {
-        var program = programs[stateHash];
+    this._getProgram = function(stateHash) {
+        var program = this._programs[stateHash];
         if (!program) {
             if (debugCfg.logScripts === true) {
                 SceneJS_loggingModule.info("Creating render and pick shaders: '" + stateHash + "'");
             }
-            program = programs[stateHash] = {
+            program = this._programs[stateHash] = {
                 id: nextProgramId++,
-                render: createShader(composeRenderingVertexShader(), composeRenderingFragmentShader()),
-                pick: createShader(composePickingVertexShader(), composePickingFragmentShader()),
+                render: this._createShader(this._composeRenderingVertexShader(), this._composeRenderingFragmentShader()),
+                pick: this._createShader(this._composePickingVertexShader(), this._composePickingFragmentShader()),
                 stateHash: stateHash,
                 refCount: 0
             };
@@ -1073,19 +1138,19 @@ var SceneJS_renderModule = new (function() {
         return program;
     }
 
-    function releaseProgram(program) {
+    this._releaseProgram = function(program) {
         if (--program.refCount <= 0) {
             program.render.destroy();
             program.pick.destroy();
-            programs[program.stateHash] = null;
+            this._programs[program.stateHash] = null;
         }
-    }
+    };
 
-    function createShader(vertexShaderSrc, fragmentShaderSrc) {
+    this._createShader = function(vertexShaderSrc, fragmentShaderSrc) {
         try {
             return new SceneJS_webgl_Program(
-                    stateHash,
-                    states.canvas.context,
+                    this._stateHash,
+                    this._states.canvas.context,
                     [vertexShaderSrc.join("\n")],
                     [fragmentShaderSrc.join("\n")],
                     SceneJS_loggingModule);
@@ -1098,22 +1163,22 @@ var SceneJS_renderModule = new (function() {
             console.error("");
             console.error("Vertex shader:");
             console.error("");
-            logShaderLoggingSource(vertexShaderSrc);
+            this._logShaderLoggingSource(vertexShaderSrc);
             console.error("");
             console.error("Fragment shader:");
-            logShaderLoggingSource(fragmentShaderSrc);
+            this._logShaderLoggingSource(fragmentShaderSrc);
             console.error("-----------------------------------------------------------------------------------------:");
             throw SceneJS_errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create SceneJS Shader: " + e);
         }
     }
 
-    function logShaderLoggingSource(src) {
+    this._logShaderLoggingSource = function(src) {
         for (var i = 0, len = src.length; i < len; i++) {
             console.error(src[i]);
         }
-    }
+    };
 
-    function composePickingVertexShader() {
+    this._composePickingVertexShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
 
@@ -1200,13 +1265,13 @@ var SceneJS_renderModule = new (function() {
             SceneJS_loggingModule.info(src);
         }
         return src;
-    }
+    };
 
     /**
      * Composes a fragment shader script for rendering mode in current scene state
      * @private
      */
-    function composePickingFragmentShader() {
+    this._composePickingFragmentShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
         var customFragmentShader = customShaders.fragment || {};
@@ -1280,7 +1345,7 @@ var SceneJS_renderModule = new (function() {
             SceneJS_loggingModule.info(src);
         }
         return src;
-    }
+    };
 
 
     /*===================================================================================================================
@@ -1289,7 +1354,7 @@ var SceneJS_renderModule = new (function() {
      *
      *==================================================================================================================*/
 
-    function isTexturing() {
+    this._isTexturing = function() {
         if (texState.layers.length > 0) {
             if (geoState.geo.uvBuf || geoState.geo.uvBuf2) {
                 return true;
@@ -1299,9 +1364,9 @@ var SceneJS_renderModule = new (function() {
             }
         }
         return false;
-    }
+    };
 
-    function isLighting() {
+    this._isLighting = function() {
         if (lightState.lights.length > 0) {
             if (geoState.geo.normalBuf) {
                 return true;
@@ -1311,9 +1376,9 @@ var SceneJS_renderModule = new (function() {
             }
         }
         return false;
-    }
+    };
 
-    function composeRenderingVertexShader() {
+    this._composeRenderingVertexShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
 
@@ -1324,8 +1389,8 @@ var SceneJS_renderModule = new (function() {
         var fragmentHooks = customFragmentShader.hooks || {};
 
 
-        var texturing = isTexturing();
-        var lighting = isLighting();
+        var texturing = this._isTexturing();
+        var lighting = this._isLighting();
         var fogging = fogState.fog && true;
         var clipping = clipState.clips.length > 0;
         var morphing = morphState.morph && true;
@@ -1535,14 +1600,14 @@ var SceneJS_renderModule = new (function() {
      * Rendering Fragment shader
      *---------------------------------------------------------------------------------------------------------------*/
 
-    function composeRenderingFragmentShader() {
+    this._composeRenderingFragmentShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
-        var texturing = isTexturing();
-        var lighting = isLighting();
+        var texturing = this._isTexturing();
+        var lighting = this._isLighting();
         var fogging = fogState.fog && true;
         var clipping = clipState && clipState.clips.length > 0;
         var colortrans = colortransState && colortransState.trans;
@@ -1960,22 +2025,22 @@ var SceneJS_renderModule = new (function() {
     }
 
     this.pick = function(params, options) {
-        states = sceneStates[params.sceneId];
-        return pickFrame(params.sceneId, params.canvasX, params.canvasY, options);
+        this._states = this._sceneStates[params.sceneId];
+        return this._pickFrame(params.sceneId, params.canvasX, params.canvasY, options);
     };
 
-    function pickFrame(sceneId, canvasX, canvasY, options) {
-        //if (!states.pickBufferActive) {
-        createPickBuffer();
-        bindPickBuffer();
-        states.nodeRenderer.init({ picking: true });
-        renderBin(states.bin, true);
-        states.pickBufferActive = true;
-        states.nodeRenderer.cleanup();
+    this._pickFrame = function(sceneId, canvasX, canvasY, options) {
+        //if (!this._states.pickBufferActive) {
+        this._createPickBuffer();
+        this._bindPickBuffer();
+        this._states.nodeRenderer.init({ picking: true });
+        this._renderBin(this._states.bin, true);
+        this._states.pickBufferActive = true;
+        this._states.nodeRenderer.cleanup();
         //}
-        var pickIndex = readPickBuffer(canvasX, canvasY);
+        var pickIndex = this._readPickBuffer(canvasX, canvasY);
         var wasPicked = false;
-        var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
+        var pickListeners = this._states.nodeRenderer.pickListeners[pickIndex];
         if (pickListeners) {
             var listeners = pickListeners.listeners;
             for (var i = listeners.length - 1; i >= 0; i--) {
@@ -1983,20 +2048,20 @@ var SceneJS_renderModule = new (function() {
                 listeners[i]({ canvasX: canvasX, canvasY: canvasY }, options);
             }
         }
-        unbindPickBuffer();
+        this._unbindPickBuffer();
         return wasPicked;
-    }
+    };
 
     function deactivatePick() {
 
     }
 
-    function createPickBuffer() {
-        var canvas = states.canvas;
+    this._createPickBuffer = function() {
+        var canvas = this._states.canvas;
         var gl = canvas.context;
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
-        var pickBuf = states.pickBuf;
+        var pickBuf = this._states.pickBuf;
         if (pickBuf) { // Currently have a pick buffer
             if (pickBuf.width == width && pickBuf.height) { // Canvas size unchanged, buffer still good
                 return;
@@ -2008,7 +2073,7 @@ var SceneJS_renderModule = new (function() {
             }
         }
 
-        pickBuf = states.pickBuf = {
+        pickBuf = this._states.pickBuf = {
             frameBuf : gl.createFramebuffer(),
             renderBuf : gl.createRenderbuffer(),
             texture : gl.createTexture(),
@@ -2061,20 +2126,20 @@ var SceneJS_renderModule = new (function() {
             default:
                 throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: " + status);
         }
-    }
+    };
 
-    function bindPickBuffer() {
-        var context = states.canvas.context;
-        context.bindFramebuffer(context.FRAMEBUFFER, states.pickBuf.frameBuf);
+    this._bindPickBuffer = function() {
+        var context = this._states.canvas.context;
+        context.bindFramebuffer(context.FRAMEBUFFER, this._states.pickBuf.frameBuf);
         context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
         context.disable(context.BLEND);
-    }
+    };
 
     /** Reads pick buffer pixel at given coordinates, returns index of associated listener else (-1)
      */
-    function readPickBuffer(pickX, pickY) {
-        var canvas = states.canvas.canvas;
-        var context = states.canvas.context;
+    this._readPickBuffer = function(pickX, pickY) {
+        var canvas = this._states.canvas.canvas;
+        var context = this._states.canvas.context;
 
         var x = pickX;
         var y = canvas.height - pickY;
@@ -2083,10 +2148,10 @@ var SceneJS_renderModule = new (function() {
 
         var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
         return (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
-    }
+    };
 
-    function unbindPickBuffer() {
-        var context = states.canvas.context;
+    this._unbindPickBuffer = function() {
+        var context = this._states.canvas.context;
         context.bindFramebuffer(context.FRAMEBUFFER, null);
-    }
+    };
 })();

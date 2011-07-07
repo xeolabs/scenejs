@@ -28,7 +28,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setMaterial(idStack[stackLen - 1], materialStack[stackLen - 1]);
-                    } else  {
+                    } else  { // Full compile supplies it's own default states
                         SceneJS_renderModule.setMaterial();
                     }
                     dirty = false;

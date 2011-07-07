@@ -1,6 +1,6 @@
 (function() {
 
-     var DEFAULT_TRANSFORM = {
+    var DEFAULT_TRANSFORM = {
         matrix : SceneJS_math_identityMat4(),
         fixed: true,
         isDefault : true
@@ -33,7 +33,7 @@
                             transform.matrixAsArray = new Float32Array(transform.matrix);
                         }
                         SceneJS_renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
-                    } else  {
+                    } else { // Full compile supplies it's own default states
                         SceneJS_renderModule.setProjectionTransform();
                     }
                     dirty = false;
@@ -47,7 +47,9 @@
         nodeId = id;
         transform = t;
         dirty = true;
-    };
+    }
+
+    ;
 
     function popTransform() {
         stackLen--;
@@ -63,7 +65,9 @@
             };
         }
         dirty = true;
-    };
+    }
+
+    ;
 
     var Camera = SceneJS.createNodeType("camera");
 

@@ -98,7 +98,7 @@ var SceneJS_flagsModule = new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setFlags(idStack[stackLen - 1], self.flags);
-                    } else   {
+                    } else  { // Full compile supplies it's own default states
                         SceneJS_renderModule.setFlags();
                     }
                     dirty = false;

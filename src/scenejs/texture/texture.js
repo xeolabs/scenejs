@@ -137,7 +137,7 @@ new (function() {
         this._params.waitForLoad = (config.waitForLoad != undefined && config.waitForLoad != null)
                 ? config.waitForLoad
                 : params.waitForLoad;
-        
+
         if (!params.layers) {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.NODE_CONFIG_EXPECTED,
@@ -223,7 +223,7 @@ new (function() {
                 }
                 SceneJS_loadStatusModule.status.numNodesLoading++;
             } else {
-                SceneJS_loadStatusModule.status.numNodesLoaded++;                
+                SceneJS_loadStatusModule.status.numNodesLoaded++;
             }
             if (layer.rebuildMatrix) {
                 this._rebuildTextureMatrix(layer);

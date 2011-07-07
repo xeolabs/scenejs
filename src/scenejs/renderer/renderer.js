@@ -1,7 +1,7 @@
 new (function() {
 
     var canvas;         // Currently active canvas
-    var idStack =[];
+    var idStack = [];
     var propStack = [];
     var stackLen = 0;
     var dirty;
@@ -59,7 +59,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
-                    } else  {
+                    } else  { // Full compile supplies it's own default states
                         SceneJS_renderModule.setRenderer();
                     }
                     dirty = false;
@@ -94,7 +94,9 @@ new (function() {
                 }
             }
         };
-    };
+    }
+
+    ;
 
     var getSuperProperty = function(name) {
         var props;
@@ -181,7 +183,9 @@ new (function() {
             SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, props.props.viewport);
         }
         dirty = true;
-    };
+    }
+
+    ;
 
     /**
      * Maps renderer node properties to WebGL context enums
@@ -510,7 +514,9 @@ new (function() {
                     newProps.props.viewport);
         }
         dirty = true;
-    };
+    }
+
+    ;
 
     /** @class A scene node that sets WebGL state for nodes in its subtree.
      * <p>This node basically exposes various WebGL state configurations through the SceneJS API.</p>
