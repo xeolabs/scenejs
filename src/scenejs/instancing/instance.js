@@ -62,7 +62,7 @@
             instances[nodeID] = null;
             idStack.pop();
             countInstances--;
-            SceneJS_renderModule.setIDPrefix((countInstances > 0) ? idStack[countInstances - 1] : null);
+            SceneJS_renderModule.setIDPrefix((countInstances > 0) ? idStack.join("") : null);
         };
 
         SceneJS._compilationStates.setSupplier("instances", {
@@ -209,8 +209,8 @@
                     SceneJS_flagsModule.postVisitNode(this._symbol);
                 }
 
-                SceneJS_compileModule.postVisitNode(this._symbol);
-                SceneJS_renderModule.marshallStates();
+               // SceneJS_compileModule.postVisitNode(this._symbol);
+             //   SceneJS_renderModule.marshallStates();
                 SceneJS_instancingModule._releaseInstance(nodeId);
                 this._symbol = null;
             }
