@@ -29,8 +29,6 @@ var SceneJS_flagsModule = new (function() {
         frontface: "ccw"        // Default vertex winding for front face
     };
 
-    this.flags = {}; // Flags at top of flag stack
-
     /** Creates flag set by inheriting flags off top of stack where not overridden
      */
     function createFlags(flags) {
@@ -97,7 +95,7 @@ var SceneJS_flagsModule = new (function() {
             function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setFlags(idStack[stackLen - 1], self.flags);
+                        SceneJS_renderModule.setFlags(idStack[stackLen - 1], flagStack[stackLen - 1]);
                     } else  { // Full compile supplies it's own default states
                         SceneJS_renderModule.setFlags();
                     }
@@ -109,7 +107,7 @@ var SceneJS_flagsModule = new (function() {
         var attr = node.attr;
         var flags = attr.flags;
         if (flags) {
-            flags = createFlags(flags);
+            flags = createFlags(flags);  // TODO: very inefficient
         } else {
             flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
         }
@@ -117,13 +115,13 @@ var SceneJS_flagsModule = new (function() {
         flagStack[stackLen] = flags;
         stackLen++;
         dirty = true;
-        this.flags = flags;
+       // this.flags = flags;
     };
 
     this.postVisitNode = function(node) {
         if (stackLen > 0 && idStack[stackLen - 1] === node.attr.id) {
             stackLen--;
-            this.flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
+          //  this.flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
             dirty = true;
         }
     };

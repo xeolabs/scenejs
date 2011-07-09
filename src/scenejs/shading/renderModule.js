@@ -195,13 +195,13 @@ var SceneJS_renderModule = new (function() {
     this.COMPILE_SCENE = 0;     // When we set a state update, rebuilding entire scene from scratch
     this.COMPILE_NODES = 1;   //
 
-    this._compileMode = null; // DOCS: http://scenejs.wikispaces.com/Scene+Graph+Compilation
+    this.compileMode = null; // DOCS: http://scenejs.wikispaces.com/Scene+Graph+Compilation
 
     var picking; // True when picking
 
     /* Currently exported states
      */
-    this._flagsState = null;
+    var flagsState;
     var rendererState;
     var lightState;
     var colortransState;
@@ -325,7 +325,7 @@ var SceneJS_renderModule = new (function() {
 
             clipState = this._DEFAULT_CLIP_STATE;
             colortransState = this._DEFAULT_COLORTRANS_STATE;
-            this._flagsState = this._DEFAULT_FLAGS_STATE;
+            flagsState = this._DEFAULT_FLAGS_STATE;
             fogState = this._DEFAULT_FOG_STATE;
             imageBufState = this._DEFAULT_IMAGEBUF_STATE;
             lightState = this._DEFAULT_LIGHTS_STATE;
@@ -367,14 +367,14 @@ var SceneJS_renderModule = new (function() {
             }
         }
 
-        this._compileMode = options.compileMode;
+        this.compileMode = options.compileMode;
 
         picking = false;
     };
 
 
     this.marshallStates = function() {
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { fullCompile : this._compileMode === SceneJS_renderModule.COMPILE_SCENE });
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { fullCompile : this.compileMode === SceneJS_renderModule.COMPILE_SCENE });
     };
 
     /*-----------------------------------------------------------------------------------------------------------------
@@ -402,7 +402,7 @@ var SceneJS_renderModule = new (function() {
         if (!typeMap) {
             typeMap = this._stateMap[stateType] = {};
         }
-        if (this._compileMode != SceneJS_renderModule.COMPILE_SCENE) {
+        if (this.compileMode != SceneJS_renderModule.COMPILE_SCENE) {
             state = typeMap[id];
             if (!state) {
                 state = {
@@ -457,7 +457,7 @@ var SceneJS_renderModule = new (function() {
         }
         clipState = this._getState(this._CLIPS, id);
         clips = clips || [];
-        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             if (clips.length > 0) {
                 var hash = [];
                 for (var i = 0; i < clips.length; i++) {
@@ -484,7 +484,7 @@ var SceneJS_renderModule = new (function() {
         }
         colortransState = this._getState(this._COLORTRANS, id);
         colortransState.trans = trans;
-        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             colortransState.hash = trans ? "t" : "f";
             this._stateHash = null;
         }
@@ -495,11 +495,11 @@ var SceneJS_renderModule = new (function() {
      */
     this.setFlags = function(id, flags) {
         if (arguments.length == 0) {
-            this._flagsState = this._DEFAULT_FLAGS_STATE;
+            flagsState = this._DEFAULT_FLAGS_STATE;
             return;
         }
-        this._flagsState = this._getState(this._FLAGS, id);
-        this._flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
+        flagsState = this._getState(this._FLAGS, id);
+        flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
     };
 
     /**
@@ -513,7 +513,7 @@ var SceneJS_renderModule = new (function() {
         }
         fogState = this._getState(this._FOG, id);
         fogState.fog = fog;
-        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             fogState.hash = fog ? fog.mode : "";
             this._stateHash = null;
         }
@@ -542,7 +542,7 @@ var SceneJS_renderModule = new (function() {
         }
         lightState = this._getState(this._LIGHTS, id);
         lights = lights || [];
-        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             var hash = [];
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
@@ -582,7 +582,7 @@ var SceneJS_renderModule = new (function() {
             return;
         }
         morphState = this._getState(this._MORPH, id);
-        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             if (morph) {
                 var target1 = morph.target1;
                 morphState.hash = ([
@@ -619,7 +619,7 @@ var SceneJS_renderModule = new (function() {
         texState = this._getState(this._TEXTURE, id);
         texture = texture || {};
         var layers = texture.layers || [];
-        if (this._compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             var hashStr;
             if (layers.length > 0) {
                 var hash = [];
@@ -769,7 +769,7 @@ var SceneJS_renderModule = new (function() {
         var node;
         var id;
 
-        if (this._compileMode != SceneJS_renderModule.COMPILE_SCENE) {
+        if (this.compileMode != SceneJS_renderModule.COMPILE_SCENE) {
 
             /* Dynamic state reattachment for scene branch compilation.
              *
@@ -803,10 +803,10 @@ var SceneJS_renderModule = new (function() {
             // This breaks BioDigital Human's green bounding box -
             // makes it persist after fly-to:
 
-            //                        if (node.this._flagsState._stateId != this._flagsState._stateId) {
-            //                            this._releaseState(node.this._flagsState);
-            //                            node.this._flagsState = flagsState;
-            //                            this._flagsState._refCount++;
+            //                        if (node.flagsState._stateId != flagsState._stateId) {
+            //                            this._releaseState(node.flagsState);
+            //                            node.flagsState = flagsState;
+            //                            flagsState._refCount++;
             //                        }
             return;
         }
@@ -837,7 +837,7 @@ var SceneJS_renderModule = new (function() {
         }
 
         geoState._refCount++;
-        this._flagsState._refCount++;
+        flagsState._refCount++;
         rendererState._refCount++;
         lightState._refCount++;
         colortransState._refCount++;
@@ -865,7 +865,7 @@ var SceneJS_renderModule = new (function() {
             program : program,
 
             geoState:               geoState,
-            flagsState:             this._flagsState,
+            flagsState:             flagsState,
             rendererState:          rendererState,
             lightState:             lightState,
             colortransState :       colortransState,
@@ -875,7 +875,7 @@ var SceneJS_renderModule = new (function() {
             viewXFormState:         viewXFormState,
             projXFormState:         projXFormState,
             texState:               texState,
-            pickColorState :             pickColorState,
+            pickColorState :        pickColorState,
             imageBufState :         imageBufState,
             clipState :             clipState,
             morphState :            morphState,

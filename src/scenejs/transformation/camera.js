@@ -29,45 +29,17 @@
             function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
+                        var transform = transformStack[stackLen - 1];
                         if (!transform.matrixAsArray) {
                             transform.matrixAsArray = new Float32Array(transform.matrix);
                         }
-                        SceneJS_renderModule.setProjectionTransform(nodeId, transform.matrixAsArray);
+                        SceneJS_renderModule.setProjectionTransform(idStack[stackLen - 1], transform.matrixAsArray);
                     } else { // Full compile supplies it's own default states
                         SceneJS_renderModule.setProjectionTransform();
                     }
                     dirty = false;
                 }
             });
-
-    function pushTransform(id, t) {
-        idStack[stackLen] = id;
-        transformStack[stackLen] = t;
-        stackLen++;
-        nodeId = id;
-        transform = t;
-        dirty = true;
-    }
-
-    ;
-
-    function popTransform() {
-        stackLen--;
-        if (stackLen > 0) {
-            nodeId = idStack[stackLen - 1];
-            transform = transformStack[stackLen - 1];
-        } else {
-            nodeId = null;
-            transform = {
-                matrix : SceneJS_math_identityMat4(),
-                fixed: true,
-                isDefault : true
-            };
-        }
-        dirty = true;
-    }
-
-    ;
 
     var Camera = SceneJS.createNodeType("camera");
 
@@ -156,11 +128,15 @@
         if (this._compileMemoLevel == 0) {
             this._rebuild();
         }
-        pushTransform(this.attr.id, this._transform);
+        idStack[stackLen] = this.attr.id;
+        transformStack[stackLen] = this._transform;
+        stackLen++;
+        dirty = true;
     };
 
     Camera.prototype._postCompile = function() {
-        popTransform();
+        stackLen--;
+        dirty = true;
     };
 
     Camera.prototype._rebuild = function () {

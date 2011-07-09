@@ -115,9 +115,9 @@ new (function() {
         } catch (e) {
             throw SceneJS_errorModule.fatalError(// Just in case we get a context but can't get any functionson it
                     SceneJS.errors.WEBGL_NOT_SUPPORTED,
-                    'Canvas document element with ID \''
+                  'Canvas document element with ID \''
                             + canvasId
-                            + '\' failed to provide a supported WebGL context');
+                            + '\' provided a supported WebGL context, but functions appear to be missing');
         }
         return {
             canvas: canvas,

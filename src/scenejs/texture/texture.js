@@ -196,16 +196,6 @@ new (function() {
         }
     };
 
-
-    /**
-     * Returns the node's current state. Possible states are {@link #STATE_INITIAL},
-     * {@link #STATE_LOADING}, {@link #STATE_LOADED} and {@link #STATE_ERROR}.
-     * @returns {int} The state
-     */
-    Texture.prototype.getState = function() {
-        return this._state;
-    };
-
     Texture.prototype._compile = function(traversalContext) {
         var layer;
         for (var i = 0; i < this._layers.length; i++) {
@@ -228,7 +218,7 @@ new (function() {
             if (layer.rebuildMatrix) {
                 this._rebuildTextureMatrix(layer);
             }
-        }
+        }        
         pushTexture(this.attr.id, { layers: this._layers, params: this._params });
         this._compileNodes(traversalContext);
         popTexture();

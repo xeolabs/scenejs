@@ -22,24 +22,12 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setColortrans(idStack[stackLen - 1], colortransStack[stackLen - 1]);
-                    } else  {
+                    } else {
                         SceneJS_renderModule.setColortrans();
                     }
                     dirty = false;
                 }
             });
-
-    function pushColortrans(id, trans) {
-        idStack[stackLen] = id;
-        colortransStack[stackLen] = trans;
-        stackLen++;
-        dirty = true;
-    }
-
-    function popColortrans() {
-        stackLen--;
-        dirty = true;
-    }
 
     var Colortrans = SceneJS.createNodeType("colortrans");
 
@@ -168,11 +156,15 @@ new (function() {
     };
 
     Colortrans.prototype._preCompile = function() {
-        pushColortrans(this.attr.id, this.attr);
+        idStack[stackLen] = this.attr.id;
+        colortransStack[stackLen] = this.attr;
+        stackLen++;
+        dirty = true;
     };
 
     Colortrans.prototype._postCompile = function() {
-        popColortrans();
+        stackLen--;
+        dirty = true;
     };
 
 })();
