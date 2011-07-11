@@ -5,9 +5,22 @@
     Transform.prototype._init = function(params) {
         this._mat = null;
         this._xform = null;
+        this.setMultOrder(params.multOrder);
         this.setTranslateXYZ({x : params.x, y: params.y, z: params.z });
         this.setScaleXYZ({x : params.x, y: params.y, z: params.z });
         this.setRotateXYZ({x : params.x, y: params.y, z: params.z });
+    };
+
+    Transform.prototype.setMultOrder = function(multOrder) {
+        multOrder = multOrder || "post";
+        if (multOrder != "post" && multOrder != "pre") {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Illegal transform multOrder - '" + multOrder + "' should be 'pre' or 'post'");
+        }
+        this.attr.multOrder = multOrder;
+        this._postMult = (multOrder == "post");
+        this._compileMemoLevel = 0;
     };
 
     Transform.prototype.setTranslateXYZ = function(xyz) {
@@ -188,7 +201,13 @@
         if (origMemoLevel < 2 || (!superXForm.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
             var tempMat = SceneJS_math_mat4();
-            SceneJS_math_mulMat4(superXForm.matrix, this._mat, tempMat);
+
+            if (this._postMult) {
+                SceneJS_math_mulMat4(superXForm.matrix, this._mat, tempMat);
+            } else {
+                SceneJS_math_mulMat4(this._mat, superXForm.matrix, tempMat);
+            }
+
             this._xform = {
                 localMatrix: this._mat,
                 matrix: tempMat,

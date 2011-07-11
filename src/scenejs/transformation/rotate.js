@@ -4,8 +4,21 @@
     Rotate.prototype._init = function(params) {
         this._mat = null;
         this._xform = null;
+        this.setMultOrder(params.multOrder);
         this.setAngle(params.angle);
         this.setXYZ({x : params.x, y: params.y, z: params.z });
+    };
+
+    Rotate.prototype.setMultOrder = function(multOrder) {
+        multOrder = multOrder || "post";
+        if (multOrder != "post" && multOrder != "pre") {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Illegal rotate multOrder - '" + multOrder + "' should be 'pre' or 'post'");
+        }
+        this.attr.multOrder = multOrder;
+        this._postMult = (multOrder == "post");
+        this._compileMemoLevel = 0;
     };
 
     Rotate.prototype.setAngle = function(angle) {
@@ -112,7 +125,7 @@
                 /* When building a view transform, apply the negated rotation angle
                  * to correctly transform the SceneJS.Camera
                  */
-                var angle =  this.attr.angle;
+                var angle = this.attr.angle;
                 this._mat = SceneJS_math_rotationMat4v(angle * Math.PI / 180.0, [this.attr.x, this.attr.y, this.attr.z]);
             } else {
                 this._mat = SceneJS_math_identityMat4();
@@ -122,8 +135,13 @@
         if (origMemoLevel < 2 || (!superXForm.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
             var tempMat = SceneJS_math_mat4();
-            SceneJS_math_mulMat4(superXForm.matrix, this._mat, tempMat);
 
+            if (this._postMult) {
+               SceneJS_math_mulMat4(superXForm.matrix, this._mat, tempMat);
+            } else {
+                SceneJS_math_mulMat4(this._mat, superXForm.matrix, tempMat);
+            }
+          
             this._xform = {
                 localMatrix: this._mat,
                 matrix: tempMat,

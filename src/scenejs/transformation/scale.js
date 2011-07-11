@@ -5,7 +5,20 @@
     Scale.prototype._init = function(params) {
         this._mat = null;
         this._xform = null;
+        this.setMultOrder(params.multOrder);
         this.setXYZ({x : params.x, y: params.y, z: params.z });
+    };
+
+    Scale.prototype.setMultOrder = function(multOrder) {
+        multOrder = multOrder || "post";
+        if (multOrder != "post" && multOrder != "pre") {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Illegal scale multOrder - '" + multOrder + "' should be 'pre' or 'post'");
+        }
+        this.attr.multOrder = multOrder;
+        this._postMult = (multOrder == "post");
+        this._compileMemoLevel = 0;
     };
 
     Scale.prototype.setXYZ = function(xyz) {
@@ -97,7 +110,13 @@
         if (origMemoLevel < 2 || (!superXform.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
             var tempMat = SceneJS_math_mat4();
-            SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
+
+            if (this._postMult) {
+                SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
+            } else {
+                SceneJS_math_mulMat4(this._mat, superXform.matrix, tempMat);
+            }
+
             this._xform = {
                 localMatrix: this._mat,
                 matrix: tempMat,

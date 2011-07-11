@@ -18,25 +18,12 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
-                    } else  { // Full compile supplies it's own default states
+                    } else { // Full compile supplies it's own default states
                         SceneJS_renderModule.setLights();
                     }
                     dirty = false;
                 }
             });
-
-    function pushLight(id, light) {  // TODO: what to do with ID?
-        var modelMat = SceneJS_modelTransformModule.getTransform().matrix;
-        if (light.mode == "point") {
-            light.worldPos = SceneJS_math_transformPoint3(modelMat, light.pos);
-        } else if (light.mode == "dir") {
-            light.worldDir = SceneJS_math_transformVector3(modelMat, light.dir);
-        }
-        idStack[stackLen] = id;
-        lightStack[stackLen] = light;
-        stackLen++;
-        dirty = true;
-    }
 
     var Light = SceneJS.createNodeType("light");
 
@@ -158,7 +145,16 @@ new (function() {
     };
 
     Light.prototype._preCompile = function() {
-        pushLight(this.attr.id, this._light);
+        var modelMat = SceneJS_modelTransformModule.getTransform().matrix;
+        if (this._light.mode == "point") {
+            this._light.worldPos = SceneJS_math_transformPoint3(modelMat, this._light.pos);
+        } else if (this._light.mode == "dir") {
+            this._light.worldDir = SceneJS_math_transformVector3(modelMat, this._light.dir);
+        }
+        idStack[stackLen] = this.attr.id;
+        lightStack[stackLen] = this._light;
+        stackLen++;
+        dirty = true;
     };
 
     Light.prototype._postCompile = function() {

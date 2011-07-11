@@ -188,7 +188,7 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (! this._lastImageBufState || node.imageBufState._stateId != this._lastImageBufState._stateId) {
             if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
-                gl.finish();
+                gl.finish(); // Force imagebuf to complete
                 this._lastImageBufState.imageBuf.unbind();
             }
             if (node.imageBufState.imageBuf) {
@@ -683,8 +683,8 @@ var SceneJS_NodeRenderer = function(cfg) {
      */
     this.cleanup = function() {
 
-        this._context.finish();
-        //this._context.flush();
+        //this._context.finish();
+        this._context.flush();
 
         //            if (this._lastRendererState) {
         //                this._lastRendererState.props.restoreProps(canvas.context);

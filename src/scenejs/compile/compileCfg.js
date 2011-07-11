@@ -125,8 +125,7 @@ var SceneJS_compileCfg = new (function() {
                     }
                 },
                 level: this.COMPILE_SCENE
-            }
-            ,
+            },
 
             "bind": {
                 attr: {

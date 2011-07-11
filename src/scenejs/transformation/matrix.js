@@ -1,11 +1,24 @@
 (function() {
-    
+
     var Matrix = SceneJS.createNodeType("matrix");
 
     Matrix.prototype._init = function(params) {
         this._xform = null;
         this._mat = SceneJS_math_identityMat4();
+        this.setMultOrder(params.multOrder);
         this.setElements(params.elements);
+    };
+
+    Matrix.prototype.setMultOrder = function(multOrder) {
+        multOrder = multOrder || "post";
+        if (multOrder != "post" && multOrder != "pre") {
+            throw SceneJS_errorModule.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Illegal matrix multOrder - '" + multOrder + "' should be 'pre' or 'post'");
+        }
+        this.attr.multOrder = multOrder;
+        this._postMult = (multOrder == "post");
+        this._compileMemoLevel = 0;
     };
 
     /**
@@ -73,7 +86,13 @@
             var mat = SceneJS_math_mat4();
             mat = this._mat;
             var tempMat = SceneJS_math_mat4();
-            SceneJS_math_mulMat4(superXform.matrix, mat, tempMat);
+
+            if (this._postMult) {
+                SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
+            } else {
+                SceneJS_math_mulMat4(this._mat, superXform.matrix, tempMat);
+            }
+            
             this._xform = {
                 localMatrix: this._mat,
                 matrix: tempMat,

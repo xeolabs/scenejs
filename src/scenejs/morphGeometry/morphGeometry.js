@@ -287,7 +287,7 @@ new (function() {
             this._setMorph(params);
         }
         this.attr.factor = params.factor || 0;
-        this.attr.clamp = (params.clamp === false) ? false : true;
+        this.attr.clamp = !!params.clamp;
     };
 
     MorphGeometry.prototype._setMorph = function(params) {

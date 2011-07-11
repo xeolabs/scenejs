@@ -268,7 +268,12 @@ var SceneJS_renderModule = new (function() {
                         boundaries : [],        // Node boundaries packed in one array
                         boundaryNodes : [],     // Maps boundary index to node ID
 
-                        bin: [],
+                        bin: [],                // Draw list - state sorting happens here
+                        lenBin: 0,
+
+                        enabledBin: [],          // Draw list containing enabled nodes
+                        lenEnabledBin: 0,
+
                         nodeMap: {},
                         geoNodesMap : {},        // Display list nodes findable by their geometry scene nodes
                         stateMap: {},
@@ -341,7 +346,7 @@ var SceneJS_renderModule = new (function() {
             renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
             shaderState = this._DEFAULT_SHADER_STATE;
 
-            this._states.bin = [];
+            this._states.lenBin = 0;
 
             nextStateId = 0;                 // Ready to ID new states
 
@@ -500,6 +505,7 @@ var SceneJS_renderModule = new (function() {
         }
         flagsState = this._getState(this._FLAGS, id);
         flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
+        this._states.lenEnabledBin = 0;
     };
 
     /**
@@ -888,7 +894,7 @@ var SceneJS_renderModule = new (function() {
 
         this._states.nodeMap[id] = node;
 
-        this._states.bin.push(node);
+        this._states.bin[this._states.lenBin++] = node;
 
         /* Make the display list node findable by its geometry scene nodes
          */
@@ -995,6 +1001,7 @@ var SceneJS_renderModule = new (function() {
         if (this._states.needSortIds) {
             this._createSortIDs(this._states.bin);
         }
+        this._states.bin.length = this._states.lenBin;
         this._states.bin.sort(this._sortNodes);
     };
 
@@ -1025,7 +1032,7 @@ var SceneJS_renderModule = new (function() {
         var doProfile = params.profileFunc ? true : false;
         var nodeRenderer = this._states.nodeRenderer;
         nodeRenderer.init({ doProfile: doProfile });
-        this._renderBin(this._states.bin, false); //Not picking
+        this._renderBin(this._states, false); //Not picking
         nodeRenderer.cleanup();
         this._states = null;
         if (doProfile) {
@@ -1033,61 +1040,84 @@ var SceneJS_renderModule = new (function() {
         }
     };
 
-    this._renderBin = function(bin, picking) {
+    this._renderBin = function(states, picking) {
 
-        var enabledLayers = SceneJS_layerModule.getEnabledLayers();
-        var context = this._states.canvas.context;
+        var enabledBin = states.enabledBin;
+        var lenEnabledBin = states.lenEnabledBin;
+        var nodeRenderer = states.nodeRenderer;
         var nTransparent = 0;
-        var node;
-        var countDestroyed = 0;
-        var i, len = bin.length;
-        var flags;
+        var _transparentBin = transparentBin;
 
-        //  var sceneBVH = SceneJS._bvhModule.sceneBVH[this._states.sceneId];
+        var drawListFilter = false;
 
-        /* Render opaque nodes while buffering transparent nodes.
-         * Layer order is preserved independently within opaque and transparent bins.
-         * At each node that is marked destroyed, we'll just slice it out of the bin array instead.
-         */
-        for (i = 0; i < len; i++) {
-            node = bin[i];
+        if (drawListFilter && lenEnabledBin > 0) {
+            for (var i = 0; i < lenEnabledBin; i++) {
+                node = enabledBin[i];
+                flags = node.flagsState.flags;
+                if (picking && flags.picking === false) {                   // When picking, skip unpickable node
+                    continue;
+                }
+                if (!picking && flags.transparent === true) {               // Buffer transparent node when not picking
+                    _transparentBin[nTransparent++] = node;
 
-            if (node.destroyed) {
-                if (i < len) {
-                    countDestroyed++;
+                } else {
+                    nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
+                }
+            }
+        } else {
+
+            var bin = states.bin;
+
+            var enabledLayers = SceneJS_layerModule.getEnabledLayers();
+            var context = this._states.canvas.context;
+            var node;
+            var countDestroyed = 0;
+            var flags;
+
+            /* Render opaque nodes while buffering transparent nodes.
+             * Layer order is preserved independently within opaque and transparent bins.
+             * At each node that is marked destroyed, we'll just slice it out of the bin array instead.
+             */
+            for (var i = 0, len = bin.length; i < len; i++) {
+                node = bin[i];
+
+                if (node.destroyed) {
+                    if (i < len) {
+                        countDestroyed++;
+                        bin[i] = bin[i + countDestroyed];
+                    }
+                    continue;
+                }
+
+                if (countDestroyed > 0) {
                     bin[i] = bin[i + countDestroyed];
                 }
-                continue;
-            }
 
+                if (node.layerName && !enabledLayers[node.layerName]) {     // Skip disabled layers
+                    continue;
+                }
+
+                flags = node.flagsState.flags;
+
+                if (flags.enabled === false) {                              // Skip disabled node
+                    continue;
+                }
+
+                if (picking && flags.picking === false) {                   // When picking, skip unpickable node
+                    continue;
+                }
+
+                if (!picking && flags.transparent === true) {               // Buffer transparent node when not picking
+                    _transparentBin[nTransparent++] = node;
+
+                } else {
+                    nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
+                    enabledBin[states.lenEnabledBin++] = node;
+                }
+            }
             if (countDestroyed > 0) {
-                bin[i] = bin[i + countDestroyed];
+                bin.length -= countDestroyed;
             }
-
-            if (node.layerName && !enabledLayers[node.layerName]) {     // Skip disabled layers
-                continue;
-            }
-
-            flags = node.flagsState.flags;
-
-            if (flags.enabled === false) {                              // Skip disabled node
-                continue;
-            }
-
-            if (picking && flags.picking === false) {                   // When picking, skip unpickable node
-                continue;
-            }
-
-            if (!picking && flags.transparent === true) {               // Buffer transparent node when not picking
-                transparentBin[nTransparent++] = node;
-
-            } else {
-                this._states.nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
-            }
-        }
-
-        if (countDestroyed > 0) {
-            bin.length -= countDestroyed;
         }
 
         /* Render transparent nodes with blending
@@ -1096,8 +1126,7 @@ var SceneJS_renderModule = new (function() {
             context.enable(context.BLEND);
             context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);  // Default - may be overridden by flags
             for (i = 0,len = nTransparent; i < len; i++) {
-                node = transparentBin[i];
-                this._states.nodeRenderer.renderNode(node);
+                nodeRenderer.renderNode(transparentBin[i]);
             }
             context.disable(context.BLEND);
         }
@@ -2034,7 +2063,7 @@ var SceneJS_renderModule = new (function() {
         this._createPickBuffer();
         this._bindPickBuffer();
         this._states.nodeRenderer.init({ picking: true });
-        this._renderBin(this._states.bin, true);
+        this._renderBin(this._states, true);
         this._states.pickBufferActive = true;
         this._states.nodeRenderer.cleanup();
         //}
