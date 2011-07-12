@@ -255,6 +255,12 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
+        "matrix": {
+            set: {
+                level: this.COMPILE_BRANCH
+            }
+        },
+
         /* View and camera transforms
          */
         "lookAt": {
