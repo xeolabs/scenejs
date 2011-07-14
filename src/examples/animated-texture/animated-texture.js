@@ -1,6 +1,15 @@
 /**
  * Animated texture example
  *
+ * In this example we're creating two texture layers, then animating the
+ * rotation, scale and blendFactor of the second layer to create the effect
+ * of multiple spinning General Zods that fade in and out over an underlying
+ * image of SuperMan.
+ *
+ * More info:
+ *
+ * http://scenejs.wikispaces.com/texture
+ *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
  * January 2010
@@ -63,6 +72,26 @@ SceneJS.createScene({
 
                                     layers: [
                                         {
+                                            uri:"superman.jpg",
+                                            minFilter: "linear",
+                                            magFilter: "linear",
+                                            wrapS: "repeat",
+                                            wrapT: "repeat",
+                                            isDepth: false,
+                                            depthMode:"luminance",
+                                            depthCompareMode: "compareRToTexture",
+                                            depthCompareFunc: "lequal",
+                                            flipY: false,
+                                            width: 1,
+                                            height: 1,
+                                            internalFormat:"lequal",
+                                            sourceFormat:"alpha",
+                                            sourceType: "unsignedByte",
+                                            applyTo:"baseColor",
+                                            blendMode: "add",
+                                            blendFactor: 1.0
+                                        },
+                                        {
                                             uri:"general-zod.jpg",
                                             minFilter: "linear",
                                             magFilter: "linear",
@@ -79,7 +108,8 @@ SceneJS.createScene({
                                             sourceFormat:"alpha",
                                             sourceType: "unsignedByte",
                                             applyTo:"baseColor",
-                                            blendMode: "multiply",
+                                            blendMode: "add",
+                                            blendFactor: 1.0,
 
                                             /* Texture rotation angle in degrees
                                              */
@@ -185,15 +215,19 @@ canvas.addEventListener('mouseup', mouseUp, true);
 scene.start({
     idleFunc: function() {
 
-        /* "this" is the scene        
+        /* Animate scale, rotate and blendFactor of second texture layer
          */
         scene.findNode("theTexture").set("layers", {
-            "0":{
+            "1":{
                 scale: {
                     x: texScale,
                     y: texScale
                 },
-                rotate: texAngle
+                rotate: texAngle,
+
+                // http://scenejs.wikispaces.com/texture#Texture%20Layers-Layer%20Blend%20Factor
+
+                blendFactor: Math.abs(Math.sin(texAngle * 0.01))
             }
         });
         texAngle += 0.4;

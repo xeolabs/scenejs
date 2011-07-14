@@ -30,7 +30,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setTexture(idStack[stackLen - 1], textureStack[stackLen - 1]);
-                    } else  {
+                    } else {
                         SceneJS_renderModule.setTexture();
                     }
                     dirty = false;
@@ -134,7 +134,7 @@ new (function() {
         /* When set, texture waits for layers to load before compiling children
          */
         var config = SceneJS_debugModule.getConfigs("texturing") || {};
-        this._params.waitForLoad = (config.waitForLoad != undefined && config.waitForLoad != null)
+        var waitForLoad = (config.waitForLoad != undefined && config.waitForLoad != null)
                 ? config.waitForLoad
                 : params.waitForLoad;
 
@@ -184,10 +184,12 @@ new (function() {
             this._layers.push({
                 image : null,                       // Initialised when state == IMAGE_LOADED
                 creationParams: layerParam,         // Create texture using this
+                waitForLoad: waitForLoad,
                 texture: null,                      // Initialised when state == TEXTURE_LOADED
                 applyFrom: layerParam.applyFrom || "uv",
                 applyTo: layerParam.applyTo || "baseColor",
                 blendMode: layerParam.blendMode || "add",
+                blendFactor: (layerParam.blendFactor != undefined && layerParam.blendFactor != null) ? layerParam.blendFactor : 1.0 ,
                 scale : layerParam.scale,
                 translate : layerParam.translate,
                 rotate : layerParam.rotate,
@@ -218,8 +220,8 @@ new (function() {
             if (layer.rebuildMatrix) {
                 this._rebuildTextureMatrix(layer);
             }
-        }        
-        pushTexture(this.attr.id, { layers: this._layers, params: this._params });
+        }
+        pushTexture(this.attr.id, this._layers);
         this._compileNodes(traversalContext);
         popTexture();
     };
@@ -294,6 +296,9 @@ new (function() {
                     }
                     if (cfg.rotate) {
                         this.setRotate(layer, cfg.rotate);
+                    }
+                    if (cfg.blendFactor != undefined && cfg.blendFactor != null) {
+                        layer.blendFactor = cfg.blendFactor;
                     }
                 }
             }

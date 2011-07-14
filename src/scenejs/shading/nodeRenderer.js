@@ -216,13 +216,14 @@ var SceneJS_NodeRenderer = function(cfg) {
                     if (layer.matrixAsArray) { // Must bind matrix in any case
                         program.setUniform("SCENEJS_uLayer" + j + "Matrix", layer.matrixAsArray);
                     }
+                    program.setUniform("SCENEJS_uLayer" + j + "BlendFactor", layer.blendFactor);
                 }
             }
-            if (numLayers != countBound) {
-                if (node.texState.params.waitForLoad) { // Abort if waiting for missing textures                    
-                    return;
-                }
-            }
+//            if (numLayers != countBound) {
+//                if (node.texState.params.waitForLoad) { // Abort if waiting for missing textures
+//                    return;
+//                }
+//            }
             this._lastTexStateId = node.texState._stateId;
         }
 
