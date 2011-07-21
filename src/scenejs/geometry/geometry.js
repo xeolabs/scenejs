@@ -1,39 +1,12 @@
 new (function() {
 
-    var canvas;
-    var canvasGeos = {};                   // Geometry map for each canvas
-    var currentGeos = null;
     var geoStack = [];
     var stackLen = 0;
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_COMPILING,
-            function(params) {
-                canvas = params.canvas;
-                if (!canvasGeos[canvas.canvasId]) {      // Lazy-create geometry map for canvas
-                    canvasGeos[canvas.canvasId] = new SceneJS_Map();
-                }
-                currentGeos = canvasGeos[canvas.canvasId];
-                stackLen = 0;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RESET,
+            SceneJS_eventModule.SCENE_CREATED,
             function() {
-                for (var canvasId in canvasGeos) {    // Destroy geometries on all canvases
-                    if (canvasGeos.hasOwnProperty(canvasId)) {
-                        var geoMap = canvasGeos[canvasId].items;
-                        for (var resource in geoMap) {
-                            if (geoMap.hasOwnProperty(resource)) {
-                                var geometry = geoMap[resource];
-                                destroyVBOs(geometry);
-                            }
-                        }
-                    }
-                }
-                canvas = null;
-                canvasGeos = {};
-                currentGeos = null;
+                stackLen = 0;
             });
 
     function destroyVBOs(geo) {
@@ -56,10 +29,6 @@ new (function() {
             if (geo.colorBuf) {
                 geo.colorBuf.destroy();
             }
-        }
-        var geoMap = canvasGeos[geo.canvas.canvasId];
-        if (geoMap) {
-            geoMap.removeItem(geo.resource);
         }
     }
 
@@ -89,35 +58,24 @@ new (function() {
         }
     }
 
-    function createGeometry(resource, source, callback) {
+    function createGeometry(scene, source, callback) {
+
         if (typeof source == "string") {
 
             /* Load from stream
              */
             var geoService = SceneJS.Services.getService(SceneJS.Services.GEO_LOADER_SERVICE_ID);
-            var self = this;
-
-            /* http://scenejs.wikispaces.com/GeoLoaderService
-             */
             geoService.loadGeometry(source,
                     function(data) {
-                        callback(_createGeometry(resource, data));
+                        callback(_createGeometry(scene, data));
                     });
         } else {
 
-            if (resource) {  // Attempt to reuse a geo resource
-                var geo = currentGeos.items[resource];
-                if (geo) {
-                    geo._resourceCount++;
-                    return { canvasId: canvas.canvasId, resource: geo.resource, arrays: geo.arrays };
-                }
-            }
-
-            /* Arrays specified
+            /* Create from arrays
              */
             var data = createTypedArrays(source);
             data.primitive = source.primitive;
-            return _createGeometry(resource, data);
+            return _createGeometry(scene, data);
         }
     }
 
@@ -132,14 +90,15 @@ new (function() {
         };
     }
 
-    function _createGeometry(resource, data) {
+    function _createGeometry(scene, data) {
+
+        var context = scene.canvas.context;
 
         if (!data.primitive) { // "points", "lines", "line-loop", "line-strip", "triangles", "triangle-strip" or "triangle-fan"
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.NODE_CONFIG_EXPECTED,
                     "SceneJS.geometry node property expected : primitive");
         }
-        var context = canvas.context;
         var usage = context.STATIC_DRAW;
         //var usage = (!data.fixed) ? context.STREAM_DRAW : context.STATIC_DRAW;
 
@@ -182,7 +141,8 @@ new (function() {
             var geo = {
                 fixed : true, // TODO: support dynamic geometry
                 primitive: primitive,
-                canvas : canvas,
+                scene: scene,
+                canvas : scene.canvas,
                 context : context,
                 vertexBuf : vertexBuf,
                 normalBuf : normalBuf,
@@ -190,14 +150,13 @@ new (function() {
                 uvBuf: uvBuf,
                 uvBuf2: uvBuf2,
                 colorBuf: colorBuf,
-                arrays: data,          // Retain the arrays for geometric ops
-                _resourceCount : 1     // One user of this geo resource so far
+                arrays: data
             };
             if (data.positions) {
                 // geo.boundary = getBoundary(data.positions);
             }
-            geo.resource = resource ? currentGeos.addItem(resource, geo) : currentGeos.addItem(geo);
-            return { canvasId: canvas.canvasId, resource: geo.resource, arrays: geo.arrays };
+
+            return geo;
         } catch (e) { // Allocation failure - delete whatever buffers got allocated
             if (vertexBuf) {
                 vertexBuf.destroy();
@@ -221,22 +180,11 @@ new (function() {
         }
     }
 
-    function destroyGeometry(handle) {
-        var geos = canvasGeos[handle.canvasId];
-        if (!geos) {  // Canvas must have been destroyed - that's OK, will have destroyed geometry as well
-            return;
-        }
-        var geo = geos.items[handle.resource];
-        if (!geo) {
-            throw SceneJS_errorModule.fatalError("geometry not found: '" + handle.resource + "'");
-        }
-        if (--geo._resourceCount == 0) {
-            destroyVBOs(geo);
-        }
+    function destroyGeometry(geo) {
+        destroyVBOs(geo);
     }
 
-    function pushGeometry(id, handle) {
-        var geo = currentGeos.items[handle.resource];
+    function pushGeometry(id, geo) {
         if (!geo.vertexBuf) {
 
             /* Geometry has no vertex buffer - it must be therefore be indexing a vertex/uv buffers defined
@@ -257,43 +205,6 @@ new (function() {
             SceneJS_renderModule.setGeometry(id, geo);
         }
         geoStack[stackLen++] = geo;
-    }
-
-    function getBoundary(positions) {
-        var boundary = {
-            xmin : SceneJS_math_MAX_DOUBLE,
-            ymin : SceneJS_math_MAX_DOUBLE,
-            zmin : SceneJS_math_MAX_DOUBLE,
-            xmax : SceneJS_math_MIN_DOUBLE,
-            ymax : SceneJS_math_MIN_DOUBLE,
-            zmax : SceneJS_math_MIN_DOUBLE
-        };
-        var x, y, z;
-        for (var i = 0, len = positions.length - 2; i < len; i += 3) {
-            x = positions[i];
-            y = positions[i + 1];
-            z = positions[i + 2];
-            if (x < boundary.xmin) {
-                boundary.xmin = x;
-            }
-            if (y < boundary.ymin) {
-                boundary.ymin = y;
-            }
-            if (z < boundary.zmin) {
-                boundary.zmin = z;
-            }
-
-            if (x > boundary.xmax) {
-                boundary.xmax = x;
-            }
-            if (y > boundary.ymax) {
-                boundary.ymax = y;
-            }
-            if (z > boundary.zmax) {
-                boundary.zmax = z;
-            }
-        }
-        return boundary;
     }
 
     function inheritVertices(geo) {
@@ -324,24 +235,58 @@ new (function() {
         stackLen--;
     }
 
+    /*----------------------------------------------------------------------------------------------------------------
+     * Geometry node
+     *---------------------------------------------------------------------------------------------------------------*/
+
     window.SceneJS_geometry = SceneJS.createNodeType("geometry");
 
     SceneJS_geometry.prototype._init = function(params) {
-        this._create = null; // Callback to create geometry
-        this._handle = null; // Handle to created geometry
-        this._resource = params.resource;       // Optional - can be null
-        if (params.create instanceof Function) { // Factory function
-            this._create = params.create;
-        } else if (params.stream) { // Stream
-            this._stream = params.stream;
-        } else { // Arrays
-            this.attr.positions = params.positions || [];
-            this.attr.normals = params.normals || [];
-            this.attr.colors = params.colors || [];
-            this.attr.indices = params.indices || [];
-            this.attr.uv = params.uv || [];
-            this.attr.uv2 = params.uv2 || [];
-            this.attr.primitive = params.primitive || "triangles";
+
+        if (this.core._nodeCount == 1) { // This node defines the core
+
+            if (params.create instanceof Function) {
+
+                /* Create using factory function
+                 * Expose the arrays on the node
+                 */
+                var data = params.create();
+                SceneJS._apply(createGeometry(this.scene, data), this.core);
+
+            } else if (params.stream) {
+
+                /* Load from stream
+                 * TODO: Expose the arrays on the node
+                 */
+                this._stream = params.stream;
+                this.core._loading = true;
+
+                var self = this;
+                createGeometry(
+                        this.scene,
+                        this._stream,
+                        function(geo) {
+                            SceneJS._apply(geo, self.core);
+                            self.core._loading = false;
+                            SceneJS_compileModule.nodeUpdated(self, "loaded"); // Compile again to apply freshly-loaded geometry
+                        });
+            } else {
+
+                /* Create from arrays
+                 * Expose the arrays on the node
+                 */
+                var arrays = {
+                    positions : params.positions || [],
+                    normals : params.normals || [],
+                    colors : params.colors || [],
+                    indices : params.indices || [],
+                    uv : params.uv || [],
+                    uv2 : params.uv2 || [],
+                    primitive : params.primitive || "triangles"
+                };
+
+                SceneJS._apply(createGeometry(this.scene, arrays), this.core);
+            }
         }
     };
 
@@ -353,24 +298,49 @@ new (function() {
         return this._getArrays().positions;
     };
 
+    SceneJS_geometry.prototype.setPositions = function(params) {
+        //    sceneResources["theCanvas"].items["my-geometry"].vertexBuf.setData(new Float32Array(params.positions), params.offset);
+        //return this.core.arrays.positions.set(params.positions, params.offset);
+    };
+
     SceneJS_geometry.prototype.getNormals = function() {
         return this._getArrays().normals;
+    };
+
+    SceneJS_geometry.prototype.setNormals = function(params) {
+        return this._getArrays().normals.set(params.normals, params.offset);
     };
 
     SceneJS_geometry.prototype.getColors = function() {
         return this._getArrays().colors;
     };
 
+    SceneJS_geometry.prototype.setColors = function(params) {
+        return this._getArrays().colors.set(params.colors, params.offset);
+    };
+
     SceneJS_geometry.prototype.getIndices = function() {
         return this._getArrays().indices;
+    };
+
+    SceneJS_geometry.prototype.setIndices = function(params) {
+        return this._getArrays().colors.set(params.indices, params.offset);
     };
 
     SceneJS_geometry.prototype.getUv = function() {
         return this._getArrays().uv;
     };
 
+    SceneJS_geometry.prototype.setUv = function(params) {
+        return this._getArrays().uv.set(params.uv, params.offset);
+    };
+
     SceneJS_geometry.prototype.getUv2 = function() {
         return this._getArrays().uv2;
+    };
+
+    SceneJS_geometry.prototype.setUv2 = function(params) {
+        return this._getArrays().uv2.set(params.uv2, params.offset);
     };
 
     SceneJS_geometry.prototype.getPrimitive = function() {
@@ -381,12 +351,12 @@ new (function() {
         if (this.attr.positions) {
             return this.attr;
         } else {
-            if (!this._handle) {
+            if (!this.core) {
                 throw SceneJS_errorModule.fatalError(
                         SceneJS.errors.NODE_ILLEGAL_STATE,
                         "Invalid node state exception: geometry stream not loaded yet - can't query geometry data yet");
             }
-            return this._handle.arrays;
+            return this.core.arrays;
         }
     };
 
@@ -438,52 +408,27 @@ new (function() {
     };
 
     SceneJS_geometry.prototype._preCompile = function() {
-        if (!this._handle) { // Geometry VBOs not created yet
-            if (this._create) { // Factory function
-                var attr = this._create();
-                this.attr.positions = attr.positions;
-                this.attr.normals = attr.normals;
-                this.attr.colors = attr.colors;
-                this.attr.indices = attr.indices;
-                this.attr.uv = attr.uv;
-                this.attr.uv2 = attr.uv2;
-                this.attr.primitive = attr.primitive;
-                this._handle = createGeometry(this._resource, this.attr);
-            } else if (this._stream) { // Stream
-                var self = this;
-                createGeometry(
-                        this._resource,
-                        this._stream,
-                        function(handle) {
-                            self._handle = handle;
-                            SceneJS_compileModule.nodeUpdated(self, "loaded"); // Compile again to apply freshly-loaded geometry
-                        });
-            } else { // Arrays
-                this._handle = createGeometry(this._resource, this.attr);
-            }
-        }
-        if (this._handle) {
-            pushGeometry(this.attr.id, this._handle);
+        if (!this.core._loading) {
+            pushGeometry(this.attr.id, this.core);
         }
     };
 
     SceneJS_geometry.prototype._postCompile = function() {
-        if (this._handle) {
+        if (!this.core._loading) {
             popGeometry();
         }
     };
 
     SceneJS_geometry.prototype._destroy = function() {
-        if (this._handle) { // Not created yet
-            destroyGeometry(this._handle);
-        }
-        this._handle = null;
+        if (this.core._nodeCount == 1) { // Last core user
+            destroyGeometry(this.core);
 
-        /* When destroying scene nodes, we only need to notify the rendering module
-         * of each geometry node destruction because that will destroy the display list
-         * node associated with the geometry, which will in turn destroy rendering
-         * states associated with the display list node, and so on.
-         */
-        SceneJS_renderModule.removeGeometry(this.scene.attr.id, this.attr.id);
+            /* When destroying scene nodes, we only need to notify the rendering module
+             * of each geometry node destruction because that will destroy the display list
+             * node associated with the geometry, which will in turn destroy rendering
+             * states associated with the display list node, and so on.
+             */
+            SceneJS_renderModule.removeGeometry(this.scene.attr.id, this.attr.id);
+        }
     };
 })();

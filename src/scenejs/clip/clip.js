@@ -22,7 +22,7 @@ new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_renderModule.setClips(idStack[stackLen - 1], clipStack.slice(0, stackLen));
-                    } else  {
+                    } else {
                         SceneJS_renderModule.setClips();
                     }
                     dirty = false;
@@ -30,7 +30,7 @@ new (function() {
             });
 
     function pushClip(id, clip) {
-        var modelMat = SceneJS_modelTransformModule.getTransform().matrix;
+        var modelMat = SceneJS_modelTransformModule.transform.matrix;
         var worldA = SceneJS_math_transformPoint3(modelMat, clip.a);
         var worldB = SceneJS_math_transformPoint3(modelMat, clip.b);
         var worldC = SceneJS_math_transformPoint3(modelMat, clip.c);
@@ -48,15 +48,19 @@ new (function() {
         idStack[stackLen] = id;
         stackLen++;
         dirty = true;
-    };
+    }
+
+    ;
 
     var Clip = SceneJS.createNodeType("clip");
 
     Clip.prototype._init = function(params) {
-        this.setMode(params.mode);
-        this.setA(params.a);
-        this.setB(params.b);
-        this.setC(params.c);
+        if (this.core._nodeCount == 1) {
+            this.setMode(params.mode);
+            this.setA(params.a);
+            this.setB(params.b);
+            this.setC(params.c);
+        }
     };
 
     /**
@@ -69,11 +73,11 @@ new (function() {
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "SceneJS.clip has a mode of unsupported type: '" + mode + " - should be 'disabled', 'inside' or 'outside'");
         }
-        this.attr.mode = mode;
+        this.core.mode = mode;
     };
 
     Clip.prototype.getMode = function() {
-        return this.attr.mode;
+        return this.core.mode;
     };
 
     Clip.prototype.setAbc = function(abc) {
@@ -93,7 +97,7 @@ new (function() {
 
     Clip.prototype.setA = function(a) {
         a = a || {};
-        this.attr.a = [
+        this.core.a = [
             a.x != undefined ? a.x : 0.0,
             a.y != undefined ? a.y : 0.0,
             a.z != undefined ? a.z : 0.0,
@@ -103,15 +107,15 @@ new (function() {
 
     Clip.prototype.getA = function() {
         return {
-            x: this.attr.a[0],
-            y: this.attr.a[1],
-            z: this.attr.a[2]
+            x: this.core.a[0],
+            y: this.core.a[1],
+            z: this.core.a[2]
         };
     };
 
     Clip.prototype.setB = function(b) {
         b = b || {};
-        this.attr.b = [
+        this.core.b = [
             b.x != undefined ? b.x : 0.0,
             b.y != undefined ? b.y : 0.0,
             b.z != undefined ? b.z : 0.0,
@@ -121,15 +125,15 @@ new (function() {
 
     Clip.prototype.getB = function() {
         return {
-            x: this.attr.b[0],
-            y: this.attr.b[1],
-            z: this.attr.b[2]
+            x: this.core.b[0],
+            y: this.core.b[1],
+            z: this.core.b[2]
         };
     };
 
     Clip.prototype.setC = function(c) {
         c = c || {};
-        this.attr.c = [
+        this.core.c = [
             c.x != undefined ? c.x : 0.0,
             c.y != undefined ? c.y : 0.0,
             c.z != undefined ? c.z : 0.0,
@@ -139,15 +143,15 @@ new (function() {
 
     Clip.prototype.getC = function() {
         return {
-            x: this.attr.c[0],
-            y: this.attr.c[1],
-            z: this.attr.c[2]
+            x: this.core.c[0],
+            y: this.core.c[1],
+            z: this.core.c[2]
         };
     };
 
     Clip.prototype.getAttributes = function() {
         return {
-            mode: this.attr.mode,
+            mode: this.core.mode,
             a: this.getA(),
             b: this.getB(),
             c: this.getC()
@@ -155,22 +159,8 @@ new (function() {
     };
 
     Clip.prototype._compile = function(traversalContext) {
-        //this._preCompile(traversalContext);
-        pushClip(this.attr.id, this.attr);
+        pushClip(this.attr.id, this.core);
         this._compileNodes(traversalContext);
-    };
-
-    Clip.prototype._preCompile = function() {
-        //    if (this._compileMemoLevel == 0) {
-        //        this._makeClip();
-        //    }
-        pushClip(this.attr.id, this.attr);
-    };
-
-
-
-    Clip.prototype._postCompile = function() {
-        //SceneJS_clipModule.popClip();
     };
 
 })();

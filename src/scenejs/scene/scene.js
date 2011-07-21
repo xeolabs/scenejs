@@ -115,7 +115,7 @@ new (function() {
         } catch (e) {
             throw SceneJS_errorModule.fatalError(// Just in case we get a context but can't get any functionson it
                     SceneJS.errors.WEBGL_NOT_SUPPORTED,
-                  'Canvas document element with ID \''
+                    'Canvas document element with ID \''
                             + canvasId
                             + '\' provided a supported WebGL context, but functions appear to be missing');
         }
@@ -126,52 +126,36 @@ new (function() {
         };
     }
 
-    function createScene(scene, params, contextAttr) {
-        if (!initialised) {
-            SceneJS_loggingModule.info("SceneJS V" + SceneJS.VERSION + " initialised");
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.INIT);
-            initialised = true;
-        }
-        var canvas = findCanvas(params.canvasId, contextAttr); // canvasId can be null
-        var loggingElement = findLoggingElement(params.loggingElementId); // loggingElementId can be null
-        var sceneId = params.sceneId;
-        scenes[sceneId] = {
-            sceneId: sceneId,
-            scene:scene,
-            canvas: canvas,
-            loggingElement: loggingElement
-        };
-        nScenes++;
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_CREATED, { sceneId : sceneId, canvas: canvas });
-        SceneJS_loggingModule.info("Scene defined: " + sceneId);
-        SceneJS_compileModule.nodeUpdated(scene, "created");
-    }
+    //    function createScene(scene, params, contextAttr) {
+    //        if (!initialised) {
+    //            SceneJS_loggingModule.info("SceneJS V" + SceneJS.VERSION + " initialised");
+    //            SceneJS_eventModule.fireEvent(SceneJS_eventModule.INIT);
+    //            initialised = true;
+    //        }
+    //        var canvas = findCanvas(params.canvasId, contextAttr); // canvasId can be null
+    //        var loggingElement = findLoggingElement(params.loggingElementId); // loggingElementId can be null
+    //        var sceneId = params.sceneId;
+    //        scenes[sceneId] = {
+    //            sceneId: sceneId,
+    //            scene:scene,
+    //            canvas: canvas,
+    //            loggingElement: loggingElement
+    //        };
+    //        scene.canvas = canvas;
+    //        nScenes++;
+    //        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_CREATED, { sceneId : sceneId, canvas: canvas });
+    //        SceneJS_loggingModule.info("Scene defined: " + sceneId);
+    //        SceneJS_compileModule.nodeUpdated(scene, "created");
+    //    }
 
-    ;
-
-    function destroyScene(sceneId) {
-        scenes[sceneId] = null;
-        nScenes--;
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DESTROYED, {sceneId : sceneId });
-        SceneJS_loggingModule.info("Scene destroyed: " + sceneId);
-        if (nScenes == 0) {
-            SceneJS_loggingModule.info("SceneJS reset");
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.RESET);
-        }
-    }
-
-    ;
-
-    function activateScene(sceneId) {
-        var scene = scenes[sceneId];
-        if (!scene) {
-            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
-        }
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_COMPILING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
-    }
-
-    ;
+    //    function activateScene(sceneId) {
+    //        var scene = scenes[sceneId];
+    //        if (!scene) {
+    //            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_NOT_FOUND, "Scene not defined: '" + sceneId + "'");
+    //        }
+    //        SceneJS_eventModule.fireEvent(SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
+    //        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_COMPILING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
+    //    }
 
     function getSceneContext(sceneId) {
         var scene = scenes[sceneId];
@@ -192,7 +176,6 @@ new (function() {
         return list;
     }
 
-
     function deactivateScene() {
 
     }
@@ -200,17 +183,38 @@ new (function() {
     var Scene = SceneJS.createNodeType("scene");
 
     Scene.prototype._init = function(params) {
-        if (params.canvasId) {
-            this._canvasId = document.getElementById(params.canvasId) ? params.canvasId : Scene.DEFAULT_CANVAS_ID;
-        } else {
-            this._canvasId = Scene.DEFAULT_CANVAS_ID;
+
+        if (!params.canvasId) {
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.ILLEGAL_NODE_CONFIG, "Scene canvasId expected");
         }
+
         this._loggingElementId = params.loggingElementId;
-        this.setLayers(params.layers);
         this._destroyed = false;
         this.scene = this;
         this.nodeMap = new SceneJS_Map(); // Can auto-generate IDs when not supplied
         this.instanceMap = {}; // Map for each node ID of instances that target it - targets don't have to exist yet
+        this._layers = params.layers || {};
+
+        this.canvas = findCanvas(params.canvasId, params.contextAttr); // canvasId can be null
+
+        var sceneId = this.attr.id;
+        scenes[sceneId] = {
+            sceneId: sceneId,
+            scene: this,
+            canvas: this.canvas,
+            loggingElement: findLoggingElement(this._loggingElementId) // loggingElementId can be null
+        };
+        nScenes++;
+
+        if (!initialised) {
+            SceneJS_loggingModule.info("SceneJS V" + SceneJS.VERSION + " initialised");
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.INIT);
+            initialised = true;
+        }
+
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_CREATED, { sceneId : sceneId, canvas: this.canvas });
+        SceneJS_loggingModule.info("Scene defined: " + sceneId);
+        SceneJS_compileModule.nodeUpdated(this, "created");
     };
 
     /** ID of canvas SceneJS looks for when {@link Scene} node does not supply one
@@ -231,18 +235,20 @@ new (function() {
     /** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to.
      */
     Scene.prototype.getZBufferDepth = function() {
-        var context;
-        if (this._created) {
-            context = getSceneContext(this.attr.id);
-            return context.getParameter(context.DEPTH_BITS)
+        if (this._destroyed) {
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
-        return context;
+        var context = this.canvas.context;
+        return context.getParameter(context.DEPTH_BITS)
     };
 
     /**
      Sets which layers are included in the each render of the scene, along with their priorities (default priority is 0)
      */
     Scene.prototype.setLayers = function(layers) {
+        if (this._destroyed) {
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
+        }
         this._layers = layers || {};
     };
 
@@ -269,23 +275,8 @@ new (function() {
      */
     Scene.prototype.start = function(cfg) {
         if (this._destroyed) {
-            throw SceneJS_errorModule.fatalError(
-                    SceneJS.errors.NODE_ILLEGAL_STATE,
-                    "Attempted start on Scene that has been destroyed");
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
-
-        /*
-         * Lazy scene creation
-         */
-        if (!this._created) {
-            createScene(this, {
-                canvasId: this._canvasId,
-                loggingElementId: this._loggingElementId,
-                sceneId: this.attr.id
-            }, cfg.contextAttr || {});
-            this._created = true;
-        }
-
         if (!this._running || this._paused) {
             cfg = cfg || {};
 
@@ -360,6 +351,9 @@ new (function() {
     /** Pauses/unpauses current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
      */
     Scene.prototype.pause = function(doPause) {
+        if (this._destroyed) {
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
+        }
         if (this._running && this._created) {
             this._paused = doPause;
         }
@@ -377,17 +371,7 @@ new (function() {
      */
     Scene.prototype.render = function() {
         if (this._destroyed) {
-            throw SceneJS_errorModule.fatalError(
-                    SceneJS.errors.NODE_ILLEGAL_STATE,
-                    "Attempted render on Scene that has been destroyed");
-        }
-        if (!this._created) { // Lazy scene creation
-            createScene(this, {
-                canvasId: this._canvasId,
-                loggingElementId: this._loggingElementId,
-                sceneId: this.attr.id
-            });
-            this._created = true;
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
         if (!this._running) {
             this._compileWithEvents();
@@ -399,14 +383,7 @@ new (function() {
      */
     Scene.prototype.pick = function(canvasX, canvasY, options) {
         if (this._destroyed) {
-            throw SceneJS_errorModule.fatalError(
-                    SceneJS.errors.NODE_ILLEGAL_STATE,
-                    "Attempted pick on Scene that has been destroyed");
-        }
-        if (!this._created) {
-            throw SceneJS_errorModule.fatalError(
-                    SceneJS.errors.NODE_ILLEGAL_STATE,
-                    "Attempted pick on Scene that has not been rendered");
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
         if (!SceneJS_renderModule.pick({
             sceneId: this.attr.id,
@@ -418,7 +395,13 @@ new (function() {
 
     Scene.prototype._compile = function() {
         SceneJS._actionNodeDestroys();                          // Do first to avoid clobbering allocations by node compiles
-        activateScene(this.attr.id);
+
+        var sceneId = this.attr.id;
+        var scene = scenes[sceneId];
+
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.LOGGING_ELEMENT_ACTIVATED, { loggingElement: scene.loggingElement });
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_COMPILING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
+
         if (SceneJS_compileModule.preVisitNode(this)) {
             SceneJS_layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
             var traversalContext = {};
@@ -433,11 +416,22 @@ new (function() {
      * @private
      */
     Scene.prototype._destroy = function() {
-        if (this._created) {
+        if (!this._destroyed) {
             this.stop();
-            destroyScene(this.attr.id); // Last one fires RESET command
-            this._created = false;
+
             this._destroyed = true;
+
+            var sceneId = this.attr.id;
+            scenes[sceneId] = null;
+            nScenes--;
+
+            SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DESTROYED, {sceneId : sceneId });
+            SceneJS_loggingModule.info("Scene destroyed: " + sceneId);
+
+            if (nScenes == 0) {
+                SceneJS_loggingModule.info("SceneJS reset");
+                SceneJS_eventModule.fireEvent(SceneJS_eventModule.RESET);
+            }
         }
     };
 
@@ -445,13 +439,16 @@ new (function() {
      * when you render it.
      */
     Scene.prototype.isActive = function() {
-        return this._created;
+        return !this._destroyed;
     };
 
     /** Stops current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
      */
     Scene.prototype.stop = function() {
-        if (this._running && this._created) {
+        if (this._destroyed) {
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
+        }
+        if (this._running) {
             this._running = false;
             window["__scenejs_compileScene" + this.attr.id] = null;
             if (!this._startCfg.requestAnimFrame) {
@@ -463,8 +460,8 @@ new (function() {
     /** Determines if node exists in this scene
      */
     Scene.prototype.containsNode = function(nodeId) {
-        if (!this._created) {
-            return null;
+        if (this._destroyed) {
+            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
         var node = this.nodeMap.items[nodeId];
         return (node) ? true : false;

@@ -3,10 +3,11 @@
     var Matrix = SceneJS.createNodeType("matrix");
 
     Matrix.prototype._init = function(params) {
-        this._xform = null;
-        this._mat = SceneJS_math_identityMat4();
-        this.setMultOrder(params.multOrder);
-        this.setElements(params.elements);
+        this._xf = {};
+        if (this.core._nodeCount == 1) { // This node is the resource definer
+            this.setMultOrder(params.multOrder);
+            this.setElements(params.elements);
+        }
     };
 
     Matrix.prototype.setMultOrder = function(multOrder) {
@@ -38,8 +39,12 @@
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Matrix elements should number 16");
         }
-        for (var i = 0; i < 16; i++) {
-            this._mat[i] = elements[i];
+        if (!this.core.mat) {
+            this.core.mat = SceneJS_math_identityMat4();
+        } else {
+            for (var i = 0; i < 16; i++) {
+                this.core.mat[i] = elements[i];
+            }
         }
         this._resetCompilationMemos();
         return this;
@@ -51,7 +56,7 @@
     Matrix.prototype.getElements = function() {
         var elements = new Array(16);
         for (var i = 0; i < 16; i++) {
-            elements[i] = this._mat[i];
+            elements[i] = this.core.mat[i];
         }
         return elements;
     };
@@ -61,7 +66,7 @@
      * @returns {Number[16]} The matrix elements
      */
     Matrix.prototype.getMatrix = function() {
-        return this._mat.slice(0);
+        return this.core.mat.slice(0);
     };
 
     Matrix.prototype._compile = function(traversalContext) {
@@ -76,34 +81,30 @@
         if (this._compileMemoLevel == 0) {
             this._compileMemoLevel = 1;
         }
-        var superXform = SceneJS_modelTransformModule.getTransform();
+        var superXform = SceneJS_modelTransformModule.transform;
         if (origMemoLevel < 2 || (!superXform.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
 
             /* When building a view transform, apply the inverse of the matrix
              * to correctly transform the SceneJS.Camera
              */
-            var mat = SceneJS_math_mat4();
-            mat = this._mat;
             var tempMat = SceneJS_math_mat4();
 
             if (this._postMult) {
-                SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
+                SceneJS_math_mulMat4(superXform.matrix, this.core.mat, tempMat);
             } else {
-                SceneJS_math_mulMat4(this._mat, superXform.matrix, tempMat);
+                SceneJS_math_mulMat4(this.core.mat, superXform.matrix, tempMat);
             }
-            
-            this._xform = {
-                localMatrix: this._mat,
-                matrix: tempMat,
-                fixed: origMemoLevel == 2
-            };
+
+            this._xf.localMatrix = this.core.mat;
+            this._xf.matrix = tempMat;
+            this._xf.fixed = origMemoLevel == 2;
 
             if (this._compileMemoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xf);
     };
 
     Matrix.prototype._postCompile = function() {

@@ -408,6 +408,14 @@
     };
 
     /**
+     * Splices the selected scene node - replaces itself on its parent with its child nodes
+     */
+    NodeSelector.prototype.splice = function() {
+        this._targetNode.splice();
+        return this;
+    };
+
+    /**
      * Destroys the selected scene node
      */
     NodeSelector.prototype.destroy = function() {
@@ -494,7 +502,7 @@
             methods[attr] = func;
         }
         //func.call(targetNode, this._parseAttr(attr, value));
-         func.call(targetNode, value);
+        func.call(targetNode, value);
 
         /* TODO: optimise - dont fire unless listener exists
          */

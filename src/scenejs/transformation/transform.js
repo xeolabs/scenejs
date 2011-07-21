@@ -3,12 +3,14 @@
     var Transform = SceneJS.createNodeType("transform");
 
     Transform.prototype._init = function(params) {
+        if (this.core._nodeCount == 1) { // This node is the resource definer
+            this.setMultOrder(params.multOrder);
+            this.setTranslateXYZ({x : params.x, y: params.y, z: params.z });
+            this.setScaleXYZ({x : params.x, y: params.y, z: params.z });
+            this.setRotateXYZ({x : params.x, y: params.y, z: params.z });
+        }
         this._mat = null;
-        this._xform = null;
-        this.setMultOrder(params.multOrder);
-        this.setTranslateXYZ({x : params.x, y: params.y, z: params.z });
-        this.setScaleXYZ({x : params.x, y: params.y, z: params.z });
-        this.setRotateXYZ({x : params.x, y: params.y, z: params.z });
+        this._xf = null;
     };
 
     Transform.prototype.setMultOrder = function(multOrder) {
@@ -18,7 +20,7 @@
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Illegal transform multOrder - '" + multOrder + "' should be 'pre' or 'post'");
         }
-        this.attr.multOrder = multOrder;
+        this.core.multOrder = multOrder;
         this._postMult = (multOrder == "post");
         this._compileMemoLevel = 0;
     };
@@ -197,7 +199,7 @@
 
             this._compileMemoLevel = 1;
         }
-        var superXForm = SceneJS_modelTransformModule.getTransform();
+        var superXForm = SceneJS_modelTransformModule.transform;
         if (origMemoLevel < 2 || (!superXForm.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
             var tempMat = SceneJS_math_mat4();
@@ -208,16 +210,15 @@
                 SceneJS_math_mulMat4(this._mat, superXForm.matrix, tempMat);
             }
 
-            this._xform = {
-                localMatrix: this._mat,
-                matrix: tempMat,
-                fixed: origMemoLevel == 2
-            };
+            this._xf.localMatrix = this._mat;
+            this._xf.matrix = tempMat;
+            this._xf.fixed = origMemoLevel == 2;
+
             if (this._compileMemoLevel == 1 && superXForm.fixed && !instancing) {   // Bump up memoization level if model-space fixed
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xf);
     };
 
     Transform.prototype._postCompile = function() {

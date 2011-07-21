@@ -32,30 +32,32 @@ new (function() {
     var Colortrans = SceneJS.createNodeType("colortrans");
 
     Colortrans.prototype._init = function(params) {
-        this.setScale(params.scale);
-        this.setAdd(params.add);
-        this.setSaturation(params.saturation);
+        if (this.core._nodeCount == 1) { // This node defines the resource
+            this.setScale(params.scale);
+            this.setAdd(params.add);
+            this.setSaturation(params.saturation);
+        }
     };
 
     Colortrans.prototype.setSaturation = function(saturation) {
-        this.attr.saturation = saturation;
+        this.core.saturation = saturation;
     };
 
     Colortrans.prototype.mulSaturation = function(saturation) {
-        this.attr.saturation *= saturation;
+        this.core.saturation *= saturation;
     };
 
     Colortrans.prototype.incSaturation = function(saturation) {
-        this.attr.saturation += saturation;
+        this.core.saturation += saturation;
     };
 
     Colortrans.prototype.getSaturation = function() {
-        return this.attr.saturation;
+        return this.core.saturation;
     };
 
     Colortrans.prototype.setScale = function(scale) {
         scale = scale || {};
-        this.attr.scale = {
+        this.core.scale = {
             r: scale.r != undefined ? scale.r : 1,
             g: scale.g != undefined ? scale.g : 1,
             b: scale.b != undefined ? scale.b : 1,
@@ -65,7 +67,7 @@ new (function() {
 
     Colortrans.prototype.incScale = function(scale) {
         scale = scale || {};
-        var s = this.attr.scale;
+        var s = this.core.scale;
         if (scale.r) {
             s.r += scale.r;
         }
@@ -82,7 +84,7 @@ new (function() {
 
     Colortrans.prototype.mulScale = function(scale) {
         scale = scale || {};
-        var s = this.attr.scale;
+        var s = this.core.scale;
         if (scale.r) {
             s.r *= scale.r;
         }
@@ -98,12 +100,12 @@ new (function() {
     };
 
     Colortrans.prototype.getScale = function() {
-        return this.attr.scale;
+        return this.core.scale;
     };
 
     Colortrans.prototype.setAdd = function(add) {
         add = add || {};
-        this.attr.add = {
+        this.core.add = {
             r: add.r != undefined ? add.r : 0,
             g: add.g != undefined ? add.g : 0,
             b: add.b != undefined ? add.b : 0,
@@ -113,7 +115,7 @@ new (function() {
 
     Colortrans.prototype.incAdd = function(add) {
         add = add || {};
-        var s = this.attr.add;
+        var s = this.core.add;
         if (add.r) {
             s.r += add.r;
         }
@@ -130,7 +132,7 @@ new (function() {
 
     Colortrans.prototype.mulAdd = function(add) {
         add = add || {};
-        var s = this.attr.add;
+        var s = this.core.add;
         if (add.r) {
             s.r *= add.r;
         }
@@ -146,7 +148,7 @@ new (function() {
     };
 
     Colortrans.prototype.getAdd = function() {
-        return this.attr.add;
+        return this.core.add;
     };
 
     Colortrans.prototype._compile = function(traversalContext) {
@@ -157,7 +159,7 @@ new (function() {
 
     Colortrans.prototype._preCompile = function() {
         idStack[stackLen] = this.attr.id;
-        colortransStack[stackLen] = this.attr;
+        colortransStack[stackLen] = this.core;
         stackLen++;
         dirty = true;
     };

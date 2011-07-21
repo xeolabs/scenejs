@@ -6,7 +6,7 @@
 
         var origMemoLevel = this._compileMemoLevel;
 
-        var superXform = SceneJS_viewTransformModule.getTransform();
+        var superXform = SceneJS_viewTransformModule.transform;
         var lookAt = superXform.lookAt;
         if (lookAt) {
             if (this._compileMemoLevel == 0 || (!superXform.fixed)) {

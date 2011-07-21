@@ -32,25 +32,23 @@ new (function() {
         dirty = true;
     }
 
-    ;
-
     function popShaders() {
         stackLen--;
         dirty = true;
     }
 
-    ;
-
     var Shader = SceneJS.createNodeType("shader");
 
     Shader.prototype._init = function(params) {
-        this._vars = {};
-        this._setShaders(params.shaders);
-        this.setVars(params.vars);
+        if (this.core._nodeCount == 1) { // This node is the resource definer
+            this._setShaders(params.shaders);
+            this.setVars(params.vars);
+        }
     };
 
     Shader.prototype._setShaders = function(shaders) {
-        this._shaders = {};
+        shaders = shaders || [];
+        this.core.shaders = {};
         var shader;
         for (var i = 0, len = shaders.length; i < len; i++) {
             shader = shaders[i];
@@ -67,7 +65,7 @@ new (function() {
                     code = shader.code;
                 }
             }
-            this._shaders[shader.stage] = {
+            this.core.shaders[shader.stage] = {
                 code: code,
                 hooks: shader.hooks
             };
@@ -76,7 +74,7 @@ new (function() {
 
     Shader.prototype.setVars = function(vars) {
         vars = vars || {};
-        SceneJS._apply(vars, this._vars);
+        SceneJS._apply(vars, this.core.vars);
     };
 
     Shader.prototype._compile = function(traversalContext) {
@@ -86,7 +84,7 @@ new (function() {
     };
 
     Shader.prototype._preCompile = function() {
-        pushShaders(this.attr.id, { shaders: this._shaders, vars: this._vars });
+        pushShaders(this.attr.id, { shaders: this.core.shaders, vars: this.core.vars });
     };
 
     Shader.prototype._postCompile = function() {

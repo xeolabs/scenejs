@@ -4,103 +4,106 @@
 
     Lookat.prototype._init = function(params) {
         this._mat = null;
-        this._xform = null;
-
-        this.setEye(params.eye);
-        this.setLook(params.look);
-        this.setUp(params.up);
+        this._xf = {
+            type: "lookat"
+        };
+        if (this.core._nodeCount == 1) { // This node is the resource definer
+            this.setEye(params.eye);
+            this.setLook(params.look);
+            this.setUp(params.up);
+        }
     };
 
     Lookat.prototype.setEye = function(eye) {
         eye = eye || {};
-        this._eyeX = (eye.x != undefined && eye.x != null) ? eye.x : 0;
-        this._eyeY = (eye.y != undefined && eye.y != null) ? eye.y : 0;
-        this._eyeZ = (eye.z != undefined && eye.z != null) ? eye.z : 0;
+        this.core.eyeX = (eye.x != undefined && eye.x != null) ? eye.x : 0;
+        this.core.eyeY = (eye.y != undefined && eye.y != null) ? eye.y : 0;
+        this.core.eyeZ = (eye.z != undefined && eye.z != null) ? eye.z : 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setEyeX = function(x) {
-        this._eyeX = x || 0;
+        this.core.eyeX = x || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setEyeY = function(y) {
-        this._eyeY = y || 0;
+        this.core.eyeY = y || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.incEye = function(eye) {
         eye = eye || {};
-        this._eyeX += (eye.x != undefined && eye.x != null) ? eye.x : 0;
-        this._eyeY += (eye.y != undefined && eye.y != null) ? eye.y : 0;
-        this._eyeZ += (eye.z != undefined && eye.z != null) ? eye.z : 0;
+        this.core.eyeX += (eye.x != undefined && eye.x != null) ? eye.x : 0;
+        this.core.eyeY += (eye.y != undefined && eye.y != null) ? eye.y : 0;
+        this.core.eyeZ += (eye.z != undefined && eye.z != null) ? eye.z : 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.incEyeX = function(x) {
-        this._eyeX += x;
+        this.core.eyeX += x;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.incEyeY = function(y) {
-        this._eyeY += y;
+        this.core.eyeY += y;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.incEyeZ = function(z) {
-        this._eyeZ += z;
+        this.core.eyeZ += z;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setEyeZ = function(z) {
-        this._eyeZ = z || 0;
+        this.core.eyeZ = z || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.getEye = function() {
         return {
-            x: this._eyeX,
-            y: this._eyeY,
-            z: this._eyeZ
+            x: this.core.eyeX,
+            y: this.core.eyeY,
+            z: this.core.eyeZ
         };
     };
 
     Lookat.prototype.setLook = function(look) {
         look = look || {};
-        this._lookX = (look.x != undefined && look.x != null) ? look.x : 0;
-        this._lookY = (look.y != undefined && look.y != null) ? look.y : 0;
-        this._lookZ = (look.z != undefined && look.z != null) ? look.z : 0;
+        this.core.lookX = (look.x != undefined && look.x != null) ? look.x : 0;
+        this.core.lookY = (look.y != undefined && look.y != null) ? look.y : 0;
+        this.core.lookZ = (look.z != undefined && look.z != null) ? look.z : 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setLookX = function(x) {
-        this._lookX = x || 0;
+        this.core.lookX = x || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setLookY = function(y) {
-        this._lookY = y || 0;
+        this.core.lookY = y || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setLookZ = function(z) {
-        this._lookZ = z || 0;
+        this.core.lookZ = z || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.incLook = function(look) {
         look = look || {};
-        this._lookX += (look.x != undefined && look.x != null) ? look.x : 0;
-        this._lookY += (look.y != undefined && look.y != null) ? look.y : 0;
-        this._lookZ += (look.z != undefined && look.z != null) ? look.z : 0;
+        this.core.lookX += (look.x != undefined && look.x != null) ? look.x : 0;
+        this.core.lookY += (look.y != undefined && look.y != null) ? look.y : 0;
+        this.core.lookZ += (look.z != undefined && look.z != null) ? look.z : 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.getLook = function() {
         return {
-            x: this._lookX,
-            y: this._lookY,
-            z: this._lookZ
+            x: this.core.lookX,
+            y: this.core.lookY,
+            z: this.core.lookZ
         };
     };
 
@@ -114,40 +117,40 @@
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Lookat up vector is zero length - at least one of its x,y and z components must be non-zero");
         }
-        this._upX = x;
-        this._upY = y;
-        this._upZ = z;
+        this.core.upX = x;
+        this.core.upY = y;
+        this.core.upZ = z;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setUpX = function(x) {
-        this._upX = x || 0;
+        this.core.upX = x || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setUpY = function(x) {
-        this._upY = y || 0;
+        this.core.upY = y || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.setUpZ = function(x) {
-        this._upZ = z || 0;
+        this.core.upZ = z || 0;
         this._compileMemoLevel = 0;
     };
 
     Lookat.prototype.getUp = function() {
         return {
-            x: this._upX,
-            y: this._upY,
-            z: this._upZ
+            x: this.core.upX,
+            y: this.core.upY,
+            z: this.core.upZ
         };
     };
 
     Lookat.prototype.incUp = function(up) {
         up = up || {};
-        this._upX += (up.x != undefined && up.x != null) ? up.x : 0;
-        this._upY += (up.y != undefined && up.y != null) ? up.y : 0;
-        this._upZ += (up.z != undefined && up.z != null) ? up.z : 0;
+        this.core.upX += (up.x != undefined && up.x != null) ? up.x : 0;
+        this.core.upY += (up.y != undefined && up.y != null) ? up.y : 0;
+        this.core.upZ += (up.z != undefined && up.z != null) ? up.z : 0;
         this._compileMemoLevel = 0;
     };
 
@@ -159,27 +162,27 @@
         return (this._compileMemoLevel > 0)
                 ? this._mat.slice(0)
                 : SceneJS_math_lookAtMat4c(
-                this._eyeX, this._eyeY, this._eyeZ,
-                this._lookX, this._lookY, this._lookZ,
-                this._upX, this._upY, this._upZ);
+                this.core.eyeX, this.core.eyeY, this.core.eyeZ,
+                this.core.lookX, this.core.lookY, this.core.lookZ,
+                this.core.upX, this.core.upY, this.core.upZ);
     };
 
     Lookat.prototype.getAttributes = function() {
         return {
             look: {
-                x: this._lookX,
-                y: this._lookY,
-                z: this._lookZ
+                x: this.core.lookX,
+                y: this.core.lookY,
+                z: this.core.lookZ
             },
             eye: {
-                x: this._eyeX,
-                y: this._eyeY,
-                z: this._eyeZ
+                x: this.core.eyeX,
+                y: this.core.eyeY,
+                z: this.core.eyeZ
             },
             up: {
-                x: this._upX,
-                y: this._upY,
-                z: this._upZ
+                x: this.core.upX,
+                y: this.core.upY,
+                z: this.core.upZ
             }
         };
     };
@@ -194,30 +197,29 @@
         var origMemoLevel = this._compileMemoLevel;
         if (this._compileMemoLevel == 0) {
             this._mat = SceneJS_math_lookAtMat4c(
-                    this._eyeX, this._eyeY, this._eyeZ,
-                    this._lookX, this._lookY, this._lookZ,
-                    this._upX, this._upY, this._upZ);
+                    this.core.eyeX, this.core.eyeY, this.core.eyeZ,
+                    this.core.lookX, this.core.lookY, this.core.lookZ,
+                    this.core.upX, this.core.upY, this.core.upZ);
             this._compileMemoLevel = 1;
         }
-        var superXform = SceneJS_viewTransformModule.getTransform();
+        var superXform = SceneJS_viewTransformModule.transform;
         if (this._compileMemoLevel < 2 || (!superXform.fixed)) {
             var tempMat = SceneJS_math_mat4();
             SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
-            this._xform = {
-                type: "lookat",
-                matrix: tempMat,
-                lookAt : {
-                    eye: [this._eyeX, this._eyeY, this._eyeZ ],
-                    look: [this._lookX, this._lookY, this._lookZ ],
-                    up:  [this._upX, this._upY, this._upZ ]
-                },
-                fixed: origMemoLevel == 2
+
+            this._xf.matrix = tempMat;
+            this._xf.lookAt = {
+                eye: [this.core.eyeX, this.core.eyeY, this.core.eyeZ ],
+                look: [this.core.lookX, this.core.lookY, this.core.lookZ ],
+                up:  [this.core.upX, this.core.upY, this.core.upZ ]
             };
+            this._xf.fixed = origMemoLevel == 2;
+
             if (this._compileMemoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if space fixed
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_viewTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_viewTransformModule.pushTransform(this.attr.id, this._xf);
     };
 
     Lookat.prototype._postCompile = function() {

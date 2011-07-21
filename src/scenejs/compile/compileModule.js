@@ -186,6 +186,11 @@ var SceneJS_compileModule = new (function() {
             level = SceneJS_compileCfg.getCompileLevel(nodeType, op, attrName, value);
         }
 
+        if (level == SceneJS_compileCfg.REDRAW) {
+            compileScene.redraw = true;
+            return;
+        }
+
         if (level == SceneJS_compileCfg.COMPILE_NOTHING) {
             return;
         }
@@ -272,12 +277,15 @@ var SceneJS_compileModule = new (function() {
         if (compileScene.compilingScene) {
             compileScene.flagSceneCompile = true;
             compileScene.compilingScene = false;
-            //compileScene.compilingSceneFor = null;
             return { level: this.COMPILE_EVERYTHING };
         }
 
         var compilationQueue = compileScene.compilationQueue;
         if (compilationQueue.size == 0) {
+            if (compileScene.redraw) {
+                compileScene.redraw = false;
+                return { level: this.REDRAW };
+            }
             return { level: this.COMPILE_NOTHING };
         }
 
@@ -314,18 +322,18 @@ var SceneJS_compileModule = new (function() {
             node = compilation.node;
             nodeId = node.attr.id;
 
-//            if (this._debugCfg.logTrace) {
-//                var logLevels = this._debugCfg.logTrace.levels || {};
-//                var minLevel = logLevels.min || SceneJS_compileCfg.COMPILE_SCENE;
-//                var maxLevel = (logLevels.max == undefined || logLevels.max == null) ? SceneJS_compileCfg.COMPILE_NODE : logLevels.max;
-//                if (minLevel <= level && level <= maxLevel) {
-//                    SceneJS_loggingModule.info("Compiling - level: "
-//                            + SceneJS_compileCfg.levelNameStrings[compilation.level] + ", node: "
-//                            + compilation.node.attr.type + ", node ID: " + compilation.node.attr.id + ", op: "
-//                            + compilation.op + ", attr: "
-//                            + compilation.attrName);
-//                }
-//            }
+            //            if (this._debugCfg.logTrace) {
+            //                var logLevels = this._debugCfg.logTrace.levels || {};
+            //                var minLevel = logLevels.min || SceneJS_compileCfg.COMPILE_SCENE;
+            //                var maxLevel = (logLevels.max == undefined || logLevels.max == null) ? SceneJS_compileCfg.COMPILE_NODE : logLevels.max;
+            //                if (minLevel <= level && level <= maxLevel) {
+            //                    SceneJS_loggingModule.info("Compiling - level: "
+            //                            + SceneJS_compileCfg.levelNameStrings[compilation.level] + ", node: "
+            //                            + compilation.node.attr.type + ", node ID: " + compilation.node.attr.id + ", op: "
+            //                            + compilation.op + ", attr: "
+            //                            + compilation.attrName);
+            //                }
+            //            }
 
             if (level == SceneJS_compileCfg.COMPILE_SCENE) {
                 throw SceneJS_errorModule.fatalError("Internal error - SceneJS_compileCfg.COMPILE_SCENE should not be queued");

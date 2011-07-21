@@ -487,7 +487,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                  * may linger in the shader uniform if there is no material state change for the next node.
                  */
                 if (node.flagsState && node.flagsState.flags.highlight) {
-                    program.setUniform("SCENEJS_uMaterialBaseColor", material.highlightBaseColor);
+                   // program.setUniform("SCENEJS_uMaterialBaseColor", material.highlightBaseColor);
                     this._lastMaterialStateId = null;
                 }
             }

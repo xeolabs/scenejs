@@ -55,7 +55,7 @@
         /* Resource ID ensures that we reuse any sphere that has already been created with
          * these parameters instead of wasting memory
          */
-        this._resource = "disk_" + radius + "_" + height + "_" + rings + "_" + innerRadius + "_" + semiMajorAxis + "_" + sweep;
+        this.coreId = "disk_" + radius + "_" + height + "_" + rings + "_" + innerRadius + "_" + semiMajorAxis + "_" + sweep;
 
         /* Callback that does the creation in case we can't find matching disk to reuse
          */

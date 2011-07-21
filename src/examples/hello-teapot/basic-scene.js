@@ -128,7 +128,7 @@ SceneJS.createScene({
 
                                                             nodes: [
                                                                 {
-                                                                    type : "teapot"
+                                                                    type : "teapot"                                                                   
                                                                 }
                                                             ]
                                                         }

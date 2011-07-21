@@ -103,7 +103,7 @@ var SceneJS = {
         if (!json.id) {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "createNode 'id' is mandatory for 'scene' node");
+                    "createScene 'id' is mandatory for 'scene' node");
         }
         if (this._scenes[json.id]) {
             throw SceneJS_errorModule.fatalError(
@@ -134,43 +134,58 @@ var SceneJS = {
         return SceneJS._selectNode(scene);
     },
 
-    /**
-     * Parses JSON into a subgraph of nodes using iterative depth-first search
-     */
-    _parseNodeJSON : function(v, scene) {
-        var key = SceneJS._createUUID();  // Marking that will work for multiple stack-based iterations
-        v["__visited" + key] = true;
-        v["__node" + key] = this._createNode(v, scene);
-        scene = scene || v["__node" + key];
-        var s = [];
-        var i, len;
-        if (v.nodes) {
-            for (i = 0,len = v.nodes.length; i < len; i++) {
-                var child = v.nodes[i];
-                child["__node" + key] = this._createNode(child, scene);
-                child["__parent" + key] = v;
-                s.push(child);
-            }
-        }
-        var w;
-        var u;
-        while (s.length > 0) {
-            w = s.pop();
-            w["__parent" + key]["__node" + key].insertNode(w["__node" + key], 0);
+    //    /**
+    //     * Parses JSON into a subgraph of nodes using iterative depth-first search
+    //     */
+    //    _parseNodeJSON : function(v, scene) {
+    //        var key = SceneJS._createUUID();  // Marking that will work for multiple stack-based iterations
+    //        v["__visited" + key] = true;
+    //        v["__node" + key] = this._createNode(v, scene);
+    //        scene = scene || v["__node" + key];
+    //        var s = [];
+    //        var i, len;
+    //        if (v.nodes) {
+    //            //for (i = 0,len = v.nodes.length; i < len; i++) {
+    //            for (i = v.nodes.length-1; i >= 0; i--) {
+    //                var child = v.nodes[i];
+    //                child["__node" + key] = this._createNode(child, scene);
+    //                child["__parent" + key] = v;
+    //                s.unshift(child);
+    //            }
+    //        }
+    //        var w;
+    //        var u;
+    //        while (s.length > 0) {
+    //            w = s.shift();
+    //            w["__parent" + key]["__node" + key].addNode(w["__node" + key]);
+    //
+    //            if (w.nodes) {
+    //                for (i = w.nodes.length-1; i >= 0; i--) {
+    //                    u = w.nodes[i];
+    //                    if (!u["__parent" + key]) {
+    //                        u["__node" + key] = this._createNode(u, scene);
+    //                        u["__parent" + key] = w;
+    //                        s.unshift(u);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //        return v["__node" + key];
+    //    },
 
-            if (w.nodes) {
-                for (i = 0,len = w.nodes.length; i < len; i++) {
-                    u = w.nodes[i];
-                    if (!u["__parent" + key]) {
-                        u["__node" + key] = this._createNode(u, scene);
-                        u["__parent" + key] = w;
-                        s.push(u);
-                    }
-                }
+    _parseNodeJSON : function(json, scene) {
+        var newNode = this._createNode(json, scene)
+        scene = scene || newNode;
+        newNode.scene = scene;
+        if (json.nodes) {
+            var len = json.nodes.length;
+            for (var i = 0; i < len; i++) {
+                newNode.addNode(SceneJS._parseNodeJSON(json.nodes[i], scene));
             }
         }
-        return v["__node" + key];
+        return newNode;
     },
+
 
     _createNode : function(json, scene) {
         json.type = json.type || "node";
@@ -359,6 +374,8 @@ var SceneJS = {
         return o2;
     },
 
+
+
     /** Lazy-bound state resources published by "suppliers"
      */
     _compilationStates : new (function() {
@@ -375,9 +392,35 @@ var SceneJS = {
         };
     })()
 };
-//
-//SceneJS._namespace("SceneJS");
-//
-//window["SceneJS"] = SceneJS;
 
+var SceneJS_State = function(cfg) {
+    this.attr = cfg.attr || {};
+    this.state = cfg.state || {};
+    if (cfg.parent) {
+        cfg.parent.addChild(this);
+    }
+    this.children = [];
+    this.dirty = true;
+    this._cleanFunc = cfg.cleanFunc;
+};
 
+SceneJS_State.prototype.addChild = function(state) {
+    state.parent = this;
+    this.children.push(state);
+};
+
+SceneJS_State.prototype.setDirty = function() {
+    if (this.dirty) {
+        return;
+    }
+    this.dirty = true;
+    if (this.children.length > 0) {
+        var child;
+        for (var i = 0, len = this.children.length; i < len; i++) {
+            child = this.children[i];
+            if (!child.dirty) {
+                child.setDirty();
+            }
+        }
+    }
+};

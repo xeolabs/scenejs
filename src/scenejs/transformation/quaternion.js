@@ -3,21 +3,23 @@
     var Quaternion = SceneJS.createNodeType("quaternion");
 
     Quaternion.prototype._init = function(params) {
-        this._mat = null;
-        this._xform = null;
+        if (this.core._nodeCount == 1) { // This node is the resource definer
+            this.setMultOrder(params.multOrder);
 
-        this.setMultOrder(params.multOrder);
+            this.core.q = SceneJS_math_identityQuaternion();
 
-        this._q = SceneJS_math_identityQuaternion();
-
-        if (params.x || params.y || params.x || params.angle || params.w) {
-            this.setRotation(params);
-        }
-        if (params.rotations) {
-            for (var i = 0; i < params.rotations.length; i++) {
-                this.addRotation(params.rotations[i]);
+            if (params.x || params.y || params.x || params.angle || params.w) {
+                this.setRotation(params);
+            }
+            if (params.rotations) {
+                for (var i = 0; i < params.rotations.length; i++) {
+                    this.addRotation(params.rotations[i]);
+                }
             }
         }
+        this._mat = null;
+        this._xf = {};
+
     };
 
     Quaternion.prototype.setMultOrder = function(multOrder) {
@@ -27,44 +29,44 @@
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Illegal quaternion multOrder - '" + multOrder + "' should be 'pre' or 'post'");
         }
-        this.attr.multOrder = multOrder;
+        this.core.multOrder = multOrder;
         this._postMult = (multOrder == "post");
         this._compileMemoLevel = 0;
     };
 
     Quaternion.prototype.setRotation = function(q) {
         q = q || {};
-        this._q = SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
+        this.core.q = SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
         this._resetCompilationMemos();
         return this;
     };
 
     Quaternion.prototype.getRotation = function() {
-        return SceneJS_math_angleAxisFromQuaternion(this._q);
+        return SceneJS_math_angleAxisFromQuaternion(this.core.q);
     };
 
     Quaternion.prototype.addRotation = function(q) {
-        this._q = SceneJS_math_mulQuaternions(SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
+        this.core.q = SceneJS_math_mulQuaternions(SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this.core.q);
         this._resetCompilationMemos();
         return this;
     };
 
     Quaternion.prototype.getMatrix = function() {
-        return (this._compileMemoLevel > 0) ? this._mat.slice(0) : SceneJS_math_newMat4FromQuaternion(this._q);
+        return (this._compileMemoLevel > 0) ? this._mat.slice(0) : SceneJS_math_newMat4FromQuaternion(this.core.q);
     };
 
     Quaternion.prototype.normalize = function() {
-        this._q = SceneJS_math_normalizeQuaternion(this._q);
+        this.core.q = SceneJS_math_normalizeQuaternion(this.core.q);
         this._resetCompilationMemos();
         return this;
     };
 
     Quaternion.prototype.getAttributes = function() {
         return {
-            x: this._q[0],
-            y: this._q[1],
-            z: this._q[2],
-            w: this._q[3]
+            x: this.core.q[0],
+            y: this.core.q[1],
+            z: this.core.q[2],
+            w: this.core.q[3]
         };
     };
 
@@ -77,10 +79,10 @@
     Quaternion.prototype._preCompile = function() {
         var origMemoLevel = this._compileMemoLevel;
         if (this._compileMemoLevel == 0) {
-            this._mat = SceneJS_math_newMat4FromQuaternion(this._q);
+            this._mat = SceneJS_math_newMat4FromQuaternion(this.core.q);
             this._compileMemoLevel = 1;
         }
-        var superXform = SceneJS_modelTransformModule.getTransform();
+        var superXform = SceneJS_modelTransformModule.transform;
         if (origMemoLevel < 2 || (!superXform.fixed)) {
             var instancing = SceneJS_instancingModule.instancing();
             var tempMat = SceneJS_math_mat4();
@@ -91,17 +93,15 @@
                 SceneJS_math_mulMat4(this._mat, superXform.matrix, tempMat);
             }
 
-            this._xform = {
-                localMatrix: this._mat,
-                matrix: tempMat,
-                fixed: origMemoLevel == 2
-            };
+            this._xf.localMatrix = this._mat;
+            this._xf.matrix = tempMat;
+            this._xf.fixed = origMemoLevel == 2;
 
             if (this._compileMemoLevel == 1 && superXform.fixed && !instancing) {   // Bump up memoization level if model-space fixed
                 this._compileMemoLevel = 2;
             }
         }
-        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xform);
+        SceneJS_modelTransformModule.pushTransform(this.attr.id, this._xf);
     };
 
     Quaternion.prototype._postCompile = function() {

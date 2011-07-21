@@ -542,6 +542,14 @@ var SceneJS_webgl_ArrayBuffer;
             context.bindBuffer(type, this.handle);
         };
 
+          this.setData = function(data, offset) {
+            if (offset) {
+                context.bufferSubData(type, offset, data);
+            } else {
+                context.bufferData(type, data);
+            }
+        };
+
         this.unbind = function() {
             context.bindBuffer(type, null);
         };
@@ -566,6 +574,14 @@ var SceneJS_webgl_VertexBuffer;
 
         this.bind = function() {
             context.bindBuffer(context.ARRAY_BUFFER, this.handle);
+        };
+
+        this.setData = function(data, offset) {
+            if (offset) {
+                context.bufferSubData(context.ARRAY_BUFFER, offset, new Float32Array([data]));
+            } else {
+                context.bufferData(context.ARRAY_BUFFER, new Float32Array([data]));
+            }
         };
 
         this.unbind = function() {

@@ -51,7 +51,7 @@ var SceneJS_renderModule = new (function() {
         return function(data) {
             data._id = stateId;
             data._stateId = stateId--;
-            data._refCount = 0;
+            data._nodeCount = 0;
             data._default = true;
             return data;
         };
@@ -398,8 +398,8 @@ var SceneJS_renderModule = new (function() {
      * @param stateType ID of the type of state, eg.  this._TEXTURE etc
      * @param id ID of scene graph node that is setting this state
      */
-    this._getState = function(stateType, id) {
-        if (idPrefix) {
+    this._getState = function(stateType, id, noPrefix) {
+        if (!noPrefix && idPrefix) {
             id = idPrefix + id;
         }
         var state;
@@ -414,7 +414,7 @@ var SceneJS_renderModule = new (function() {
                     _id: id,
                     _stateId : nextStateId,
                     _stateType: stateType,
-                    _refCount: 0
+                    _nodeCount: 0
                 };
                 typeMap[id] = state;
             }
@@ -423,7 +423,7 @@ var SceneJS_renderModule = new (function() {
                 _id: id,
                 _stateId : nextStateId,
                 _stateType: stateType,
-                _refCount: 0
+                _nodeCount: 0
             };
             if (id) {
                 typeMap[id] = state;
@@ -440,10 +440,10 @@ var SceneJS_renderModule = new (function() {
         if (state._stateType == undefined) {
             return;
         }
-        if (state._refCount <= 0) {
+        if (state._nodeCount <= 0) {
             return;
         }
-        if (--state._refCount == 0) {
+        if (--state._nodeCount == 0) {
             var typeMap = this._stateMap[state._stateType];
             if (typeMap) {
                 delete typeMap[state.id];
@@ -487,7 +487,7 @@ var SceneJS_renderModule = new (function() {
             this._stateHash = null;
             return;
         }
-        colortransState = this._getState(this._COLORTRANS, id);
+        colortransState = this._getState(this._COLORTRANS, id, true);
         colortransState.trans = trans;
         if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
             colortransState.hash = trans ? "t" : "f";
@@ -574,7 +574,7 @@ var SceneJS_renderModule = new (function() {
             materialState = this._DEFAULT_MATERIAL_STATE;
             return;
         }
-        materialState = this._getState(this._MATERIAL, id);
+        materialState = this._getState(this._MATERIAL, id, true);
         materialState.material = material || this._DEFAULT_MATERIAL_STATE.material;
     };
 
@@ -796,12 +796,12 @@ var SceneJS_renderModule = new (function() {
             if (node.renderListenersState._stateId != renderListenersState._stateId) {
                 this._releaseState(node.renderListenersState);
                 node.renderListenersState = renderListenersState;
-                renderListenersState._refCount++;
+                renderListenersState._nodeCount++;
             }
             if (node.pickListenersState._stateId != pickListenersState._stateId) {
                 this._releaseState(node.pickListenersState);
                 node.pickListenersState = pickListenersState;
-                pickListenersState._refCount++;
+                pickListenersState._nodeCount++;
             }
 
             // This breaks BioDigital Human's green bounding box -
@@ -810,7 +810,7 @@ var SceneJS_renderModule = new (function() {
             //                        if (node.flagsState._stateId != flagsState._stateId) {
             //                            this._releaseState(node.flagsState);
             //                            node.flagsState = flagsState;
-            //                            flagsState._refCount++;
+            //                            flagsState._nodeCount++;
             //                        }
             return;
         }
@@ -840,24 +840,24 @@ var SceneJS_renderModule = new (function() {
             id = idPrefix + geoId;
         }
 
-        geoState._refCount++;
-        flagsState._refCount++;
-        rendererState._refCount++;
-        lightState._refCount++;
-        colortransState._refCount++;
-        materialState._refCount++;
-        fogState._refCount++;
-        modelXFormState._refCount++;
-        viewXFormState._refCount++;
-        projXFormState._refCount++;
-        texState._refCount++;
-        pickColorState._refCount++;
-        imageBufState._refCount++;
-        clipState._refCount++;
-        morphState._refCount++;
-        pickListenersState._refCount++;
-        renderListenersState._refCount++;
-        shaderState._refCount++;
+        geoState._nodeCount++;
+        flagsState._nodeCount++;
+        rendererState._nodeCount++;
+        lightState._nodeCount++;
+        colortransState._nodeCount++;
+        materialState._nodeCount++;
+        fogState._nodeCount++;
+        modelXFormState._nodeCount++;
+        viewXFormState._nodeCount++;
+        projXFormState._nodeCount++;
+        texState._nodeCount++;
+        pickColorState._nodeCount++;
+        imageBufState._nodeCount++;
+        clipState._nodeCount++;
+        morphState._nodeCount++;
+        pickListenersState._nodeCount++;
+        renderListenersState._nodeCount++;
+        shaderState._nodeCount++;
 
         node = {
             id: id,
@@ -913,7 +913,7 @@ var SceneJS_renderModule = new (function() {
             this._releaseState(state);
         }
         node[stateName] = soupState;
-        soupState._refCount++;
+        soupState._nodeCount++;
         return soupState;
     };
 

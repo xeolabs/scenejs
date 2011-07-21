@@ -171,13 +171,13 @@ var SceneJS_compileCfg = new (function() {
 
         "colortrans": {
             set: {
-                level: this.COMPILE_BRANCH
+                level: this.REDRAW
             },
             inc: {
-                level: this.COMPILE_BRANCH
+                level: this.REDRAW
             },
             mul: {
-                level: this.COMPILE_BRANCH
+                level: this.REDRAW
             }
         },
 
@@ -261,6 +261,12 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
+        "material": {
+            set: {
+                level: this.REDRAW
+            }
+        },
+
         /* View and camera transforms
          */
         "lookAt": {
@@ -300,7 +306,7 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
-        /* Recompile texture node once it has loaded
+        /* 
          */
         "texture": {
             set: {
@@ -319,6 +325,26 @@ var SceneJS_compileCfg = new (function() {
         /* Recompile stream-loaded geometry node once it has loaded
          */
         "geometry": {
+
+            set: {
+                attr: {
+                    positions: {
+                        level: this.REDRAW
+                    },
+                    normals: {
+                        level: this.REDRAW
+                    },
+                    uv: {
+                        level: this.REDRAW
+                    },
+                    uv2: {
+                        level: this.REDRAW
+                    },
+                    indices: {
+                        level: this.REDRAW
+                    }
+                }
+            },
 
             "loaded": {
                 level: this.COMPILE_SCENE

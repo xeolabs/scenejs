@@ -32,6 +32,8 @@
                         var transform = transformStack[stackLen - 1];
                         if (!transform.matrixAsArray) {
                             transform.matrixAsArray = new Float32Array(transform.matrix);
+                        } else {
+                            transform.matrixAsArray.set(transform.matrix);
                         }
                         SceneJS_renderModule.setProjectionTransform(idStack[stackLen - 1], transform.matrixAsArray);
                     } else { // Full compile supplies it's own default states
@@ -44,12 +46,14 @@
     var Camera = SceneJS.createNodeType("camera");
 
     Camera.prototype._init = function(params) {
-        this.setOptics(params.optics); // Can be undefined
+        if (this.core._nodeCount == 1) {
+            this.setOptics(params.optics); // Can be undefined
+        }
     };
 
     Camera.prototype.setOptics = function(optics) {
         if (!optics) {
-            this.attr.optics = {
+            this.core.optics = {
                 type: "perspective",
                 fovy : 60.0,
                 aspect : 1.0,
@@ -58,7 +62,7 @@
             };
         } else {
             if (optics.type == "ortho") {
-                this.attr.optics = {
+                this.core.optics = {
                     type: optics.type,
                     left : optics.left || -1.0,
                     bottom : optics.bottom || -1.0,
@@ -68,7 +72,7 @@
                     far : optics.far || 5000.0
                 };
             } else if (optics.type == "frustum") {
-                this.attr.optics = {
+                this.core.optics = {
                     type: optics.type,
                     left : optics.left || -1.0,
                     bottom : optics.bottom || -1.0,
@@ -78,7 +82,7 @@
                     far : optics.far || 5000.0
                 };
             } else  if (optics.type == "perspective") {
-                this.attr.optics = {
+                this.core.optics = {
                     type: optics.type,
                     fovy : optics.fovy || 60.0,
                     aspect: optics.aspect || 1.0,
@@ -103,9 +107,9 @@
 
     Camera.prototype.getOptics = function() {
         var optics = {};
-        for (var key in this.attr.optics) {
-            if (this.attr.optics.hasOwnProperty(key)) {
-                optics[key] = this.attr.optics[key];
+        for (var key in this.core.optics) {
+            if (this.core.optics.hasOwnProperty(key)) {
+                optics[key] = this.core.optics[key];
             }
         }
         return optics;
@@ -141,7 +145,7 @@
 
     Camera.prototype._rebuild = function () {
         if (this._compileMemoLevel == 0) {
-            var optics = this.attr.optics;
+            var optics = this.core.optics;
             if (optics.type == "ortho") {
                 this._transform = {
                     type: optics.type,

@@ -52,12 +52,60 @@ SceneJS._Node = function(cfg, scene) {
         }
     }
 
+    if (cfg) {
+        this._createCore(cfg.coreId || cfg.resource);
+    }
+
     if (cfg && this._init) {
         this._init(cfg);
     }
 };
 
 SceneJS._Node.prototype.constructor = Node;
+
+SceneJS._Node.prototype._cores = {};
+
+SceneJS._Node.prototype._createCore = function(coreId) {
+    var sceneId = this.scene.attr.id;
+    var sceneCores = this._cores[sceneId];
+    if (!sceneCores) {
+        sceneCores = this._cores[sceneId] = {};
+    }
+    var nodeCores = sceneCores[this.attr.type];
+    if (!nodeCores) {
+        nodeCores = sceneCores[this.attr.type] = {};
+    }
+    if (coreId) {
+
+        /* Attempt to reuse a core
+         */
+        this.core = nodeCores[coreId];
+        if (this.core) {
+            this.core._nodeCount++;
+        }
+    } else {
+        coreId = SceneJS._createUUID();
+    }
+    if (!this.core) {
+        this.core = nodeCores[coreId] = {
+            _coreId: coreId,
+            _nodeCount : 1
+        };
+    }
+    return this.core;
+};
+
+/**
+ * Returns the ID of this node's core
+ */
+SceneJS._Node.prototype.getCoreId = function() {
+    return this.core._coreId;
+};
+
+/**
+ * Backwards compatibility
+ */
+SceneJS._Node.prototype.getResource = SceneJS._Node.prototype.getCoreId;
 
 /**
  * Dumps anything that was memoized on this node to reduce recompilation work
@@ -74,6 +122,33 @@ SceneJS._Node.prototype._resetTreeCompilationMemos = function() {
     for (var i = 0; i < this.children.length; i++) {
         this.children[i]._resetTreeCompilationMemos();
     }
+};
+
+SceneJS._Node.prototype._flagDirty = function() {
+    this._compileMemoLevel = 0;
+    if (this.attr._childStates && this.attr._dirty) {
+        this._flagDirtyState(this.attr);
+    }
+};
+
+SceneJS._Node.prototype._flagDirtyState = function(attr) {
+    attr._dirty = true;
+    if (attr._childStates) {
+        for (var i = 0, len = attr._childStates.length; i < len; i++) {
+            if (!attr._childStates[i]._dirty) {
+                this._flagDirtyState(attr._childStates[i]);
+            }
+        }
+    }
+};
+
+SceneJS._Node.prototype._buildStateDep = function(parent) {
+    this.attr._parentState = parent;
+    if (!parent._childStates) {
+        parent._childStates = [];
+    }
+    parent._childStates.push(this.attr);
+    this.attr._dirty = true;
 };
 
 /** @private */
@@ -119,7 +194,9 @@ SceneJS._Node.prototype._compileNodes = function(traversalContext, selectedChild
              */
             if (SceneJS_compileModule.preVisitNode(child)) {
 
+                //  if (child.flags) {
                 SceneJS_flagsModule.preVisitNode(child);
+                // }
 
                 childTraversalContext = {
 
@@ -133,7 +210,9 @@ SceneJS._Node.prototype._compileNodes = function(traversalContext, selectedChild
                 };
                 child._compileWithEvents.call(child, childTraversalContext);
 
+                //if (child.flags) {
                 SceneJS_flagsModule.postVisitNode(child);
+                // }
 
             }
             SceneJS_compileModule.postVisitNode(child);
@@ -430,6 +509,31 @@ SceneJS._Node.prototype.removeNodes = function() {
     return children;
 };
 
+/** Destroys node and moves children up to parent, inserting them where this node resided.
+ * @returns {Node} The parent
+ */
+SceneJS._Node.prototype.splice = function() {
+    if (this.parent == null) {
+        return null;
+    }
+    var parentChildren = this.parent.children;
+    var thisId = this.attr.id;
+    var children = this.children;
+    this.children = [];
+    for (var i = 0, len = children.length; i < len; i++) {  // Link this node's children to new parent
+        children[i].parent = this.parent;
+    }
+    for (var i = 0, len = parentChildren.length; i < len; i++) { // Replace node on parent's children with this node's children
+        if (parentChildren[i].attr.id == thisId) {
+            this.parent.children = parentChildren.splice(i, 1, children);
+            this.parent._resetTreeCompilationMemos();
+            this.destroy();
+            SceneJS_compileModule.nodeUpdated(this.parent);
+            return parent;
+        }
+    }
+};
+
 /** Appends multiple child nodes
  * @param {Array[Node]} nodes Array of nodes
  * @return {Node} This node
@@ -661,8 +765,12 @@ SceneJS._Node.prototype._doDestroy = function() {
     if (this._destroy) {
         this._destroy();
     }
+    if (--this.core._nodeCount <= 0) {
+        this._cores[this.scene.attr.id][this.attr.type][this.core._coreId] = null;
+    }
     return this;
 };
+
 
 /**
  * Fires an event at this node, immediately calling listeners registered for the event
@@ -784,3 +892,57 @@ SceneJS._Node.prototype._findNodesByType = function(type, list, recursive) {
 SceneJS._Node.prototype.getJSON = function() {
     return this.attr;
 };
+
+
+
+SceneJS_State.prototype._cleanStack = [];
+SceneJS_State.prototype._cleanStackLen = 0;
+
+SceneJS_State.prototype.setClean = function() {
+    if (!this.dirty) {
+        return;
+    }
+    if (!this.parent) {
+        this._cleanFunc(this.parent ? this.parent : null, this);
+        this.dirty = false;
+        return;
+    }
+
+    this._cleanStackLen = 0;
+
+    /* Stack dirty states on path to root
+     */
+    var state = this;
+    while (state && state.dirty) {
+        this._cleanStack[this._cleanStackLen++] = state;
+        state = state.parent;
+    }
+
+    /* Stack last clean state if existing
+     */
+    if (state && state.parent) {
+        this._cleanStack[this._cleanStackLen++] = state.parent;
+    }
+
+    /* Clean states down the path
+     */
+    var parentState;
+    for (var i = this._cleanStackLen - 1; i > 0; i--) {
+        parentState = this._cleanStack[i - 1];
+        state = this._cleanStack[i];
+        this._cleanFunc(parentState, state);
+        parentState.dirty = false;
+        state.dirty = false;
+    }
+};
+
+SceneJS_State.prototype.reset = function() {
+    this.children = [];
+    this.dirty = true;
+};
+
+
+
+
+
+

@@ -29,16 +29,18 @@ new (function() {
 
     Light.prototype._init = function(params) {
         params = params || {};
-        this._light = {};
-        this.setMode(params.mode);
-        this.setColor(params.color);
-        this.setDiffuse(params.diffuse);
-        this.setSpecular(params.specular);
-        this.setPos(params.pos);
-        this.setDir(params.dir);
-        this.setConstantAttenuation(params.constantAttenuation);
-        this.setLinearAttenuation(params.linearAttenuation);
-        this.setQuadraticAttenuation(params.quadraticAttenuation);
+        if (this.core._nodeCount == 1) { // This node is the resource definer
+            this.core.light = {};
+            this.setMode(params.mode);
+            this.setColor(params.color);
+            this.setDiffuse(params.diffuse);
+            this.setSpecular(params.specular);
+            this.setPos(params.pos);
+            this.setDir(params.dir);
+            this.setConstantAttenuation(params.constantAttenuation);
+            this.setLinearAttenuation(params.linearAttenuation);
+            this.setQuadraticAttenuation(params.quadraticAttenuation);
+        }
     };
 
     Light.prototype.setMode = function(mode) {
@@ -48,17 +50,17 @@ new (function() {
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Light unsupported mode - should be 'dir' or 'point' or 'ambient'");
         }
-        this._light.mode = mode;
+        this.core.light.mode = mode;
         return this;
     };
 
     Light.prototype.getMode = function() {
-        return this._light.mode;
+        return this.core.light.mode;
     };
 
     Light.prototype.setColor = function(color) {
         color = color || {};
-        this._light.color = [
+        this.core.light.color = [
             color.r != undefined ? color.r : 1.0,
             color.g != undefined ? color.g : 1.0,
             color.b != undefined ? color.b : 1.0
@@ -68,74 +70,74 @@ new (function() {
 
     Light.prototype.getColor = function() {
         return {
-            r: this._light.color[0],
-            g: this._light.color[1],
-            b: this._light.color[2] };
+            r: this.core.light.color[0],
+            g: this.core.light.color[1],
+            b: this.core.light.color[2] };
     };
 
     Light.prototype.setDiffuse = function (diffuse) {
-        this._light.diffuse = (diffuse != undefined) ? diffuse : true;
+        this.core.light.diffuse = (diffuse != undefined) ? diffuse : true;
         return this;
     };
 
     Light.prototype.getDiffuse = function() {
-        return this._light.diffuse;
+        return this.core.light.diffuse;
     };
 
     Light.prototype.setSpecular = function (specular) {
-        this._light.specular = specular || true;
+        this.core.light.specular = specular || true;
         return this;
     };
 
     Light.prototype.getSpecular = function() {
-        return this._light.specular;
+        return this.core.light.specular;
     };
 
     Light.prototype.setPos = function(pos) {
         pos = pos || {};
-        this._light.pos = [ pos.x || 0.0, pos.y || 0.0, pos.z || 0.0 ];
+        this.core.light.pos = [ pos.x || 0.0, pos.y || 0.0, pos.z || 0.0 ];
         return this;
     };
 
     Light.prototype.getPos = function() {
-        return { x: this._light.pos[0], y: this._light.pos[1], z: this._light.pos[2] };
+        return { x: this.core.light.pos[0], y: this.core.light.pos[1], z: this.core.light.pos[2] };
     };
 
     Light.prototype.setDir = function(dir) {
         dir = dir || {};
-        this._light.dir = [ dir.x || 0.0, dir.y || 0.0, (dir.z == undefined || dir.z == null) ? -1 : dir.z ];
+        this.core.light.dir = [ dir.x || 0.0, dir.y || 0.0, (dir.z == undefined || dir.z == null) ? -1 : dir.z ];
         return this;
     };
 
     Light.prototype.getDir = function() {
-        return { x: this._light.dir[0], y: this._light.dir[1], z: this._light.dir[2] };
+        return { x: this.core.light.dir[0], y: this.core.light.dir[1], z: this.core.light.dir[2] };
     };
 
     Light.prototype.setConstantAttenuation = function (constantAttenuation) {
-        this._light.constantAttenuation = (constantAttenuation != undefined) ? constantAttenuation : 1.0;
+        this.core.light.constantAttenuation = (constantAttenuation != undefined) ? constantAttenuation : 1.0;
         return this;
     };
 
     Light.prototype.getConstantAttenuation = function() {
-        return this._light.constantAttenuation;
+        return this.core.light.constantAttenuation;
     };
 
     Light.prototype.setLinearAttenuation = function (linearAttenuation) {
-        this._light.linearAttenuation = linearAttenuation || 0.0;
+        this.core.light.linearAttenuation = linearAttenuation || 0.0;
         return this;
     };
 
     Light.prototype.getLinearAttenuation = function() {
-        return this._light.linearAttenuation;
+        return this.core.light.linearAttenuation;
     };
 
     Light.prototype.setQuadraticAttenuation = function (quadraticAttenuation) {
-        this._light.quadraticAttenuation = quadraticAttenuation || 0.0;
+        this.core.light.quadraticAttenuation = quadraticAttenuation || 0.0;
         return this;
     };
 
     Light.prototype.getQuadraticAttenuation = function() {
-        return this._light.quadraticAttenuation;
+        return this.core.light.quadraticAttenuation;
     };
 
     Light.prototype._compile = function(traversalContext) {
@@ -145,14 +147,14 @@ new (function() {
     };
 
     Light.prototype._preCompile = function() {
-        var modelMat = SceneJS_modelTransformModule.getTransform().matrix;
-        if (this._light.mode == "point") {
-            this._light.worldPos = SceneJS_math_transformPoint3(modelMat, this._light.pos);
-        } else if (this._light.mode == "dir") {
-            this._light.worldDir = SceneJS_math_transformVector3(modelMat, this._light.dir);
+        var modelMat = SceneJS_modelTransformModule.transform.matrix;
+        if (this.core.light.mode == "point") {
+            this.core.light.worldPos = SceneJS_math_transformPoint3(modelMat, this.core.light.pos);
+        } else if (this.core.light.mode == "dir") {
+            this.core.light.worldDir = SceneJS_math_transformVector3(modelMat, this.core.light.dir);
         }
         idStack[stackLen] = this.attr.id;
-        lightStack[stackLen] = this._light;
+        lightStack[stackLen] = this.core.light;
         stackLen++;
         dirty = true;
     };

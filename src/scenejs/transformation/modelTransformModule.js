@@ -31,16 +31,18 @@ var SceneJS_modelTransformModule = new (function() {
     var stackLen = 0;
 
     var nodeId;
-    var transform;
+    this.transform = DEFAULT_TRANSFORM;
 
     var dirty;
+
+    var self = this;
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
             function() {
                 stackLen = 0;
                 nodeId = null;
-                transform = DEFAULT_TRANSFORM;
+                self.transform = DEFAULT_TRANSFORM;
                 dirty = true;
             });
 
@@ -49,16 +51,20 @@ var SceneJS_modelTransformModule = new (function() {
             function (params) {
                 if (dirty) {
                     if (stackLen > 0) {
-                        if (!transform.matrixAsArray) {
-                            transform.matrixAsArray = new Float32Array(transform.matrix);
-                        }
-                        if (!transform.normalMatrixAsArray) {
-                            transform.normalMatrixAsArray = new Float32Array(
+                        var t = self.transform;
+                        if (!t.matrixAsArray) {
+                            t.matrixAsArray = new Float32Array(t.matrix);
+                            t.normalMatrixAsArray = new Float32Array(
                                     SceneJS_math_transposeMat4(
-                                            SceneJS_math_inverseMat4(transform.matrix, SceneJS_math_mat4())));
+                                            SceneJS_math_inverseMat4(t.matrix, SceneJS_math_mat4())));
+                        } else {
+                            t.matrixAsArray.set(t.matrix);
+                            t.normalMatrixAsArray.set(
+                                    SceneJS_math_transposeMat4(
+                                            SceneJS_math_inverseMat4(t.matrix, SceneJS_math_mat4())));
                         }
-                        SceneJS_renderModule.setModelTransform(nodeId, transform.matrixAsArray, transform.normalMatrixAsArray);
-                    } else  {
+                        SceneJS_renderModule.setModelTransform(nodeId, t.matrixAsArray, t.normalMatrixAsArray);
+                    } else {
                         SceneJS_renderModule.setModelTransform();
                     }
                     dirty = false;
@@ -70,22 +76,18 @@ var SceneJS_modelTransformModule = new (function() {
         transformStack[stackLen] = t;
         stackLen++;
         nodeId = id;
-        transform = t;
+        this.transform = t;
         dirty = true;
-    };
-
-    this.getTransform = function() {
-        return transform;
     };
 
     this.popTransform = function() {
         stackLen--;
         if (stackLen > 0) {
             nodeId = idStack[stackLen - 1];
-            transform = transformStack[stackLen - 1];
+            this.transform = transformStack[stackLen - 1];            
         } else {
             nodeId = null;
-            transform = DEFAULT_TRANSFORM;
+            this.transform = DEFAULT_TRANSFORM;
         }
         dirty = true;
     };

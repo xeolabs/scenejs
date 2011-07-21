@@ -79,7 +79,7 @@ SceneJS.createScene({
 
                                     nodes: [
                                         {
-                                            type: "node",
+                                            type: "material",
                                             baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                                             specularColor:  { r: 0.4, g: 0.4, b: 0.4 },
                                             specular:       0.2,
@@ -111,6 +111,8 @@ SceneJS.createScene({
                                                         {
 
                                                             type: "geometry",
+
+                                                            id: "myGeometry",
 
                                                             /* Optional resource name, must be unique among all
                                                              * geometries - if another geometry has already

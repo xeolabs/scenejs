@@ -129,6 +129,10 @@ function addMorph() {
             return;
         }
 
+        var positions1 = [];
+        for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
+            positions1.push(positions[i]);
+        }
         var positions2 = [];
         for (var i = 0, j = 0, len = positions.length; i < len; i++,j += 3) {
             positions2.push(positions[i] * (1 + (Math.sin(i * 0.003) * 0.1)));
@@ -151,7 +155,7 @@ function addMorph() {
 
                 targets: [
                     {
-                        positions: positions   // Target 1
+                        positions: positions1  // Target 1
                     },
                     {
                         positions: positions2  // Target 2

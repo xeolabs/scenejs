@@ -10,10 +10,10 @@
 
     Billboard.prototype._preCompile = function(traversalContext) {
         // 0. The base variable
-        var superViewXForm = SceneJS_viewTransformModule.getTransform();
+        var superViewXForm = SceneJS_viewTransformModule.transform;
         var lookAt = superViewXForm.lookAt;
 
-        var superModelXForm = SceneJS_modelTransformModule.getTransform();
+        var superModelXForm = SceneJS_modelTransformModule.transform;
         var matrix = superModelXForm.matrix.slice(0);
 
         // 1. Invert the model rotation matrix, which will reset the subnodes rotation
