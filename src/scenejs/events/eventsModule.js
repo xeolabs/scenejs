@@ -25,7 +25,6 @@ var SceneJS_eventModule = new (function() {
     this.RENDERER_EXPORTED = 9;               // Export of the current WebGL context state
 //    this.CANVAS_ACTIVATED = 10;
     this.CANVAS_DEACTIVATED = 11;
-    this.VIEWPORT_UPDATED = 12;
     this.GEOMETRY_UPDATED = 13;
     this.GEOMETRY_EXPORTED = 14;
     this.MODEL_TRANSFORM_UPDATED = 15;

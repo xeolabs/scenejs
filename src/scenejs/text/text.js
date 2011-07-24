@@ -92,8 +92,8 @@ SceneJS.Text.prototype._init = function(params) {
     }
 };
 
-SceneJS.Text.prototype._compile = function(traversalContext) {
+SceneJS.Text.prototype._compile = function() {
     if (this._mode == "bitmap") {
-        this._compileNodes(traversalContext);
+        this._compileNodes();
     }
 };

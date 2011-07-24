@@ -63,9 +63,9 @@ var SceneJS_modelTransformModule = new (function() {
                                     SceneJS_math_transposeMat4(
                                             SceneJS_math_inverseMat4(t.matrix, SceneJS_math_mat4())));
                         }
-                        SceneJS_renderModule.setModelTransform(nodeId, t.matrixAsArray, t.normalMatrixAsArray);
+                        SceneJS_DrawList.setModelTransform(nodeId, t.matrixAsArray, t.normalMatrixAsArray);
                     } else {
-                        SceneJS_renderModule.setModelTransform();
+                        SceneJS_DrawList.setModelTransform();
                     }
                     dirty = false;
                 }

@@ -202,7 +202,7 @@ new (function() {
             /* We don't render Geometry's that have no index buffer - they merely define
              * vertex/uv buffers that are indexed by sub-Geometry's in a composite geometry
              */
-            SceneJS_renderModule.setGeometry(id, geo);
+            SceneJS_DrawList.setGeometry(id, geo);
         }
         geoStack[stackLen++] = geo;
     }
@@ -401,10 +401,10 @@ new (function() {
         return this._boundary;
     };
 
-    SceneJS_geometry.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
-        this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
+    SceneJS_geometry.prototype._compile = function() {
+        this._preCompile();
+        this._compileNodes();
+        this._postCompile();
     };
 
     SceneJS_geometry.prototype._preCompile = function() {
@@ -428,7 +428,7 @@ new (function() {
              * node associated with the geometry, which will in turn destroy rendering
              * states associated with the display list node, and so on.
              */
-            SceneJS_renderModule.removeGeometry(this.scene.attr.id, this.attr.id);
+            SceneJS_DrawList.removeGeometry(this.scene.attr.id, this.attr.id);
         }
     };
 })();

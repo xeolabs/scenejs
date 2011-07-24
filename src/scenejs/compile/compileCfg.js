@@ -12,10 +12,8 @@ var SceneJS_compileCfg = new (function() {
     this.REDRAW = -1;           // Compile nothing and redraw the display list
     this.COMPILE_SCENE = 0;     // Compile entire scene graph
     this.COMPILE_BRANCH = 1;    // Compile node, plus path to root, plus subnodes
-    this.COMPILE_SUBTREE = 2;   // Compile node plus subnodes
-    this.COMPILE_PATH = 3;      // Compile node plus path to root
-    this.COMPILE_NODE = 4;      // Compile just node
-    this.RESORT = 5;            // Resort display list and redraw
+    this.COMPILE_PATH = 2;      // Compile node plus path to root
+    this.RESORT = 3;            // Resort display list and redraw
 
     /* Level names for logging
      */
@@ -28,10 +26,7 @@ var SceneJS_compileCfg = new (function() {
      *
      *      Configs for base node type overrides configs for subtypes
      *
-     *      COMPILE_NODE and COMPILE_SUBGRAPH are bumped to COMPILE_BRANCH if node within an instanced subgraph
-     *
-     *      COMPILE_SCENE for structure updates so we can rediscover which nodes are within instanced subtrees.
-     *      Compilation is therefore optimised for update as cost of restructure.
+     *      COMPILE_SCENE for structure updates
      *
      *      DOCS: http://scenejs.wikispaces.com/Scene+Graph+Compilation
      */
@@ -144,17 +139,9 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
-        /*-----------------------------------------------------------------------------------
-         * billboard
-         *---------------------------------------------------------------------------------*/
-
         "billboard": {
             alwaysCompile: true
         },
-
-        /*-----------------------------------------------------------------------------------
-         * clip
-         *---------------------------------------------------------------------------------*/
 
         "clip": {
             set: {
@@ -164,10 +151,6 @@ var SceneJS_compileCfg = new (function() {
                 level: this.COMPILE_BRANCH
             }
         },
-
-        /*-----------------------------------------------------------------------------------
-         * colortrans
-         *---------------------------------------------------------------------------------*/
 
         "colortrans": {
             set: {
@@ -181,12 +164,7 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
-        /*-----------------------------------------------------------------------------------
-         * lights
-         *---------------------------------------------------------------------------------*/
-
         "lights": {
-            //alwaysCompile: true
         },
 
         "scene" : {
@@ -205,11 +183,6 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
-
-        /* Transform nodes require many things below them to recompile,
-         * such as transforms and boundingBoxes
-         */
-
         "scale": {
             set: {
                 level: this.COMPILE_BRANCH
@@ -218,10 +191,6 @@ var SceneJS_compileCfg = new (function() {
                 level: this.COMPILE_BRANCH
             }
         },
-
-        /*-----------------------------------------------------------------------------------
-         * stationary
-         *---------------------------------------------------------------------------------*/
 
         "stationary": {
             alwaysCompile: true
@@ -261,71 +230,59 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
+        "xform": {
+            set: {
+                level: this.REDRAW
+            }
+        },
+
         "material": {
             set: {
                 level: this.REDRAW
             }
         },
 
-        /* View and camera transforms
-         */
         "lookAt": {
             set: {
-                level: this.COMPILE_PATH
+                level: this.REDRAW
             },
             inc: {
-                level: this.COMPILE_PATH
+                level: this.REDRAW
             }
         },
 
         "camera": {
             set: {
-                level: this.COMPILE_PATH
+                level: this.REDRAW
             },
             inc: {
-                level: this.COMPILE_PATH
+                level: this.REDRAW
             }
         },
 
-        /*
-         */
         "morphGeometry": {
             set: {
-                level: this.COMPILE_BRANCH
+                level: this.REDRAW
             },
             "loaded": {
-                level: this.COMPILE_SCENE
+                level: this.REDRAW
             }
         },
 
-        /* Keep recompiling instance node while it searches for its target
-         */
-        "instance": {
-            "searching": {
-                level: this.COMPILE_BRANCH
-            }
-        },
-
-        /* 
-         */
         "texture": {
             set: {
                 attr: {
                     layers: {
-                        level: this.COMPILE_BRANCH
+                        level: this.REDRAW
                     }
                 }
             },
-
             "loaded" : {
-                level: this.REDRAW // Texture lazy-binds from with display list
+                level: this.REDRAW
             }
         },
 
-        /* Recompile stream-loaded geometry node once it has loaded
-         */
         "geometry": {
-
             set: {
                 attr: {
                     positions: {
@@ -360,26 +317,67 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
-        /* Interpolator needs to recompile the node as it waits for it's sequence to begin, then
-         * for as long as it is interpolating in order to update. The target node will notify for
-         * it's own recompilations as it is updated.
-         */
-        "interpolator": {
-            "before": {
-                level: this.COMPILE_PATH
-            },
-            "running": {
-                level: this.COMPILE_PATH
-            }
-        },
-
-        /* Custom shader
-         */
         "shader": {
             set: {
                 attr: {
                     vars: {
                         level: this.COMPILE_PATH
+                    }
+                }
+            }
+        },
+        
+        "flags": {
+            "set" : {
+                attr: {
+                    "flags": {
+                        attr: {
+                            transparent: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            enabled: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            picking: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            colortrans: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            clipping: {
+                                level: this.COMPILE_BRANCH
+                            }
+                        },
+                        level: this.COMPILE_SCENE
+                    }
+                }
+            },
+
+            "add" : {
+                attr: {
+
+                    /* "add" op is used to overwrite flags
+                     */
+                    "flags": {
+
+                        attr: {
+
+                            transparent: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            enabled: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            picking: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            colortrans: {
+                                level: this.COMPILE_BRANCH
+                            },
+                            clipping: {
+                                level: this.COMPILE_BRANCH
+                            }
+                        }
                     }
                 }
             }

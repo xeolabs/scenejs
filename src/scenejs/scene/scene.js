@@ -192,7 +192,6 @@ new (function() {
         this._destroyed = false;
         this.scene = this;
         this.nodeMap = new SceneJS_Map(); // Can auto-generate IDs when not supplied
-        this.instanceMap = {}; // Map for each node ID of instances that target it - targets don't have to exist yet
         this._layers = params.layers || {};
 
         this.canvas = findCanvas(params.canvasId, params.contextAttr); // canvasId can be null
@@ -271,7 +270,7 @@ new (function() {
     })();
 
     /**
-     * Starts the scene rendering repeatedly in a loop.
+     * Starts the render loop for this scene
      */
     Scene.prototype.start = function(cfg) {
         if (this._destroyed) {
@@ -284,67 +283,41 @@ new (function() {
             this._paused = false;
 
             var self = this;
-            var fnName = "__scenejs_compileScene" + this.attr.id;
+            var fnName = "__scenejs_sceneLoop" + this.attr.id;
 
-            /* Render loop
-             */
             var sleeping = false;
 
             SceneJS_compileModule.nodeUpdated(this, "start");
 
             window[fnName] = function() {
-
                 if (self._running && !self._paused) { // idleFunc may have stopped render loop
-
                     if (cfg.idleFunc) {
                         cfg.idleFunc();
                     }
-
                     var compileFlags = SceneJS_compileModule.beginSceneCompile(self.attr.id);
                     if (compileFlags.level != SceneJS_compileModule.COMPILE_NOTHING) {          // level could be REDRAW
-
-                        SceneJS_renderModule.bindScene({ sceneId: self.attr.id }, {
+                        SceneJS_DrawList.bindScene({ sceneId: self.attr.id }, {
                             compileMode: compileFlags.level == SceneJS_compileModule.COMPILE_EVERYTHING ?
-                                         SceneJS_renderModule.COMPILE_SCENE : SceneJS_renderModule.COMPILE_NODES,
+                                         SceneJS_DrawList.COMPILE_SCENE : SceneJS_DrawList.COMPILE_NODES,
                             resort: compileFlags.resort });
-
                         self._compileWithEvents();
-
                         sleeping = false;
-
                         SceneJS_compileModule.finishSceneCompile();
-
-                        SceneJS_renderModule.renderFrame({ profileFunc: cfg.profileFunc });
-
+                        SceneJS_DrawList.renderFrame({ profileFunc: cfg.profileFunc });
+                        requestAnimFrame(window[fnName]);
                     } else {
                         if (!sleeping && cfg.sleepFunc) {
                             cfg.sleepFunc();
                         }
                         sleeping = true;
+                        requestAnimFrame(window[fnName]);
                     }
-                }
-
-                if (!cfg.requestAnimationFrame) {
-                    window.setTimeout(window[fnName], 1000 / (cfg.fps || 60));
+                } else {
+                    requestAnimFrame(window[fnName]);
                 }
             };
-
-            if (cfg.requestAnimationFrame === true) {
-                (function animloop() {
-                    if (window[fnName]) {
-                        window[fnName]();
-                        requestAnimFrame(animloop);
-                    }
-                })();
-            } else {
-                window[fnName]();
-            }
-
             this._startCfg = cfg;
-
-            /* Push one frame immediately
-             */
-            window[fnName]();
+            requestAnimFrame(window[fnName]); // Push one frame immediately
         }
     };
 
@@ -385,7 +358,7 @@ new (function() {
         if (this._destroyed) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
-        if (!SceneJS_renderModule.pick({
+        if (!SceneJS_DrawList.pick({
             sceneId: this.attr.id,
             canvasX : canvasX,
             canvasY : canvasY }, options)) {
@@ -404,8 +377,7 @@ new (function() {
 
         if (SceneJS_compileModule.preVisitNode(this)) {
             SceneJS_layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
-            var traversalContext = {};
-            this._compileNodes(traversalContext);
+            this._compileNodes();
         }
         SceneJS_compileModule.postVisitNode(this);
         deactivateScene();

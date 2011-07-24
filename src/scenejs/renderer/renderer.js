@@ -55,12 +55,12 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
-                    } else  { // Full compile supplies it's own default states
-                        SceneJS_renderModule.setRenderer();
+                        SceneJS_DrawList.setRenderer(idStack[stackLen - 1], propStack[stackLen - 1]);
+                    } else {
+                        SceneJS_DrawList.setRenderer();
                     }
                     dirty = false;
                 }
@@ -95,8 +95,6 @@ new (function() {
             }
         };
     }
-
-    ;
 
     var getSuperProperty = function(name) {
         var props;
@@ -176,16 +174,9 @@ new (function() {
     function pushProps(id, props) {
         idStack[stackLen] = id;
         propStack[stackLen] = props;
-
         stackLen++;
-
-        if (props.props.viewport) {
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, props.props.viewport);
-        }
         dirty = true;
     }
-
-    ;
 
     /**
      * Maps renderer node properties to WebGL context enums
@@ -462,7 +453,6 @@ new (function() {
                 };
             }
             context.viewport(v.x, v.y, v.width, v.height);
-            SceneJS_eventModule.fireEvent(SceneJS_eventModule.VIEWPORT_UPDATED, v);
         },
 
         /** Sets scissor region on the given context
@@ -508,36 +498,23 @@ new (function() {
         var oldProps = propStack[stackLen - 1];
         stackLen--;
         var newProps = propStack[stackLen - 1];
-        if (oldProps.props.viewport) {
-            SceneJS_eventModule.fireEvent(
-                    SceneJS_eventModule.VIEWPORT_UPDATED,
-                    newProps.props.viewport);
-        }
         dirty = true;
     }
-
-    ;
-
-    /** @class A scene node that sets WebGL state for nodes in its subtree.
-     * <p>This node basically exposes various WebGL state configurations through the SceneJS API.</p>
-     * (TODO: more comments here!)
-
-     * @extends SceneJS_node
-     */
+   
     var Renderer = SceneJS.createNodeType("renderer");
 
-
-    // @private
     Renderer.prototype._init = function(params) {
-        for (var key in params) {
-            if (params.hasOwnProperty(key)) {
-                this.attr[key] = params[key];
+        if (this.core._nodeCount == 1) { // This node defines the resource
+            for (var key in params) {
+                if (params.hasOwnProperty(key)) {
+                    this.core[key] = params[key];
+                }
             }
         }
     };
 
     Renderer.prototype.setViewport = function(viewport) {
-        this.attr.viewport = viewport ? {
+        this.core.viewport = viewport ? {
             x : viewport.x || 1,
             y : viewport.y || 1,
             width: viewport.width || 1000,
@@ -546,16 +523,16 @@ new (function() {
     };
 
     Renderer.prototype.getViewport = function() {
-        return this.attr.viewport ? {
-            x : this.attr.viewport.x,
-            y : this.attr.viewport.y,
-            width: this.attr.viewport.width,
-            height: this.attr.viewport.height
+        return this.core.viewport ? {
+            x : this.core.viewport.x,
+            y : this.core.viewport.y,
+            width: this.core.viewport.width,
+            height: this.core.viewport.height
         } : undefined;
     };
 
     Renderer.prototype.setScissor = function(scissor) {
-        this.attr.scissor = scissor ? {
+        this.core.scissor = scissor ? {
             x : scissor.x || 1,
             y : scissor.y || 1,
             width: scissor.width || 1000,
@@ -564,16 +541,16 @@ new (function() {
     };
 
     Renderer.prototype.getScissor = function() {
-        return this.attr.scissor ? {
-            x : this.attr.scissor.x,
-            y : this.attr.scissor.y,
-            width: this.attr.scissor.width,
-            height: this.attr.scissor.height
+        return this.core.scissor ? {
+            x : this.core.scissor.x,
+            y : this.core.scissor.y,
+            width: this.core.scissor.width,
+            height: this.core.scissor.height
         } : undefined;
     };
 
     Renderer.prototype.setClear = function(clear) {
-        this.attr.clear = clear ? {
+        this.core.clear = clear ? {
             r : clear.r || 0,
             g : clear.g || 0,
             b : clear.b || 0
@@ -581,23 +558,23 @@ new (function() {
     };
 
     Renderer.prototype.getClear = function() {
-        return this.attr.clear ? {
-            r : this.attr.clear.r,
-            g : this.attr.clear.g,
-            b : this.attr.clear.b
+        return this.core.clear ? {
+            r : this.core.clear.r,
+            g : this.core.clear.g,
+            b : this.core.clear.b
         } : null;
     };
 
     Renderer.prototype.setEnableBlend = function(enableBlend) {
-        this.attr.enableBlend = enableBlend;
+        this.core.enableBlend = enableBlend;
     };
 
     Renderer.prototype.getEnableBlend = function() {
-        return this.attr.enableBlend;
+        return this.core.enableBlend;
     };
 
     Renderer.prototype.setBlendColor = function(color) {
-        this.attr.blendColor = color ? {
+        this.core.blendColor = color ? {
             r : color.r || 0,
             g : color.g || 0,
             b : color.b || 0,
@@ -606,52 +583,52 @@ new (function() {
     };
 
     Renderer.prototype.getBlendColor = function() {
-        return this.attr.blendColor ? {
-            r : this.attr.blendColor.r,
-            g : this.attr.blendColor.g,
-            b : this.attr.blendColor.b,
-            a : this.attr.blendColor.a
+        return this.core.blendColor ? {
+            r : this.core.blendColor.r,
+            g : this.core.blendColor.g,
+            b : this.core.blendColor.b,
+            a : this.core.blendColor.a
         } : undefined;
     };
 
     Renderer.prototype.setBlendEquation = function(eqn) {
-        this.attr.blendEquation = eqn;
+        this.core.blendEquation = eqn;
     };
 
     Renderer.prototype.getBlendEquation = function() {
-        return this.attr.blendEquation;
+        return this.core.blendEquation;
     };
 
     Renderer.prototype.setBlendEquationSeparate = function(eqn) {
-        this.attr.blendEquationSeparate = eqn ? {
+        this.core.blendEquationSeparate = eqn ? {
             rgb : eqn.rgb || "funcAdd",
             alpha : eqn.alpha || "funcAdd"
         } : undefined;
     };
 
     Renderer.prototype.getBlendEquationSeparate = function() {
-        return this.attr.blendEquationSeparate ? {
-            rgb : this.attr.rgb,
-            alpha : this.attr.alpha
+        return this.core.blendEquationSeparate ? {
+            rgb : this.core.rgb,
+            alpha : this.core.alpha
         } : undefined;
     };
 
     Renderer.prototype.setBlendFunc = function(funcs) {
-        this.attr.blendFunc = funcs ? {
+        this.core.blendFunc = funcs ? {
             sfactor : funcs.sfactor || "srcAlpha",
             dfactor : funcs.dfactor || "one"
         } : undefined;
     };
 
     Renderer.prototype.getBlendFunc = function() {
-        return this.attr.blendFunc ? {
-            sfactor : this.attr.sfactor,
-            dfactor : this.attr.dfactor
+        return this.core.blendFunc ? {
+            sfactor : this.core.sfactor,
+            dfactor : this.core.dfactor
         } : undefined;
     };
 
     Renderer.prototype.setBlendFuncSeparate = function(eqn) {
-        this.attr.blendFuncSeparate = eqn ? {
+        this.core.blendFuncSeparate = eqn ? {
             srcRGB : eqn.srcRGB || "zero",
             dstRGB : eqn.dstRGB || "zero",
             srcAlpha : eqn.srcAlpha || "zero",
@@ -660,111 +637,111 @@ new (function() {
     };
 
     Renderer.prototype.getBlendFuncSeparate = function() {
-        return this.attr.blendFuncSeparate ? {
-            srcRGB : this.attr.blendFuncSeparate.srcRGB,
-            dstRGB : this.attr.blendFuncSeparate.dstRGB,
-            srcAlpha : this.attr.blendFuncSeparate.srcAlpha,
-            dstAlpha : this.attr.blendFuncSeparate.dstAlpha
+        return this.core.blendFuncSeparate ? {
+            srcRGB : this.core.blendFuncSeparate.srcRGB,
+            dstRGB : this.core.blendFuncSeparate.dstRGB,
+            srcAlpha : this.core.blendFuncSeparate.srcAlpha,
+            dstAlpha : this.core.blendFuncSeparate.dstAlpha
         } : undefined;
     };
 
     Renderer.prototype.setEnableCullFace = function(enableCullFace) {
-        this.attr.enableCullFace = enableCullFace;
+        this.core.enableCullFace = enableCullFace;
     };
 
     Renderer.prototype.getEnableCullFace = function() {
-        return this.attr.enableCullFace;
+        return this.core.enableCullFace;
     };
 
 
     Renderer.prototype.setCullFace = function(cullFace) {
-        this.attr.cullFace = cullFace;
+        this.core.cullFace = cullFace;
     };
 
     Renderer.prototype.getCullFace = function() {
-        return this.attr.cullFace;
+        return this.core.cullFace;
     };
 
     Renderer.prototype.setEnableDepthTest = function(enableDepthTest) {
-        this.attr.enableDepthTest = enableDepthTest;
+        this.core.enableDepthTest = enableDepthTest;
     };
 
     Renderer.prototype.getEnableDepthTest = function() {
-        return this.attr.enableDepthTest;
+        return this.core.enableDepthTest;
     };
 
     Renderer.prototype.setDepthFunc = function(depthFunc) {
-        this.attr.depthFunc = depthFunc;
+        this.core.depthFunc = depthFunc;
     };
 
     Renderer.prototype.getDepthFunc = function() {
-        return this.attr.depthFunc;
+        return this.core.depthFunc;
     };
 
     Renderer.prototype.setEnableDepthMask = function(enableDepthMask) {
-        this.attr.enableDepthMask = enableDepthMask;
+        this.core.enableDepthMask = enableDepthMask;
     };
 
     Renderer.prototype.getEnableDepthMask = function() {
-        return this.attr.enableDepthMask;
+        return this.core.enableDepthMask;
     };
 
     Renderer.prototype.setClearDepth = function(clearDepth) {
-        this.attr.clearDepth = clearDepth;
+        this.core.clearDepth = clearDepth;
     };
 
     Renderer.prototype.getClearDepth = function() {
-        return this.attr.clearDepth;
+        return this.core.clearDepth;
     };
 
     Renderer.prototype.setDepthRange = function(range) {
-        this.attr.depthRange = range ? {
+        this.core.depthRange = range ? {
             zNear : (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
             zFar : (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
         } : undefined;
     };
 
     Renderer.prototype.getDepthRange = function() {
-        return this.attr.depthRange ? {
-            zNear : this.attr.depthRange.zNear,
-            zFar : this.attr.depthRange.zFar
+        return this.core.depthRange ? {
+            zNear : this.core.depthRange.zNear,
+            zFar : this.core.depthRange.zFar
         } : undefined;
     };
 
     Renderer.prototype.setFrontFace = function(frontFace) {
-        this.attr.frontFace = frontFace;
+        this.core.frontFace = frontFace;
     };
 
     Renderer.prototype.getFrontFace = function() {
-        return this.attr.frontFace;
+        return this.core.frontFace;
     };
 
     Renderer.prototype.setLineWidth = function(lineWidth) {
-        this.attr.lineWidth = lineWidth;
+        this.core.lineWidth = lineWidth;
     };
 
     Renderer.prototype.getLineWidth = function() {
-        return this.attr.lineWidth;
+        return this.core.lineWidth;
     };
 
     Renderer.prototype.setEnableScissorTest = function(enableScissorTest) {
-        this.attr.enableScissorTest = enableScissorTest;
+        this.core.enableScissorTest = enableScissorTest;
     };
 
     Renderer.prototype.getEnableScissorTest = function() {
-        return this.attr.enableScissorTest;
+        return this.core.enableScissorTest;
     };
 
     Renderer.prototype.setClearStencil = function(clearStencil) {
-        this.attr.clearStencil = clearStencil;
+        this.core.clearStencil = clearStencil;
     };
 
     Renderer.prototype.getClearStencil = function() {
-        return this.attr.clearStencil;
+        return this.core.clearStencil;
     };
 
     Renderer.prototype.setColorMask = function(color) {
-        this.attr.colorMask = color ? {
+        this.core.colorMask = color ? {
             r : color.r || 0,
             g : color.g || 0,
             b : color.b || 0,
@@ -773,68 +750,62 @@ new (function() {
     };
 
     Renderer.prototype.getColorMask = function() {
-        return this.attr.colorMask ? {
-            r : this.attr.colorMask.r,
-            g : this.attr.colorMask.g,
-            b : this.attr.colorMask.b,
-            a : this.attr.colorMask.a
+        return this.core.colorMask ? {
+            r : this.core.colorMask.r,
+            g : this.core.colorMask.g,
+            b : this.core.colorMask.b,
+            a : this.core.colorMask.a
         } : undefined;
     };
 
     Renderer.prototype.setWireframe = function(wireframe) {
-        this.attr.wireframe = wireframe;
+        this.core.wireframe = wireframe;
     };
 
     Renderer.prototype.getWireframe = function() {
-        return this.attr.wireframe;
+        return this.core.wireframe;
     };
 
     Renderer.prototype.setHighlight = function(highlight) {
-        this.attr.highlight = highlight;
+        this.core.highlight = highlight;
     };
 
     Renderer.prototype.getHighlight = function() {
-        return this.attr.highlight;
+        return this.core.highlight;
     };
 
     Renderer.prototype.setEnableClip = function(enableClip) {
-        this.attr.enableClip = enableClip;
+        this.core.enableClip = enableClip;
     };
 
     Renderer.prototype.getEnableClip = function() {
-        return this.attr.enableClip;
+        return this.core.enableClip;
     };
 
     Renderer.prototype.setEnableFog = function(enableFog) {
-        this.attr.enableFog = enableFog;
+        this.core.enableFog = enableFog;
     };
 
     Renderer.prototype.getEnableFog = function() {
-        return this.attr.enableFog;
+        return this.core.enableFog;
     };
 
-    // @private
-    Renderer.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
-        this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
+    Renderer.prototype._compile = function() {
+        this._preCompile();
+        this._compileNodes();
+        this._postCompile();
     };
 
-
-    // @private
-    Renderer.prototype._preCompile = function(traversalContext) {
+    Renderer.prototype._preCompile = function() {
         if (this._compileMemoLevel == 0) {
-            this._props = createProps(this.attr);
+            this._props = createProps(this.core);
             this._compileMemoLevel = 1;
         }
-        pushProps(this.attr.id, this._props);
+        pushProps(this.core.id, this._props);
     };
 
-
-    // @private
-    Renderer.prototype._postCompile = function(traversalContext) {
+    Renderer.prototype._postCompile = function() {
         popProps();
     };
-
 
 })();

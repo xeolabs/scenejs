@@ -17,9 +17,9 @@ new (function() {
             function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setShader(idStack[stackLen - 1], shaderStack[stackLen - 1]);
+                        SceneJS_DrawList.setShader(idStack[stackLen - 1], shaderStack[stackLen - 1]);
                     } else { // Full compile supplies it's own default states
-                        SceneJS_renderModule.setShader();
+                        SceneJS_DrawList.setShader();
                     }
                     dirty = false;
                 }
@@ -77,10 +77,10 @@ new (function() {
         SceneJS._apply(vars, this.core.vars);
     };
 
-    Shader.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
-        this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
+    Shader.prototype._compile = function() {
+        this._preCompile();
+        this._compileNodes();
+        this._postCompile();
     };
 
     Shader.prototype._preCompile = function() {

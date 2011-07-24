@@ -16,9 +16,9 @@ var SceneJS_pickingModule = new (function() {
             function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setPickListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
+                        SceneJS_DrawList.setPickListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
                     } else  {
-                        SceneJS_renderModule.setPickListeners();
+                        SceneJS_DrawList.setPickListeners();
                     }
                     dirty = false;
                 }

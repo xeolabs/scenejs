@@ -35,12 +35,13 @@ var SceneJS_flagsModule = new (function() {
         var newFlags = {};
         var topFlags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
         var flag;
-        for (var name in flags) {
+        var name;
+        for (name in flags) {
             if (flags.hasOwnProperty(name)) {
                 newFlags[name] = flags[name];
             }
         }
-        for (var name in topFlags) {
+        for (name in topFlags) {
             if (topFlags.hasOwnProperty(name)) {
                 flag = newFlags[name];
                 if (flag == null || flag == undefined) {
@@ -95,9 +96,9 @@ var SceneJS_flagsModule = new (function() {
             function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setFlags(idStack[stackLen - 1], flagStack[stackLen - 1]);
-                    } else  { // Full compile supplies it's own default states
-                        SceneJS_renderModule.setFlags();
+                        SceneJS_DrawList.setFlags(idStack[stackLen - 1], flagStack[stackLen - 1]);
+                    } else { // Full compile supplies it's own default states
+                        SceneJS_DrawList.setFlags();
                     }
                     dirty = false;
                 }
@@ -115,16 +116,59 @@ var SceneJS_flagsModule = new (function() {
         flagStack[stackLen] = flags;
         stackLen++;
         dirty = true;
-       // this.flags = flags;
     };
 
     this.postVisitNode = function(node) {
         if (stackLen > 0 && idStack[stackLen - 1] === node.attr.id) {
             stackLen--;
-          //  this.flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
             dirty = true;
         }
     };
 
+    var Flags = SceneJS.createNodeType("flags");
+
+    Flags.prototype._init = function(params) {
+        if (this.core._nodeCount == 1) { // This node defines the resource
+            if (!params.flags) {
+                throw SceneJS_errorModule.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "flags node 'flags' attribute missing ");
+            }
+            this.setFlags(params.flags);
+        }
+    };
+
+    Flags.prototype.setFlags = function(flags) {
+        this.core.flags = SceneJS._shallowClone(flags);
+    };
+
+    Flags.prototype.addFlags = function(flags) {
+        SceneJS._apply(flags, this.core.flags);          
+    };
+
+    Flags.prototype.getFlags = function() {
+        return SceneJS._shallowClone(this.core.flags);
+    };
+
+    Flags.prototype._compile = function() {
+        var flags = this.core.flags;
+
+        flags = createFlags(flags);  // TODO: very inefficient
+
+        idStack[stackLen] = this.attr.id;
+        flagStack[stackLen] = flags;
+        stackLen++;
+        dirty = true;
+
+        this._compileNodes();
+
+        stackLen--;
+        dirty = true;
+    };
 })();
+
+
+
+
+
 

@@ -141,44 +141,7 @@
 
     NodeSelector.prototype.numNodes = function() {
         return this._targetNode.children.length;
-    };
-
-    /**
-     * Iterates over instance nodes that target the selected node, executing a function
-     * for each.
-     * If the function returns true at any node, then traversal stops and a selector is
-     * returned for that node.
-     * @param {Function(index, node)} fn Function to execute on each instance node
-     * @return {Object} Selector for selected node, if any
-     */
-    NodeSelector.prototype.eachInstance = function(fn) {
-        if (!fn) {
-            throw SceneJS_errorModule.fatalError("eachInstance param 'fn' is null or undefined");
-        }
-        if (typeof fn != "function") {
-            throw SceneJS_errorModule.fatalError("eachInstance param 'fn' should be a function");
-        }
-        var nodeInstances = this._targetNode.scene.instanceMap[this._targetNode.attr.id];
-        if (nodeInstances) {
-            var instances = nodeInstances.instances;
-            var count = 0;
-            var selector;
-            for (var instanceNodeId in instances) {
-                if (instances.hasOwnProperty(instanceNodeId)) {
-                    selector = SceneJS._selectNode(this._targetNode.scene.nodeMap[instanceNodeId]);
-                    if (fn.call(selector, count++) === true) {
-                        return selector;
-                    }
-                }
-            }
-        }
-        return undefined;
-    };
-
-    NodeSelector.prototype.numInstances = function() {
-        var instances = this._targetNode.scene.instanceMap[this._targetNode.attr.id];
-        return instances ? instances.numInstances : 0;
-    };
+    };   
 
     /** Sets an attribute of the selected node
      */

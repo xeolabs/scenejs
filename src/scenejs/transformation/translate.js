@@ -95,10 +95,10 @@
         };
     };
 
-    Translate.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
-        this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
+    Translate.prototype._compile = function() {
+        this._preCompile();
+        this._compileNodes();
+        this._postCompile();
     };
 
     Translate.prototype._preCompile = function() {
@@ -109,7 +109,6 @@
         }
         var superXForm = SceneJS_modelTransformModule.transform;
         if (origMemoLevel < 2 || (!superXForm.fixed)) {
-            var instancing = SceneJS_instancingModule.instancing();
 
             var tempMat = SceneJS_math_mat4();
 
@@ -123,7 +122,7 @@
             this._xf.matrix = tempMat;
             this._xf.fixed = origMemoLevel == 2;
 
-            if (this._compileMemoLevel == 1 && superXForm.fixed && !instancing) {
+            if (this._compileMemoLevel == 1 && superXForm.fixed) {
                 this._compileMemoLevel = 2;
             }
         }

@@ -23,6 +23,7 @@ SceneJS._Node = function(cfg, scene) {
         this.scene = scene || this;
     }
 
+
     /* Child nodes
      */
     this.children = [];
@@ -54,10 +55,10 @@ SceneJS._Node = function(cfg, scene) {
 
     if (cfg) {
         this._createCore(cfg.coreId || cfg.resource);
-    }
-
-    if (cfg && this._init) {
-        this._init(cfg);
+        if (this._init) {
+            this._init(cfg);
+        }
+        this.state.hash = this._hash ? this._hash() : "";
     }
 };
 
@@ -92,6 +93,9 @@ SceneJS._Node.prototype._createCore = function(coreId) {
             _nodeCount : 1
         };
     }
+    this.state = new SceneJS_State({
+        core: this.core
+    });
     return this.core;
 };
 
@@ -126,48 +130,32 @@ SceneJS._Node.prototype._resetTreeCompilationMemos = function() {
 
 SceneJS._Node.prototype._flagDirty = function() {
     this._compileMemoLevel = 0;
-    if (this.attr._childStates && this.attr._dirty) {
-        this._flagDirtyState(this.attr);
-    }
+    //    if (this.attr._childStates && this.attr._dirty) {
+    //        this._flagDirtyState(this.attr);
+    //    }
 };
 
-SceneJS._Node.prototype._flagDirtyState = function(attr) {
-    attr._dirty = true;
-    if (attr._childStates) {
-        for (var i = 0, len = attr._childStates.length; i < len; i++) {
-            if (!attr._childStates[i]._dirty) {
-                this._flagDirtyState(attr._childStates[i]);
-            }
-        }
-    }
-};
-
-SceneJS._Node.prototype._buildStateDep = function(parent) {
-    this.attr._parentState = parent;
-    if (!parent._childStates) {
-        parent._childStates = [];
-    }
-    parent._childStates.push(this.attr);
-    this.attr._dirty = true;
-};
+//SceneJS._Node.prototype._flagDirtyState = function(attr) {
+//    attr._dirty = true;
+//    if (attr._childStates) {
+//        for (var i = 0, len = attr._childStates.length; i < len; i++) {
+//            if (!attr._childStates[i]._dirty) {
+//                this._flagDirtyState(attr._childStates[i]);
+//            }
+//        }
+//    }
+//};
 
 /** @private */
-SceneJS._Node.prototype._compile = function(traversalContext) {
-    this._compileNodes(traversalContext);
+SceneJS._Node.prototype._compile = function() {
+    this._compileNodes();
 };
 
 /** @private
  *
- * Recursively renders a node's child list. This is effectively rendering a subtree,
- * minus the root node, in depth-first, right-to-left order. As this function descends,
- * it tracks in traversalContext the location of each node in relation to the right
- * fringe of the subtree. As soon as the current node has zero children and no right
- * sibling, then it must be the last one in the subtree. If the nodes are part of the
- * subtree of an instanced node, then a callback will have been planted on the traversalContext
- * by the Instance node that is intiating it. The callback is then called to render the
- * Instance's child nodes as if they were children of the last node.
+ * Recursively renders a node's child list.
  */
-SceneJS._Node.prototype._compileNodes = function(traversalContext, selectedChildren) { // Selected children - useful for Selector node
+SceneJS._Node.prototype._compileNodes = function() { // Selected children - useful for Selector node
 
     if (this.listeners["picked"]) {
         SceneJS_pickingModule.preVisitNode(this);
@@ -177,38 +165,24 @@ SceneJS._Node.prototype._compileNodes = function(traversalContext, selectedChild
         SceneJS_nodeEventsModule.preVisitNode(this);
     }
 
-    var children = selectedChildren || this.children;  // Set of child nodes we'll be rendering
+    var children = this.children;  // Set of child nodes we'll be rendering
     var numChildren = children.length;
     var child;
     var childId;
     var i;
 
     if (numChildren > 0) {
-        var childTraversalContext;
         for (i = 0; i < numChildren; i++) {
             child = children[i];
             childId = child.attr.id;
 
-
-            /* Compile module culls child traversal when child compilation not required.
-             */
             if (SceneJS_compileModule.preVisitNode(child)) {
 
                 //  if (child.flags) {
                 SceneJS_flagsModule.preVisitNode(child);
                 // }
 
-                childTraversalContext = {
-
-                    /* For instancing mechanism, track if we are traversing down right fringe
-                     * and pass down the callback.
-                     *
-                     * DOCS: http://scenejs.wikispaces.com/Instancing+Algorithm
-                     */
-                    insideRightFringe: traversalContext.insideRightFringe || (i < numChildren - 1),
-                    callback : traversalContext.callback
-                };
-                child._compileWithEvents.call(child, childTraversalContext);
+                child._compileWithEvents.call(child);
 
                 //if (child.flags) {
                 SceneJS_flagsModule.postVisitNode(child);
@@ -216,14 +190,6 @@ SceneJS._Node.prototype._compileNodes = function(traversalContext, selectedChild
 
             }
             SceneJS_compileModule.postVisitNode(child);
-        }
-    }
-
-    if (numChildren == 0) {
-        if (! traversalContext.insideRightFringe) { // Last node in the subtree
-            if (traversalContext.callback) { // Within subtree of instanced
-                traversalContext.callback(traversalContext); // Visit instance's children as temp children of last node
-            }
         }
     }
 
@@ -240,13 +206,13 @@ SceneJS._Node.prototype._compileNodes = function(traversalContext, selectedChild
 /**
  * Wraps _compile to fire built-in events either side of rendering.
  * @private */
-SceneJS._Node.prototype._compileWithEvents = function(traversalContext) {
+SceneJS._Node.prototype._compileWithEvents = function() {
     if (this.attr.layer) {
         SceneJS_layerModule.pushLayer(this.attr.layer);
     }
 
     /* As scene is traversed, SceneJS_loadStatusModule will track the counts
-     * of nodes that are still initialising (ie. texture, instance nodes).
+     * of nodes that are still initialising
      *
      * If we are listening to "loading-status" events on this node, then we'll
      * get a snapshot of those stats, then report the difference from that
@@ -256,7 +222,7 @@ SceneJS._Node.prototype._compileWithEvents = function(traversalContext) {
     if (this.listeners["loading-status"]) {
         loadStatusSnapshot = SceneJS_loadStatusModule.getStatusSnapshot();
     }
-    this._compile(traversalContext);
+    this._compile();
     if (this.listeners["loading-status"]) { // Report diff of loading stats that occurred while rending this tree
         this._fireEvent("loading-status", SceneJS_loadStatusModule.diffStatus(loadStatusSnapshot));
     }
@@ -267,10 +233,10 @@ SceneJS._Node.prototype._compileWithEvents = function(traversalContext) {
 
 
 /** @private */
-SceneJS._Node.prototype._compileNodeAtIndex = function(index, traversalContext) {
+SceneJS._Node.prototype._compileNodeAtIndex = function(index) {
     if (index >= 0 && index < this.children.length) {
         var child = this.children[index];
-        child._compileWithEvents.call(child, traversalContext);
+        child._compileWithEvents.call(child);
     }
 };
 
@@ -892,55 +858,6 @@ SceneJS._Node.prototype._findNodesByType = function(type, list, recursive) {
 SceneJS._Node.prototype.getJSON = function() {
     return this.attr;
 };
-
-
-
-SceneJS_State.prototype._cleanStack = [];
-SceneJS_State.prototype._cleanStackLen = 0;
-
-SceneJS_State.prototype.setClean = function() {
-    if (!this.dirty) {
-        return;
-    }
-    if (!this.parent) {
-        this._cleanFunc(this.parent ? this.parent : null, this);
-        this.dirty = false;
-        return;
-    }
-
-    this._cleanStackLen = 0;
-
-    /* Stack dirty states on path to root
-     */
-    var state = this;
-    while (state && state.dirty) {
-        this._cleanStack[this._cleanStackLen++] = state;
-        state = state.parent;
-    }
-
-    /* Stack last clean state if existing
-     */
-    if (state && state.parent) {
-        this._cleanStack[this._cleanStackLen++] = state.parent;
-    }
-
-    /* Clean states down the path
-     */
-    var parentState;
-    for (var i = this._cleanStackLen - 1; i > 0; i--) {
-        parentState = this._cleanStack[i - 1];
-        state = this._cleanStack[i];
-        this._cleanFunc(parentState, state);
-        parentState.dirty = false;
-        state.dirty = false;
-    }
-};
-
-SceneJS_State.prototype.reset = function() {
-    this.children = [];
-    this.dirty = true;
-};
-
 
 
 

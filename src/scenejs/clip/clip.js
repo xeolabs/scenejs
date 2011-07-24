@@ -18,39 +18,16 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setClips(idStack[stackLen - 1], clipStack.slice(0, stackLen));
+                        SceneJS_DrawList.setClips(idStack[stackLen - 1], clipStack.slice(0, stackLen));
                     } else {
-                        SceneJS_renderModule.setClips();
+                        SceneJS_DrawList.setClips();
                     }
                     dirty = false;
                 }
             });
-
-    function pushClip(id, clip) {
-        var modelMat = SceneJS_modelTransformModule.transform.matrix;
-        var worldA = SceneJS_math_transformPoint3(modelMat, clip.a);
-        var worldB = SceneJS_math_transformPoint3(modelMat, clip.b);
-        var worldC = SceneJS_math_transformPoint3(modelMat, clip.c);
-        var normal = SceneJS_math_normalizeVec3(
-                SceneJS_math_cross3Vec4(
-                        SceneJS_math_normalizeVec3(
-                                SceneJS_math_subVec3(worldB, worldA, [0,0,0]), [0,0,0]),
-                        SceneJS_math_normalizeVec3(
-                                SceneJS_math_subVec3(worldB, worldC, [0,0,0]), [0,0,0])));
-
-        var dist = SceneJS_math_dotVector3(normal, worldA);
-
-        clip.normalAndDist = [normal[0], normal[1], normal[2], dist];
-        clipStack[stackLen] = clip;
-        idStack[stackLen] = id;
-        stackLen++;
-        dirty = true;
-    }
-
-    ;
 
     var Clip = SceneJS.createNodeType("clip");
 
@@ -60,6 +37,21 @@ new (function() {
             this.setA(params.a);
             this.setB(params.b);
             this.setC(params.c);
+
+//            this.core.doClean = function() {
+//                var modelMat = SceneJS_modelTransformModule.transform.matrix;
+//                var worldA = SceneJS_math_transformPoint3(modelMat, this.a);
+//                var worldB = SceneJS_math_transformPoint3(modelMat, this.b);
+//                var worldC = SceneJS_math_transformPoint3(modelMat, this.c);
+//                var normal = SceneJS_math_normalizeVec3(
+//                        SceneJS_math_cross3Vec4(
+//                                SceneJS_math_normalizeVec3(
+//                                        SceneJS_math_subVec3(worldB, worldA, [0,0,0]), [0,0,0]),
+//                                SceneJS_math_normalizeVec3(
+//                                        SceneJS_math_subVec3(worldB, worldC, [0,0,0]), [0,0,0])));
+//                var dist = SceneJS_math_dotVector3(normal, worldA);
+//                this.normalAndDist = [normal[0], normal[1], normal[2], dist];
+//            };
         }
     };
 
@@ -158,9 +150,31 @@ new (function() {
         };
     };
 
-    Clip.prototype._compile = function(traversalContext) {
-        pushClip(this.attr.id, this.core);
-        this._compileNodes(traversalContext);
+    Clip.prototype._compile = function() {
+
+        var core = this.core;
+
+                var modelMat = SceneJS_modelTransformModule.transform.matrix;
+                var worldA = SceneJS_math_transformPoint3(modelMat, core.a);
+                var worldB = SceneJS_math_transformPoint3(modelMat, core.b);
+                var worldC = SceneJS_math_transformPoint3(modelMat, core.c);
+                var normal = SceneJS_math_normalizeVec3(
+                        SceneJS_math_cross3Vec4(
+                                SceneJS_math_normalizeVec3(
+                                        SceneJS_math_subVec3(worldB, worldA, [0,0,0]), [0,0,0]),
+                                SceneJS_math_normalizeVec3(
+                                        SceneJS_math_subVec3(worldB, worldC, [0,0,0]), [0,0,0])));
+
+                var dist = SceneJS_math_dotVector3(normal, worldA);
+
+                core.normalAndDist = [normal[0], normal[1], normal[2], dist];
+
+        clipStack[stackLen] = core;
+        idStack[stackLen] = this.attr.id;
+        stackLen++;
+        dirty = true;
+
+        this._compileNodes();
     };
 
 })();

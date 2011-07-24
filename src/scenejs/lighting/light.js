@@ -14,12 +14,12 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
+                        SceneJS_DrawList.setLights(idStack[stackLen - 1], lightStack.slice(0, stackLen));
                     } else { // Full compile supplies it's own default states
-                        SceneJS_renderModule.setLights();
+                        SceneJS_DrawList.setLights();
                     }
                     dirty = false;
                 }
@@ -30,7 +30,9 @@ new (function() {
     Light.prototype._init = function(params) {
         params = params || {};
         if (this.core._nodeCount == 1) { // This node is the resource definer
-            this.core.light = {};
+            this.core.light = {
+               viewSpace: !!params.viewSpace
+            };
             this.setMode(params.mode);
             this.setColor(params.color);
             this.setDiffuse(params.diffuse);
@@ -51,7 +53,6 @@ new (function() {
                     "Light unsupported mode - should be 'dir' or 'point' or 'ambient'");
         }
         this.core.light.mode = mode;
-        return this;
     };
 
     Light.prototype.getMode = function() {
@@ -65,7 +66,6 @@ new (function() {
             color.g != undefined ? color.g : 1.0,
             color.b != undefined ? color.b : 1.0
         ];
-        return this;
     };
 
     Light.prototype.getColor = function() {
@@ -77,7 +77,6 @@ new (function() {
 
     Light.prototype.setDiffuse = function (diffuse) {
         this.core.light.diffuse = (diffuse != undefined) ? diffuse : true;
-        return this;
     };
 
     Light.prototype.getDiffuse = function() {
@@ -86,7 +85,6 @@ new (function() {
 
     Light.prototype.setSpecular = function (specular) {
         this.core.light.specular = specular || true;
-        return this;
     };
 
     Light.prototype.getSpecular = function() {
@@ -96,7 +94,6 @@ new (function() {
     Light.prototype.setPos = function(pos) {
         pos = pos || {};
         this.core.light.pos = [ pos.x || 0.0, pos.y || 0.0, pos.z || 0.0 ];
-        return this;
     };
 
     Light.prototype.getPos = function() {
@@ -106,7 +103,6 @@ new (function() {
     Light.prototype.setDir = function(dir) {
         dir = dir || {};
         this.core.light.dir = [ dir.x || 0.0, dir.y || 0.0, (dir.z == undefined || dir.z == null) ? -1 : dir.z ];
-        return this;
     };
 
     Light.prototype.getDir = function() {
@@ -115,7 +111,6 @@ new (function() {
 
     Light.prototype.setConstantAttenuation = function (constantAttenuation) {
         this.core.light.constantAttenuation = (constantAttenuation != undefined) ? constantAttenuation : 1.0;
-        return this;
     };
 
     Light.prototype.getConstantAttenuation = function() {
@@ -124,7 +119,6 @@ new (function() {
 
     Light.prototype.setLinearAttenuation = function (linearAttenuation) {
         this.core.light.linearAttenuation = linearAttenuation || 0.0;
-        return this;
     };
 
     Light.prototype.getLinearAttenuation = function() {
@@ -133,20 +127,13 @@ new (function() {
 
     Light.prototype.setQuadraticAttenuation = function (quadraticAttenuation) {
         this.core.light.quadraticAttenuation = quadraticAttenuation || 0.0;
-        return this;
     };
 
     Light.prototype.getQuadraticAttenuation = function() {
         return this.core.light.quadraticAttenuation;
     };
 
-    Light.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
-        this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
-    };
-
-    Light.prototype._preCompile = function() {
+    Light.prototype._compile = function() {
         var modelMat = SceneJS_modelTransformModule.transform.matrix;
         if (this.core.light.mode == "point") {
             this.core.light.worldPos = SceneJS_math_transformPoint3(modelMat, this.core.light.pos);
@@ -157,9 +144,8 @@ new (function() {
         lightStack[stackLen] = this.core.light;
         stackLen++;
         dirty = true;
-    };
 
-    Light.prototype._postCompile = function() {
+        this._compileNodes();
     };
 
 })();

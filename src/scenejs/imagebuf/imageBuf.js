@@ -1,51 +1,44 @@
 new (function() {
 
     var sceneBufs = {};
-    var currentSceneBufs = null;
 
     var idStack = [];
     var bufStack = [];
     var stackLen = 0;
 
-    var canvas;
     var dirty;
 
     SceneJS_eventModule.addListener(
-            SceneJS_eventModule.INIT,
-            function() {
-                sceneBufs = {};
-                currentSceneBufs = null;
-            });
-
-    SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function(e) {
-                canvas = e.canvas;
-                currentSceneBufs = sceneBufs[e.sceneId];
-                if (!currentSceneBufs) {
-                    currentSceneBufs = sceneBufs[e.sceneId] = {};
-                }
+            function() {
                 stackLen = 0;
                 dirty = true;
             });
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setImagebuf(idStack[stackLen - 1], bufStack[stackLen - 1]);
-                    } else  { // Full compile supplies it's own default states
-                        SceneJS_renderModule.setImagebuf(); // No imageBuf
+                        SceneJS_DrawList.setImagebuf(idStack[stackLen - 1], bufStack[stackLen - 1]);
+                    } else { // Full compile supplies it's own default states
+                        SceneJS_DrawList.setImagebuf(); // No imageBuf
                     }
                     dirty = false;
                 }
             });
 
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_DESTROYED,
+            function(params) {
+                sceneBufs[params.sceneId] = null;
+            });
+
     /** Creates image buffer, registers it under the given ID
      */
-    function createImageBuffer(id) {
-        var bufId = id;
+    function createImageBuffer(scene, bufId) {
+
+        var canvas = scene.canvas;
         var gl = canvas.context;
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
@@ -155,29 +148,21 @@ new (function() {
 
         /* Register the buffer
          */
-        currentSceneBufs[bufId] = buf;
-
-        return bufId;
-    }
-
-    function pushImageBuffer(id, bufId) {
-        var buf = currentSceneBufs[bufId];
-        if (!buf) {
-            throw SceneJS_errorModule.fatalError("Image buffer not found: " + bufId);
+        var bufs = sceneBufs[scene.attr.id];
+        if (!bufs) {
+            bufs = sceneBufs[scene.attr.id] = {};
         }
-        idStack[stackLen] = id;
-        bufStack[stackLen] = buf;
-        stackLen++;
-        dirty = true;
+        bufs[bufId] = buf;
+        return buf;
     }
 
-    function destroyImageBuffer(bufId) {
+    function destroyImageBuffer(buf) {
 
     }
 
     SceneJS._compilationStates.setSupplier("imagebuf", {
-        get: function(id) {
-            var bufs = currentSceneBufs;
+        get: function(sceneId, id) {
+            var bufs = sceneBufs[sceneId];
             return {
                 bind: function(unit) {
                     var buf = bufs[id];
@@ -196,46 +181,27 @@ new (function() {
         }
     });
 
-    function popImageBuffer() {
-        stackLen--;
-        dirty = true;
-    }
-
-    ;
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_DESTROYED,
-            function() {
-
-            });
-
     var ImageBuf = SceneJS.createNodeType("imageBuf");
 
-    ImageBuf.prototype._init = function(params) {
+    ImageBuf.prototype._init = function() {
+        this._buf = createImageBuffer(this.scene, this.attr.id);
     };
 
-    ImageBuf.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
-        this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
-    };
+    ImageBuf.prototype._compile = function() {
+        idStack[stackLen] = this.attr.id;
+        bufStack[stackLen] = this._buf;
+        stackLen++;
+        dirty = true;
 
-    ImageBuf.prototype._preCompile = function(traversalContext) {
-        if (!this._bufId) {
-            this._bufId = createImageBuffer(this.attr.id);
-        }
-        pushImageBuffer(this.attr.id, this._bufId);
-    };
+        this._compileNodes();
 
-    ImageBuf.prototype._postCompile = function(traversalContext) {
-        popImageBuffer();
+        stackLen--;
+        dirty = true;
     };
 
     ImageBuf.prototype._destroy = function() {
-        if (this._bufId) {
-            destroyImageBuffer(this._bufId);
-            this._bufId = null;
+        if (this._buf) {
+            destroyImageBuffer(this._buf);
         }
     };
-
 })();

@@ -1,7 +1,7 @@
 <project name="" basedir="." default="package">
 
-    <property name="BUILD_MAJOR" value="0"/>
-    <property name="BUILD_MINOR" value="9"/>
+    <property name="BUILD_MAJOR" value="1"/>
+    <property name="BUILD_MINOR" value="0"/>
     <property name="BUILD_ID" value="0"/>
     <property name="PATCH_ID" value="0"/>
 
@@ -34,6 +34,7 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/core/core.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/node.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/core/state.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/service.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/nodeSelector.js"/>
 
@@ -47,7 +48,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/core/webgl-trace.js"/>
 
-
         <fileset dir="${SRC_DIR}" includes="scenejs/events/eventsModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/compile/compileCfg.js"/>
@@ -57,21 +57,15 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/time/timeModule.js"/>
-
         <fileset dir="${SRC_DIR}" includes="scenejs/layers/layerModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/instancing/library.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/instancing/instance.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/selector/selector.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/scene/scene.js"/>
 
+        <fileset dir="${SRC_DIR}" includes="scenejs/shading/drawList.js"/>        
         <fileset dir="${SRC_DIR}" includes="scenejs/shading/nodeRenderer.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/shading/renderModule.js"/>
 
-        <!--<fileset dir="${SRC_DIR}" includes="scenejs/renderer/rendererConfigModule.js"/>-->
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/flags/flagsModule.js"/>
@@ -89,7 +83,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/text/bitmapTextModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/text/text.js"/>
 
-
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/modelTransformModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/rotate.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/translate.js"/>
@@ -104,15 +97,12 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/projectionModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/camera.js"/>
 
+        <!-- Stripped down provisional modelling matrix -->
+         <fileset dir="${SRC_DIR}" includes="scenejs/transformation/xform.js"/>
+
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/material/materialModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
-
         <fileset dir="${SRC_DIR}" includes="scenejs/colortrans/colortrans.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/interpolation/interpolator.js"/>
-
         <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>

@@ -1,6 +1,3 @@
-/**
- * @class A scene node that defines morphing of geometry positions
- */
 new (function() {
 
     var idStack = [];
@@ -10,94 +7,21 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function(params) {
+            function() {
                 stackLen = 0;
             });
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-
-                        /* Get top morph on stack
-                         */
-                        var morph = morphStack[stackLen - 1];
-                        var factor = morph.factor;
-
-                        /* Will hold target frame enclosing factor
-                         */
-                        var key1;
-                        var key2;
-
-                        /* Find the target frame
-                         */
-                        if (factor <= morph.keys[0]) {
-
-                            /* Clamp to first target frame
-                             */
-                            factor = morph.keys[0];
-                            key1 = 0;
-                            key2 = 1;
-
-                        } else {
-
-                            if (factor >= morph.keys[morph.keys.length - 1]) {
-
-                                /* Clamp to last target frame
-                                 */
-                                factor = morph.keys[morph.keys.length - 1];
-                                key1 = morph.keys.length - 2;
-                                key2 = morph.keys.length - 1;
-
-                            } else {
-
-                                /* Find target frame enclosing
-                                 */
-                                for (var i = morph.targets.length - 1; i >= 0; i--) {
-                                    if (factor > morph.keys[i]) {
-                                        key1 = i;
-                                        key2 = i + 1; // Clamping to last ensures this is never out of range
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        /* Normalise factor to range [0.0..1.0] for the target frame
-                         */
-                        var normalizedFactor = (factor - morph.keys[key1]) / (morph.keys[key2] - morph.keys[key1]);
-                        SceneJS_renderModule.setMorph(idStack[stackLen - 1], { // Set factor and target frame on shader module
-                            factor: normalizedFactor,
-                            target1: morph.targets[key1],
-                            target2: morph.targets[key2]
-                        });
-
-                    } else { // Set null morph
-                        SceneJS_renderModule.setMorph();
+                        SceneJS_DrawList.setMorph(idStack[stackLen - 1], morphStack[stackLen - 1]);
+                    } else {
+                        SceneJS_DrawList.setMorph();
                     }
                     dirty = false;
                 }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.RESET,
-            function() {
-//                for (var canvasId in canvasMorphs) {    // Destroy geometries on all canvases
-//                    if (canvasMorphs.hasOwnProperty(canvasId)) {
-//                        var morphs = canvasMorphs[canvasId];
-//                        for (var resource in morphs) {
-//                            if (morphs.hasOwnProperty(resource)) {
-//                                var morph = morphs[resource];
-//                                destroyMorph(morph);
-//                            }
-//                        }
-//                    }
-//                }
-//                canvas = null;
-//                canvasMorphs = {};
-//                currentMorphs = null;
-                stackLen = 0;
             });
 
     /**
@@ -127,7 +51,6 @@ new (function() {
 
 
     function createMorphGeometry(scene, source, options, callback) {
-
         if (typeof source == "string") {
 
             /* Load from stream - http://scenejs.wikispaces.com/MorphGeoLoaderService
@@ -141,8 +64,7 @@ new (function() {
 
             /* Create from arrays
              */
-            var data = createTypedMorph(source);
-            return _createMorph(scene, data, options);
+            return _createMorph(scene, createTypedMorph(source), options);
         }
     }
 
@@ -175,7 +97,9 @@ new (function() {
             scene: scene,
             canvas: scene.canvas,
             keys: data.keys,
-            targets: []
+            targets: [],
+            key1: 0,
+            key2: 1
         };
 
         try {
@@ -263,9 +187,10 @@ new (function() {
 
                 /* Create from arrays
                  */
-                var data = this._createMorphData(params);
-                SceneJS._apply(createMorphGeometry(this.scene, data, params.options), this.core);
+                SceneJS._apply(createMorphGeometry(this.scene, this._createMorphData(params), params.options), this.core);
             }
+            
+            this.setFactor(params.factor);
         }
 
         this.core.factor = params.factor || 0;
@@ -328,8 +253,11 @@ new (function() {
         }
         return {
             keys : keys,
-            targets : targets
-        }
+            targets : targets,
+            key1 : 0,
+            key2 : 1,
+            factor: 0
+        };
     };
 
     MorphGeometry.prototype.getState = function() {
@@ -341,17 +269,48 @@ new (function() {
     };
 
     MorphGeometry.prototype.setFactor = function(factor) {
-        this.core.factor = factor || 0.0;
+        factor = factor || 0.0;
+
+        var core = this.core;
+
+        var keys = core.keys;
+        var key1 = core.key1;
+        var key2 = core.key2;
+
+        if (factor < keys[0]) {
+            key1 = 0;
+            key2 = 1;
+
+        } else if (factor > keys[keys.length - 1]) {
+            key1 = keys.length - 2;
+            key2 = key1 + 1;
+
+        } else {
+            while (keys[key1] > factor) {
+                key1--;
+                key2--;
+            }
+            while (keys[key2] < factor) {
+                key1++;
+                key2++;
+            }
+        }
+
+        /* Normalise factor to range [0.0..1.0] for the target frame
+         */
+        core.factor = (factor - keys[key1]) / (keys[key2] - keys[key1]);
+        core.key1 = key1;
+        core.key2 = key2;
     };
 
     MorphGeometry.prototype.getFactor = function() {
         return this.core.factor;
     };
 
-    MorphGeometry.prototype._compile = function(traversalContext) {
-        this._preCompile(traversalContext);
-        this._compileNodes(traversalContext);
-        this._postCompile(traversalContext);
+    MorphGeometry.prototype._compile = function() {
+        this._preCompile();
+        this._compileNodes();
+        this._postCompile();
     };
 
     MorphGeometry.prototype._preCompile = function() {

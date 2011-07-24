@@ -4,7 +4,6 @@
  */
 new (function() {
 
-    var canvas;
     var idStack = [];
     var textureStack = [];
     var stackLen = 0;
@@ -15,23 +14,22 @@ new (function() {
             function() {
 
             });
-   
+
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
-            function(params) {
-                canvas = params.canvas;
+            function() {
                 stackLen = 0;
                 dirty = true;
             });
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setTexture(idStack[stackLen - 1], textureStack[stackLen - 1]);
+                        SceneJS_DrawList.setTexture(idStack[stackLen - 1], textureStack[stackLen - 1]);
                     } else {
-                        SceneJS_renderModule.setTexture();
+                        SceneJS_DrawList.setTexture();
                     }
                     dirty = false;
                 }
@@ -39,8 +37,8 @@ new (function() {
 
     /** Creates texture from either image URL or image object
      */
-    function createTexture(cfg, onComplete) {
-        var context = canvas.context;
+    function createTexture(scene, cfg, onComplete) {
+        var context = scene.canvas.context;
         var textureId = SceneJS._createUUID();
         try {
             if (cfg.autoUpdate) {
@@ -50,21 +48,20 @@ new (function() {
                         context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
                     }
                     catch(e) {
-
                         context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image, null);
                     }
                     context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
                     context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
-                    //  context.generateMipmap(context.TEXTURE_2D);
+                    //context.generateMipmap(context.TEXTURE_2D);
                 };
             }
             return new SceneJS_webgl_Texture2D(context, {
                 textureId : textureId,
-                canvas: canvas,
+                canvas: scene.canvas,
                 image : cfg.image,
                 url: cfg.uri,
                 texels :cfg.texels,
-                minFilter : getGLOption("minFilter", context, cfg, context.LINEAR),
+                minFilter : getGLOption("minFilter", context, cfg, context.NEAREST_MIPMAP_NEAREST),
                 magFilter :  getGLOption("magFilter", context, cfg, context.LINEAR),
                 wrapS : getGLOption("wrapS", context, cfg, context.CLAMP_TO_EDGE),
                 wrapT :   getGLOption("wrapT", context, cfg, context.CLAMP_TO_EDGE),
@@ -113,17 +110,6 @@ new (function() {
         texture.destroy();
     }
 
-    function pushTexture(id, layers) {
-        idStack[stackLen] = id;
-        textureStack[stackLen] = layers;
-        stackLen++;
-        dirty = true;
-    }
-
-    function popTexture() {
-        stackLen--;
-        dirty = true;
-    }
 
     /*----------------------------------------------------------------------------------------------------------------
      * Texture node
@@ -134,12 +120,8 @@ new (function() {
     Texture.prototype._init = function(params) {
 
         if (this.core._nodeCount == 1) { // This node is the resource definer
-
             this.core.layers = [];
             this.core.params = {};
-
-            /* When set, texture waits for layers to load before compiling children
-             */
             var config = SceneJS_debugModule.getConfigs("texturing") || {};
             var waitForLoad = (config.waitForLoad != undefined && config.waitForLoad != null)
                     ? config.waitForLoad
@@ -188,7 +170,8 @@ new (function() {
                                 "should be either 'baseColor', 'specular' or 'normals'");
                     }
                 }
-                this.core.layers.push({
+
+                var layer = {
                     image : null,                       // Initialised when state == IMAGE_LOADED
                     creationParams: layerParam,         // Create texture using this
                     waitForLoad: waitForLoad,
@@ -196,13 +179,31 @@ new (function() {
                     applyFrom: layerParam.applyFrom || "uv",
                     applyTo: layerParam.applyTo || "baseColor",
                     blendMode: layerParam.blendMode || "add",
-                    blendFactor: (layerParam.blendFactor != undefined && layerParam.blendFactor != null) ? layerParam.blendFactor : 1.0 ,
-                    scale : layerParam.scale,
-                    translate : layerParam.translate,
-                    rotate : layerParam.rotate,
-                    rebuildMatrix : true
-                });
-            }         
+                    blendFactor: (layerParam.blendFactor != undefined && layerParam.blendFactor != null) ? layerParam.blendFactor : 1.0,
+                    translate: { x:0, y: 0},
+                    scale: { x: 1, y: 1 },
+                    rotate: 0.0
+                };
+
+                this.core.layers.push(layer);
+
+                this._setLayerTransform(layerParam, layer);
+
+                if (layer.creationParams.imageBuf) {
+                    layer.texture = SceneJS._compilationStates.getState("imagebuf", this.scene.attr.id, layer.creationParams.imageBuf);
+                } else {
+                    var self = this;
+                    layer.texture = createTexture(
+                            this.scene,
+                            layer.creationParams,
+                            function() {
+                                if (self._destroyed) {
+                                    destroyTexture(layer.texture);
+                                }
+                                SceneJS_compileModule.nodeUpdated(self, "loaded"); // Trigger display list redraw
+                            });
+                }
+            }
         }
     };
 
@@ -217,138 +218,83 @@ new (function() {
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Invalid Texture#setLayer argument: index out of range (" + this.core.layers.length + " layers defined)");
         }
-        var layer = this.core.layers[cfg.index];
-        cfg = cfg.cfg || {};
-        if (cfg.translate) {
-            this.setTranslate(layer, cfg.translate);
-        }
-        if (cfg.scale) {
-            this.setScale(layer, cfg.scale);
-        }
-        if (cfg.rotate) {
-            this.setRotate(layer, cfg.rotate);
-        }
+        this._setLayer(parseInt(cfg.index), cfg);
     };
 
     Texture.prototype.setLayers = function(layers) {
+        var indexNum;
         for (var index in layers) {
             if (layers.hasOwnProperty(index)) {
                 if (index != undefined || index != null) {
-
-                    if (index < 0 || index >= this.core.layers.length) {
+                    indexNum = parseInt(index);
+                    if (indexNum < 0 || indexNum >= this.core.layers.length) {
                         throw SceneJS_errorModule.fatalError(
                                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
                                 "Invalid Texture#setLayer argument: index out of range (" + this.core.layers.length + " layers defined)");
                     }
-                    var cfg = layers[index] || {};
-                    var layer = this.core.layers[index];
-                    if (cfg.translate) {
-                        this.setTranslate(layer, cfg.translate);
-                    }
-                    if (cfg.scale) {
-                        this.setScale(layer, cfg.scale);
-                    }
-                    if (cfg.rotate) {
-                        this.setRotate(layer, cfg.rotate);
-                    }
-                    if (cfg.blendFactor != undefined && cfg.blendFactor != null) {
-                        layer.blendFactor = cfg.blendFactor;
-                    }
+                    this._setLayer(indexNum, layers[index] || {});
                 }
             }
         }
     };
 
-    Texture.prototype.setTranslate = function(layer, xy) {
-        if (!layer.translate) {
-            layer.translate = { x: 0, y: 0 };
+    Texture.prototype._setLayer = function(index, cfg) {
+        cfg = cfg || {};
+        var layer = this.core.layers[index];
+        if (cfg.blendFactor != undefined && cfg.blendFactor != null) {
+            layer.blendFactor = cfg.blendFactor;
         }
-        if (xy.x != undefined) {
-            layer.translate.x = xy.x;
-        }
-        if (xy.y != undefined) {
-            layer.translate.y = xy.y;
-        }
-        layer.rebuildMatrix = true;
+        this._setLayerTransform(cfg, layer);
     };
 
-    Texture.prototype.setScale = function(layer, xy) {
-        if (!layer.scale) {
-            layer.scale = { x: 1, y: 1 };
-        }
-        if (xy.x != undefined) {
-            layer.scale.x = xy.x;
-        }
-        if (xy.y != undefined) {
-            layer.scale.y = xy.y;
-        }
-        layer.rebuildMatrix = true;
-    };
-
-    Texture.prototype.setRotate = function(layer, angle) {
-        if (!layer.rotate) {
-            layer.rotate = angle;
-        }
-        layer.rotate = angle;
-        layer.rebuildMatrix = true;
-    };
-
-    Texture.prototype._compile = function(traversalContext) {
-        var layer;
-        for (var i = 0; i < this.core.layers.length; i++) {
-            layer = this.core.layers[i];
-            if (!layer.texture) {
-                if (layer.creationParams.imageBuf) {
-                    layer.texture = SceneJS._compilationStates.getState("imagebuf", layer.creationParams.imageBuf);
-                } else {
-                    var self = this;
-                    layer.texture = createTexture(
-                            layer.creationParams,
-                            function() {
-                                if (self._destroyed) {
-                                    destroyTexture(layer.texture);
-                                }
-                                SceneJS_compileModule.nodeUpdated(self, "loaded"); // Trigger display list redraw
-                            });
-                }
-                SceneJS_loadStatusModule.status.numNodesLoading++;
-            } else {
-                SceneJS_loadStatusModule.status.numNodesLoaded++;
+    Texture.prototype._setLayerTransform = function(cfg, layer) {
+        var matrix;
+        var t;
+        if (cfg.translate) {
+            var translate = cfg.translate;
+            if (translate.x != undefined) {
+                layer.translate.x = translate.x;
             }
-            if (layer.rebuildMatrix) {
-                this._rebuildTextureMatrix(layer);
+            if (translate.y != undefined) {
+                layer.translate.y = translate.y;
             }
-        }
-        pushTexture(this.attr.id, this.core.layers);
-        this._compileNodes(traversalContext);
-        popTexture();
-    };
-
-    Texture.prototype._rebuildTextureMatrix = function(layer) {
-        if (layer.rebuildMatrix) {
-            if (layer.translate || layer.rotate || layer.scale) {
-                layer.matrix = Texture.prototype._getMatrix(layer.translate, layer.rotate, layer.scale);
-                layer.matrixAsArray = new Float32Array(layer.matrix);
-                layer.rebuildMatrix = false;
-            }
-        }
-    };
-
-    Texture.prototype._getMatrix = function(translate, rotate, scale) {
-        var matrix = null;
-        if (translate) {
             matrix = SceneJS_math_translationMat4v([ translate.x || 0, translate.y || 0, 0]);
         }
-        if (scale) {
-            var t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
+        if (cfg.scale) {
+            var scale = cfg.scale;
+            if (scale.x != undefined) {
+                layer.scale.x = scale.x;
+            }
+            if (scale.y != undefined) {
+                layer.scale.y = scale.y;
+            }
+            t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
             matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
         }
-        if (rotate) {
-            var t = SceneJS_math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
+        if (cfg.rotate != undefined && cfg.rotate != null) {
+            var rotate = cfg.rotate;
+            layer.rotate = rotate;
+            t = SceneJS_math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
             matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
         }
-        return matrix;
+        if (matrix) {
+            layer.matrix = matrix;
+            layer.matrixAsArray = new Float32Array(layer.matrix); // TODO - reinsert into array
+        }
     };
+
+    Texture.prototype._compile = function() {
+        idStack[stackLen] = this.attr.id;
+        textureStack[stackLen] = this.core;
+        stackLen++;
+        dirty = true;
+
+        this._compileNodes();
+
+        stackLen--;
+        dirty = true;
+    };
+
 
     Texture.prototype._destroy = function() {
         if (this.core._nodeCount == 1) { // Last resource user

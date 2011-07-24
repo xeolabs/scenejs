@@ -5,7 +5,7 @@
  * traversal by the other modules, then when traversal is finished, sort them into a sequence of
  * that would involve minimal WebGL state changes, then apply the sequence to WebGL.
  */
-var SceneJS_renderModule = new (function() {
+var SceneJS_DrawList = new (function() {
 
     this._DEFAULT_STATE_SORT_DELAY = 10;
 
@@ -73,7 +73,7 @@ var SceneJS_renderModule = new (function() {
     });
 
     this._DEFAULT_COLORTRANS_STATE = createState({
-        trans : null,
+        core : null,
         hash :"f"
     });
 
@@ -132,8 +132,6 @@ var SceneJS_renderModule = new (function() {
     });
 
     this._DEFAULT_TEXTURE_STATE = createState({
-        layers: [],
-        params: {},
         hash: ""
     });
 
@@ -164,11 +162,6 @@ var SceneJS_renderModule = new (function() {
         shader : {}
     });
 
-
-    /*----------------------------------------------------------------------
-     *
-     *--------------------------------------------------------------------*/
-
     /** Shader programs currently allocated on all canvases
      */
     this._programs = {};
@@ -187,8 +180,6 @@ var SceneJS_renderModule = new (function() {
     this._nodeMap = null;
     this._stateMap = null;
     var nextStateId;
-
-    var idPrefix;
 
     var nextProgramId = 0;
 
@@ -265,9 +256,6 @@ var SceneJS_renderModule = new (function() {
                             context: params.canvas.context
                         }),
 
-                        boundaries : [],        // Node boundaries packed in one array
-                        boundaryNodes : [],     // Maps boundary index to node ID
-
                         bin: [],                // Draw list - state sorting happens here
                         lenBin: 0,
 
@@ -319,9 +307,7 @@ var SceneJS_renderModule = new (function() {
 
         this._stateHash = null;
 
-        idPrefix = null;
-
-        if (options.compileMode == SceneJS_renderModule.COMPILE_SCENE) {        // Rebuild display list for entire scene
+        if (options.compileMode == SceneJS_DrawList.COMPILE_SCENE) {        // Rebuild display list for entire scene
 
             /* Going to rebuild the state graph as we recompile
              * the entire scene graph. We'll set the state soup to
@@ -357,7 +343,7 @@ var SceneJS_renderModule = new (function() {
 
             this._forceBinSort(true);             // Sort display list with orders re-built from layer orders
 
-        } else if (options.compileMode == SceneJS_renderModule.COMPILE_NODES) {   // Rebuild display list for subtree
+        } else if (options.compileMode == SceneJS_DrawList.COMPILE_NODES) {   // Rebuild display list for subtree
 
             /* Going to overwrite selected state graph nodes
              * as we partially recompile portions of the scene graph.
@@ -379,35 +365,24 @@ var SceneJS_renderModule = new (function() {
 
 
     this.marshallStates = function() {
-        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { fullCompile : this.compileMode === SceneJS_renderModule.COMPILE_SCENE });
+        SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_RENDERING, { fullCompile : this.compileMode === SceneJS_DrawList.COMPILE_SCENE });
     };
 
     /*-----------------------------------------------------------------------------------------------------------------
      * State setting/updating
      *----------------------------------------------------------------------------------------------------------------*/
 
-    /**
-     * Set when pre/post compiling instance nodes, this is prefixed to all IDs
-     * by getState to disambiguate when the ID'd nodes are within instances
-     */
-    this.setIDPrefix = function(id) {
-        idPrefix = id;
-    };
-
     /** Find or create a new state of the given state type and node ID
      * @param stateType ID of the type of state, eg.  this._TEXTURE etc
      * @param id ID of scene graph node that is setting this state
      */
-    this._getState = function(stateType, id, noPrefix) {
-        if (!noPrefix && idPrefix) {
-            id = idPrefix + id;
-        }
+    this._getState = function(stateType, id) {
         var state;
         var typeMap = this._stateMap[stateType];
         if (!typeMap) {
             typeMap = this._stateMap[stateType] = {};
         }
-        if (this.compileMode != SceneJS_renderModule.COMPILE_SCENE) {
+        if (this.compileMode != SceneJS_DrawList.COMPILE_SCENE) {
             state = typeMap[id];
             if (!state) {
                 state = {
@@ -451,9 +426,6 @@ var SceneJS_renderModule = new (function() {
         }
     };
 
-    /**
-     * Set the current world-space clipping planes
-     */
     this.setClips = function(id, clips) {
         if (!id) {
             clipState = this._DEFAULT_CLIP_STATE;
@@ -462,7 +434,7 @@ var SceneJS_renderModule = new (function() {
         }
         clipState = this._getState(this._CLIPS, id);
         clips = clips || [];
-        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             if (clips.length > 0) {
                 var hash = [];
                 for (var i = 0; i < clips.length; i++) {
@@ -478,26 +450,20 @@ var SceneJS_renderModule = new (function() {
         clipState.clips = clips;
     };
 
-    /**
-     * Set the current color transform
-     */
-    this.setColortrans = function(id, trans) {
+    this.setColortrans = function(id, core) {
         if (!id) {
             colortransState = this._DEFAULT_COLORTRANS_STATE;
             this._stateHash = null;
             return;
         }
         colortransState = this._getState(this._COLORTRANS, id, true);
-        colortransState.trans = trans;
-        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
-            colortransState.hash = trans ? "t" : "f";
+        colortransState.core = core;
+        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
+            colortransState.hash = core ? "t" : "f";
             this._stateHash = null;
         }
     };
 
-    /**
-     * Set the current flags
-     */
     this.setFlags = function(id, flags) {
         if (arguments.length == 0) {
             flagsState = this._DEFAULT_FLAGS_STATE;
@@ -508,9 +474,6 @@ var SceneJS_renderModule = new (function() {
         this._states.lenEnabledBin = 0;
     };
 
-    /**
-     * Set the current fog
-     */
     this.setFog = function(id, fog) {
         if (arguments.length == 0) {
             fogState = this._DEFAULT_FOG_STATE;
@@ -519,15 +482,12 @@ var SceneJS_renderModule = new (function() {
         }
         fogState = this._getState(this._FOG, id);
         fogState.fog = fog;
-        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             fogState.hash = fog ? fog.mode : "";
             this._stateHash = null;
         }
     };
 
-    /**
-     * Set the current image buffer
-     */
     this.setImagebuf = function(id, imageBuf) {
         if (arguments.length == 0) {
             imageBufState = this._DEFAULT_IMAGEBUF_STATE;
@@ -537,9 +497,6 @@ var SceneJS_renderModule = new (function() {
         imageBufState.imageBuf = imageBuf;
     };
 
-    /**
-     * Set the current world-space light sources
-     */
     this.setLights = function(id, lights) {
         if (arguments.length == 0) {
             lightState = this._DEFAULT_LIGHTS_STATE;
@@ -548,7 +505,7 @@ var SceneJS_renderModule = new (function() {
         }
         lightState = this._getState(this._LIGHTS, id);
         lights = lights || [];
-        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             var hash = [];
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
@@ -566,9 +523,6 @@ var SceneJS_renderModule = new (function() {
         lightState.lights = lights;
     };
 
-    /**
-     * Set the current surface material
-     */
     this.setMaterial = function(id, material) {
         if (arguments.length == 0) {
             materialState = this._DEFAULT_MATERIAL_STATE;
@@ -578,9 +532,6 @@ var SceneJS_renderModule = new (function() {
         materialState.material = material || this._DEFAULT_MATERIAL_STATE.material;
     };
 
-    /**
-     * Set model-space morph targets
-     */
     this.setMorph = function(id, morph) {
         if (arguments.length == 0) {
             morphState = this._DEFAULT_MORPH_STATE;
@@ -588,14 +539,14 @@ var SceneJS_renderModule = new (function() {
             return;
         }
         morphState = this._getState(this._MORPH, id);
-        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             if (morph) {
-                var target1 = morph.target1;
+                var target0 = morph.targets[0];  // All targets have same arrays
                 morphState.hash = ([
-                    target1.vertexBuf ? "t" : "f",
-                    target1.normalBuf ? "t" : "f",
-                    target1.uvBuf ? "t" : "f",
-                    target1.uvBuf2 ? "t" : "f"]).join("")
+                    target0.vertexBuf ? "t" : "f",
+                    target0.normalBuf ? "t" : "f",
+                    target0.uvBuf ? "t" : "f",
+                    target0.uvBuf2 ? "t" : "f"]).join("")
             } else {
                 morphState.hash = "";
             }
@@ -615,18 +566,17 @@ var SceneJS_renderModule = new (function() {
         this._stateHash = null;
     };
 
-
-    this.setTexture = function(id, layers) {
+    this.setTexture = function(id, core) {
         if (arguments.length == 0) {
             texState = this._DEFAULT_TEXTURE_STATE;
             this._stateHash = null;
             return;
         }
         texState = this._getState(this._TEXTURE, id);
-        layers = layers || [];
-        if (this.compileMode == SceneJS_renderModule.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             var hashStr;
-            if (layers.length > 0) {
+            if (core && core.layers.length > 0) {
+                var layers = core.layers;
                 var hash = [];
                 for (var i = 0, len = layers.length; i < len; i++) {
                     var layer = layers[i];
@@ -647,12 +597,9 @@ var SceneJS_renderModule = new (function() {
             texState.hash = hashStr;
             this._stateHash = null;
         }
-        texState.layers = layers;
+        texState.core = core;
     };
 
-    /**
-     * Set the current renderer configs
-     */
     this.setRenderer = function(id, props) {
         if (arguments.length == 0) {
             rendererState = this._DEFAULT_RENDERER_STATE;
@@ -662,9 +609,7 @@ var SceneJS_renderModule = new (function() {
         rendererState.props = props;
         this._stateHash = null;
     };
-    /**
-     * Set the current model matrix and model normal matrix
-     */
+
     this.setModelTransform = function(id, mat, normalMat) {
         if (arguments.length == 0) {
             modelXFormState = this._DEFAULT_MODEL_TRANSFORM_STATE;
@@ -675,21 +620,15 @@ var SceneJS_renderModule = new (function() {
         modelXFormState.normalMat = normalMat || this._DEFAULT_NORMAL_MAT;
     };
 
-    /**
-     * Set the current projection matrix
-     */
-    this.setProjectionTransform = function(id, mat) {
+    this.setProjectionTransform = function(id, transform) {
         if (arguments.length == 0) {
             projXFormState = this._DEFAULT_PROJ_TRANSFORM_STATE;
             return;
         }
         projXFormState = this._getState(this._PROJ_TRANSFORM, id);
-        projXFormState.mat = mat || this._DEFAULT_MAT;
+        projXFormState.mat = transform.matrixAsArray || this._DEFAULT_MAT;
     };
 
-    /**
-     * Set the current view matrix and view normal matrix
-     */
     this.setViewTransform = function(id, mat, normalMat, lookAt) {
         if (arguments.length == 0) {
             viewXFormState = this._DEFAULT_VIEW_TRANSFORM_STATE;
@@ -701,9 +640,6 @@ var SceneJS_renderModule = new (function() {
         viewXFormState.lookAt = lookAt || SceneJS_math_LOOKAT_ARRAYS;
     };
 
-    /**
-     * Set the current pick listeners
-     */
     this.setPickListeners = function(id, listeners) {
         if (arguments.length == 0) {
             pickListenersState = this._DEFAULT_PICK_LISTENERS_STATE;
@@ -713,9 +649,6 @@ var SceneJS_renderModule = new (function() {
         pickListenersState.listeners = listeners || [];
     };
 
-    /**
-     * Set the current node render listeners
-     */
     this.setRenderListeners = function(id, listeners) {
         if (arguments.length == 0) {
             renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
@@ -725,9 +658,6 @@ var SceneJS_renderModule = new (function() {
         renderListenersState.listeners = listeners || [];
     };
 
-    /**
-     * Set user-defined GLSL
-     */
     this.setShader = function(id, shader) {
         if (arguments.length == 0) {
             shaderState = this._DEFAULT_SHADER_STATE;
@@ -762,7 +692,6 @@ var SceneJS_renderModule = new (function() {
      * Then we create the state graph node, which has the program and pointers to
      * the current state soup elements.
      *
-
      */
     this.setGeometry = function(geoId, geo) {
 
@@ -773,7 +702,7 @@ var SceneJS_renderModule = new (function() {
         var node;
         var id;
 
-        if (this.compileMode != SceneJS_renderModule.COMPILE_SCENE) {
+        if (this.compileMode != SceneJS_DrawList.COMPILE_SCENE) {
 
             /* Dynamic state reattachment for scene branch compilation.
              *
@@ -789,9 +718,6 @@ var SceneJS_renderModule = new (function() {
              * if their reference count has dropped to zero.
              *
              */
-            if (idPrefix) {
-                id = idPrefix + geoId;
-            }
             node = this._nodeMap[id];
             if (node.renderListenersState._stateId != renderListenersState._stateId) {
                 this._releaseState(node.renderListenersState);
@@ -804,14 +730,15 @@ var SceneJS_renderModule = new (function() {
                 pickListenersState._nodeCount++;
             }
 
-            // This breaks BioDigital Human's green bounding box -
-            // makes it persist after fly-to:
+            // The following commented out - breaks BioDigital Human's green bounding box -
+            // makes it persist after fly-to.
+            // Solution may be in using a "flags" node instead of per-node flags.
 
-            //                        if (node.flagsState._stateId != flagsState._stateId) {
-            //                            this._releaseState(node.flagsState);
-            //                            node.flagsState = flagsState;
-            //                            flagsState._nodeCount++;
-            //                        }
+//                                    if (node.flagsState._stateId != flagsState._stateId) {
+//                                        this._releaseState(node.flagsState);
+//                                        node.flagsState = flagsState;
+//                                        flagsState._nodeCount++;
+//                                    }
             return;
         }
 
@@ -835,10 +762,6 @@ var SceneJS_renderModule = new (function() {
         /* Create or re-use a program
          */
         var program = this._getProgram(this._stateHash);    // Touches for LRU cache
-
-        if (idPrefix) {
-            id = idPrefix + geoId;
-        }
 
         geoState._nodeCount++;
         flagsState._nodeCount++;
@@ -887,7 +810,7 @@ var SceneJS_renderModule = new (function() {
             renderListenersState:   renderListenersState,
             shaderState:            shaderState,
 
-            layerName:              SceneJS_layerModule.getLayer()
+            layerName:SceneJS_layerModule.getLayer()
         };
 
         this._states.nodeMap[id] = node;
@@ -896,15 +819,11 @@ var SceneJS_renderModule = new (function() {
 
         /* Make the display list node findable by its geometry scene nodes
          */
-        var geoNodeMap = this._states.geoNodesMap[geoId];
-        if (!geoNodeMap) {
-            geoNodeMap = this._states.geoNodesMap[geoId] = [];
+        var geoNodesMap = this._states.geoNodesMap[geoId];
+        if (!geoNodesMap) {
+            geoNodesMap = this._states.geoNodesMap[geoId] = [];
         }
-        geoNodeMap.push(node);
-
-        /* If node has boundary, add to BVH
-         */
-        //  SceneJS._bvhModule.insertNode(geo.boundary, this._states.sceneId, id);
+        geoNodesMap.push(node);
     };
 
     this._attachState = function(node, stateName, soupState) {
@@ -978,11 +897,6 @@ var SceneJS_renderModule = new (function() {
         }
     };
 
-    //    function hintBinSort() {
-    //        states.rendersUntilSort = stateSortDelay;
-    //        states.needSort = false;
-    //    }
-
     this._forceBinSort = function(rebuildSortIDs) {
         if (rebuildSortIDs) {
             this._states.needSortIds = rebuildSortIDs;
@@ -1046,7 +960,7 @@ var SceneJS_renderModule = new (function() {
         var nTransparent = 0;
         var _transparentBin = transparentBin;
 
-        var drawListFilter = false;
+        var drawListFilter = true;
 
         if (drawListFilter && lenEnabledBin > 0) {
             for (var i = 0; i < lenEnabledBin; i++) {
@@ -1128,7 +1042,7 @@ var SceneJS_renderModule = new (function() {
             }
             context.disable(context.BLEND);
         }
-    }
+    };
 
     //-----------------------------------------------------------------------------------------------------------------
     //  Shader generation
@@ -1145,7 +1059,7 @@ var SceneJS_renderModule = new (function() {
             morphState.hash,
             geoState.hash
         ]).join(";");
-    }
+    };
 
     this._getProgram = function(stateHash) {
         var program = this._programs[stateHash];
@@ -1163,7 +1077,7 @@ var SceneJS_renderModule = new (function() {
         }
         program.refCount++;
         return program;
-    }
+    };
 
     this._releaseProgram = function(program) {
         if (--program.refCount <= 0) {
@@ -1197,7 +1111,7 @@ var SceneJS_renderModule = new (function() {
             console.error("-----------------------------------------------------------------------------------------:");
             throw SceneJS_errorModule.fatalError(SceneJS.errors.ERROR, "Failed to create SceneJS Shader: " + e);
         }
-    }
+    };
 
     this._logShaderLoggingSource = function(src) {
         for (var i = 0, len = src.length; i < len; i++) {
@@ -1241,7 +1155,7 @@ var SceneJS_renderModule = new (function() {
 
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
-            if (morphState.morph.target1.vertexBuf) {      // target2 has these arrays also
+            if (morphState.morph.targets[0].vertexBuf) {      // target2 has these arrays also
                 src.push("attribute vec3 SCENEJS_aMorphVertex;");
             }
         }
@@ -1254,7 +1168,7 @@ var SceneJS_renderModule = new (function() {
         }
 
         if (morphing) {
-            if (morphState.morph.target1.vertexBuf) {
+            if (morphState.morph.targets[0].vertexBuf) {
                 src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
 
                 if (vertexHooks.modelPos) {
@@ -1382,11 +1296,11 @@ var SceneJS_renderModule = new (function() {
      *==================================================================================================================*/
 
     this._isTexturing = function() {
-        if (texState.layers.length > 0) {
+        if (texState.core && texState.core.layers.length > 0) {
             if (geoState.geo.uvBuf || geoState.geo.uvBuf2) {
                 return true;
             }
-            if (morphState.morph && (morphState.morph.target1.uvBuf || morphState.morph.target1.uvBuf2)) {
+            if (morphState.morph && (morphState.morph.targets[0].uvBuf || morphState.morph.targets[0].uvBuf2)) {
                 return true;
             }
         }
@@ -1398,7 +1312,7 @@ var SceneJS_renderModule = new (function() {
             if (geoState.geo.normalBuf) {
                 return true;
             }
-            if (morphState.morph && morphState.morph.target1.normalBuf) {
+            if (morphState.morph && morphState.morph.targets[0].normalBuf) {
                 return true;
             }
         }
@@ -1505,11 +1419,11 @@ var SceneJS_renderModule = new (function() {
 
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
-            if (morphState.morph.target1.vertexBuf) {      // target2 has these arrays also
+            if (morphState.morph.targets[0].vertexBuf) {      // target2 has these arrays also
                 src.push("attribute vec3 SCENEJS_aMorphVertex;");
             }
             if (lighting) {
-                if (morphState.morph.target1.normalBuf) {
+                if (morphState.morph.targets[0].normalBuf) {
                     src.push("attribute vec3 SCENEJS_aMorphNormal;");
                 }
             }
@@ -1535,12 +1449,12 @@ var SceneJS_renderModule = new (function() {
          * Morphing - morph targets are in same model space as the geometry
          */
         if (morphing) {
-            if (morphState.morph.target1.vertexBuf) {
+            if (morphState.morph.targets[0].vertexBuf) {
                 src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
                 src.push("  modelVertex = vec4(mix(modelVertex.xyz, vMorphVertex.xyz, SCENEJS_uMorphFactor), 1.0); ");
             }
             if (lighting) {
-                if (morphState.morph.target1.normalBuf) {
+                if (morphState.morph.targets[0].normalBuf) {
                     src.push("  vec4 vMorphNormal = vec4(SCENEJS_aMorphNormal, 1.0); ");
                     src.push("  modelNormal = vec4( mix(modelNormal.xyz, vMorphNormal.xyz, 0.0), 1.0); ");
                 }
@@ -1637,7 +1551,7 @@ var SceneJS_renderModule = new (function() {
         var lighting = this._isLighting();
         var fogging = fogState.fog && true;
         var clipping = clipState && clipState.clips.length > 0;
-        var colortrans = colortransState && colortransState.trans;
+        var colortrans = colortransState && colortransState.core;
 
         var src = ["\n"];
 
@@ -1673,8 +1587,9 @@ var SceneJS_renderModule = new (function() {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
 
-            for (var i = 0; i < texState.layers.length; i++) {
-                var layer = texState.layers[i];
+            var layer;
+            for (var i = 0, len =  texState.core.layers.length; i < len; i++) {
+                layer = texState.core.layers[i];
                 src.push("uniform sampler2D SCENEJS_uSampler" + i + ";");
                 if (layer.matrix) {
                     src.push("uniform mat4 SCENEJS_uLayer" + i + "Matrix;");
@@ -1682,7 +1597,6 @@ var SceneJS_renderModule = new (function() {
                 src.push("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
             }
         }
-
 
         /* Vertex color variable
          */
@@ -1767,7 +1681,6 @@ var SceneJS_renderModule = new (function() {
         src.push("  vec3  specularColor = SCENEJS_uMaterialSpecularColor;");
         src.push("  float shine         = SCENEJS_uMaterialShine;");
 
-
         if (fragmentHooks.materialBaseColor) {
             src.push("color=" + fragmentHooks.materialBaseColor + "(color);");
         }
@@ -1834,8 +1747,9 @@ var SceneJS_renderModule = new (function() {
             src.push("  vec4    texturePos;");
             src.push("  vec2    textureCoord=vec2(0.0,0.0);");
 
-            for (var i = 0; i < texState.layers.length; i++) {
-                var layer = texState.layers[i];
+            var layer;
+            for (var i = 0, len = texState.core.layers.length; i < len; i++) {
+                layer = texState.core.layers[i];
 
                 /* Texture input
                  */
@@ -1884,7 +1798,6 @@ var SceneJS_renderModule = new (function() {
 
                 /* Texture output
                  */
-
                 if (layer.applyTo == "baseColor") {
                     if (layer.blendMode == "multiply") {
                         src.push("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");

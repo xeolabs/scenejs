@@ -24,12 +24,12 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setMaterial(idStack[stackLen - 1], materialStack[stackLen - 1]);
-                    } else { // Full compile supplies it's own default states
-                        SceneJS_renderModule.setMaterial();
+                        SceneJS_DrawList.setMaterial(idStack[stackLen - 1], materialStack[stackLen - 1]);
+                    } else {
+                        SceneJS_DrawList.setMaterial();
                     }
                     dirty = false;
                 }
@@ -56,7 +56,6 @@ new (function() {
             color.g != undefined && color.g != null ? color.g : 0.0,
             color.b != undefined && color.b != null ? color.b : 0.0
         ] : DEFAULT_MATERIAL.baseColor;
-        this._flagDirty();
     };
 
     Material.prototype.getBaseColor = function() {
@@ -73,7 +72,6 @@ new (function() {
             color.g != undefined && color.g != null ? color.g : 0.0,
             color.b != undefined && color.b != null ? color.b : 0.0
         ] : DEFAULT_MATERIAL.specularColor;
-        this._flagDirty();
     };
 
     Material.prototype.getSpecularColor = function() {
@@ -86,7 +84,6 @@ new (function() {
 
     Material.prototype.setSpecular = function(specular) {
         this.core.specular = (specular != undefined && specular != null) ? specular : DEFAULT_MATERIAL.specular;
-        this._flagDirty();
     };
 
     Material.prototype.getSpecular = function() {
@@ -95,7 +92,6 @@ new (function() {
 
     Material.prototype.setShine = function(shine) {
         this.core.shine = (shine != undefined && shine != null) ? shine : DEFAULT_MATERIAL.shine;
-        this._flagDirty();
     };
 
     Material.prototype.getShine = function() {
@@ -104,7 +100,6 @@ new (function() {
 
     Material.prototype.setReflect = function(reflect) {
         this.core.reflect = (reflect != undefined && reflect != null) ? reflect : DEFAULT_MATERIAL.reflect;
-        this._flagDirty();
     };
 
     Material.prototype.getReflect = function() {
@@ -113,7 +108,6 @@ new (function() {
 
     Material.prototype.setEmit = function(emit) {
         this.core.emit = (emit != undefined && emit != null) ? emit : DEFAULT_MATERIAL.emit;
-        this._flagDirty();
     };
 
     Material.prototype.getEmit = function() {
@@ -122,7 +116,6 @@ new (function() {
 
     Material.prototype.setAlpha = function(alpha) {
         this.core.alpha = (alpha != undefined && alpha != null) ? alpha : DEFAULT_MATERIAL.alpha;
-        this._flagDirty();
     };
 
     Material.prototype.getAlpha = function() {
@@ -131,16 +124,15 @@ new (function() {
 
     Material.prototype.setOpacity = function(opacity) {
         this.core.opacity = (opacity != undefined && opacity != null) ? opacity : DEFAULT_MATERIAL.opacity;
-        this._flagDirty();
     };
 
     Material.prototype.getOpacity = function() {
         return this.core.opacity;
     };
 
-    Material.prototype._compile = function(traversalContext) {
+    Material.prototype._compile = function() {
         this._preCompile();
-        this._compileNodes(traversalContext);
+        this._compileNodes();
         this._postCompile();
     };
 
@@ -165,12 +157,7 @@ new (function() {
         //        this._material.fixed = (origMemoLevel == 1); // State not changed because of update to this node
 
         idStack[stackLen] = this.attr.id;           // Push material
-        materialStack[stackLen] = this.core;
-
-        if (stackLen > 0) {
-            this._buildStateDep(materialStack[stackLen - 1]);
-        }
-
+        materialStack[stackLen] = this.core;       
         stackLen++;
         dirty = true;
     };
@@ -181,11 +168,6 @@ new (function() {
     };
 
 
-    Material.prototype._destroy = function() {
-        if (this._destroyed) {
-            return;
-        }
-        this._destroyed = true;
-    };
+    Material.prototype._destroy = function() {};
 
 })();

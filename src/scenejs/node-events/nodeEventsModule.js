@@ -22,9 +22,9 @@ var SceneJS_nodeEventsModule = new (function() {
             function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setRenderListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
+                        SceneJS_DrawList.setRenderListeners(idStack[stackLen - 1], listenerStack.slice(0, stackLen));
                     } else {
-                        SceneJS_renderModule.setRenderListeners();
+                        SceneJS_DrawList.setRenderListeners();
                     }
                     dirty = false;
                 }
@@ -79,9 +79,9 @@ var SceneJS_nodeEventsModule = new (function() {
 //            function() {
 //                if (dirty) {
 //                    if (idStackLen > 0) {
-//                        SceneJS_renderModule.setRenderListeners(idStack[idStackLen - 1], listenerStack.slice(0, listenerStackLen));
+//                        SceneJS_DrawList.setRenderListeners(idStack[idStackLen - 1], listenerStack.slice(0, listenerStackLen));
 //                    } else {
-//                        SceneJS_renderModule.setRenderListeners();
+//                        SceneJS_DrawList.setRenderListeners();
 //                    }
 //                    dirty = false;
 //                }

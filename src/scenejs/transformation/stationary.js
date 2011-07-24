@@ -2,8 +2,9 @@
 
     var Stationary = SceneJS.createNodeType("stationary");
 
-    Stationary.prototype._compile = function(traversalContext) {
+    Stationary.prototype._compile = function() {
 
+        
         var origMemoLevel = this._compileMemoLevel;
 
         var superXform = SceneJS_viewTransformModule.transform;
@@ -19,16 +20,17 @@
                     fixed: origMemoLevel == 1
                 };
 
-                if (superXform.fixed && !SceneJS_instancingModule.instancing()) {
+                if (superXform.fixed) {
                     this._compileMemoLevel = 1;
                 }
            }
             SceneJS_viewTransformModule.pushTransform(this.attr.id, this._xform);
-            this._compileNodes(traversalContext);
+            this._compileNodes();
             SceneJS_viewTransformModule.popTransform();
         } else {
-            this._compileNodes(traversalContext);
+            this._compileNodes();
         }
+
     };
 
 })();

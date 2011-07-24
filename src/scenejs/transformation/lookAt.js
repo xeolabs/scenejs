@@ -187,42 +187,24 @@
         };
     };
 
-    Lookat.prototype._compile = function(traversalContext) {
-        this._preCompile();
-        this._compileNodes(traversalContext);
-        this._postCompile();
-    };
-
-    Lookat.prototype._preCompile = function() {
-        var origMemoLevel = this._compileMemoLevel;
+    Lookat.prototype._compile = function() {
         if (this._compileMemoLevel == 0) {
             this._mat = SceneJS_math_lookAtMat4c(
                     this.core.eyeX, this.core.eyeY, this.core.eyeZ,
                     this.core.lookX, this.core.lookY, this.core.lookZ,
                     this.core.upX, this.core.upY, this.core.upZ);
             this._compileMemoLevel = 1;
-        }
-        var superXform = SceneJS_viewTransformModule.transform;
-        if (this._compileMemoLevel < 2 || (!superXform.fixed)) {
-            var tempMat = SceneJS_math_mat4();
-            SceneJS_math_mulMat4(superXform.matrix, this._mat, tempMat);
-
-            this._xf.matrix = tempMat;
+            this._xf.matrix = this._mat;
             this._xf.lookAt = {
                 eye: [this.core.eyeX, this.core.eyeY, this.core.eyeZ ],
                 look: [this.core.lookX, this.core.lookY, this.core.lookZ ],
                 up:  [this.core.upX, this.core.upY, this.core.upZ ]
             };
-            this._xf.fixed = origMemoLevel == 2;
-
-            if (this._compileMemoLevel == 1 && superXform.fixed && !SceneJS_instancingModule.instancing()) {   // Bump up memoization level if space fixed
-                this._compileMemoLevel = 2;
-            }
         }
         SceneJS_viewTransformModule.pushTransform(this.attr.id, this._xf);
-    };
 
-    Lookat.prototype._postCompile = function() {
+        this._compileNodes();
+
         SceneJS_viewTransformModule.popTransform();
     };
 

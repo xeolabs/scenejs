@@ -198,32 +198,33 @@ var SceneJS_NodeRenderer = function(cfg) {
         }
 
         /*----------------------------------------------------------------------------------------------------------
-         * texture
-         *
-         * Handle texture here so we can efficiently abort this node if configured to wait for textures
+         * texture         
          *--------------------------------------------------------------------------------------------------------*/
 
         if (node.texState._stateId != this._lastTexStateId) {
-            var numLayers = node.texState.layers.length;
-            var layer;
-            var countBound = 0;
-            for (var j = 0; j < numLayers; j++) {
-                layer = node.texState.layers[j];
-                if (layer.texture) {
-                    if (program.bindTexture("SCENEJS_uSampler" + j, layer.texture, j)) {
-                        countBound++;
+            var core = node.texState.core;
+            if (core) {
+                var numLayers = core.layers.length;
+                var layer;
+                var countBound = 0;
+                for (var j = 0; j < numLayers; j++) {
+                    layer = core.layers[j];
+                    if (layer.texture) {
+                        if (program.bindTexture("SCENEJS_uSampler" + j, layer.texture, j)) {
+                            countBound++;
+                        }
+                        if (layer.matrixAsArray) { // Must bind matrix in any case
+                            program.setUniform("SCENEJS_uLayer" + j + "Matrix", layer.matrixAsArray);
+                        }
+                        program.setUniform("SCENEJS_uLayer" + j + "BlendFactor", layer.blendFactor);
                     }
-                    if (layer.matrixAsArray) { // Must bind matrix in any case
-                        program.setUniform("SCENEJS_uLayer" + j + "Matrix", layer.matrixAsArray);
-                    }
-                    program.setUniform("SCENEJS_uLayer" + j + "BlendFactor", layer.blendFactor);
                 }
+                //            if (numLayers != countBound) {
+                //                if (node.texState.params.waitForLoad) { // Abort if waiting for missing textures
+                //                    return;
+                //                }
+                //            }
             }
-//            if (numLayers != countBound) {
-//                if (node.texState.params.waitForLoad) { // Abort if waiting for missing textures
-//                    return;
-//                }
-//            }
             this._lastTexStateId = node.texState._stateId;
         }
 
@@ -261,8 +262,8 @@ var SceneJS_NodeRenderer = function(cfg) {
 
                 morph = node.morphState.morph;
 
-                target1 = morph.target1;
-                target2 = morph.target2;
+                target1 = morph.targets[morph.key1];
+                target2 = morph.targets[morph.key2];
 
                 if (target1.vertexBuf) {
                     program.bindFloatArrayBuffer("SCENEJS_aVertex", target1.vertexBuf);
@@ -302,7 +303,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                 program.bindFloatArrayBuffer("SCENEJS_aNormal", geo.normalBuf);
             }
             // TODO
-            if (node.texState && node.texState.layers.length > 0) {
+            if (node.texState && node.texState.core && node.texState.core.layers.length > 0) {
                 if (geo.uvBuf) {
                     program.bindFloatArrayBuffer("SCENEJS_aUVCoord", geo.uvBuf);
                 }
@@ -443,7 +444,7 @@ var SceneJS_NodeRenderer = function(cfg) {
              * colortrans
              *--------------------------------------------------------------------------------------------------------*/
 
-            if (node.colortransState && node.colortransState.trans
+            if (node.colortransState && node.colortransState.core
                     && (node.colortransState._stateId != this._lastColortransStateId ||
                         node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable colortrans
 
@@ -452,13 +453,13 @@ var SceneJS_NodeRenderer = function(cfg) {
                 if (node.flagsState.flags.colortrans === false) {
                     program.setUniform("SCENEJS_uColorTransMode", 0);  // Disable
                 } else {
-                    var trans = node.colortransState.trans;
-                    var scale = trans.scale;
-                    var add = trans.add;
+                    var core = node.colortransState.core;
+                    var scale = core.scale;
+                    var add = core.add;
                     program.setUniform("SCENEJS_uColorTransMode", 1);  // Enable
                     program.setUniform("SCENEJS_uColorTransScale", [scale.r, scale.g, scale.b, scale.a]);  // Scale
                     program.setUniform("SCENEJS_uColorTransAdd", [add.r, add.g, add.b, add.a]);  // Scale
-                    program.setUniform("SCENEJS_uColorTransSaturation", trans.saturation);  // Saturation
+                    program.setUniform("SCENEJS_uColorTransSaturation", core.saturation);  // Saturation
                     this._lastColortransStateId = node.colortransState._stateId;
                 }
             }
@@ -487,7 +488,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                  * may linger in the shader uniform if there is no material state change for the next node.
                  */
                 if (node.flagsState && node.flagsState.flags.highlight) {
-                   // program.setUniform("SCENEJS_uMaterialBaseColor", material.highlightBaseColor);
+                    // program.setUniform("SCENEJS_uMaterialBaseColor", material.highlightBaseColor);
                     this._lastMaterialStateId = null;
                 }
             }

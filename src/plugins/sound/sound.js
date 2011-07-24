@@ -14,7 +14,7 @@ SceneJS.Sound.prototype._init = function(params) {
     this._loaded = false;
 };
 
-SceneJS.Sound.prototype._compile = function(traversalContext) {
+SceneJS.Sound.prototype._compile = function() {
     if (!this._loaded && soundManager.supported())
     {
         this._sound = soundManager.createSound(this._soundParams);
@@ -72,7 +72,7 @@ SceneJS.Sound.prototype._compile = function(traversalContext) {
         SceneJS_compileModule.nodeUpdated(this);
     }
 
-    this._compileNodes(traversalContext);
+    this._compileNodes();
 };
 
 SceneJS.Sound.prototype.setVolume = function(volume) {

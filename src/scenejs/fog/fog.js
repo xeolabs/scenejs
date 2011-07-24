@@ -53,9 +53,9 @@ new (function() {
             function(params) {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setFog(idStack[stackLen - 1], fogStack[stackLen - 1]);
+                        SceneJS_DrawList.setFog(idStack[stackLen - 1], fogStack[stackLen - 1]);
                     } else { // Full compile supplies it's own default states
-                        SceneJS_renderModule.setFog();
+                        SceneJS_DrawList.setFog();
                     }
                     dirty = false;
                 }
@@ -154,9 +154,9 @@ new (function() {
         };
     };
 
-    Fog.prototype._compile = function(traversalContext) {
+    Fog.prototype._compile = function() {
         this._preCompile();
-        this._compileNodes(traversalContext);
+        this._compileNodes();
         this._postCompile();
     };
 

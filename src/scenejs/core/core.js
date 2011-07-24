@@ -383,44 +383,12 @@ var SceneJS = {
         this.setSupplier = function(type, supplier) {
             suppliers[type] = supplier;
         };
-        this.getState = function(type, id) {
+        this.getState = function(type, sceneId, id) {
             var s = suppliers[type];
             if (!s) {
                 throw SceneJS_errorModule.fatalError("Internal error - Compilation state supplier not found: '" + type + "'");
             }
-            return s.get(id);
+            return s.get(sceneId, id);
         };
     })()
-};
-
-var SceneJS_State = function(cfg) {
-    this.attr = cfg.attr || {};
-    this.state = cfg.state || {};
-    if (cfg.parent) {
-        cfg.parent.addChild(this);
-    }
-    this.children = [];
-    this.dirty = true;
-    this._cleanFunc = cfg.cleanFunc;
-};
-
-SceneJS_State.prototype.addChild = function(state) {
-    state.parent = this;
-    this.children.push(state);
-};
-
-SceneJS_State.prototype.setDirty = function() {
-    if (this.dirty) {
-        return;
-    }
-    this.dirty = true;
-    if (this.children.length > 0) {
-        var child;
-        for (var i = 0, len = this.children.length; i < len; i++) {
-            child = this.children[i];
-            if (!child.dirty) {
-                child.setDirty();
-            }
-        }
-    }
 };

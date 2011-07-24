@@ -18,12 +18,12 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_renderModule.setColortrans(idStack[stackLen - 1], colortransStack[stackLen - 1]);
+                        SceneJS_DrawList.setColortrans(idStack[stackLen - 1], colortransStack[stackLen - 1]);
                     } else {
-                        SceneJS_renderModule.setColortrans();
+                        SceneJS_DrawList.setColortrans();
                     }
                     dirty = false;
                 }
@@ -151,20 +151,15 @@ new (function() {
         return this.core.add;
     };
 
-    Colortrans.prototype._compile = function(traversalContext) {
-        this._preCompile();
-        this._compileNodes(traversalContext);
-        this._postCompile();
-    };
+    Colortrans.prototype._compile = function() {
 
-    Colortrans.prototype._preCompile = function() {
         idStack[stackLen] = this.attr.id;
         colortransStack[stackLen] = this.core;
         stackLen++;
         dirty = true;
-    };
 
-    Colortrans.prototype._postCompile = function() {
+        this._compileNodes();
+
         stackLen--;
         dirty = true;
     };

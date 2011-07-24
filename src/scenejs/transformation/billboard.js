@@ -2,13 +2,13 @@
 
     var Billboard = SceneJS.createNodeType("billboard");
 
-    Billboard.prototype._compile = function(traversalContext) {
+    Billboard.prototype._compile = function() {
         this._preCompile();
-        this._compileNodes(traversalContext);
+        this._compileNodes();
         this._postCompile();
     };
 
-    Billboard.prototype._preCompile = function(traversalContext) {
+    Billboard.prototype._preCompile = function() {
         // 0. The base variable
         var superViewXForm = SceneJS_viewTransformModule.transform;
         var lookAt = superViewXForm.lookAt;
@@ -53,7 +53,7 @@
         SceneJS_modelTransformModule.pushTransform(this.attr.id, { matrix: matrix }); // TODO : memoize!
     };
 
-    Billboard.prototype._postCompile = function(traversalContext) {
+    Billboard.prototype._postCompile = function() {
         SceneJS_modelTransformModule.popTransform();
     };
 })();

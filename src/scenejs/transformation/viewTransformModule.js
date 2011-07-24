@@ -49,9 +49,9 @@ var SceneJS_viewTransformModule = new (function() {
                     t.matrixAsArray.set(t.matrix);
                     t.normalMatrixAsArray.set(SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(t.matrix, SceneJS_math_mat4())));
                 }
-                SceneJS_renderModule.setViewTransform(nodeId, t.matrixAsArray, t.normalMatrixAsArray, t.lookAt);
+                SceneJS_DrawList.setViewTransform(nodeId, t.matrixAsArray, t.normalMatrixAsArray, t.lookAt);
             } else {
-                SceneJS_renderModule.setViewTransform();
+                SceneJS_DrawList.setViewTransform();
             }
             dirty = false;
         }
