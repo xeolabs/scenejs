@@ -42,7 +42,7 @@ var SceneJS = {
 
     /** Version of this release
      */
-    VERSION: '0.9',
+    VERSION: '2.0.0',
 
     /** Names of supported WebGL canvas contexts
      */
@@ -134,45 +134,6 @@ var SceneJS = {
         return SceneJS._selectNode(scene);
     },
 
-    //    /**
-    //     * Parses JSON into a subgraph of nodes using iterative depth-first search
-    //     */
-    //    _parseNodeJSON : function(v, scene) {
-    //        var key = SceneJS._createUUID();  // Marking that will work for multiple stack-based iterations
-    //        v["__visited" + key] = true;
-    //        v["__node" + key] = this._createNode(v, scene);
-    //        scene = scene || v["__node" + key];
-    //        var s = [];
-    //        var i, len;
-    //        if (v.nodes) {
-    //            //for (i = 0,len = v.nodes.length; i < len; i++) {
-    //            for (i = v.nodes.length-1; i >= 0; i--) {
-    //                var child = v.nodes[i];
-    //                child["__node" + key] = this._createNode(child, scene);
-    //                child["__parent" + key] = v;
-    //                s.unshift(child);
-    //            }
-    //        }
-    //        var w;
-    //        var u;
-    //        while (s.length > 0) {
-    //            w = s.shift();
-    //            w["__parent" + key]["__node" + key].addNode(w["__node" + key]);
-    //
-    //            if (w.nodes) {
-    //                for (i = w.nodes.length-1; i >= 0; i--) {
-    //                    u = w.nodes[i];
-    //                    if (!u["__parent" + key]) {
-    //                        u["__node" + key] = this._createNode(u, scene);
-    //                        u["__parent" + key] = w;
-    //                        s.unshift(u);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //        return v["__node" + key];
-    //    },
-
     _parseNodeJSON : function(json, scene) {
         var newNode = this._createNode(json, scene)
         scene = scene || newNode;
@@ -189,7 +150,15 @@ var SceneJS = {
 
     _createNode : function(json, scene) {
         json.type = json.type || "node";
-        var nodeType = this._nodeTypes[json.type] || SceneJS._Node;
+        var nodeType;
+        if (json.type == "node") {
+            nodeType = SceneJS._Node;
+        } else {
+            nodeType = this._nodeTypes[json.type];
+            if (!nodeType) {
+                throw SceneJS_errorModule.fatalError("Scene node type not supported in SceneJS " + SceneJS.VERSION + ": '" + json.type + "'");
+            }
+        }
         return new nodeType(json, scene);
     },
 

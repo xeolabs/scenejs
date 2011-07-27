@@ -5824,7 +5824,7 @@
 
             /* Resource ID ensures that we save memory by reusing any teapot that has already been created
              */
-            resource :"teapot",
+            coreId : "teapot",
             create: create
         });
 

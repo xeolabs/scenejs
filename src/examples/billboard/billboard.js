@@ -2,17 +2,11 @@
  This example demonstrates how to define billboards, in this case a simple quad sprite
  object that supports texturing.
 
- This example assumes that you have looked at a few of the other examples
- and now have an understanding of concepts such as basic SceneJS syntax,
- lighting, material, data flow etc.
-
  Cheers to Salomon Brys for this example - salomon.brys@gmail.com
 
- */
+ Jul 24 2012 - Lindsay - Removed instance nodes for V2.0
 
-/*----------------------------------------------------------------------
- * Scene graph definition
- *---------------------------------------------------------------------*/
+ */
 
 SceneJS.createScene({
     type: "scene",
@@ -22,47 +16,6 @@ SceneJS.createScene({
 
     nodes: [
 
-        /*----------------------------------------------------------------------------
-         * The library node marks its subgraph as an explicit library section, causing
-         * traversal to bypass it. These are useful when we want certain nodes within
-         * our scene graph to only be traversed into via instance node that target them.
-         *
-         * We can define these anywhere in our scene.
-         *---------------------------------------------------------------------------*/
-
-        {
-            type: "library",
-            nodes: [
-
-                /*----------------------------------------------------------------------------
-                 * The billboard node ensures that its subgraph is always oriented towards
-                 * the viewpoint.
-                 *---------------------------------------------------------------------------*/
-
-                {
-                    id: "SalomonSprite",
-                    type: "billboard",
-                    nodes: [
-                        {
-                            type: "texture",
-                            layers: [
-                                {
-                                    uri: "images/avatar.png" ,
-                                    blendMode: "add"
-                                }
-                            ],
-                            nodes: [
-                                {
-                                    type: "quad",
-                                    xSize: 1.2,
-                                    ySize: 1.2
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
         {
             type: "lookAt",
             eye : { x: 0, y: 1, z: 25 },
@@ -133,8 +86,25 @@ SceneJS.createScene({
                                                     z: 0,
                                                     nodes: [
                                                         {
-                                                            type: "instance",
-                                                            target: "SalomonSprite"
+                                                            type: "billboard",
+                                                            nodes: [
+                                                                {
+                                                                    type: "texture",
+                                                                    layers: [
+                                                                        {
+                                                                            uri: "images/avatar.png" ,
+                                                                            blendMode: "add"
+                                                                        }
+                                                                    ],
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "quad",
+                                                                            xSize: 1.2,
+                                                                            ySize: 1.2
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -147,8 +117,25 @@ SceneJS.createScene({
                                             z: -1,
                                             nodes: [
                                                 {
-                                                    type: "instance",
-                                                    target: "SalomonSprite"
+                                                    type: "billboard",
+                                                    nodes: [
+                                                        {
+                                                            type: "texture",
+                                                            layers: [
+                                                                {
+                                                                    uri: "images/avatar.png" ,
+                                                                    blendMode: "add"
+                                                                }
+                                                            ],
+                                                            nodes: [
+                                                                {
+                                                                    type: "quad",
+                                                                    xSize: 1.2,
+                                                                    ySize: 1.2
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }
@@ -193,8 +180,6 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * -0.5;
 
-        scene.findNode("pitch").set("angle", pitch);
-        scene.findNode("yaw").set("angle", yaw);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -207,6 +192,14 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-/* Start the scene - more info: http://scenejs.wikispaces.com/scene#Starting
- */
-scene.start();
+scene.start({
+
+    /* It's more efficient to update nodes within the idle func
+     * rather than as each mouse event occurs. That way SceneJS
+     * doesnt have to buffer lots of redundant updates to process.  
+     */
+    idleFunc: function() {
+        scene.findNode("pitch").set("angle", pitch);
+        scene.findNode("yaw").set("angle", yaw);
+    }
+});

@@ -84,7 +84,6 @@ var SceneJS_DrawList = new (function() {
             picking : true,         // Picking enabled
             clipping : true,        // User-defined clipping enabled
             enabled : true,         // Node not culled from traversal
-            visible : true,         // Node visible - when false, everything happens except geometry draw
             transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
             backfaces: true,        // Show backfaces
             frontface: "ccw"        // Default vertex winding for front face
@@ -387,7 +386,7 @@ var SceneJS_DrawList = new (function() {
             if (!state) {
                 state = {
                     _id: id,
-                    _stateId : nextStateId,
+                    _stateId : nextStateId++,
                     _stateType: stateType,
                     _nodeCount: 0
                 };
@@ -396,7 +395,7 @@ var SceneJS_DrawList = new (function() {
         } else { // Recompiling whole scene
             state = {
                 _id: id,
-                _stateId : nextStateId,
+                _stateId : nextStateId++,
                 _stateType: stateType,
                 _nodeCount: 0
             };
@@ -404,7 +403,7 @@ var SceneJS_DrawList = new (function() {
                 typeMap[id] = state;
             }
         }
-        nextStateId++;
+
         return state;
     };
 
@@ -470,6 +469,12 @@ var SceneJS_DrawList = new (function() {
             return;
         }
         flagsState = this._getState(this._FLAGS, id);
+        flags = flags || this._DEFAULT_FLAGS_STATE.flags;
+        //                if (!flagsState.flags
+        //                        || (flagsState.flags.enabled != flags.enabled)
+        //                        || (flagsState.flags.transparent != flags.transparent)) {
+        //                    this._states.lenEnabledBin = 0;
+        //                }
         flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
         this._states.lenEnabledBin = 0;
     };
@@ -693,14 +698,13 @@ var SceneJS_DrawList = new (function() {
      * the current state soup elements.
      *
      */
-    this.setGeometry = function(geoId, geo) {
+    this.setGeometry = function(id, geo) {
 
         /* Pull in dirty states from other modules
          */
         this.marshallStates();
 
         var node;
-        var id;
 
         if (this.compileMode != SceneJS_DrawList.COMPILE_SCENE) {
 
@@ -728,24 +732,19 @@ var SceneJS_DrawList = new (function() {
                 this._releaseState(node.pickListenersState);
                 node.pickListenersState = pickListenersState;
                 pickListenersState._nodeCount++;
+            }         
+            if (node.flagsState._stateId != flagsState._stateId) {
+                this._releaseState(node.flagsState);
+                node.flagsState = flagsState;
+                flagsState._nodeCount++;
             }
-
-            // The following commented out - breaks BioDigital Human's green bounding box -
-            // makes it persist after fly-to.
-            // Solution may be in using a "flags" node instead of per-node flags.
-
-//                                    if (node.flagsState._stateId != flagsState._stateId) {
-//                                        this._releaseState(node.flagsState);
-//                                        node.flagsState = flagsState;
-//                                        flagsState._nodeCount++;
-//                                    }
             return;
         }
 
         /*
          */
 
-        geoState = this._getState(this._GEO, geoId);
+        geoState = this._getState(this._GEO, id);
         geoState.geo = geo;
         geoState.hash = ([                           // Safe to build geometry hash here - geometry is immutable
             geo.normalBuf ? "t" : "f",
@@ -817,11 +816,11 @@ var SceneJS_DrawList = new (function() {
 
         this._states.bin[this._states.lenBin++] = node;
 
-        /* Make the display list node findable by its geometry scene nodes
+        /* Make the display list node findable by its geometry scene node
          */
-        var geoNodesMap = this._states.geoNodesMap[geoId];
+        var geoNodesMap = this._states.geoNodesMap[id];
         if (!geoNodesMap) {
-            geoNodesMap = this._states.geoNodesMap[geoId] = [];
+            geoNodesMap = this._states.geoNodesMap[id] = [];
         }
         geoNodesMap.push(node);
     };
@@ -842,10 +841,10 @@ var SceneJS_DrawList = new (function() {
      *
      * This may be done outside of a render pass.
      */
-    this.removeGeometry = function(sceneId, geoId) {
+    this.removeGeometry = function(sceneId, id) {
         var sceneState = this._sceneStates[sceneId];
         var geoNodesMap = sceneState.geoNodesMap;
-        var nodes = geoNodesMap[geoId];
+        var nodes = geoNodesMap[id];
         if (!nodes) {
             return;
         }
@@ -872,7 +871,8 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.renderListenersState);
             this._releaseState(node.shaderState);
         }
-        geoNodesMap[geoId] = null;
+        geoNodesMap[id] = null;
+        sceneState.lenEnabledBin = 0;
     };
 
 
@@ -910,11 +910,13 @@ var SceneJS_DrawList = new (function() {
      * pathological because they force all other state switches.
      */
     this._preSortBins = function() {
-        if (this._states.needSortIds) {
-            this._createSortIDs(this._states.bin);
+        var states = this._states;
+        if (states.needSortIds) {
+            this._createSortIDs(states.bin);
         }
-        this._states.bin.length = this._states.lenBin;
-        this._states.bin.sort(this._sortNodes);
+        states.bin.length = states.lenBin;
+        states.bin.sort(this._sortNodes);
+        states.lenEnabledBin = 0;
     };
 
     this._sortNodes = function(a, b) {
@@ -954,14 +956,20 @@ var SceneJS_DrawList = new (function() {
 
     this._renderBin = function(states, picking) {
 
+        var context = this._states.canvas.context;
+
         var enabledBin = states.enabledBin;
         var lenEnabledBin = states.lenEnabledBin;
         var nodeRenderer = states.nodeRenderer;
         var nTransparent = 0;
         var _transparentBin = transparentBin;
 
-        var drawListFilter = true;
+        /*---------------------------------------------
+         * TODO: get this working - makes objects vanish
+         * with Human dental implant animation
+         *--------------------------------------------*/
 
+        var drawListFilter = true;
         if (drawListFilter && lenEnabledBin > 0) {
             for (var i = 0; i < lenEnabledBin; i++) {
                 node = enabledBin[i];
@@ -981,10 +989,10 @@ var SceneJS_DrawList = new (function() {
             var bin = states.bin;
 
             var enabledLayers = SceneJS_layerModule.getEnabledLayers();
-            var context = this._states.canvas.context;
             var node;
             var countDestroyed = 0;
             var flags;
+            var _picking = picking;
 
             /* Render opaque nodes while buffering transparent nodes.
              * Layer order is preserved independently within opaque and transparent bins.
@@ -1005,26 +1013,28 @@ var SceneJS_DrawList = new (function() {
                     bin[i] = bin[i + countDestroyed];
                 }
 
-                if (node.layerName && !enabledLayers[node.layerName]) {     // Skip disabled layers
-                    continue;
-                }
-
                 flags = node.flagsState.flags;
 
                 if (flags.enabled === false) {                              // Skip disabled node
                     continue;
                 }
 
-                if (picking && flags.picking === false) {                   // When picking, skip unpickable node
+                if (node.layerName && !enabledLayers[node.layerName]) {     // Skip disabled layers
                     continue;
                 }
 
-                if (!picking && flags.transparent === true) {               // Buffer transparent node when not picking
+                if (_picking && flags.picking === false) {                   // When picking, skip unpickable node
+                    continue;
+                }
+
+                if (!_picking && flags.transparent === true) {               // Buffer transparent node when not picking
                     _transparentBin[nTransparent++] = node;
 
                 } else {
                     nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
-                    enabledBin[states.lenEnabledBin++] = node;
+                    if (drawListFilter) {
+                        enabledBin[states.lenEnabledBin++] = node;
+                    }
                 }
             }
             if (countDestroyed > 0) {
@@ -1588,7 +1598,7 @@ var SceneJS_DrawList = new (function() {
             }
 
             var layer;
-            for (var i = 0, len =  texState.core.layers.length; i < len; i++) {
+            for (var i = 0, len = texState.core.layers.length; i < len; i++) {
                 layer = texState.core.layers[i];
                 src.push("uniform sampler2D SCENEJS_uSampler" + i + ";");
                 if (layer.matrix) {
@@ -1818,7 +1828,7 @@ var SceneJS_DrawList = new (function() {
                     if (layer.blendMode == "multiply") {
                         src.push("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     } else {
-                       src.push("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        src.push("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     }
                 }
 

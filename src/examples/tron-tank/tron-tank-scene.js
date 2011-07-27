@@ -248,7 +248,7 @@ SceneJS.createScene({
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
-var needFrame = true;
+var needUpdate = true;
 var speed = 0;
 var tankPos = { x: 0, y: 0, z: -100 };
 var eyeDir = 0;
@@ -338,10 +338,10 @@ SceneJS.scene("theScene").start({
 
     idleFunc: function() {
 
-        if (!needFrame && ( pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0)) {
+        if (!needUpdate && ( pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0)) {
             return;
         }
-        needFrame = false;
+        needUpdate = false;
         
         pitch += pitchInc;
 

@@ -53,10 +53,10 @@
 
         SceneJS_geometry.prototype._init.call(this, {
 
-            /* Resource ID ensures that we reuse any sphere that has already been created with
+            /* Core ID ensures that we reuse any sphere that has already been created with
              * these parameters instead of wasting memory
              */
-            resource : "sphere_" + radius + "_" + rings + "_" + slices + "_" + semiMajorAxis + "_" + sweep + "_" + sliceDepth,
+            coreId : params.coreId || "sphere_" + radius + "_" + rings + "_" + slices + "_" + semiMajorAxis + "_" + sweep + "_" + sliceDepth,
 
             /* Callback that does the creation in case we can't find matching sphere to reuse
              */

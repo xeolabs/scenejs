@@ -22,11 +22,7 @@ var SceneJS_viewTransformModule = new (function() {
             function() {
                 stackLen = 0;
                 nodeId = null;
-                self.transform = {
-                    matrix : SceneJS_math_identityMat4(),
-                    fixed: true,
-                    identity : true
-                };
+                self.transform = DEFAULT_TRANSFORM;
                 dirty = true;
             });
 

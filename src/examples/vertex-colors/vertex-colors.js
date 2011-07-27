@@ -92,7 +92,7 @@ SceneJS.createScene({
                                                             sourceFormat:"alpha",
                                                             sourceType: "unsignedByte",
                                                             applyTo:"baseColor",
-                                                            blendMode:"add",
+                                                            blendMode:"multiply",
 
                                                             /* Texture rotation angle in degrees
                                                              */

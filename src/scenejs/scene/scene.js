@@ -303,6 +303,8 @@ new (function() {
                         self._compileWithEvents();
                         sleeping = false;
                         SceneJS_compileModule.finishSceneCompile();
+                        SceneJS_layerModule.setActiveLayers(self._layers);   // TODO: needed for display list redraw when scene node not compiled - need to tidy up placementof this
+                                               
                         SceneJS_DrawList.renderFrame({ profileFunc: cfg.profileFunc });
                         requestAnimFrame(window[fnName]);
                     } else {

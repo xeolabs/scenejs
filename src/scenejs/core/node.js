@@ -58,7 +58,6 @@ SceneJS._Node = function(cfg, scene) {
         if (this._init) {
             this._init(cfg);
         }
-        this.state.hash = this._hash ? this._hash() : "";
     }
 };
 
@@ -93,9 +92,9 @@ SceneJS._Node.prototype._createCore = function(coreId) {
             _nodeCount : 1
         };
     }
-    this.state = new SceneJS_State({
-        core: this.core
-    });
+//    this.state = new SceneJS_State({
+//        core: this.core
+//    });
     return this.core;
 };
 

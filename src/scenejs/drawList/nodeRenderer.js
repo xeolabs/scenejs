@@ -104,6 +104,7 @@ var SceneJS_NodeRenderer = function(cfg) {
         this._program = null;
         this._lastRendererState = null;
         this._lastImageBufState = null;
+        this._lastRenderListenersState = null;
         this._pickIndex = 0;
         this.profile = params.doProfile ? {
             program: 0,
@@ -126,9 +127,15 @@ var SceneJS_NodeRenderer = function(cfg) {
          */
         this._queryFacade._setNode(node);
 
+
+        /* Cache some often-used node states for fast access
+         */
+        var nodeFlagsState = node.flagsState;
+        var nodeGeoState = node.geoState;
+
         /* Only pick nodes that are enabled for picking
          */
-        if (this._picking && node.flagsState.flags.picking === false) {
+        if (this._picking && nodeFlagsState.flags.picking === false) {
             return;
         }
 
@@ -236,7 +243,7 @@ var SceneJS_NodeRenderer = function(cfg) {
          * 3. If new geometry then bind VBOs for whatever is not already bound
          *--------------------------------------------------------------------------------------------------------*/
 
-        if ((node.geoState._stateId != this._lastGeoStateId)  // New geometry
+        if ((nodeGeoState._stateId != this._lastGeoStateId)  // New geometry
                 || (node.morphState.morph && node.morphState._stateId != this._lastMorphStateId)) {   // New morphGeometry
 
             /* Disable all vertex arrays
@@ -253,7 +260,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             var morph;
             var target1, target2;
 
-            var geo = node.geoState.geo;
+            var geo = nodeGeoState.geo;
 
             if (node.morphState.morph && node.morphState._stateId != this._lastMorphStateId) {
 
@@ -315,7 +322,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                 program.bindFloatArrayBuffer("SCENEJS_aVertexColor", geo.colorBuf);
             }
             geo.indexBuf.bind();
-            this._lastGeoStateId = node.geoState._stateId;
+            this._lastGeoStateId = nodeGeoState._stateId;
         }
 
         /* Set GL props
@@ -378,12 +385,12 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (node.clipState &&
             (node.clipState._stateId != this._lastClipStateId ||
-             node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable clip
+             nodeFlagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable clip
             var clips = node.clipState.clips;
             var clip;
             for (var k = 0, len = clips.length; k < len; k++) {
                 clip = clips[k];
-                if (node.flagsState.flags.clipping === false) { // Flags disable/enable clipping
+                if (nodeFlagsState.flags.clipping === false) { // Flags disable/enable clipping
                     program.setUniform("SCENEJS_uClipMode" + k, 0);
                 } else if (clip.mode == "inside") {
                     program.setUniform("SCENEJS_uClipMode" + k, 2);
@@ -405,11 +412,11 @@ var SceneJS_NodeRenderer = function(cfg) {
 
             if (node.fogState && node.fogState.fog &&
                 (node.fogState._stateId != this._lastFogStateId ||
-                 node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable fog
+                 nodeFlagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable fog
 
                 var fog = node.fogState.fog;
 
-                if (node.flagsState.flags.fog === false || fog.mode == "disabled") {
+                if (nodeFlagsState.flags.fog === false || fog.mode == "disabled") {
 
                     // When fog is disabled, don't bother loading any of its parameters
                     // because they will be ignored by the shader
@@ -446,11 +453,11 @@ var SceneJS_NodeRenderer = function(cfg) {
 
             if (node.colortransState && node.colortransState.core
                     && (node.colortransState._stateId != this._lastColortransStateId ||
-                        node.flagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable colortrans
+                        nodeFlagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable colortrans
 
                 /* Bind colortrans
                  */
-                if (node.flagsState.flags.colortrans === false) {
+                if (nodeFlagsState.flags.colortrans === false) {
                     program.setUniform("SCENEJS_uColorTransMode", 0);  // Disable
                 } else {
                     var core = node.colortransState.core;
@@ -469,14 +476,14 @@ var SceneJS_NodeRenderer = function(cfg) {
              *--------------------------------------------------------------------------------------------------------*/
 
             if (node.materialState && node.materialState != this._lastMaterialStateId
-                    || node.flagsState._stateId != this._lastFlagsStateId) { // Flags can enable/disable specularity
+                    || nodeFlagsState._stateId != this._lastFlagsStateId) { // Flags can enable/disable specularity
 
                 /* Bind Material
                  */
                 var material = node.materialState.material;
                 program.setUniform("SCENEJS_uMaterialBaseColor", material.baseColor);
                 program.setUniform("SCENEJS_uMaterialSpecularColor", material.specularColor);
-                program.setUniform("SCENEJS_uMaterialSpecular", node.flagsState.flags.specular != false ? material.specular : 0.0);
+                program.setUniform("SCENEJS_uMaterialSpecular", nodeFlagsState.flags.specular != false ? material.specular : 0.0);
                 program.setUniform("SCENEJS_uMaterialShine", material.shine);
                 program.setUniform("SCENEJS_uMaterialEmit", material.emit);
                 program.setUniform("SCENEJS_uMaterialAlpha", material.alpha);
@@ -487,7 +494,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                  * material state change for the next node, otherwise otherwise the highlight
                  * may linger in the shader uniform if there is no material state change for the next node.
                  */
-                if (node.flagsState && node.flagsState.flags.highlight) {
+                if (nodeFlagsState && nodeFlagsState.flags.highlight) {
                     // program.setUniform("SCENEJS_uMaterialBaseColor", material.highlightBaseColor);
                     this._lastMaterialStateId = null;
                 }
@@ -574,11 +581,11 @@ var SceneJS_NodeRenderer = function(cfg) {
          * Set these last because we change certain other states when we determine that flags will change
          *--------------------------------------------------------------------------------------------------------*/
 
-        if (! this._lastFlagsState || node.flagsState._stateId != this._lastFlagsState._stateId) {
+        if (! this._lastFlagsState || nodeFlagsState._stateId != this._lastFlagsState._stateId) {
 
             /*
              */
-            var newFlags = node.flagsState.flags;
+            var newFlags = nodeFlagsState.flags;
             var oldFlags = this._lastFlagsState ? this._lastFlagsState.flags : null;
 
             //            var clear = newFlags.clear;
@@ -634,7 +641,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             //                }
             //            }
 
-            this._lastFlagsState = node.flagsState;
+            this._lastFlagsState = nodeFlagsState;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -643,8 +650,8 @@ var SceneJS_NodeRenderer = function(cfg) {
          * TODO: should we also suppress shading in the renderer? This will currently apply phong shading to the lines.
          *--------------------------------------------------------------------------------------------------------*/
 
-        var primitive = node.geoState.geo.primitive;
-        if (node.flagsState && node.flagsState.flags.wireframe) {
+        var primitive = nodeGeoState.geo.primitive;
+        if (nodeFlagsState && nodeFlagsState.flags.wireframe) {
             if (primitive == gl.TRIANGLES ||
                 primitive == gl.TRIANGLE_STRIP ||
                 primitive == gl.TRIANGLE_FAN) {
@@ -654,7 +661,7 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         gl.drawElements(
                 primitive,
-                node.geoState.geo.indexBuf.numItems,
+                nodeGeoState.geo.indexBuf.numItems,
                 gl.UNSIGNED_SHORT,
                 0);
     };

@@ -20,10 +20,10 @@
 
         SceneJS_geometry.prototype._init.call(this, {
 
-            /* Resource ID ensures that we reuse any quad that has already been created with
+            /* Core ID ensures that we reuse any quad that has already been created with
              * these parameters instead of wasting memory
              */
-            resource : "quad_" + x + "_" + y + (solid ? "_solid" : "_wire"),
+            coreId : params.coreId || "quad_" + x + "_" + y + (solid ? "_solid" : "_wire"),
 
             /* Factory function used when resource not found
              */

@@ -321,7 +321,7 @@ var SceneJS_compileCfg = new (function() {
             set: {
                 attr: {
                     vars: {
-                        level: this.COMPILE_PATH
+                        level: this.COMPILE_BRANCH
                     }
                 }
             }

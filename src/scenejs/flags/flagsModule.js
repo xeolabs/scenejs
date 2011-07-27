@@ -23,7 +23,6 @@ var SceneJS_flagsModule = new (function() {
         picking : true,         // Picking enabled
         clipping : true,        // User-defined clipping enabled
         enabled : true,         // Node not culled from traversal
-        visible : true,         // Node visible - when false, everything happens except geometry draw
         transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,        // Show backfaces
         frontface: "ccw"        // Default vertex winding for front face
@@ -143,7 +142,7 @@ var SceneJS_flagsModule = new (function() {
     };
 
     Flags.prototype.addFlags = function(flags) {
-        SceneJS._apply(flags, this.core.flags);          
+        SceneJS._apply(flags, this.core.flags);
     };
 
     Flags.prototype.getFlags = function() {
@@ -157,6 +156,49 @@ var SceneJS_flagsModule = new (function() {
 
         idStack[stackLen] = this.attr.id;
         flagStack[stackLen] = flags;
+        stackLen++;
+        dirty = true;
+
+        this._compileNodes();
+
+        stackLen--;
+        dirty = true;
+    };
+
+
+
+    var Mask = SceneJS.createNodeType("mask");
+
+    Mask.prototype._init = function(params) {
+        if (this.core._nodeCount == 1) { // This node defines a core
+            if (!params.mask) {
+                throw SceneJS_errorModule.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "mask node 'mask' attribute missing ");
+            }
+            this.setMask(params.mask);
+        }
+    };
+
+    Mask.prototype.setMask = function(mask) {
+        this.core.mask = SceneJS._shallowClone(mask);
+    };
+
+    Mask.prototype.addMask = function(mask) {
+        SceneJS._apply(mask, this.core.mask);
+    };
+
+    Mask.prototype.getMask = function() {
+        return SceneJS._shallowClone(this.core.mask);
+    };
+
+    Mask.prototype._compile = function() {
+        var mask = this.core.mask;
+
+        mask = createFlags(mask);  // TODO: very inefficient
+
+        idStack[stackLen] = this.attr.id;
+        flagStack[stackLen] = mask;
         stackLen++;
         dirty = true;
 

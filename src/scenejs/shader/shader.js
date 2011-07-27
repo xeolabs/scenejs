@@ -74,7 +74,11 @@ new (function() {
 
     Shader.prototype.setVars = function(vars) {
         vars = vars || {};
-        SceneJS._apply(vars, this.core.vars);
+        var core = this.core;
+        if (!core.vars) {
+            core.vars = {};
+        }
+        SceneJS._apply(vars, core.vars);
     };
 
     Shader.prototype._compile = function() {
