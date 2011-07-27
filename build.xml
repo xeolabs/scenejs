@@ -1,4 +1,4 @@
-<project name="SceneJS2.0" basedir="." default="package">
+<project name="SceneJS2.0.0" basedir="." default="package">
 
     <property name="BUILD_MAJOR" value="1"/>
     <property name="BUILD_MINOR" value="0"/>
