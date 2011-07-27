@@ -1,28 +1,34 @@
-# SceneJS
+# SceneJS Version 2
 
-SceneJS is a concise, fast and flexible scene graph framework for WebGL, targeted to be a browser interface
+SceneJS is a lean and fast scene graph framework for WebGL, designed to be a browser interface
 for model and data visualisation systems.
+
+SceneJS V2 refocuses SceneJS on it's original goal, which is to render large numbers of articulated
+objects at the highest frame rate possible while placing the minimum load on JavaScript and the CPU.
+
+Essentially, SceneJS V2 is an optimised list of WebGL calls with a simple scene graph on top. As
+updates are made to the scene graph, SceneJS rebuilds affected portions of the display list, keeping
+the list lean and fast in the process.
 
 Some key features:
 
- * flexible JSON API for scene graph create/update/query
- * message system
- * automatic internal GLSL generation
- * IoC container
- * GL state sorting
- * interpolated animation
- * morphing
- * branching
- * instancing
+ * JSON API
+ * fast
+ * automatic shader generation
+ * GPU state change minimisation
+ * sharable OpenSG-style node cores
+ * geometry morphing
  * text
- * animated textures
- * rendering to textures
+ * texture animation
+ * render-to-texture
  * color, specular, glow, transparency and bump mapping
  * arbitrarily-aligned clipping planes
- * multimaterials
- * material atlasses
- * render order layers
+ * multi-layered textures
+ * texture atlass support
+ * render-order layers
  * debugging modes
+ * messaging system
+ * IoC container
  * and more..
 
 
