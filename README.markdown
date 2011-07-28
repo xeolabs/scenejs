@@ -5,11 +5,13 @@ visualisation systems.
 
 Essentially, SceneJS is an optimised draw list of WebGL calls with a simple scene graph layered on top. As updates are
 made to the scene graph, SceneJS dynamically rebuilds the affected portions of the draw list, while taking care of
-various WebGL things like GLSL shader generation.
+various things like shader generation, state minimisation, depth ordering for transparency and so on.
 
 The SceneJS V2 API deliberately leaves out things like animation, physics and visibility culling, opting instead to
 provide a lean kernel that takes care of fast rendering (and picking). This way, SceneJS is able to concentrate on
  doing that efficiently, leaving you to bolt on your own application-level code to do the rest.
+
+For an example of what can be done with SceneJS, take a look at http://biodigitalhuman.com
 
 Some key features:
 
