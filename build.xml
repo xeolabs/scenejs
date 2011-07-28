@@ -1,6 +1,6 @@
 <project name="SceneJS2.0.0" basedir="." default="package">
 
-    <property name="BUILD_MAJOR" value="1"/>
+    <property name="BUILD_MAJOR" value="2"/>
     <property name="BUILD_MINOR" value="0"/>
     <property name="BUILD_ID" value="0"/>
     <property name="PATCH_ID" value="0"/>
@@ -118,8 +118,6 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/shader/shader.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/node-events/nodeEventsModule.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/clone/clone.js"/>
     </path>
 
     <target name="all" depends="archive"/>
